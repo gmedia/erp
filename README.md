@@ -4,6 +4,7 @@
 ## Technologies
 - [x] Laravel, React.js, Inertia.js, Vite.js, Shadcn UI, Tailwind CSS, TypeScript, ESLint, Prettier, PHPUnit, Pest, FakerPHP. ([Link](https://ui.shadcn.com/docs/installation/laravel))
 - [x] Sail. ([Link](https://laravel.com/docs/12.x/sail))
+- [x] Boost. ([Link](https://github.com/laravel/boost))
 - [ ] Octane. ([Link](https://laravel.com/docs/12.x/octane))
 - [ ] Buggregator (XHProf, VarDumper, Ray, Sentry, SMTP Server, Monolog, Inspector). ([Link](https://docs.buggregator.dev/))
 - [ ] Laravel IDE Helper. ([Link](https://github.com/barryvdh/laravel-ide-helper))
