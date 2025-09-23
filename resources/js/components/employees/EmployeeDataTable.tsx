@@ -69,6 +69,17 @@ interface EmployeeDataTableProps {
   onSearchChange: (search: string) => void
   isLoading?: boolean
   filterValue?: string
+  filters?: {
+    search?: string
+    department?: string
+    position?: string
+    min_salary?: string
+    max_salary?: string
+    hire_date_from?: string
+    hire_date_to?: string
+    sort_by?: string
+    sort_direction?: string
+  }
 }
 
 export function EmployeeDataTable({
@@ -83,6 +94,7 @@ export function EmployeeDataTable({
   onSearchChange,
   isLoading,
   filterValue = "",
+  filters,
 }: EmployeeDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -196,32 +208,41 @@ export function EmployeeDataTable({
     return pages
   }
 
-  const handleExport = () => {
-    const selectedRows = table.getSelectedRowModel().rows
-    const dataToExport = selectedRows.length > 0 ? selectedRows.map(row => row.original) : data
-    
-    const csvContent = [
-      ["Name", "Email", "Phone", "Department", "Position", "Salary", "Hire Date"],
-      ...dataToExport.map(employee => [
-        employee.name,
-        employee.email,
-        employee.phone,
-        employee.department,
-        employee.position,
-        employee.salary ? parseFloat(employee.salary).toFixed(2) : "0.00",
-        employee.hire_date ? new Date(employee.hire_date).toLocaleDateString() : "",
-      ])
-    ].map(row => row.map(field => `"${String(field || "").replace(/"/g, '""')}"`)).join("\n")
+  const handleExport = async () => {
+    try {
+      // Use filters from props
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters || {}).filter(([_, value]) => value !== null && value !== '')
+      )
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "employees.csv"
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    window.URL.revokeObjectURL(url)
+      const response = await fetch('/api/employees/export', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        },
+        body: JSON.stringify(cleanFilters),
+      })
+
+      if (!response.ok) {
+        throw new Error('Export failed')
+      }
+
+      const result = await response.json()
+      
+      // Create download link and trigger download
+      const a = document.createElement('a')
+      a.href = result.url
+      a.download = result.filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      
+    } catch (error) {
+      console.error('Export error:', error)
+      alert('Failed to export employees. Please try again.')
+    }
   }
 
   return (

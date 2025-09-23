@@ -273,6 +273,11 @@ export default function EmployeeIndex() {
             onSearchChange={(search) => handleFilterChange({ search })}
             isLoading={isLoading}
             filterValue={filters.search}
+            filters={{
+              search: filters.search,
+              department: filters.department === 'all-departments' ? '' : filters.department,
+              position: filters.position === 'all-positions' ? '' : filters.position,
+            }}
           />
         </div>
       </div>

@@ -21,6 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // API routes for employee CRUD operations
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::apiResource('employees', EmployeeController::class);
+    Route::post('employees/export', [EmployeeController::class, 'export']);
 });
 
 require __DIR__.'/settings.php';
