@@ -142,4 +142,56 @@ class EmployeeController extends Controller
 
         return response()->json(null, Response::HTTP_NO_CONTENT);
     }
+
+    /**
+     * Export employees to Excel based on filters.
+     */
+    public function export(Request $request)
+    {
+        $validated = $request->validate([
+            'search' => 'nullable|string|max:255',
+            'department' => 'nullable|string|max:255',
+            'position' => 'nullable|string|max:255',
+            'min_salary' => 'nullable|numeric|min:0',
+            'max_salary' => 'nullable|numeric|min:0',
+            'hire_date_from' => 'nullable|date',
+            'hire_date_to' => 'nullable|date',
+            'sort_by' => 'nullable|string|in:name,email,department,position,salary,hire_date,created_at',
+            'sort_direction' => 'nullable|string|in:asc,desc',
+        ]);
+
+        // Map request parameters to match EmployeeExport expectations
+        $filters = [
+            'search' => $validated['search'] ?? null,
+            'department' => $validated['department'] ?? null,
+            'position' => $validated['position'] ?? null,
+            'min_salary' => $validated['min_salary'] ?? null,
+            'max_salary' => $validated['max_salary'] ?? null,
+            'hire_date_from' => $validated['hire_date_from'] ?? null,
+            'hire_date_to' => $validated['hire_date_to'] ?? null,
+            'sort_by' => $validated['sort_by'] ?? 'created_at',
+            'sort_direction' => $validated['sort_direction'] ?? 'desc',
+        ];
+
+        // Remove null values
+        $filters = array_filter($filters);
+
+        // Generate filename with timestamp
+        $filename = 'employees_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+        
+        // Store the file in storage/app/public/exports/
+        $filePath = 'exports/' . $filename;
+        
+        // Generate the Excel file using public disk
+        $export = new \App\Exports\EmployeeExport($filters);
+        \Maatwebsite\Excel\Facades\Excel::store($export, $filePath, 'public');
+
+        // Generate the public URL for download
+        $url = \Illuminate\Support\Facades\Storage::url($filePath);
+
+        return response()->json([
+            'url' => $url,
+            'filename' => $filename,
+        ]);
+    }
 }
