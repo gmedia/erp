@@ -230,7 +230,7 @@ export function EmployeeDataTable({
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
-      
+
     } catch (error) {
       console.error('Export error:', error)
       alert('Failed to export employees. Please try again.')
@@ -343,7 +343,7 @@ export function EmployeeDataTable({
           </TableBody>
         </Table>
       </div>
-      
+
       {/* Pagination Controls */}
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center space-x-2">
@@ -363,12 +363,9 @@ export function EmployeeDataTable({
               <SelectItem value="100">100</SelectItem>
             </SelectContent>
           </Select>
+          <p className="text-sm text-muted-foreground">Showing {pagination.from} to {pagination.to} of {pagination.total} entries</p>
         </div>
-        
-        <div className="text-sm text-muted-foreground">
-          Showing {pagination.from} to {pagination.to} of {pagination.total} entries
-        </div>
-        
+
         <Pagination>
           <PaginationContent>
             <PaginationItem>
@@ -384,9 +381,9 @@ export function EmployeeDataTable({
                 className={pagination.page <= 1 ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
-            
+
             {renderPageNumbers()}
-            
+
             <PaginationItem>
               <PaginationNext
                 href="#"
