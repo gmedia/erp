@@ -14,7 +14,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ChevronDown, Download, PlusCircle } from "lucide-react"
+import { ChevronDown, Download, Filter, PlusCircle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -31,6 +31,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import {
   Pagination,
   PaginationContent,
@@ -81,6 +90,8 @@ interface EmployeeDataTableProps {
     sort_by?: string
     sort_direction?: string
   }
+  onFilterChange: (filters: any) => void
+  onResetFilters: () => void
 }
 
 export function EmployeeDataTable({
@@ -96,11 +107,21 @@ export function EmployeeDataTable({
   isLoading,
   filterValue = "",
   filters,
+  onFilterChange,
+  onResetFilters,
 }: EmployeeDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
   const [searchValue, setSearchValue] = React.useState(filterValue)
+  const [isFilterModalOpen, setIsFilterModalOpen] = React.useState(false)
+
+  // Temporary filter states for modal
+  const [tempFilters, setTempFilters] = React.useState({
+    search: filters?.search || '',
+    department: filters?.department || '',
+    position: filters?.position || '',
+  })
 
   // Create columns with action handlers
   const columnsWithActions = React.useMemo(() => {
@@ -237,6 +258,37 @@ export function EmployeeDataTable({
     }
   }
 
+  const handleOpenFilterModal = () => {
+    setTempFilters({
+      search: filters?.search || '',
+      department: filters?.department || '',
+      position: filters?.position || '',
+    })
+    setIsFilterModalOpen(true)
+  }
+
+  const handleApplyFilters = () => {
+    onFilterChange(tempFilters)
+    setIsFilterModalOpen(false)
+  }
+
+  const handleResetModalFilters = () => {
+    setTempFilters({
+      search: '',
+      department: '',
+      position: '',
+    })
+  }
+
+  const handleResetFiltersFromModal = () => {
+    onResetFilters()
+    setIsFilterModalOpen(false)
+  }
+
+  const handleCloseFilterModal = () => {
+    setIsFilterModalOpen(false)
+  }
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-between py-4">
@@ -248,6 +300,84 @@ export function EmployeeDataTable({
           className="max-w-sm"
         />
         <div className="flex items-center space-x-2">
+          <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Filter className="h-4 w-4 mr-2" />
+                Filters
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Filter Employees</DialogTitle>
+                <DialogDescription>
+                  Apply filters to find specific employees
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Search</label>
+                  <Input
+                    placeholder="Search employees..."
+                    value={tempFilters.search}
+                    onChange={(e) => setTempFilters(prev => ({ ...prev, search: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Department</label>
+                  <Select
+                    value={tempFilters.department}
+                    onValueChange={(value) => setTempFilters(prev => ({ ...prev, department: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="All departments" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all-departments">All departments</SelectItem>
+                      <SelectItem value="Engineering">Engineering</SelectItem>
+                      <SelectItem value="Marketing">Marketing</SelectItem>
+                      <SelectItem value="Sales">Sales</SelectItem>
+                      <SelectItem value="HR">HR</SelectItem>
+                      <SelectItem value="Finance">Finance</SelectItem>
+                      <SelectItem value="Operations">Operations</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Position</label>
+                  <Select
+                    value={tempFilters.position}
+                    onValueChange={(value) => setTempFilters(prev => ({ ...prev, position: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="All positions" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all-positions">All positions</SelectItem>
+                      <SelectItem value="Manager">Manager</SelectItem>
+                      <SelectItem value="Senior Developer">Senior Developer</SelectItem>
+                      <SelectItem value="Developer">Developer</SelectItem>
+                      <SelectItem value="Junior Developer">Junior Developer</SelectItem>
+                      <SelectItem value="Designer">Designer</SelectItem>
+                      <SelectItem value="Analyst">Analyst</SelectItem>
+                      <SelectItem value="Coordinator">Coordinator</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={handleResetModalFilters}>
+                  Reset
+                </Button>
+                <Button variant="outline" onClick={handleResetFiltersFromModal}>
+                  Clear All
+                </Button>
+                <Button onClick={handleApplyFilters}>
+                  Apply Filters
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           <Button
             variant="outline"
             size="sm"
