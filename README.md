@@ -13,6 +13,10 @@
     ```
     ./vendor/bin/phpstan analyse
     ```
+- Format files and overwrite:
+    ```
+    ./node_modules/.bin/blade-formatter --write resources/**/*.blade.php
+    ```
 ## Technologies
 - [x] Laravel, React.js, Inertia.js, Vite.js, Shadcn UI, Tailwind CSS, TypeScript, ESLint, Prettier, PHPUnit, Pest, FakerPHP. ([Link](https://ui.shadcn.com/docs/installation/laravel))
 - [x] Sail. ([Link](https://laravel.com/docs/12.x/sail))
@@ -21,7 +25,7 @@
 - [x] Laravel IDE Helper. ([Link](https://github.com/barryvdh/laravel-ide-helper))
 - [x] Larastan, PHPStan. ([Link](https://github.com/larastan/larastan))
 - [ ] Duster (TLint, PHP_CodeSniffer, PHP CS Fixer, Pint). ([Link](https://github.com/tighten/duster))
-- [ ] blade-formatter. ([Link](https://github.com/shufo/blade-formatter))
+- [x] blade-formatter. ([Link](https://github.com/shufo/blade-formatter))
 - [ ] Vitest. ([Link](https://vitest.dev/guide/))
 - [ ] Laravel Actions. ([Link](https://github.com/lorisleiva/laravel-actions))
 - [ ] Laravel Actions IDE Helper. ([Link](https://github.com/Wulfheart/laravel-actions-ide-helper))
