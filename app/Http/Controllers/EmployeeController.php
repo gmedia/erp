@@ -9,14 +9,67 @@ use Illuminate\Http\Response;
 class EmployeeController extends Controller
 {
     /**
-     * Display a listing of the employees.
+     * Display a listing of the employees with filtering and sorting.
      */
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 15);
         $page = $request->get('page', 1);
         
-        $employees = Employee::paginate($perPage, ['*'], 'page', $page);
+        // Start building the query
+        $query = Employee::query();
+        
+        // Search functionality - search across name, email, phone, department, position
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('department', 'like', "%{$search}%")
+                  ->orWhere('position', 'like', "%{$search}%");
+            });
+        }
+        
+        // Department filter - exact match
+        if ($request->filled('department')) {
+            $query->where('department', $request->get('department'));
+        }
+        
+        // Position filter - exact match
+        if ($request->filled('position')) {
+            $query->where('position', $request->get('position'));
+        }
+        
+        // Salary range filtering
+        if ($request->filled('salary_min')) {
+            $query->where('salary', '>=', $request->get('salary_min'));
+        }
+        
+        if ($request->filled('salary_max')) {
+            $query->where('salary', '<=', $request->get('salary_max'));
+        }
+        
+        // Hire date range filtering
+        if ($request->filled('hire_date_from')) {
+            $query->whereDate('hire_date', '>=', $request->get('hire_date_from'));
+        }
+        
+        if ($request->filled('hire_date_to')) {
+            $query->whereDate('hire_date', '<=', $request->get('hire_date_to'));
+        }
+        
+        // Server-side sorting
+        $sortableColumns = ['name', 'email', 'department', 'position', 'salary', 'hire_date', 'created_at'];
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = strtolower($request->get('sort_order', 'desc')) === 'asc' ? 'asc' : 'desc';
+        
+        if (in_array($sortBy, $sortableColumns)) {
+            $query->orderBy($sortBy, $sortOrder);
+        }
+        
+        // Execute paginated query
+        $employees = $query->paginate($perPage, ['*'], 'page', $page);
         
         return response()->json([
             'data' => $employees->items(),

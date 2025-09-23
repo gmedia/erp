@@ -1,5 +1,5 @@
 import { Head } from "@inertiajs/react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import axios from "axios"
 import { toast } from "sonner"
@@ -8,6 +8,9 @@ import { Employee } from "@/types"
 import { EmployeeDataTable } from "@/components/employees/EmployeeDataTable"
 import { EmployeeForm } from "@/components/employees/EmployeeForm"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,26 +26,38 @@ export default function EmployeeIndex() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null)
+  
+  // Filter states
+  const [filters, setFilters] = useState({
+    search: '',
+    department: '',
+    position: '',
+  })
+  
   const [pagination, setPagination] = useState({
     page: 1,
     per_page: 15,
   })
   const queryClient = useQueryClient()
 
-  // Fetch employees with pagination
+  // Fetch employees with pagination and filters
   const { data: employeesData, isLoading } = useQuery({
-    queryKey: ["employees", pagination],
+    queryKey: ["employees", pagination, filters],
     queryFn: async () => {
       try {
         const response = await axios.get("/api/employees", {
           params: {
             page: pagination.page,
             per_page: pagination.per_page,
+            search: filters.search,
+            department: filters.department === 'all-departments' ? '' : filters.department,
+            position: filters.position === 'all-positions' ? '' : filters.position,
           },
         })
         return response.data || { data: [], meta: { current_page: 1, per_page: 15, total: 0, last_page: 1 } }
       } catch (error) {
         console.error("Failed to fetch employees:", error)
+        toast.error("Failed to load employees")
         return { data: [], meta: { current_page: 1, per_page: 15, total: 0, last_page: 1 } }
       }
     },
@@ -142,6 +157,20 @@ export default function EmployeeIndex() {
     }
   }
 
+  const handleFilterChange = (newFilters: Partial<typeof filters>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }))
+    setPagination(prev => ({ ...prev, page: 1 }))
+  }
+
+  const handleResetFilters = () => {
+    setFilters({
+      search: '',
+      department: '',
+      position: '',
+    })
+    setPagination({ page: 1, per_page: 15 })
+  }
+
   return (
     <>
       <Head title="Employees" />
@@ -158,6 +187,71 @@ export default function EmployeeIndex() {
             Add Employee
           </Button>
         </div>
+
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Search</label>
+                <Input
+                  placeholder="Search employees..."
+                  value={filters.search}
+                  onChange={(e) => handleFilterChange({ search: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Department</label>
+                <Select
+                  value={filters.department}
+                  onValueChange={(value) => handleFilterChange({ department: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All departments" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all-departments">All departments</SelectItem>
+                    <SelectItem value="Engineering">Engineering</SelectItem>
+                    <SelectItem value="Marketing">Marketing</SelectItem>
+                    <SelectItem value="Sales">Sales</SelectItem>
+                    <SelectItem value="HR">HR</SelectItem>
+                    <SelectItem value="Finance">Finance</SelectItem>
+                    <SelectItem value="Operations">Operations</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Position</label>
+                <Select
+                  value={filters.position}
+                  onValueChange={(value) => handleFilterChange({ position: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All positions" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all-positions">All positions</SelectItem>
+                    <SelectItem value="Manager">Manager</SelectItem>
+                    <SelectItem value="Senior Developer">Senior Developer</SelectItem>
+                    <SelectItem value="Developer">Developer</SelectItem>
+                    <SelectItem value="Junior Developer">Junior Developer</SelectItem>
+                    <SelectItem value="Designer">Designer</SelectItem>
+                    <SelectItem value="Analyst">Analyst</SelectItem>
+                    <SelectItem value="Coordinator">Coordinator</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-end">
+                <Button
+                  variant="outline"
+                  onClick={handleResetFilters}
+                  className="w-full"
+                >
+                  Reset Filters
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="bg-white rounded-lg shadow">
           <EmployeeDataTable
@@ -176,7 +270,9 @@ export default function EmployeeIndex() {
             }}
             onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
             onPageSizeChange={(per_page) => setPagination({ page: 1, per_page })}
+            onSearchChange={(search) => handleFilterChange({ search })}
             isLoading={isLoading}
+            filterValue={filters.search}
           />
         </div>
       </div>
