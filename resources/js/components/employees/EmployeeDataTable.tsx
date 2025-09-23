@@ -66,7 +66,9 @@ interface EmployeeDataTableProps {
   }
   onPageChange: (page: number) => void
   onPageSizeChange: (per_page: number) => void
+  onSearchChange: (search: string) => void
   isLoading?: boolean
+  filterValue?: string
 }
 
 export function EmployeeDataTable({
@@ -78,12 +80,14 @@ export function EmployeeDataTable({
   pagination,
   onPageChange,
   onPageSizeChange,
+  onSearchChange,
   isLoading,
+  filterValue = "",
 }: EmployeeDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+  const [searchValue, setSearchValue] = React.useState(filterValue)
 
   // Create columns with action handlers
   const columnsWithActions = React.useMemo(() => {
@@ -130,20 +134,34 @@ export function EmployeeDataTable({
     data,
     columns: columnsWithActions,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
-      columnFilters,
       columnVisibility,
       rowSelection,
     },
     manualPagination: true,
   })
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setSearchValue(value)
+  }
+
+  const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      onSearchChange(searchValue)
+    }
+  }
+
+  // Update search when filterValue prop changes
+  React.useEffect(() => {
+    setSearchValue(filterValue)
+  }, [filterValue])
 
   const handlePageChange = (page: number) => {
     onPageChange(page)
@@ -179,7 +197,7 @@ export function EmployeeDataTable({
   }
 
   const handleExport = () => {
-    const selectedRows = table.getFilteredSelectedRowModel().rows
+    const selectedRows = table.getSelectedRowModel().rows
     const dataToExport = selectedRows.length > 0 ? selectedRows.map(row => row.original) : data
     
     const csvContent = [
@@ -210,11 +228,10 @@ export function EmployeeDataTable({
     <div className="w-full">
       <div className="flex items-center justify-between py-4">
         <Input
-          placeholder="Filter employees..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
+          placeholder="Search employees..."
+          value={searchValue}
+          onChange={handleSearchChange}
+          onKeyDown={handleSearchKeyDown}
           className="max-w-sm"
         />
         <div className="flex items-center space-x-2">
