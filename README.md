@@ -1,12 +1,20 @@
 # ERP
 ## Local development setup
 - Run: `./vendor/bin/sail up -d`
+- Run this to generate autocompletion for Facades.
+    ```
+    php artisan ide-helper:generate
+    ```
+- Run this to add phpdocs for your models.
+    ```
+    php artisan ide-helper:models -RW
+    ```
 ## Technologies
 - [x] Laravel, React.js, Inertia.js, Vite.js, Shadcn UI, Tailwind CSS, TypeScript, ESLint, Prettier, PHPUnit, Pest, FakerPHP. ([Link](https://ui.shadcn.com/docs/installation/laravel))
 - [x] Sail. ([Link](https://laravel.com/docs/12.x/sail))
 - [x] Boost. ([Link](https://github.com/laravel/boost))
 - [x] Shadcn UI MCP Server. ([Link](https://javascript.plainenglish.io/i-stopped-writing-ui-code-now-i-let-mcp-servers-build-my-interfaces-with-shadcn-190d0bf4a7db))
-- [ ] Laravel IDE Helper. ([Link](https://github.com/barryvdh/laravel-ide-helper))
+- [x] Laravel IDE Helper. ([Link](https://github.com/barryvdh/laravel-ide-helper))
 - [ ] Larastan, PHPStan. ([Link](https://github.com/larastan/larastan))
 - [ ] Duster (TLint, PHP_CodeSniffer, PHP CS Fixer, Pint). ([Link](https://github.com/tighten/duster))
 - [ ] blade-formatter. ([Link](https://github.com/shufo/blade-formatter))
