@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Employee;
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -19,7 +20,7 @@ class EmployeeExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
         $this->filters = $filters;
     }
 
-    public function query()
+    public function query(): Builder
     {
         $query = Employee::query();
 
@@ -64,7 +65,7 @@ class EmployeeExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
         // Apply sorting
         $sortBy = $this->filters['sort_by'] ?? 'created_at';
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
-        
+
         // Validate sort_by to prevent SQL injection
         $allowedSortColumns = ['name', 'email', 'department', 'position', 'salary', 'hire_date', 'created_at'];
         if (in_array($sortBy, $allowedSortColumns)) {
