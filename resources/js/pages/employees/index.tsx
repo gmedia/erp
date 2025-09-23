@@ -37,21 +37,21 @@ export default function EmployeeIndex() {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null)
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
-  
+
   // Filter states
   const [filters, setFilters] = useState({
     search: '',
     department: '',
     position: '',
   })
-  
+
   // Temporary filter states for modal
   const [tempFilters, setTempFilters] = useState({
     search: '',
     department: '',
     position: '',
   })
-  
+
   const [pagination, setPagination] = useState({
     page: 1,
     per_page: 15,
@@ -312,13 +312,10 @@ export default function EmployeeIndex() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            <Button onClick={handleAddEmployee}>
-              Add Employee
-            </Button>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow">
+        <div className="bg-white rounded-lg">
           <EmployeeDataTable
             data={employees}
             onAddEmployee={handleAddEmployee}
