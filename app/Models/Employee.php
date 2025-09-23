@@ -38,7 +38,7 @@ class Employee extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -51,12 +51,15 @@ class Employee extends Model
     ];
 
     /**
-     * The attributes that should be cast.
+     * Get the attributes that should be cast.
      *
-     * @var array<string, string>
+     * @return array<string, string>
      */
-    protected $casts = [
-        'hire_date' => 'date',
-        'salary' => 'decimal:2',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'hire_date' => 'date',
+            'salary' => 'decimal:2',
+        ];
+    }
 }
