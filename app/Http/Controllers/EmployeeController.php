@@ -15,62 +15,62 @@ class EmployeeController extends Controller
     {
         $perPage = $request->get('per_page', 15);
         $page = $request->get('page', 1);
-        
+
         // Start building the query
         $query = Employee::query();
-        
+
         // Search functionality - search across name, email, phone, department, position
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('department', 'like', "%{$search}%")
-                  ->orWhere('position', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('department', 'like', "%{$search}%")
+                    ->orWhere('position', 'like', "%{$search}%");
             });
         }
-        
+
         // Department filter - exact match
         if ($request->filled('department')) {
             $query->where('department', $request->get('department'));
         }
-        
+
         // Position filter - exact match
         if ($request->filled('position')) {
             $query->where('position', $request->get('position'));
         }
-        
+
         // Salary range filtering
         if ($request->filled('salary_min')) {
             $query->where('salary', '>=', $request->get('salary_min'));
         }
-        
+
         if ($request->filled('salary_max')) {
             $query->where('salary', '<=', $request->get('salary_max'));
         }
-        
+
         // Hire date range filtering
         if ($request->filled('hire_date_from')) {
             $query->whereDate('hire_date', '>=', $request->get('hire_date_from'));
         }
-        
+
         if ($request->filled('hire_date_to')) {
             $query->whereDate('hire_date', '<=', $request->get('hire_date_to'));
         }
-        
+
         // Server-side sorting
         $sortableColumns = ['name', 'email', 'department', 'position', 'salary', 'hire_date', 'created_at'];
         $sortBy = $request->get('sort_by', 'created_at');
         $sortOrder = strtolower($request->get('sort_order', 'desc')) === 'asc' ? 'asc' : 'desc';
-        
+
         if (in_array($sortBy, $sortableColumns)) {
             $query->orderBy($sortBy, $sortOrder);
         }
-        
+
         // Execute paginated query
         $employees = $query->paginate($perPage, ['*'], 'page', $page);
-        
+
         return response()->json([
             'data' => $employees->items(),
             'meta' => [
@@ -81,7 +81,7 @@ class EmployeeController extends Controller
                 'from' => $employees->firstItem(),
                 'to' => $employees->lastItem(),
                 'has_more_pages' => $employees->hasMorePages(),
-            ]
+            ],
         ]);
     }
 
@@ -178,10 +178,10 @@ class EmployeeController extends Controller
 
         // Generate filename with timestamp
         $filename = 'employees_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-        
+
         // Store the file in storage/app/public/exports/
         $filePath = 'exports/' . $filename;
-        
+
         // Generate the Excel file using public disk
         $export = new \App\Exports\EmployeeExport($filters);
         \Maatwebsite\Excel\Facades\Excel::store($export, $filePath, 'public');

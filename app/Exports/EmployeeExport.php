@@ -5,13 +5,13 @@ namespace App\Exports;
 use App\Models\Employee;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class EmployeeExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
+class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
     protected $filters;
 
@@ -25,7 +25,7 @@ class EmployeeExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
         $query = Employee::query();
 
         // Apply search filter
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -35,30 +35,30 @@ class EmployeeExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
         }
 
         // Apply department filter
-        if (!empty($this->filters['department'])) {
+        if (! empty($this->filters['department'])) {
             $query->where('department', $this->filters['department']);
         }
 
         // Apply position filter
-        if (!empty($this->filters['position'])) {
+        if (! empty($this->filters['position'])) {
             $query->where('position', $this->filters['position']);
         }
 
         // Apply salary range filters
-        if (!empty($this->filters['min_salary'])) {
+        if (! empty($this->filters['min_salary'])) {
             $query->where('salary', '>=', $this->filters['min_salary']);
         }
 
-        if (!empty($this->filters['max_salary'])) {
+        if (! empty($this->filters['max_salary'])) {
             $query->where('salary', '<=', $this->filters['max_salary']);
         }
 
         // Apply hire date range filters
-        if (!empty($this->filters['hire_date_from'])) {
+        if (! empty($this->filters['hire_date_from'])) {
             $query->where('hire_date', '>=', $this->filters['hire_date_from']);
         }
 
-        if (!empty($this->filters['hire_date_to'])) {
+        if (! empty($this->filters['hire_date_to'])) {
             $query->where('hire_date', '<=', $this->filters['hire_date_to']);
         }
 
