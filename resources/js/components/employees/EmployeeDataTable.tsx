@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import axios from 'axios'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -215,26 +216,17 @@ export function EmployeeDataTable({
         Object.entries(filters || {}).filter(([_, value]) => value !== null && value !== '')
       )
 
-      const response = await fetch('/api/employees/export', {
-        method: 'POST',
+      const response = await axios.post('/api/employees/export', cleanFilters, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-        },
-        body: JSON.stringify(cleanFilters),
+        }
       })
 
-      if (!response.ok) {
-        throw new Error('Export failed')
-      }
-
-      const result = await response.json()
-      
       // Create download link and trigger download
       const a = document.createElement('a')
-      a.href = result.url
-      a.download = result.filename
+      a.href = response.data.url
+      a.download = response.data.filename
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
