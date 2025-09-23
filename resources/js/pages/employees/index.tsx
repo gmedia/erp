@@ -23,21 +23,33 @@ export default function EmployeeIndex() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null)
+  const [pagination, setPagination] = useState({
+    page: 1,
+    per_page: 15,
+  })
   const queryClient = useQueryClient()
 
-  // Fetch employees
-  const { data: employees = [], isLoading } = useQuery({
-    queryKey: ["employees"],
+  // Fetch employees with pagination
+  const { data: employeesData, isLoading } = useQuery({
+    queryKey: ["employees", pagination],
     queryFn: async () => {
       try {
-        const response = await axios.get("/api/employees")
-        return response.data || []
+        const response = await axios.get("/api/employees", {
+          params: {
+            page: pagination.page,
+            per_page: pagination.per_page,
+          },
+        })
+        return response.data || { data: [], meta: { current_page: 1, per_page: 15, total: 0, last_page: 1 } }
       } catch (error) {
         console.error("Failed to fetch employees:", error)
-        return []
+        return { data: [], meta: { current_page: 1, per_page: 15, total: 0, last_page: 1 } }
       }
     },
   })
+
+  const employees = employeesData?.data || []
+  const meta = employeesData?.meta || { current_page: 1, per_page: 15, total: 0, last_page: 1 }
 
   // Create employee mutation
   const createEmployeeMutation = useMutation({
@@ -154,6 +166,17 @@ export default function EmployeeIndex() {
             onEditEmployee={handleEditEmployee}
             onDeleteEmployee={handleDeleteEmployee}
             onViewEmployee={handleViewEmployee}
+            pagination={{
+              page: meta.current_page,
+              per_page: meta.per_page,
+              total: meta.total,
+              last_page: meta.last_page,
+              from: meta.from || 0,
+              to: meta.to || 0,
+            }}
+            onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
+            onPageSizeChange={(per_page) => setPagination({ page: 1, per_page })}
+            isLoading={isLoading}
           />
         </div>
       </div>
