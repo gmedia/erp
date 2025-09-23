@@ -21,6 +21,11 @@
     ```
     ./node_modules/.bin/blade-formatter --write resources/**/*.blade.php
     ```
+- Run Prettier and ESLint:
+    ```
+    npm run format
+    npm run lint
+    ```
 ## Technologies
 - [x] Laravel, React.js, Inertia.js, Vite.js, Shadcn UI, Tailwind CSS, TypeScript, ESLint, Prettier, PHPUnit, Pest, FakerPHP. ([Link](https://ui.shadcn.com/docs/installation/laravel))
 - [x] Sail. ([Link](https://laravel.com/docs/12.x/sail))
