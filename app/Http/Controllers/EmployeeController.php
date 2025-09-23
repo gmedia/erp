@@ -11,10 +11,25 @@ class EmployeeController extends Controller
     /**
      * Display a listing of the employees.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $employees = Employee::all();
-        return response()->json($employees);
+        $perPage = $request->get('per_page', 15);
+        $page = $request->get('page', 1);
+        
+        $employees = Employee::paginate($perPage, ['*'], 'page', $page);
+        
+        return response()->json([
+            'data' => $employees->items(),
+            'meta' => [
+                'current_page' => $employees->currentPage(),
+                'per_page' => $employees->perPage(),
+                'total' => $employees->total(),
+                'last_page' => $employees->lastPage(),
+                'from' => $employees->firstItem(),
+                'to' => $employees->lastItem(),
+                'has_more_pages' => $employees->hasMorePages(),
+            ]
+        ]);
     }
 
     /**

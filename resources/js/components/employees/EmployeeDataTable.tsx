@@ -24,6 +24,21 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+import {
   Table,
   TableBody,
   TableCell,
@@ -31,6 +46,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Employee } from "@/types"
 import { employeeColumns } from "./EmployeeColumns"
 
@@ -40,6 +56,17 @@ interface EmployeeDataTableProps {
   onEditEmployee: (employee: Employee) => void
   onDeleteEmployee: (employee: Employee) => void
   onViewEmployee: (employee: Employee) => void
+  pagination: {
+    page: number
+    per_page: number
+    total: number
+    last_page: number
+    from: number
+    to: number
+  }
+  onPageChange: (page: number) => void
+  onPageSizeChange: (per_page: number) => void
+  isLoading?: boolean
 }
 
 export function EmployeeDataTable({
@@ -48,6 +75,10 @@ export function EmployeeDataTable({
   onEditEmployee,
   onDeleteEmployee,
   onViewEmployee,
+  pagination,
+  onPageChange,
+  onPageSizeChange,
+  isLoading,
 }: EmployeeDataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -101,7 +132,6 @@ export function EmployeeDataTable({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -112,7 +142,41 @@ export function EmployeeDataTable({
       columnVisibility,
       rowSelection,
     },
+    manualPagination: true,
   })
+
+  const handlePageChange = (page: number) => {
+    onPageChange(page)
+  }
+
+  const handlePageSizeChange = (per_page: string) => {
+    onPageSizeChange(Number(per_page))
+  }
+
+  const renderPageNumbers = () => {
+    const pages = []
+    const maxPages = 5
+    const startPage = Math.max(1, pagination.page - Math.floor(maxPages / 2))
+    const endPage = Math.min(pagination.last_page, startPage + maxPages - 1)
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            href="#"
+            isActive={i === pagination.page}
+            onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+              e.preventDefault()
+              handlePageChange(i)
+            }}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      )
+    }
+    return pages
+  }
 
   const handleExport = () => {
     const selectedRows = table.getFilteredSelectedRowModel().rows
@@ -216,7 +280,17 @@ export function EmployeeDataTable({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  {Array.from({ length: employeeColumns.length }).map((_, cellIndex) => (
+                    <TableCell key={cellIndex}>
+                      <Skeleton className="h-4 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -239,29 +313,65 @@ export function EmployeeDataTable({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+      
+      {/* Pagination Controls */}
+      <div className="flex items-center justify-between py-4">
+        <div className="flex items-center space-x-2">
+          <p className="text-sm text-muted-foreground">Rows per page</p>
+          <Select
+            value={String(pagination.per_page)}
+            onValueChange={handlePageSizeChange}
           >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+            <SelectTrigger className="w-[70px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="15">15</SelectItem>
+              <SelectItem value="25">25</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+              <SelectItem value="100">100</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+        
+        <div className="text-sm text-muted-foreground">
+          Showing {pagination.from} to {pagination.to} of {pagination.total} entries
+        </div>
+        
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                  e.preventDefault()
+                  if (pagination.page > 1) {
+                    handlePageChange(pagination.page - 1)
+                  }
+                }}
+                aria-disabled={pagination.page <= 1}
+                className={pagination.page <= 1 ? "pointer-events-none opacity-50" : ""}
+              />
+            </PaginationItem>
+            
+            {renderPageNumbers()}
+            
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                  e.preventDefault()
+                  if (pagination.page < pagination.last_page) {
+                    handlePageChange(pagination.page + 1)
+                  }
+                }}
+                aria-disabled={pagination.page >= pagination.last_page}
+                className={pagination.page >= pagination.last_page ? "pointer-events-none opacity-50" : ""}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   )
