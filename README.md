@@ -13,6 +13,10 @@
     ```
     ./vendor/bin/phpstan analyse
     ```
+- To fix everything at once:
+    ```
+    ./vendor/bin/duster fix
+    ```
 - Format files and overwrite:
     ```
     ./node_modules/.bin/blade-formatter --write resources/**/*.blade.php
@@ -24,7 +28,7 @@
 - [x] Shadcn UI MCP Server. ([Link](https://javascript.plainenglish.io/i-stopped-writing-ui-code-now-i-let-mcp-servers-build-my-interfaces-with-shadcn-190d0bf4a7db))
 - [x] Laravel IDE Helper. ([Link](https://github.com/barryvdh/laravel-ide-helper))
 - [x] Larastan, PHPStan. ([Link](https://github.com/larastan/larastan))
-- [ ] Duster (TLint, PHP_CodeSniffer, PHP CS Fixer, Pint). ([Link](https://github.com/tighten/duster))
+- [x] Duster (TLint, PHP_CodeSniffer, PHP CS Fixer, Pint). ([Link](https://github.com/tighten/duster))
 - [x] blade-formatter. ([Link](https://github.com/shufo/blade-formatter))
 - [ ] Vitest. ([Link](https://vitest.dev/guide/))
 - [ ] Laravel Actions. ([Link](https://github.com/lorisleiva/laravel-actions))

@@ -3,9 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Models\Employee;
+use Exception;
+use Faker\Factory as Faker;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Faker\Factory as Faker;
 
 class EmployeeCreateCommand extends Command
 {
@@ -29,18 +30,19 @@ class EmployeeCreateCommand extends Command
     public function handle()
     {
         $count = (int) $this->argument('count');
-        
+
         if ($count <= 0) {
             $this->error('Count must be a positive integer.');
+
             return Command::FAILURE;
         }
 
         $faker = Faker::create();
-        
+
         // Check existing employee count
         $existingCount = Employee::count();
         $this->info("Found {$existingCount} existing employees.");
-        
+
         // Define realistic departments and positions
         $departments = [
             'Engineering' => ['Software Engineer', 'Senior Software Engineer', 'Tech Lead', 'Principal Engineer', 'DevOps Engineer', 'QA Engineer'],
@@ -56,9 +58,10 @@ class EmployeeCreateCommand extends Command
         // Calculate max possible unique emails
         $maxPossibleEmails = 10000; // Reasonable limit for dummy data
         $availableSlots = $maxPossibleEmails - $existingCount;
-        
+
         if ($availableSlots <= 0) {
             $this->error('Maximum unique email limit reached. Cannot generate more employees.');
+
             return Command::FAILURE;
         }
 
@@ -82,16 +85,16 @@ class EmployeeCreateCommand extends Command
                     // Select random department and position
                     $department = array_rand($departments);
                     $position = $departments[$department][array_rand($departments[$department])];
-                    
+
                     // Generate unique email
                     $email = $this->generateUniqueEmail($faker);
-                    
+
                     // Generate realistic salary based on position
                     $salary = $this->generateSalaryForPosition($position, $faker);
-                    
+
                     // Generate hire date within last 5 years
                     $hireDate = $faker->dateTimeBetween('-5 years', 'now');
-                    
+
                     Employee::create([
                         'name' => $faker->name,
                         'email' => $email,
@@ -101,13 +104,13 @@ class EmployeeCreateCommand extends Command
                         'salary' => $salary,
                         'hire_date' => $hireDate->format('Y-m-d'),
                     ]);
-                    
+
                     $created++;
                     $progressBar->advance();
-                    
-                } catch (\Exception $e) {
+
+                } catch (Exception $e) {
                     $failed++;
-                    $this->error("Failed to create employee: " . $e->getMessage());
+                    $this->error('Failed to create employee: ' . $e->getMessage());
                 }
             }
         });
@@ -116,12 +119,12 @@ class EmployeeCreateCommand extends Command
         $this->newLine();
 
         $this->info("✅ Successfully created {$created} employees.");
-        
+
         if ($failed > 0) {
             $this->warn("⚠️ Failed to create {$failed} employees.");
         }
 
-        $this->info("📊 Total employees in database: " . Employee::count());
+        $this->info('📊 Total employees in database: ' . Employee::count());
 
         return Command::SUCCESS;
     }
@@ -133,19 +136,19 @@ class EmployeeCreateCommand extends Command
     {
         $maxAttempts = 100;
         $attempts = 0;
-        
+
         do {
             $email = $faker->unique()->safeEmail;
             $exists = Employee::where('email', $email)->exists();
             $attempts++;
-            
+
             if ($attempts >= $maxAttempts) {
                 // Fallback to timestamp-based email if unique generation fails
                 $email = 'employee_' . time() . '_' . rand(1000, 9999) . '@example.com';
                 break;
             }
         } while ($exists);
-        
+
         return $email;
     }
 
@@ -192,7 +195,7 @@ class EmployeeCreateCommand extends Command
         ];
 
         $range = $salaryRanges[$position] ?? [40000, 80000];
-        
+
         return number_format($faker->numberBetween($range[0], $range[1]), 2, '.', '');
     }
 }

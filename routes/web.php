@@ -24,5 +24,5 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::post('employees/export', [EmployeeController::class, 'export']);
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
