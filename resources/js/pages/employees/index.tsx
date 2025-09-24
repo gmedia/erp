@@ -317,7 +317,7 @@ export default function EmployeeIndex() {
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDeleteConfirm}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            className="bg-destructive"
                         >
                             Delete
                         </AlertDialogAction>
