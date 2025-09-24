@@ -297,7 +297,8 @@ export function EmployeeDataTable({
 
     return (
         <div className="w-full">
-            <div className="flex items-center justify-between py-4">
+            <div className="lg:flex items-center justify-between py-4">
+              <div className="flex items-center space-x-2 mb-2">
                 <Input
                     placeholder="Search employees..."
                     value={searchValue}
@@ -305,185 +306,186 @@ export function EmployeeDataTable({
                     onKeyDown={handleSearchKeyDown}
                     className="max-w-sm"
                 />
-                <div className="flex items-center space-x-2">
-                    <Dialog
-                        open={isFilterModalOpen}
-                        onOpenChange={setIsFilterModalOpen}
-                    >
-                        <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                                <Filter className="mr-2 h-4 w-4" />
-                                Filters
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                                <DialogTitle>Filter Employees</DialogTitle>
-                                <DialogDescription>
-                                    Apply filters to find specific employees
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                <div>
-                                    <label className="mb-2 block text-sm font-medium">
-                                        Search
-                                    </label>
-                                    <Input
-                                        placeholder="Search employees..."
-                                        value={tempFilters.search}
-                                        onChange={(e) =>
-                                            setTempFilters((prev) => ({
-                                                ...prev,
-                                                search: e.target.value,
-                                            }))
-                                        }
-                                    />
-                                </div>
-                                <div>
-                                    <label className="mb-2 block text-sm font-medium">
-                                        Department
-                                    </label>
-                                    <Select
-                                        value={tempFilters.department}
-                                        onValueChange={(value) =>
-                                            setTempFilters((prev) => ({
-                                                ...prev,
-                                                department: value,
-                                            }))
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="All departments" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all-departments">
-                                                All departments
-                                            </SelectItem>
-                                            <SelectItem value="Engineering">
-                                                Engineering
-                                            </SelectItem>
-                                            <SelectItem value="Marketing">
-                                                Marketing
-                                            </SelectItem>
-                                            <SelectItem value="Sales">
-                                                Sales
-                                            </SelectItem>
-                                            <SelectItem value="HR">
-                                                HR
-                                            </SelectItem>
-                                            <SelectItem value="Finance">
-                                                Finance
-                                            </SelectItem>
-                                            <SelectItem value="Operations">
-                                                Operations
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div>
-                                    <label className="mb-2 block text-sm font-medium">
-                                        Position
-                                    </label>
-                                    <Select
-                                        value={tempFilters.position}
-                                        onValueChange={(value) =>
-                                            setTempFilters((prev) => ({
-                                                ...prev,
-                                                position: value,
-                                            }))
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="All positions" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all-positions">
-                                                All positions
-                                            </SelectItem>
-                                            <SelectItem value="Manager">
-                                                Manager
-                                            </SelectItem>
-                                            <SelectItem value="Senior Developer">
-                                                Senior Developer
-                                            </SelectItem>
-                                            <SelectItem value="Developer">
-                                                Developer
-                                            </SelectItem>
-                                            <SelectItem value="Junior Developer">
-                                                Junior Developer
-                                            </SelectItem>
-                                            <SelectItem value="Designer">
-                                                Designer
-                                            </SelectItem>
-                                            <SelectItem value="Analyst">
-                                                Analyst
-                                            </SelectItem>
-                                            <SelectItem value="Coordinator">
-                                                Coordinator
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button
-                                    variant="outline"
-                                    onClick={handleResetModalFilters}
-                                >
-                                    Reset
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    onClick={handleResetFiltersFromModal}
-                                >
-                                    Clear All
-                                </Button>
-                                <Button onClick={handleApplyFilters}>
-                                    Apply Filters
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                    <Button
+              </div>
+              <div className="flex items-center space-x-2 mb-2">
+                <Dialog
+                  open={isFilterModalOpen}
+                  onOpenChange={setIsFilterModalOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Filter className="mr-2 h-4 w-4" />
+                      Filters
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Filter Employees</DialogTitle>
+                      <DialogDescription>
+                        Apply filters to find specific employees
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div>
+                        <label className="mb-2 block text-sm font-medium">
+                          Search
+                        </label>
+                        <Input
+                          placeholder="Search employees..."
+                          value={tempFilters.search}
+                          onChange={(e) =>
+                            setTempFilters((prev) => ({
+                              ...prev,
+                              search: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-2 block text-sm font-medium">
+                          Department
+                        </label>
+                        <Select
+                          value={tempFilters.department}
+                          onValueChange={(value) =>
+                            setTempFilters((prev) => ({
+                              ...prev,
+                              department: value,
+                            }))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="All departments" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all-departments">
+                              All departments
+                            </SelectItem>
+                            <SelectItem value="Engineering">
+                              Engineering
+                            </SelectItem>
+                            <SelectItem value="Marketing">
+                              Marketing
+                            </SelectItem>
+                            <SelectItem value="Sales">
+                              Sales
+                            </SelectItem>
+                            <SelectItem value="HR">
+                              HR
+                            </SelectItem>
+                            <SelectItem value="Finance">
+                              Finance
+                            </SelectItem>
+                            <SelectItem value="Operations">
+                              Operations
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="mb-2 block text-sm font-medium">
+                          Position
+                        </label>
+                        <Select
+                          value={tempFilters.position}
+                          onValueChange={(value) =>
+                            setTempFilters((prev) => ({
+                              ...prev,
+                              position: value,
+                            }))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="All positions" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all-positions">
+                              All positions
+                            </SelectItem>
+                            <SelectItem value="Manager">
+                              Manager
+                            </SelectItem>
+                            <SelectItem value="Senior Developer">
+                              Senior Developer
+                            </SelectItem>
+                            <SelectItem value="Developer">
+                              Developer
+                            </SelectItem>
+                            <SelectItem value="Junior Developer">
+                              Junior Developer
+                            </SelectItem>
+                            <SelectItem value="Designer">
+                              Designer
+                            </SelectItem>
+                            <SelectItem value="Analyst">
+                              Analyst
+                            </SelectItem>
+                            <SelectItem value="Coordinator">
+                              Coordinator
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button
                         variant="outline"
-                        size="sm"
-                        onClick={handleExport}
-                        disabled={data.length === 0}
-                    >
-                        <Download className="mr-2 h-4 w-4" />
-                        Export
+                        onClick={handleResetModalFilters}
+                      >
+                        Reset
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={handleResetFiltersFromModal}
+                      >
+                        Clear All
+                      </Button>
+                      <Button onClick={handleApplyFilters}>
+                        Apply Filters
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  disabled={data.length === 0}
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Export
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      Columns <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm">
-                                Columns <ChevronDown className="ml-2 h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            {table
-                                .getAllColumns()
-                                .filter((column) => column.getCanHide())
-                                .map((column) => {
-                                    return (
-                                        <DropdownMenuCheckboxItem
-                                            key={column.id}
-                                            className="capitalize"
-                                            checked={column.getIsVisible()}
-                                            onCheckedChange={(value) =>
-                                                column.toggleVisibility(!!value)
-                                            }
-                                        >
-                                            {column.id}
-                                        </DropdownMenuCheckboxItem>
-                                    );
-                                })}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <Button size="sm" onClick={onAddEmployee}>
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Add Employee
-                    </Button>
-                </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {table
+                      .getAllColumns()
+                      .filter((column) => column.getCanHide())
+                      .map((column) => {
+                        return (
+                          <DropdownMenuCheckboxItem
+                            key={column.id}
+                            className="capitalize"
+                            checked={column.getIsVisible()}
+                            onCheckedChange={(value) =>
+                              column.toggleVisibility(!!value)
+                            }
+                          >
+                            {column.id}
+                          </DropdownMenuCheckboxItem>
+                        );
+                      })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button size="sm" onClick={onAddEmployee}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add
+                </Button>
+              </div>
             </div>
             <div className="rounded-md border">
                 <Table>
