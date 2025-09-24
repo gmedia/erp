@@ -16,7 +16,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Employee } from '@/types';
+import { Employee, EmployeeFormData } from '@/types';
 
 export default function EmployeeIndex() {
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -97,8 +97,23 @@ export default function EmployeeIndex() {
 
     // Create employee mutation
     const createEmployeeMutation = useMutation({
-        mutationFn: async (data: any) => {
-            const response = await axios.post('/api/employees', data);
+        mutationFn: async (data: EmployeeFormData) => {
+            const hireDate = data.hire_date instanceof Date
+                ? data.hire_date
+                : new Date(data.hire_date);
+            const formattedHireDate = hireDate.toISOString().split('T')[0];
+
+            const apiData = {
+                name: data.name,
+                email: data.email,
+                phone: data.phone,
+                department: data.department,
+                position: data.position,
+                salary: data.salary,
+                hire_date: formattedHireDate,
+            };
+
+            const response = await axios.post('/api/employees', apiData);
             return response.data;
         },
         onSuccess: () => {
@@ -107,7 +122,7 @@ export default function EmployeeIndex() {
             setSelectedEmployee(null);
             toast.success('Employee created successfully');
         },
-        onError: (error: any) => {
+        onError: (error: Error & { response?: { data?: { message?: string } } }) => {
             toast.error(
                 error.response?.data?.message || 'Failed to create employee',
             );
@@ -116,8 +131,23 @@ export default function EmployeeIndex() {
 
     // Update employee mutation
     const updateEmployeeMutation = useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: any }) => {
-            const response = await axios.put(`/api/employees/${id}`, data);
+        mutationFn: async ({ id, data }: { id: number; data: EmployeeFormData }) => {
+            const hireDate = data.hire_date instanceof Date
+                ? data.hire_date
+                : new Date(data.hire_date);
+            const formattedHireDate = hireDate.toISOString().split('T')[0];
+
+            const apiData = {
+                name: data.name,
+                email: data.email,
+                phone: data.phone,
+                department: data.department,
+                position: data.position,
+                salary: data.salary,
+                hire_date: formattedHireDate,
+            };
+
+            const response = await axios.put(`/api/employees/${id}`, apiData);
             return response.data;
         },
         onSuccess: () => {
@@ -126,7 +156,7 @@ export default function EmployeeIndex() {
             setSelectedEmployee(null);
             toast.success('Employee updated successfully');
         },
-        onError: (error: any) => {
+        onError: (error: Error & { response?: { data?: { message?: string } } }) => {
             toast.error(
                 error.response?.data?.message || 'Failed to update employee',
             );
@@ -143,7 +173,7 @@ export default function EmployeeIndex() {
             setEmployeeToDelete(null);
             toast.success('Employee deleted successfully');
         },
-        onError: (error: any) => {
+        onError: (error: Error & { response?: { data?: { message?: string } } }) => {
             toast.error(
                 error.response?.data?.message || 'Failed to delete employee',
             );
@@ -169,20 +199,14 @@ export default function EmployeeIndex() {
         toast.info(`Viewing ${employee.name}'s profile`);
     };
 
-    const handleFormSubmit = (data: any) => {
+    const handleFormSubmit = (data: EmployeeFormData) => {
         if (selectedEmployee) {
             updateEmployeeMutation.mutate({
                 id: selectedEmployee.id,
-                data: {
-                    ...data,
-                    hire_date: data.hire_date.toISOString().split('T')[0],
-                },
+                data: data,
             });
         } else {
-            createEmployeeMutation.mutate({
-                ...data,
-                hire_date: data.hire_date.toISOString().split('T')[0],
-            });
+            createEmployeeMutation.mutate(data);
         }
     };
 
