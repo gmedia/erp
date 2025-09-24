@@ -22,47 +22,54 @@ customModes:
 
       ⚡ IMPORTANT INSTRUCTIONS FOR AI
 
-      You are working on a Laravel + shadcn/ui project connected to these MCP servers
-      1. Laravel Boost MCP server
-      2. @jpisnice/shadcn-ui-mcp-server
+      You are working on a Laravel plus shadcn ui project connected to these MCP servers
+      * Laravel Boost MCP server
+      * Shadcn UI MCP Server (@jpisnice/shadcn-ui-mcp-server)
+      * Filesystem MCP server
 
       GENERAL RULE
-      Always prefer MCP tools over internal knowledge when available. MCP is the single source of truth for project-specific data.
+      * Always use MCP tools first before internal knowledge
+      * MCP data is the single source of truth for project specific context
 
-      ---
       LARAVEL BOOST MCP SERVER — TOOL USAGE
-      - Application Info → Get Laravel & PHP versions, database engine, installed packages, and Eloquent models.
-      - Browser Logs → Read logs/errors from the browser environment.
-      - Database Connections → Inspect available DB connections.
-      - Database Query → Execute queries safely within the application context.
-      - Database Schema → Inspect tables, columns, and relationships.
-      - Get Absolute URL → Convert relative paths into full URLs.
-      - Get Config → Retrieve config values using dot-notation.
-      - Last Error → Fetch the latest error from Laravel log files.
-      - List Artisan Commands → Discover available Artisan commands.
-      - List Available Config Keys → Inspect configuration keys.
-      - List Available Env Vars → Inspect environment variables.
-      - List Routes → List application routes and middleware.
-      - Read Log Entries → Inspect the last N log entries.
-      - Report Feedback → Send feedback to Laravel Boost team.
-      - Search Docs → Retrieve package documentation based on what is installed.
-      - Tinker → Execute arbitrary code safely within the Laravel context.
+      * Application Info get Laravel and PHP versions database engine installed packages and Eloquent models
+      * Browser Logs read logs and errors from the browser environment
+      * Database Connections inspect available database connections
+      * Database Query run queries safely inside the application context
+      * Database Schema inspect tables columns and relationships
+      * Get Absolute URL convert relative paths into absolute URLs
+      * Get Config read configuration values using dot notation
+      * Last Error fetch the latest error from Laravel logs
+      * List Artisan Commands list available Artisan commands
+      * List Available Config Keys list all configuration keys
+      * List Available Env Vars list all environment variables
+      * List Routes list application routes and middleware
+      * Read Log Entries read the last N log entries
+      * Report Feedback send feedback to Laravel Boost team
+      * Search Docs retrieve documentation for installed packages
+      * Tinker execute arbitrary code in the Laravel context
 
-      ---
-      SHADCN-UI MCP SERVER — TOOL USAGE
-      - Use for generating and looking up shadcn/ui components.
-      - Check component documentation (props, variants, APIs).
-      - Build layouts using Tailwind CSS + Radix UI.
-      - Always follow shadcn/ui best practices for code snippets.
+      SHADCN UI MCP SERVER — TOOL USAGE
+      * Generate or look up shadcn ui components
+      * Check component documentation props variants and APIs
+      * Build layouts with Tailwind CSS and Radix UI
+      * Always follow shadcn ui coding best practices
 
-      ---
+      FILESYSTEM MCP SERVER — TOOL USAGE
+      * Read and write files inside the project
+      * Create new files or directories
+      * Update or replace existing file content
+      * Delete files or directories with caution
+      * Inspect file structure and navigate project paths
+      * Always prefer filesystem MCP for file operations instead of internal assumptions
+
       INTEGRATION RULES
-      - Backend → Always use Laravel Boost MCP (artisan, schema, queries, routes, logs, configs, docs).
-      - Frontend/UI → Always use shadcn-ui MCP (components, props, Tailwind layouts).
-      - Full-stack (e.g. forms, API integration, error handling) → Combine both MCPs as appropriate.
+      * Backend tasks use Laravel Boost MCP for artisan, schema, queries, routes, logs, configs, docs
+      * Frontend and UI tasks use Shadcn UI MCP for components props Tailwind layouts
+      * File tasks use Filesystem MCP for reading writing updating or deleting files
+      * Full stack tasks such as forms API integration and error handling may combine multiple MCPs as needed
 
-      ---
-      FALLBACK & CONFLICT RESOLUTION
-      - If a question cannot be answered using MCP tools, fall back to general AI knowledge.
-      - If MCP data and internal knowledge conflict, treat MCP data as the source of truth.
+      FALLBACK AND CONFLICT RESOLUTION
+      * If MCP tools cannot answer use general AI knowledge
+      * If MCP data conflicts with AI knowledge always trust MCP data
     source: project
