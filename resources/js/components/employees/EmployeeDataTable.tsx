@@ -86,7 +86,7 @@ interface EmployeeDataTableProps {
         sort_by?: string;
         sort_direction?: string;
     };
-    onFilterChange: (filters: any) => void;
+    onFilterChange: (filters: Record<string, string | undefined>) => void;
     onResetFilters: () => void;
 }
 
@@ -240,7 +240,7 @@ export function EmployeeDataTable({
             // Use filters from props
             const cleanFilters = Object.fromEntries(
                 Object.entries(filters || {}).filter(
-                    ([_, value]) => value !== null && value !== '',
+                    ([, value]) => value !== null && value !== '',
                 ),
             );
 
@@ -268,15 +268,6 @@ export function EmployeeDataTable({
         }
     };
 
-    const handleOpenFilterModal = () => {
-        setTempFilters({
-            search: filters?.search || '',
-            department: filters?.department || '',
-            position: filters?.position || '',
-        });
-        setIsFilterModalOpen(true);
-    };
-
     const handleApplyFilters = () => {
         onFilterChange(tempFilters);
         setIsFilterModalOpen(false);
@@ -292,10 +283,6 @@ export function EmployeeDataTable({
 
     const handleResetFiltersFromModal = () => {
         onResetFilters();
-        setIsFilterModalOpen(false);
-    };
-
-    const handleCloseFilterModal = () => {
         setIsFilterModalOpen(false);
     };
 
