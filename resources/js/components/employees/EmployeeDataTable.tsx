@@ -129,30 +129,39 @@ export function EmployeeDataTable({
                     cell: ({ row }: { row: { original: Employee } }) => {
                         const employee = row.original;
                         return (
-                            <div className="flex items-center space-x-2">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => onViewEmployee(employee)}
-                                >
-                                    View
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => onEditEmployee(employee)}
-                                >
-                                    Edit
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-destructive hover:text-destructive"
-                                    onClick={() => onDeleteEmployee(employee)}
-                                >
-                                    Delete
-                                </Button>
-                            </div>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                        Actions <ChevronDown className="ml-2 h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuCheckboxItem
+                                        key="view"
+                                        className="capitalize"
+                                        checked={false}
+                                        onCheckedChange={() => onViewEmployee(employee)}
+                                    >
+                                        View
+                                    </DropdownMenuCheckboxItem>
+                                    <DropdownMenuCheckboxItem
+                                        key="edit"
+                                        className="capitalize"
+                                        checked={false}
+                                        onCheckedChange={() => onEditEmployee(employee)}
+                                    >
+                                        Edit
+                                    </DropdownMenuCheckboxItem>
+                                    <DropdownMenuCheckboxItem
+                                        key="delete"
+                                        className="capitalize text-destructive"
+                                        checked={false}
+                                        onCheckedChange={() => onDeleteEmployee(employee)}
+                                    >
+                                        Delete
+                                    </DropdownMenuCheckboxItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         );
                     },
                 };
