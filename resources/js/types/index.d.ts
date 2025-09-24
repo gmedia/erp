@@ -1,34 +1,5 @@
-export interface User {
-    id: number;
-    name: string;
-    email: string;
-    email_verified_at?: string;
-    created_at: string;
-    updated_at: string;
-}
-
-export interface Employee {
-    id: number;
-    name: string;
-    email: string;
-    phone: string;
-    department: string;
-    position: string;
-    salary: string;
-    hire_date: string;
-    created_at: string;
-    updated_at: string;
-}
-
-export interface EmployeeFormData {
-    name: string;
-    email: string;
-    phone: string;
-    department: string;
-    position: string;
-    salary: string;
-    hire_date: Date;
-}
+export * from "./user"
+export * from "./employee"
 
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,
