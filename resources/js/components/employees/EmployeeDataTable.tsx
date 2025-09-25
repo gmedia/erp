@@ -132,7 +132,8 @@ export function EmployeeDataTable({
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" size="sm">
-                                        Actions <ChevronDown className="ml-2 h-4 w-4" />
+                                        Actions{' '}
+                                        <ChevronDown className="ml-2 h-4 w-4" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
@@ -140,7 +141,9 @@ export function EmployeeDataTable({
                                         key="view"
                                         className="capitalize"
                                         checked={false}
-                                        onCheckedChange={() => onViewEmployee(employee)}
+                                        onCheckedChange={() =>
+                                            onViewEmployee(employee)
+                                        }
                                     >
                                         View
                                     </DropdownMenuCheckboxItem>
@@ -148,15 +151,19 @@ export function EmployeeDataTable({
                                         key="edit"
                                         className="capitalize"
                                         checked={false}
-                                        onCheckedChange={() => onEditEmployee(employee)}
+                                        onCheckedChange={() =>
+                                            onEditEmployee(employee)
+                                        }
                                     >
                                         Edit
                                     </DropdownMenuCheckboxItem>
                                     <DropdownMenuCheckboxItem
                                         key="delete"
-                                        className="capitalize text-destructive"
+                                        className="text-destructive capitalize"
                                         checked={false}
-                                        onCheckedChange={() => onDeleteEmployee(employee)}
+                                        onCheckedChange={() =>
+                                            onDeleteEmployee(employee)
+                                        }
                                     >
                                         Delete
                                     </DropdownMenuCheckboxItem>
@@ -296,215 +303,229 @@ export function EmployeeDataTable({
     };
 
     return (
-        <div className="w-full">
-            <div className="lg:flex items-center justify-between py-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <Input
-                    placeholder="Search employees..."
-                    value={searchValue}
-                    onChange={handleSearchChange}
-                    onKeyDown={handleSearchKeyDown}
-                    className="max-w-sm"
-                />
-              </div>
-              <div className="flex items-center space-x-2 mb-2">
-                <Dialog
-                  open={isFilterModalOpen}
-                  onOpenChange={setIsFilterModalOpen}
-                >
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Filter className="mr-2 h-4 w-4" />
-                      Filters
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Filter Employees</DialogTitle>
-                      <DialogDescription>
-                        Apply filters to find specific employees
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div>
-                        <label className="mb-2 block text-sm font-medium">
-                          Search
-                        </label>
-                        <Input
-                          placeholder="Search employees..."
-                          value={tempFilters.search}
-                          onChange={(e) =>
-                            setTempFilters((prev) => ({
-                              ...prev,
-                              search: e.target.value,
-                            }))
-                          }
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-2 block text-sm font-medium">
-                          Department
-                        </label>
-                        <Select
-                          value={tempFilters.department}
-                          onValueChange={(value) =>
-                            setTempFilters((prev) => ({
-                              ...prev,
-                              department: value,
-                            }))
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="All departments" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all-departments">
-                              All departments
-                            </SelectItem>
-                            <SelectItem value="Engineering">
-                              Engineering
-                            </SelectItem>
-                            <SelectItem value="Marketing">
-                              Marketing
-                            </SelectItem>
-                            <SelectItem value="Sales">
-                              Sales
-                            </SelectItem>
-                            <SelectItem value="HR">
-                              HR
-                            </SelectItem>
-                            <SelectItem value="Finance">
-                              Finance
-                            </SelectItem>
-                            <SelectItem value="Operations">
-                              Operations
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <label className="mb-2 block text-sm font-medium">
-                          Position
-                        </label>
-                        <Select
-                          value={tempFilters.position}
-                          onValueChange={(value) =>
-                            setTempFilters((prev) => ({
-                              ...prev,
-                              position: value,
-                            }))
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="All positions" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all-positions">
-                              All positions
-                            </SelectItem>
-                            <SelectItem value="Manager">
-                              Manager
-                            </SelectItem>
-                            <SelectItem value="Senior Developer">
-                              Senior Developer
-                            </SelectItem>
-                            <SelectItem value="Developer">
-                              Developer
-                            </SelectItem>
-                            <SelectItem value="Junior Developer">
-                              Junior Developer
-                            </SelectItem>
-                            <SelectItem value="Designer">
-                              Designer
-                            </SelectItem>
-                            <SelectItem value="Analyst">
-                              Analyst
-                            </SelectItem>
-                            <SelectItem value="Coordinator">
-                              Coordinator
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button
+        <div className="w-full bg-background text-foreground">
+            <div className="items-center justify-between py-4 lg:flex">
+                <div className="mb-2 flex items-center space-x-2">
+                    <Input
+                        placeholder="Search employees..."
+                        value={searchValue}
+                        onChange={handleSearchChange}
+                        onKeyDown={handleSearchKeyDown}
+                        className="max-w-sm border-border bg-background placeholder:text-muted-foreground"
+                    />
+                </div>
+                <div className="mb-2 flex items-center space-x-2">
+                    <Dialog
+                        open={isFilterModalOpen}
+                        onOpenChange={setIsFilterModalOpen}
+                    >
+                        <DialogTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-border bg-background hover:bg-accent hover:text-accent-foreground"
+                            >
+                                <Filter className="mr-2 h-4 w-4" />
+                                Filters
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="border-border bg-background text-foreground sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Filter Employees</DialogTitle>
+                                <DialogDescription className="text-muted-foreground">
+                                    Apply filters to find specific employees
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium">
+                                        Search
+                                    </label>
+                                    <Input
+                                        placeholder="Search employees..."
+                                        value={tempFilters.search}
+                                        onChange={(e) =>
+                                            setTempFilters((prev) => ({
+                                                ...prev,
+                                                search: e.target.value,
+                                            }))
+                                        }
+                                        className="border-border bg-background placeholder:text-muted-foreground"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium">
+                                        Department
+                                    </label>
+                                    <Select
+                                        value={tempFilters.department}
+                                        onValueChange={(value) =>
+                                            setTempFilters((prev) => ({
+                                                ...prev,
+                                                department: value,
+                                            }))
+                                        }
+                                    >
+                                        <SelectTrigger className="border-border bg-background">
+                                            <SelectValue placeholder="All departments" />
+                                        </SelectTrigger>
+                                        <SelectContent className="border-border bg-background text-foreground">
+                                            <SelectItem value="all-departments">
+                                                All departments
+                                            </SelectItem>
+                                            <SelectItem value="Engineering">
+                                                Engineering
+                                            </SelectItem>
+                                            <SelectItem value="Marketing">
+                                                Marketing
+                                            </SelectItem>
+                                            <SelectItem value="Sales">
+                                                Sales
+                                            </SelectItem>
+                                            <SelectItem value="HR">
+                                                HR
+                                            </SelectItem>
+                                            <SelectItem value="Finance">
+                                                Finance
+                                            </SelectItem>
+                                            <SelectItem value="Operations">
+                                                Operations
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium">
+                                        Position
+                                    </label>
+                                    <Select
+                                        value={tempFilters.position}
+                                        onValueChange={(value) =>
+                                            setTempFilters((prev) => ({
+                                                ...prev,
+                                                position: value,
+                                            }))
+                                        }
+                                    >
+                                        <SelectTrigger className="border-border bg-background">
+                                            <SelectValue placeholder="All positions" />
+                                        </SelectTrigger>
+                                        <SelectContent className="border-border bg-background text-foreground">
+                                            <SelectItem value="all-positions">
+                                                All positions
+                                            </SelectItem>
+                                            <SelectItem value="Manager">
+                                                Manager
+                                            </SelectItem>
+                                            <SelectItem value="Senior Developer">
+                                                Senior Developer
+                                            </SelectItem>
+                                            <SelectItem value="Developer">
+                                                Developer
+                                            </SelectItem>
+                                            <SelectItem value="Junior Developer">
+                                                Junior Developer
+                                            </SelectItem>
+                                            <SelectItem value="Designer">
+                                                Designer
+                                            </SelectItem>
+                                            <SelectItem value="Analyst">
+                                                Analyst
+                                            </SelectItem>
+                                            <SelectItem value="Coordinator">
+                                                Coordinator
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button
+                                    variant="outline"
+                                    onClick={handleResetModalFilters}
+                                >
+                                    Reset
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={handleResetFiltersFromModal}
+                                >
+                                    Clear All
+                                </Button>
+                                <Button onClick={handleApplyFilters}>
+                                    Apply Filters
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                    <Button
                         variant="outline"
-                        onClick={handleResetModalFilters}
-                      >
-                        Reset
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={handleResetFiltersFromModal}
-                      >
-                        Clear All
-                      </Button>
-                      <Button onClick={handleApplyFilters}>
-                        Apply Filters
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleExport}
-                  disabled={data.length === 0}
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Export
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      Columns <ChevronDown className="ml-2 h-4 w-4" />
+                        size="sm"
+                        onClick={handleExport}
+                        disabled={data.length === 0}
+                        className="border-border bg-background hover:bg-accent hover:text-accent-foreground"
+                    >
+                        <Download className="mr-2 h-4 w-4" />
+                        Export
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {table
-                      .getAllColumns()
-                      .filter((column) => column.getCanHide())
-                      .map((column) => {
-                        return (
-                          <DropdownMenuCheckboxItem
-                            key={column.id}
-                            className="capitalize"
-                            checked={column.getIsVisible()}
-                            onCheckedChange={(value) =>
-                              column.toggleVisibility(!!value)
-                            }
-                          >
-                            {column.id}
-                          </DropdownMenuCheckboxItem>
-                        );
-                      })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <Button size="sm" onClick={onAddEmployee}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add
-                </Button>
-              </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-border bg-background hover:bg-accent hover:text-accent-foreground"
+                            >
+                                Columns <ChevronDown className="ml-2 h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            align="end"
+                            className="border-border bg-background text-foreground"
+                        >
+                            {table
+                                .getAllColumns()
+                                .filter((column) => column.getCanHide())
+                                .map((column) => (
+                                    <DropdownMenuCheckboxItem
+                                        key={column.id}
+                                        className="capitalize"
+                                        checked={column.getIsVisible()}
+                                        onCheckedChange={(value) =>
+                                            column.toggleVisibility(!!value)
+                                        }
+                                    >
+                                        {column.id}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button size="sm" onClick={onAddEmployee}>
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Add
+                    </Button>
+                </div>
             </div>
-            <div className="rounded-md border">
+
+            {/* Table */}
+            <div className="overflow-hidden rounded-md border border-border">
                 <Table>
-                    <TableHeader>
+                    <TableHeader className="bg-muted">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
-                                                      header.getContext(),
-                                                  )}
-                                        </TableHead>
-                                    );
-                                })}
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead
+                                        key={header.id}
+                                        className="border-border"
+                                    >
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                  header.column.columnDef
+                                                      .header,
+                                                  header.getContext(),
+                                              )}
+                                    </TableHead>
+                                ))}
                             </TableRow>
                         ))}
                     </TableHeader>
@@ -515,8 +536,11 @@ export function EmployeeDataTable({
                                     {Array.from({
                                         length: employeeColumns.length,
                                     }).map((_, cellIndex) => (
-                                        <TableCell key={cellIndex}>
-                                            <Skeleton className="h-4 w-full" />
+                                        <TableCell
+                                            key={cellIndex}
+                                            className="border-border"
+                                        >
+                                            <Skeleton className="h-4 w-full bg-muted" />
                                         </TableCell>
                                     ))}
                                 </TableRow>
@@ -528,9 +552,13 @@ export function EmployeeDataTable({
                                     data-state={
                                         row.getIsSelected() && 'selected'
                                     }
+                                    className="hover:bg-muted/50"
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell
+                                            key={cell.id}
+                                            className="border-border"
+                                        >
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext(),
@@ -543,7 +571,7 @@ export function EmployeeDataTable({
                             <TableRow>
                                 <TableCell
                                     colSpan={employeeColumns.length}
-                                    className="h-24 text-center"
+                                    className="h-24 text-center text-muted-foreground"
                                 >
                                     No results.
                                 </TableCell>
@@ -553,20 +581,18 @@ export function EmployeeDataTable({
                 </Table>
             </div>
 
-            {/* Pagination Controls */}
-            <div className="flex items-center justify-between py-4">
+            {/* Pagination */}
+            <div className="flex items-center justify-between py-4 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-2">
-                    <p className="text-sm text-muted-foreground">
-                        Rows per page
-                    </p>
+                    <p>Rows per page</p>
                     <Select
                         value={String(pagination.per_page)}
                         onValueChange={handlePageSizeChange}
                     >
-                        <SelectTrigger className="w-[70px]">
+                        <SelectTrigger className="w-[70px] border-border bg-background">
                             <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="border-border bg-background text-foreground">
                             <SelectItem value="10">10</SelectItem>
                             <SelectItem value="15">15</SelectItem>
                             <SelectItem value="25">25</SelectItem>
@@ -574,7 +600,7 @@ export function EmployeeDataTable({
                             <SelectItem value="100">100</SelectItem>
                         </SelectContent>
                     </Select>
-                    <p className="text-sm text-muted-foreground">
+                    <p>
                         Showing {pagination.from} to {pagination.to} of{' '}
                         {pagination.total} entries
                     </p>
@@ -585,9 +611,7 @@ export function EmployeeDataTable({
                         <PaginationItem>
                             <PaginationPrevious
                                 href="#"
-                                onClick={(
-                                    e: React.MouseEvent<HTMLAnchorElement>,
-                                ) => {
+                                onClick={(e) => {
                                     e.preventDefault();
                                     if (pagination.page > 1) {
                                         handlePageChange(pagination.page - 1);
@@ -607,9 +631,7 @@ export function EmployeeDataTable({
                         <PaginationItem>
                             <PaginationNext
                                 href="#"
-                                onClick={(
-                                    e: React.MouseEvent<HTMLAnchorElement>,
-                                ) => {
+                                onClick={(e) => {
                                     e.preventDefault();
                                     if (
                                         pagination.page < pagination.last_page
