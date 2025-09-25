@@ -32,6 +32,8 @@ export default function EmployeeIndex() {
         search: '',
         department: '',
         position: '',
+        sort_by: undefined,
+        sort_direction: undefined,
     });
 
     const [pagination, setPagination] = useState({
@@ -58,6 +60,8 @@ export default function EmployeeIndex() {
                             filters.position === 'all-positions'
                                 ? ''
                                 : filters.position,
+                        sort_by: filters.sort_by,
+                        sort_direction: filters.sort_direction,
                     },
                 });
                 return (
@@ -72,7 +76,6 @@ export default function EmployeeIndex() {
                     }
                 );
             } catch (error) {
-                console.error('Failed to fetch employees:', error);
                 toast.error('Failed to load employees');
                 return {
                     data: [],
@@ -240,6 +243,8 @@ export default function EmployeeIndex() {
             search: '',
             department: '',
             position: '',
+            sort_by: undefined,
+            sort_direction: undefined,
         });
         setPagination({ page: 1, per_page: 15 });
     };
@@ -296,6 +301,8 @@ export default function EmployeeIndex() {
                                 filters.position === 'all-positions'
                                     ? ''
                                     : filters.position,
+                            sort_by: filters.sort_by,
+                            sort_direction: filters.sort_direction,
                         }}
                         onFilterChange={handleFilterChange}
                         onResetFilters={handleResetFilters}
