@@ -54,6 +54,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Employee } from '@/types';
+import { Loader2 } from 'lucide-react';
 import { employeeColumns } from './EmployeeColumns';
 
 interface EmployeeDataTableProps {
@@ -112,6 +113,7 @@ export function EmployeeDataTable({
     const [rowSelection, setRowSelection] = React.useState({});
     const [searchValue, setSearchValue] = React.useState(filterValue);
     const [isFilterModalOpen, setIsFilterModalOpen] = React.useState(false);
+    const [exporting, setExporting] = React.useState(false);
     // Sorting state
     // Removed unused local sorting state; sorting is now fully managed via filters prop.
 
@@ -283,6 +285,7 @@ export function EmployeeDataTable({
     };
 
     const handleExport = async () => {
+        setExporting(true);
         try {
             // Use filters from props
             const cleanFilters = Object.fromEntries(
@@ -311,6 +314,8 @@ export function EmployeeDataTable({
             document.body.removeChild(a);
         } catch {
             alert('Failed to export employees. Please try again.');
+        } finally {
+            setExporting(false);
         }
     };
 
@@ -492,10 +497,14 @@ export function EmployeeDataTable({
                         variant="outline"
                         size="sm"
                         onClick={handleExport}
-                        disabled={data.length === 0}
+                        disabled={data.length === 0 || exporting}
                         className="border-border bg-background hover:bg-accent hover:text-accent-foreground"
                     >
-                        <Download className="mr-2 h-4 w-4" />
+                        {exporting ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                            <Download className="mr-2 h-4 w-4" />
+                        )}
                         Export
                     </Button>
                     <DropdownMenu>
