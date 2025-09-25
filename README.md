@@ -29,8 +29,6 @@
 ## Technologies
 - [x] Laravel, React.js, Inertia.js, Vite.js, Shadcn UI, Tailwind CSS, TypeScript, ESLint, Prettier, PHPUnit, Pest, FakerPHP. ([Link](https://ui.shadcn.com/docs/installation/laravel))
 - [x] Sail. ([Link](https://laravel.com/docs/12.x/sail))
-- [x] Boost. ([Link](https://github.com/laravel/boost))
-- [x] Shadcn UI MCP Server. ([Link](https://javascript.plainenglish.io/i-stopped-writing-ui-code-now-i-let-mcp-servers-build-my-interfaces-with-shadcn-190d0bf4a7db))
 - [x] Laravel IDE Helper. ([Link](https://github.com/barryvdh/laravel-ide-helper))
 - [x] Larastan, PHPStan. ([Link](https://github.com/larastan/larastan))
 - [x] Duster (TLint, PHP_CodeSniffer, PHP CS Fixer, Pint). ([Link](https://github.com/tighten/duster))
