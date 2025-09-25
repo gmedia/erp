@@ -360,8 +360,8 @@ export function EmployeeForm({
                                 {isLoading
                                     ? 'Saving...'
                                     : employee
-                                      ? 'Update Employee'
-                                      : 'Add Employee'}
+                                      ? 'Update'
+                                      : 'Add'}
                             </Button>
                         </DialogFooter>
                     </form>

@@ -113,12 +113,7 @@ export function EmployeeDataTable({
     const [searchValue, setSearchValue] = React.useState(filterValue);
     const [isFilterModalOpen, setIsFilterModalOpen] = React.useState(false);
     // Sorting state
-    const [sortBy, setSortBy] = React.useState<string | undefined>(
-        filters?.sort_by,
-    );
-    const [sortDir, setSortDir] = React.useState<string | undefined>(
-        filters?.sort_direction,
-    );
+    // Removed unused local sorting state; sorting is now fully managed via filters prop.
 
     // Temporary filter states for modal
     const [tempFilters, setTempFilters] = React.useState({
@@ -246,8 +241,7 @@ export function EmployeeDataTable({
         // Update sort_by and sort_direction states
         const sort_by = columnId;
         const sort_direction = newSorting[0].desc ? 'desc' : 'asc';
-        setSortBy(sort_by);
-        setSortDir(sort_direction);
+        // Local sort state updates removed; sorting is propagated via onFilterChange.
 
         // Propagate sorting changes via filter change callback
         onFilterChange({
@@ -315,7 +309,7 @@ export function EmployeeDataTable({
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-        } catch (error) {
+        } catch {
             alert('Failed to export employees. Please try again.');
         }
     };
