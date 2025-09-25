@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class EmployeeController extends Controller
 {
@@ -17,6 +18,12 @@ class EmployeeController extends Controller
         $page = $request->get('page', 1);
 
         // Start building the query
+// Validate sorting parameters
+$allowedSorts = ['id','name','email','phone','department','position','salary','hire_date','created_at','updated_at'];
+$request->validate([
+    'sort_by' => ['sometimes','in:'.implode(',', $allowedSorts)],
+    'sort_direction' => ['sometimes','in:asc,desc'],
+]);
         $query = Employee::query();
 
         // Search functionality - search across name, email, phone, department, position
@@ -60,9 +67,22 @@ class EmployeeController extends Controller
         }
 
         // Server-side sorting
-        $sortableColumns = ['name', 'email', 'department', 'position', 'salary', 'hire_date', 'created_at'];
+        $sortableColumns = [
+            'id',
+            'name',
+            'email',
+            'phone',
+            'department',
+            'position',
+            'salary',
+            'hire_date',
+            'created_at',
+            'updated_at',
+        ];
         $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = strtolower($request->get('sort_order', 'desc')) === 'asc' ? 'asc' : 'desc';
+        // Accept both `sort_dir` and legacy `sort_order` parameters
+        $sortDir = $request->get('sort_direction', 'desc');
+        $sortOrder = strtolower($sortDir) === 'asc' ? 'asc' : 'desc';
 
         if (in_array($sortBy, $sortableColumns)) {
             $query->orderBy($sortBy, $sortOrder);

@@ -112,6 +112,9 @@ export function EmployeeDataTable({
     const [rowSelection, setRowSelection] = React.useState({});
     const [searchValue, setSearchValue] = React.useState(filterValue);
     const [isFilterModalOpen, setIsFilterModalOpen] = React.useState(false);
+    // Sorting state
+    const [sortBy, setSortBy] = React.useState<string | undefined>(filters?.sort_by);
+    const [sortDir, setSortDir] = React.useState<string | undefined>(filters?.sort_direction);
 
     // Temporary filter states for modal
     const [tempFilters, setTempFilters] = React.useState({
@@ -219,6 +222,36 @@ export function EmployeeDataTable({
     const handlePageSizeChange = (per_page: string) => {
         onPageSizeChange(Number(per_page));
     };
+// Handle sorting when a column header is clicked
+const handleSortingChange = (columnId: string) => {
+    // Determine the new sorting direction
+    const existing = sorting.find((s) => s.id === columnId);
+    let newSorting: SortingState = [];
+
+    if (!existing) {
+        // No existing sort for this column, default to ascending
+        newSorting = [{ id: columnId, desc: false }];
+    } else {
+        // Toggle the sort direction
+        newSorting = [{ id: columnId, desc: !existing.desc }];
+    }
+
+    // Update local sorting state
+    setSorting(newSorting);
+
+    // Update sort_by and sort_direction states
+    const sort_by = columnId;
+    const sort_direction = newSorting[0].desc ? 'desc' : 'asc';
+    setSortBy(sort_by);
+    setSortDir(sort_direction);
+
+    // Propagate sorting changes via filter change callback
+    onFilterChange({
+        ...(filters || {}),
+        sort_by,
+        sort_direction,
+    });
+};
 
     const renderPageNumbers = () => {
         const pages = [];
@@ -279,7 +312,6 @@ export function EmployeeDataTable({
             a.click();
             document.body.removeChild(a);
         } catch (error) {
-            console.error('Export error:', error);
             alert('Failed to export employees. Please try again.');
         }
     };
@@ -515,7 +547,8 @@ export function EmployeeDataTable({
                                 {headerGroup.headers.map((header) => (
                                     <TableHead
                                         key={header.id}
-                                        className="border-border"
+                                        className="border-border cursor-pointer select-none"
+                                        onClick={() => handleSortingChange(header.column.id)}
                                     >
                                         {header.isPlaceholder
                                             ? null
