@@ -159,7 +159,7 @@ export function EmployeeDataTable({
                                     </DropdownMenuCheckboxItem>
                                     <DropdownMenuCheckboxItem
                                         key="delete"
-                                        className="text-destructive capitalize"
+                                        className="capitalize dark:focus:bg-destructive/90 text-red-600 dark:hover:text-white-700"
                                         checked={false}
                                         onCheckedChange={() =>
                                             onDeleteEmployee(employee)
