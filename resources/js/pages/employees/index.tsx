@@ -336,9 +336,7 @@ export default function EmployeeIndex() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleDeleteConfirm}
-                        >
+                        <AlertDialogAction onClick={handleDeleteConfirm}>
                             Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>
