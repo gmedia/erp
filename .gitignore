@@ -28,3 +28,7 @@ yarn-error.log
 /.zed
 running_task.md
 .kilocode*
+
+# Playwright artifacts
+playwright-report/
+test-results/

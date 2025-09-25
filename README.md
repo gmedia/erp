@@ -33,7 +33,7 @@
 - [x] Larastan, PHPStan. ([Link](https://github.com/larastan/larastan))
 - [x] Duster (TLint, PHP_CodeSniffer, PHP CS Fixer, Pint). ([Link](https://github.com/tighten/duster))
 - [x] blade-formatter. ([Link](https://github.com/shufo/blade-formatter))
-- [ ] Vitest. ([Link](https://vitest.dev/guide/))
+- [x] Playwright. ([Link](https://playwright.dev/docs/intro))
 - [ ] Laravel Actions. ([Link](https://github.com/lorisleiva/laravel-actions))
 - [ ] Laravel Actions IDE Helper. ([Link](https://github.com/Wulfheart/laravel-actions-ide-helper))
 - [ ] Scramble. ([Link](https://github.com/dedoc/scramble))
