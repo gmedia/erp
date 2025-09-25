@@ -1,5 +1,5 @@
-export * from "./user"
-export * from "./employee"
+export * from './employee';
+export * from './user';
 
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,

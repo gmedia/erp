@@ -98,9 +98,10 @@ export default function EmployeeIndex() {
     // Create employee mutation
     const createEmployeeMutation = useMutation({
         mutationFn: async (data: EmployeeFormData) => {
-            const hireDate = data.hire_date instanceof Date
-                ? data.hire_date
-                : new Date(data.hire_date);
+            const hireDate =
+                data.hire_date instanceof Date
+                    ? data.hire_date
+                    : new Date(data.hire_date);
             const formattedHireDate = hireDate.toISOString().split('T')[0];
 
             const apiData = {
@@ -122,7 +123,9 @@ export default function EmployeeIndex() {
             setSelectedEmployee(null);
             toast.success('Employee created successfully');
         },
-        onError: (error: Error & { response?: { data?: { message?: string } } }) => {
+        onError: (
+            error: Error & { response?: { data?: { message?: string } } },
+        ) => {
             toast.error(
                 error.response?.data?.message || 'Failed to create employee',
             );
@@ -131,10 +134,17 @@ export default function EmployeeIndex() {
 
     // Update employee mutation
     const updateEmployeeMutation = useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: EmployeeFormData }) => {
-            const hireDate = data.hire_date instanceof Date
-                ? data.hire_date
-                : new Date(data.hire_date);
+        mutationFn: async ({
+            id,
+            data,
+        }: {
+            id: number;
+            data: EmployeeFormData;
+        }) => {
+            const hireDate =
+                data.hire_date instanceof Date
+                    ? data.hire_date
+                    : new Date(data.hire_date);
             const formattedHireDate = hireDate.toISOString().split('T')[0];
 
             const apiData = {
@@ -156,7 +166,9 @@ export default function EmployeeIndex() {
             setSelectedEmployee(null);
             toast.success('Employee updated successfully');
         },
-        onError: (error: Error & { response?: { data?: { message?: string } } }) => {
+        onError: (
+            error: Error & { response?: { data?: { message?: string } } },
+        ) => {
             toast.error(
                 error.response?.data?.message || 'Failed to update employee',
             );
@@ -173,7 +185,9 @@ export default function EmployeeIndex() {
             setEmployeeToDelete(null);
             toast.success('Employee deleted successfully');
         },
-        onError: (error: Error & { response?: { data?: { message?: string } } }) => {
+        onError: (
+            error: Error & { response?: { data?: { message?: string } } },
+        ) => {
             toast.error(
                 error.response?.data?.message || 'Failed to delete employee',
             );
