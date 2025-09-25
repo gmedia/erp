@@ -75,7 +75,7 @@ export default function EmployeeIndex() {
                         },
                     }
                 );
-            } catch (error) {
+            } catch {
                 toast.error('Failed to load employees');
                 return {
                     data: [],
