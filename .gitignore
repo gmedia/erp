@@ -27,3 +27,4 @@ yarn-error.log
 /.vscode
 /.zed
 running_task.md
+.kilocode*
