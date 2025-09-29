@@ -9,7 +9,7 @@
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
         "types": "tsc --noEmit",
-        "test:e2e": "playwright test"
+        "test:e2e": "npx playwright test"
     },
     "devDependencies": {
         "@eslint/js": "^9.19.0",
