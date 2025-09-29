@@ -17,6 +17,16 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Employee, EmployeeFormData } from '@/types';
+import { type BreadcrumbItem } from '@/types';
+import { employees } from '@/routes';
+import AppLayout from '@/layouts/app-layout';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Employees',
+        href: employees().url,
+    },
+];
 
 export default function EmployeeIndex() {
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -253,62 +263,53 @@ export default function EmployeeIndex() {
         <>
             <Head title="Employees" />
 
-            <div className="p-8">
-                <div className="mb-8 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">
-                            Employees
-                        </h1>
-                        <p className="text-muted-foreground">
-                            Manage your team members and their information
-                        </p>
+            <AppLayout breadcrumbs={breadcrumbs}>
+                <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                    <div className="rounded-lg bg-white">
+                        <EmployeeDataTable
+                            data={employees}
+                            onAddEmployee={handleAddEmployee}
+                            onEditEmployee={handleEditEmployee}
+                            onDeleteEmployee={handleDeleteEmployee}
+                            onViewEmployee={handleViewEmployee}
+                            pagination={{
+                                page: meta.current_page,
+                                per_page: meta.per_page,
+                                total: meta.total,
+                                last_page: meta.last_page,
+                                from: meta.from || 0,
+                                to: meta.to || 0,
+                            }}
+                            onPageChange={(page) =>
+                                setPagination((prev) => ({ ...prev, page }))
+                            }
+                            onPageSizeChange={(per_page) =>
+                                setPagination({ page: 1, per_page })
+                            }
+                            onSearchChange={(search) =>
+                                handleFilterChange({ search })
+                            }
+                            isLoading={isLoading}
+                            filterValue={filters.search}
+                            filters={{
+                                search: filters.search,
+                                department:
+                                    filters.department === 'all-departments'
+                                        ? ''
+                                        : filters.department,
+                                position:
+                                    filters.position === 'all-positions'
+                                        ? ''
+                                        : filters.position,
+                                sort_by: filters.sort_by,
+                                sort_direction: filters.sort_direction,
+                            }}
+                            onFilterChange={handleFilterChange}
+                            onResetFilters={handleResetFilters}
+                        />
                     </div>
                 </div>
-
-                <div className="rounded-lg bg-white">
-                    <EmployeeDataTable
-                        data={employees}
-                        onAddEmployee={handleAddEmployee}
-                        onEditEmployee={handleEditEmployee}
-                        onDeleteEmployee={handleDeleteEmployee}
-                        onViewEmployee={handleViewEmployee}
-                        pagination={{
-                            page: meta.current_page,
-                            per_page: meta.per_page,
-                            total: meta.total,
-                            last_page: meta.last_page,
-                            from: meta.from || 0,
-                            to: meta.to || 0,
-                        }}
-                        onPageChange={(page) =>
-                            setPagination((prev) => ({ ...prev, page }))
-                        }
-                        onPageSizeChange={(per_page) =>
-                            setPagination({ page: 1, per_page })
-                        }
-                        onSearchChange={(search) =>
-                            handleFilterChange({ search })
-                        }
-                        isLoading={isLoading}
-                        filterValue={filters.search}
-                        filters={{
-                            search: filters.search,
-                            department:
-                                filters.department === 'all-departments'
-                                    ? ''
-                                    : filters.department,
-                            position:
-                                filters.position === 'all-positions'
-                                    ? ''
-                                    : filters.position,
-                            sort_by: filters.sort_by,
-                            sort_direction: filters.sort_direction,
-                        }}
-                        onFilterChange={handleFilterChange}
-                        onResetFilters={handleResetFilters}
-                    />
-                </div>
-            </div>
+            </AppLayout>
 
             <EmployeeForm
                 open={isFormOpen}
