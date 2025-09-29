@@ -30,5 +30,5 @@ running_task.md
 .kilocode*
 
 # Playwright artifacts
-playwright-report/
-test-results/
+tmp-playwright-report/
+tmp-test-results/
