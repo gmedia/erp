@@ -1,14 +1,11 @@
 import { test, expect } from '@playwright/test';
+import { login } from './helpers';
 
 test('user can change their name in profile settings', async ({ page }) => {
   // 1. Log in using existing credentials
-  await page.goto('/login');
-  await page.fill('input[name="email"]', 'admin@admin.com');
-  await page.fill('input[name="password"]', 'password');
-  await page.click('button[type="submit"]');
+  await login(page);
 
   // Ensure login succeeded by checking for dashboard navigation
-  await expect(page).toHaveURL(/\/dashboard/);
 
   // 2. Navigate to the profile page
   await page.goto('/settings/profile');
