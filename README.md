@@ -31,6 +31,11 @@
     sudo chmod -R 777 playwright-report test-results
     ./vendor/bin/sail npm run test:e2e
     ```
+- Run SonarQube:
+    ```
+    docker run -u root --rm -v "$(pwd):/var/www/html" -w /var/www/html sonarsource/sonar-scanner-cli:11
+
+    ```
 ## Technologies
 - [x] Laravel, React.js, Inertia.js, Vite.js, Shadcn UI, Tailwind CSS, TypeScript, ESLint, Prettier, PHPUnit, Pest, FakerPHP. ([Link](https://ui.shadcn.com/docs/installation/laravel))
 - [x] Sail. ([Link](https://laravel.com/docs/12.x/sail))
@@ -39,6 +44,10 @@
 - [x] Duster (TLint, PHP_CodeSniffer, PHP CS Fixer, Pint). ([Link](https://github.com/tighten/duster))
 - [x] blade-formatter. ([Link](https://github.com/shufo/blade-formatter))
 - [x] Playwright. ([Link](https://playwright.dev/docs/intro))
+- [!] Security Advisories Health Check. ([Link](https://github.com/spatie/security-advisories-health-check))
+- [!] npm-check-updates. ([Link](https://github.com/raineorshine/npm-check-updates))
+- [!] Laravel CSP. ([Link](https://github.com/spatie/laravel-csp))
+- [ ] SonarQube. ([Link](https://docs.sonarsource.com/sonarqube-community-build/server-installation/from-docker-image/installation-overview))
 - [ ] Laravel Actions. ([Link](https://github.com/lorisleiva/laravel-actions))
 - [ ] Laravel Actions IDE Helper. ([Link](https://github.com/Wulfheart/laravel-actions-ide-helper))
 - [ ] Scramble. ([Link](https://github.com/dedoc/scramble))
@@ -56,12 +65,10 @@
 - [ ] Laravel Permission. ([Link](https://github.com/spatie/laravel-permission))
 - [ ] Laravel Backup. ([Link](https://github.com/spatie/laravel-backup))
 - [ ] Laravel Health. ([Link](https://github.com/spatie/laravel-health))
-- [ ] Security Advisories Health Check. ([Link](https://github.com/spatie/security-advisories-health-check))
 - [ ] Laravel Migration Generator. ([Link](https://github.com/kitloong/laravel-migrations-generator))
 - [ ] codemod. ([Link](https://docs.codemod.com/guides/migrations/react-18-19))
 - [ ] Period. ([Link](https://github.com/spatie/period))
 - [ ] Laravel Chunk Upload. ([Link](https://github.com/pionl/laravel-chunk-upload))
-- [ ] npm-check-updates. ([Link](https://github.com/raineorshine/npm-check-updates))
 - [ ] Ziggy. ([Link](https://github.com/tighten/ziggy))
 - [ ] Zustand. ([Link](https://github.com/pmndrs/zustand))
 - [ ] Bref. ([Link](https://bref.sh/docs/laravel/getting-started))
