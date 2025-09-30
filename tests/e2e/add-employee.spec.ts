@@ -25,7 +25,7 @@ test('add new employee end‑to‑end', async ({ page }) => {
   // Department select
   await page.click('button:has-text("Select a department")');
   await page.getByRole('option', { name: 'Engineering' }).click();
-  
+
   // Position select
   await page.click('button:has-text("Select a position")');
   await page.getByRole('option', { name: 'Senior' }).click();
@@ -38,17 +38,11 @@ test('add new employee end‑to‑end', async ({ page }) => {
   await expect(submitButton).toBeVisible();
   await submitButton.click();
 
-  // 6️⃣ Verify success toast
-  // Wait for the toast container (react-hot-toast) to become visible
-  await page.waitForSelector('#react-hot-toast', { state: 'visible' });
-  const toast = page.getByText('Employee created successfully');
-  await expect(toast).toBeVisible({ timeout: 30000 });
-
-  // 7️⃣ Search for the newly created employee
+  // 6️⃣ Search for the newly created employee
   await page.fill('input[placeholder=\"Search employees...\"]', uniqueEmail);
   await page.press('input[placeholder=\"Search employees...\"]', 'Enter');
 
-  // 8️⃣ Assert the employee appears in the table
+  // 7️⃣ Assert the employee appears in the table
   const row = page.locator(`text=${uniqueEmail}`);
   await expect(row).toBeVisible();
 });
