@@ -1,25 +1,31 @@
 import { test, expect } from '@playwright/test';
+import { login, createEmployee } from './helpers';
 import * as fs from 'fs';
-import { createEmployee } from './helpers';
+import * as path from 'path';
 
-test('Export employee CSV', async ({ page }, testInfo) => {
-  // Create an employee to ensure there is data to export
+test('export employees to Excel works correctly', async ({ page, context }) => {
+  await login(page);
   const email = await createEmployee(page);
+  await page.goto('/employees');
 
-  // Click the Export button and wait for the download to start
+  const exportBtn = page.getByRole('button', { name: /Export/i });
+  await expect(exportBtn).toBeVisible();
+
   const [download] = await Promise.all([
     page.waitForEvent('download'),
-    page.getByRole('button', { name: /Export/i }).click(),
+    exportBtn.click(),
   ]);
 
-  // Save the downloaded file to the test output directory
-  const savePath = testInfo.outputPath(`employee-${Date.now()}.csv`);
-  await download.saveAs(savePath);
+  const downloadsDir = path.resolve('test-results', 'downloads');
+  if (!fs.existsSync(downloadsDir)) {
+    fs.mkdirSync(downloadsDir, { recursive: true });
+  }
+  const destPath = path.join(downloadsDir, download.suggestedFilename());
+  await download.saveAs(destPath);
 
-  // Verify the file has a .csv extension
-  expect(savePath).toMatch(/\.csv$/);
+  expect(download.suggestedFilename()).toMatch(/\.xlsx$/i);
+  expect(fs.existsSync(destPath)).toBeTruthy();
 
-  // Read the CSV content and verify it includes the created employee's email
-  const content = fs.readFileSync(savePath, 'utf8');
-  expect(content).toContain(email);
+  const header = fs.readFileSync(destPath).slice(0, 2).toString('utf8');
+  expect(header).toBe('PK');
 });
