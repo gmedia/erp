@@ -244,7 +244,14 @@ export default function EmployeeIndex() {
     };
 
     const handleFilterChange = (newFilters: Partial<typeof filters>) => {
-        setFilters((prev) => ({ ...prev, ...newFilters }));
+        // If only the search term is being updated, reset other filters to avoid
+        // unintended combination of search with stale department/position filters.
+        const isSearchOnly = Object.keys(newFilters).length === 1 && 'search' in newFilters;
+        setFilters((prev) => ({
+            ...prev,
+            ...newFilters,
+            ...(isSearchOnly ? { department: '', position: '' } : {}),
+        }));
         setPagination((prev) => ({ ...prev, page: 1 }));
     };
 

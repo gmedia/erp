@@ -402,7 +402,7 @@ export function EmployeeDataTable({
                                         }
                                     >
                                         <SelectTrigger className="border-border bg-background">
-                                            <SelectValue placeholder="All departments" />
+                                            <SelectValue placeholder="Select a department" />
                                         </SelectTrigger>
                                         <SelectContent className="border-border bg-background text-foreground">
                                             <SelectItem value="all-departments">
@@ -443,7 +443,7 @@ export function EmployeeDataTable({
                                         }
                                     >
                                         <SelectTrigger className="border-border bg-background">
-                                            <SelectValue placeholder="All positions" />
+                                            <SelectValue placeholder="Select a position" />
                                         </SelectTrigger>
                                         <SelectContent className="border-border bg-background text-foreground">
                                             <SelectItem value="all-positions">

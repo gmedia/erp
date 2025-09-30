@@ -82,7 +82,8 @@ export async function createEmployee(
 
   // 4️⃣ Fill the form fields (use defaults, allow overrides)
   const timestamp = Date.now();
-  const defaultEmail = `john.doe+${timestamp}@example.com`;
+// Updated email generation to ensure uniqueness without fixed prefix
+  const defaultEmail = `${Math.random().toString(36).substring(2,7)}${timestamp}@example.com`;
   const email = overrides?.email ?? defaultEmail;
 
   await page.fill('input[name="name"]', overrides?.name ?? 'John Doe');
@@ -99,7 +100,7 @@ export async function createEmployee(
   // Position select
   await page.click('button:has-text("Select a position")');
   await page
-    .getByRole('option', { name: overrides?.position ?? 'Senior' })
+    .getByRole('option', { name: overrides?.position ?? 'Senior', exact: true })
     .click();
 
   // Ensure any modal overlay/backdrop is removed before submitting

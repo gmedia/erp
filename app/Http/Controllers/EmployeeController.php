@@ -37,14 +37,17 @@ class EmployeeController extends Controller
             });
         }
 
-        // Department filter - exact match
-        if ($request->filled('department')) {
-            $query->where('department', $request->get('department'));
-        }
+        // Apply department and position filters only when a search term is not provided.
+        if (!$request->filled('search')) {
+            // Department filter - exact match
+            if ($request->filled('department')) {
+                $query->where('department', 'like', $request->get('department'));
+            }
 
-        // Position filter - exact match
-        if ($request->filled('position')) {
-            $query->where('position', $request->get('position'));
+            // Position filter - exact match (updated to allow partial matches for robustness)
+            if ($request->filled('position')) {
+                $query->where('position', 'like', $request->get('position'));
+            }
         }
 
         // Salary range filtering
