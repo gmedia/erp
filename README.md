@@ -26,6 +26,12 @@
     npm run format
     npm run lint
     ```
+- Run test:
+    ```
+    chown -R 1000:sail playwright-report test-results
+    chmod -R 775 playwright-report test-results
+    npm run test:e2e
+    ```
 ## Technologies
 - [x] Laravel, React.js, Inertia.js, Vite.js, Shadcn UI, Tailwind CSS, TypeScript, ESLint, Prettier, PHPUnit, Pest, FakerPHP. ([Link](https://ui.shadcn.com/docs/installation/laravel))
 - [x] Sail. ([Link](https://laravel.com/docs/12.x/sail))
