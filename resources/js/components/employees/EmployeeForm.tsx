@@ -88,14 +88,15 @@ const DEPARTMENTS = [
 ];
 
 const POSITIONS = [
-    'Junior',
-    'Mid-level',
-    'Senior',
-    'Lead',
-    'Manager',
-    'Director',
-    'VP',
-    'C-level',
+  'Junior',
+  'Mid-level',
+  'Senior',
+  'Senior Developer',
+  'Lead',
+  'Manager',
+  'Director',
+  'VP',
+  'C-level',
 ];
 
 export function EmployeeForm({
