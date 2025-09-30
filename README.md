@@ -3,11 +3,11 @@
 - Run: `./vendor/bin/sail up -d`
 - Run this to generate autocompletion for Facades.
     ```
-    php artisan ide-helper:generate
+    ./vendor/bin/sail artisan ide-helper:generate
     ```
 - Run this to add phpdocs for your models.
     ```
-    php artisan ide-helper:models -RW
+    ./vendor/bin/sail artisan ide-helper:models -RW
     ```
 - Start analyzing your code using the phpstan console command:
     ```
@@ -15,22 +15,21 @@
     ```
 - To fix everything at once:
     ```
-    ./vendor/bin/duster fix
+    ./vendor/bin/sail bin duster fix
     ```
 - Format files and overwrite:
     ```
-    ./node_modules/.bin/blade-formatter --write resources/**/*.blade.php
+    ./vendor/bin/sail npm run blade:formatter
     ```
 - Run Prettier and ESLint:
     ```
-    npm run format
-    npm run lint
+    ./vendor/bin/sail npm run format
+    ./vendor/bin/sail npm run lint
     ```
 - Run test:
     ```
-    chown -R 1000:sail playwright-report test-results
-    chmod -R 775 playwright-report test-results
-    npm run test:e2e
+    sudo chmod -R 777 playwright-report test-results
+    ./vendor/bin/sail npm run test:e2e
     ```
 ## Technologies
 - [x] Laravel, React.js, Inertia.js, Vite.js, Shadcn UI, Tailwind CSS, TypeScript, ESLint, Prettier, PHPUnit, Pest, FakerPHP. ([Link](https://ui.shadcn.com/docs/installation/laravel))
