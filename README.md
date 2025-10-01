@@ -28,6 +28,10 @@
     ```
 - Run test:
     ```
+    ./vendor/bin/sail test
+    ```
+- Run e2e test:
+    ```
     sudo chmod -R 777 playwright-report test-results
     ./vendor/bin/sail npm run test:e2e
     ```
