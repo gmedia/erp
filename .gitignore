@@ -32,3 +32,6 @@ running_task.md
 # Playwright artifacts
 playwright-report/
 test-results/
+
+# Pest artifacts
+coverage-html/
