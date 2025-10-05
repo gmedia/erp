@@ -53,15 +53,32 @@ class Employee extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'hire_date' => 'date',
+        'salary'    => 'decimal:2',
+    ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'salary',
+    ];
+
+    /**
+     * Get the formatted salary attribute.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    public function getSalaryAttribute($value)
     {
-        return [
-            'hire_date' => 'date',
-            'salary' => 'decimal:2',
-        ];
+        return number_format($value, 2, '.', '');
     }
 }

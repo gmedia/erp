@@ -93,3 +93,28 @@
 - [ ] Prometheus Postgres Exporter. ([Link](https://github.com/wrouesnel/postgres_exporter))
 - [ ] Grafana Node Exporter Full. ([Link](https://grafana.com/grafana/dashboards/1860-node-exporter-full))
 - [ ] Grafana PostgreSQL Database. ([Link](https://grafana.com/grafana/dashboards/9628-postgresql-database))
+
+## Employee Module Refactor
+
+The Employee module has been modernized and aligned with Laravel best practices.
+
+### Key Changes
+- **Model (`Employee.php`)**
+  - Replaced custom `casts()` method with `$casts` property.
+  - Added `$hidden` to hide the `salary` attribute.
+  - Implemented `getSalaryAttribute` accessor for consistent formatting.
+- **Form Requests**
+  - `StoreEmployeeRequest`, `UpdateEmployeeRequest`, and `ExportEmployeeRequest` created for validation.
+- **API Resources**
+  - `EmployeeResource` and `EmployeeCollection` provide consistent JSON responses with ISO‑8601 dates.
+- **Controller (`EmployeeController.php`)**
+  - Uses Form Requests, API Resources, and proper type hints.
+  - Added authorization checks via Laravel policies.
+  - Simplified response handling and pagination.
+- **Base Controller**
+  - Integrated `AuthorizesRequests`, `DispatchesJobs`, and `ValidatesRequests` traits.
+- **Tests**
+  - Updated to reflect new response structures and validation logic.
+  - All feature, unit, and e2e tests now pass.
+
+These updates improve code readability, security, and API consistency across the project.

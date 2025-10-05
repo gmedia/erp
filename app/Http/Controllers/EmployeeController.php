@@ -5,13 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Http\Requests\StoreEmployeeRequest;
+use App\Http\Requests\UpdateEmployeeRequest;
+use App\Http\Requests\ExportEmployeeRequest;
+use App\Http\Resources\EmployeeResource;
+use App\Http\Resources\EmployeeCollection;
+use Illuminate\Http\JsonResponse;
 
 class EmployeeController extends Controller
 {
     /**
      * Display a listing of the employees with filtering and sorting.
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $perPage = $request->get('per_page', 15);
         $page = $request->get('page', 1);
@@ -93,72 +99,41 @@ class EmployeeController extends Controller
         // Execute paginated query
         $employees = $query->paginate($perPage, ['*'], 'page', $page);
 
-        return response()->json([
-            'data' => $employees->items(),
-            'meta' => [
-                'current_page' => $employees->currentPage(),
-                'per_page' => $employees->perPage(),
-                'total' => $employees->total(),
-                'last_page' => $employees->lastPage(),
-                'from' => $employees->firstItem(),
-                'to' => $employees->lastItem(),
-                'has_more_pages' => $employees->hasMorePages(),
-            ],
-        ]);
+        return (new EmployeeCollection($employees))->response();
     }
 
     /**
      * Store a newly created employee in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEmployeeRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:employees',
-            'phone' => 'nullable|string|max:20',
-            'department' => 'required|string|max:255',
-            'position' => 'required|string|max:255',
-            'salary' => 'required|numeric|min:0',
-            'hire_date' => 'required|date',
-        ]);
+        $employee = Employee::create($request->validated());
 
-        $employee = Employee::create($validated);
-
-        return response()->json($employee, Response::HTTP_CREATED);
+        return (new EmployeeResource($employee))->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
     /**
      * Display the specified employee.
      */
-    public function show(Employee $employee)
+    public function show(Employee $employee): JsonResponse
     {
-        return response()->json($employee);
+        return (new EmployeeResource($employee))->response();
     }
 
     /**
      * Update the specified employee in storage.
      */
-    public function update(Request $request, Employee $employee)
+    public function update(UpdateEmployeeRequest $request, Employee $employee): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:employees,email,' . $employee->id,
-            'phone' => 'nullable|string|max:20',
-            'department' => 'sometimes|string|max:255',
-            'position' => 'sometimes|string|max:255',
-            'salary' => 'sometimes|numeric|min:0',
-            'hire_date' => 'sometimes|date',
-        ]);
+        $employee->update($request->validated());
 
-        $employee->update($validated);
-
-        return response()->json($employee);
+        return (new EmployeeResource($employee))->response();
     }
 
     /**
      * Remove the specified employee from storage.
      */
-    public function destroy(Employee $employee)
+    public function destroy(Employee $employee): JsonResponse
     {
         $employee->delete();
 
@@ -168,19 +143,9 @@ class EmployeeController extends Controller
     /**
      * Export employees to Excel based on filters.
      */
-    public function export(Request $request)
+    public function export(ExportEmployeeRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'search' => 'nullable|string|max:255',
-            'department' => 'nullable|string|max:255',
-            'position' => 'nullable|string|max:255',
-            'min_salary' => 'nullable|numeric|min:0',
-            'max_salary' => 'nullable|numeric|min:0',
-            'hire_date_from' => 'nullable|date',
-            'hire_date_to' => 'nullable|date',
-            'sort_by' => 'nullable|string|in:name,email,department,position,salary,hire_date,created_at',
-            'sort_direction' => 'nullable|string|in:asc,desc',
-        ]);
+        $validated = $request->validated();
 
         // Map request parameters to match EmployeeExport expectations
         $filters = [
