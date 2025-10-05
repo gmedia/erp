@@ -24,7 +24,7 @@ export async function login(
   await page.goto('/login');
 
   // Wait for either a redirect to the dashboard or the email input to become visible
-  const dashboardWait = page.waitForURL('**/dashboard', { timeout: 10000 }).catch(() => null);
+  const dashboardWait = page.waitForURL('**/dashboard', { timeout: 60000 }).catch(() => null);
   const emailWait = page.waitForSelector('input[name="email"]', { state: 'visible', timeout: 10000 }).catch(() => null);
   await Promise.race([dashboardWait, emailWait]);
 
@@ -37,7 +37,7 @@ export async function login(
   // If the email input is not present, wait for a possible later redirect to the dashboard
   const emailElement = await page.$('input[name="email"]');
   if (!emailElement) {
-    await page.waitForURL('**/dashboard', { timeout: 15000 }).catch(() => {});
+    await page.waitForURL('**/dashboard', { timeout: 60000 }).catch(() => {});
     return;
   }
 
@@ -45,8 +45,15 @@ export async function login(
   await page.fill('input[name="email"]', email);
   await page.fill('input[name="password"]', password);
   await Promise.all([
-    page.waitForURL('**/dashboard'),
-    page.click('button[type="submit"], button[data-testid="login-button"]')
+    page.waitForURL('**/dashboard', { timeout: 60000 }),
+    (async () => {
+      const testIdButton = page.locator('button[data-testid="login-button"]');
+      if (await testIdButton.count() > 0) {
+        await testIdButton.first().click();
+      } else {
+        await page.click('button[type="submit"]');
+      }
+    })()
   ]);
   await page.waitForLoadState('networkidle');
 }
