@@ -1,4 +1,5 @@
 export * from './employee';
+export * from './position';
 export * from './user';
 
 export type PageProps<
