@@ -181,3 +181,106 @@ export async function editEmployee(
   await expect(updateBtn).toBeVisible();
   await updateBtn.click();
 }
+
+
+
+/**
+ * Create a new employee via the UI.
+ *
+ * @param page - Playwright Page object.
+ * @param overrides - Optional fields to override the default values.
+ * @returns The unique name used for the created employee.
+ */
+export async function createPosition(
+  page: Page,
+  overrides?: Partial<{
+    name: string;
+  }>
+): Promise<string> {
+  // 1️⃣ Login
+  await login(page);
+
+  // 2️⃣ Navigate to position list page
+  await page.goto('/positions');
+
+  // 3️⃣ Open the “Add Position” dialog
+  const addButton = page.getByRole('button', { name: /Add/i });
+  await expect(addButton).toBeVisible();
+  await addButton.click();
+
+  // 4️⃣ Fill the form fields (use defaults, allow overrides)
+  const timestamp = Date.now();
+// Updated name generation to ensure uniqueness without fixed prefix
+  const defaultName = `${Math.random().toString(36).substring(2,7)}${timestamp}@example.com`;
+  const name = overrides?.name ?? defaultName;
+
+  await page.fill('input[name="name"]', name);
+
+  // Ensure any modal overlay/backdrop is removed before submitting
+  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
+    state: 'detached',
+  });
+  const dialog = page.getByRole('dialog');
+  const submitButton = dialog.getByRole('button', { name: /Add/ });
+  await expect(submitButton).toBeVisible();
+  await submitButton.click();
+
+  // Return the name used for later lookup
+  return name;
+}
+
+/**
+ * Search for an position by name.
+ *
+ * @param page - Playwright Page object.
+ * @param name - Name address to search for.
+ */
+export async function searchPosition(page: Page, name: string): Promise<void> {
+  await page.fill('input[placeholder="Search positions..."]', name);
+  await page.press('input[placeholder="Search positions..."]', 'Enter');
+  // Wait for the row containing the name to appear
+  await page.waitForSelector(`text=${name}`);
+}
+
+/**
+ * Edit an existing position.
+ *
+ * @param page - Playwright Page object.
+ * @param name - Name of the position to edit.
+ * @param updates - Fields to update (name and/or salary).
+ */
+export async function editPosition(
+  page: Page,
+  name: string,
+  updates: { name?: string }
+): Promise<void> {
+  // Locate the position first
+  await searchPosition(page, name);
+
+  // Locate the row and open the Actions menu
+  const row = page.locator('tr', { hasText: name }).first();
+  await expect(row).toBeVisible();
+  await row.waitFor({ state: 'attached' });
+  const actionsBtn = row.getByRole('button', { name: /Actions/i });
+  await expect(actionsBtn).toBeVisible();
+  await actionsBtn.click({ force: true });
+
+  // Click the Edit menu item
+  const editItem = page.getByRole('menuitemcheckbox', { name: /Edit/i });
+  await expect(editItem).toBeVisible();
+  await editItem.click({ force: true });
+
+  // Update fields if provided
+  if (updates.name) {
+    await page.fill('input[name="name"]', updates.name);
+  }
+
+  // Submit the edit dialog
+  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
+    state: 'detached',
+  });
+  const editDialog = page.getByRole('dialog');
+  const updateBtn = editDialog.getByRole('button', { name: /Update/ });
+  await expect(updateBtn).toBeVisible();
+  await updateBtn.click();
+}

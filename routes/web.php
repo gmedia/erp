@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\PositionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -16,12 +17,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('employees', function () {
         return Inertia::render('employees/index');
     })->name('employees');
+
+    Route::get('positions', function () {
+        return Inertia::render('positions/index');
+    })->name('positions');
 });
 
 // API routes for employee CRUD operations
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::apiResource('employees', EmployeeController::class);
     Route::post('employees/export', [EmployeeController::class, 'export']);
+    Route::apiResource('positions', PositionController::class);
+    Route::post('positions/export', [PositionController::class, 'export']);
 });
 
 require __DIR__ . '/settings.php';

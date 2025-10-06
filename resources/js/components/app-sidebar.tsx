@@ -10,10 +10,10 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard, employees } from '@/routes';
+import { dashboard, employees, positions } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Users } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Users, IdCard } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -26,6 +26,11 @@ const mainNavItems: NavItem[] = [
         title: 'Employees',
         href: employees(),
         icon: Users,
+    },
+    {
+        title: 'Positions',
+        href: positions(),
+        icon: IdCard,
     },
 ];
 

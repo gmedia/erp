@@ -29,10 +29,10 @@ import {
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
-import { dashboard, employees } from '@/routes';
+import { dashboard, employees, positions } from '@/routes';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search, Users } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, Users, IdCard } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
@@ -46,6 +46,11 @@ const mainNavItems: NavItem[] = [
         title: 'Employees',
         href: employees(),
         icon: Users,
+    },
+    {
+        title: 'Positions',
+        href: positions(),
+        icon: IdCard,
     },
 ];
 
