@@ -265,8 +265,8 @@ export async function editPosition(
   await expect(actionsBtn).toBeVisible();
   await actionsBtn.click({ force: true });
 
-  // Click the Edit menu item
-  const editItem = page.getByRole('menuitemcheckbox', { name: /Edit/i });
+  // Click the Edit menu item (updated selector to 'menuitem' for positions)
+  const editItem = page.getByRole('menuitem', { name: /Edit/i });
   await expect(editItem).toBeVisible();
   await editItem.click({ force: true });
 
