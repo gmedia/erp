@@ -15,7 +15,7 @@ test('delete position end‑to‑end', async ({ page }) => {
   await actionsButton.click();
 
   // 4. Click the Delete menu item
-  const deleteMenuItem = page.getByRole('menuitemcheckbox', { name: /Delete/i });
+  const deleteMenuItem = page.getByRole('menuitem', { name: /Delete/i });
   await deleteMenuItem.click();
 
   // 5. Confirm deletion in the dialog
