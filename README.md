@@ -28,7 +28,7 @@
     ```
 - Run test:
     ```
-    ./vendor/bin/sail test
+    ./vendor/bin/sail test --coverage-clover=coverage.xml
     ```
 - Run e2e test:
     ```
@@ -50,7 +50,7 @@
 - [!] Security Advisories Health Check. ([Link](https://github.com/spatie/security-advisories-health-check))
 - [!] npm-check-updates. ([Link](https://github.com/raineorshine/npm-check-updates))
 - [!] Laravel CSP. ([Link](https://github.com/spatie/laravel-csp))
-- [!] SonarQube. ([Link](https://docs.sonarsource.com/sonarqube-community-build/server-installation/from-docker-image/installation-overview))
+- [x] SonarQube. ([Link](https://docs.sonarsource.com/sonarqube-community-build/server-installation/from-docker-image/installation-overview))
 - [ ] Laravel Actions. ([Link](https://github.com/lorisleiva/laravel-actions))
 - [ ] Laravel Actions IDE Helper. ([Link](https://github.com/Wulfheart/laravel-actions-ide-helper))
 - [ ] Scramble. ([Link](https://github.com/dedoc/scramble))
