@@ -6,8 +6,8 @@ import axios from 'axios';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import { PositionDataTable } from '@/components/positions/PositionDataTable';
-import { PositionForm } from '@/components/positions/PositionForm';
+import { DepartmentDataTable } from '@/components/departments/DepartmentDataTable';
+import { DepartmentForm } from '@/components/departments/DepartmentForm';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -18,22 +18,22 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Position, PositionFormData } from '@/types/position';
+import { Department, DepartmentFormData } from '@/types/department';
 import { type BreadcrumbItem } from '@/types';
-import { positions } from '@/routes';
+import { departments } from '@/routes';
 import AppLayout from '@/layouts/app-layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Positions',
-        href: positions().url,
+        title: 'Departments',
+        href: departments().url,
     },
 ];
 
-export default function PositionIndex() {
+export default function DepartmentIndex() {
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
-    const [positionToDelete, setPositionToDelete] = useState<Position | null>(null);
+    const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
+    const [departmentToDelete, setDepartmentToDelete] = useState<Department | null>(null);
 
     // Filter states
     const [filters, setFilters] = useState({
@@ -46,14 +46,15 @@ export default function PositionIndex() {
         page: 1,
         per_page: 15,
     });
+
     const queryClient = useQueryClient();
 
-    // Fetch positions with pagination and filters
-    const { data: positionsData, isLoading } = useQuery({
-        queryKey: ['positions', pagination, filters],
+    // Fetch departments with pagination and filters
+    const { data: departmentsData, isLoading } = useQuery({
+        queryKey: ['departments', pagination, filters],
         queryFn: async () => {
             try {
-                const response = await axios.get('/api/positions', {
+                const response = await axios.get('/api/departments', {
                     params: {
                         page: pagination.page,
                         per_page: pagination.per_page,
@@ -74,7 +75,7 @@ export default function PositionIndex() {
                     }
                 );
             } catch {
-                toast.error('Failed to load positions');
+                toast.error('Failed to load departments');
                 return {
                     data: [],
                     meta: {
@@ -88,94 +89,94 @@ export default function PositionIndex() {
         },
     });
 
-    const positionsList = positionsData?.data || [];
-    const meta = positionsData?.meta || {
+    const departmentsList = departmentsData?.data || [];
+    const meta = departmentsData?.meta || {
         current_page: 1,
         per_page: 15,
         total: 0,
         last_page: 1,
     };
 
-    // Create position mutation
-    const createPositionMutation = useMutation({
-        mutationFn: async (data: PositionFormData) => {
-            const response = await axios.post('/api/positions', data);
+    // Create department mutation
+    const createDepartmentMutation = useMutation({
+        mutationFn: async (data: DepartmentFormData) => {
+            const response = await axios.post('/api/departments', data);
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['positions'] });
+            queryClient.invalidateQueries({ queryKey: ['departments'] });
             setIsFormOpen(false);
-            setSelectedPosition(null);
-            toast.success('Position created successfully');
+            setSelectedDepartment(null);
+            toast.success('Department created successfully');
         },
         onError: (
             error: Error & { response?: { data?: { message?: string } } },
         ) => {
-            toast.error(error?.response?.data?.message || 'Failed to create position');
+            toast.error(error?.response?.data?.message || 'Failed to create department');
         },
     });
 
-    // Update position mutation
-    const updatePositionMutation = useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: PositionFormData }) => {
-            const response = await axios.put(`/api/positions/${id}`, data);
+    // Update department mutation
+    const updateDepartmentMutation = useMutation({
+        mutationFn: async ({ id, data }: { id: number; data: DepartmentFormData }) => {
+            const response = await axios.put(`/api/departments/${id}`, data);
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['positions'] });
+            queryClient.invalidateQueries({ queryKey: ['departments'] });
             setIsFormOpen(false);
-            setSelectedPosition(null);
-            toast.success('Position updated successfully');
+            setSelectedDepartment(null);
+            toast.success('Department updated successfully');
         },
         onError: (
             error: Error & { response?: { data?: { message?: string } } },
         ) => {
-            toast.error(error?.response?.data?.message || 'Failed to update position');
+            toast.error(error?.response?.data?.message || 'Failed to update department');
         },
     });
 
-    // Delete position mutation
-    const deletePositionMutation = useMutation({
+    // Delete department mutation
+    const deleteDepartmentMutation = useMutation({
         mutationFn: async (id: number) => {
-            await axios.delete(`/api/positions/${id}`);
+            await axios.delete(`/api/departments/${id}`);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['positions'] });
-            setPositionToDelete(null);
-            toast.success('Position deleted successfully');
+            queryClient.invalidateQueries({ queryKey: ['departments'] });
+            setDepartmentToDelete(null);
+            toast.success('Department deleted successfully');
         },
         onError: (
             error: Error & { response?: { data?: { message?: string } } },
         ) => {
-            toast.error(error?.response?.data?.message || 'Failed to delete position');
+            toast.error(error?.response?.data?.message || 'Failed to delete department');
         },
     });
 
-    const handleAddPosition = () => {
-        setSelectedPosition(null);
+    const handleAddDepartment = () => {
+        setSelectedDepartment(null);
         setIsFormOpen(true);
     };
 
-    const handleEditPosition = (position: Position) => {
-        setSelectedPosition(position);
+    const handleEditDepartment = (department: Department) => {
+        setSelectedDepartment(department);
         setIsFormOpen(true);
     };
 
-    const handleDeletePosition = (position: Position) => {
-        setPositionToDelete(position);
+    const handleDeleteDepartment = (department: Department) => {
+        setDepartmentToDelete(department);
     };
 
-    const handleFormSubmit = (data: PositionFormData) => {
-        if (selectedPosition) {
-            updatePositionMutation.mutate({ id: selectedPosition.id, data });
+    const handleFormSubmit = (data: DepartmentFormData) => {
+        if (selectedDepartment) {
+            updateDepartmentMutation.mutate({ id: selectedDepartment.id, data });
         } else {
-            createPositionMutation.mutate(data);
+            createDepartmentMutation.mutate(data);
         }
     };
 
     const handleDeleteConfirm = () => {
-        if (positionToDelete) {
-            deletePositionMutation.mutate(positionToDelete.id);
+        if (departmentToDelete) {
+            deleteDepartmentMutation.mutate(departmentToDelete.id);
         }
     };
 
@@ -198,16 +199,16 @@ export default function PositionIndex() {
 
     return (
         <>
-            <Head title="Positions" />
+            <Head title="Departments" />
 
             <AppLayout breadcrumbs={breadcrumbs}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                     <div className="rounded-lg bg-white">
-                        <PositionDataTable
-                            data={positionsList}
-                            onAddPosition={handleAddPosition}
-                            onEditPosition={handleEditPosition}
-                            onDeletePosition={handleDeletePosition}
+                        <DepartmentDataTable
+                            data={departmentsList}
+                            onAddDepartment={handleAddDepartment}
+                            onEditDepartment={handleEditDepartment}
+                            onDeleteDepartment={handleDeleteDepartment}
                             pagination={{
                                 page: meta.current_page,
                                 per_page: meta.per_page,
@@ -216,15 +217,9 @@ export default function PositionIndex() {
                                 from: meta.from || 0,
                                 to: meta.to || 0,
                             }}
-                            onPageChange={(page) =>
-                                setPagination((prev) => ({ ...prev, page }))
-                            }
-                            onPageSizeChange={(per_page) =>
-                                setPagination({ page: 1, per_page })
-                            }
-                            onSearchChange={(search) =>
-                                handleFilterChange({ search })
-                            }
+                            onPageChange={(page) => setPagination((prev) => ({ ...prev, page }))}
+                            onPageSizeChange={(per_page) => setPagination({ page: 1, per_page })}
+                            onSearchChange={(search) => handleFilterChange({ search })}
                             isLoading={isLoading}
                             filterValue={filters.search}
                             filters={filters}
@@ -235,35 +230,26 @@ export default function PositionIndex() {
                 </div>
             </AppLayout>
 
-            <PositionForm
+            <DepartmentForm
                 open={isFormOpen}
                 onOpenChange={setIsFormOpen}
-                position={selectedPosition}
+                department={selectedDepartment}
                 onSubmit={handleFormSubmit}
-                isLoading={
-                    createPositionMutation.isPending ||
-                    updatePositionMutation.isPending
-                }
+                isLoading={createDepartmentMutation.isPending || updateDepartmentMutation.isPending}
             />
 
-            <AlertDialog
-                open={!!positionToDelete}
-                onOpenChange={(open) => !open && setPositionToDelete(null)}
-            >
+            <AlertDialog open={!!departmentToDelete} onOpenChange={(open) => !open && setDepartmentToDelete(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete <strong>{positionToDelete?.name}</strong>'s
-                            position record.
+                            This action cannot be undone. This will permanently delete{' '}
+                            <strong>{departmentToDelete?.name}</strong>'s department record.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDeleteConfirm}>
-                            Delete
-                        </AlertDialogAction>
+                        <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

@@ -42,8 +42,8 @@ export default function EmployeeIndex() {
         search: '',
         department: '',
         position: '',
-        sort_by: undefined,
-        sort_direction: undefined,
+        sort_by: undefined as string | undefined,
+        sort_direction: undefined as string | undefined,
     });
 
     const [pagination, setPagination] = useState({
