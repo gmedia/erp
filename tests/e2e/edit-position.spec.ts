@@ -12,8 +12,6 @@ test('edit position end‑to‑end', async ({ page }) => {
   const updatedName = name + ' Updated';
   await editPosition(page, name, { name: updatedName });
 
-  console.log(updatedName);
-
   // Verify the updated name appears in the table
   await expect(page.locator('text=' + updatedName)).toBeVisible();
 });
