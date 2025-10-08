@@ -28,6 +28,7 @@ yarn-error.log
 /.zed
 running_task.md
 .kilocode*
+.roo*
 _ide_helper.php
 
 # Playwright artifacts
