@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Calendar } from '@/components/ui/calendar';
 import { z } from 'zod';
 import { format } from 'date-fns';
@@ -54,7 +55,11 @@ export function EmployeeForm({
       }
     : undefined;
 
-  const { control } = useFormContext();
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: defaultValues as any,
+  });
+  const { control } = form;
 
   return (
     <EntityForm
@@ -64,7 +69,7 @@ export function EmployeeForm({
       onSubmit={onSubmit}
       defaultValues={defaultValues}
       schema={formSchema}
-      isLoading={isLoading}
+      isLoading={isLoading} form={form}
     >
       <NameField
         name="name"
@@ -74,7 +79,7 @@ export function EmployeeForm({
         <FormMessage />
       </NameField>
       <FormField
-        control={control}
+        control={form.control}
         name="email"
         render={({ field }) => (
           <FormItem>
@@ -87,7 +92,7 @@ export function EmployeeForm({
         )}
       />
       <FormField
-        control={control}
+        control={form.control}
         name="phone"
         render={({ field }) => (
           <FormItem>
@@ -116,7 +121,7 @@ export function EmployeeForm({
         <FormMessage />
       </SelectField>
       <FormField
-        control={control}
+        control={form.control}
         name="salary"
         render={({ field }) => (
           <FormItem>
@@ -129,7 +134,7 @@ export function EmployeeForm({
         )}
       />
       <FormField
-        control={control}
+        control={form.control}
         name="hire_date"
         render={({ field }) => (
           <FormItem className="flex flex-col">
