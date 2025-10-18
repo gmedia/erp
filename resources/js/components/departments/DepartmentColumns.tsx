@@ -1,5 +1,7 @@
 'use client';
 
+import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
+import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -10,33 +12,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { createSelectColumn } from '@/components/common/SelectColumn';
+import { GenericActions } from '@/components/common/ActionsDropdown';
 import { Department } from '@/types/department';
-import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
+import { formatDate } from '@/lib/utils';
 
 export const departmentColumns: ColumnDef<Department>[] = [
-    {
-        id: 'select',
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && 'indeterminate')
-                }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
+    createSelectColumn<Department>(),
     {
         accessorKey: 'name',
         header: ({ column }) => (
@@ -55,8 +37,7 @@ export const departmentColumns: ColumnDef<Department>[] = [
             </Button>
         ),
         cell: ({ row }) => {
-            const date = new Date(row.getValue('created_at'));
-            return <div>{date.toLocaleDateString()}</div>;
+            return <div>{formatDate(row.getValue('created_at'))}</div>;
         },
     },
     {
@@ -68,8 +49,7 @@ export const departmentColumns: ColumnDef<Department>[] = [
             </Button>
         ),
         cell: ({ row }) => {
-            const date = new Date(row.getValue('updated_at'));
-            return <div>{date.toLocaleDateString()}</div>;
+            return <div>{formatDate(row.getValue('updated_at'))}</div>;
         },
     },
     {
@@ -78,26 +58,11 @@ export const departmentColumns: ColumnDef<Department>[] = [
         cell: ({ row }) => {
             const department = row.original;
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => console.log('Edit', department.id)}>
-                            Edit department
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => console.log('Delete', department.id)}
-                        >
-                            Delete department
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <GenericActions
+                    item={department}
+                    onEdit={(item) => console.log('Edit', item.id)}
+                    onDelete={(item) => console.log('Delete', item.id)}
+                />
             );
         },
     },
