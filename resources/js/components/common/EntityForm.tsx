@@ -1,9 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -21,10 +18,14 @@ interface EntityFormProps<T> {
   onOpenChange: (open: boolean) => void;
   title: string;
   onSubmit: (values: T) => Promise<void> | void;
+  /** Optional – kept for backward compatibility; not used inside EntityForm */
   defaultValues?: Partial<T>;
-  schema?: z.ZodSchema<any>;
+  /** Optional – kept for backward compatibility; not used inside EntityForm */
+  schema?: any;
   children: React.ReactNode;
   isLoading?: boolean;
+  /** The form object returned by react‑hook‑form's useForm */
+  form: any;
 }
 
 /**
@@ -43,19 +44,9 @@ export default function EntityForm<T>({
   schema,
   children,
   isLoading = false,
+  form,
 }: EntityFormProps<T>) {
-  const form = useForm<any>({
-    resolver: schema ? zodResolver(schema as any) : undefined,
-    defaultValues: defaultValues as any,
-  });
 
-  React.useEffect(() => {
-    if (defaultValues) {
-      form.reset(defaultValues as any);
-    } else {
-      form.reset({});
-    }
-  }, [defaultValues, form]);
 
   const handleSubmit = (values: any) => {
     onSubmit(values);

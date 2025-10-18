@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as React from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { FormMessage } from '@/components/ui/form';
 import NameField from '@/components/common/NameField';
@@ -31,10 +31,14 @@ export function DepartmentForm({
 }) {
   const defaultValues = department ? { name: department.name } : undefined;
 
-  const { control } = useFormContext();
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: defaultValues as any,
+  });
+  const { control } = form;
 
   return (
-    <EntityForm
+    <EntityForm form={form}
       open={open}
       onOpenChange={onOpenChange}
       title={department ? 'Edit Department' : 'Add New Department'}

@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
 import { FormMessage } from '@/components/ui/form';
@@ -28,10 +29,14 @@ export function PositionForm({
 }) {
   const defaultValues = position ? { name: position.name } : undefined;
 
-  const { control } = useFormContext();
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: defaultValues as any,
+  });
+  const { control } = form;
 
   return (
-    <EntityForm
+    <EntityForm form={form}
       open={open}
       onOpenChange={onOpenChange}
       title={position ? 'Edit Position' : 'Add New Position'}
