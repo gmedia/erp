@@ -4,28 +4,27 @@ import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
 
 interface EntityFormProps<T> {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  title: string;
-  onSubmit: (values: T) => Promise<void> | void;
-  /** Optional – kept for backward compatibility; not used inside EntityForm */
-  defaultValues?: Partial<T>;
-  /** Optional – kept for backward compatibility; not used inside EntityForm */
-  schema?: any;
-  children: React.ReactNode;
-  isLoading?: boolean;
-  /** The form object returned by react‑hook‑form's useForm */
-  form: any;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    title: string;
+    onSubmit: (values: T) => Promise<void> | void;
+    /** Optional – kept for backward compatibility; not used inside EntityForm */
+    defaultValues?: Partial<T>;
+    /** Optional – kept for backward compatibility; not used inside EntityForm */
+    schema?: any;
+    children: React.ReactNode;
+    isLoading?: boolean;
+    /** The form object returned by react‑hook‑form's useForm */
+    form: any;
 }
 
 /**
@@ -36,48 +35,55 @@ interface EntityFormProps<T> {
  * Zod schema.
  */
 export default function EntityForm<T>({
-  open,
-  onOpenChange,
-  title,
-  onSubmit,
-  defaultValues,
-  schema,
-  children,
-  isLoading = false,
-  form,
+    open,
+    onOpenChange,
+    title,
+    onSubmit,
+    defaultValues: _defaultValues,
+    schema: _schema,
+    children,
+    isLoading = false,
+    form,
 }: EntityFormProps<T>) {
+    const handleSubmit = (values: any) => {
+        onSubmit(values);
+    };
 
-
-  const handleSubmit = (values: any) => {
-    onSubmit(values);
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {/* Optional description can be added as a child of EntityForm if needed */}
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            {children}
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isLoading}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Saving...' : 'Submit'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  );
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>{title}</DialogTitle>
+                    {/* Optional description can be added as a child of EntityForm if needed */}
+                </DialogHeader>
+                <Form {...form}>
+                    <form
+                        onSubmit={form.handleSubmit(handleSubmit)}
+                        className="space-y-4"
+                    >
+                        {children}
+                        <DialogFooter>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => onOpenChange(false)}
+                                disabled={isLoading}
+                            >
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={isLoading}>
+                                {isLoading
+                                    ? 'Saving...'
+                                    : title.toLowerCase().includes('add')
+                                      ? 'Add'
+                                      : title.toLowerCase().includes('edit')
+                                        ? 'Update'
+                                        : 'Submit'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </Form>
+            </DialogContent>
+        </Dialog>
+    );
 }

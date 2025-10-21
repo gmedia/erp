@@ -1,7 +1,7 @@
 export * from './employee';
-import type { UrlMethodPair } from '@inertiajs/react';
 export * from './position';
 export * from './user';
+import type { UrlMethodPair } from '@inertiajs/react';
 
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,

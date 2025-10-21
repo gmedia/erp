@@ -1,35 +1,38 @@
+import { SelectContent, SelectTrigger } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { SelectTrigger, SelectContent } from '@/components/ui/select';
 import { type ReactNode } from 'react';
 
 /**
  * Wrapper that applies common Tailwind classes to SelectTrigger.
  */
 export function StyledSelectTrigger({
-  className,
-  ...props
+    className,
+    ...props
 }: React.ComponentProps<'button'>) {
-  return (
-    <SelectTrigger
-      className={cn('w-full border-input bg-background', className)}
-      {...props}
-    />
-  );
+    return (
+        <SelectTrigger
+            className={cn('w-full border-input bg-background', className)}
+            {...props}
+        />
+    );
 }
 
 /**
  * Wrapper that applies common Tailwind classes to SelectContent.
  */
 export function StyledSelectContent({
-  className,
-  ...props
+    className,
+    ...props
 }: React.ComponentProps<'div'>) {
-  return (
-    <SelectContent
-      className={cn('bg-popover text-popover-foreground border border-input', className)}
-      {...props}
-    />
-  );
+    return (
+        <SelectContent
+            className={cn(
+                'border border-input bg-popover text-popover-foreground',
+                className,
+            )}
+            {...props}
+        />
+    );
 }
 
 /**
@@ -37,18 +40,20 @@ export function StyledSelectContent({
  * Use it inside a `Select` component.
  */
 export default function StyledSelect({
-  children,
-  triggerClassName,
-  contentClassName,
+    children,
+    triggerClassName,
+    contentClassName,
 }: {
-  children: ReactNode;
-  triggerClassName?: string;
-  contentClassName?: string;
+    children: ReactNode;
+    triggerClassName?: string;
+    contentClassName?: string;
 }) {
-  return (
-    <>
-      <StyledSelectTrigger className={triggerClassName} />
-      <StyledSelectContent className={contentClassName}>{children}</StyledSelectContent>
-    </>
-  );
+    return (
+        <>
+            <StyledSelectTrigger className={triggerClassName} />
+            <StyledSelectContent className={contentClassName}>
+                {children}
+            </StyledSelectContent>
+        </>
+    );
 }

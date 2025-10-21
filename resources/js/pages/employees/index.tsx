@@ -1,3 +1,5 @@
+'use client';
+
 import { Head } from '@inertiajs/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
@@ -16,10 +18,10 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Employee, EmployeeFormData } from '@/types';
-import { type BreadcrumbItem } from '@/types';
-import { employees } from '@/routes';
 import AppLayout from '@/layouts/app-layout';
+import { employees } from '@/routes';
+import { type BreadcrumbItem } from '@/types';
+import { Employee, EmployeeFormData } from '@/types/employee';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -131,7 +133,10 @@ export default function EmployeeIndex() {
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['employees'] });
+            // Refetch the employee list to ensure UI updates, even with active pagination/filters
+            queryClient.refetchQueries({ queryKey: ['employees'] });
+            // Reset pagination to first page so the new record is visible
+            setPagination({ page: 1, per_page: 15 });
             setIsFormOpen(false);
             setSelectedEmployee(null);
             toast.success('Employee created successfully');
@@ -140,7 +145,7 @@ export default function EmployeeIndex() {
             error: Error & { response?: { data?: { message?: string } } },
         ) => {
             toast.error(
-                error.response?.data?.message || 'Failed to create employee',
+                error?.response?.data?.message || 'Failed to create employee',
             );
         },
     });
@@ -174,7 +179,10 @@ export default function EmployeeIndex() {
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['employees'] });
+            // Refetch the employee list to reflect the updated data immediately
+            queryClient.refetchQueries({ queryKey: ['employees'] });
+            // Reset pagination to first page to show the updated record
+            setPagination({ page: 1, per_page: 15 });
             setIsFormOpen(false);
             setSelectedEmployee(null);
             toast.success('Employee updated successfully');
@@ -183,7 +191,7 @@ export default function EmployeeIndex() {
             error: Error & { response?: { data?: { message?: string } } },
         ) => {
             toast.error(
-                error.response?.data?.message || 'Failed to update employee',
+                error?.response?.data?.message || 'Failed to update employee',
             );
         },
     });
@@ -194,7 +202,8 @@ export default function EmployeeIndex() {
             await axios.delete(`/api/employees/${id}`);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['employees'] });
+            // Refetch the employee list after deletion to ensure the UI updates promptly
+            queryClient.refetchQueries({ queryKey: ['employees'] });
             setEmployeeToDelete(null);
             toast.success('Employee deleted successfully');
         },
@@ -202,7 +211,7 @@ export default function EmployeeIndex() {
             error: Error & { response?: { data?: { message?: string } } },
         ) => {
             toast.error(
-                error.response?.data?.message || 'Failed to delete employee',
+                error?.response?.data?.message || 'Failed to delete employee',
             );
         },
     });
@@ -246,7 +255,8 @@ export default function EmployeeIndex() {
     const handleFilterChange = (newFilters: Partial<typeof filters>) => {
         // If only the search term is being updated, reset other filters to avoid
         // unintended combination of search with stale department/position filters.
-        const isSearchOnly = Object.keys(newFilters).length === 1 && 'search' in newFilters;
+        const isSearchOnly =
+            Object.keys(newFilters).length === 1 && 'search' in newFilters;
         setFilters((prev) => ({
             ...prev,
             ...newFilters,
@@ -320,7 +330,12 @@ export default function EmployeeIndex() {
 
             <EmployeeForm
                 open={isFormOpen}
-                onOpenChange={setIsFormOpen}
+                onOpenChange={(open) => {
+                    setIsFormOpen(open);
+                    if (!open) {
+                        setSelectedEmployee(null);
+                    }
+                }}
                 employee={selectedEmployee}
                 onSubmit={handleFormSubmit}
                 isLoading={

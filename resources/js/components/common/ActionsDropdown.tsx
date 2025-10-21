@@ -6,7 +6,6 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
@@ -40,9 +39,13 @@ export function GenericActions<T>({
                     <React.Fragment key={idx}>{node}</React.Fragment>
                 ))}
                 {onView && (
-                    <DropdownMenuItem onClick={() => onView(item)}>View</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onView(item)}>
+                        View
+                    </DropdownMenuItem>
                 )}
-                <DropdownMenuItem onClick={() => onEdit(item)}>Edit</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onEdit(item)}>
+                    Edit
+                </DropdownMenuItem>
                 <DropdownMenuItem
                     className="text-destructive"
                     onClick={() => onDelete(item)}

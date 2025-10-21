@@ -18,10 +18,10 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Department, DepartmentFormData } from '@/types/department';
-import { type BreadcrumbItem } from '@/types';
-import { departments } from '@/routes';
 import AppLayout from '@/layouts/app-layout';
+import { departments } from '@/routes';
+import { type BreadcrumbItem } from '@/types';
+import { Department, DepartmentFormData } from '@/types/department';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -32,8 +32,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function DepartmentIndex() {
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
-    const [departmentToDelete, setDepartmentToDelete] = useState<Department | null>(null);
+    const [selectedDepartment, setSelectedDepartment] =
+        useState<Department | null>(null);
+    const [departmentToDelete, setDepartmentToDelete] =
+        useState<Department | null>(null);
 
     // Filter states
     const [filters, setFilters] = useState({
@@ -112,13 +114,21 @@ export default function DepartmentIndex() {
         onError: (
             error: Error & { response?: { data?: { message?: string } } },
         ) => {
-            toast.error(error?.response?.data?.message || 'Failed to create department');
+            toast.error(
+                error?.response?.data?.message || 'Failed to create department',
+            );
         },
     });
 
     // Update department mutation
     const updateDepartmentMutation = useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: DepartmentFormData }) => {
+        mutationFn: async ({
+            id,
+            data,
+        }: {
+            id: number;
+            data: DepartmentFormData;
+        }) => {
             const response = await axios.put(`/api/departments/${id}`, data);
             return response.data;
         },
@@ -131,7 +141,9 @@ export default function DepartmentIndex() {
         onError: (
             error: Error & { response?: { data?: { message?: string } } },
         ) => {
-            toast.error(error?.response?.data?.message || 'Failed to update department');
+            toast.error(
+                error?.response?.data?.message || 'Failed to update department',
+            );
         },
     });
 
@@ -148,7 +160,9 @@ export default function DepartmentIndex() {
         onError: (
             error: Error & { response?: { data?: { message?: string } } },
         ) => {
-            toast.error(error?.response?.data?.message || 'Failed to delete department');
+            toast.error(
+                error?.response?.data?.message || 'Failed to delete department',
+            );
         },
     });
 
@@ -168,7 +182,10 @@ export default function DepartmentIndex() {
 
     const handleFormSubmit = (data: DepartmentFormData) => {
         if (selectedDepartment) {
-            updateDepartmentMutation.mutate({ id: selectedDepartment.id, data });
+            updateDepartmentMutation.mutate({
+                id: selectedDepartment.id,
+                data,
+            });
         } else {
             createDepartmentMutation.mutate(data);
         }
@@ -217,9 +234,15 @@ export default function DepartmentIndex() {
                                 from: meta.from || 0,
                                 to: meta.to || 0,
                             }}
-                            onPageChange={(page) => setPagination((prev) => ({ ...prev, page }))}
-                            onPageSizeChange={(per_page) => setPagination({ page: 1, per_page })}
-                            onSearchChange={(search) => handleFilterChange({ search })}
+                            onPageChange={(page) =>
+                                setPagination((prev) => ({ ...prev, page }))
+                            }
+                            onPageSizeChange={(per_page) =>
+                                setPagination({ page: 1, per_page })
+                            }
+                            onSearchChange={(search) =>
+                                handleFilterChange({ search })
+                            }
                             isLoading={isLoading}
                             filterValue={filters.search}
                             filters={filters}
@@ -232,24 +255,38 @@ export default function DepartmentIndex() {
 
             <DepartmentForm
                 open={isFormOpen}
-                onOpenChange={setIsFormOpen}
+                onOpenChange={(open) => {
+                    setIsFormOpen(open);
+                    if (!open) {
+                        setSelectedDepartment(null);
+                    }
+                }}
                 department={selectedDepartment}
                 onSubmit={handleFormSubmit}
-                isLoading={createDepartmentMutation.isPending || updateDepartmentMutation.isPending}
+                isLoading={
+                    createDepartmentMutation.isPending ||
+                    updateDepartmentMutation.isPending
+                }
             />
 
-            <AlertDialog open={!!departmentToDelete} onOpenChange={(open) => !open && setDepartmentToDelete(null)}>
+            <AlertDialog
+                open={!!departmentToDelete}
+                onOpenChange={(open) => !open && setDepartmentToDelete(null)}
+            >
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete{' '}
-                            <strong>{departmentToDelete?.name}</strong>'s department record.
+                            This action cannot be undone. This will permanently
+                            delete <strong>{departmentToDelete?.name}</strong>'s
+                            department record.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
+                        <AlertDialogAction onClick={handleDeleteConfirm}>
+                            Delete
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

@@ -1,10 +1,11 @@
 'use client';
 
-import * as React from 'react';
+import { createActionsColumn } from '@/components/common/BaseColumns';
 import { GenericDataTable } from '@/components/common/DataTableCore';
-import { departmentColumns } from './DepartmentColumns';
 import { Input } from '@/components/ui/input';
 import { Department } from '@/types/department';
+import * as React from 'react';
+import { departmentColumns } from './DepartmentColumns';
 
 export function DepartmentDataTable({
     data,
@@ -50,9 +51,24 @@ export function DepartmentDataTable({
         },
     ];
 
+    const columns = React.useMemo(() => {
+        return departmentColumns.map((col) => {
+            if (col.id === 'actions') {
+                return {
+                    ...col,
+                    ...createActionsColumn<Department>({
+                        onEdit: (item) => onEditDepartment(item),
+                        onDelete: (item) => onDeleteDepartment(item),
+                    }),
+                };
+            }
+            return col;
+        });
+    }, [onEditDepartment, onDeleteDepartment]);
+
     return (
         <GenericDataTable
-            columns={departmentColumns}
+            columns={columns}
             data={data}
             pagination={pagination}
             onPageChange={onPageChange}

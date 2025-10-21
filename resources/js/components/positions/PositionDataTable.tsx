@@ -1,10 +1,11 @@
 'use client';
 
-import * as React from 'react';
+import { createActionsColumn } from '@/components/common/BaseColumns';
 import { GenericDataTable } from '@/components/common/DataTableCore';
-import { positionColumns } from './PositionColumns';
 import { Input } from '@/components/ui/input';
 import { Position } from '@/types/position';
+import * as React from 'react';
+import { positionColumns } from './PositionColumns';
 
 export function PositionDataTable({
     data,
@@ -50,9 +51,24 @@ export function PositionDataTable({
         },
     ];
 
+    const columns = React.useMemo(() => {
+        return positionColumns.map((col) => {
+            if (col.id === 'actions') {
+                return {
+                    ...col,
+                    ...createActionsColumn<Position>({
+                        onEdit: (item) => onEditPosition(item),
+                        onDelete: (item) => onDeletePosition(item),
+                    }),
+                };
+            }
+            return col;
+        });
+    }, [onEditPosition, onDeletePosition]);
+
     return (
         <GenericDataTable
-            columns={positionColumns}
+            columns={columns}
             data={data}
             pagination={pagination}
             onPageChange={onPageChange}

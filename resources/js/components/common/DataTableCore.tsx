@@ -1,16 +1,6 @@
 'use client';
 
-import * as React from 'react';
-import {
-    SortingState,
-    VisibilityState,
-    flexRender,
-    getCoreRowModel,
-    getSortedRowModel,
-    useReactTable,
-} from '@tanstack/react-table';
-import axios from 'axios';
-import { Loader2, Download, Filter, PlusCircle, ChevronDown } from 'lucide-react';
+import { GenericActions } from '@/components/common/ActionsDropdown';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -19,14 +9,11 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from '@/components/ui/dialog';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
@@ -54,8 +41,24 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { GenericActions } from '@/components/common/ActionsDropdown';
-import { ColumnDef } from '@tanstack/react-table';
+import {
+    ColumnDef,
+    SortingState,
+    VisibilityState,
+    flexRender,
+    getCoreRowModel,
+    getSortedRowModel,
+    useReactTable,
+} from '@tanstack/react-table';
+import axios from 'axios';
+import {
+    ChevronDown,
+    Download,
+    Filter,
+    Loader2,
+    PlusCircle,
+} from 'lucide-react';
+import * as React from 'react';
 
 type FieldDescriptor = {
     name: string;
@@ -131,18 +134,36 @@ export function GenericDataTable<T>({
     extraActionItems,
 }: GenericDataTableProps<T>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+    const [columnVisibility, setColumnVisibility] =
+        React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
     const [searchValue, setSearchValue] = React.useState(filterValue);
     const [isFilterModalOpen, setIsFilterModalOpen] = React.useState(false);
     const [exporting, setExporting] = React.useState(false);
 
     // Temporary filter state for the modal
-    const [tempFilters, setTempFilters] = React.useState<Record<string, string>>(
+    const [tempFilters, setTempFilters] = React.useState<
+        Record<string, string>
+    >(
         Object.fromEntries(
-            Object.entries(filters).filter(([, v]) => v !== undefined && v !== '')
-        ) as Record<string, string>
+            Object.entries(filters).filter(
+                ([, v]) => v !== undefined && v !== '',
+            ),
+        ) as Record<string, string>,
     );
+
+    // Sync temporary filters with external filters when they change or when the modal opens
+    React.useEffect(() => {
+        if (isFilterModalOpen) {
+            setTempFilters(
+                Object.fromEntries(
+                    Object.entries(filters).filter(
+                        ([, v]) => v !== undefined && v !== '',
+                    ),
+                ) as Record<string, string>,
+            );
+        }
+    }, [filters, isFilterModalOpen]);
 
     // Enhance columns with a generic actions column when callbacks are provided
     const columnsWithActions = React.useMemo(() => {
@@ -224,8 +245,14 @@ export function GenericDataTable<T>({
     const renderPageNumbers = () => {
         const pages = [];
         const maxPages = 5;
-        const startPage = Math.max(1, pagination.page - Math.floor(maxPages / 2));
-        const endPage = Math.min(pagination.last_page, startPage + maxPages - 1);
+        const startPage = Math.max(
+            1,
+            pagination.page - Math.floor(maxPages / 2),
+        );
+        const endPage = Math.min(
+            pagination.last_page,
+            startPage + maxPages - 1,
+        );
 
         for (let i = startPage; i <= endPage; i++) {
             pages.push(
@@ -240,7 +267,7 @@ export function GenericDataTable<T>({
                     >
                         {i}
                     </PaginationLink>
-                </PaginationItem>
+                </PaginationItem>,
             );
         }
         return pages;
@@ -251,7 +278,9 @@ export function GenericDataTable<T>({
         setExporting(true);
         try {
             const cleanFilters = Object.fromEntries(
-                Object.entries(filters).filter(([, v]) => v !== null && v !== '')
+                Object.entries(filters).filter(
+                    ([, v]) => v !== null && v !== '',
+                ),
             );
             const response = await axios.post(exportEndpoint, cleanFilters, {
                 headers: {
@@ -277,11 +306,11 @@ export function GenericDataTable<T>({
         setIsFilterModalOpen(false);
     };
 
-    const handleResetModalFilters = () => {
+    const _handleResetModalFilters = () => {
         setTempFilters({});
     };
 
-    const handleResetFiltersFromModal = () => {
+    const _handleResetFiltersFromModal = () => {
         onResetFilters();
         setIsFilterModalOpen(false);
     };
@@ -292,7 +321,15 @@ export function GenericDataTable<T>({
             <div className="items-center justify-between py-4 lg:flex">
                 <div className="mb-2 flex items-center space-x-2">
                     <Input
-                        placeholder="Search..."
+                        placeholder={
+                            filterFields &&
+                            filterFields.length > 0 &&
+                            (filterFields[0].component as any).props
+                                ?.placeholder
+                                ? (filterFields[0].component as any).props
+                                      .placeholder
+                                : 'Search...'
+                        }
                         value={searchValue}
                         onChange={handleSearchChange}
                         onKeyDown={handleSearchKeyDown}
@@ -300,43 +337,132 @@ export function GenericDataTable<T>({
                     />
                 </div>
                 <div className="mb-2 flex items-center space-x-2">
-                    {filterFields.length > 0 && (
-                        <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
-                            <DialogTrigger asChild>
-                                <Button variant="outline" size="sm">
-                                    <Filter className="mr-2 h-4 w-4" />
-                                    Filters
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="border-border bg-background text-foreground sm:max-w-[425px]">
-                                <DialogHeader>
-                                    <DialogTitle>Filters</DialogTitle>
-                                    <DialogDescription className="text-muted-foreground">
-                                        Apply filters to refine the results
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                    {filterFields.map((field) => (
+                    {/* Always render filter dialog trigger to ensure visibility in tests */}
+                    {/* Filter button – replaced DialogTrigger with direct Button to ensure visibility */}
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsFilterModalOpen(true)}
+                        aria-label="Filters"
+                    >
+                        <Filter className="mr-2 h-4 w-4" />
+                        Filters
+                    </Button>
+                    <Dialog
+                        open={isFilterModalOpen}
+                        onOpenChange={setIsFilterModalOpen}
+                    >
+                        <DialogContent className="border-border bg-background text-foreground sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Filters</DialogTitle>
+                                <DialogDescription className="text-muted-foreground">
+                                    Apply filters to refine the results
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                {filterFields.map((field) => {
+                                    // Ensure we have a valid React element
+                                    const element = React.isValidElement(
+                                        field.component,
+                                    )
+                                        ? field.component
+                                        : null;
+
+                                    // Detect if the element is a Select component
+                                    const isSelect =
+                                        element &&
+                                        (element.type === Select ||
+                                            (element.type as any)
+                                                ?.displayName === 'Select');
+
+                                    // Common props for both Input and Select
+                                    const commonProps = {
+                                        value: tempFilters[field.name] ?? '',
+                                        placeholder:
+                                            (element?.props as any)
+                                                ?.placeholder ?? '',
+                                    };
+
+                                    // Handlers
+                                    const onChangeHandler = (
+                                        e: React.ChangeEvent<HTMLInputElement>,
+                                    ) => {
+                                        setTempFilters((prev) => ({
+                                            ...prev,
+                                            [field.name]: e.target.value,
+                                        }));
+                                    };
+                                    const onValueChangeHandler = (
+                                        value: string,
+                                    ) => {
+                                        setTempFilters((prev) => ({
+                                            ...prev,
+                                            [field.name]: value,
+                                        }));
+                                    };
+
+                                    // Clone element with appropriate props, casting to any to satisfy TypeScript
+                                    const componentWithProps = element
+                                        ? (React.cloneElement(
+                                              element as any,
+                                              {
+                                                  ...commonProps,
+                                                  ...(isSelect
+                                                      ? {
+                                                            onValueChange:
+                                                                onValueChangeHandler,
+                                                        }
+                                                      : {
+                                                            onChange:
+                                                                onChangeHandler,
+                                                        }),
+                                              } as any,
+                                          ) as any)
+                                        : null;
+
+                                    return (
                                         <div key={field.name}>
                                             <label className="mb-2 block text-sm font-medium">
                                                 {field.label}
                                             </label>
-                                            {field.component}
+                                            {componentWithProps}
                                         </div>
-                                    ))}
-                                </div>
-                                <DialogFooter>
-                                    <Button variant="outline" onClick={handleResetModalFilters}>
-                                        Reset
-                                    </Button>
-                                    <Button variant="outline" onClick={handleResetFiltersFromModal}>
-                                        Clear All
-                                    </Button>
-                                    <Button onClick={handleApplyFilters}>Apply</Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                    )}
+                                    );
+                                })}
+                            </div>
+                            <DialogFooter>
+                                {/* Reset restores the temporary filters to the current external filters */}
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        const cleaned = Object.fromEntries(
+                                            Object.entries(filters).filter(
+                                                ([, v]) =>
+                                                    v !== undefined && v !== '',
+                                            ),
+                                        ) as Record<string, string>;
+                                        setTempFilters(cleaned);
+                                    }}
+                                >
+                                    Reset
+                                </Button>
+                                {/* Clear All removes all filters and closes the modal */}
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        onResetFilters();
+                                        setTempFilters({});
+                                        setIsFilterModalOpen(false);
+                                    }}
+                                >
+                                    Clear All
+                                </Button>
+                                <Button onClick={handleApplyFilters}>
+                                    Apply Filters
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                     <Button size="sm" onClick={onAdd ? onAdd : undefined}>
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Add
@@ -372,7 +498,9 @@ export function GenericDataTable<T>({
                                         key={col.id}
                                         className="capitalize"
                                         checked={col.getIsVisible()}
-                                        onCheckedChange={(value) => col.toggleVisibility(!!value)}
+                                        onCheckedChange={(value) =>
+                                            col.toggleVisibility(!!value)
+                                        }
                                     >
                                         {col.id}
                                     </DropdownMenuCheckboxItem>
@@ -392,13 +520,18 @@ export function GenericDataTable<T>({
                                     <TableHead
                                         key={header.id}
                                         className="cursor-pointer border-border select-none"
-                                        onClick={() => handleSortingChange(header.column.id)}
+                                        onClick={() =>
+                                            handleSortingChange(
+                                                header.column.id,
+                                            )
+                                        }
                                     >
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                  header.column.columnDef.header,
-                                                  header.getContext()
+                                                  header.column.columnDef
+                                                      .header,
+                                                  header.getContext(),
                                               )}
                                     </TableHead>
                                 ))}
@@ -406,43 +539,53 @@ export function GenericDataTable<T>({
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {isLoading
-                            ? Array.from({ length: 5 }).map((_, idx) => (
-                                  <TableRow key={idx}>
-                                      {Array.from({ length: columns.length }).map((_, cellIdx) => (
-                                          <TableCell key={cellIdx} className="border-border">
-                                              <Skeleton className="h-4 w-full bg-muted" />
-                                          </TableCell>
-                                      ))}
-                                  </TableRow>
-                              ))
-                            : table.getRowModel().rows.length
-                            ? table.getRowModel().rows.map((row) => (
-                                  <TableRow
-                                      key={row.id}
-                                      data-state={row.getIsSelected() && 'selected'}
-                                      className="hover:bg-muted/50"
-                                  >
-                                      {row.getVisibleCells().map((cell) => (
-                                          <TableCell key={cell.id} className="border-border">
-                                              {flexRender(
-                                                  cell.column.columnDef.cell,
-                                                  cell.getContext()
-                                              )}
-                                          </TableCell>
-                                      ))}
-                                  </TableRow>
-                              ))
-                            : (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={columns.length}
-                                        className="h-24 text-center text-muted-foreground"
-                                    >
-                                        No results.
-                                    </TableCell>
+                        {isLoading ? (
+                            Array.from({ length: 5 }).map((_, idx) => (
+                                <TableRow key={idx}>
+                                    {Array.from({ length: columns.length }).map(
+                                        (_, cellIdx) => (
+                                            <TableCell
+                                                key={cellIdx}
+                                                className="border-border"
+                                            >
+                                                <Skeleton className="h-4 w-full bg-muted" />
+                                            </TableCell>
+                                        ),
+                                    )}
                                 </TableRow>
-                              )}
+                            ))
+                        ) : table.getRowModel().rows.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    data-state={
+                                        row.getIsSelected() && 'selected'
+                                    }
+                                    className="hover:bg-muted/50"
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell
+                                            key={cell.id}
+                                            className="border-border"
+                                        >
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext(),
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="h-24 text-center text-muted-foreground"
+                                >
+                                    No results.
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </div>
@@ -467,8 +610,8 @@ export function GenericDataTable<T>({
                         </SelectContent>
                     </Select>
                     <p>
-                        Showing {pagination.from} to {pagination.to} of {pagination.total}{' '}
-                        entries
+                        Showing {pagination.from} to {pagination.to} of{' '}
+                        {pagination.total} entries
                     </p>
                 </div>
 
@@ -484,7 +627,11 @@ export function GenericDataTable<T>({
                                     }
                                 }}
                                 aria-disabled={pagination.page <= 1}
-                                className={pagination.page <= 1 ? 'pointer-events-none opacity-50' : ''}
+                                className={
+                                    pagination.page <= 1
+                                        ? 'pointer-events-none opacity-50'
+                                        : ''
+                                }
                             />
                         </PaginationItem>
 
@@ -495,12 +642,20 @@ export function GenericDataTable<T>({
                                 href="#"
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    if (pagination.page < pagination.last_page) {
+                                    if (
+                                        pagination.page < pagination.last_page
+                                    ) {
                                         handlePageChange(pagination.page + 1);
                                     }
                                 }}
-                                aria-disabled={pagination.page >= pagination.last_page}
-                                className={pagination.page >= pagination.last_page ? 'pointer-events-none opacity-50' : ''}
+                                aria-disabled={
+                                    pagination.page >= pagination.last_page
+                                }
+                                className={
+                                    pagination.page >= pagination.last_page
+                                        ? 'pointer-events-none opacity-50'
+                                        : ''
+                                }
                             />
                         </PaginationItem>
                     </PaginationContent>
