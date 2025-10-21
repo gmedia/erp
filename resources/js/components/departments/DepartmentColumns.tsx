@@ -1,69 +1,48 @@
 'use client';
 
-import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
-import { ColumnDef } from '@tanstack/react-table';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { createSelectColumn } from '@/components/common/SelectColumn';
-import { GenericActions } from '@/components/common/ActionsDropdown';
-import { Department } from '@/types/department';
+    createActionsColumn,
+    createSelectColumn,
+    createSortingHeader,
+} from '@/components/common/BaseColumns';
 import { formatDate } from '@/lib/utils';
+import { Department } from '@/types/department';
+import { ColumnDef } from '@tanstack/react-table';
 
-export const departmentColumns: ColumnDef<Department>[] = [
-    createSelectColumn<Department>(),
-    {
-        accessorKey: 'name',
-        header: ({ column }) => (
-            <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                Name
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-    },
-    {
-        accessorKey: 'created_at',
-        header: ({ column }) => (
-            <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                Created At
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => {
-            return <div>{formatDate(row.getValue('created_at'))}</div>;
+export function getDepartmentColumns(options: {
+    onEdit?: (department: Department) => void;
+    onDelete?: (department: Department) => void;
+    onView?: (department: Department) => void;
+}) {
+    const { onEdit, onDelete, onView } = options;
+    const columns: ColumnDef<Department>[] = [
+        createSelectColumn<Department>(),
+        {
+            accessorKey: 'name',
+            ...createSortingHeader<Department>('Name'),
         },
-    },
-    {
-        accessorKey: 'updated_at',
-        header: ({ column }) => (
-            <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                Updated At
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => {
-            return <div>{formatDate(row.getValue('updated_at'))}</div>;
+        {
+            accessorKey: 'created_at',
+            ...createSortingHeader<Department>('Created At'),
+            cell: ({ row }) => {
+                return <div>{formatDate(row.getValue('created_at'))}</div>;
+            },
         },
-    },
-    {
-        id: 'actions',
-        enableHiding: false,
-        cell: ({ row }) => {
-            const department = row.original;
-            return (
-                <GenericActions
-                    item={department}
-                    onEdit={(item) => console.log('Edit', item.id)}
-                    onDelete={(item) => console.log('Delete', item.id)}
-                />
-            );
+        {
+            accessorKey: 'updated_at',
+            ...createSortingHeader<Department>('Updated At'),
+            cell: ({ row }) => {
+                return <div>{formatDate(row.getValue('updated_at'))}</div>;
+            },
         },
-    },
-];
+        {
+            ...createActionsColumn<Department>({
+                onView,
+                onEdit: onEdit ? (item) => onEdit(item) : () => {},
+                onDelete: onDelete ? (item) => onDelete(item) : () => {},
+            }),
+        },
+    ];
+    return columns;
+}
+export const departmentColumns: ColumnDef<Department>[] = getDepartmentColumns({});

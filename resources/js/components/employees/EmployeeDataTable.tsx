@@ -1,12 +1,17 @@
 'use client';
 
-import * as React from 'react';
 import { GenericDataTable } from '@/components/common/DataTableCore';
-import { employeeColumns } from './EmployeeColumns';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Employee } from '@/types';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { DEPARTMENTS, POSITIONS } from '@/constants';
+import { Employee } from '@/types';
+import { getEmployeeColumns } from './EmployeeColumns';
 
 export function EmployeeDataTable({
     data,
@@ -62,8 +67,8 @@ export function EmployeeDataTable({
                     </SelectTrigger>
                     <SelectContent className="border-border bg-background text-foreground">
                         {DEPARTMENTS.map((dept) => (
-                            <SelectItem key={dept} value={dept}>
-                                {dept}
+                            <SelectItem key={dept.value} value={dept.value}>
+                                {dept.label}
                             </SelectItem>
                         ))}
                     </SelectContent>
@@ -80,8 +85,8 @@ export function EmployeeDataTable({
                     </SelectTrigger>
                     <SelectContent className="border-border bg-background text-foreground">
                         {POSITIONS.map((pos) => (
-                            <SelectItem key={pos} value={pos}>
-                                {pos}
+                            <SelectItem key={pos.value} value={pos.value}>
+                                {pos.label}
                             </SelectItem>
                         ))}
                     </SelectContent>
@@ -92,7 +97,11 @@ export function EmployeeDataTable({
 
     return (
         <GenericDataTable
-            columns={employeeColumns}
+            columns={getEmployeeColumns({
+                onEdit: onEditEmployee,
+                onDelete: onDeleteEmployee,
+                onView: onViewEmployee,
+            })}
             data={data}
             pagination={pagination}
             onPageChange={onPageChange}

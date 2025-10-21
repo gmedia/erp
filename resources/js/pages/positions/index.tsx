@@ -18,10 +18,10 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Position, PositionFormData } from '@/types/position';
-import { type BreadcrumbItem } from '@/types';
-import { positions } from '@/routes';
 import AppLayout from '@/layouts/app-layout';
+import { positions } from '@/routes';
+import { type BreadcrumbItem } from '@/types';
+import { Position, PositionFormData } from '@/types/position';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -32,8 +32,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function PositionIndex() {
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
-    const [positionToDelete, setPositionToDelete] = useState<Position | null>(null);
+    const [selectedPosition, setSelectedPosition] = useState<Position | null>(
+        null,
+    );
+    const [positionToDelete, setPositionToDelete] = useState<Position | null>(
+        null,
+    );
 
     // Filter states
     const [filters, setFilters] = useState({
@@ -111,13 +115,21 @@ export default function PositionIndex() {
         onError: (
             error: Error & { response?: { data?: { message?: string } } },
         ) => {
-            toast.error(error?.response?.data?.message || 'Failed to create position');
+            toast.error(
+                error?.response?.data?.message || 'Failed to create position',
+            );
         },
     });
 
     // Update position mutation
     const updatePositionMutation = useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: PositionFormData }) => {
+        mutationFn: async ({
+            id,
+            data,
+        }: {
+            id: number;
+            data: PositionFormData;
+        }) => {
             const response = await axios.put(`/api/positions/${id}`, data);
             return response.data;
         },
@@ -130,7 +142,9 @@ export default function PositionIndex() {
         onError: (
             error: Error & { response?: { data?: { message?: string } } },
         ) => {
-            toast.error(error?.response?.data?.message || 'Failed to update position');
+            toast.error(
+                error?.response?.data?.message || 'Failed to update position',
+            );
         },
     });
 
@@ -147,7 +161,9 @@ export default function PositionIndex() {
         onError: (
             error: Error & { response?: { data?: { message?: string } } },
         ) => {
-            toast.error(error?.response?.data?.message || 'Failed to delete position');
+            toast.error(
+                error?.response?.data?.message || 'Failed to delete position',
+            );
         },
     });
 
@@ -237,7 +253,12 @@ export default function PositionIndex() {
 
             <PositionForm
                 open={isFormOpen}
-                onOpenChange={setIsFormOpen}
+                onOpenChange={(open) => {
+                    setIsFormOpen(open);
+                    if (!open) {
+                        setSelectedPosition(null);
+                    }
+                }}
                 position={selectedPosition}
                 onSubmit={handleFormSubmit}
                 isLoading={

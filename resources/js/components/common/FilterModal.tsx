@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -8,7 +9,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import * as React from 'react';
 
 type FieldDescriptor = {
@@ -44,7 +44,9 @@ export function FilterModal({
                 <div className="grid gap-4 py-4">
                     {fields.map((field) => (
                         <div key={field.name}>
-                            <label className="mb-2 block text-sm font-medium">{field.label}</label>
+                            <label className="mb-2 block text-sm font-medium">
+                                {field.label}
+                            </label>
                             {field.component}
                         </div>
                     ))}
