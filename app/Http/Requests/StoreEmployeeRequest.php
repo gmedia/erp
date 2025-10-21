@@ -23,7 +23,7 @@ class StoreEmployeeRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:employees,email',
             'phone' => 'nullable|string|max:20',
-            'department' => 'required|string|in:Engineering,Marketing,Sales,HR,Finance',
+            'department' => 'required|string|in:hr,engineering,sales,marketing,finance,operations,customer_support,product,design,legal',
             'position' => 'required|string|max:255',
             'salary' => 'required|numeric|min:0',
             'hire_date' => 'required|date',

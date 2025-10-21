@@ -42,7 +42,7 @@ test('store creates a new employee and returns 201', function () {
         'name'       => 'John Doe',
         'email'      => 'john.doe@example.com',
         'phone'      => '555-1234',
-        'department' => 'Engineering',
+        'department' => 'engineering',
         'position'   => 'Developer',
         'salary'     => 75000.00,
         'hire_date'  => '2023-01-15',
