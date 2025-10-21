@@ -160,7 +160,7 @@ export async function editEmployee(
   await actionsBtn.click({ force: true });
 
   // Click the Edit menu item
-  const editItem = page.getByRole('menuitemcheckbox', { name: /Edit/i });
+  const editItem = page.getByRole('menuitem', { name: /Edit/i });
   await expect(editItem).toBeVisible();
   await editItem.click({ force: true });
 
