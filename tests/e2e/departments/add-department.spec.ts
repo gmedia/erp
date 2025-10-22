@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createDepartment, searchDepartment } from './helpers';
+import { createDepartment, searchDepartment } from '../helpers';
 
 test('add new department end‑to‑end', async ({ page }) => {
   // Create a department using the shared helper (includes login & navigation)

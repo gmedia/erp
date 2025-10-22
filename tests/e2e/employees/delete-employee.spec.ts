@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createEmployee, searchEmployee } from './helpers';
+import { createEmployee, searchEmployee } from '../helpers';
 
 test('delete employee end‑to‑end', async ({ page }) => {
   // 1. Create a new employee (includes login and navigation)

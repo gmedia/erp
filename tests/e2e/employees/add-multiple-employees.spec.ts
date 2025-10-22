@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createEmployee, searchEmployee } from './helpers';
+import { createEmployee, searchEmployee } from '../helpers';
 
 test('add multiple employees end‑to‑end', async ({ page }) => {
   // Create three employees, collecting their emails

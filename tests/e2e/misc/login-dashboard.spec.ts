@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from './helpers';
+import { login } from '../helpers';
 
 test('login and navigate to dashboard', async ({ page }) => {
   await login(page);

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createDepartment, searchDepartment } from './helpers';
+import { createDepartment, searchDepartment } from '../helpers';
 
 test('add multiple departments end‑to‑end', async ({ page }) => {
   // Create three departments, collecting their names

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createEmployee, searchEmployee, editEmployee } from './helpers';
+import { createEmployee, searchEmployee, editEmployee } from '../helpers';
 
 test('edit employee end‑to‑end', async ({ page }) => {
   // Create a new employee using shared helper (includes login & navigation)
