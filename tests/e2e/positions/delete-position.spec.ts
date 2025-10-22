@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { createDepartment, searchDepartment } from './helpers';
+import { createPosition, searchPosition } from '../helpers';
 
-test('delete department end‑to‑end', async ({ page }) => {
-  // 1. Create a new department (includes login and navigation)
-  const name = await createDepartment(page);
+test('delete position end‑to‑end', async ({ page }) => {
+  // 1. Create a new position (includes login and navigation)
+  const name = await createPosition(page);
 
-  // 2. Ensure the department appears in the list
-  await searchDepartment(page, name);
+  // 2. Ensure the position appears in the list
+  await searchPosition(page, name);
   const row = page.locator('tr', { hasText: name }).first();
   await expect(row).toBeVisible();
 
@@ -22,6 +22,6 @@ test('delete department end‑to‑end', async ({ page }) => {
   const confirmButton = page.getByRole('button', { name: /Delete|Confirm/i });
   await confirmButton.click();
 
-  // 6. Verify the department is no longer present
+  // 6. Verify the position is no longer present
   await expect(page.locator(`text=${name}`)).toBeHidden();
 });

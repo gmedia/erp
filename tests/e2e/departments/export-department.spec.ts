@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test';
-import { login, createPosition } from './helpers';
+import { login, createDepartment } from '../helpers';
 import * as fs from 'fs';
 import * as path from 'path';
 
-test('export positions to Excel works correctly', async ({ page, context }) => {
+test('export departments to Excel works correctly', async ({ page, context }) => {
   await login(page);
-  const name = await createPosition(page);
-  await page.goto('/positions');
+  const name = await createDepartment(page);
+  await page.goto('/departments');
 
   const exportBtn = page.getByRole('button', { name: /Export/i });
   await expect(exportBtn).toBeVisible();

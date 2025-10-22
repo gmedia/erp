@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login, createPosition, searchPosition } from './helpers';
+import { login, createPosition, searchPosition } from '../helpers';
 
 test('filter positions end‑to‑end', async ({ page }) => {
   // Log in

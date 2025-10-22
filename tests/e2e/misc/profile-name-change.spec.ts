@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from './helpers';
+import { login } from '../helpers';
 
 test('user can change their name in profile settings', async ({ page }) => {
   // 1. Log in using existing credentials

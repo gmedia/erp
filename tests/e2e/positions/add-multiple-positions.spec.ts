@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createPosition, searchPosition } from './helpers';
+import { createPosition, searchPosition } from '../helpers';
 
 test('add multiple positions end‑to‑end', async ({ page }) => {
   // Create three positions, collecting their names

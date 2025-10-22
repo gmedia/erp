@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createPosition, searchPosition } from './helpers';
+import { createPosition, searchPosition } from '../helpers';
 
 test('add new position end‑to‑end', async ({ page }) => {
   // Create position using shared helper (includes login & navigation)
