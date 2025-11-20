@@ -1,41 +1,59 @@
 # ERP
 ## Local development setup
-- Run: `./vendor/bin/sail up -d`
-- Run this to generate autocompletion for Facades.
+- Apply required permissions ssetup
     ```
-    ./vendor/bin/sail artisan ide-helper:generate
+    sudo bash permissions_setup.sh
     ```
-- Run this to add phpdocs for your models.
+- Installing composer packages
     ```
-    ./vendor/bin/sail artisan ide-helper:models -RW
+    composer install
     ```
-- Start analyzing your code using the phpstan console command:
+- Run App
     ```
-    ./vendor/bin/phpstan analyse
+    sail up -d
     ```
-- To fix everything at once:
+- Installing npm packages
     ```
-    ./vendor/bin/sail bin duster fix
+    sail npm install
     ```
-- Format files and overwrite:
+- Run Vite
     ```
-    ./vendor/bin/sail npm run blade:formatter
+    sail npm run dev
     ```
-- Run Prettier and ESLint:
+- Generate autocompletion for Facades
     ```
-    ./vendor/bin/sail npm run format
-    ./vendor/bin/sail npm run lint
+    sail artisan ide-helper:generate
     ```
-- Run test:
+- Add PHPDoc for your models
     ```
-    ./vendor/bin/sail test --coverage-clover=coverage.xml
+    sail artisan ide-helper:models -RW
     ```
-- Run e2e test:
+- Start analyzing your code using the PHPStan console command
     ```
-    sudo chmod -R 777 playwright-report test-results
-    ./vendor/bin/sail npm run test:e2e
+    sail bin phpstan analyze
     ```
-- Run SonarQube:
+- Fix everything at once
+    ```
+    sail bin duster fix
+    ```
+- Format files and overwrite
+    ```
+    sail npm run blade:formatter
+    ```
+- Run Prettier and ESLint
+    ```
+    sail npm run format
+    sail npm run lint
+    ```
+- Run PHPUnit test
+    ```
+    sail test --coverage-clover=coverage.xml
+    ```
+- Run Playwright e2e test
+    ```
+    sail npm run test:e2e
+    ```
+- Run SonarQube analyze
     ```
     docker run -u root --rm -v "$(pwd):/var/www/html" -w /var/www/html sonarsource/sonar-scanner-cli:11
     ```
