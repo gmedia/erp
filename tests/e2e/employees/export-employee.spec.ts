@@ -16,7 +16,7 @@ test('export employees to Excel works correctly', async ({ page, context }) => {
     exportBtn.click(),
   ]);
 
-  const downloadsDir = path.resolve('test-results', 'downloads');
+  const downloadsDir = path.resolve('e2e/test-results', 'downloads');
   if (!fs.existsSync(downloadsDir)) {
     fs.mkdirSync(downloadsDir, { recursive: true });
   }

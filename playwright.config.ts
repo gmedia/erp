@@ -2,12 +2,12 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: 'tests/e2e',
-  outputDir: 'test-results',
+  outputDir: 'e2e/test-results',
   use: {
     browserName: 'chromium',
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost',
   },
   reporter: [
-    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['html', { outputFolder: 'e2e/playwright-report', open: 'never' }],
   ],
 });

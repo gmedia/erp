@@ -1,24 +1,16 @@
 # ERP
 ## Local development setup
-- Apply required permissions ssetup
+- Apply project setup
     ```
-    sudo bash permissions_setup.sh
-    ```
-- Installing composer packages
-    ```
-    composer install
-    ```
-- Run App
-    ```
-    sail up -d
-    ```
-- Installing npm packages
-    ```
-    sail npm install
+    sudo bash project_setup.sh
     ```
 - Run Vite
     ```
     sail npm run dev
+    ```
+- Run App
+    ```
+    sail up -d
     ```
 - Generate autocompletion for Facades
     ```
