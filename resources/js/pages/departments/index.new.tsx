@@ -1,11 +1,12 @@
 'use client';
 
 import { CrudPage } from '@/components/common/CrudPage';
-import { DepartmentDataTable } from '@/components/departments/DepartmentDataTable';
+import { GenericDataTable } from '@/components/common/GenericDataTable';
 import { DepartmentForm } from '@/components/departments/DepartmentForm';
 import { departments } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Department, DepartmentFormData } from '@/types/department';
+import { departmentColumns } from '@/components/departments/DepartmentColumns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,15 +25,15 @@ export default function DepartmentIndex() {
                 queryKey: ['departments'],
                 breadcrumbs,
                 
-                DataTableComponent: DepartmentDataTable,
+                DataTableComponent: GenericDataTable,
                 FormComponent: DepartmentForm,
                 
                 // Map the generic props to component-specific props
                 mapDataTableProps: (props) => ({
                     data: props.data,
-                    onAddDepartment: props.onAdd,
-                    onEditDepartment: props.onEdit,
-                    onDeleteDepartment: props.onDelete,
+                    onAdd: props.onAdd,
+                    onEdit: props.onEdit,
+                    onDelete: props.onDelete,
                     pagination: props.pagination,
                     onPageChange: props.onPageChange,
                     onPageSizeChange: props.onPageSizeChange,
@@ -42,6 +43,9 @@ export default function DepartmentIndex() {
                     filters: props.filters,
                     onFilterChange: props.onFilterChange,
                     onResetFilters: props.onResetFilters,
+                    columns: departmentColumns,
+                    exportEndpoint: '/api/departments/export',
+                    entityType: 'department',
                 }),
                 
                 mapFormProps: (props) => ({

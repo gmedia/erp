@@ -1,16 +1,17 @@
 'use client';
 
 import { CrudPage } from '@/components/common/CrudPage';
-import { PositionDataTable } from '@/components/positions/PositionDataTable';
+import { GenericDataTable } from '@/components/common/GenericDataTable';
 import { PositionForm } from '@/components/positions/PositionForm';
-import { positions } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
+import positions from '@/routes/positions';
 import { Position, PositionFormData } from '@/types/position';
+import { type BreadcrumbItem } from '@/types';
+import { positionColumns } from '@/components/positions/PositionColumns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Positions',
-        href: positions().url,
+        href: positions.index().url,
     },
 ];
 
@@ -24,15 +25,15 @@ export default function PositionIndex() {
                 queryKey: ['positions'],
                 breadcrumbs,
                 
-                DataTableComponent: PositionDataTable,
+                DataTableComponent: GenericDataTable,
                 FormComponent: PositionForm,
                 
                 // Map the generic props to component-specific props
                 mapDataTableProps: (props) => ({
                     data: props.data,
-                    onAddPosition: props.onAdd,
-                    onEditPosition: props.onEdit,
-                    onDeletePosition: props.onDelete,
+                    onAdd: props.onAdd,
+                    onEdit: props.onEdit,
+                    onDelete: props.onDelete,
                     pagination: props.pagination,
                     onPageChange: props.onPageChange,
                     onPageSizeChange: props.onPageSizeChange,
@@ -42,6 +43,9 @@ export default function PositionIndex() {
                     filters: props.filters,
                     onFilterChange: props.onFilterChange,
                     onResetFilters: props.onResetFilters,
+                    columns: positionColumns,
+                    exportEndpoint: '/api/positions/export',
+                    entityType: 'position',
                 }),
                 
                 mapFormProps: (props) => ({

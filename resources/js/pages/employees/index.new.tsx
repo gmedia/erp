@@ -1,11 +1,12 @@
 'use client';
 
 import { CrudPage } from '@/components/common/CrudPage';
-import { EmployeeDataTable } from '@/components/employees/EmployeeDataTable';
+import { GenericDataTable } from '@/components/common/GenericDataTable';
 import { EmployeeForm } from '@/components/employees/EmployeeForm';
 import { employees } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
 import { Employee, EmployeeFormData } from '@/types/employee';
+import { type BreadcrumbItem } from '@/types';
+import { employeeColumns } from '@/components/employees/EmployeeColumns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -14,25 +15,17 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface EmployeeFilters {
-    search: string;
-    department: string;
-    position: string;
-    sort_by?: string;
-    sort_direction?: string;
-}
-
 export default function EmployeeIndex() {
     return (
-        <CrudPage<Employee, EmployeeFormData, EmployeeFilters>
+        <CrudPage<Employee, EmployeeFormData, { search: string; department: string; position: string; sort_by?: string; sort_direction?: string }>
             config={{
                 entityName: 'Employee',
                 entityNamePlural: 'Employees',
                 apiEndpoint: '/api/employees',
                 queryKey: ['employees'],
                 breadcrumbs,
-                
-                // Custom initial filters for employees
+                DataTableComponent: GenericDataTable,
+                FormComponent: EmployeeForm,
                 initialFilters: {
                     search: '',
                     department: '',
@@ -40,19 +33,16 @@ export default function EmployeeIndex() {
                     sort_by: undefined,
                     sort_direction: undefined,
                 },
-                
-                DataTableComponent: EmployeeDataTable,
-                FormComponent: EmployeeForm,
-                
-                // Map the generic props to component-specific props
                 mapDataTableProps: (props) => ({
                     data: props.data,
-                    onAddEmployee: props.onAdd,
-                    onEditEmployee: props.onEdit,
-                    onDeleteEmployee: props.onDelete,
-                    onViewEmployee: (employee: Employee) => {
+                    onAdd: props.onAdd,
+                    onEdit: props.onEdit,
+                    onDelete: props.onDelete,
+                    onView: (employee: Employee) => {
                         // In a real app, you might navigate to a detail page or open a modal
-                        console.log(`Viewing ${employee.name}'s profile`);
+                        import('sonner').then(({ toast }) => {
+                            toast.info(`Viewing ${employee.name}'s profile`);
+                        });
                     },
                     pagination: props.pagination,
                     onPageChange: props.onPageChange,
@@ -67,18 +57,12 @@ export default function EmployeeIndex() {
                         sort_by: props.filters.sort_by,
                         sort_direction: props.filters.sort_direction,
                     },
-                    onFilterChange: (newFilters: Partial<EmployeeFilters>) => {
-                        // If only the search term is being updated, reset other filters to avoid
-                        // unintended combination of search with stale department/position filters.
-                        const isSearchOnly = Object.keys(newFilters).length === 1 && 'search' in newFilters;
-                        props.onFilterChange({
-                            ...newFilters,
-                            ...(isSearchOnly ? { department: '', position: '' } : {}),
-                        });
-                    },
+                    onFilterChange: props.onFilterChange,
                     onResetFilters: props.onResetFilters,
+                    columns: employeeColumns,
+                    exportEndpoint: '/api/employees/export',
+                    entityType: 'employee',
                 }),
-                
                 mapFormProps: (props) => ({
                     open: props.open,
                     onOpenChange: props.onOpenChange,
@@ -86,9 +70,7 @@ export default function EmployeeIndex() {
                     onSubmit: props.onSubmit,
                     isLoading: props.isLoading,
                 }),
-                
-                // Custom delete message
-                getDeleteMessage: (employee: Employee) => 
+                getDeleteMessage: (employee) => 
                     `This action cannot be undone. This will permanently delete ${employee.name}'s employee record.`,
             }}
         />

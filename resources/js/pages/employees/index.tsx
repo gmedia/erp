@@ -1,11 +1,12 @@
 'use client';
 
 import { CrudPage } from '@/components/common/CrudPage';
-import { EmployeeDataTable } from '@/components/employees/EmployeeDataTable';
+import { GenericDataTable } from '@/components/common/GenericDataTable';
 import { EmployeeForm } from '@/components/employees/EmployeeForm';
 import { employees } from '@/routes';
 import { Employee, EmployeeFormData } from '@/types/employee';
 import { type BreadcrumbItem } from '@/types';
+import { employeeColumns } from '@/components/employees/EmployeeColumns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,7 +24,7 @@ export default function EmployeeIndex() {
                 apiEndpoint: '/api/employees',
                 queryKey: ['employees'],
                 breadcrumbs,
-                DataTableComponent: EmployeeDataTable,
+                DataTableComponent: GenericDataTable,
                 FormComponent: EmployeeForm,
                 initialFilters: {
                     search: '',
@@ -34,10 +35,10 @@ export default function EmployeeIndex() {
                 },
                 mapDataTableProps: (props) => ({
                     data: props.data,
-                    onAddEmployee: props.onAdd,
-                    onEditEmployee: props.onEdit,
-                    onDeleteEmployee: props.onDelete,
-                    onViewEmployee: (employee: Employee) => {
+                    onAdd: props.onAdd,
+                    onEdit: props.onEdit,
+                    onDelete: props.onDelete,
+                    onView: (employee: Employee) => {
                         // In a real app, you might navigate to a detail page or open a modal
                         import('sonner').then(({ toast }) => {
                             toast.info(`Viewing ${employee.name}'s profile`);
@@ -58,6 +59,9 @@ export default function EmployeeIndex() {
                     },
                     onFilterChange: props.onFilterChange,
                     onResetFilters: props.onResetFilters,
+                    columns: employeeColumns,
+                    exportEndpoint: '/api/employees/export',
+                    entityType: 'employee',
                 }),
                 mapFormProps: (props) => ({
                     open: props.open,
