@@ -104,7 +104,7 @@ export function CrudPage<T extends { id: number; name?: string }, FormData, Filt
         handlePageSizeChange,
         resetFilters,
     } = useCrudFilters<FilterType>({
-        initialFilters: config.initialFilters || { search: '' } as FilterType,
+        initialFilters: config.initialFilters || ({ search: '' } as unknown as FilterType),
         initialPagination: config.initialPagination || { page: 1, per_page: 15 },
     });
 
@@ -214,7 +214,7 @@ export function CrudPage<T extends { id: number; name?: string }, FormData, Filt
             onPageSizeChange: handlePageSizeChange,
             onSearchChange: handleSearchChange,
             isLoading,
-            filterValue: (filters as any).search || '',
+            filterValue: (filters as { search?: string }).search || '',
             filters,
             onFilterChange: handleFilterChange,
             onResetFilters: resetFilters,
@@ -236,7 +236,7 @@ export function CrudPage<T extends { id: number; name?: string }, FormData, Filt
             onPageSizeChange: handlePageSizeChange,
             onSearchChange: handleSearchChange,
             isLoading,
-            filterValue: (filters as any).search || '',
+            filterValue: (filters as { search?: string }).search || '',
             filters,
             onFilterChange: handleFilterChange,
             onResetFilters: resetFilters,

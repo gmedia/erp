@@ -42,7 +42,7 @@ export function useCrudQuery<T>({
   pagination,
   filters = {},
   enabled = true,
-}: UseCrudQueryOptions<T>): UseQueryResult<ApiResponse<T>, Error> & {
+}: UseCrudQueryOptions<T>): Omit<UseQueryResult<ApiResponse<T>, Error>, 'data'> & {
   data: T[];
   meta: ApiResponse<T>['meta'];
 } {
