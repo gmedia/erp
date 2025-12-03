@@ -1,0 +1,300 @@
+'use client';
+
+import { Head } from '@inertiajs/react';
+import { useState, ReactNode } from 'react';
+
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import AppLayout from '@/layouts/app-layout';
+import { useCrudFilters } from '@/hooks/useCrudFilters';
+import { useCrudQuery } from '@/hooks/useCrudQuery';
+import { useCrudMutations } from '@/hooks/useCrudMutations';
+import { type BreadcrumbItem } from '@/types';
+
+export interface CrudPageConfig<T, FormData, FilterType extends Record<string, any> = Record<string, any>> {
+    // Basic configuration
+    entityName: string;
+    entityNamePlural: string;
+    apiEndpoint: string;
+    queryKey: string[];
+    breadcrumbs: BreadcrumbItem[];
+    
+    // Component configuration - using generic prop interfaces
+    DataTableComponent: React.ComponentType<any>;
+    FormComponent: React.ComponentType<any>;
+    
+    // Optional callbacks for customization
+    onCreateSuccess?: () => void;
+    onUpdateSuccess?: () => void;
+    onDeleteSuccess?: () => void;
+    onError?: (error: Error) => void;
+    
+    // Filter configuration
+    initialFilters?: FilterType;
+    initialPagination?: {
+        page: number;
+        per_page: number;
+    };
+    
+    // Custom formatting for delete message
+    getDeleteMessage?: (item: T) => string;
+    
+    // Props mapping functions to adapt generic props to component-specific props
+    mapDataTableProps?: (props: {
+        data: T[];
+        onAdd: () => void;
+        onEdit: (item: T) => void;
+        onDelete: (item: T) => void;
+        pagination: {
+            page: number;
+            per_page: number;
+            total: number;
+            last_page: number;
+            from?: number;
+            to?: number;
+        };
+        onPageChange: (page: number) => void;
+        onPageSizeChange: (per_page: number) => void;
+        onSearchChange: (search: string) => void;
+        isLoading: boolean;
+        filterValue: string;
+        filters: FilterType;
+        onFilterChange: (filters: Partial<FilterType>) => void;
+        onResetFilters: () => void;
+    }) => any;
+    
+    mapFormProps?: (props: {
+        open: boolean;
+        onOpenChange: (open: boolean) => void;
+        item?: T | null;
+        onSubmit: (data: FormData) => void;
+        isLoading: boolean;
+    }) => any;
+}
+
+interface CrudPageProps<T, FormData, FilterType extends Record<string, any> = Record<string, any>> {
+    config: CrudPageConfig<T, FormData, FilterType>;
+}
+
+export function CrudPage<T extends { id: number; name?: string }, FormData, FilterType extends Record<string, any> = Record<string, any>>({
+    config,
+}: CrudPageProps<T, FormData, FilterType>) {
+    // State management
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<T | null>(null);
+    const [itemToDelete, setItemToDelete] = useState<T | null>(null);
+
+    // Filter and pagination management
+    const {
+        filters,
+        pagination,
+        setFilters,
+        setPagination,
+        handleFilterChange,
+        handleSearchChange,
+        handlePageChange,
+        handlePageSizeChange,
+        resetFilters,
+    } = useCrudFilters<FilterType>({
+        initialFilters: config.initialFilters || { search: '' } as FilterType,
+        initialPagination: config.initialPagination || { page: 1, per_page: 15 },
+    });
+
+    // CRUD operations
+    const {
+        createMutation,
+        updateMutation,
+        deleteMutation,
+    } = useCrudMutations<T, FormData>({
+        endpoint: config.apiEndpoint,
+        queryKey: config.queryKey,
+        entityName: config.entityName,
+        onSuccess: () => {
+            // Reset pagination to first page after create/update/delete
+            setPagination({ page: 1, per_page: pagination.per_page });
+        },
+        onError: config.onError,
+    });
+
+    // Data fetching
+    const { data, isLoading, meta } = useCrudQuery<T>({
+        endpoint: config.apiEndpoint,
+        queryKey: config.queryKey,
+        entityName: config.entityName,
+        pagination,
+        filters,
+    });
+
+    // Event handlers
+    const handleAdd = () => {
+        setSelectedItem(null);
+        setIsFormOpen(true);
+    };
+
+    const handleEdit = (item: T) => {
+        setSelectedItem(item);
+        setIsFormOpen(true);
+    };
+
+    const handleDelete = (item: T) => {
+        setItemToDelete(item);
+    };
+
+    const handleFormSubmit = (data: FormData) => {
+        if (selectedItem) {
+            updateMutation.mutate(
+                { id: selectedItem.id, data },
+                {
+                    onSuccess: () => {
+                        setIsFormOpen(false);
+                        setSelectedItem(null);
+                        config.onUpdateSuccess?.();
+                    },
+                }
+            );
+        } else {
+            createMutation.mutate(data, {
+                onSuccess: () => {
+                    setIsFormOpen(false);
+                    setSelectedItem(null);
+                    config.onCreateSuccess?.();
+                },
+            });
+        }
+    };
+
+    const handleDeleteConfirm = () => {
+        if (itemToDelete) {
+            deleteMutation.mutate(itemToDelete.id, {
+                onSuccess: () => {
+                    setItemToDelete(null);
+                    config.onDeleteSuccess?.();
+                },
+            });
+        }
+    };
+
+    const handleFormClose = (open: boolean) => {
+        setIsFormOpen(open);
+        if (!open) {
+            setSelectedItem(null);
+        }
+    };
+
+    // Default delete message
+    const getDeleteMessage = config.getDeleteMessage || ((item: T) => {
+        const name = item.name || `this ${config.entityName.toLowerCase()}`;
+        return `This action cannot be undone. This will permanently delete ${name}'s ${config.entityName.toLowerCase()} record.`;
+    });
+
+    // Prepare data table props
+    const dataTableProps = config.mapDataTableProps 
+        ? config.mapDataTableProps({
+            data,
+            onAdd: handleAdd,
+            onEdit: handleEdit,
+            onDelete: handleDelete,
+            pagination: {
+                page: meta.current_page,
+                per_page: meta.per_page,
+                total: meta.total,
+                last_page: meta.last_page,
+                from: meta.from || 0,
+                to: meta.to || 0,
+            },
+            onPageChange: handlePageChange,
+            onPageSizeChange: handlePageSizeChange,
+            onSearchChange: handleSearchChange,
+            isLoading,
+            filterValue: (filters as any).search || '',
+            filters,
+            onFilterChange: handleFilterChange,
+            onResetFilters: resetFilters,
+        })
+        : {
+            data,
+            onAddDepartment: handleAdd,
+            onEditDepartment: handleEdit,
+            onDeleteDepartment: handleDelete,
+            pagination: {
+                page: meta.current_page,
+                per_page: meta.per_page,
+                total: meta.total,
+                last_page: meta.last_page,
+                from: meta.from || 0,
+                to: meta.to || 0,
+            },
+            onPageChange: handlePageChange,
+            onPageSizeChange: handlePageSizeChange,
+            onSearchChange: handleSearchChange,
+            isLoading,
+            filterValue: (filters as any).search || '',
+            filters,
+            onFilterChange: handleFilterChange,
+            onResetFilters: resetFilters,
+        };
+
+    // Prepare form props
+    const formProps = config.mapFormProps
+        ? config.mapFormProps({
+            open: isFormOpen,
+            onOpenChange: handleFormClose,
+            item: selectedItem,
+            onSubmit: handleFormSubmit,
+            isLoading: createMutation.isPending || updateMutation.isPending,
+        })
+        : {
+            open: isFormOpen,
+            onOpenChange: handleFormClose,
+            department: selectedItem,
+            onSubmit: handleFormSubmit,
+            isLoading: createMutation.isPending || updateMutation.isPending,
+        };
+
+    return (
+        <>
+            <Head title={config.entityNamePlural} />
+
+            <AppLayout breadcrumbs={config.breadcrumbs}>
+                <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                    <div className="rounded-lg bg-white">
+                        <config.DataTableComponent {...dataTableProps} />
+                    </div>
+                </div>
+            </AppLayout>
+
+            <config.FormComponent {...formProps} />
+
+            <AlertDialog
+                open={!!itemToDelete}
+                onOpenChange={(open) => !open && setItemToDelete(null)}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {itemToDelete && getDeleteMessage(itemToDelete)}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDeleteConfirm}
+                            disabled={deleteMutation.isPending}
+                        >
+                            {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
+    );
+}

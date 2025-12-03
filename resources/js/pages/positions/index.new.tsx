@@ -1,35 +1,38 @@
 'use client';
 
 import { CrudPage } from '@/components/common/CrudPage';
-import { DepartmentDataTable } from '@/components/departments/DepartmentDataTable';
-import { DepartmentForm } from '@/components/departments/DepartmentForm';
-import { departments } from '@/routes';
-import { Department, DepartmentFormData } from '@/types/department';
+import { PositionDataTable } from '@/components/positions/PositionDataTable';
+import { PositionForm } from '@/components/positions/PositionForm';
+import { positions } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
+import { Position, PositionFormData } from '@/types/position';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Departments',
-        href: departments().url,
+        title: 'Positions',
+        href: positions().url,
     },
 ];
 
-export default function DepartmentIndex() {
+export default function PositionIndex() {
     return (
-        <CrudPage<Department, DepartmentFormData>
+        <CrudPage<Position, PositionFormData>
             config={{
-                entityName: 'Department',
-                entityNamePlural: 'Departments',
-                apiEndpoint: '/api/departments',
-                queryKey: ['departments'],
+                entityName: 'Position',
+                entityNamePlural: 'Positions',
+                apiEndpoint: '/api/positions',
+                queryKey: ['positions'],
                 breadcrumbs,
-                DataTableComponent: DepartmentDataTable,
-                FormComponent: DepartmentForm,
+                
+                DataTableComponent: PositionDataTable,
+                FormComponent: PositionForm,
+                
+                // Map the generic props to component-specific props
                 mapDataTableProps: (props) => ({
                     data: props.data,
-                    onAddDepartment: props.onAdd,
-                    onEditDepartment: props.onEdit,
-                    onDeleteDepartment: props.onDelete,
+                    onAddPosition: props.onAdd,
+                    onEditPosition: props.onEdit,
+                    onDeletePosition: props.onDelete,
                     pagination: props.pagination,
                     onPageChange: props.onPageChange,
                     onPageSizeChange: props.onPageSizeChange,
@@ -40,15 +43,14 @@ export default function DepartmentIndex() {
                     onFilterChange: props.onFilterChange,
                     onResetFilters: props.onResetFilters,
                 }),
+                
                 mapFormProps: (props) => ({
                     open: props.open,
                     onOpenChange: props.onOpenChange,
-                    department: props.item,
+                    position: props.item,
                     onSubmit: props.onSubmit,
                     isLoading: props.isLoading,
                 }),
-                getDeleteMessage: (department) => 
-                    `This action cannot be undone. This will permanently delete ${department.name}'s department record.`,
             }}
         />
     );

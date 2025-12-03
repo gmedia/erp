@@ -4,8 +4,8 @@ import { CrudPage } from '@/components/common/CrudPage';
 import { DepartmentDataTable } from '@/components/departments/DepartmentDataTable';
 import { DepartmentForm } from '@/components/departments/DepartmentForm';
 import { departments } from '@/routes';
-import { Department, DepartmentFormData } from '@/types/department';
 import { type BreadcrumbItem } from '@/types';
+import { Department, DepartmentFormData } from '@/types/department';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,8 +23,11 @@ export default function DepartmentIndex() {
                 apiEndpoint: '/api/departments',
                 queryKey: ['departments'],
                 breadcrumbs,
+                
                 DataTableComponent: DepartmentDataTable,
                 FormComponent: DepartmentForm,
+                
+                // Map the generic props to component-specific props
                 mapDataTableProps: (props) => ({
                     data: props.data,
                     onAddDepartment: props.onAdd,
@@ -40,6 +43,7 @@ export default function DepartmentIndex() {
                     onFilterChange: props.onFilterChange,
                     onResetFilters: props.onResetFilters,
                 }),
+                
                 mapFormProps: (props) => ({
                     open: props.open,
                     onOpenChange: props.onOpenChange,
@@ -47,8 +51,6 @@ export default function DepartmentIndex() {
                     onSubmit: props.onSubmit,
                     isLoading: props.isLoading,
                 }),
-                getDeleteMessage: (department) => 
-                    `This action cannot be undone. This will permanently delete ${department.name}'s department record.`,
             }}
         />
     );
