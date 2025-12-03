@@ -24,8 +24,11 @@ export default function PositionIndex() {
                 apiEndpoint: '/api/positions',
                 queryKey: ['positions'],
                 breadcrumbs,
+                
                 DataTableComponent: GenericDataTable,
                 FormComponent: PositionForm,
+                
+                // Map the generic props to component-specific props
                 mapDataTableProps: (props) => ({
                     data: props.data,
                     onAdd: props.onAdd,
@@ -44,6 +47,7 @@ export default function PositionIndex() {
                     exportEndpoint: '/api/positions/export',
                     entityType: 'position',
                 }),
+                
                 mapFormProps: (props) => ({
                     open: props.open,
                     onOpenChange: props.onOpenChange,
@@ -51,8 +55,6 @@ export default function PositionIndex() {
                     onSubmit: props.onSubmit,
                     isLoading: props.isLoading,
                 }),
-                getDeleteMessage: (position) => 
-                    `This action cannot be undone. This will permanently delete ${position.name}'s position record.`,
             }}
         />
     );
