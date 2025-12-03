@@ -11,7 +11,7 @@ import { ArrowUpDown } from 'lucide-react';
  *
  * @param label - The column header label.
  */
-export function createSortingHeader<_T>(label: string) {
+export function createSortingHeader<T>(label: string) {
     return {
         header: ({ column }: { column: any }) => (
             <Button
@@ -31,7 +31,7 @@ export function createSortingHeader<_T>(label: string) {
  * Returns an actions column that renders the shared {@link EntityActions}
  * component. The caller supplies callbacks for edit/delete and optionally view.
  */
-export function createActionsColumn<_T>(options: {
+export function createActionsColumn<T>(options: {
     onEdit: (row: T) => void;
     onDelete: (row: T) => void;
     onView?: (row: T) => void;
@@ -40,7 +40,7 @@ export function createActionsColumn<_T>(options: {
         id: 'actions',
         enableHiding: false,
         cell: ({ row }: { row: any }) => {
-            const item = row.original as _T;
+            const item = row.original as T;
             return (
                 <EntityActions
                     item={item}

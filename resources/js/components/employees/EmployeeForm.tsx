@@ -78,7 +78,7 @@ export function EmployeeForm({
         resolver: zodResolver(formSchema),
         defaultValues: defaultValues as any,
     });
-    const { _control, reset } = form;
+    const { reset } = form;
 
     // Reset form values when the selected employee changes (edit mode)
     React.useEffect(() => {

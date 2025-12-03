@@ -35,7 +35,7 @@ export function DepartmentForm({
         resolver: zodResolver(formSchema),
         defaultValues: defaultValues as any,
     });
-    const { _control, reset } = form;
+    const { reset } = form;
 
     // Reset form values when the selected department changes (edit mode)
     React.useEffect(() => {
