@@ -35,16 +35,6 @@ export function PositionForm({
         resolver: zodResolver(formSchema),
         defaultValues: defaultValues as any,
     });
-    const { reset } = form;
-
-    // Reset form values when the selected position changes (edit mode)
-    React.useEffect(() => {
-        if (position) {
-            reset({ name: position.name });
-        } else {
-            reset({});
-        }
-    }, [position, reset]);
 
     return (
         <EntityForm
