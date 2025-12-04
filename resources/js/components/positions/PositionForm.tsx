@@ -16,24 +16,26 @@ const formSchema = z.object({
         .max(255, { message: 'Maximum 255 characters.' }),
 });
 
+interface PositionFormProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    position?: Position | null;
+    onSubmit: (data: PositionFormData) => void;
+    isLoading?: boolean;
+}
+
 export function PositionForm({
     open,
     onOpenChange,
     position,
     onSubmit,
     isLoading = false,
-}: {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    position?: Position | null;
-    onSubmit: (data: PositionFormData) => void;
-    isLoading?: boolean;
-}) {
+}: PositionFormProps) {
     const defaultValues = position ? { name: position.name } : undefined;
 
     const form = useForm({
         resolver: zodResolver(formSchema),
-        defaultValues: defaultValues as any,
+        defaultValues,
     });
 
     return (

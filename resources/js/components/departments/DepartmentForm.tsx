@@ -5,7 +5,6 @@ import NameField from '@/components/common/NameField';
 import { FormMessage } from '@/components/ui/form';
 import { Department, DepartmentFormData } from '@/types/department';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -16,24 +15,26 @@ const formSchema = z.object({
         .max(255, { message: 'Maximum 255 characters.' }),
 });
 
+interface DepartmentFormProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    department?: Department | null;
+    onSubmit: (data: DepartmentFormData) => void;
+    isLoading?: boolean;
+}
+
 export function DepartmentForm({
     open,
     onOpenChange,
     department,
     onSubmit,
     isLoading = false,
-}: {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    department?: Department | null;
-    onSubmit: (data: DepartmentFormData) => void;
-    isLoading?: boolean;
-}) {
+}: DepartmentFormProps) {
     const defaultValues = department ? { name: department.name } : undefined;
 
     const form = useForm({
         resolver: zodResolver(formSchema),
-        defaultValues: defaultValues as any,
+        defaultValues,
     });
 
     return (

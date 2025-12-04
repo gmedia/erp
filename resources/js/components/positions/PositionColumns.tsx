@@ -3,32 +3,16 @@
 import {
     createActionsColumn,
     createSelectColumn,
-    createSortingHeader,
 } from '@/components/common/BaseColumns';
-import { formatDate } from '@/lib/utils';
+import { createDateColumn, createTextColumn } from '@/components/common/ColumnUtils';
 import { Position } from '@/types/position';
 import { ColumnDef } from '@tanstack/react-table';
 
 export const positionColumns: ColumnDef<Position>[] = [
     createSelectColumn<Position>(),
-    {
-        accessorKey: 'name',
-        ...createSortingHeader<Position>('Name'),
-    },
-    {
-        accessorKey: 'created_at',
-        ...createSortingHeader<Position>('Created At'),
-        cell: ({ row }) => {
-            return <div>{formatDate(row.getValue('created_at'))}</div>;
-        },
-    },
-    {
-        accessorKey: 'updated_at',
-        ...createSortingHeader<Position>('Updated At'),
-        cell: ({ row }) => {
-            return <div>{formatDate(row.getValue('updated_at'))}</div>;
-        },
-    },
+    createTextColumn<Position>('name', 'Name'),
+    createDateColumn<Position>('created_at', 'Created At'),
+    createDateColumn<Position>('updated_at', 'Updated At'),
     {
         ...createActionsColumn<Position>({
             onEdit: () => {},

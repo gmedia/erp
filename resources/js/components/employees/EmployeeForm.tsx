@@ -20,13 +20,12 @@ import {
 } from '@/components/ui/popover';
 import { DEPARTMENTS, POSITIONS } from '@/constants';
 import { cn } from '@/lib/utils';
-import { Employee } from '@/types';
+import { Employee, EmployeeFormData } from '@/types/employee';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
-import * as React from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import * as z from 'zod';
 
 const formSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -46,19 +45,21 @@ const formSchema = z.object({
     hire_date: z.date({ message: 'Hire date is required.' }),
 });
 
+interface EmployeeFormProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    employee?: Employee | null;
+    onSubmit: (data: EmployeeFormData) => void;
+    isLoading?: boolean;
+}
+
 export function EmployeeForm({
     open,
     onOpenChange,
     employee,
     onSubmit,
     isLoading = false,
-}: {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    employee?: Employee | null;
-    onSubmit: (data: z.infer<typeof formSchema>) => void;
-    isLoading?: boolean;
-}) {
+}: EmployeeFormProps) {
     const defaultValues = employee
         ? {
               name: employee.name,
@@ -76,29 +77,12 @@ export function EmployeeForm({
 
     const form = useForm({
         resolver: zodResolver(formSchema),
-        defaultValues: defaultValues as any,
+        defaultValues,
     });
-    const { reset } = form;
-
-    // Reset form values when the selected employee changes (edit mode)
-    React.useEffect(() => {
-        if (employee) {
-            reset({
-                name: employee.name,
-                email: employee.email,
-                phone: employee.phone,
-                department: employee.department,
-                position: employee.position,
-                salary: employee.salary,
-                hire_date: new Date(employee.hire_date),
-            });
-        } else {
-            reset({});
-        }
-    }, [employee, reset]);
 
     return (
         <EntityForm
+            form={form}
             open={open}
             onOpenChange={onOpenChange}
             title={employee ? 'Edit Employee' : 'Add New Employee'}
@@ -106,7 +90,6 @@ export function EmployeeForm({
             defaultValues={defaultValues}
             schema={formSchema}
             isLoading={isLoading}
-            form={form}
         >
             <NameField name="name" label="Name" placeholder="John Doe">
                 <FormMessage />
@@ -188,7 +171,7 @@ export function EmployeeForm({
                                         className={cn(
                                             'w-full pl-3 text-left font-normal',
                                             !field.value &&
-                                                'text-muted-foreground',
+                                                'text-muted-foreground'
                                         )}
                                     >
                                         {field.value ? (
