@@ -60,24 +60,27 @@ export function EmployeeForm({
     onSubmit,
     isLoading = false,
 }: EmployeeFormProps) {
-    const defaultValues = employee
-        ? {
-              name: employee.name,
-              email: employee.email,
-              phone: employee.phone,
-              department: employee.department,
-              position: employee.position,
-              salary: employee.salary,
-              hire_date: new Date(employee.hire_date),
-          }
-        : {
-              // Provide a default hire date for new employees to satisfy validation
-              hire_date: new Date(),
-          };
-
     const form = useForm({
         resolver: zodResolver(formSchema),
-        defaultValues,
+        defaultValues: employee
+            ? {
+                  name: employee.name,
+                  email: employee.email,
+                  phone: employee.phone,
+                  department: employee.department,
+                  position: employee.position,
+                  salary: employee.salary,
+                  hire_date: new Date(employee.hire_date),
+              }
+            : {
+                  name: '',
+                  email: '',
+                  phone: '',
+                  department: '',
+                  position: '',
+                  salary: '',
+                  hire_date: new Date(),
+              },
     });
 
     return (
@@ -87,7 +90,6 @@ export function EmployeeForm({
             onOpenChange={onOpenChange}
             title={employee ? 'Edit Employee' : 'Add New Employee'}
             onSubmit={onSubmit}
-            defaultValues={defaultValues}
             schema={formSchema}
             isLoading={isLoading}
         >

@@ -13,10 +13,8 @@ export const departmentColumns: ColumnDef<Department>[] = [
     createTextColumn<Department>('name', 'Name'),
     createDateColumn<Department>('created_at', 'Created At'),
     createDateColumn<Department>('updated_at', 'Updated At'),
-    {
-        ...createActionsColumn<Department>({
-            onEdit: () => {},
-            onDelete: () => {},
-        }),
-    },
+    createActionsColumn<Department>({
+        onEdit: () => {},
+        onDelete: () => {},
+    }),
 ];

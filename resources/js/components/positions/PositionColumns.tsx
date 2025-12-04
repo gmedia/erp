@@ -13,10 +13,8 @@ export const positionColumns: ColumnDef<Position>[] = [
     createTextColumn<Position>('name', 'Name'),
     createDateColumn<Position>('created_at', 'Created At'),
     createDateColumn<Position>('updated_at', 'Updated At'),
-    {
-        ...createActionsColumn<Position>({
-            onEdit: () => {},
-            onDelete: () => {},
-        }),
-    },
+    createActionsColumn<Position>({
+        onEdit: () => {},
+        onDelete: () => {},
+    }),
 ];

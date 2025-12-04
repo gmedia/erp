@@ -31,11 +31,9 @@ export function PositionForm({
     onSubmit,
     isLoading = false,
 }: PositionFormProps) {
-    const defaultValues = position ? { name: position.name } : undefined;
-
     const form = useForm({
         resolver: zodResolver(formSchema),
-        defaultValues,
+        defaultValues: position ? { name: position.name } : undefined,
     });
 
     return (
@@ -45,8 +43,6 @@ export function PositionForm({
             onOpenChange={onOpenChange}
             title={position ? 'Edit Position' : 'Add New Position'}
             onSubmit={onSubmit}
-            defaultValues={defaultValues}
-            schema={formSchema}
             isLoading={isLoading}
         >
             <NameField name="name" label="Name" placeholder="e.g., Manager">

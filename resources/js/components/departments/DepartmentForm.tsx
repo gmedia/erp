@@ -30,11 +30,9 @@ export function DepartmentForm({
     onSubmit,
     isLoading = false,
 }: DepartmentFormProps) {
-    const defaultValues = department ? { name: department.name } : undefined;
-
     const form = useForm({
         resolver: zodResolver(formSchema),
-        defaultValues,
+        defaultValues: department ? { name: department.name } : undefined,
     });
 
     return (
@@ -44,8 +42,6 @@ export function DepartmentForm({
             onOpenChange={onOpenChange}
             title={department ? 'Edit Department' : 'Add New Department'}
             onSubmit={onSubmit}
-            defaultValues={defaultValues}
-            schema={formSchema}
             isLoading={isLoading}
         >
             <NameField name="name" label="Name" placeholder="e.g., Marketing">
