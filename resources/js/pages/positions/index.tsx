@@ -28,32 +28,17 @@ export default function PositionIndex() {
                 DataTableComponent: GenericDataTable,
                 FormComponent: PositionForm,
                 
-                // Map the generic props to component-specific props
+                // Simplified prop mapping using spread operator
                 mapDataTableProps: (props) => ({
-                    data: props.data,
-                    onAdd: props.onAdd,
-                    onEdit: props.onEdit,
-                    onDelete: props.onDelete,
-                    pagination: props.pagination,
-                    onPageChange: props.onPageChange,
-                    onPageSizeChange: props.onPageSizeChange,
-                    onSearchChange: props.onSearchChange,
-                    isLoading: props.isLoading,
-                    filterValue: props.filterValue,
-                    filters: props.filters,
-                    onFilterChange: props.onFilterChange,
-                    onResetFilters: props.onResetFilters,
+                    ...props,
                     columns: positionColumns,
                     exportEndpoint: '/api/positions/export',
                     entityType: 'position',
                 }),
                 
                 mapFormProps: (props) => ({
-                    open: props.open,
-                    onOpenChange: props.onOpenChange,
+                    ...props,
                     position: props.item,
-                    onSubmit: props.onSubmit,
-                    isLoading: props.isLoading,
                 }),
             }}
         />
