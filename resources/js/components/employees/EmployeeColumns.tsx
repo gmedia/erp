@@ -1,15 +1,11 @@
 'use client';
 
-import {
-    createActionsColumn,
-    createSelectColumn,
-} from '@/components/common/BaseColumns';
+import { createActionsColumn, createSelectColumn } from '@/components/common/BaseColumns';
 import {
     createCurrencyColumn,
     createDateColumn,
     createEmailColumn,
     createPhoneColumn,
-    createSimpleTextColumn,
     createTextColumn,
 } from '@/components/common/ColumnUtils';
 import { Employee } from '@/types/employee';
