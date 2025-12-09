@@ -1,25 +1,26 @@
 'use client';
 
-import { createActionsColumn, createSelectColumn } from '@/components/common/BaseColumns';
 import {
-    createCurrencyColumn,
-    createDateColumn,
+    createSelectColumn,
+    createTextColumn,
     createEmailColumn,
     createPhoneColumn,
-    createTextColumn,
-} from '@/components/common/ColumnUtils';
+    createCurrencyColumn,
+    createDateColumn,
+    createActionsColumn,
+} from '@/utils/columns';
 import { Employee } from '@/types/employee';
 import { ColumnDef } from '@tanstack/react-table';
 
 export const employeeColumns: ColumnDef<Employee>[] = [
     createSelectColumn<Employee>(),
-    createTextColumn<Employee>('name', 'Name'),
-    createEmailColumn<Employee>('email', 'Email'),
-    createPhoneColumn<Employee>('phone', 'Phone'),
-    createTextColumn<Employee>('department', 'Department'),
-    createTextColumn<Employee>('position', 'Position'),
-    createCurrencyColumn<Employee>('salary', 'Salary'),
-    createDateColumn<Employee>('hire_date', 'Hire Date'),
+    createTextColumn<Employee>({ accessorKey: 'name', label: 'Name' }),
+    createEmailColumn<Employee>({ accessorKey: 'email', label: 'Email' }),
+    createPhoneColumn<Employee>({ accessorKey: 'phone', label: 'Phone' }),
+    createTextColumn<Employee>({ accessorKey: 'department', label: 'Department' }),
+    createTextColumn<Employee>({ accessorKey: 'position', label: 'Position' }),
+    createCurrencyColumn<Employee>({ accessorKey: 'salary', label: 'Salary' }),
+    createDateColumn<Employee>({ accessorKey: 'hire_date', label: 'Hire Date' }),
     createActionsColumn<Employee>({
         onEdit: () => {},
         onDelete: () => {},

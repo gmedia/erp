@@ -1,18 +1,19 @@
 'use client';
 
 import {
-    createActionsColumn,
     createSelectColumn,
-} from '@/components/common/BaseColumns';
-import { createDateColumn, createTextColumn } from '@/components/common/ColumnUtils';
+    createTextColumn,
+    createDateColumn,
+    createActionsColumn,
+} from '@/utils/columns';
 import { Position } from '@/types/position';
 import { ColumnDef } from '@tanstack/react-table';
 
 export const positionColumns: ColumnDef<Position>[] = [
     createSelectColumn<Position>(),
-    createTextColumn<Position>('name', 'Name'),
-    createDateColumn<Position>('created_at', 'Created At'),
-    createDateColumn<Position>('updated_at', 'Updated At'),
+    createTextColumn<Position>({ accessorKey: 'name', label: 'Name' }),
+    createDateColumn<Position>({ accessorKey: 'created_at', label: 'Created At' }),
+    createDateColumn<Position>({ accessorKey: 'updated_at', label: 'Updated At' }),
     createActionsColumn<Position>({
         onEdit: () => {},
         onDelete: () => {},

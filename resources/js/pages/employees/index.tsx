@@ -26,6 +26,8 @@ export default function EmployeeIndex() {
                 breadcrumbs,
                 DataTableComponent: GenericDataTable,
                 FormComponent: EmployeeForm,
+                
+                // Include initial filters for department and position
                 initialFilters: {
                     search: '',
                     department: '',
@@ -33,43 +35,20 @@ export default function EmployeeIndex() {
                     sort_by: undefined,
                     sort_direction: undefined,
                 },
+                
+                // Simplified prop mapping using spread operator
                 mapDataTableProps: (props) => ({
-                    data: props.data,
-                    onAdd: props.onAdd,
-                    onEdit: props.onEdit,
-                    onDelete: props.onDelete,
-                    onView: (employee: Employee) => {
-                        // In a real app, you might navigate to a detail page or open a modal
-                        import('sonner').then(({ toast }) => {
-                            toast.info(`Viewing ${employee.name}'s profile`);
-                        });
-                    },
-                    pagination: props.pagination,
-                    onPageChange: props.onPageChange,
-                    onPageSizeChange: props.onPageSizeChange,
-                    onSearchChange: props.onSearchChange,
-                    isLoading: props.isLoading,
-                    filterValue: props.filterValue,
-                    filters: {
-                        search: props.filters.search,
-                        department: props.filters.department === 'all-departments' ? '' : props.filters.department,
-                        position: props.filters.position === 'all-positions' ? '' : props.filters.position,
-                        sort_by: props.filters.sort_by,
-                        sort_direction: props.filters.sort_direction,
-                    },
-                    onFilterChange: props.onFilterChange,
-                    onResetFilters: props.onResetFilters,
+                    ...props,
                     columns: employeeColumns,
                     exportEndpoint: '/api/employees/export',
                     entityType: 'employee',
                 }),
+                
                 mapFormProps: (props) => ({
-                    open: props.open,
-                    onOpenChange: props.onOpenChange,
+                    ...props,
                     employee: props.item,
-                    onSubmit: props.onSubmit,
-                    isLoading: props.isLoading,
                 }),
+                
                 getDeleteMessage: (employee) => 
                     `This action cannot be undone. This will permanently delete ${employee.name}'s employee record.`,
             }}
