@@ -29,6 +29,8 @@ yarn-error.log
 running_task.md
 .kilocode*
 .roo*
+
+# IDE helper
 _ide_helper.php
 
 # Playwright artifacts
