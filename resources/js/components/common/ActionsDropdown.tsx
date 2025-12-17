@@ -14,8 +14,8 @@ import * as React from 'react';
 type GenericActionsProps<T> = {
     item: T;
     onView?: (item: T) => void;
-    onEdit: (item: T) => void;
-    onDelete: (item: T) => void;
+    onEdit?: (item: T) => void;
+    onDelete?: (item: T) => void;
     extraItems?: React.ReactNode[];
 };
 
@@ -43,15 +43,19 @@ export function GenericActions<T>({
                         View
                     </DropdownMenuItem>
                 )}
-                <DropdownMenuItem onClick={() => onEdit(item)}>
-                    Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                    className="text-destructive"
-                    onClick={() => onDelete(item)}
-                >
-                    Delete
-                </DropdownMenuItem>
+                {onEdit && (
+                    <DropdownMenuItem onClick={() => onEdit(item)}>
+                        Edit
+                    </DropdownMenuItem>
+                )}
+                {onDelete && (
+                    <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => onDelete(item)}
+                    >
+                        Delete
+                    </DropdownMenuItem>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );

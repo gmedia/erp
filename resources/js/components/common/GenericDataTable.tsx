@@ -1,6 +1,6 @@
 'use client';
 
-import { createActionsColumn } from '@/utils/columns';
+
 import { GenericDataTable as DataTableCore } from '@/components/common/DataTableCore';
 import { Input } from '@/components/ui/input';
 import {
@@ -77,21 +77,7 @@ export function GenericDataTable<T extends Record<string, any>>({
         },
     ] : filterFields;
 
-    const processedColumns = React.useMemo(() => {
-        return columns.map((col) => {
-            if (col.id === 'actions') {
-                return {
-                    ...col,
-                    ...createActionsColumn<T>({
-                        onView,
-                        onEdit: (item) => onEdit(item),
-                        onDelete: (item) => onDelete(item),
-                    }),
-                };
-            }
-            return col;
-        });
-    }, [columns, onEdit, onDelete, onView]);
+    const processedColumns = columns;
 
     return (
         <DataTableCore

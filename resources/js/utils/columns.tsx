@@ -39,8 +39,8 @@ export type LinkColumnOptions<T> = ColumnBuilderOptions<T> & {
 };
 
 export type ActionsColumnOptions<T> = {
-  onEdit: (row: T) => void;
-  onDelete: (row: T) => void;
+  onEdit?: (row: T) => void;
+  onDelete?: (row: T) => void;
   onView?: (row: T) => void;
   enableHiding?: boolean;
 };
@@ -294,7 +294,7 @@ export function createUrlColumn<T extends Record<string, any>>(
 
 // Actions column for edit/delete/view operations
 export function createActionsColumn<T extends Record<string, any>>(
-  options: ActionsColumnOptions<T>
+  options: ActionsColumnOptions<T> = {}
 ): ColumnDef<T> {
   const {
     onEdit,
@@ -312,8 +312,8 @@ export function createActionsColumn<T extends Record<string, any>>(
         <EntityActions
           item={item}
           onView={onView}
-          onEdit={() => onEdit(item)}
-          onDelete={() => onDelete(item)}
+          onEdit={onEdit ? () => onEdit(item) : undefined}
+          onDelete={onDelete ? () => onDelete(item) : undefined}
         />
       );
     },
@@ -411,9 +411,6 @@ export function createSimpleEntityColumns<T extends Record<string, any>>(): Colu
     createTextColumn<T>({ accessorKey: 'name' as keyof T, label: 'Name' }),
     createDateColumn<T>({ accessorKey: 'created_at' as keyof T, label: 'Created At' }),
     createDateColumn<T>({ accessorKey: 'updated_at' as keyof T, label: 'Updated At' }),
-    createActionsColumn<T>({
-      onEdit: () => {},
-      onDelete: () => {},
-    }),
+    createActionsColumn<T>(),
   ];
 }

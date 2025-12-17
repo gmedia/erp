@@ -21,8 +21,5 @@ export const employeeColumns: ColumnDef<Employee>[] = [
     createTextColumn<Employee>({ accessorKey: 'position', label: 'Position' }),
     createCurrencyColumn<Employee>({ accessorKey: 'salary', label: 'Salary' }),
     createDateColumn<Employee>({ accessorKey: 'hire_date', label: 'Hire Date' }),
-    createActionsColumn<Employee>({
-        onEdit: () => {},
-        onDelete: () => {},
-    }),
+    createActionsColumn<Employee>(),
 ];
