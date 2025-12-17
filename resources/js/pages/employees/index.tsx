@@ -3,7 +3,7 @@
 import { CrudPage } from '@/components/common/CrudPage';
 import { GenericDataTable } from '@/components/common/GenericDataTable';
 import { EmployeeForm } from '@/components/employees/EmployeeForm';
-import { employees } from '@/routes';
+import employees from '@/routes/employees';
 import { Employee, EmployeeFormData } from '@/types/employee';
 import { type BreadcrumbItem } from '@/types';
 import { employeeColumns } from '@/components/employees/EmployeeColumns';
@@ -11,7 +11,7 @@ import { employeeColumns } from '@/components/employees/EmployeeColumns';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Employees',
-        href: employees().url,
+        href: employees.index().url,
     },
 ];
 
@@ -26,7 +26,7 @@ export default function EmployeeIndex() {
                 breadcrumbs,
                 DataTableComponent: GenericDataTable,
                 FormComponent: EmployeeForm,
-                
+
                 // Include initial filters for department and position
                 initialFilters: {
                     search: '',
@@ -35,7 +35,7 @@ export default function EmployeeIndex() {
                     sort_by: undefined,
                     sort_direction: undefined,
                 },
-                
+
                 // Simplified prop mapping using spread operator
                 mapDataTableProps: (props) => ({
                     ...props,
@@ -43,13 +43,13 @@ export default function EmployeeIndex() {
                     exportEndpoint: '/api/employees/export',
                     entityType: 'employee',
                 }),
-                
+
                 mapFormProps: (props) => ({
                     ...props,
                     employee: props.item,
                 }),
-                
-                getDeleteMessage: (employee) => 
+
+                getDeleteMessage: (employee) =>
                     `This action cannot be undone. This will permanently delete ${employee.name}'s employee record.`,
             }}
         />

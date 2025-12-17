@@ -1,6 +1,6 @@
 'use client';
 
-import { createActionsColumn } from '@/components/common/BaseColumns';
+import { createActionsColumn } from '@/utils/columns';
 import { GenericDataTable as DataTableCore } from '@/components/common/DataTableCore';
 import { Input } from '@/components/ui/input';
 import {
@@ -22,7 +22,7 @@ interface PaginationInfo {
     to: number;
 }
 
-interface GenericDataTableProps<T> {
+interface GenericDataTableProps<T extends Record<string, any>> {
     data: T[];
     onAdd: () => void;
     onEdit: (item: T) => void;
@@ -42,7 +42,7 @@ interface GenericDataTableProps<T> {
     entityType: 'department' | 'position' | 'employee';
 }
 
-export function GenericDataTable<T>({
+export function GenericDataTable<T extends Record<string, any>>({
     data,
     onAdd,
     onEdit,
