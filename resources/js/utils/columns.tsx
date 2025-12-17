@@ -3,6 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowUpDown } from 'lucide-react';
 import { EntityActions } from '@/components/common/EntityActions';
 
@@ -47,7 +48,7 @@ export type ActionsColumnOptions<T> = {
 // Helper function to create sorting header
 export function createSortingHeader<T>(label: string) {
   return {
-    header: ({ column }: { column: any }) => (
+    header: ({ column }: { column: { toggleSorting: (value: boolean) => void; getIsSorted: () => 'asc' | 'desc' | false } }) => (
       <Button
         variant="ghost"
         onClick={() =>
@@ -324,21 +325,22 @@ export function createSelectColumn<T extends Record<string, any>>(): ColumnDef<T
   return {
     id: 'select',
     header: ({ table }) => (
-      <input
-        type="checkbox"
-        checked={table.getIsAllPageRowsSelected()}
-        onChange={(e) => table.toggleAllPageRowsSelected(e.target.checked)}
-        aria-label="Select all rows"
-        className="h-4 w-4 rounded border-gray-300"
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && 'indeterminate')
+        }
+        onCheckedChange={(value) =>
+          table.toggleAllPageRowsSelected(!!value)
+        }
+        aria-label="Select all"
       />
     ),
     cell: ({ row }) => (
-      <input
-        type="checkbox"
+      <Checkbox
         checked={row.getIsSelected()}
-        onChange={(e) => row.toggleSelected(e.target.checked)}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        className="h-4 w-4 rounded border-gray-300"
       />
     ),
     enableSorting: false,
