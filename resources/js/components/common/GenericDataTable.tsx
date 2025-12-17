@@ -22,6 +22,12 @@ interface PaginationInfo {
     to: number;
 }
 
+type FieldDescriptor = {
+    name: string;
+    label: string;
+    component: React.ReactNode;
+};
+
 interface GenericDataTableProps<T extends Record<string, any>> {
     data: T[];
     onAdd: () => void;
@@ -39,7 +45,7 @@ interface GenericDataTableProps<T extends Record<string, any>> {
     onResetFilters: () => void;
     columns: any[];
     exportEndpoint: string;
-    entityType: 'department' | 'position' | 'employee';
+    filterFields?: FieldDescriptor[];
 }
 
 export function GenericDataTable<T extends Record<string, any>>({
@@ -59,61 +65,17 @@ export function GenericDataTable<T extends Record<string, any>>({
     onResetFilters,
     columns,
     exportEndpoint,
-    entityType,
-}: GenericDataTableProps<T>) {
-    const getFilterFields = () => {
-        const baseFields = [
-            {
-                name: 'search',
-                label: 'Search',
-                component: <Input placeholder={`Search ${entityType}s...`} />,
-            },
-        ];
-
-        if (entityType === 'employee') {
-            return [
-                ...baseFields,
-                {
-                    name: 'department',
-                    label: 'Department',
-                    component: (
-                        <Select>
-                            <SelectTrigger className="border-border bg-background">
-                                <SelectValue placeholder="Select a department" />
-                            </SelectTrigger>
-                            <SelectContent className="border-border bg-background text-foreground">
-                                {DEPARTMENTS.map((dept) => (
-                                    <SelectItem key={dept.value} value={dept.value}>
-                                        {dept.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    ),
-                },
-                {
-                    name: 'position',
-                    label: 'Position',
-                    component: (
-                        <Select>
-                            <SelectTrigger className="border-border bg-background">
-                                <SelectValue placeholder="Select a position" />
-                            </SelectTrigger>
-                            <SelectContent className="border-border bg-background text-foreground">
-                                {POSITIONS.map((pos) => (
-                                    <SelectItem key={pos.value} value={pos.value}>
-                                        {pos.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    ),
-                },
-            ];
-        }
-
-        return baseFields;
-    };
+    filterFields = [],
+    entityName = '',
+}: GenericDataTableProps<T> & { entityName?: string }) {
+    // Add default search field if no filterFields provided
+    const defaultFilterFields = filterFields.length === 0 ? [
+        {
+            name: 'search',
+            label: 'Search',
+            component: <Input placeholder={`Search${entityName ? ` ${entityName.toLowerCase()}s` : ''}...`} />,
+        },
+    ] : filterFields;
 
     const processedColumns = React.useMemo(() => {
         return columns.map((col) => {
@@ -131,8 +93,6 @@ export function GenericDataTable<T extends Record<string, any>>({
         });
     }, [columns, onEdit, onDelete, onView]);
 
-    const filterFields = getFilterFields();
-
     return (
         <DataTableCore
             columns={processedColumns}
@@ -147,11 +107,58 @@ export function GenericDataTable<T extends Record<string, any>>({
             onFilterChange={onFilterChange}
             onResetFilters={onResetFilters}
             exportEndpoint={exportEndpoint}
-            filterFields={filterFields}
+            filterFields={defaultFilterFields}
             onAdd={onAdd}
             onEdit={onEdit}
             onDelete={onDelete}
             onView={onView}
         />
     );
+}
+
+// Convenience function for employee-specific filter fields
+export function createEmployeeFilterFields(): FieldDescriptor[] {
+    return [
+        {
+            name: 'search',
+            label: 'Search',
+            component: <Input placeholder="Search employees..." />,
+        },
+        {
+            name: 'department',
+            label: 'Department',
+            component: (
+                <Select>
+                    <SelectTrigger className="border-border bg-background">
+                        <SelectValue placeholder="Select a department" />
+                    </SelectTrigger>
+                    <SelectContent className="border-border bg-background text-foreground">
+                        {DEPARTMENTS.map((dept) => (
+                            <SelectItem key={dept.value} value={dept.value}>
+                                {dept.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            ),
+        },
+        {
+            name: 'position',
+            label: 'Position',
+            component: (
+                <Select>
+                    <SelectTrigger className="border-border bg-background">
+                        <SelectValue placeholder="Select a position" />
+                    </SelectTrigger>
+                    <SelectContent className="border-border bg-background text-foreground">
+                        {POSITIONS.map((pos) => (
+                            <SelectItem key={pos.value} value={pos.value}>
+                                {pos.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            ),
+        },
+    ];
 }

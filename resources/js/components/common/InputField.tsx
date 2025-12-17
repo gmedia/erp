@@ -1,10 +1,10 @@
 'use client';
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Input, InputProps } from '@/components/ui/input';
+import { Input } from '@/components/ui/input';
 import { Control, Path } from 'react-hook-form';
 
-interface InputFieldProps<T extends Record<string, any>> extends Omit<InputProps, 'name'> {
+interface InputFieldProps<T extends Record<string, any>> extends Omit<React.ComponentProps<'input'>, 'name'> {
     control: Control<T>;
     name: Path<T>;
     label: string;

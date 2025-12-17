@@ -1,7 +1,7 @@
 'use client';
 
 import { CrudPage } from '@/components/common/CrudPage';
-import { GenericDataTable } from '@/components/common/GenericDataTable';
+import { GenericDataTable, createEmployeeFilterFields } from '@/components/common/GenericDataTable';
 import { EmployeeForm } from '@/components/employees/EmployeeForm';
 import employees from '@/routes/employees';
 import { Employee, EmployeeFormData } from '@/types/employee';
@@ -41,7 +41,7 @@ export default function EmployeeIndex() {
                     ...props,
                     columns: employeeColumns,
                     exportEndpoint: '/api/employees/export',
-                    entityType: 'employee',
+                    filterFields: createEmployeeFilterFields(),
                 }),
 
                 mapFormProps: (props) => ({
