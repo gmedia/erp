@@ -11,6 +11,11 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
+import NameField from '@/components/common/NameField';
+import { FormMessage } from '@/components/ui/form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 
 interface EntityFormProps<T> {
     open: boolean;
@@ -85,5 +90,57 @@ export default function EntityForm<T>({
                 </Form>
             </DialogContent>
         </Dialog>
+    );
+}
+
+// Simple entity form schema
+const simpleEntityFormSchema = z.object({
+    name: z
+        .string()
+        .min(2, { message: 'Name must be at least 2 characters.' })
+        .max(255, { message: 'Maximum 255 characters.' }),
+});
+
+export type SimpleEntityFormData = z.infer<typeof simpleEntityFormSchema>;
+
+interface SimpleEntityFormProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    entity?: { name: string } | null;
+    onSubmit: (data: SimpleEntityFormData) => void;
+    isLoading?: boolean;
+    entityName: string;
+}
+
+/**
+ * SimpleEntityForm – a reusable form for simple entities with just a name field.
+ * Used for departments, positions, and other basic entities.
+ */
+export function SimpleEntityForm({
+    open,
+    onOpenChange,
+    entity,
+    onSubmit,
+    isLoading = false,
+    entityName,
+}: SimpleEntityFormProps) {
+    const form = useForm<SimpleEntityFormData>({
+        resolver: zodResolver(simpleEntityFormSchema),
+        defaultValues: entity ? { name: entity.name } : undefined,
+    });
+
+    return (
+        <EntityForm
+            form={form}
+            open={open}
+            onOpenChange={onOpenChange}
+            title={entity ? `Edit ${entityName}` : `Add New ${entityName}`}
+            onSubmit={onSubmit}
+            isLoading={isLoading}
+        >
+            <NameField name="name" label="Name" placeholder={`e.g., ${entityName}`}>
+                <FormMessage />
+            </NameField>
+        </EntityForm>
     );
 }

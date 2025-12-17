@@ -368,7 +368,7 @@ export function createBadgeColumn<T extends Record<string, any>>(
       if (!value) return <div>-</div>;
 
       const colorClass = colorMap[value] || defaultColor;
-      
+
       return (
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colorClass}`}>
           {value}
@@ -400,4 +400,18 @@ export function createSimpleTextColumn<T extends Record<string, any>>(
     accessorKey: accessorKey as string,
     header: label,
   };
+}
+
+// Simple entity columns for basic CRUD entities (departments, positions)
+export function createSimpleEntityColumns<T extends Record<string, any>>(): ColumnDef<T>[] {
+  return [
+    createSelectColumn<T>(),
+    createTextColumn<T>({ accessorKey: 'name' as keyof T, label: 'Name' }),
+    createDateColumn<T>({ accessorKey: 'created_at' as keyof T, label: 'Created At' }),
+    createDateColumn<T>({ accessorKey: 'updated_at' as keyof T, label: 'Updated At' }),
+    createActionsColumn<T>({
+      onEdit: () => {},
+      onDelete: () => {},
+    }),
+  ];
 }

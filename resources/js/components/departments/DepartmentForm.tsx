@@ -1,25 +1,13 @@
 'use client';
 
-import EntityForm from '@/components/common/EntityForm';
-import NameField from '@/components/common/NameField';
-import { FormMessage } from '@/components/ui/form';
-import { Department, DepartmentFormData } from '@/types/department';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-
-const formSchema = z.object({
-    name: z
-        .string()
-        .min(2, { message: 'Name must be at least 2 characters.' })
-        .max(255, { message: 'Maximum 255 characters.' }),
-});
+import { SimpleEntityForm, SimpleEntityFormData } from '@/components/common/EntityForm';
+import { Department } from '@/types/department';
 
 interface DepartmentFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     department?: Department | null;
-    onSubmit: (data: DepartmentFormData) => void;
+    onSubmit: (data: SimpleEntityFormData) => void;
     isLoading?: boolean;
 }
 
@@ -30,23 +18,14 @@ export function DepartmentForm({
     onSubmit,
     isLoading = false,
 }: DepartmentFormProps) {
-    const form = useForm({
-        resolver: zodResolver(formSchema),
-        defaultValues: department ? { name: department.name } : undefined,
-    });
-
     return (
-        <EntityForm
-            form={form}
+        <SimpleEntityForm
             open={open}
             onOpenChange={onOpenChange}
-            title={department ? 'Edit Department' : 'Add New Department'}
+            entity={department}
             onSubmit={onSubmit}
             isLoading={isLoading}
-        >
-            <NameField name="name" label="Name" placeholder="e.g., Marketing">
-                <FormMessage />
-            </NameField>
-        </EntityForm>
+            entityName="Department"
+        />
     );
 }

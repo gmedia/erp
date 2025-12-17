@@ -1,7 +1,7 @@
 'use client';
 
 import { Head } from '@inertiajs/react';
-import { useState, ReactNode } from 'react';
+import { useState, ReactNode, useCallback } from 'react';
 
 import {
     AlertDialog,
@@ -26,27 +26,27 @@ export interface CrudPageConfig<T, FormData, FilterType extends Record<string, a
     apiEndpoint: string;
     queryKey: string[];
     breadcrumbs: BreadcrumbItem[];
-    
+
     // Component configuration - using generic prop interfaces
     DataTableComponent: React.ComponentType<any>;
     FormComponent: React.ComponentType<any>;
-    
+
     // Optional callbacks for customization
     onCreateSuccess?: () => void;
     onUpdateSuccess?: () => void;
     onDeleteSuccess?: () => void;
     onError?: (error: Error) => void;
-    
+
     // Filter configuration
     initialFilters?: FilterType;
     initialPagination?: {
         page: number;
         per_page: number;
     };
-    
+
     // Custom formatting for delete message
     getDeleteMessage?: (item: T) => string;
-    
+
     // Props mapping functions to adapt generic props to component-specific props
     mapDataTableProps?: (props: {
         data: T[];
@@ -70,7 +70,7 @@ export interface CrudPageConfig<T, FormData, FilterType extends Record<string, a
         onFilterChange: (filters: Partial<FilterType>) => void;
         onResetFilters: () => void;
     }) => any;
-    
+
     mapFormProps?: (props: {
         open: boolean;
         onOpenChange: (open: boolean) => void;
@@ -134,21 +134,21 @@ export function CrudPage<T extends { id: number; name?: string }, FormData, Filt
     });
 
     // Event handlers
-    const handleAdd = () => {
+    const handleAdd = useCallback(() => {
         setSelectedItem(null);
         setIsFormOpen(true);
-    };
+    }, []);
 
-    const handleEdit = (item: T) => {
+    const handleEdit = useCallback((item: T) => {
         setSelectedItem(item);
         setIsFormOpen(true);
-    };
+    }, []);
 
-    const handleDelete = (item: T) => {
+    const handleDelete = useCallback((item: T) => {
         setItemToDelete(item);
-    };
+    }, []);
 
-    const handleFormSubmit = (data: FormData) => {
+    const handleFormSubmit = useCallback((data: FormData) => {
         if (selectedItem) {
             updateMutation.mutate(
                 { id: selectedItem.id, data },
@@ -169,9 +169,9 @@ export function CrudPage<T extends { id: number; name?: string }, FormData, Filt
                 },
             });
         }
-    };
+    }, [selectedItem, updateMutation, createMutation, config]);
 
-    const handleDeleteConfirm = () => {
+    const handleDeleteConfirm = useCallback(() => {
         if (itemToDelete) {
             deleteMutation.mutate(itemToDelete.id, {
                 onSuccess: () => {
@@ -180,14 +180,14 @@ export function CrudPage<T extends { id: number; name?: string }, FormData, Filt
                 },
             });
         }
-    };
+    }, [itemToDelete, deleteMutation, config]);
 
-    const handleFormClose = (open: boolean) => {
+    const handleFormClose = useCallback((open: boolean) => {
         setIsFormOpen(open);
         if (!open) {
             setSelectedItem(null);
         }
-    };
+    }, []);
 
     // Default delete message
     const getDeleteMessage = config.getDeleteMessage || ((item: T) => {
@@ -196,7 +196,7 @@ export function CrudPage<T extends { id: number; name?: string }, FormData, Filt
     });
 
     // Prepare data table props
-    const dataTableProps = config.mapDataTableProps 
+    const dataTableProps = config.mapDataTableProps
         ? config.mapDataTableProps({
             data,
             onAdd: handleAdd,

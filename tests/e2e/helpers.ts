@@ -55,7 +55,7 @@ export async function login(
       }
     })()
   ]);
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 }
 
 /**
