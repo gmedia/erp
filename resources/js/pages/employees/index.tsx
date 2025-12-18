@@ -1,7 +1,8 @@
 'use client';
 
 import { CrudPage } from '@/components/common/CrudPage';
-import { GenericDataTable, createEmployeeFilterFields } from '@/components/common/GenericDataTable';
+import { GenericDataTable } from '@/components/common/GenericDataTable';
+import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
 import { EmployeeForm } from '@/components/employees/EmployeeForm';
 import employees from '@/routes/employees';
 import { Employee, EmployeeFormData } from '@/types/employee';

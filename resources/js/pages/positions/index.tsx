@@ -1,6 +1,7 @@
 'use client';
 
 import { SimpleEntityIndex } from '@/components/common/SimpleEntityIndex';
+import { positionColumns } from '@/components/positions/PositionColumns';
 import positions from '@/routes/positions';
 import { type BreadcrumbItem } from '@/types';
 
@@ -19,6 +20,7 @@ export default function PositionIndex() {
             routes={positions}
             apiEndpoint="/api/positions"
             breadcrumbs={breadcrumbs}
+            columns={positionColumns}
         />
     );
 }

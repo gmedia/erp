@@ -24,6 +24,7 @@ interface SimpleEntityIndexProps<Entity extends SimpleEntity> {
     routes: any; // Routes object with index() method
     apiEndpoint: string;
     breadcrumbs: BreadcrumbItem[];
+    columns?: ColumnDef<Entity>[]; // Optional custom columns
 }
 
 export function SimpleEntityIndex<Entity extends SimpleEntity>({
@@ -32,8 +33,9 @@ export function SimpleEntityIndex<Entity extends SimpleEntity>({
     routes,
     apiEndpoint,
     breadcrumbs,
+    columns,
 }: SimpleEntityIndexProps<Entity>) {
-    const columns: ColumnDef<Entity>[] = createSimpleEntityColumns<Entity>();
+    const finalColumns: ColumnDef<Entity>[] = columns || createSimpleEntityColumns<Entity>();
 
     return (
         <CrudPage<Entity, SimpleEntityFormData>
@@ -49,7 +51,7 @@ export function SimpleEntityIndex<Entity extends SimpleEntity>({
 
                 mapDataTableProps: (props) => ({
                     ...props,
-                    columns,
+                    columns: finalColumns,
                     exportEndpoint: `${apiEndpoint}/export`,
                     entityName,
                 }),

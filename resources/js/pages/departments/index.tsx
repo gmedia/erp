@@ -1,6 +1,7 @@
 'use client';
 
 import { SimpleEntityIndex } from '@/components/common/SimpleEntityIndex';
+import { departmentColumns } from '@/components/departments/DepartmentColumns';
 import departments from '@/routes/departments';
 import { type BreadcrumbItem } from '@/types';
 
@@ -19,6 +20,7 @@ export default function DepartmentIndex() {
             routes={departments}
             apiEndpoint="/api/departments"
             breadcrumbs={breadcrumbs}
+            columns={departmentColumns}
         />
     );
 }
