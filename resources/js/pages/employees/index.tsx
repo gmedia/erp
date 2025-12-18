@@ -8,6 +8,14 @@ import { Employee, EmployeeFormData } from '@/types/employee';
 import { type BreadcrumbItem } from '@/types';
 import { employeeColumns } from '@/components/employees/EmployeeColumns';
 
+interface EmployeeFilters {
+    search: string;
+    department: string;
+    position: string;
+    sort_by?: string;
+    sort_direction?: string;
+}
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Employees',
@@ -17,7 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function EmployeeIndex() {
     return (
-        <CrudPage<Employee, EmployeeFormData, { search: string; department: string; position: string; sort_by?: string; sort_direction?: string }>
+        <CrudPage<Employee, EmployeeFormData, EmployeeFilters>
             config={{
                 entityName: 'Employee',
                 entityNamePlural: 'Employees',
@@ -27,16 +35,12 @@ export default function EmployeeIndex() {
                 DataTableComponent: GenericDataTable,
                 FormComponent: EmployeeForm,
 
-                // Include initial filters for department and position
                 initialFilters: {
                     search: '',
                     department: '',
                     position: '',
-                    sort_by: undefined,
-                    sort_direction: undefined,
                 },
 
-                // Simplified prop mapping using spread operator
                 mapDataTableProps: (props) => ({
                     ...props,
                     columns: employeeColumns,
