@@ -21,7 +21,7 @@ interface SimpleEntityFormData {
 interface SimpleEntityIndexProps<Entity extends SimpleEntity> {
     entityName: string;
     entityNamePlural: string;
-    routes: any; // Routes object with index() method
+    routes?: any; // Routes object with index() method (optional)
     apiEndpoint: string;
     breadcrumbs: BreadcrumbItem[];
     columns?: ColumnDef<Entity>[]; // Optional custom columns
