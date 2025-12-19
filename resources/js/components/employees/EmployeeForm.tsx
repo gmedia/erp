@@ -6,7 +6,7 @@ import SelectField from '@/components/common/SelectField';
 import { InputField } from '@/components/common/InputField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import { DEPARTMENTS, POSITIONS } from '@/constants';
-import { Employee, EmployeeFormData } from '@/types/employee';
+import { Employee, EmployeeFormData } from '@/types/entity';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -70,7 +70,7 @@ export function EmployeeForm({
             isLoading={isLoading}
         >
             <NameField name="name" label="Name" placeholder="John Doe" />
-            
+
             <InputField
                 control={form.control}
                 name="email"
@@ -78,28 +78,28 @@ export function EmployeeForm({
                 type="email"
                 placeholder="john.doe@example.com"
             />
-            
+
             <InputField
                 control={form.control}
                 name="phone"
                 label="Phone"
                 placeholder="+1 (555) 123-4567"
             />
-            
+
             <SelectField
                 name="department"
                 label="Department"
                 options={DEPARTMENTS}
                 placeholder="Select a department"
             />
-            
+
             <SelectField
                 name="position"
                 label="Position"
                 options={POSITIONS}
                 placeholder="Select a position"
             />
-            
+
             <InputField
                 control={form.control}
                 name="salary"
@@ -107,7 +107,7 @@ export function EmployeeForm({
                 type="number"
                 placeholder="50000"
             />
-            
+
             <DatePickerField
                 control={form.control}
                 name="hire_date"

@@ -2,6 +2,7 @@
 
 import EntityForm from '@/components/common/EntityForm';
 import NameField from '@/components/common/NameField';
+import { Position, PositionFormData } from '@/types/entity';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -9,17 +10,6 @@ import * as z from 'zod';
 const formSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
 });
-
-interface Position {
-    id: number;
-    name: string;
-    created_at: string;
-    updated_at: string;
-}
-
-interface PositionFormData {
-    name: string;
-}
 
 interface PositionFormProps {
     open: boolean;
@@ -36,7 +26,7 @@ export function PositionForm({
     onSubmit,
     isLoading = false,
 }: PositionFormProps) {
-    const form = useForm({
+    const form = useForm<PositionFormData>({
         resolver: zodResolver(formSchema),
         defaultValues: position
             ? { name: position.name }
@@ -50,7 +40,6 @@ export function PositionForm({
             onOpenChange={onOpenChange}
             title={position ? 'Edit Position' : 'Add New Position'}
             onSubmit={onSubmit}
-            schema={formSchema}
             isLoading={isLoading}
         >
             <NameField name="name" label="Name" placeholder="e.g., Software Engineer" />

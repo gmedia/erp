@@ -2,6 +2,7 @@
 
 import EntityForm from '@/components/common/EntityForm';
 import NameField from '@/components/common/NameField';
+import { Department, DepartmentFormData } from '@/types/entity';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -9,17 +10,6 @@ import * as z from 'zod';
 const formSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
 });
-
-interface Department {
-    id: number;
-    name: string;
-    created_at: string;
-    updated_at: string;
-}
-
-interface DepartmentFormData {
-    name: string;
-}
 
 interface DepartmentFormProps {
     open: boolean;
@@ -36,7 +26,7 @@ export function DepartmentForm({
     onSubmit,
     isLoading = false,
 }: DepartmentFormProps) {
-    const form = useForm({
+    const form = useForm<DepartmentFormData>({
         resolver: zodResolver(formSchema),
         defaultValues: department
             ? { name: department.name }
@@ -50,7 +40,6 @@ export function DepartmentForm({
             onOpenChange={onOpenChange}
             title={department ? 'Edit Department' : 'Add New Department'}
             onSubmit={onSubmit}
-            schema={formSchema}
             isLoading={isLoading}
         >
             <NameField name="name" label="Name" placeholder="e.g., Human Resources" />

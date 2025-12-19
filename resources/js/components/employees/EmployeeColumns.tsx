@@ -9,7 +9,7 @@ import {
     createDateColumn,
     createActionsColumn,
 } from '@/utils/columns';
-import { Employee } from '@/types/employee';
+import { Employee } from '@/types/entity';
 import { ColumnDef } from '@tanstack/react-table';
 
 export const employeeColumns: ColumnDef<Employee>[] = [

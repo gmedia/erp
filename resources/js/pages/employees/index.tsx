@@ -4,7 +4,7 @@ import { CrudPage } from '@/components/common/CrudPage';
 import { GenericDataTable } from '@/components/common/GenericDataTable';
 import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
 import { EmployeeForm } from '@/components/employees/EmployeeForm';
-import { Employee, EmployeeFormData } from '@/types/employee';
+import { Employee, EmployeeFormData } from '@/types/entity';
 import { type BreadcrumbItem } from '@/types';
 import { employeeColumns } from '@/components/employees/EmployeeColumns';
 

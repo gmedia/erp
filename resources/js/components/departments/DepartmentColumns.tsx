@@ -6,14 +6,8 @@ import {
     createDateColumn,
     createActionsColumn,
 } from '@/utils/columns';
+import { Department } from '@/types/entity';
 import { ColumnDef } from '@tanstack/react-table';
-
-interface Department {
-    id: number;
-    name: string;
-    created_at: string;
-    updated_at: string;
-}
 
 export const departmentColumns: ColumnDef<Department>[] = [
     createSelectColumn<Department>(),
