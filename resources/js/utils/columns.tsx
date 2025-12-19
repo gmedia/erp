@@ -5,7 +5,7 @@ import { formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowUpDown } from 'lucide-react';
-import { EntityActions } from '@/components/common/EntityActions';
+import { GenericActions } from '@/components/common/ActionsDropdown';
 
 // Type definitions for better type safety
 export type ColumnBuilderOptions<T> = {
@@ -309,7 +309,7 @@ export function createActionsColumn<T extends Record<string, any>>(
     cell: ({ row }) => {
       const item = row.original as T;
       return (
-        <EntityActions
+        <GenericActions
           item={item}
           onView={onView}
           onEdit={onEdit ? () => onEdit(item) : undefined}
