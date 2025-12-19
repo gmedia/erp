@@ -1,7 +1,7 @@
 'use client';
 
 import { Head } from '@inertiajs/react';
-import { useState, ReactNode, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 import {
     AlertDialog,
@@ -96,7 +96,6 @@ export function CrudPage<T extends { id: number; name?: string }, FormData, Filt
     const {
         filters,
         pagination,
-        setFilters,
         setPagination,
         handleFilterChange,
         handleSearchChange,

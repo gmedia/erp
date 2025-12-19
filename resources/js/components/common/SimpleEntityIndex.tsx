@@ -3,42 +3,25 @@
 import { CrudPage } from '@/components/common/CrudPage';
 import { GenericDataTable } from '@/components/common/GenericDataTable';
 import { SimpleEntityForm } from '@/components/common/EntityForm';
-import { type BreadcrumbItem } from '@/types';
+import { Input } from '@/components/ui/input';
 import { createSimpleEntityColumns } from '@/utils/columns';
-import { ColumnDef } from '@tanstack/react-table';
+import { SimpleEntity, SimpleEntityFormData, SimpleEntityFilters, BreadcrumbItem } from '@/types';
 
-interface SimpleEntity {
-    id: number;
-    name: string;
-    created_at: string;
-    updated_at: string;
-}
-
-interface SimpleEntityFormData {
-    name: string;
-}
-
-interface SimpleEntityIndexProps<Entity extends SimpleEntity> {
+interface SimpleEntityIndexProps {
     entityName: string;
     entityNamePlural: string;
-    routes?: any; // Routes object with index() method (optional)
     apiEndpoint: string;
     breadcrumbs: BreadcrumbItem[];
-    columns?: ColumnDef<Entity>[]; // Optional custom columns
 }
 
-export function SimpleEntityIndex<Entity extends SimpleEntity>({
+export function SimpleEntityIndex({
     entityName,
     entityNamePlural,
-    routes,
     apiEndpoint,
     breadcrumbs,
-    columns,
-}: SimpleEntityIndexProps<Entity>) {
-    const finalColumns: ColumnDef<Entity>[] = columns || createSimpleEntityColumns<Entity>();
-
+}: SimpleEntityIndexProps) {
     return (
-        <CrudPage<Entity, SimpleEntityFormData>
+        <CrudPage<SimpleEntity, SimpleEntityFormData, SimpleEntityFilters>
             config={{
                 entityName,
                 entityNamePlural,
@@ -49,11 +32,21 @@ export function SimpleEntityIndex<Entity extends SimpleEntity>({
                 DataTableComponent: GenericDataTable,
                 FormComponent: SimpleEntityForm,
 
+                initialFilters: {
+                    search: '',
+                },
+
                 mapDataTableProps: (props) => ({
                     ...props,
-                    columns: finalColumns,
+                    columns: createSimpleEntityColumns<SimpleEntity>(),
                     exportEndpoint: `${apiEndpoint}/export`,
-                    entityName,
+                    filterFields: [
+                        {
+                            name: 'search',
+                            label: 'Search',
+                            component: <Input placeholder={`Search ${entityNamePlural.toLowerCase()}...`} />,
+                        },
+                    ],
                 }),
 
                 mapFormProps: (props) => ({
@@ -61,6 +54,9 @@ export function SimpleEntityIndex<Entity extends SimpleEntity>({
                     entity: props.item,
                     entityName,
                 }),
+
+                getDeleteMessage: (entity) =>
+                    `This action cannot be undone. This will permanently delete ${entity.name}'s ${entityName.toLowerCase()} record.`,
             }}
         />
     );

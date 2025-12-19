@@ -44,8 +44,6 @@ export default function EntityForm<T>({
     onOpenChange,
     title,
     onSubmit,
-    defaultValues: _defaultValues,
-    schema: _schema,
     children,
     isLoading = false,
     form,

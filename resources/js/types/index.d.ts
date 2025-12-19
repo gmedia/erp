@@ -1,31 +1,20 @@
-export * from './employee';
-export * from './position';
-export * from './user';
-import type { UrlMethodPair } from '@inertiajs/react';
+// Shared types for the application
+export interface SimpleEntity {
+    id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+}
 
-export type PageProps<
-    T extends Record<string, unknown> = Record<string, unknown>,
-> = T & {
-    auth: {
-        user: User;
-    };
-};
-export type BreadcrumbItem = {
+export interface SimpleEntityFormData {
+    name: string;
+}
+
+export interface SimpleEntityFilters {
+    search: string;
+}
+
+export interface BreadcrumbItem {
     title: string;
-    href?: string;
-};
-
-export type NavItem = {
-    title: string;
-    // href can be a plain string or an Inertia UrlMethodPair (e.g., route definition)
-    href: string | UrlMethodPair;
-    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-};
-
-export type SharedData = {
-    auth: {
-        // User data may include an optional avatar URL
-        user: User & { avatar?: string };
-    };
-    // Add any additional shared properties here if needed
-};
+    href: string;
+}
