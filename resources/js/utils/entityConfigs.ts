@@ -40,42 +40,47 @@ export type EntityConfig<
     FilterType extends Record<string, any> = Record<string, any>
 > = SimpleEntityConfig | ComplexEntityConfig<T, FormData, FilterType>;
 
-// Predefined configurations for simple entities
-export const departmentConfig: SimpleEntityConfig = {
-    type: 'simple',
-    entityName: 'Department',
-    entityNamePlural: 'Departments',
-    apiEndpoint: '/api/departments',
-    exportEndpoint: '/api/departments/export',
-    queryKey: ['departments'],
-    breadcrumbs: [
-        {
-            title: 'Departments',
-            href: '/departments',
-        },
-    ],
-    filterPlaceholder: 'Search departments...',
-    getDeleteMessage: (department) =>
-        `This action cannot be undone. This will permanently delete ${department.name || 'this department'}'s department record.`,
-};
+// Helper function to create generic delete messages
+const createGenericDeleteMessage = (entityName: string) => (item: { name?: string }) =>
+    `This action cannot be undone. This will permanently delete ${item.name || `this ${entityName.toLowerCase()}`}'s ${entityName.toLowerCase()} record.`;
 
-export const positionConfig: SimpleEntityConfig = {
+// Helper function to create simple entity configs
+const createSimpleEntityConfig = (
+    entityName: string,
+    entityNamePlural: string,
+    apiBase: string,
+    filterPlaceholder: string
+): SimpleEntityConfig => ({
     type: 'simple',
-    entityName: 'Position',
-    entityNamePlural: 'Positions',
-    apiEndpoint: '/api/positions',
-    exportEndpoint: '/api/positions/export',
-    queryKey: ['positions'],
+    entityName,
+    entityNamePlural,
+    apiEndpoint: `/api/${apiBase}`,
+    exportEndpoint: `/api/${apiBase}/export`,
+    queryKey: [apiBase],
     breadcrumbs: [
         {
-            title: 'Positions',
-            href: '/positions',
+            title: entityNamePlural,
+            href: `/${apiBase}`,
         },
     ],
-    filterPlaceholder: 'Search positions...',
-    getDeleteMessage: (position) =>
-        `This action cannot be undone. This will permanently delete ${position.name || 'this position'}'s position record.`,
-};
+    filterPlaceholder,
+    getDeleteMessage: createGenericDeleteMessage(entityName),
+});
+
+// Predefined configurations for simple entities
+export const departmentConfig: SimpleEntityConfig = createSimpleEntityConfig(
+    'Department',
+    'Departments',
+    'departments',
+    'Search departments...'
+);
+
+export const positionConfig: SimpleEntityConfig = createSimpleEntityConfig(
+    'Position',
+    'Positions',
+    'positions',
+    'Search positions...'
+);
 
 // Import types for complex entities
 import { Employee, EmployeeFormData } from '@/types/entity';

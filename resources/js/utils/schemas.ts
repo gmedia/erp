@@ -14,7 +14,7 @@ export const employeeFormSchema = z.object({
     phone: z.string().min(10, { message: 'Phone number must be at least 10 digits.' }),
     department: z.string().min(1, { message: 'Department is required.' }),
     position: z.string().min(1, { message: 'Position is required.' }),
-    salary: z.string().regex(/^\d+$/, { message: 'Please enter a valid salary amount.' }),
+    salary: z.string().regex(/^\d+(\.\d{1,2})?$/, { message: 'Please enter a valid salary amount.' }),
     hire_date: z.date({ message: 'Hire date is required.' }),
 });
 
