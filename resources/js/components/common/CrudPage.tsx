@@ -3,17 +3,8 @@
 import { Head } from '@inertiajs/react';
 import { useState, useCallback } from 'react';
 
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import AppLayout from '@/layouts/app-layout';
+import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
@@ -272,28 +263,14 @@ export function CrudPage<T extends { id: number; name?: string }, FormData, Filt
 
             <config.FormComponent {...formProps} />
 
-            <AlertDialog
+            <DeleteConfirmationDialog
                 open={!!itemToDelete}
                 onOpenChange={(open) => !open && setItemToDelete(null)}
-            >
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            {itemToDelete && getDeleteMessage(itemToDelete)}
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleDeleteConfirm}
-                            disabled={deleteMutation.isPending}
-                        >
-                            {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+                item={itemToDelete}
+                onConfirm={handleDeleteConfirm}
+                isLoading={deleteMutation.isPending}
+                getDeleteMessage={getDeleteMessage}
+            />
         </>
     );
 }

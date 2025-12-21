@@ -1,5 +1,74 @@
 import { Page, expect } from '@playwright/test';
 
+// Generic entity creation helper
+interface EntityField {
+  name: string;
+  type: 'text' | 'email' | 'select';
+  selector?: string;
+  defaultValue: string;
+  optionSelector?: string;
+}
+
+interface EntityConfig {
+  route: string;
+  fields: EntityField[];
+  returnField: string; // field name to return as identifier
+}
+
+/**
+ * Generic function to create any entity via the UI.
+ *
+ * @param page - Playwright Page object.
+ * @param config - Entity configuration.
+ * @param overrides - Optional field overrides.
+ * @returns The unique identifier field value used for the created entity.
+ */
+async function createEntity(
+  page: Page,
+  config: EntityConfig,
+  overrides: Record<string, string> = {}
+): Promise<string> {
+  // 1️⃣ Login
+  await login(page);
+
+  // 2️⃣ Navigate to entity list page
+  await page.goto(config.route);
+
+  // 3️⃣ Open the "Add Entity" dialog
+  const addButton = page.getByRole('button', { name: /Add/i });
+  await expect(addButton).toBeVisible();
+  await addButton.click();
+
+  // 4️⃣ Fill the form fields
+  let returnValue = '';
+
+  for (const field of config.fields) {
+    const value = overrides[field.name] ?? field.defaultValue;
+
+    if (field.name === config.returnField) {
+      returnValue = value;
+    }
+
+    if (field.type === 'select') {
+      await page.click(`button:has-text("${field.selector}")`);
+      await page.getByRole('option', { name: value }).click();
+    } else {
+      await page.fill(`input[name="${field.name}"]`, value);
+    }
+  }
+
+  // Ensure any modal overlay/backdrop is removed before submitting
+  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
+    state: 'detached',
+  });
+  const dialog = page.getByRole('dialog');
+  const submitButton = dialog.getByRole('button', { name: /Add/ });
+  await expect(submitButton).toBeVisible();
+  await submitButton.click();
+
+  return returnValue;
+}
+
 /**
  * Logs in a user using the provided credentials.
  *
@@ -67,60 +136,32 @@ export async function login(
  */
 export async function createEmployee(
   page: Page,
-  overrides?: Partial<{
+  overrides: Partial<{
     name: string;
     email: string;
     phone: string;
     salary: string;
     department: string;
     position: string;
-  }>
+  }> = {}
 ): Promise<string> {
-  // 1️⃣ Login
-  await login(page);
-
-  // 2️⃣ Navigate to employee list page
-  await page.goto('/employees');
-
-  // 3️⃣ Open the “Add Employee” dialog
-  const addButton = page.getByRole('button', { name: /Add/i });
-  await expect(addButton).toBeVisible();
-  await addButton.click();
-
-  // 4️⃣ Fill the form fields (use defaults, allow overrides)
   const timestamp = Date.now();
-// Updated email generation to ensure uniqueness without fixed prefix
   const defaultEmail = `${Math.random().toString(36).substring(2,7)}${timestamp}@example.com`;
-  const email = overrides?.email ?? defaultEmail;
 
-  await page.fill('input[name="name"]', overrides?.name ?? 'John Doe');
-  await page.fill('input[name="email"]', email);
-  await page.fill('input[name="phone"]', overrides?.phone ?? '+628123456789');
-  await page.fill('input[name="salary"]', overrides?.salary ?? '5000');
+  const config: EntityConfig = {
+    route: '/employees',
+    returnField: 'email',
+    fields: [
+      { name: 'name', type: 'text', defaultValue: 'John Doe' },
+      { name: 'email', type: 'email', defaultValue: defaultEmail },
+      { name: 'phone', type: 'text', defaultValue: '+628123456789' },
+      { name: 'salary', type: 'text', defaultValue: '5000' },
+      { name: 'department', type: 'select', selector: 'Select a department', defaultValue: 'Engineering' },
+      { name: 'position', type: 'select', selector: 'Select a position', defaultValue: 'Senior Developer' },
+    ],
+  };
 
-  // Department select
-  await page.click('button:has-text("Select a department")');
-  await page
-    .getByRole('option', { name: overrides?.department ?? 'Engineering' })
-    .click();
-
-  // Position select
-  await page.click('button:has-text("Select a position")');
-  await page
-    .getByRole('option', { name: overrides?.position ?? 'Senior', exact: true })
-    .click();
-
-  // Ensure any modal overlay/backdrop is removed before submitting
-  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
-    state: 'detached',
-  });
-  const dialog = page.getByRole('dialog');
-  const submitButton = dialog.getByRole('button', { name: /Add/ });
-  await expect(submitButton).toBeVisible();
-  await submitButton.click();
-
-  // Return the email used for later lookup
-  return email;
+  return createEntity(page, config, overrides);
 }
 
 /**
@@ -185,48 +226,30 @@ export async function editEmployee(
 
 
 /**
- * Create a new employee via the UI.
+ * Create a new position via the UI.
  *
  * @param page - Playwright Page object.
  * @param overrides - Optional fields to override the default values.
- * @returns The unique name used for the created employee.
+ * @returns The unique name used for the created position.
  */
 export async function createPosition(
   page: Page,
-  overrides?: Partial<{
+  overrides: Partial<{
     name: string;
-  }>
+  }> = {}
 ): Promise<string> {
-  // 1️⃣ Login
-  await login(page);
-
-  // 2️⃣ Navigate to position list page
-  await page.goto('/positions');
-
-  // 3️⃣ Open the “Add Position” dialog
-  const addButton = page.getByRole('button', { name: /Add/i });
-  await expect(addButton).toBeVisible();
-  await addButton.click();
-
-  // 4️⃣ Fill the form fields (use defaults, allow overrides)
   const timestamp = Date.now();
-// Updated name generation to ensure uniqueness without fixed prefix
   const defaultName = `${Math.random().toString(36).substring(2,7)}${timestamp}`;
-  const name = overrides?.name ?? defaultName;
 
-  await page.fill('input[name="name"]', name);
+  const config: EntityConfig = {
+    route: '/positions',
+    returnField: 'name',
+    fields: [
+      { name: 'name', type: 'text', defaultValue: defaultName },
+    ],
+  };
 
-  // Ensure any modal overlay/backdrop is removed before submitting
-  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
-    state: 'detached',
-  });
-  const dialog = page.getByRole('dialog');
-  const submitButton = dialog.getByRole('button', { name: /Add/ });
-  await expect(submitButton).toBeVisible();
-  await submitButton.click();
-
-  // Return the name used for later lookup
-  return name;
+  return createEntity(page, config, overrides);
 }
 
 /**
@@ -298,42 +321,22 @@ export async function editPosition(
  */
 export async function createDepartment(
   page: Page,
-  overrides?: Partial<{
+  overrides: Partial<{
     name: string;
-  }>
+  }> = {}
 ): Promise<string> {
-  // 1️⃣ Login
-  await login(page);
-
-  // 2️⃣ Navigate to department list page
-  await page.goto('/departments');
-
-  // 3️⃣ Open the “Add Department” dialog
-  const addButton = page.getByRole('button', { name: /Add/i });
-  await expect(addButton).toBeVisible();
-  await addButton.click();
-
-  // 4️⃣ Fill the form fields (use defaults, allow overrides)
   const timestamp = Date.now();
-  // Updated name generation to ensure uniqueness without fixed prefix
-  const defaultName = `${Math.random()
-    .toString(36)
-    .substring(2, 7)}${timestamp}`;
-  const name = overrides?.name ?? defaultName;
+  const defaultName = `${Math.random().toString(36).substring(2, 7)}${timestamp}`;
 
-  await page.fill('input[name="name"]', name);
+  const config: EntityConfig = {
+    route: '/departments',
+    returnField: 'name',
+    fields: [
+      { name: 'name', type: 'text', defaultValue: defaultName },
+    ],
+  };
 
-  // Ensure any modal overlay/backdrop is removed before submitting
-  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
-    state: 'detached',
-  });
-  const dialog = page.getByRole('dialog');
-  const submitButton = dialog.getByRole('button', { name: /Add/ });
-  await expect(submitButton).toBeVisible();
-  await submitButton.click();
-
-  // Return the name used for later lookup
-  return name;
+  return createEntity(page, config, overrides);
 }
 
 /**

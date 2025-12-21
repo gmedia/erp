@@ -1,6 +1,7 @@
 'use client';
 
 import { GenericActions } from '@/components/common/ActionsDropdown';
+import { DataTablePagination } from '@/components/common/DataTablePagination';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -17,14 +18,6 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from '@/components/ui/pagination';
 import {
     Select,
     SelectContent,
@@ -50,7 +43,6 @@ import {
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import axios from 'axios';
 import {
     ChevronDown,
     Download,
@@ -59,6 +51,7 @@ import {
     PlusCircle,
 } from 'lucide-react';
 import * as React from 'react';
+import { useExport } from '@/hooks/useExport';
 
 type FieldDescriptor = {
     name: string;
@@ -139,7 +132,8 @@ export function GenericDataTable<T>({
     const [rowSelection, setRowSelection] = React.useState({});
     const [searchValue, setSearchValue] = React.useState(filterValue);
     const [isFilterModalOpen, setIsFilterModalOpen] = React.useState(false);
-    const [exporting, setExporting] = React.useState(false);
+    // Use the export hook
+    const { exporting, exportData } = useExport({ endpoint: exportEndpoint });
 
     // Temporary filter state for the modal
     const [tempFilters, setTempFilters] = React.useState<
@@ -242,63 +236,10 @@ export function GenericDataTable<T>({
         });
     };
 
-    const renderPageNumbers = () => {
-        const pages = [];
-        const maxPages = 5;
-        const startPage = Math.max(
-            1,
-            pagination.page - Math.floor(maxPages / 2),
-        );
-        const endPage = Math.min(
-            pagination.last_page,
-            startPage + maxPages - 1,
-        );
 
-        for (let i = startPage; i <= endPage; i++) {
-            pages.push(
-                <PaginationItem key={i}>
-                    <PaginationLink
-                        href="#"
-                        isActive={i === pagination.page}
-                        onClick={(e) => {
-                            e.preventDefault();
-                            handlePageChange(i);
-                        }}
-                    >
-                        {i}
-                    </PaginationLink>
-                </PaginationItem>,
-            );
-        }
-        return pages;
-    };
 
-    const handleExport = async () => {
-        if (!exportEndpoint) return;
-        setExporting(true);
-        try {
-            const cleanFilters = Object.fromEntries(
-                Object.entries(filters).filter(
-                    ([, v]) => v !== null && v !== '',
-                ),
-            );
-            const response = await axios.post(exportEndpoint, cleanFilters, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
-            });
-            const a = document.createElement('a');
-            a.href = response.data.url;
-            a.download = response.data.filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        } catch {
-            alert('Failed to export data. Please try again.');
-        } finally {
-            setExporting(false);
-        }
+    const handleExport = () => {
+        exportData(filters);
     };
 
     const handleApplyFilters = () => {
@@ -591,76 +532,11 @@ export function GenericDataTable<T>({
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between py-4 text-sm text-muted-foreground">
-                <div className="flex items-center space-x-2">
-                    <p>Rows per page</p>
-                    <Select
-                        value={String(pagination.per_page)}
-                        onValueChange={handlePageSizeChange}
-                    >
-                        <SelectTrigger className="w-[70px] border-border bg-background">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="border-border bg-background text-foreground">
-                            <SelectItem value="10">10</SelectItem>
-                            <SelectItem value="15">15</SelectItem>
-                            <SelectItem value="25">25</SelectItem>
-                            <SelectItem value="50">50</SelectItem>
-                            <SelectItem value="100">100</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <p>
-                        Showing {pagination.from} to {pagination.to} of{' '}
-                        {pagination.total} entries
-                    </p>
-                </div>
-
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious
-                                href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    if (pagination.page > 1) {
-                                        handlePageChange(pagination.page - 1);
-                                    }
-                                }}
-                                aria-disabled={pagination.page <= 1}
-                                className={
-                                    pagination.page <= 1
-                                        ? 'pointer-events-none opacity-50'
-                                        : ''
-                                }
-                            />
-                        </PaginationItem>
-
-                        {renderPageNumbers()}
-
-                        <PaginationItem>
-                            <PaginationNext
-                                href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    if (
-                                        pagination.page < pagination.last_page
-                                    ) {
-                                        handlePageChange(pagination.page + 1);
-                                    }
-                                }}
-                                aria-disabled={
-                                    pagination.page >= pagination.last_page
-                                }
-                                className={
-                                    pagination.page >= pagination.last_page
-                                        ? 'pointer-events-none opacity-50'
-                                        : ''
-                                }
-                            />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            </div>
+            <DataTablePagination
+                pagination={pagination}
+                onPageChange={handlePageChange}
+                onPageSizeChange={(per_page: number) => handlePageSizeChange(per_page.toString())}
+            />
         </div>
     );
 }
