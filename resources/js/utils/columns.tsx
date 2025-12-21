@@ -405,12 +405,12 @@ export function createSimpleTextColumn<T extends Record<string, any>>(
 }
 
 // Simple entity columns for basic CRUD entities (departments, positions)
-export function createSimpleEntityColumns<T extends Record<string, any>>(): ColumnDef<T>[] {
+export function createSimpleEntityColumns<T extends { name: string; created_at: string; updated_at: string }>(): ColumnDef<T>[] {
   return [
     createSelectColumn<T>(),
-    createTextColumn<T>({ accessorKey: 'name' as keyof T, label: 'Name' }),
-    createDateColumn<T>({ accessorKey: 'created_at' as keyof T, label: 'Created At' }),
-    createDateColumn<T>({ accessorKey: 'updated_at' as keyof T, label: 'Updated At' }),
+    createTextColumn<T>({ accessorKey: 'name', label: 'Name' }),
+    createDateColumn<T>({ accessorKey: 'created_at', label: 'Created At' }),
+    createDateColumn<T>({ accessorKey: 'updated_at', label: 'Updated At' }),
     createActionsColumn<T>(),
   ];
 }

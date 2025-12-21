@@ -18,7 +18,7 @@ interface SimpleEntityCrudPageConfig<T, FormData, FilterType extends Record<stri
     getDeleteMessage?: (item: T) => string;
 }
 
-export function createSimpleEntityCrudPage<T extends { id: number; name?: string }, FormData, FilterType extends Record<string, any> = Record<string, any>>(
+export function createSimpleEntityCrudPage<T extends { id: number; name: string; created_at: string; updated_at: string }, FormData, FilterType extends Record<string, any> = Record<string, any>>(
     config: SimpleEntityCrudPageConfig<T, FormData, FilterType>
 ) {
     return function SimpleEntityCrudPageComponent() {
