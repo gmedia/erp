@@ -1,16 +1,24 @@
 # ERP
 ## Local development setup
+- Apply permission setup
+    ```
+    sudo bash permission_setup.sh
+    ```
 - Apply project setup
     ```
-    sudo bash project_setup.sh
-    ```
-- Run Vite
-    ```
-    sail npm run dev
+    bash project_setup.sh
     ```
 - Run App
     ```
     sail up -d
+    ```
+- Run Vite
+    ```
+    npm run dev
+    ```
+- Create symbolic link
+    ```
+    sail artisan storage:link
     ```
 - Generate autocompletion for Facades
     ```
@@ -28,14 +36,14 @@
     ```
     sail bin duster fix
     ```
-- Format files and overwrite
+- Format and overwrite blade files
     ```
-    sail npm run blade:formatter
+    npm run blade:formatter
     ```
 - Run Prettier and ESLint
     ```
-    sail npm run format
-    sail npm run lint
+    npm run format
+    npm run lint
     ```
 - Run PHPUnit test
     ```
@@ -43,9 +51,9 @@
     ```
 - Run Playwright e2e test
     ```
-    sail npm run test:e2e
+    npm run test:e2e
     ```
-- Run SonarQube analyze
+- Start analyzing using the SonarQube scanner
     ```
     docker run -u root --rm -v "$(pwd):/var/www/html" -w /var/www/html sonarsource/sonar-scanner-cli:11
     ```
