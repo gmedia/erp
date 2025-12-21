@@ -19,22 +19,22 @@ import AppLogo from './app-logo';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: dashboard(),
+        href: dashboard.url(),
         icon: LayoutGrid,
     },
     {
         title: 'Employees',
-        href: employees(),
+        href: employees.url(),
         icon: Users,
     },
     {
         title: 'Positions',
-        href: positions(),
+        href: positions.url(),
         icon: IdCard,
     },
     {
         title: 'Departments',
-        href: departments(),
+        href: departments.url(),
         icon: IdCard,
     },
 ];

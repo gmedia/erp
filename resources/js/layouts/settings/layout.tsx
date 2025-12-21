@@ -13,22 +13,22 @@ import { type PropsWithChildren } from 'react';
 const sidebarNavItems: NavItem[] = [
     {
         title: 'Profile',
-        href: edit(),
+        href: edit.url(),
         icon: null,
     },
     {
         title: 'Password',
-        href: editPassword(),
+        href: editPassword.url(),
         icon: null,
     },
     {
         title: 'Two-Factor Auth',
-        href: show(),
+        href: show.url(),
         icon: null,
     },
     {
         title: 'Appearance',
-        href: editAppearance(),
+        href: editAppearance.url(),
         icon: null,
     },
 ];
@@ -53,16 +53,12 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                     <nav className="flex flex-col space-y-1 space-x-0">
                         {sidebarNavItems.map((item, index) => (
                             <Button
-                                key={`${typeof item.href === 'string' ? item.href : item.href.url}-${index}`}
+                                key={`${item.href}-${index}`}
                                 size="sm"
                                 variant="ghost"
                                 asChild
                                 className={cn('w-full justify-start', {
-                                    'bg-muted':
-                                        currentPath ===
-                                        (typeof item.href === 'string'
-                                            ? item.href
-                                            : item.href.url),
+                                    'bg-muted': currentPath === item.href,
                                 })}
                             >
                                 <Link href={item.href}>
