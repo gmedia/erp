@@ -7,19 +7,9 @@ import { InputField } from '@/components/common/InputField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import { DEPARTMENTS, POSITIONS } from '@/constants';
 import { Employee, EmployeeFormData } from '@/types/entity';
+import { employeeFormSchema } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-
-const formSchema = z.object({
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    email: z.string().email({ message: 'Please enter a valid email address.' }),
-    phone: z.string().min(10, { message: 'Phone number must be at least 10 digits.' }),
-    department: z.string().min(2, { message: 'Department must be at least 2 characters.' }),
-    position: z.string().min(2, { message: 'Position must be at least 2 characters.' }),
-    salary: z.string().regex(/^\d+$/, { message: 'Please enter a valid salary amount.' }),
-    hire_date: z.date({ message: 'Hire date is required.' }),
-});
 
 interface EmployeeFormProps {
     open: boolean;
@@ -37,7 +27,7 @@ export function EmployeeForm({
     isLoading = false,
 }: EmployeeFormProps) {
     const form = useForm({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(employeeFormSchema),
         defaultValues: employee
             ? {
                   name: employee.name,
@@ -66,7 +56,7 @@ export function EmployeeForm({
             onOpenChange={onOpenChange}
             title={employee ? 'Edit Employee' : 'Add New Employee'}
             onSubmit={onSubmit}
-            schema={formSchema}
+            schema={employeeFormSchema}
             isLoading={isLoading}
         >
             <NameField name="name" label="Name" placeholder="John Doe" />

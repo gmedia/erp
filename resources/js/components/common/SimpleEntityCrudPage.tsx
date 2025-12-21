@@ -6,7 +6,11 @@ import { SimpleEntityForm } from '@/components/common/EntityForm';
 import { createSimpleEntityFilterFields } from '@/components/common/filters';
 import { createSimpleEntityColumns } from '@/utils/columns';
 import { type BreadcrumbItem } from '@/types';
-import { EntityConfig, SimpleEntityConfig } from '@/utils/entityConfigs';
+import { EntityConfig, SimpleEntityConfig, ComplexEntityConfig } from '@/utils/entityConfigs';
+
+// Static imports for complex entities
+import { EmployeeForm } from '@/components/employees/EmployeeForm';
+import { employeeColumns } from '@/components/employees/EmployeeColumns';
 
 // Unified CRUD page factory that handles both simple and complex entities
 export function createEntityCrudPage<
@@ -15,8 +19,6 @@ export function createEntityCrudPage<
     FilterType extends Record<string, any> = Record<string, any>
 >(config: EntityConfig<T, FormData, FilterType>) {
     return function EntityCrudPageComponent() {
-        // For now, handle simple entities only. Complex entities will be handled separately
-        // to avoid complex dynamic imports and type issues
         if (config.type === 'simple') {
             const simpleConfig = config as SimpleEntityConfig;
             return (
@@ -52,8 +54,62 @@ export function createEntityCrudPage<
             );
         }
 
-        // For complex entities, throw an error for now - they should use the original CrudPage directly
-        throw new Error(`Complex entity type '${(config as any).type}' not supported by createEntityCrudPage. Use CrudPage directly.`);
+        if (config.type === 'complex') {
+            const complexConfig = config as ComplexEntityConfig<T, FormData, FilterType>;
+
+            // For now, only handle Employee as complex entity
+            if (config.entityName === 'Employee') {
+                return (
+                    <CrudPage<T, FormData, FilterType>
+                        config={{
+                            entityName: complexConfig.entityName,
+                            entityNamePlural: complexConfig.entityNamePlural,
+                            apiEndpoint: complexConfig.apiEndpoint,
+                            queryKey: complexConfig.queryKey,
+                            breadcrumbs: complexConfig.breadcrumbs,
+
+                            DataTableComponent: GenericDataTable,
+                            FormComponent: EmployeeForm,
+
+                            initialFilters: complexConfig.initialFilters,
+
+                            mapDataTableProps: (props) => ({
+                                data: props.data,
+                                onAdd: props.onAdd,
+                                onEdit: props.onEdit,
+                                onDelete: props.onDelete,
+                                pagination: props.pagination,
+                                onPageChange: props.onPageChange,
+                                onPageSizeChange: props.onPageSizeChange,
+                                onSearchChange: props.onSearchChange,
+                                isLoading: props.isLoading,
+                                filterValue: props.filterValue,
+                                filters: props.filters,
+                                onFilterChange: props.onFilterChange,
+                                onResetFilters: props.onResetFilters,
+                                columns: employeeColumns,
+                                exportEndpoint: complexConfig.exportEndpoint,
+                                filterFields: complexConfig.filterFields,
+                            }),
+
+                            mapFormProps: (props) => ({
+                                open: props.open,
+                                onOpenChange: props.onOpenChange,
+                                employee: props.item, // For EmployeeForm compatibility
+                                onSubmit: props.onSubmit,
+                                isLoading: props.isLoading,
+                            }),
+
+                            getDeleteMessage: complexConfig.getDeleteMessage,
+                        }}
+                    />
+                );
+            }
+
+            throw new Error(`Complex entity '${config.entityName}' not supported yet`);
+        }
+
+        throw new Error(`Unknown entity type '${(config as any).type}'`);
     };
 }
 

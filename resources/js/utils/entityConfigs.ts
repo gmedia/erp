@@ -108,11 +108,11 @@ export const employeeConfig: ComplexEntityConfig<Employee, EmployeeFormData, Emp
         department: '',
         position: '',
     },
-    filterFields: createEmployeeFilterFields() as Array<{
-        name: keyof EmployeeFilters;
-        label: string;
-        component: React.ReactNode;
-    }>,
+    filterFields: createEmployeeFilterFields().map(field => ({
+        name: field.name as keyof EmployeeFilters,
+        label: field.label,
+        component: field.component,
+    })),
     getDeleteMessage: (employee) =>
         `This action cannot be undone. This will permanently delete ${employee.name}'s employee record.`,
 };

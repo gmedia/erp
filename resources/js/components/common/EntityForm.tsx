@@ -15,6 +15,7 @@ import NameField from '@/components/common/NameField';
 import { FormMessage } from '@/components/ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { simpleEntitySchema } from '@/utils/schemas';
 import * as z from 'zod';
 
 interface EntityFormProps<T> {
@@ -91,15 +92,8 @@ export default function EntityForm<T>({
     );
 }
 
-// Simple entity form schema
-const simpleEntityFormSchema = z.object({
-    name: z
-        .string()
-        .min(2, { message: 'Name must be at least 2 characters.' })
-        .max(255, { message: 'Maximum 255 characters.' }),
-});
-
-export type SimpleEntityFormData = z.infer<typeof simpleEntityFormSchema>;
+// Re-export for backward compatibility
+export type SimpleEntityFormData = z.infer<typeof simpleEntitySchema>;
 
 interface SimpleEntityFormProps {
     open: boolean;
@@ -123,7 +117,7 @@ export function SimpleEntityForm({
     entityName,
 }: SimpleEntityFormProps) {
     const form = useForm<SimpleEntityFormData>({
-        resolver: zodResolver(simpleEntityFormSchema),
+        resolver: zodResolver(simpleEntitySchema),
         defaultValues: entity ? { name: entity.name } : undefined,
     });
 
