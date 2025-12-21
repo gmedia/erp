@@ -12,7 +12,7 @@ The Department module uses simple entity CRUD operations with the following stru
 
 ## Components
 
-Since departments use the shared `SimpleEntityCrudPage` factory function, this directory is primarily for future extensibility. The actual components are provided by the common components:
+Since departments use the shared `createEntityCrudPage` factory function, this directory is primarily for future extensibility. The actual components are provided by the common components:
 
 - `SimpleEntityForm` from `@/components/common/EntityForm`
 - `GenericDataTable` from `@/components/common/GenericDataTable`
@@ -23,18 +23,18 @@ Since departments use the shared `SimpleEntityCrudPage` factory function, this d
 The department page is created using:
 
 ```tsx
-export default createSimpleEntityCrudPage<Department, DepartmentFormData, SimpleEntityFilters>({
-    entityName: 'Department',
-    entityNamePlural: 'Departments',
-    apiEndpoint: '/api/departments',
-    queryKey: ['departments'],
-    breadcrumbs,
-    exportEndpoint: '/api/departments/export',
-    filterPlaceholder: 'Search departments...',
-    getDeleteMessage: (department) =>
-        `This action cannot be undone. This will permanently delete ${department.name}'s department record.`,
-});
+import { createEntityCrudPage } from '@/components/common/SimpleEntityCrudPage';
+import { departmentConfig } from '@/utils/entityConfigs';
+
+export default createEntityCrudPage(departmentConfig);
 ```
+
+The configuration is defined in `@/utils/entityConfigs.ts` and includes:
+- API endpoints
+- Breadcrumbs
+- Export endpoints
+- Filter placeholders
+- Delete confirmation messages
 
 ## Future Extensions
 

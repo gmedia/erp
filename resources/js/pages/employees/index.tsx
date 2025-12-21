@@ -2,50 +2,30 @@
 
 import { CrudPage } from '@/components/common/CrudPage';
 import { GenericDataTable } from '@/components/common/GenericDataTable';
-import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
 import { EmployeeForm } from '@/components/employees/EmployeeForm';
 import { Employee, EmployeeFormData } from '@/types/entity';
-import { type BreadcrumbItem } from '@/types';
 import { employeeColumns } from '@/components/employees/EmployeeColumns';
-
-interface EmployeeFilters {
-    search: string;
-    department: string;
-    position: string;
-    sort_by?: string;
-    sort_direction?: string;
-}
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Employees',
-        href: '/employees',
-    },
-];
+import { employeeConfig, EmployeeFilters } from '@/utils/entityConfigs';
 
 export default function EmployeeIndex() {
     return (
         <CrudPage<Employee, EmployeeFormData, EmployeeFilters>
             config={{
-                entityName: 'Employee',
-                entityNamePlural: 'Employees',
-                apiEndpoint: '/api/employees',
-                queryKey: ['employees'],
-                breadcrumbs,
+                entityName: employeeConfig.entityName,
+                entityNamePlural: employeeConfig.entityNamePlural,
+                apiEndpoint: employeeConfig.apiEndpoint,
+                queryKey: employeeConfig.queryKey,
+                breadcrumbs: employeeConfig.breadcrumbs,
                 DataTableComponent: GenericDataTable,
                 FormComponent: EmployeeForm,
 
-                initialFilters: {
-                    search: '',
-                    department: '',
-                    position: '',
-                },
+                initialFilters: employeeConfig.initialFilters,
 
                 mapDataTableProps: (props) => ({
                     ...props,
                     columns: employeeColumns,
-                    exportEndpoint: '/api/employees/export',
-                    filterFields: createEmployeeFilterFields(),
+                    exportEndpoint: employeeConfig.exportEndpoint,
+                    filterFields: employeeConfig.filterFields,
                 }),
 
                 mapFormProps: (props) => ({
@@ -53,8 +33,7 @@ export default function EmployeeIndex() {
                     employee: props.item,
                 }),
 
-                getDeleteMessage: (employee) =>
-                    `This action cannot be undone. This will permanently delete ${employee.name}'s employee record.`,
+                getDeleteMessage: employeeConfig.getDeleteMessage,
             }}
         />
     );
