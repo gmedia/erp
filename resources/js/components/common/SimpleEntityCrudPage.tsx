@@ -6,6 +6,7 @@ import { SimpleEntityForm } from '@/components/common/EntityForm';
 import { createSimpleEntityFilterFields } from '@/components/common/filters';
 import { createSimpleEntityColumns } from '@/utils/columns';
 import { type BreadcrumbItem } from '@/types';
+import { type FilterState } from '@/hooks/useCrudFilters';
 import { EntityConfig, SimpleEntityConfig, ComplexEntityConfig } from '@/utils/entityConfigs';
 
 // Static imports for complex entities
@@ -16,7 +17,7 @@ import { employeeColumns } from '@/components/employees/EmployeeColumns';
 export function createEntityCrudPage<
     T extends { id: number; name: string; created_at: string; updated_at: string },
     FormData,
-    FilterType extends Record<string, any> = Record<string, any>
+    FilterType extends FilterState = FilterState
 >(config: EntityConfig<T, FormData, FilterType>) {
     return function EntityCrudPageComponent() {
         if (config.type === 'simple') {
@@ -109,15 +110,15 @@ export function createEntityCrudPage<
             throw new Error(`Complex entity '${config.entityName}' not supported yet`);
         }
 
-        throw new Error(`Unknown entity type '${(config as any).type}'`);
+        throw new Error(`Unknown entity type '${(config as { type?: string }).type ?? 'undefined'}'`);
     };
 }
 
 // Legacy alias for backward compatibility
 export const createSimpleEntityCrudPage = createEntityCrudPage;
 
-// Type for creating entity configurations
-export interface SimpleEntityCrudPageConfig<T, FormData, FilterType extends Record<string, any> = Record<string, any>> {
+// Type for creating entity configurations (deprecated - use EntityConfig instead)
+export interface SimpleEntityCrudPageConfig {
     entityName: string;
     entityNamePlural: string;
     apiEndpoint: string;
@@ -125,5 +126,5 @@ export interface SimpleEntityCrudPageConfig<T, FormData, FilterType extends Reco
     breadcrumbs: BreadcrumbItem[];
     exportEndpoint: string;
     filterPlaceholder: string;
-    getDeleteMessage?: (item: T) => string;
+    getDeleteMessage?: (item: { name?: string }) => string;
 }

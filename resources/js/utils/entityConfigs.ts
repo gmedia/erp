@@ -20,14 +20,14 @@ export interface SimpleEntityConfig extends BaseEntityConfig {
 
 // Configuration for complex entities (employees)
 export interface ComplexEntityConfig<
-    T extends Record<string, any>,
-    FormData,
-    FilterType extends Record<string, any> = Record<string, any>
+    TEntity = Record<string, unknown> & { id: number; name?: string },
+    TFormData = unknown,
+    TFilterType = Record<string, unknown>
 > extends BaseEntityConfig {
     type: 'complex';
-    initialFilters?: FilterType;
+    initialFilters?: TFilterType;
     filterFields?: Array<{
-        name: keyof FilterType;
+        name: keyof TFilterType;
         label: string;
         component: React.ReactNode;
     }>;
@@ -35,10 +35,10 @@ export interface ComplexEntityConfig<
 
 // Union type for all entity configurations
 export type EntityConfig<
-    T extends Record<string, any> = any,
-    FormData = any,
-    FilterType extends Record<string, any> = Record<string, any>
-> = SimpleEntityConfig | ComplexEntityConfig<T, FormData, FilterType>;
+    T = unknown,
+    FormData = unknown,
+    FilterType = unknown
+> = SimpleEntityConfig | ComplexEntityConfig<T & { id: number; name?: string }, FormData, FilterType>;
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage = (entityName: string) => (item: { name?: string }) =>
