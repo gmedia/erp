@@ -46,7 +46,7 @@ export type ActionsColumnOptions<T> = {
 };
 
 // Helper function to create sorting header
-export function createSortingHeader<T>(label: string) {
+export function createSortingHeader(label: string) {
   return {
     header: ({ column }: { column: { toggleSorting: (value: boolean) => void; getIsSorted: () => 'asc' | 'desc' | false } }) => (
       <Button
@@ -75,7 +75,7 @@ export function createTextColumn<T extends Record<string, any>>(
   if (enableSorting) {
     return {
       ...baseColumn,
-      ...createSortingHeader<T>(label),
+      ...createSortingHeader(label),
     };
   }
 
@@ -109,7 +109,7 @@ export function createDateColumn<T extends Record<string, any>>(
   if (enableSorting) {
     return {
       ...baseColumn,
-      ...createSortingHeader<T>(label),
+      ...createSortingHeader(label),
     };
   }
 
@@ -156,7 +156,7 @@ export function createCurrencyColumn<T extends Record<string, any>>(
   if (enableSorting) {
     return {
       ...baseColumn,
-      ...createSortingHeader<T>(label),
+      ...createSortingHeader(label),
     };
   }
 
@@ -200,7 +200,7 @@ export function createNumberColumn<T extends Record<string, any>>(
   if (enableSorting) {
     return {
       ...baseColumn,
-      ...createSortingHeader<T>(label),
+      ...createSortingHeader(label),
     };
   }
 
@@ -252,7 +252,7 @@ export function createLinkColumn<T extends Record<string, any>>(
   if (enableSorting) {
     return {
       ...baseColumn,
-      ...createSortingHeader<T>(label),
+      ...createSortingHeader(label),
     };
   }
 
@@ -382,7 +382,7 @@ export function createBadgeColumn<T extends Record<string, any>>(
   if (enableSorting) {
     return {
       ...baseColumn,
-      ...createSortingHeader<T>(label),
+      ...createSortingHeader(label),
     };
   }
 

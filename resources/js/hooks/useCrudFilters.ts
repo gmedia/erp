@@ -2,7 +2,12 @@
 
 import { useState, useCallback } from 'react';
 
-export interface UseCrudFiltersOptions<T extends Record<string, any>> {
+export interface FilterState {
+  search?: string;
+  [key: string]: string | number | undefined;
+}
+
+export interface UseCrudFiltersOptions<T extends FilterState = FilterState> {
   initialFilters?: T;
   initialPagination?: {
     page: number;
@@ -11,7 +16,7 @@ export interface UseCrudFiltersOptions<T extends Record<string, any>> {
   resetPageOnFilterChange?: boolean;
 }
 
-export interface UseCrudFiltersResult<T extends Record<string, any>> {
+export interface UseCrudFiltersResult<T extends FilterState = FilterState> {
   filters: T;
   pagination: {
     page: number;
@@ -27,7 +32,7 @@ export interface UseCrudFiltersResult<T extends Record<string, any>> {
   handlePageSizeChange: (per_page: number) => void;
 }
 
-export function useCrudFilters<T extends Record<string, any>>({
+export function useCrudFilters<T extends FilterState = FilterState>({
   initialFilters = {} as T,
   initialPagination = { page: 1, per_page: 15 },
   resetPageOnFilterChange = true,
@@ -40,7 +45,7 @@ export function useCrudFilters<T extends Record<string, any>>({
       ...prev,
       ...newFilters,
     }));
-    
+
     if (resetPageOnFilterChange) {
       setPaginationState((prev) => ({ ...prev, page: 1 }));
     }

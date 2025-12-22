@@ -5,12 +5,16 @@ import { useState, useCallback } from 'react';
 
 import AppLayout from '@/layouts/app-layout';
 import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
-import { useCrudFilters } from '@/hooks/useCrudFilters';
+import { useCrudFilters, type FilterState } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 import { type BreadcrumbItem } from '@/types';
 
-export interface CrudPageConfig<T, FormData, FilterType extends Record<string, any> = Record<string, any>> {
+export interface CrudPageConfig<
+    T extends { id: number; name?: string },
+    FormData,
+    FilterType extends FilterState = FilterState
+> {
     // Basic configuration
     entityName: string;
     entityNamePlural: string;
@@ -71,11 +75,19 @@ export interface CrudPageConfig<T, FormData, FilterType extends Record<string, a
     }) => any;
 }
 
-interface CrudPageProps<T, FormData, FilterType extends Record<string, any> = Record<string, any>> {
+interface CrudPageProps<
+    T extends { id: number; name?: string },
+    FormData,
+    FilterType extends FilterState = FilterState
+> {
     config: CrudPageConfig<T, FormData, FilterType>;
 }
 
-export function CrudPage<T extends { id: number; name?: string }, FormData, FilterType extends Record<string, any> = Record<string, any>>({
+export function CrudPage<
+    T extends { id: number; name?: string },
+    FormData,
+    FilterType extends FilterState = FilterState
+>({
     config,
 }: CrudPageProps<T, FormData, FilterType>) {
     // State management
