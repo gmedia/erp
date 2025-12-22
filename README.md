@@ -14,7 +14,7 @@
     ```
 - Run Vite
     ```
-    npm run dev
+    sail npm run dev
     ```
 - Create symbolic link
     ```
@@ -38,12 +38,12 @@
     ```
 - Format and overwrite blade files
     ```
-    npm run blade:formatter
+    sail npm run blade:formatter
     ```
 - Run Prettier and ESLint
     ```
-    npm run format
-    npm run lint
+    sail npm run format
+    sail npm run lint
     ```
 - Run PHPUnit test
     ```
@@ -51,7 +51,7 @@
     ```
 - Run Playwright e2e test
     ```
-    npm run test:e2e
+    sail npm run test:e2e
     ```
 - Start analyzing using the SonarQube scanner
     ```

@@ -5,7 +5,7 @@ export default defineConfig({
   outputDir: 'e2e/test-results',
   use: {
     browserName: 'chromium',
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:81',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:80',
   },
   reporter: [
     ['html', { outputFolder: 'e2e/playwright-report', open: 'never' }],

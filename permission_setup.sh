@@ -21,14 +21,17 @@ chown 1337:1000 "package-lock.json"
 
 # Required by wayfinder
 
+rm -rf "resources/js/actions"
 mkdir -p "resources/js/actions"
 chmod -R ugo+rw "resources/js/actions"
 chown -R 1337:1000 "resources/js/actions"
 
+rm -rf "resources/js/routes"
 mkdir -p "resources/js/routes"
 chmod -R ugo+rw "resources/js/routes"
 chown -R 1337:1000 "resources/js/routes"
 
+rm -rf "resources/js/wayfinder"
 mkdir -p "resources/js/wayfinder"
 chmod -R ugo+rw "resources/js/wayfinder"
 chown -R 1337:1000 "resources/js/wayfinder"
@@ -53,6 +56,7 @@ chown -R 1337:1000 "storage/app/public"
 
 # Required by playwright e2e test
 
+rm -rf "e2e"
 mkdir -p "e2e"
 chmod -R ugo+rw "e2e"
 chown -R 1337:1000 "e2e"
