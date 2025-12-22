@@ -1,9 +1,8 @@
 'use client';
 
-
 import { GenericDataTable as DataTableCore } from '@/components/common/DataTableCore';
 import { Input } from '@/components/ui/input';
-import * as React from 'react';
+import { ColumnDef } from '@tanstack/react-table';
 
 interface PaginationInfo {
     page: number;
@@ -35,7 +34,7 @@ interface GenericDataTableProps<T extends Record<string, any>> {
     filters?: Record<string, string | undefined>;
     onFilterChange: (filters: Record<string, string | undefined>) => void;
     onResetFilters: () => void;
-    columns: any[];
+    columns: ColumnDef<T>[];
     exportEndpoint: string;
     filterFields?: FieldDescriptor[];
 }
@@ -69,11 +68,9 @@ export function GenericDataTable<T extends Record<string, any>>({
         },
     ] : filterFields;
 
-    const processedColumns = columns;
-
     return (
         <DataTableCore
-            columns={processedColumns}
+            columns={columns}
             data={data}
             pagination={pagination}
             onPageChange={onPageChange}

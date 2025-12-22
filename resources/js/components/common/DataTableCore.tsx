@@ -247,15 +247,6 @@ export function GenericDataTable<T>({
         setIsFilterModalOpen(false);
     };
 
-    const _handleResetModalFilters = () => {
-        setTempFilters({});
-    };
-
-    const _handleResetFiltersFromModal = () => {
-        onResetFilters();
-        setIsFilterModalOpen(false);
-    };
-
     return (
         <div className="w-full bg-background text-foreground">
             {/* Toolbar */}
