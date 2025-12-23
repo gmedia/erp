@@ -1,6 +1,4 @@
-import React from 'react';
 import { type BreadcrumbItem } from '@/types';
-import { Employee, EmployeeFormData } from '@/types/entity';
 
 // Base configuration interface for all entities
 export interface BaseEntityConfig {
@@ -13,33 +11,20 @@ export interface BaseEntityConfig {
     getDeleteMessage: (item: { name?: string }) => string;
 }
 
-// Configuration for simple entities (departments, positions)
+// Configuration for simple entities (departments, positions) - just name field
 export interface SimpleEntityConfig extends BaseEntityConfig {
     type: 'simple';
     filterPlaceholder: string;
 }
 
-// Configuration for complex entities (employees)
-export interface ComplexEntityConfig<
-    TEntity = Record<string, unknown> & { id: number; name?: string },
-    TFormData = unknown,
-    TFilterType = Record<string, unknown>
-> extends BaseEntityConfig {
+// Configuration for complex entities (employees) - multiple fields with custom components
+export interface ComplexEntityConfig extends BaseEntityConfig {
     type: 'complex';
-    initialFilters?: TFilterType;
-    filterFields?: Array<{
-        name: keyof TFilterType;
-        label: string;
-        component: React.ReactNode;
-    }>;
+    initialFilters?: Record<string, any>;
 }
 
 // Union type for all entity configurations
-export type EntityConfig<
-    T = unknown,
-    FormData = unknown,
-    FilterType = unknown
-> = SimpleEntityConfig | ComplexEntityConfig<T & { id: number; name?: string }, FormData, FilterType>;
+export type EntityConfig = SimpleEntityConfig | ComplexEntityConfig;
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage = (entityName: string) => (item: { name?: string }) =>
@@ -84,15 +69,7 @@ export const positionConfig: SimpleEntityConfig = createSimpleEntityConfig(
 );
 
 // Configuration for complex entities (employees)
-export interface EmployeeFilters {
-    search: string;
-    department: string;
-    position: string;
-    sort_by?: string;
-    sort_direction?: string;
-}
-
-export const employeeConfig: ComplexEntityConfig<Employee, EmployeeFormData, EmployeeFilters> = {
+export const employeeConfig: ComplexEntityConfig = {
     type: 'complex',
     entityName: 'Employee',
     entityNamePlural: 'Employees',

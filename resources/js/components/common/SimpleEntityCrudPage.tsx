@@ -6,142 +6,100 @@ import { DataTable } from '@/components/common/DataTableCore';
 import { SimpleEntityForm } from '@/components/common/EntityForm';
 import { createSimpleEntityFilterFields } from '@/components/common/filters';
 import { createSimpleEntityColumns } from '@/utils/columns';
-import { type FilterState } from '@/hooks/useCrudFilters';
 import { EntityConfig, SimpleEntityConfig, ComplexEntityConfig } from '@/utils/entityConfigs';
-import { ComponentType } from 'react';
-import { ColumnDef } from '@tanstack/react-table';
-import { type BreadcrumbItem } from '@/types';
+import { EmployeeForm } from '@/components/employees/EmployeeForm';
+import { employeeColumns } from '@/components/employees/EmployeeColumns';
+import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
 
-// Unified CRUD page factory that handles both simple and complex entities
-export function createEntityCrudPage<
-    T extends { id: number; name: string; created_at: string; updated_at: string },
-    FormData,
-    FilterType extends FilterState = FilterState
->(config: EntityConfig<T, FormData, FilterType>) {
-    return function EntityCrudPageComponent() {
-        if (config.type === 'simple') {
-            const simpleConfig = config as SimpleEntityConfig;
-            return (
-                <CrudPage<T, FormData, FilterType>
-                    config={{
-                        entityName: simpleConfig.entityName,
-                        entityNamePlural: simpleConfig.entityNamePlural,
-                        apiEndpoint: simpleConfig.apiEndpoint,
-                        queryKey: simpleConfig.queryKey,
-                        breadcrumbs: simpleConfig.breadcrumbs,
+// Simple entity CRUD page factory
+function createSimpleEntityCrudPage(config: SimpleEntityConfig) {
+    return function SimpleEntityPage() {
+        return (
+            <CrudPage
+                config={{
+                    entityName: config.entityName,
+                    entityNamePlural: config.entityNamePlural,
+                    apiEndpoint: config.apiEndpoint,
+                    queryKey: config.queryKey,
+                    breadcrumbs: config.breadcrumbs,
+                    initialFilters: { search: '' },
 
-                        DataTableComponent: DataTable,
-                        FormComponent: SimpleEntityForm,
+                    DataTableComponent: DataTable,
+                    FormComponent: SimpleEntityForm,
 
-                        initialFilters: { search: '' } as FilterType,
+                    mapDataTableProps: (props) => ({
+                        ...props,
+                        columns: createSimpleEntityColumns(),
+                        exportEndpoint: config.exportEndpoint,
+                        filterFields: createSimpleEntityFilterFields(config.filterPlaceholder),
+                        entityName: config.entityName,
+                    }),
 
-                        mapDataTableProps: (props) => ({
-                            ...props,
-                            columns: createSimpleEntityColumns<T>(),
-                            exportEndpoint: simpleConfig.exportEndpoint,
-                            filterFields: createSimpleEntityFilterFields(simpleConfig.filterPlaceholder),
-                            entityName: simpleConfig.entityName,
-                        }),
+                    mapFormProps: (props) => ({
+                        ...props,
+                        entity: props.item,
+                        entityName: config.entityName,
+                    }),
 
-                        mapFormProps: (props) => ({
-                            ...props,
-                            entity: props.item,
-                            entityName: simpleConfig.entityName,
-                        }),
-
-                        getDeleteMessage: simpleConfig.getDeleteMessage,
-                    }}
-                />
-            );
-        }
-
-        if (config.type === 'complex') {
-            const complexConfig = config as ComplexEntityConfig<T, FormData, FilterType>;
-
-            // For now, only support employees as complex entity
-            if (complexConfig.entityName === 'Employee') {
-                // Dynamic imports for employee components
-                const EmployeeFormPromise = import('@/components/employees/EmployeeForm').then(module => module.EmployeeForm);
-                const EmployeeColumnsPromise = import('@/components/employees/EmployeeColumns').then(module => module.employeeColumns);
-                const EmployeeFiltersPromise = import('@/components/employees/EmployeeFilters').then(module => module.createEmployeeFilterFields);
-
-                // Create a component that handles the async loading
-                const ComplexEntityPage = () => {
-                    const [EmployeeForm, setEmployeeForm] = React.useState<React.ComponentType<any> | null>(null);
-                    const [employeeColumns, setEmployeeColumns] = React.useState<any[]>([]);
-                    const [createEmployeeFilterFields, setCreateEmployeeFilterFields] = React.useState<(() => any[]) | null>(null);
-
-                    React.useEffect(() => {
-                        Promise.all([EmployeeFormPromise, EmployeeColumnsPromise, EmployeeFiltersPromise]).then(
-                            ([EmployeeFormModule, EmployeeColumnsModule, EmployeeFiltersModule]) => {
-                                setEmployeeForm(() => EmployeeFormModule);
-                                setEmployeeColumns(EmployeeColumnsModule);
-                                setCreateEmployeeFilterFields(() => EmployeeFiltersModule);
-                            }
-                        );
-                    }, []);
-
-                    if (!EmployeeForm || !createEmployeeFilterFields) {
-                        return <div>Loading...</div>;
-                    }
-
-                    return (
-                        <CrudPage<T, FormData, FilterType>
-                            config={{
-                                entityName: complexConfig.entityName,
-                                entityNamePlural: complexConfig.entityNamePlural,
-                                apiEndpoint: complexConfig.apiEndpoint,
-                                queryKey: complexConfig.queryKey,
-                                breadcrumbs: complexConfig.breadcrumbs,
-
-                                DataTableComponent: DataTable,
-                                FormComponent: EmployeeForm,
-
-                                initialFilters: complexConfig.initialFilters || ({ search: '' } as FilterType),
-
-                                mapDataTableProps: (props) => ({
-                                    ...props,
-                                    columns: employeeColumns,
-                                    exportEndpoint: complexConfig.exportEndpoint,
-                                    filterFields: createEmployeeFilterFields(),
-                                    entityName: complexConfig.entityName,
-                                }),
-
-                                mapFormProps: (props) => ({
-                                    open: props.open,
-                                    onOpenChange: props.onOpenChange,
-                                    employee: props.item, // Use specific prop name for employees
-                                    onSubmit: props.onSubmit,
-                                    isLoading: props.isLoading,
-                                }),
-
-                                getDeleteMessage: complexConfig.getDeleteMessage,
-                            }}
-                        />
-                    );
-                };
-
-                return <ComplexEntityPage />;
-            }
-
-            throw new Error(`Unsupported complex entity: ${complexConfig.entityName}`);
-        }
-
-        throw new Error(`Unknown entity type '${(config as { type?: string }).type ?? 'undefined'}'`);
+                    getDeleteMessage: config.getDeleteMessage,
+                }}
+            />
+        );
     };
 }
 
-// Legacy alias for backward compatibility
-export const createSimpleEntityCrudPage = createEntityCrudPage;
+// Complex entity CRUD page factory
+function createComplexEntityCrudPage(config: ComplexEntityConfig) {
+    return function ComplexEntityPage() {
+        return (
+            <CrudPage
+                config={{
+                    entityName: config.entityName,
+                    entityNamePlural: config.entityNamePlural,
+                    apiEndpoint: config.apiEndpoint,
+                    queryKey: config.queryKey,
+                    breadcrumbs: config.breadcrumbs,
+                    initialFilters: config.initialFilters || { search: '' },
 
-// Type for creating entity configurations (deprecated - use EntityConfig instead)
-export interface SimpleEntityCrudPageConfig {
-    entityName: string;
-    entityNamePlural: string;
-    apiEndpoint: string;
-    queryKey: string[];
-    breadcrumbs: BreadcrumbItem[];
-    exportEndpoint: string;
-    filterPlaceholder: string;
-    getDeleteMessage?: (item: { name?: string }) => string;
+                    DataTableComponent: DataTable,
+                    FormComponent: EmployeeForm,
+
+                    mapDataTableProps: (props) => ({
+                        ...props,
+                        columns: employeeColumns,
+                        exportEndpoint: config.exportEndpoint,
+                        filterFields: createEmployeeFilterFields(),
+                        entityName: config.entityName,
+                    }),
+
+                    mapFormProps: (props) => ({
+                        open: props.open,
+                        onOpenChange: props.onOpenChange,
+                        employee: props.item, // Employee form expects 'employee' prop
+                        onSubmit: props.onSubmit,
+                        isLoading: props.isLoading,
+                    }),
+
+                    getDeleteMessage: config.getDeleteMessage,
+                }}
+            />
+        );
+    };
+}
+
+// Unified factory function that delegates to the appropriate implementation
+export function createEntityCrudPage(config: EntityConfig) {
+    if (config.type === 'simple') {
+        return createSimpleEntityCrudPage(config);
+    }
+
+    if (config.type === 'complex') {
+        // Currently only employees are supported as complex entities
+        if (config.entityName === 'Employee') {
+            return createComplexEntityCrudPage(config);
+        }
+        throw new Error(`Unsupported complex entity: ${config.entityName}`);
+    }
+
+    throw new Error(`Unknown entity type: ${(config as any).type}`);
 }
