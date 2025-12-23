@@ -1,5 +1,6 @@
 import React from 'react';
 import { type BreadcrumbItem } from '@/types';
+import { Employee, EmployeeFormData } from '@/types/entity';
 
 // Base configuration interface for all entities
 export interface BaseEntityConfig {
@@ -82,15 +83,6 @@ export const positionConfig: SimpleEntityConfig = createSimpleEntityConfig(
     'Search positions...'
 );
 
-// Import types for complex entities
-import { Employee, EmployeeFormData } from '@/types/entity';
-import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
-import { registerComplexEntity } from '@/components/common/SimpleEntityCrudPage';
-
-// Import complex entity components
-import { EmployeeForm } from '@/components/employees/EmployeeForm';
-import { employeeColumns } from '@/components/employees/EmployeeColumns';
-
 // Configuration for complex entities (employees)
 export interface EmployeeFilters {
     search: string;
@@ -99,17 +91,6 @@ export interface EmployeeFilters {
     sort_by?: string;
     sort_direction?: string;
 }
-
-// Register Employee components
-registerComplexEntity('Employee', {
-    FormComponent: EmployeeForm,
-    columns: employeeColumns,
-    filterFields: createEmployeeFilterFields().map(field => ({
-        name: field.name as keyof EmployeeFilters,
-        label: field.label,
-        component: field.component,
-    })),
-});
 
 export const employeeConfig: ComplexEntityConfig<Employee, EmployeeFormData, EmployeeFilters> = {
     type: 'complex',

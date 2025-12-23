@@ -68,7 +68,7 @@ function getPlaceholderFromFilterFields(filterFields: FieldDescriptor[]): string
     return 'Search...';
 }
 
-interface GenericDataTableProps<T> {
+export interface DataTableProps<T> {
     columns: ColumnDef<T>[];
     data: T[];
     pagination: {
@@ -98,24 +98,22 @@ interface GenericDataTableProps<T> {
     onView?: (item: T) => void;
     /** Optional extra items for the actions dropdown */
     extraActionItems?: React.ReactNode[];
+    /** Optional entity name for default search placeholder */
+    entityName?: string;
 }
 
 /**
- * GenericDataTable – a reusable data‑table component.
+ * DataTable – a reusable data table component with built-in filtering, pagination, and actions.
  *
- * It mirrors the behaviour of the existing Employee/Position/Department tables
- * while exposing a flexible API via props.
- *
- * Props mapping:
- * - `columns` – column definitions (including any custom renderers)
- * - `data` – row data
- * - Pagination & search props – identical to the original tables
- * - `filterFields` – array of field descriptors rendered by the built‑in filter modal
- * - `onAdd`, `onEdit`, `onDelete`, `onView` – callbacks wired to the generic
- *   {@link GenericActions} dropdown.
- * - `exportEndpoint` – URL used for the export request (defaults to `/api/export`)
+ * Features:
+ * - Column definitions with custom renderers
+ * - Built-in pagination and page size controls
+ * - Search and advanced filtering
+ * - Export functionality
+ * - Row actions (add, edit, delete, view)
+ * - Loading states and empty states
  */
-export function GenericDataTable<T>({
+export function DataTable<T>({
     columns,
     data,
     pagination,
@@ -134,7 +132,8 @@ export function GenericDataTable<T>({
     onDelete,
     onView,
     extraActionItems,
-}: GenericDataTableProps<T>) {
+    entityName,
+}: DataTableProps<T>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({});
@@ -154,6 +153,18 @@ export function GenericDataTable<T>({
             ),
         ) as Record<string, string>,
     );
+
+    // Add default search field if no filterFields provided and entityName is given
+    const defaultFilterFields = React.useMemo(() => {
+        if (filterFields.length === 0 && entityName) {
+            return [{
+                name: 'search',
+                label: 'Search',
+                component: <Input placeholder={`Search ${entityName.toLowerCase()}s...`} />,
+            }];
+        }
+        return filterFields;
+    }, [filterFields, entityName]);
 
     // Sync temporary filters with external filters when they change or when the modal opens
     React.useEffect(() => {
@@ -263,8 +274,8 @@ export function GenericDataTable<T>({
                 <div className="mb-2 flex items-center space-x-2">
                     <Input
                         placeholder={
-                            filterFields && filterFields.length > 0
-                                ? getPlaceholderFromFilterFields(filterFields)
+                            defaultFilterFields && defaultFilterFields.length > 0
+                                ? getPlaceholderFromFilterFields(defaultFilterFields)
                                 : 'Search...'
                         }
                         value={searchValue}
@@ -297,7 +308,7 @@ export function GenericDataTable<T>({
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
-                                {filterFields.map((field) => {
+                                {defaultFilterFields.map((field) => {
                                     // Ensure we have a valid React element
                                     const element = React.isValidElement(
                                         field.component,
