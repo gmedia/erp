@@ -11,7 +11,7 @@ import { useCrudMutations } from '@/hooks/useCrudMutations';
 import { type BreadcrumbItem } from '@/types';
 
 export interface CrudPageConfig<
-    T extends { id: number; name?: string },
+    T extends { id: number; name: string },
     FormData,
     FilterType extends FilterState = FilterState
 > {
@@ -76,7 +76,7 @@ export interface CrudPageConfig<
 }
 
 interface CrudPageProps<
-    T extends { id: number; name?: string },
+    T extends { id: number; name: string },
     FormData,
     FilterType extends FilterState = FilterState
 > {
@@ -84,7 +84,7 @@ interface CrudPageProps<
 }
 
 export function CrudPage<
-    T extends { id: number; name?: string },
+    T extends { id: number; name: string },
     FormData,
     FilterType extends FilterState = FilterState
 >({

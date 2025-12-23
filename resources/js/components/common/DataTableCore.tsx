@@ -53,6 +53,21 @@ type FieldDescriptor = {
     component: React.ReactNode;
 };
 
+// Helper function to safely extract placeholder from filter fields
+function getPlaceholderFromFilterFields(filterFields: FieldDescriptor[]): string {
+    if (filterFields.length === 0) return 'Search...';
+
+    const firstField = filterFields[0];
+    const component = firstField.component;
+
+    if (React.isValidElement(component)) {
+        const placeholder = (component.props as any)?.placeholder;
+        return placeholder || 'Search...';
+    }
+
+    return 'Search...';
+}
+
 interface GenericDataTableProps<T> {
     columns: ColumnDef<T>[];
     data: T[];
@@ -248,12 +263,8 @@ export function GenericDataTable<T>({
                 <div className="mb-2 flex items-center space-x-2">
                     <Input
                         placeholder={
-                            filterFields &&
-                            filterFields.length > 0 &&
-                            (filterFields[0].component as any).props
-                                ?.placeholder
-                                ? (filterFields[0].component as any).props
-                                      .placeholder
+                            filterFields && filterFields.length > 0
+                                ? getPlaceholderFromFilterFields(filterFields)
                                 : 'Search...'
                         }
                         value={searchValue}

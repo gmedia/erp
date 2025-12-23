@@ -85,6 +85,11 @@ export const positionConfig: SimpleEntityConfig = createSimpleEntityConfig(
 // Import types for complex entities
 import { Employee, EmployeeFormData } from '@/types/entity';
 import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
+import { registerComplexEntity } from '@/components/common/SimpleEntityCrudPage';
+
+// Import complex entity components
+import { EmployeeForm } from '@/components/employees/EmployeeForm';
+import { employeeColumns } from '@/components/employees/EmployeeColumns';
 
 // Configuration for complex entities (employees)
 export interface EmployeeFilters {
@@ -94,6 +99,17 @@ export interface EmployeeFilters {
     sort_by?: string;
     sort_direction?: string;
 }
+
+// Register Employee components
+registerComplexEntity('Employee', {
+    FormComponent: EmployeeForm,
+    columns: employeeColumns,
+    filterFields: createEmployeeFilterFields().map(field => ({
+        name: field.name as keyof EmployeeFilters,
+        label: field.label,
+        component: field.component,
+    })),
+});
 
 export const employeeConfig: ComplexEntityConfig<Employee, EmployeeFormData, EmployeeFilters> = {
     type: 'complex',
@@ -113,11 +129,6 @@ export const employeeConfig: ComplexEntityConfig<Employee, EmployeeFormData, Emp
         department: '',
         position: '',
     },
-    filterFields: createEmployeeFilterFields().map(field => ({
-        name: field.name as keyof EmployeeFilters,
-        label: field.label,
-        component: field.component,
-    })),
     getDeleteMessage: (employee) =>
         `This action cannot be undone. This will permanently delete ${employee.name}'s employee record.`,
 };
