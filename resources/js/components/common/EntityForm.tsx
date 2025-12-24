@@ -14,11 +14,11 @@ import { Form } from '@/components/ui/form';
 import NameField from '@/components/common/NameField';
 import { FormMessage } from '@/components/ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, UseFormReturn, FieldValues } from 'react-hook-form';
 import { simpleEntitySchema } from '@/utils/schemas';
 import * as z from 'zod';
 
-interface EntityFormProps<T = Record<string, unknown>> {
+interface EntityFormProps<T extends FieldValues = FieldValues> {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     title: string;
@@ -30,7 +30,7 @@ interface EntityFormProps<T = Record<string, unknown>> {
     children: React.ReactNode;
     isLoading?: boolean;
     /** The form object returned by react‑hook‑form's useForm */
-    form: ReturnType<typeof useForm>;
+    form: UseFormReturn<T>;
 }
 
 /**
@@ -40,7 +40,7 @@ interface EntityFormProps<T = Record<string, unknown>> {
  * field JSX passed as children inside the form. Validation is optional via a
  * Zod schema.
  */
-export default function EntityForm<T>({
+export default function EntityForm<T extends FieldValues = FieldValues>({
     open,
     onOpenChange,
     title,
@@ -49,7 +49,7 @@ export default function EntityForm<T>({
     isLoading = false,
     form,
 }: EntityFormProps<T>) {
-    const handleSubmit = (values: any) => {
+    const handleSubmit = (values: T) => {
         onSubmit(values);
     };
 
