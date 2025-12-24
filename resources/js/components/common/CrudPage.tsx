@@ -5,10 +5,25 @@ import { useState, useCallback } from 'react';
 
 import AppLayout from '@/layouts/app-layout';
 import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
+import { DataTableProps as BaseDataTableProps } from '@/components/common/DataTableCore';
 import { useCrudFilters, type FilterState } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 import { type BreadcrumbItem } from '@/types';
+
+// Extend the base DataTable props with additional required props for CRUD operations
+export interface DataTableProps<T, FilterType extends FilterState = FilterState> extends Omit<BaseDataTableProps<T>, 'onFilterChange' | 'filters'> {
+    filters: FilterType;
+    onFilterChange: (filters: Partial<FilterType>) => void;
+}
+
+export interface FormProps<T, FormData> {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    item?: T | null;
+    onSubmit: (data: FormData) => void;
+    isLoading: boolean;
+}
 
 export interface CrudPageConfig<
     T extends { id: number; name: string },
@@ -43,7 +58,7 @@ export interface CrudPageConfig<
     getDeleteMessage?: (item: T) => string;
 
     // Props mapping functions to adapt generic props to component-specific props
-    mapDataTableProps?: (props: {
+    mapDataTableProps: (props: {
         data: T[];
         onAdd: () => void;
         onEdit: (item: T) => void;
@@ -66,7 +81,7 @@ export interface CrudPageConfig<
         onResetFilters: () => void;
     }) => any;
 
-    mapFormProps?: (props: {
+    mapFormProps: (props: {
         open: boolean;
         onOpenChange: (open: boolean) => void;
         item?: T | null;
@@ -193,73 +208,42 @@ export function CrudPage<
 
     // Default delete message
     const getDeleteMessage = config.getDeleteMessage || ((item: T) => {
-        const name = item.name || `this ${config.entityName.toLowerCase()}`;
+        const name = (item as any).name || `this ${config.entityName.toLowerCase()}`;
         return `This action cannot be undone. This will permanently delete ${name}'s ${config.entityName.toLowerCase()} record.`;
     });
 
     // Prepare data table props
-    const dataTableProps = config.mapDataTableProps
-        ? config.mapDataTableProps({
-            data,
-            onAdd: handleAdd,
-            onEdit: handleEdit,
-            onDelete: handleDelete,
-            pagination: {
-                page: meta.current_page,
-                per_page: meta.per_page,
-                total: meta.total,
-                last_page: meta.last_page,
-                from: meta.from || 0,
-                to: meta.to || 0,
-            },
-            onPageChange: handlePageChange,
-            onPageSizeChange: handlePageSizeChange,
-            onSearchChange: handleSearchChange,
-            isLoading,
-            filterValue: (filters as { search?: string }).search || '',
-            filters,
-            onFilterChange: handleFilterChange,
-            onResetFilters: resetFilters,
-        })
-        : {
-            data,
-            onAddDepartment: handleAdd,
-            onEditDepartment: handleEdit,
-            onDeleteDepartment: handleDelete,
-            pagination: {
-                page: meta.current_page,
-                per_page: meta.per_page,
-                total: meta.total,
-                last_page: meta.last_page,
-                from: meta.from || 0,
-                to: meta.to || 0,
-            },
-            onPageChange: handlePageChange,
-            onPageSizeChange: handlePageSizeChange,
-            onSearchChange: handleSearchChange,
-            isLoading,
-            filterValue: (filters as { search?: string }).search || '',
-            filters,
-            onFilterChange: handleFilterChange,
-            onResetFilters: resetFilters,
-        };
+    const dataTableProps = config.mapDataTableProps({
+        data,
+        onAdd: handleAdd,
+        onEdit: handleEdit,
+        onDelete: handleDelete,
+        pagination: {
+            page: meta.current_page,
+            per_page: meta.per_page,
+            total: meta.total,
+            last_page: meta.last_page,
+            from: meta.from || 0,
+            to: meta.to || 0,
+        },
+        onPageChange: handlePageChange,
+        onPageSizeChange: handlePageSizeChange,
+        onSearchChange: handleSearchChange,
+        isLoading,
+        filterValue: (filters as { search?: string }).search || '',
+        filters,
+        onFilterChange: handleFilterChange,
+        onResetFilters: resetFilters,
+    });
 
     // Prepare form props
-    const formProps = config.mapFormProps
-        ? config.mapFormProps({
-            open: isFormOpen,
-            onOpenChange: handleFormClose,
-            item: selectedItem,
-            onSubmit: handleFormSubmit,
-            isLoading: createMutation.isPending || updateMutation.isPending,
-        })
-        : {
-            open: isFormOpen,
-            onOpenChange: handleFormClose,
-            department: selectedItem,
-            onSubmit: handleFormSubmit,
-            isLoading: createMutation.isPending || updateMutation.isPending,
-        };
+    const formProps = config.mapFormProps({
+        open: isFormOpen,
+        onOpenChange: handleFormClose,
+        item: selectedItem,
+        onSubmit: handleFormSubmit,
+        isLoading: createMutation.isPending || updateMutation.isPending,
+    });
 
     return (
         <>

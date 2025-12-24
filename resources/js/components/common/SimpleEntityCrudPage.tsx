@@ -3,7 +3,7 @@
 import React from 'react';
 import { CrudPage } from '@/components/common/CrudPage';
 import { DataTable } from '@/components/common/DataTableCore';
-import { SimpleEntityForm, type SimpleEntityFormData } from '@/components/common/EntityForm';
+import { SimpleEntityForm } from '@/components/common/EntityForm';
 import { createSimpleEntityFilterFields } from '@/components/common/filters';
 import { createSimpleEntityColumns } from '@/utils/columns';
 import { EntityConfig, SimpleEntityConfig, ComplexEntityConfig } from '@/utils/entityConfigs';
@@ -35,19 +35,16 @@ function createSimpleEntityCrudPage(config: SimpleEntityConfig) {
                         entityName: config.entityName,
                     }),
 
-                    mapFormProps: (props: {
-                        open: boolean;
-                        onOpenChange: (open: boolean) => void;
-                        item?: { name: string } | null;
-                        onSubmit: (data: SimpleEntityFormData) => void;
-                        isLoading: boolean;
-                    }) => ({
-                        ...props,
-                        entity: props.item,
+                    mapFormProps: (props) => ({
+                        open: props.open,
+                        onOpenChange: props.onOpenChange,
+                        entity: props.item ? { name: props.item.name } : null,
+                        onSubmit: props.onSubmit,
+                        isLoading: props.isLoading,
                         entityName: config.entityName,
                     }),
 
-                    getDeleteMessage: config.getDeleteMessage,
+                    getDeleteMessage: (item) => config.getDeleteMessage(item),
                 }}
             />
         );
