@@ -11,7 +11,24 @@ import { EmployeeForm } from '@/components/employees/EmployeeForm';
 import { employeeColumns } from '@/components/employees/EmployeeColumns';
 import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
 
-// Simple entity CRUD page factory
+// Unified factory function that creates appropriate CRUD pages based on entity configuration
+export function createEntityCrudPage(config: EntityConfig) {
+    if (config.type === 'simple') {
+        return createSimpleEntityCrudPage(config);
+    }
+
+    if (config.type === 'complex') {
+        // Currently only employees are supported as complex entities
+        if (config.entityName === 'Employee') {
+            return createComplexEntityCrudPage(config);
+        }
+        throw new Error(`Unsupported complex entity: ${config.entityName}`);
+    }
+
+    throw new Error(`Unknown entity type: ${(config as any).type}`);
+}
+
+// Simple entity CRUD page factory - refactored to reduce duplication
 function createSimpleEntityCrudPage(config: SimpleEntityConfig) {
     return function SimpleEntityPage() {
         return (
@@ -51,7 +68,7 @@ function createSimpleEntityCrudPage(config: SimpleEntityConfig) {
     };
 }
 
-// Complex entity CRUD page factory
+// Complex entity CRUD page factory - simplified and consistent
 function createComplexEntityCrudPage(config: ComplexEntityConfig) {
     return function ComplexEntityPage() {
         return (
@@ -88,21 +105,4 @@ function createComplexEntityCrudPage(config: ComplexEntityConfig) {
             />
         );
     };
-}
-
-// Unified factory function that delegates to the appropriate implementation
-export function createEntityCrudPage(config: EntityConfig) {
-    if (config.type === 'simple') {
-        return createSimpleEntityCrudPage(config);
-    }
-
-    if (config.type === 'complex') {
-        // Currently only employees are supported as complex entities
-        if (config.entityName === 'Employee') {
-            return createComplexEntityCrudPage(config);
-        }
-        throw new Error(`Unsupported complex entity: ${config.entityName}`);
-    }
-
-    throw new Error(`Unknown entity type: ${(config as any).type}`);
 }
