@@ -9,7 +9,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ChevronDown } from 'lucide-react';
 
-export function ColumnVisibilityToggle({ table }: { table: any }) {
+import { Table } from '@tanstack/react-table';
+
+export function ColumnVisibilityToggle<T>({ table }: { table: Table<T> }) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -27,8 +29,8 @@ export function ColumnVisibilityToggle({ table }: { table: any }) {
             >
                 {table
                     .getAllColumns()
-                    .filter((col: any) => col.getCanHide())
-                    .map((col: any) => (
+                    .filter((col) => col.getCanHide())
+                    .map((col) => (
                         <DropdownMenuCheckboxItem
                             key={col.id}
                             className="capitalize"

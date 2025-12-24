@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form';
 import { simpleEntitySchema } from '@/utils/schemas';
 import * as z from 'zod';
 
-interface EntityFormProps<T> {
+interface EntityFormProps<T = Record<string, unknown>> {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     title: string;
@@ -26,11 +26,11 @@ interface EntityFormProps<T> {
     /** Optional – kept for backward compatibility; not used inside EntityForm */
     defaultValues?: Partial<T>;
     /** Optional – kept for backward compatibility; not used inside EntityForm */
-    schema?: any;
+    schema?: unknown;
     children: React.ReactNode;
     isLoading?: boolean;
     /** The form object returned by react‑hook‑form's useForm */
-    form: any;
+    form: ReturnType<typeof useForm>;
 }
 
 /**

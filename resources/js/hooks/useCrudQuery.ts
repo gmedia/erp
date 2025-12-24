@@ -26,7 +26,7 @@ export interface ApiResponse<T> {
   };
 }
 
-export interface UseCrudQueryOptions<T> {
+export interface UseCrudQueryOptions<Entity> {
   endpoint: string;
   queryKey: string[];
   entityName: string;
@@ -35,18 +35,18 @@ export interface UseCrudQueryOptions<T> {
   enabled?: boolean;
 }
 
-export function useCrudQuery<T>({
+export function useCrudQuery<Entity>({
   endpoint,
   queryKey,
   entityName,
   pagination,
   filters = {},
   enabled = true,
-}: UseCrudQueryOptions<T>): Omit<UseQueryResult<ApiResponse<T>, Error>, 'data'> & {
-  data: T[];
-  meta: ApiResponse<T>['meta'];
+}: UseCrudQueryOptions<Entity>): Omit<UseQueryResult<ApiResponse<Entity>, Error>, 'data'> & {
+  data: Entity[];
+  meta: ApiResponse<Entity>['meta'];
 } {
-  const query = useQuery<ApiResponse<T>, Error>({
+  const query = useQuery<ApiResponse<Entity>, Error>({
     queryKey: [...queryKey, pagination, filters],
     queryFn: async () => {
       try {
@@ -57,7 +57,7 @@ export function useCrudQuery<T>({
             ...filters,
           },
         });
-        
+
         return (
           response.data || {
             data: [],

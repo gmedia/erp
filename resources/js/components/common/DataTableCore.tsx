@@ -442,16 +442,16 @@ export function DataTable<T>({
                                 .getAllColumns()
                                 .filter((col) => col.getCanHide())
                                 .map((col) => (
-                                    <DropdownMenuCheckboxItem
-                                        key={col.id}
-                                        className="capitalize"
-                                        checked={col.getIsVisible()}
-                                        onCheckedChange={(value) =>
-                                            col.toggleVisibility(!!value)
-                                        }
-                                    >
-                                        {col.id}
-                                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                        key={col.id}
+                        className="capitalize"
+                        checked={col.getIsVisible()}
+                        onCheckedChange={(value: boolean) =>
+                            col.toggleVisibility(!!value)
+                        }
+                    >
+                        {col.id}
+                    </DropdownMenuCheckboxItem>
                                 ))}
                         </DropdownMenuContent>
                     </DropdownMenu>

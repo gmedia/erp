@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
 
-export interface UseCrudMutationsOptions<T, FormData> {
+export interface UseCrudMutationsOptions<Entity, FormData> {
   endpoint: string;
   queryKey: string[];
   entityName: string;
@@ -12,19 +12,19 @@ export interface UseCrudMutationsOptions<T, FormData> {
   onError?: (error: Error) => void;
 }
 
-export interface UseCrudMutationsResult<T, FormData> {
-  createMutation: ReturnType<typeof useMutation<T, Error, FormData>>;
-  updateMutation: ReturnType<typeof useMutation<T, Error, { id: number; data: FormData }>>;
+export interface UseCrudMutationsResult<Entity, FormData> {
+  createMutation: ReturnType<typeof useMutation<Entity, Error, FormData>>;
+  updateMutation: ReturnType<typeof useMutation<Entity, Error, { id: number; data: FormData }>>;
   deleteMutation: ReturnType<typeof useMutation<void, Error, number>>;
 }
 
-export function useCrudMutations<T, FormData>({
+export function useCrudMutations<Entity, FormData>({
   endpoint,
   queryKey,
   entityName,
   onSuccess,
   onError,
-}: UseCrudMutationsOptions<T, FormData>): UseCrudMutationsResult<T, FormData> {
+}: UseCrudMutationsOptions<Entity, FormData>): UseCrudMutationsResult<Entity, FormData> {
   const queryClient = useQueryClient();
 
   const handleError = (error: Error & { response?: { data?: { message?: string } } }) => {
@@ -33,7 +33,7 @@ export function useCrudMutations<T, FormData>({
     onError?.(error);
   };
 
-  const createMutation = useMutation<T, Error, FormData>({
+  const createMutation = useMutation<Entity, Error, FormData>({
     mutationFn: async (data: FormData) => {
       const response = await axios.post(endpoint, data);
       return response.data;
@@ -46,7 +46,7 @@ export function useCrudMutations<T, FormData>({
     onError: handleError,
   });
 
-  const updateMutation = useMutation<T, Error, { id: number; data: FormData }>({
+  const updateMutation = useMutation<Entity, Error, { id: number; data: FormData }>({
     mutationFn: async ({ id, data }: { id: number; data: FormData }) => {
       const response = await axios.put(`${endpoint}/${id}`, data);
       return response.data;
