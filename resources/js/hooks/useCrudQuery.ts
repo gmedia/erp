@@ -2,7 +2,7 @@
 
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import axios from 'axios';
-import { toast } from 'sonner';
+import { handleApiError, type ApiError } from '@/utils/errorHandling';
 
 export interface PaginationState {
   page: number;
@@ -70,7 +70,7 @@ export function useCrudQuery<Entity>({
           }
         );
       } catch (error) {
-        toast.error(`Failed to load ${entityName}`);
+        handleApiError(error, `Failed to load ${entityName}`);
         return {
           data: [],
           meta: {

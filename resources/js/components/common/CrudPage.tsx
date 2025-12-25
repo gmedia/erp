@@ -1,7 +1,7 @@
 'use client';
 
 import { Head } from '@inertiajs/react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo, memo } from 'react';
 
 import AppLayout from '@/layouts/app-layout';
 import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
@@ -9,6 +9,7 @@ import { DataTableProps as BaseDataTableProps } from '@/components/common/DataTa
 import { useCrudFilters, type FilterState } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
+import { type ApiError } from '@/utils/errorHandling';
 import { type BreadcrumbItem } from '@/types';
 
 // Extend the base DataTable props with additional required props for CRUD operations
@@ -45,7 +46,7 @@ export interface CrudPageConfig<
     onCreateSuccess?: () => void;
     onUpdateSuccess?: () => void;
     onDeleteSuccess?: () => void;
-    onError?: (error: Error) => void;
+    onError?: (error: ApiError) => void;
 
     // Filter configuration
     initialFilters?: FilterType;
@@ -206,44 +207,74 @@ export function CrudPage<
         }
     }, []);
 
-    // Default delete message
-    const getDeleteMessage = config.getDeleteMessage || ((item: T) => {
-        const name = item.name || `this ${config.entityName.toLowerCase()}`;
-        return `This action cannot be undone. This will permanently delete ${name}'s ${config.entityName.toLowerCase()} record.`;
-    });
+    // Memoize expensive computations
+    const getDeleteMessage = useMemo(() =>
+        config.getDeleteMessage || ((item: T) => {
+            const name = item.name || `this ${config.entityName.toLowerCase()}`;
+            return `This action cannot be undone. This will permanently delete ${name}'s ${config.entityName.toLowerCase()} record.`;
+        }), [config.getDeleteMessage, config.entityName]);
+
+    const tablePagination = useMemo(() => ({
+        page: meta.current_page,
+        per_page: meta.per_page,
+        total: meta.total,
+        last_page: meta.last_page,
+        from: meta.from || 0,
+        to: meta.to || 0,
+    }), [meta]);
+
+    const filterValue = useMemo(() =>
+        (filters as { search?: string }).search || '',
+        [filters]);
 
     // Prepare data table props
-    const dataTableProps = config.mapDataTableProps({
+    const dataTableProps = useMemo(() => config.mapDataTableProps({
         data,
         onAdd: handleAdd,
         onEdit: handleEdit,
         onDelete: handleDelete,
-        pagination: {
-            page: meta.current_page,
-            per_page: meta.per_page,
-            total: meta.total,
-            last_page: meta.last_page,
-            from: meta.from || 0,
-            to: meta.to || 0,
-        },
+        pagination: tablePagination,
         onPageChange: handlePageChange,
         onPageSizeChange: handlePageSizeChange,
         onSearchChange: handleSearchChange,
         isLoading,
-        filterValue: (filters as { search?: string }).search || '',
+        filterValue,
         filters,
         onFilterChange: handleFilterChange,
         onResetFilters: resetFilters,
-    });
+    }), [
+        config.mapDataTableProps,
+        data,
+        handleAdd,
+        handleEdit,
+        handleDelete,
+        tablePagination,
+        handlePageChange,
+        handlePageSizeChange,
+        handleSearchChange,
+        isLoading,
+        filterValue,
+        filters,
+        handleFilterChange,
+        resetFilters,
+    ]);
 
     // Prepare form props
-    const formProps = config.mapFormProps({
+    const formProps = useMemo(() => config.mapFormProps({
         open: isFormOpen,
         onOpenChange: handleFormClose,
         item: selectedItem,
         onSubmit: handleFormSubmit,
         isLoading: createMutation.isPending || updateMutation.isPending,
-    });
+    }), [
+        config.mapFormProps,
+        isFormOpen,
+        handleFormClose,
+        selectedItem,
+        handleFormSubmit,
+        createMutation.isPending,
+        updateMutation.isPending,
+    ]);
 
     return (
         <>
@@ -270,3 +301,6 @@ export function CrudPage<
         </>
     );
 }
+
+// Memoize the component to prevent unnecessary re-renders
+export default memo(CrudPage) as typeof CrudPage;

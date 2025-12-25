@@ -46,12 +46,85 @@ import {
 } from 'lucide-react';
 import * as React from 'react';
 import { useExport } from '@/hooks/useExport';
+import type { FieldDescriptor } from './filters';
 
-type FieldDescriptor = {
-    name: string;
-    label: string;
-    component: React.ReactNode;
-};
+// FilterModal component to reduce complexity in DataTable
+interface FilterModalProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    filterFields: FieldDescriptor[];
+    tempFilters: Record<string, string>;
+    onTempFiltersChange: (filters: Record<string, string>) => void;
+    onApply: () => void;
+    onReset: () => void;
+    onClearAll: () => void;
+}
+
+function FilterModal({
+    open,
+    onOpenChange,
+    filterFields,
+    tempFilters,
+    onTempFiltersChange,
+    onApply,
+    onReset,
+    onClearAll,
+}: FilterModalProps) {
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="border-border bg-background text-foreground sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Filters</DialogTitle>
+                    <DialogDescription className="text-muted-foreground">
+                        Apply filters to refine the results
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    {filterFields.map((field) => {
+                        const element = React.isValidElement(field.component) ? field.component : null;
+                        const isSelect = element && (element.type === Select || (element.type as { displayName?: string })?.displayName === 'Select');
+
+                        const commonProps = {
+                            value: tempFilters[field.name] ?? '',
+                            placeholder: (element?.props as { placeholder?: string })?.placeholder ?? '',
+                        };
+
+                        const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+                            onTempFiltersChange({ ...tempFilters, [field.name]: e.target.value });
+                        };
+
+                        const onValueChangeHandler = (value: string) => {
+                            onTempFiltersChange({ ...tempFilters, [field.name]: value });
+                        };
+
+                        const componentWithProps = element
+                            ? React.cloneElement(element, {
+                                  ...commonProps,
+                                  ...(isSelect ? { onValueChange: onValueChangeHandler } : { onChange: onChangeHandler }),
+                              })
+                            : null;
+
+                        return (
+                            <div key={field.name}>
+                                <label className="mb-2 block text-sm font-medium">{field.label}</label>
+                                {componentWithProps}
+                            </div>
+                        );
+                    })}
+                </div>
+                <DialogFooter>
+                    <Button variant="outline" onClick={onReset}>
+                        Reset
+                    </Button>
+                    <Button variant="outline" onClick={onClearAll}>
+                        Clear All
+                    </Button>
+                    <Button onClick={onApply}>Apply Filters</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
 
 // Helper function to safely extract placeholder from filter fields
 function getPlaceholderFromFilterFields(filterFields: FieldDescriptor[]): string {
@@ -61,7 +134,7 @@ function getPlaceholderFromFilterFields(filterFields: FieldDescriptor[]): string
     const component = firstField.component;
 
     if (React.isValidElement(component)) {
-        const placeholder = (component.props as any)?.placeholder;
+        const placeholder = (component.props as { placeholder?: string })?.placeholder;
         return placeholder || 'Search...';
     }
 
@@ -285,8 +358,6 @@ export function DataTable<T>({
                     />
                 </div>
                 <div className="mb-2 flex items-center space-x-2">
-                    {/* Always render filter dialog trigger to ensure visibility in tests */}
-                    {/* Filter button – replaced DialogTrigger with direct Button to ensure visibility */}
                     <Button
                         variant="outline"
                         size="sm"
@@ -296,121 +367,26 @@ export function DataTable<T>({
                         <Filter className="mr-2 h-4 w-4" />
                         Filters
                     </Button>
-                    <Dialog
+
+                    <FilterModal
                         open={isFilterModalOpen}
                         onOpenChange={setIsFilterModalOpen}
-                    >
-                        <DialogContent className="border-border bg-background text-foreground sm:max-w-[425px]">
-                            <DialogHeader>
-                                <DialogTitle>Filters</DialogTitle>
-                                <DialogDescription className="text-muted-foreground">
-                                    Apply filters to refine the results
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                {defaultFilterFields.map((field) => {
-                                    // Ensure we have a valid React element
-                                    const element = React.isValidElement(
-                                        field.component,
-                                    )
-                                        ? field.component
-                                        : null;
-
-                                    // Detect if the element is a Select component
-                                    const isSelect =
-                                        element &&
-                                        (element.type === Select ||
-                                            (element.type as any)
-                                                ?.displayName === 'Select');
-
-                                    // Common props for both Input and Select
-                                    const commonProps = {
-                                        value: tempFilters[field.name] ?? '',
-                                        placeholder:
-                                            (element?.props as any)
-                                                ?.placeholder ?? '',
-                                    };
-
-                                    // Handlers
-                                    const onChangeHandler = (
-                                        e: React.ChangeEvent<HTMLInputElement>,
-                                    ) => {
-                                        setTempFilters((prev) => ({
-                                            ...prev,
-                                            [field.name]: e.target.value,
-                                        }));
-                                    };
-                                    const onValueChangeHandler = (
-                                        value: string,
-                                    ) => {
-                                        setTempFilters((prev) => ({
-                                            ...prev,
-                                            [field.name]: value,
-                                        }));
-                                    };
-
-                                    // Clone element with appropriate props, casting to any to satisfy TypeScript
-                                    const componentWithProps = element
-                                        ? (React.cloneElement(
-                                              element as any,
-                                              {
-                                                  ...commonProps,
-                                                  ...(isSelect
-                                                      ? {
-                                                            onValueChange:
-                                                                onValueChangeHandler,
-                                                        }
-                                                      : {
-                                                            onChange:
-                                                                onChangeHandler,
-                                                        }),
-                                              } as any,
-                                          ) as any)
-                                        : null;
-
-                                    return (
-                                        <div key={field.name}>
-                                            <label className="mb-2 block text-sm font-medium">
-                                                {field.label}
-                                            </label>
-                                            {componentWithProps}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                            <DialogFooter>
-                                {/* Reset restores the temporary filters to the current external filters */}
-                                <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                        const cleaned = Object.fromEntries(
-                                            Object.entries(filters).filter(
-                                                ([, v]) =>
-                                                    v !== undefined && v !== '',
-                                            ),
-                                        ) as Record<string, string>;
-                                        setTempFilters(cleaned);
-                                    }}
-                                >
-                                    Reset
-                                </Button>
-                                {/* Clear All removes all filters and closes the modal */}
-                                <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                        onResetFilters();
-                                        setTempFilters({});
-                                        setIsFilterModalOpen(false);
-                                    }}
-                                >
-                                    Clear All
-                                </Button>
-                                <Button onClick={handleApplyFilters}>
-                                    Apply Filters
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                        filterFields={defaultFilterFields}
+                        tempFilters={tempFilters}
+                        onTempFiltersChange={setTempFilters}
+                        onApply={handleApplyFilters}
+                        onReset={() => {
+                            const cleaned = Object.fromEntries(
+                                Object.entries(filters).filter(([_, v]) => v !== undefined && v !== '')
+                            ) as Record<string, string>;
+                            setTempFilters(cleaned);
+                        }}
+                        onClearAll={() => {
+                            onResetFilters();
+                            setTempFilters({});
+                            setIsFilterModalOpen(false);
+                        }}
+                    />
                     <Button size="sm" onClick={onAdd ? onAdd : undefined}>
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Add
