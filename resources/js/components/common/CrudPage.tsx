@@ -208,7 +208,7 @@ export function CrudPage<
 
     // Default delete message
     const getDeleteMessage = config.getDeleteMessage || ((item: T) => {
-        const name = (item as any).name || `this ${config.entityName.toLowerCase()}`;
+        const name = item.name || `this ${config.entityName.toLowerCase()}`;
         return `This action cannot be undone. This will permanently delete ${name}'s ${config.entityName.toLowerCase()} record.`;
     });
 

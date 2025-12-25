@@ -1,6 +1,17 @@
-# CrudPage Component
+# CRUD Components
 
-A generic, reusable page component that handles complete CRUD workflows (Create, Read, Update, Delete) for any entity type. This component eliminates duplication across departments, positions, and employees modules by providing a unified interface for common CRUD operations.
+This directory contains reusable components for building CRUD (Create, Read, Update, Delete) interfaces. The components are designed to eliminate code duplication across different entity types (departments, positions, employees) by providing configurable, generic solutions.
+
+## Components Overview
+
+### CrudPage
+A generic, reusable page component that handles complete CRUD workflows for any entity type.
+
+### SimpleEntityCrudPage
+A factory function that creates CRUD pages for simple entities (just name field) and complex entities with custom components. Uses a registry-based approach to eliminate code duplication.
+
+### DataTable & Related Components
+Reusable data table components with built-in filtering, pagination, sorting, and export functionality.
 
 ## Features
 

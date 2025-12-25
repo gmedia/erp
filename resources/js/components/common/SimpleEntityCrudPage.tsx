@@ -11,26 +11,61 @@ import { EmployeeForm } from '@/components/employees/EmployeeForm';
 import { employeeColumns } from '@/components/employees/EmployeeColumns';
 import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
 
-// Unified factory function that creates appropriate CRUD pages based on entity configuration
-export function createEntityCrudPage(config: EntityConfig) {
-    if (config.type === 'simple') {
-        return createSimpleEntityCrudPage(config);
-    }
-
-    if (config.type === 'complex') {
-        // Currently only employees are supported as complex entities
-        if (config.entityName === 'Employee') {
-            return createComplexEntityCrudPage(config);
-        }
-        throw new Error(`Unsupported complex entity: ${config.entityName}`);
-    }
-
-    throw new Error(`Unknown entity type: ${(config as any).type}`);
+// Configuration for entity-specific components and behavior
+interface EntityComponents {
+    DataTableComponent: React.ComponentType<any>;
+    FormComponent: React.ComponentType<any>;
+    getColumns: () => any[];
+    getFilterFields: (config: EntityConfig) => any[];
+    mapFormProps: (config: EntityConfig, crudProps: any) => any;
 }
 
-// Simple entity CRUD page factory - refactored to reduce duplication
-function createSimpleEntityCrudPage(config: SimpleEntityConfig) {
-    return function SimpleEntityPage() {
+// Registry of entity-specific configurations
+const entityRegistry: Record<string, EntityComponents> = {
+    simple: {
+        DataTableComponent: DataTable,
+        FormComponent: SimpleEntityForm,
+        getColumns: createSimpleEntityColumns,
+        getFilterFields: (config: EntityConfig) => createSimpleEntityFilterFields((config as SimpleEntityConfig).filterPlaceholder),
+        mapFormProps: (config: EntityConfig, crudProps: any) => ({
+            open: crudProps.open,
+            onOpenChange: crudProps.onOpenChange,
+            entity: crudProps.item ? { name: crudProps.item.name } : null,
+            onSubmit: crudProps.onSubmit,
+            isLoading: crudProps.isLoading,
+            entityName: config.entityName,
+        }),
+    },
+    Employee: {
+        DataTableComponent: DataTable,
+        FormComponent: EmployeeForm,
+        getColumns: () => employeeColumns,
+        getFilterFields: (_config: EntityConfig) => createEmployeeFilterFields(),
+        mapFormProps: (_config: EntityConfig, crudProps: any) => ({
+            open: crudProps.open,
+            onOpenChange: crudProps.onOpenChange,
+            employee: crudProps.item, // Employee form expects 'employee' prop
+            onSubmit: crudProps.onSubmit,
+            isLoading: crudProps.isLoading,
+        }),
+    },
+};
+
+/**
+ * Unified factory function that creates appropriate CRUD pages based on entity configuration.
+ * Eliminates code duplication by using a registry-based approach.
+ */
+export function createEntityCrudPage(config: EntityConfig) {
+    // Determine which component configuration to use
+    const componentKey = config.type === 'simple' ? 'simple' : config.entityName;
+    const components = entityRegistry[componentKey];
+
+    if (!components) {
+        throw new Error(`No component configuration found for entity: ${config.entityName} (type: ${config.type})`);
+    }
+
+    // Create the page component with unified logic
+    return function EntityCrudPage() {
         return (
             <CrudPage
                 config={{
@@ -39,68 +74,22 @@ function createSimpleEntityCrudPage(config: SimpleEntityConfig) {
                     apiEndpoint: config.apiEndpoint,
                     queryKey: config.queryKey,
                     breadcrumbs: config.breadcrumbs,
-                    initialFilters: { search: '' },
+                    initialFilters: config.type === 'simple' ? { search: '' } : (config as ComplexEntityConfig).initialFilters || { search: '' },
 
-                    DataTableComponent: DataTable,
-                    FormComponent: SimpleEntityForm,
+                    DataTableComponent: components.DataTableComponent,
+                    FormComponent: components.FormComponent,
 
                     mapDataTableProps: (props) => ({
                         ...props,
-                        columns: createSimpleEntityColumns(),
+                        columns: components.getColumns(),
                         exportEndpoint: config.exportEndpoint,
-                        filterFields: createSimpleEntityFilterFields(config.filterPlaceholder),
+                        filterFields: components.getFilterFields(config),
                         entityName: config.entityName,
                     }),
 
-                    mapFormProps: (props) => ({
-                        open: props.open,
-                        onOpenChange: props.onOpenChange,
-                        entity: props.item ? { name: props.item.name } : null,
-                        onSubmit: props.onSubmit,
-                        isLoading: props.isLoading,
-                        entityName: config.entityName,
-                    }),
+                    mapFormProps: (crudProps) => components.mapFormProps(config, crudProps),
 
                     getDeleteMessage: (item) => config.getDeleteMessage(item),
-                }}
-            />
-        );
-    };
-}
-
-// Complex entity CRUD page factory - simplified and consistent
-function createComplexEntityCrudPage(config: ComplexEntityConfig) {
-    return function ComplexEntityPage() {
-        return (
-            <CrudPage
-                config={{
-                    entityName: config.entityName,
-                    entityNamePlural: config.entityNamePlural,
-                    apiEndpoint: config.apiEndpoint,
-                    queryKey: config.queryKey,
-                    breadcrumbs: config.breadcrumbs,
-                    initialFilters: config.initialFilters || { search: '' },
-
-                    DataTableComponent: DataTable,
-                    FormComponent: EmployeeForm,
-
-                    mapDataTableProps: (props) => ({
-                        ...props,
-                        columns: employeeColumns,
-                        exportEndpoint: config.exportEndpoint,
-                        filterFields: createEmployeeFilterFields(),
-                        entityName: config.entityName,
-                    }),
-
-                    mapFormProps: (props) => ({
-                        open: props.open,
-                        onOpenChange: props.onOpenChange,
-                        employee: props.item, // Employee form expects 'employee' prop
-                        onSubmit: props.onSubmit,
-                        isLoading: props.isLoading,
-                    }),
-
-                    getDeleteMessage: config.getDeleteMessage,
                 }}
             />
         );
