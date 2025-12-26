@@ -219,9 +219,36 @@ CrudPage<EntityType, FormDataType, FilterType>
 
 ## Examples
 
-See the example files:
-- `resources/js/pages/departments/index.new.tsx`
-- `resources/js/pages/positions/index.new.tsx`
-- `resources/js/pages/employees/index.new.tsx`
+The current implementation uses the `createEntityCrudPage` factory function which provides:
 
-These demonstrate how to migrate existing pages to use the CrudPage component.
+- **Departments & Positions**: Simple entity CRUD with name field only
+- **Employees**: Complex entity CRUD with multiple fields (name, email, phone, department, position, salary, hire_date)
+
+## Usage Examples
+
+### Simple Entity (Departments/Positions)
+
+```tsx
+import { createEntityCrudPage } from '@/components/common/SimpleEntityCrudPage';
+import { departmentConfig } from '@/utils/entityConfigs';
+
+export default createEntityCrudPage(departmentConfig);
+```
+
+### Complex Entity (Employees)
+
+```tsx
+import { createEntityCrudPage } from '@/components/common/SimpleEntityCrudPage';
+import { employeeConfig } from '@/utils/entityConfigs';
+
+export default createEntityCrudPage(employeeConfig);
+```
+
+The factory function automatically selects the appropriate components based on the entity configuration type.
+
+## Recent Improvements
+
+- **Unified Registry System**: Removed hardcoded entity name checks
+- **Better Type Safety**: Improved TypeScript generics and type checking
+- **Standardized Form Fields**: Configuration-driven form field rendering
+- **Extensible Architecture**: Easy to add new entity types without code changes

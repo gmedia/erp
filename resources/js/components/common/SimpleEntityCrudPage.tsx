@@ -13,97 +13,84 @@ import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilte
 import { type ColumnDef } from '@tanstack/react-table';
 import { type FieldDescriptor } from './filters';
 
-// Base interface for entity component configurations
-interface BaseEntityComponents<T> {
+// Base interface for all entity component configurations
+interface EntityComponentConfig<T = any> {
     DataTableComponent: React.ComponentType<any>;
     FormComponent: React.ComponentType<any>;
     getColumns: () => ColumnDef<T>[];
     getFilterFields: (config: EntityConfig) => FieldDescriptor[];
+    mapFormProps: (config: EntityConfig, crudProps: any) => any;
+    supportsConfig: (config: EntityConfig) => boolean;
 }
 
-// Specialized interface for different entity types
-interface SimpleEntityComponents extends BaseEntityComponents<{ name: string; created_at: string; updated_at: string }> {
-    type: 'simple';
-    mapFormProps: (config: SimpleEntityConfig, crudProps: any) => any;
-}
+// Registry class for entity component configurations
+class EntityComponentRegistry {
+    private registry = new Map<string, EntityComponentConfig>();
 
-interface EmployeeEntityComponents extends BaseEntityComponents<any> {
-    type: 'employee';
-    mapFormProps: (config: ComplexEntityConfig, crudProps: any) => any;
-}
-
-// Union type for all entity component configurations
-type EntityComponents = SimpleEntityComponents | EmployeeEntityComponents;
-
-// Registry class for better type safety and extensibility
-class EntityRegistry {
-    private registry = new Map<string, EntityComponents>();
-
-    register(key: string, components: EntityComponents): void {
-        this.registry.set(key, components);
+    register(key: string, config: EntityComponentConfig): void {
+        this.registry.set(key, config);
     }
 
-    get<T extends EntityComponents>(key: string): T | undefined {
-        return this.registry.get(key) as T | undefined;
+    get(key: string): EntityComponentConfig | undefined {
+        return this.registry.get(key);
     }
 
     has(key: string): boolean {
         return this.registry.has(key);
     }
-
-    keys(): string[] {
-        return Array.from(this.registry.keys());
-    }
 }
 
 // Create and configure the registry
-const entityRegistry = new EntityRegistry();
+const entityRegistry = new EntityComponentRegistry();
 
-// Register simple entity components
+// Register simple entity components (for departments, positions)
 entityRegistry.register('simple', {
-    type: 'simple',
     DataTableComponent: DataTable,
     FormComponent: SimpleEntityForm,
     getColumns: createSimpleEntityColumns,
     getFilterFields: (config: EntityConfig) =>
         createSimpleEntityFilterFields((config as SimpleEntityConfig).filterPlaceholder),
-    mapFormProps: (config: SimpleEntityConfig, crudProps: any) => ({
-        open: crudProps.open,
-        onOpenChange: crudProps.onOpenChange,
-        entity: crudProps.item ? { name: crudProps.item.name } : null,
-        onSubmit: crudProps.onSubmit,
-        isLoading: crudProps.isLoading,
-        entityName: config.entityName,
-    }),
+    mapFormProps: (config: EntityConfig, crudProps: any) => {
+        const simpleConfig = config as SimpleEntityConfig;
+        return {
+            open: crudProps.open,
+            onOpenChange: crudProps.onOpenChange,
+            entity: crudProps.item ? { name: crudProps.item.name } : null,
+            onSubmit: crudProps.onSubmit,
+            isLoading: crudProps.isLoading,
+            entityName: simpleConfig.entityName,
+        };
+    },
+    supportsConfig: (config: EntityConfig) => config.type === 'simple',
 });
 
 // Register employee entity components
-entityRegistry.register('Employee', {
-    type: 'employee',
+entityRegistry.register('employee', {
     DataTableComponent: DataTable,
     FormComponent: EmployeeForm,
     getColumns: () => employeeColumns,
     getFilterFields: (_config: EntityConfig) => createEmployeeFilterFields(),
-    mapFormProps: (_config: ComplexEntityConfig, crudProps: any) => ({
+    mapFormProps: (config: EntityConfig, crudProps: any) => ({
         open: crudProps.open,
         onOpenChange: crudProps.onOpenChange,
         employee: crudProps.item, // Employee form expects 'employee' prop
         onSubmit: crudProps.onSubmit,
         isLoading: crudProps.isLoading,
     }),
+    supportsConfig: (config: EntityConfig) => config.type === 'complex' && config.entityName === 'Employee',
 });
 
 /**
  * Unified factory function that creates appropriate CRUD pages based on entity configuration.
- * Eliminates code duplication by using a registry-based approach.
+ * Uses a registry-based approach for better extensibility and maintainability.
  */
 export function createEntityCrudPage(config: EntityConfig) {
-    // Determine which component configuration to use
-    const componentKey = config.type === 'simple' ? 'simple' : config.entityName;
+    // Determine which component configuration to use based on entity type
+    const componentKey = config.type === 'simple' ? 'simple' : 'employee';
     const components = entityRegistry.get(componentKey);
 
     if (!components) {
-        throw new Error(`No component configuration found for entity: ${config.entityName} (type: ${config.type})`);
+        throw new Error(`No component configuration found for entity type: ${config.type} (${config.entityName})`);
     }
 
     // Create the page component with unified logic
@@ -129,13 +116,7 @@ export function createEntityCrudPage(config: EntityConfig) {
                         entityName: config.entityName,
                     }),
 
-                    mapFormProps: (crudProps) => {
-                        if (components.type === 'simple') {
-                            return (components as SimpleEntityComponents).mapFormProps(config as SimpleEntityConfig, crudProps);
-                        } else {
-                            return (components as EmployeeEntityComponents).mapFormProps(config as ComplexEntityConfig, crudProps);
-                        }
-                    },
+                    mapFormProps: (crudProps) => components.mapFormProps(config, crudProps),
 
                     getDeleteMessage: (item) => config.getDeleteMessage(item),
                 }}
