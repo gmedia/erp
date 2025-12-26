@@ -18,4 +18,4 @@ export const employeeFormSchema = z.object({
     hire_date: z.date({ message: 'Hire date is required.' }),
 });
 
-export type EmployeeFormDataSchema = z.infer<typeof employeeFormSchema>;
+export type EmployeeFormData = z.infer<typeof employeeFormSchema>;
