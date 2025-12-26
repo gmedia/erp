@@ -239,6 +239,36 @@ export function DataTable<T>({
         return filterFields;
     }, [filterFields, entityName]);
 
+    // Memoize pagination data
+    const memoizedPagination = React.useMemo(() => pagination, [
+        pagination.page,
+        pagination.per_page,
+        pagination.total,
+        pagination.last_page,
+        pagination.from,
+        pagination.to
+    ]);
+
+    // Memoize sorting change handler
+    const handleSortingChange = React.useCallback((columnId: string) => {
+        const existing = sorting.find((s) => s.id === columnId);
+        const newSorting: SortingState = existing
+            ? [{ id: columnId, desc: !existing.desc }]
+            : [{ id: columnId, desc: false }];
+
+        setSorting(newSorting);
+        onFilterChange({
+            ...filters,
+            sort_by: columnId,
+            sort_direction: newSorting[0].desc ? 'desc' : 'asc',
+        });
+    }, [sorting, filters, onFilterChange]);
+
+    // Memoize export handler
+    const handleExport = React.useCallback(() => {
+        exportData(filters);
+    }, [exportData, filters]);
+
     // Sync temporary filters with external filters when they change or when the modal opens
     React.useEffect(() => {
         if (isFilterModalOpen) {
@@ -315,25 +345,9 @@ export function DataTable<T>({
         onPageSizeChange(Number(per_page));
     };
 
-    const handleSortingChange = (columnId: string) => {
-        const existing = sorting.find((s) => s.id === columnId);
-        const newSorting: SortingState = existing
-            ? [{ id: columnId, desc: !existing.desc }]
-            : [{ id: columnId, desc: false }];
-
-        setSorting(newSorting);
-        onFilterChange({
-            ...filters,
-            sort_by: columnId,
-            sort_direction: newSorting[0].desc ? 'desc' : 'asc',
-        });
-    };
 
 
 
-    const handleExport = () => {
-        exportData(filters);
-    };
 
     const handleApplyFilters = () => {
         onFilterChange(tempFilters);

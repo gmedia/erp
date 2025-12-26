@@ -184,7 +184,6 @@ export function EmployeeForm({
             onOpenChange={onOpenChange}
             title={employee ? 'Edit Employee' : 'Add New Employee'}
             onSubmit={onSubmit}
-            schema={employeeFormSchema}
             isLoading={isLoading}
         >
             {EMPLOYEE_FORM_FIELDS.map((fieldConfig) =>
