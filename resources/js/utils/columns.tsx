@@ -102,7 +102,7 @@ export function createDateColumn<T extends Record<string, any>>(
     cell: ({ row }) => {
       const value = row.getValue(accessorKey as string);
       if (!value) return <div>-</div>;
-      return <div>{formatDate(value as string)}</div>;
+      return <div>{formatDate(String(value))}</div>;
     },
   };
 
@@ -137,8 +137,9 @@ export function createCurrencyColumn<T extends Record<string, any>>(
   const baseColumn: ColumnDef<T> = {
     accessorKey: accessorKey as string,
     cell: ({ row }) => {
-      const value = parseFloat(row.getValue(accessorKey as string) as string);
-      if (isNaN(value)) {
+      const value = row.getValue(accessorKey as string);
+      const numValue = typeof value === 'number' ? value : parseFloat(String(value));
+      if (isNaN(numValue)) {
         return <div className={className}>-</div>;
       }
 
@@ -147,7 +148,7 @@ export function createCurrencyColumn<T extends Record<string, any>>(
         currency,
         minimumFractionDigits,
         maximumFractionDigits,
-      }).format(value);
+      }).format(numValue);
 
       return <div className={className}>{formatted}</div>;
     },

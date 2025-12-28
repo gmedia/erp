@@ -29,10 +29,6 @@ export interface CustomEntityConfig<T = any, FormData = any> extends BaseEntityC
 // Union type for all entity configurations
 export type EntityConfig<T = any, FormData = any> = CustomEntityConfig<T, FormData>;
 
-// Helper function to create generic delete messages
-const createGenericDeleteMessage = (entityName: string) => (item: { name?: string }) =>
-    `This action cannot be undone. This will permanently delete ${item.name || `this ${entityName.toLowerCase()}`}'s ${entityName.toLowerCase()} record.`;
-
 import { createSimpleEntityColumns } from '@/utils/columns';
 import { createSimpleEntityFilterFields } from '@/components/common/filters';
 import { SimpleEntityForm } from '@/components/common/EntityForm';
@@ -40,7 +36,11 @@ import { EmployeeForm } from '@/components/employees/EmployeeForm';
 import { employeeColumns } from '@/components/employees/EmployeeColumns';
 import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
 
-// Helper function to create simple entity configs
+// Helper function to create generic delete messages
+const createGenericDeleteMessage = (entityName: string) => (item: { name?: string }) =>
+    `This action cannot be undone. This will permanently delete ${item.name || `this ${entityName.toLowerCase()}`}'s ${entityName.toLowerCase()} record.`;
+
+// Helper function to create simple entity configs with consistent structure
 const createSimpleEntityConfig = <T extends { name: string; created_at: string; updated_at: string }>(
     entityName: string,
     entityNamePlural: string,
@@ -52,12 +52,7 @@ const createSimpleEntityConfig = <T extends { name: string; created_at: string; 
     apiEndpoint: `/api/${apiBase}`,
     exportEndpoint: `/api/${apiBase}/export`,
     queryKey: [apiBase],
-    breadcrumbs: [
-        {
-            title: entityNamePlural,
-            href: `/${apiBase}`,
-        },
-    ],
+    breadcrumbs: [{ title: entityNamePlural, href: `/${apiBase}` }],
     initialFilters: { search: '' },
     columns: createSimpleEntityColumns<T>(),
     filterFields: createSimpleEntityFilterFields(filterPlaceholder),
