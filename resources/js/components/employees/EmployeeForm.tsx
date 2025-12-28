@@ -1,15 +1,17 @@
 'use client';
 
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import EntityForm from '@/components/common/EntityForm';
 import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
 import { InputField } from '@/components/common/InputField';
 import { DatePickerField } from '@/components/common/DatePickerField';
+
 import { DEPARTMENTS, POSITIONS } from '@/constants';
 import { Employee, EmployeeFormData } from '@/types/entity';
 import { employeeFormSchema } from '@/utils/schemas';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 
 interface EmployeeFormProps {
     open: boolean;

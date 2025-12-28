@@ -1,4 +1,4 @@
-// Shared entity types and interfaces
+// Base entity interfaces
 export interface BaseEntity {
     id: number;
     created_at: string;
@@ -17,7 +17,7 @@ export interface SimpleEntityFilters {
     search: string;
 }
 
-// Re-export from specific modules for convenience
+// Re-export entity types for convenience
 export type { Department, DepartmentFormData } from './department';
 export type { Position, PositionFormData } from './position';
 export type { Employee, EmployeeFormData } from './employee';

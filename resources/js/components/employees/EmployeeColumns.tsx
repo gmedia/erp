@@ -1,5 +1,7 @@
 'use client';
 
+import { ColumnDef } from '@tanstack/react-table';
+
 import {
     createSelectColumn,
     createTextColumn,
@@ -9,8 +11,8 @@ import {
     createDateColumn,
     createActionsColumn,
 } from '@/utils/columns';
+
 import { Employee } from '@/types/entity';
-import { ColumnDef } from '@tanstack/react-table';
 
 export const employeeColumns: ColumnDef<Employee>[] = [
     createSelectColumn<Employee>(),

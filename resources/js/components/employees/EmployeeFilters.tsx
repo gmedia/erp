@@ -1,6 +1,7 @@
 'use client';
 
 import { createSelectFilterField, createTextFilterField, type FieldDescriptor } from '@/components/common/filters';
+
 import { DEPARTMENTS, POSITIONS } from '@/constants';
 
 // Employee-specific filter fields

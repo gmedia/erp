@@ -1,41 +1,51 @@
-# Position Components
+# Simple Entity Components
 
-This directory contains components specific to the Position module.
+This directory contains components for simple entities (Departments, Positions) that follow a standardized CRUD pattern.
 
 ## Overview
 
-The Position module uses simple entity CRUD operations with the following structure:
-- **Entity**: Position (name, created_at, updated_at)
-- **Form**: Simple name field
-- **Table**: Basic columns (select, name, created_at, updated_at, actions)
-- **Filters**: Simple search filter
+Simple entities use shared, configuration-driven components for basic CRUD operations:
+- **Entity Structure**: Basic entities with `name`, `created_at`, `updated_at` fields
+- **Form**: Single name input field with validation
+- **Table**: Standard columns (select, name, created_at, updated_at, actions)
+- **Filters**: Simple search functionality
 
-## Components
+## Shared Components
 
-Since positions use the shared `createEntityCrudPage` factory function, this directory is primarily for future extensibility. The actual components are provided by the common components:
+All simple entities use the common component system:
 
-- `SimpleEntityForm` from `@/components/common/EntityForm`
-- `GenericDataTable` from `@/components/common/GenericDataTable`
-- Column definitions from `@/utils/columns`
+- `SimpleEntityForm` - Standardized form for name-only entities
+- `DataTable` - Generic table with built-in sorting, filtering, and pagination
+- Column builders from `@/utils/columns` for consistent table structure
 
-## Usage
+## Usage Pattern
 
-The position page is created using:
+Simple entity pages are created using the configuration-driven factory:
 
 ```tsx
-import { createEntityCrudPage } from '@/components/common/SimpleEntityCrudPage';
-import { positionConfig } from '@/utils/entityConfigs';
+import { createEntityCrudPage } from '@/components/common/EntityCrudPage';
+import { departmentConfig } from '@/utils/entityConfigs';
 
-export default createEntityCrudPage(positionConfig);
+export default createEntityCrudPage(departmentConfig);
 ```
 
-The configuration is defined in `@/utils/entityConfigs.ts` and includes:
-- API endpoints
-- Breadcrumbs
-- Export endpoints
-- Filter placeholders
+## Configuration
+
+Entity configurations are defined in `@/utils/entityConfigs.ts` and include:
+- API endpoints and export URLs
+- Navigation breadcrumbs
+- Filter configurations
 - Delete confirmation messages
+- Component mappings
 
-## Future Extensions
+## Extending Simple Entities
 
-If positions need custom components in the future, they should be added here following the same pattern as the employees module.
+If a simple entity needs custom behavior:
+1. Add custom components to the respective directory
+2. Update the entity configuration to use custom components
+3. Follow the employee module pattern for complex customizations
+
+## Current Simple Entities
+
+- **Departments**: Basic organizational units
+- **Positions**: Job roles and titles
