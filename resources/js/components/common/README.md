@@ -7,8 +7,8 @@ This directory contains reusable components for building CRUD (Create, Read, Upd
 ### CrudPage
 A generic, reusable page component that handles complete CRUD workflows for any entity type.
 
-### SimpleEntityCrudPage
-A factory function that creates CRUD pages for simple entities (just name field) and complex entities with custom components. Uses a registry-based approach to eliminate code duplication.
+### EntityCrudPage
+A factory function that creates CRUD pages for any entity type using configuration-driven approach. Eliminates code duplication by using unified entity configurations that include all necessary components, columns, and filters.
 
 ### DataTable & Related Components
 Reusable data table components with built-in filtering, pagination, sorting, and export functionality.
@@ -229,7 +229,7 @@ The current implementation uses the `createEntityCrudPage` factory function whic
 ### Simple Entity (Departments/Positions)
 
 ```tsx
-import { createEntityCrudPage } from '@/components/common/SimpleEntityCrudPage';
+import { createEntityCrudPage } from '@/components/common/EntityCrudPage';
 import { departmentConfig } from '@/utils/entityConfigs';
 
 export default createEntityCrudPage(departmentConfig);
@@ -238,17 +238,31 @@ export default createEntityCrudPage(departmentConfig);
 ### Complex Entity (Employees)
 
 ```tsx
-import { createEntityCrudPage } from '@/components/common/SimpleEntityCrudPage';
+import { createEntityCrudPage } from '@/components/common/EntityCrudPage';
 import { employeeConfig } from '@/utils/entityConfigs';
 
 export default createEntityCrudPage(employeeConfig);
 ```
 
-The factory function automatically selects the appropriate components based on the entity configuration type.
+The factory function uses configuration-driven approach where all components, columns, and filters are specified in the entity configuration.
 
 ## Recent Improvements
 
-- **Unified Registry System**: Removed hardcoded entity name checks
-- **Better Type Safety**: Improved TypeScript generics and type checking
-- **Standardized Form Fields**: Configuration-driven form field rendering
-- **Extensible Architecture**: Easy to add new entity types without code changes
+- **Simplified Configuration System**: Unified entity configurations that include all necessary components
+- **Removed Complex Registry**: Replaced registry-based approach with direct configuration usage
+- **Better Maintainability**: Configuration directly specifies components instead of complex lookups
+- **Improved Type Safety**: Cleaner TypeScript interfaces and better type checking
+- **Reduced Coupling**: Eliminated tight coupling between factory and specific entity components
+
+## Architecture Changes
+
+### Before (Registry-based)
+- Complex registry system with component lookups
+- Separate type definitions for simple vs complex entities
+- Tight coupling between factory and specific components
+
+### After (Configuration-driven)
+- Unified `CustomEntityConfig` interface for all entities
+- Configuration includes all components, columns, and filters
+- Looser coupling with direct component references in config
+- Easier to extend and maintain
