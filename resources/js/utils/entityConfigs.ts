@@ -91,7 +91,7 @@ function createSimpleEntityConfig<T extends { name: string; created_at: string; 
 }
 
 // Factory function for complex entity configs
-function createComplexEntityConfig<T = any, FormData = any>(
+function createComplexEntityConfig<T extends { id: number; name: string }, FormData>(
     options: ComplexEntityConfigOptions<T, FormData>
 ): CustomEntityConfig<T, FormData> {
     return {
@@ -126,19 +126,14 @@ export const positionConfig = createSimpleEntityConfig({
     filterPlaceholder: 'Search positions...'
 });
 
-// Configuration for complex entities (employees)
-export const employeeConfig: CustomEntityConfig = {
+// Configuration for complex entities (employees) - using factory for consistency
+export const employeeConfig = createComplexEntityConfig({
     entityName: 'Employee',
     entityNamePlural: 'Employees',
     apiEndpoint: '/api/employees',
     exportEndpoint: '/api/employees/export',
     queryKey: ['employees'],
-    breadcrumbs: [
-        {
-            title: 'Employees',
-            href: '/employees',
-        },
-    ],
+    breadcrumbs: [{ title: 'Employees', href: '/employees' }],
     initialFilters: {
         search: '',
         department: '',
@@ -151,4 +146,4 @@ export const employeeConfig: CustomEntityConfig = {
     entityNameForSearch: 'employee',
     getDeleteMessage: (employee: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${employee.name}'s employee record.`,
-};
+});

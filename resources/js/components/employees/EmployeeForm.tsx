@@ -24,7 +24,7 @@ interface EmployeeFormProps {
 /**
  * Helper function to get default values for employee form
  */
-function getEmployeeFormDefaults(employee?: Employee | null): EmployeeFormData {
+const getEmployeeFormDefaults = (employee?: Employee | null): EmployeeFormData => {
     if (!employee) {
         return {
             name: '',
@@ -46,7 +46,7 @@ function getEmployeeFormDefaults(employee?: Employee | null): EmployeeFormData {
         salary: employee.salary,
         hire_date: new Date(employee.hire_date),
     };
-}
+};
 
 export function EmployeeForm({
     open,

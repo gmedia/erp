@@ -340,7 +340,7 @@ export function DataTable<T>({
 
 
     const handleApplyFilters = () => {
-        onFilterChange(tempFilters);
+        onFilterChange(tempFilters as Record<string, string | undefined>);
         setIsFilterModalOpen(false);
     };
 
