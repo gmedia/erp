@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
+import { ColumnDef } from '@tanstack/react-table';
 import { CrudPage } from '@/components/common/CrudPage';
 import { DataTable } from '@/components/common/DataTableCore';
-import { EntityConfig } from '@/utils/entityConfigs';
+import { BaseEntityConfig, CustomEntityConfig } from '@/utils/entityConfigs';
 
 // Define form component types for better type safety
 export interface BaseFormProps<FormData = unknown> {
@@ -65,11 +66,10 @@ export function createFormPropsMapper<T extends { id: number; name: string }>(co
 
 // Extended config with form type information
 export interface EntityCrudConfig<
-    T extends { id: number; name: string } = { id: number; name: string },
+    T = any,
     FormData = unknown
-> extends EntityConfig<T, FormData> {
-    formType: FormComponentType;
-    formComponent: React.ComponentType<SimpleFormProps | ComplexFormProps<T>>;
+> extends Omit<CustomEntityConfig<T, FormData>, 'columns'> {
+    columns: ColumnDef<T>[];
 }
 
 /**
