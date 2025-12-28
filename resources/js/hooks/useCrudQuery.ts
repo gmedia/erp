@@ -2,7 +2,7 @@
 
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import axios from 'axios';
-import { handleApiError, type ApiError } from '@/utils/errorHandling';
+import { handleApiError } from '@/utils/errorHandling';
 
 export interface PaginationState {
   page: number;

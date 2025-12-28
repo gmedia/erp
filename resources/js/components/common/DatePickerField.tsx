@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { Control, Path } from 'react-hook-form';
 
-interface DatePickerFieldProps<T extends Record<string, unknown>> {
+interface DatePickerFieldProps<T extends Record<string, unknown> = Record<string, unknown>> {
     control: Control<T>;
     name: Path<T>;
     label: string;

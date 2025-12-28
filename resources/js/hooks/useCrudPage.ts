@@ -8,7 +8,7 @@ import { type ApiError } from '@/utils/errorHandling';
 
 export interface CrudPageConfig<
     T extends { id: number; name: string },
-    FormData,
+    FormData = unknown,
     FilterType extends FilterState = FilterState
 > {
     // Basic configuration
@@ -34,6 +34,7 @@ export interface CrudPageConfig<
 }
 
 export interface CrudPageState<T, FormData, FilterType extends FilterState> {
+    // FormData is used in the function signature but not in the interface
     // State
     isFormOpen: boolean;
     selectedItem: T | null;

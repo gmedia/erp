@@ -4,7 +4,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input';
 import { Control, Path } from 'react-hook-form';
 
-interface InputFieldProps<T extends Record<string, unknown>> extends Omit<React.ComponentProps<'input'>, 'name'> {
+interface InputFieldProps<T extends Record<string, unknown> = Record<string, unknown>> extends Omit<React.ComponentProps<'input'>, 'name'> {
     control: Control<T>;
     name: Path<T>;
     label: string;

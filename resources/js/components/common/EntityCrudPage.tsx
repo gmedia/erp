@@ -6,21 +6,21 @@ import { DataTable } from '@/components/common/DataTableCore';
 import { EntityConfig } from '@/utils/entityConfigs';
 
 // Define form component types for better type safety
-export interface BaseFormProps {
+export interface BaseFormProps<FormData = unknown> {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onSubmit: (data: any) => void;
+    onSubmit: (data: FormData) => void;
     isLoading: boolean;
 }
 
-export interface SimpleFormProps extends BaseFormProps {
+export interface SimpleFormProps extends BaseFormProps<{ name: string }> {
     entity: { name: string } | null;
     entityName: string;
-    onSubmit: (data: { name: string }) => void;
 }
 
-export interface ComplexFormProps<T = any> extends BaseFormProps {
-    [key: string]: any; // Dynamic prop name based on entity
+export interface ComplexFormProps<T extends { id: number; name: string }> extends BaseFormProps {
+    [key: string]: unknown; // Dynamic prop name based on entity
+    employee?: T | null;
 }
 
 export type FormComponentType = 'simple' | 'complex';
@@ -33,12 +33,12 @@ export function isSimpleFormComponent(
 }
 
 // Utility function to create form props mapper based on form type
-export function createFormPropsMapper(config: EntityCrudConfig) {
+export function createFormPropsMapper<T extends { id: number; name: string }>(config: EntityCrudConfig<T>) {
     return (crudProps: {
         open: boolean;
         onOpenChange: (open: boolean) => void;
-        item?: any;
-        onSubmit: (data: any) => void;
+        item?: T | null;
+        onSubmit: (data: unknown) => void;
         isLoading: boolean;
     }) => {
         const baseProps = {
@@ -58,13 +58,16 @@ export function createFormPropsMapper(config: EntityCrudConfig) {
             return {
                 ...baseProps,
                 [config.entityName.toLowerCase()]: crudProps.item,
-            } as ComplexFormProps;
+            } as ComplexFormProps<T>;
         }
     };
 }
 
 // Extended config with form type information
-export interface EntityCrudConfig<T = any, FormData = any> extends EntityConfig<T, FormData> {
+export interface EntityCrudConfig<
+    T extends { id: number; name: string } = { id: number; name: string },
+    FormData = unknown
+> extends EntityConfig<T, FormData> {
     formType: FormComponentType;
     formComponent: React.ComponentType<SimpleFormProps | ComplexFormProps<T>>;
 }

@@ -3,9 +3,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { handleApiError, createOperationErrorMessage, type ApiError } from '@/utils/errorHandling';
+import { handleApiError, type ApiError } from '@/utils/errorHandling';
 
-export interface UseCrudMutationsOptions<Entity, FormData> {
+export interface UseCrudMutationsOptions<TData, FormData> {
   endpoint: string;
   queryKey: string[];
   entityName: string;

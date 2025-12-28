@@ -8,7 +8,6 @@ import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmation
 import { DataTableProps as BaseDataTableProps } from '@/components/common/DataTableCore';
 import { useCrudPage, type CrudPageConfig as BaseCrudPageConfig } from '@/hooks/useCrudPage';
 import { type FilterState } from '@/hooks/useCrudFilters';
-import { type ApiError } from '@/utils/errorHandling';
 import { type BreadcrumbItem } from '@/types';
 
 // Extend the base DataTable props with additional required props for CRUD operations
@@ -17,7 +16,7 @@ export interface DataTableProps<T, FilterType extends FilterState = FilterState>
     onFilterChange: (filters: Partial<FilterType>) => void;
 }
 
-export interface FormProps<T, FormData> {
+export interface FormProps<T extends { id: number; name: string }, FormData = unknown> {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     item?: T | null;
@@ -116,7 +115,7 @@ export function CrudPage<
         onFilterChange: crudState.handleFilterChange,
         onResetFilters: crudState.resetFilters,
     }), [
-        config.mapDataTableProps,
+        config,
         crudState.data,
         crudState.handleAdd,
         crudState.handleEdit,
@@ -140,7 +139,7 @@ export function CrudPage<
         onSubmit: crudState.handleFormSubmit,
         isLoading: crudState.isCreating || crudState.isUpdating,
     }), [
-        config.mapFormProps,
+        config,
         crudState.isFormOpen,
         crudState.handleFormClose,
         crudState.selectedItem,
