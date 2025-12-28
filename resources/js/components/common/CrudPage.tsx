@@ -1,14 +1,13 @@
 'use client';
 
 import { Head } from '@inertiajs/react';
-import { useState, useCallback, useMemo, memo } from 'react';
+import { useMemo, memo } from 'react';
 
 import AppLayout from '@/layouts/app-layout';
 import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
 import { DataTableProps as BaseDataTableProps } from '@/components/common/DataTableCore';
-import { useCrudFilters, type FilterState } from '@/hooks/useCrudFilters';
-import { useCrudQuery } from '@/hooks/useCrudQuery';
-import { useCrudMutations } from '@/hooks/useCrudMutations';
+import { useCrudPage, type CrudPageConfig as BaseCrudPageConfig } from '@/hooks/useCrudPage';
+import { type FilterState } from '@/hooks/useCrudFilters';
 import { type ApiError } from '@/utils/errorHandling';
 import { type BreadcrumbItem } from '@/types';
 
@@ -30,33 +29,14 @@ export interface CrudPageConfig<
     T extends { id: number; name: string },
     FormData,
     FilterType extends FilterState = FilterState
-> {
-    // Basic configuration
-    entityName: string;
+> extends BaseCrudPageConfig<T, FormData, FilterType> {
+    // UI configuration
     entityNamePlural: string;
-    apiEndpoint: string;
-    queryKey: string[];
     breadcrumbs: BreadcrumbItem[];
 
     // Component configuration - using generic prop interfaces
     DataTableComponent: React.ComponentType<any>;
     FormComponent: React.ComponentType<any>;
-
-    // Optional callbacks for customization
-    onCreateSuccess?: () => void;
-    onUpdateSuccess?: () => void;
-    onDeleteSuccess?: () => void;
-    onError?: (error: ApiError) => void;
-
-    // Filter configuration
-    initialFilters?: FilterType;
-    initialPagination?: {
-        page: number;
-        per_page: number;
-    };
-
-    // Custom formatting for delete message
-    getDeleteMessage?: (item: T) => string;
 
     // Props mapping functions to adapt generic props to component-specific props
     mapDataTableProps: (props: {
@@ -106,174 +86,67 @@ export function CrudPage<
 >({
     config,
 }: CrudPageProps<T, FormData, FilterType>) {
-    // State management
-    const [isFormOpen, setIsFormOpen] = useState(false);
-    const [selectedItem, setSelectedItem] = useState<T | null>(null);
-    const [itemToDelete, setItemToDelete] = useState<T | null>(null);
-
-    // Filter and pagination management
-    const {
-        filters,
-        pagination,
-        setPagination,
-        handleFilterChange,
-        handleSearchChange,
-        handlePageChange,
-        handlePageSizeChange,
-        resetFilters,
-    } = useCrudFilters<FilterType>({
-        initialFilters: config.initialFilters || ({ search: '' } as unknown as FilterType),
-        initialPagination: config.initialPagination || { page: 1, per_page: 15 },
-    });
-
-    // CRUD operations
-    const {
-        createMutation,
-        updateMutation,
-        deleteMutation,
-    } = useCrudMutations<T, FormData>({
-        endpoint: config.apiEndpoint,
-        queryKey: config.queryKey,
+    // Use the custom hook to manage all CRUD state and logic
+    const crudState = useCrudPage<T, FormData, FilterType>({
         entityName: config.entityName,
-        onSuccess: () => {
-            // Reset pagination to first page after create/update/delete
-            setPagination({ page: 1, per_page: pagination.per_page });
-        },
+        apiEndpoint: config.apiEndpoint,
+        queryKey: config.queryKey,
+        onCreateSuccess: config.onCreateSuccess,
+        onUpdateSuccess: config.onUpdateSuccess,
+        onDeleteSuccess: config.onDeleteSuccess,
         onError: config.onError,
+        initialFilters: config.initialFilters,
+        initialPagination: config.initialPagination,
+        getDeleteMessage: config.getDeleteMessage,
     });
-
-    // Data fetching
-    const { data, isLoading, meta } = useCrudQuery<T>({
-        endpoint: config.apiEndpoint,
-        queryKey: config.queryKey,
-        entityName: config.entityName,
-        pagination,
-        filters,
-    });
-
-    // Event handlers
-    const handleAdd = useCallback(() => {
-        setSelectedItem(null);
-        setIsFormOpen(true);
-    }, []);
-
-    const handleEdit = useCallback((item: T) => {
-        setSelectedItem(item);
-        setIsFormOpen(true);
-    }, []);
-
-    const handleDelete = useCallback((item: T) => {
-        setItemToDelete(item);
-    }, []);
-
-    const handleFormSubmit = useCallback((data: FormData) => {
-        if (selectedItem) {
-            updateMutation.mutate(
-                { id: selectedItem.id, data },
-                {
-                    onSuccess: () => {
-                        setIsFormOpen(false);
-                        setSelectedItem(null);
-                        config.onUpdateSuccess?.();
-                    },
-                }
-            );
-        } else {
-            createMutation.mutate(data, {
-                onSuccess: () => {
-                    setIsFormOpen(false);
-                    setSelectedItem(null);
-                    config.onCreateSuccess?.();
-                },
-            });
-        }
-    }, [selectedItem, updateMutation, createMutation, config]);
-
-    const handleDeleteConfirm = useCallback(() => {
-        if (itemToDelete) {
-            deleteMutation.mutate(itemToDelete.id, {
-                onSuccess: () => {
-                    setItemToDelete(null);
-                    config.onDeleteSuccess?.();
-                },
-            });
-        }
-    }, [itemToDelete, deleteMutation, config]);
-
-    const handleFormClose = useCallback((open: boolean) => {
-        setIsFormOpen(open);
-        if (!open) {
-            setSelectedItem(null);
-        }
-    }, []);
-
-    // Memoize expensive computations
-    const getDeleteMessage = useMemo(() =>
-        config.getDeleteMessage || ((item: T) => {
-            const name = item.name || `this ${config.entityName.toLowerCase()}`;
-            return `This action cannot be undone. This will permanently delete ${name}'s ${config.entityName.toLowerCase()} record.`;
-        }), [config.getDeleteMessage, config.entityName]);
-
-    const tablePagination = useMemo(() => ({
-        page: meta.current_page,
-        per_page: meta.per_page,
-        total: meta.total,
-        last_page: meta.last_page,
-        from: meta.from || 0,
-        to: meta.to || 0,
-    }), [meta]);
-
-    const filterValue = useMemo(() =>
-        (filters as { search?: string }).search || '',
-        [filters]);
 
     // Prepare data table props
     const dataTableProps = useMemo(() => config.mapDataTableProps({
-        data,
-        onAdd: handleAdd,
-        onEdit: handleEdit,
-        onDelete: handleDelete,
-        pagination: tablePagination,
-        onPageChange: handlePageChange,
-        onPageSizeChange: handlePageSizeChange,
-        onSearchChange: handleSearchChange,
-        isLoading,
-        filterValue,
-        filters,
-        onFilterChange: handleFilterChange,
-        onResetFilters: resetFilters,
+        data: crudState.data,
+        onAdd: crudState.handleAdd,
+        onEdit: crudState.handleEdit,
+        onDelete: crudState.handleDelete,
+        pagination: crudState.tablePagination,
+        onPageChange: crudState.handlePageChange,
+        onPageSizeChange: crudState.handlePageSizeChange,
+        onSearchChange: crudState.handleSearchChange,
+        isLoading: crudState.isLoading,
+        filterValue: crudState.filterValue,
+        filters: crudState.filters,
+        onFilterChange: crudState.handleFilterChange,
+        onResetFilters: crudState.resetFilters,
     }), [
         config.mapDataTableProps,
-        data,
-        handleAdd,
-        handleEdit,
-        handleDelete,
-        tablePagination,
-        handlePageChange,
-        handlePageSizeChange,
-        handleSearchChange,
-        isLoading,
-        filterValue,
-        filters,
-        handleFilterChange,
-        resetFilters,
+        crudState.data,
+        crudState.handleAdd,
+        crudState.handleEdit,
+        crudState.handleDelete,
+        crudState.tablePagination,
+        crudState.handlePageChange,
+        crudState.handlePageSizeChange,
+        crudState.handleSearchChange,
+        crudState.isLoading,
+        crudState.filterValue,
+        crudState.filters,
+        crudState.handleFilterChange,
+        crudState.resetFilters,
     ]);
 
     // Prepare form props
     const formProps = useMemo(() => config.mapFormProps({
-        open: isFormOpen,
-        onOpenChange: handleFormClose,
-        item: selectedItem,
-        onSubmit: handleFormSubmit,
-        isLoading: createMutation.isPending || updateMutation.isPending,
+        open: crudState.isFormOpen,
+        onOpenChange: crudState.handleFormClose,
+        item: crudState.selectedItem,
+        onSubmit: crudState.handleFormSubmit,
+        isLoading: crudState.isCreating || crudState.isUpdating,
     }), [
         config.mapFormProps,
-        isFormOpen,
-        handleFormClose,
-        selectedItem,
-        handleFormSubmit,
-        createMutation.isPending,
-        updateMutation.isPending,
+        crudState.isFormOpen,
+        crudState.handleFormClose,
+        crudState.selectedItem,
+        crudState.handleFormSubmit,
+        crudState.isCreating,
+        crudState.isUpdating,
     ]);
 
     return (
@@ -291,12 +164,12 @@ export function CrudPage<
             <config.FormComponent {...formProps} />
 
             <DeleteConfirmationDialog
-                open={!!itemToDelete}
-                onOpenChange={(open) => !open && setItemToDelete(null)}
-                item={itemToDelete}
-                onConfirm={handleDeleteConfirm}
-                isLoading={deleteMutation.isPending}
-                getDeleteMessage={getDeleteMessage}
+                open={!!crudState.itemToDelete}
+                onOpenChange={(open) => !open && crudState.handleDeleteCancel()}
+                item={crudState.itemToDelete}
+                onConfirm={crudState.handleDeleteConfirm}
+                isLoading={crudState.isDeleting}
+                getDeleteMessage={crudState.getDeleteMessage}
             />
         </>
     );

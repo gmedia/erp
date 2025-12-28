@@ -5,6 +5,70 @@ import { CrudPage } from '@/components/common/CrudPage';
 import { DataTable } from '@/components/common/DataTableCore';
 import { EntityConfig } from '@/utils/entityConfigs';
 
+// Define form component types for better type safety
+export interface BaseFormProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    onSubmit: (data: any) => void;
+    isLoading: boolean;
+}
+
+export interface SimpleFormProps extends BaseFormProps {
+    entity: { name: string } | null;
+    entityName: string;
+    onSubmit: (data: { name: string }) => void;
+}
+
+export interface ComplexFormProps<T = any> extends BaseFormProps {
+    [key: string]: any; // Dynamic prop name based on entity
+}
+
+export type FormComponentType = 'simple' | 'complex';
+
+// Type guard to check if a form component accepts simple props
+export function isSimpleFormComponent(
+    component: React.ComponentType<any>
+): component is React.ComponentType<SimpleFormProps> {
+    return component.name === 'SimpleEntityForm' || component.displayName === 'SimpleEntityForm';
+}
+
+// Utility function to create form props mapper based on form type
+export function createFormPropsMapper(config: EntityCrudConfig) {
+    return (crudProps: {
+        open: boolean;
+        onOpenChange: (open: boolean) => void;
+        item?: any;
+        onSubmit: (data: any) => void;
+        isLoading: boolean;
+    }) => {
+        const baseProps = {
+            open: crudProps.open,
+            onOpenChange: crudProps.onOpenChange,
+            onSubmit: crudProps.onSubmit,
+            isLoading: crudProps.isLoading,
+        };
+
+        if (config.formType === 'simple') {
+            return {
+                ...baseProps,
+                entity: crudProps.item ? { name: crudProps.item.name } : null,
+                entityName: config.entityName,
+            } as SimpleFormProps;
+        } else {
+            return {
+                ...baseProps,
+                [config.entityName.toLowerCase()]: crudProps.item,
+            } as ComplexFormProps;
+        }
+    };
+}
+
+// Extended config with form type information
+export interface EntityCrudConfig<T = any, FormData = any> extends EntityConfig<T, FormData> {
+    formType: FormComponentType;
+    formComponent: React.ComponentType<SimpleFormProps | ComplexFormProps<T>>;
+}
+
 /**
  * Creates a CRUD page component based on the provided entity configuration.
  *
@@ -24,7 +88,7 @@ import { EntityConfig } from '@/utils/entityConfigs';
  * export default createEntityCrudPage(employeeConfig);
  * ```
  */
-export function createEntityCrudPage(config: EntityConfig): () => React.JSX.Element {
+export function createEntityCrudPage(config: EntityCrudConfig): () => React.JSX.Element {
     // Validate input configuration
     if (!config) {
         throw new Error('Entity configuration is required');
@@ -32,6 +96,10 @@ export function createEntityCrudPage(config: EntityConfig): () => React.JSX.Elem
 
     if (!config.entityName || !config.apiEndpoint) {
         throw new Error('Entity configuration must include entityName and apiEndpoint');
+    }
+
+    if (!config.formType) {
+        throw new Error('Entity configuration must include formType');
     }
 
     // Create the page component using the configuration
@@ -58,28 +126,7 @@ export function createEntityCrudPage(config: EntityConfig): () => React.JSX.Elem
                             entityName: config.entityNameForSearch,
                         }),
 
-                        mapFormProps: (crudProps) => {
-                            // Handle different form component prop requirements
-                            if (config.formComponent.name === 'SimpleEntityForm') {
-                                return {
-                                    open: crudProps.open,
-                                    onOpenChange: crudProps.onOpenChange,
-                                    entity: crudProps.item ? { name: crudProps.item.name } : null,
-                                    onSubmit: crudProps.onSubmit,
-                                    isLoading: crudProps.isLoading,
-                                    entityName: config.entityName,
-                                };
-                            } else {
-                                // Employee form and other complex forms
-                                return {
-                                    open: crudProps.open,
-                                    onOpenChange: crudProps.onOpenChange,
-                                    [config.entityName.toLowerCase()]: crudProps.item,
-                                    onSubmit: crudProps.onSubmit,
-                                    isLoading: crudProps.isLoading,
-                                };
-                            }
-                        },
+                        mapFormProps: createFormPropsMapper(config),
 
                         getDeleteMessage: config.getDeleteMessage,
                     }}
