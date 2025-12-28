@@ -239,16 +239,6 @@ export function DataTable<T>({
         return filterFields;
     }, [filterFields, entityName]);
 
-    // Memoize pagination data
-    const memoizedPagination = React.useMemo(() => pagination, [
-        pagination.page,
-        pagination.per_page,
-        pagination.total,
-        pagination.last_page,
-        pagination.from,
-        pagination.to
-    ]);
-
     // Memoize sorting change handler
     const handleSortingChange = React.useCallback((columnId: string) => {
         const existing = sorting.find((s) => s.id === columnId);
