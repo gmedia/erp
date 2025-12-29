@@ -4,40 +4,28 @@ This directory contains components specific to the Department module.
 
 ## Overview
 
-The Department module uses simple entity CRUD operations with the following structure:
-
-- **Entity**: Department (name, created_at, updated_at)
-- **Form**: Simple name field
-- **Table**: Basic columns (select, name, created_at, updated_at, actions)
-- **Filters**: Simple search filter
-
-## Components
-
-Since departments use the shared `createEntityCrudPage` factory function, this directory is primarily for future extensibility. The actual components are provided by the common components:
-
-- `SimpleEntityForm` from `@/components/common/EntityForm`
-- `GenericDataTable` from `@/components/common/GenericDataTable`
-- Column definitions from `@/utils/columns`
+The Department module provides simple entity CRUD operations for organizational departments.
 
 ## Usage
 
-The department page is created using:
+The department page is created using the configuration-driven factory:
 
 ```tsx
-import { createEntityCrudPage } from '@/components/common/SimpleEntityCrudPage';
+import { createEntityCrudPage } from '@/components/common/EntityCrudPage';
 import { departmentConfig } from '@/utils/entityConfigs';
 
 export default createEntityCrudPage(departmentConfig);
 ```
 
-The configuration is defined in `@/utils/entityConfigs.ts` and includes:
+## Configuration
 
-- API endpoints
-- Breadcrumbs
-- Export endpoints
-- Filter placeholders
-- Delete confirmation messages
+Department configuration includes:
+- API endpoints (`/api/departments`)
+- Simple form with name field only
+- Basic table columns (select, name, created_at, updated_at, actions)
+- Search filtering
+- Standard delete confirmation
 
 ## Future Extensions
 
-If departments need custom components in the future, they should be added here following the same pattern as the employees module.
+If departments require custom components beyond the standard CRUD operations, add them here following the employee module pattern.

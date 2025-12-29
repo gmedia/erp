@@ -247,54 +247,31 @@ export default createEntityCrudPage(employeeConfig);
 
 The factory function uses configuration-driven approach where all components, columns, and filters are specified in the entity configuration.
 
-## Recent Improvements
+## Architecture Overview
 
-- **Simplified Configuration System**: Unified entity configurations that include all necessary components
-- **Removed Complex Registry**: Replaced registry-based approach with direct configuration usage
-- **Better Maintainability**: Configuration directly specifies components instead of complex lookups
-- **Improved Type Safety**: Cleaner TypeScript interfaces and better type checking
-- **Reduced Coupling**: Eliminated tight coupling between factory and specific entity components
+The CRUD components follow a configuration-driven architecture that eliminates code duplication:
 
-## Component Architecture Refactoring
+### Key Components
 
-### DataTableCore Breakdown
+- **`CrudPage`**: Generic page component handling complete CRUD workflows
+- **`EntityCrudPage`**: Factory function creating pages from entity configurations
+- **`DataTable`**: Reusable table with filtering, pagination, and sorting
+- **`EntityForm`**: Generic form wrapper with validation support
 
-The large `DataTableCore.tsx` component has been broken down into smaller, focused components:
+### Configuration-Driven Design
 
-- **FilterModal.tsx**: Dedicated modal for advanced filtering with dynamic field rendering
-- **DataTableToolbar.tsx**: Toolbar containing search, filters, actions, and column visibility controls
-- **DataTableCore.tsx**: Core table functionality with pagination and data rendering
+All CRUD pages are created using entity configurations defined in `@/utils/entityConfigs.ts`:
 
-### Benefits
+```tsx
+// Simple entities (departments, positions)
+export default createEntityCrudPage(departmentConfig);
 
-- **Improved Maintainability**: Smaller, single-responsibility components
-- **Better Reusability**: Components can be used independently
-- **Enhanced Testability**: Easier to test individual components
-- **Cleaner Code**: Reduced complexity and improved readability
+// Complex entities (employees)
+export default createEntityCrudPage(employeeConfig);
+```
 
-### EntityCrudPage Simplification
-
-- **Simplified Prop Mapping**: Streamlined prop mapping functions
-- **Better Type Safety**: Improved TypeScript interfaces with proper generics
-- **Cleaner Architecture**: More maintainable configuration system
-
-### Code Quality Improvements
-
-- **Linting Compliance**: Fixed TypeScript and ESLint issues
-- **Import Optimization**: Removed unused imports and dependencies
-- **Consistent Patterns**: Standardized component patterns across the codebase
-
-## Architecture Changes
-
-### Before (Registry-based)
-
-- Complex registry system with component lookups
-- Separate type definitions for simple vs complex entities
-- Tight coupling between factory and specific components
-
-### After (Configuration-driven)
-
-- Unified `CustomEntityConfig` interface for all entities
-- Configuration includes all components, columns, and filters
-- Looser coupling with direct component references in config
-- Easier to extend and maintain
+This approach provides:
+- **Consistency**: Standardized patterns across all entities
+- **Maintainability**: Changes to common behavior affect all entities
+- **Extensibility**: New entities can be added with minimal code
+- **Type Safety**: Full TypeScript support with proper generics

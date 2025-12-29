@@ -6,24 +6,7 @@ import { CustomEntityConfig } from '@/utils/entityConfigs';
 import { ColumnDef } from '@tanstack/react-table';
 import React from 'react';
 
-// Form component prop interfaces for better type safety
-export interface BaseFormProps<FormData = unknown> {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    onSubmit: (data: FormData) => void;
-    isLoading: boolean;
-}
-
-export interface SimpleFormProps extends BaseFormProps<{ name: string }> {
-    entity: { name: string } | null;
-    entityName: string;
-}
-
-export interface ComplexFormProps<FormData = unknown>
-    extends BaseFormProps<FormData> {
-    [key: string]: unknown; // Dynamic prop name based on entity
-}
-
+// Form component types
 export type FormComponentType = 'simple' | 'complex';
 
 // Configuration interface for the CRUD page factory
@@ -32,16 +15,13 @@ export interface EntityCrudConfig<T extends Record<string, unknown>>
     columns: ColumnDef<T>[];
 }
 
-// Form props mapper factory - simplified to avoid generic complexity
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function createFormPropsMapper(config: EntityCrudConfig<any>) {
+// Simplified form props mapper
+function createFormPropsMapper(config: EntityCrudConfig<Record<string, unknown>>) {
     return (crudProps: {
         open: boolean;
         onOpenChange: (open: boolean) => void;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        item?: any;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        onSubmit: (data: any) => void;
+        item?: Record<string, unknown> | null;
+        onSubmit: (data: unknown) => void;
         isLoading: boolean;
     }) => {
         const baseProps = {
@@ -129,7 +109,7 @@ export function createEntityCrudPage<T extends { id: number; name: string }>(
                             entityName: config.entityNameForSearch,
                         }),
 
-                        mapFormProps: createFormPropsMapper(config),
+                        mapFormProps: createFormPropsMapper(config as EntityCrudConfig<Record<string, unknown>>),
 
                         getDeleteMessage: config.getDeleteMessage,
                     }}
