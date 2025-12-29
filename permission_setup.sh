@@ -36,6 +36,10 @@ mkdir -p "resources/js/wayfinder"
 chmod -R ugo+rw "resources/js/wayfinder"
 chown -R 1337:1000 "resources/js/wayfinder"
 
+# Required by eslint
+chmod -R ugo+rw "resources/js"
+chown -R 1337:1000 "resources/js"
+
 # Required by vite
 
 mkdir -p "public"
