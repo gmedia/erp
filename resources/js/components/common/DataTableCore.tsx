@@ -267,7 +267,7 @@ export function DataTable<T>({
                 onResetFilters={() => {
                     const cleaned = Object.fromEntries(
                         Object.entries(filters).filter(
-                            ([_, v]) => v !== undefined && v !== '',
+                            ([, v]) => v !== undefined && v !== '',
                         ),
                     ) as Record<string, string>;
                     setTempFilters(cleaned);

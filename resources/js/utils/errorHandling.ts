@@ -19,8 +19,15 @@ export interface ApiError {
 }
 
 // Parse axios error into structured error
-export function parseApiError(error: any): ApiError {
-    if (!error?.response) {
+export function parseApiError(error: unknown): ApiError {
+    const axiosError = error as {
+        response?: {
+            status: number;
+            data?: { message?: string; errors?: Record<string, string[]> };
+        };
+    };
+
+    if (!axiosError?.response) {
         // Network error
         return {
             type: ErrorType.NETWORK,
@@ -29,7 +36,7 @@ export function parseApiError(error: any): ApiError {
         };
     }
 
-    const { status, data } = error.response;
+    const { status, data } = axiosError.response;
 
     switch (status) {
         case 400:
@@ -90,7 +97,10 @@ export function parseApiError(error: any): ApiError {
 }
 
 // Handle and display error to user
-export function handleApiError(error: any, fallbackMessage: string): ApiError {
+export function handleApiError(
+    error: unknown,
+    fallbackMessage: string,
+): ApiError {
     const parsedError = parseApiError(error);
 
     // Show appropriate toast based on error type

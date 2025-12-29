@@ -12,18 +12,20 @@ export interface BaseEntityConfig {
     queryKey: string[];
     breadcrumbs: BreadcrumbItem[];
     getDeleteMessage: (item: { name?: string }) => string;
-    initialFilters?: Record<string, any>;
+    initialFilters?: Record<string, string | number | undefined>;
 }
 
 // Configuration for entities with custom components
-export interface CustomEntityConfig<T = any, FormData = any>
-    extends BaseEntityConfig {
+export interface CustomEntityConfig<
+    T extends Record<string, unknown> = Record<string, unknown>,
+    FormData = unknown,
+> extends BaseEntityConfig {
     // Column definitions for the data table
     columns: ColumnDef<T>[];
     // Filter field descriptors
     filterFields: FieldDescriptor[];
     // Form component (can be a React component or import path)
-    formComponent: any;
+    formComponent: React.ComponentType<any>;
     // Form type for proper prop mapping
     formType: FormComponentType;
     // Optional entity name for search placeholder
@@ -31,10 +33,10 @@ export interface CustomEntityConfig<T = any, FormData = any>
 }
 
 // Union type for all entity configurations
-export type EntityConfig<T = any, FormData = any> = CustomEntityConfig<
-    T,
-    FormData
->;
+export type EntityConfig<
+    T extends Record<string, unknown> = Record<string, unknown>,
+    FormData = unknown,
+> = CustomEntityConfig<T, FormData>;
 
 import { SimpleEntityForm } from '@/components/common/EntityForm';
 import { createSimpleEntityFilterFields } from '@/components/common/filters';

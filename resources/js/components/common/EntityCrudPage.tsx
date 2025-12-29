@@ -33,8 +33,7 @@ export interface EntityCrudConfig<
     T extends { id: number; name: string },
     FormData = unknown,
 > extends Omit<CustomEntityConfig<T, FormData>, 'columns'> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    columns: ColumnDef<any>[];
+    columns: ColumnDef<T>[];
 }
 
 // Form props mapper factory - simplified to avoid generic complexity

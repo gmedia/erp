@@ -22,7 +22,7 @@ export interface BreadcrumbItem {
 export interface NavItem {
     title: string;
     href: string;
-    icon?: React.ComponentType<any> | null;
+    icon?: React.ComponentType<{ className?: string }> | null;
 }
 
 // Re-export User type for convenience
@@ -32,5 +32,5 @@ export interface SharedData {
     auth: {
         user: import('./user').User;
     };
-    [key: string]: any;
+    [key: string]: unknown;
 }
