@@ -19,5 +19,5 @@ export interface SimpleEntityFilters {
 
 // Re-export entity types for convenience
 export type { Department, DepartmentFormData } from './department';
-export type { Position, PositionFormData } from './position';
 export type { Employee, EmployeeFormData } from './employee';
+export type { Position, PositionFormData } from './position';

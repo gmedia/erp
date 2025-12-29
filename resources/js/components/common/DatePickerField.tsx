@@ -1,15 +1,27 @@
 'use client';
 
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { Control, Path } from 'react-hook-form';
 
-interface DatePickerFieldProps<T extends Record<string, unknown> = Record<string, unknown>> {
+interface DatePickerFieldProps<
+    T extends Record<string, unknown> = Record<string, unknown>,
+> {
     control: Control<T>;
     name: Path<T>;
     label: string;
@@ -38,7 +50,7 @@ export function DatePickerField<T extends Record<string, any>>({
                                     variant="outline"
                                     className={cn(
                                         'w-full pl-3 text-left font-normal',
-                                        !field.value && 'text-muted-foreground'
+                                        !field.value && 'text-muted-foreground',
                                     )}
                                 >
                                     {field.value ? (

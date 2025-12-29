@@ -5,6 +5,7 @@ This directory contains components specific to the Employee module.
 ## Overview
 
 The Employee module handles complex entity CRUD operations with the following structure:
+
 - **Entity**: Employee (name, email, phone, department, position, salary, hire_date, created_at, updated_at)
 - **Form**: Multiple fields with validation (name, email, phone, department, position, salary, hire_date)
 - **Table**: Complex columns (select, name, email, phone, department, position, salary, hire_date, actions)
@@ -28,6 +29,7 @@ export default createEntityCrudPage(employeeConfig);
 ```
 
 The configuration is defined in `@/utils/entityConfigs.ts` and includes:
+
 - API endpoints
 - Breadcrumbs
 - Export endpoints
@@ -46,15 +48,15 @@ The configuration is defined in `@/utils/entityConfigs.ts` and includes:
 
 ## Form Fields
 
-| Field | Type | Validation | Required |
-|-------|------|------------|----------|
-| Name | Text | 2+ characters | Yes |
-| Email | Email | Valid email format | Yes |
-| Phone | Text | 10+ digits | Yes |
-| Department | Select | From constants | Yes |
-| Position | Select | From constants | Yes |
-| Salary | Number | Valid decimal | Yes |
-| Hire Date | Date | Not future, not before 1900 | Yes |
+| Field      | Type   | Validation                  | Required |
+| ---------- | ------ | --------------------------- | -------- |
+| Name       | Text   | 2+ characters               | Yes      |
+| Email      | Email  | Valid email format          | Yes      |
+| Phone      | Text   | 10+ digits                  | Yes      |
+| Department | Select | From constants              | Yes      |
+| Position   | Select | From constants              | Yes      |
+| Salary     | Number | Valid decimal               | Yes      |
+| Hire Date  | Date   | Not future, not before 1900 | Yes      |
 
 ## Recent Improvements
 

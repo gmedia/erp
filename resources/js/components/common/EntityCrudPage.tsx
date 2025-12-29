@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
-import { ColumnDef } from '@tanstack/react-table';
 import { CrudPage } from '@/components/common/CrudPage';
 import { DataTable } from '@/components/common/DataTableCore';
-import { BaseEntityConfig, CustomEntityConfig } from '@/utils/entityConfigs';
+import { CustomEntityConfig } from '@/utils/entityConfigs';
+import { ColumnDef } from '@tanstack/react-table';
+import React from 'react';
 
-// Define form component types for better type safety
+// Form component prop interfaces for better type safety
 export interface BaseFormProps<FormData = unknown> {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -19,27 +19,30 @@ export interface SimpleFormProps extends BaseFormProps<{ name: string }> {
     entityName: string;
 }
 
-export interface ComplexFormProps<T extends { id: number; name: string }> extends BaseFormProps {
+export interface ComplexFormProps<
+    T extends { id: number; name: string },
+    FormData = unknown,
+> extends BaseFormProps<FormData> {
     [key: string]: unknown; // Dynamic prop name based on entity
-    employee?: T | null;
 }
 
 export type FormComponentType = 'simple' | 'complex';
 
-// Type guard to check if a form component accepts simple props
-export function isSimpleFormComponent(
-    component: React.ComponentType<any>
-): component is React.ComponentType<SimpleFormProps> {
-    return component.name === 'SimpleEntityForm' || component.displayName === 'SimpleEntityForm';
+// Configuration interface for the CRUD page factory
+export interface EntityCrudConfig<
+    T extends { id: number; name: string },
+    FormData = unknown,
+> extends Omit<CustomEntityConfig<T, FormData>, 'columns'> {
+    columns: ColumnDef<any>[];
 }
 
-// Utility function to create form props mapper based on form type
-export function createFormPropsMapper<T extends { id: number; name: string }>(config: EntityCrudConfig<T>) {
+// Form props mapper factory - simplified to avoid generic complexity
+function createFormPropsMapper(config: EntityCrudConfig<any, any>) {
     return (crudProps: {
         open: boolean;
         onOpenChange: (open: boolean) => void;
-        item?: T | null;
-        onSubmit: (data: unknown) => void;
+        item?: any;
+        onSubmit: (data: any) => void;
         isLoading: boolean;
     }) => {
         const baseProps = {
@@ -54,22 +57,16 @@ export function createFormPropsMapper<T extends { id: number; name: string }>(co
                 ...baseProps,
                 entity: crudProps.item ? { name: crudProps.item.name } : null,
                 entityName: config.entityName,
-            } as SimpleFormProps;
+            };
         } else {
+            // For complex forms, use the entity name in lowercase as the prop key
+            const entityKey = config.entityName.toLowerCase();
             return {
                 ...baseProps,
-                [config.entityName.toLowerCase()]: crudProps.item,
-            } as ComplexFormProps<T>;
+                [entityKey]: crudProps.item,
+            };
         }
     };
-}
-
-// Extended config with form type information
-export interface EntityCrudConfig<
-    T = any,
-    FormData = unknown
-> extends Omit<CustomEntityConfig<T, FormData>, 'columns'> {
-    columns: ColumnDef<T>[];
 }
 
 /**
@@ -91,14 +88,19 @@ export interface EntityCrudConfig<
  * export default createEntityCrudPage(employeeConfig);
  * ```
  */
-export function createEntityCrudPage(config: EntityCrudConfig): () => React.JSX.Element {
+export function createEntityCrudPage<
+    T extends { id: number; name: string },
+    FormData = unknown,
+>(config: EntityCrudConfig<T, FormData>): () => React.JSX.Element {
     // Validate input configuration
     if (!config) {
         throw new Error('Entity configuration is required');
     }
 
     if (!config.entityName || !config.apiEndpoint) {
-        throw new Error('Entity configuration must include entityName and apiEndpoint');
+        throw new Error(
+            'Entity configuration must include entityName and apiEndpoint',
+        );
     }
 
     if (!config.formType) {
@@ -136,7 +138,10 @@ export function createEntityCrudPage(config: EntityCrudConfig): () => React.JSX.
                 />
             );
         } catch (error) {
-            console.error(`Error rendering CRUD page for ${config.entityName}:`, error);
+            console.error(
+                `Error rendering CRUD page for ${config.entityName}:`,
+                error,
+            );
             throw error;
         }
     };

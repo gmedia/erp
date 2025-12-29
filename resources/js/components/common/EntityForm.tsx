@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 
+import NameField from '@/components/common/NameField';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -10,12 +11,10 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Form } from '@/components/ui/form';
-import NameField from '@/components/common/NameField';
-import { FormMessage } from '@/components/ui/form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, UseFormReturn, FieldValues } from 'react-hook-form';
+import { Form, FormMessage } from '@/components/ui/form';
 import { simpleEntitySchema } from '@/utils/schemas';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FieldValues, useForm, UseFormReturn } from 'react-hook-form';
 import * as z from 'zod';
 
 interface EntityFormProps<T extends FieldValues = FieldValues> {
@@ -130,7 +129,11 @@ export function SimpleEntityForm({
             onSubmit={onSubmit}
             isLoading={isLoading}
         >
-            <NameField name="name" label="Name" placeholder={`e.g., ${entityName}`}>
+            <NameField
+                name="name"
+                label="Name"
+                placeholder={`e.g., ${entityName}`}
+            >
                 <FormMessage />
             </NameField>
         </EntityForm>

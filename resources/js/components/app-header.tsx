@@ -141,7 +141,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             {rightNavItems.map((item) => (
                                                 <a
                                                     key={item.title}
-                                            href={item.href}
+                                                    href={item.href}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="flex items-center space-x-2 font-medium"

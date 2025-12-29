@@ -1,22 +1,29 @@
 'use client';
 
 import { Head } from '@inertiajs/react';
-import { useMemo, memo } from 'react';
+import { memo, useMemo } from 'react';
 
-import AppLayout from '@/layouts/app-layout';
-import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
 import { DataTableProps as BaseDataTableProps } from '@/components/common/DataTableCore';
-import { useCrudPage, type CrudPageConfig as BaseCrudPageConfig } from '@/hooks/useCrudPage';
+import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
 import { type FilterState } from '@/hooks/useCrudFilters';
+import {
+    useCrudPage,
+    type CrudPageConfig as BaseCrudPageConfig,
+} from '@/hooks/useCrudPage';
+import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 
 // Extend the base DataTable props with additional required props for CRUD operations
-export interface DataTableProps<T, FilterType extends FilterState = FilterState> extends Omit<BaseDataTableProps<T>, 'onFilterChange' | 'filters'> {
+export interface DataTableProps<T, FilterType extends FilterState = FilterState>
+    extends Omit<BaseDataTableProps<T>, 'onFilterChange' | 'filters'> {
     filters: FilterType;
     onFilterChange: (filters: Partial<FilterType>) => void;
 }
 
-export interface FormProps<T extends { id: number; name: string }, FormData = unknown> {
+export interface FormProps<
+    T extends { id: number; name: string },
+    FormData = unknown,
+> {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     item?: T | null;
@@ -27,7 +34,7 @@ export interface FormProps<T extends { id: number; name: string }, FormData = un
 export interface CrudPageConfig<
     T extends { id: number; name: string },
     FormData,
-    FilterType extends FilterState = FilterState
+    FilterType extends FilterState = FilterState,
 > extends BaseCrudPageConfig<T, FormData, FilterType> {
     // UI configuration
     entityNamePlural: string;
@@ -73,7 +80,7 @@ export interface CrudPageConfig<
 interface CrudPageProps<
     T extends { id: number; name: string },
     FormData,
-    FilterType extends FilterState = FilterState
+    FilterType extends FilterState = FilterState,
 > {
     config: CrudPageConfig<T, FormData, FilterType>;
 }
@@ -81,10 +88,8 @@ interface CrudPageProps<
 export function CrudPage<
     T extends { id: number; name: string },
     FormData,
-    FilterType extends FilterState = FilterState
->({
-    config,
-}: CrudPageProps<T, FormData, FilterType>) {
+    FilterType extends FilterState = FilterState,
+>({ config }: CrudPageProps<T, FormData, FilterType>) {
     // Use the custom hook to manage all CRUD state and logic
     const crudState = useCrudPage<T, FormData, FilterType>({
         entityName: config.entityName,
@@ -100,53 +105,61 @@ export function CrudPage<
     });
 
     // Prepare data table props
-    const dataTableProps = useMemo(() => config.mapDataTableProps({
-        data: crudState.data,
-        onAdd: crudState.handleAdd,
-        onEdit: crudState.handleEdit,
-        onDelete: crudState.handleDelete,
-        pagination: crudState.tablePagination,
-        onPageChange: crudState.handlePageChange,
-        onPageSizeChange: crudState.handlePageSizeChange,
-        onSearchChange: crudState.handleSearchChange,
-        isLoading: crudState.isLoading,
-        filterValue: crudState.filterValue,
-        filters: crudState.filters,
-        onFilterChange: crudState.handleFilterChange,
-        onResetFilters: crudState.resetFilters,
-    }), [
-        config,
-        crudState.data,
-        crudState.handleAdd,
-        crudState.handleEdit,
-        crudState.handleDelete,
-        crudState.tablePagination,
-        crudState.handlePageChange,
-        crudState.handlePageSizeChange,
-        crudState.handleSearchChange,
-        crudState.isLoading,
-        crudState.filterValue,
-        crudState.filters,
-        crudState.handleFilterChange,
-        crudState.resetFilters,
-    ]);
+    const dataTableProps = useMemo(
+        () =>
+            config.mapDataTableProps({
+                data: crudState.data,
+                onAdd: crudState.handleAdd,
+                onEdit: crudState.handleEdit,
+                onDelete: crudState.handleDelete,
+                pagination: crudState.tablePagination,
+                onPageChange: crudState.handlePageChange,
+                onPageSizeChange: crudState.handlePageSizeChange,
+                onSearchChange: crudState.handleSearchChange,
+                isLoading: crudState.isLoading,
+                filterValue: crudState.filterValue,
+                filters: crudState.filters,
+                onFilterChange: crudState.handleFilterChange,
+                onResetFilters: crudState.resetFilters,
+            }),
+        [
+            config,
+            crudState.data,
+            crudState.handleAdd,
+            crudState.handleEdit,
+            crudState.handleDelete,
+            crudState.tablePagination,
+            crudState.handlePageChange,
+            crudState.handlePageSizeChange,
+            crudState.handleSearchChange,
+            crudState.isLoading,
+            crudState.filterValue,
+            crudState.filters,
+            crudState.handleFilterChange,
+            crudState.resetFilters,
+        ],
+    );
 
     // Prepare form props
-    const formProps = useMemo(() => config.mapFormProps({
-        open: crudState.isFormOpen,
-        onOpenChange: crudState.handleFormClose,
-        item: crudState.selectedItem,
-        onSubmit: crudState.handleFormSubmit,
-        isLoading: crudState.isCreating || crudState.isUpdating,
-    }), [
-        config,
-        crudState.isFormOpen,
-        crudState.handleFormClose,
-        crudState.selectedItem,
-        crudState.handleFormSubmit,
-        crudState.isCreating,
-        crudState.isUpdating,
-    ]);
+    const formProps = useMemo(
+        () =>
+            config.mapFormProps({
+                open: crudState.isFormOpen,
+                onOpenChange: crudState.handleFormClose,
+                item: crudState.selectedItem,
+                onSubmit: crudState.handleFormSubmit,
+                isLoading: crudState.isCreating || crudState.isUpdating,
+            }),
+        [
+            config,
+            crudState.isFormOpen,
+            crudState.handleFormClose,
+            crudState.selectedItem,
+            crudState.handleFormSubmit,
+            crudState.isCreating,
+            crudState.isUpdating,
+        ],
+    );
 
     return (
         <>

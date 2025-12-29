@@ -5,6 +5,7 @@ This directory contains components for simple entities (Departments, Positions) 
 ## Overview
 
 Simple entities use shared, configuration-driven components for basic CRUD operations:
+
 - **Entity Structure**: Basic entities with `name`, `created_at`, `updated_at` fields
 - **Form**: Single name input field with validation
 - **Table**: Standard columns (select, name, created_at, updated_at, actions)
@@ -32,6 +33,7 @@ export default createEntityCrudPage(departmentConfig);
 ## Configuration
 
 Entity configurations are defined in `@/utils/entityConfigs.ts` and include:
+
 - API endpoints and export URLs
 - Navigation breadcrumbs
 - Filter configurations
@@ -41,6 +43,7 @@ Entity configurations are defined in `@/utils/entityConfigs.ts` and include:
 ## Extending Simple Entities
 
 If a simple entity needs custom behavior:
+
 1. Add custom components to the respective directory
 2. Update the entity configuration to use custom components
 3. Follow the employee module pattern for complex customizations

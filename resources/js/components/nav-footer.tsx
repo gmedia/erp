@@ -29,7 +29,8 @@ export function NavFooter({
                                 asChild
                                 className="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100"
                             >
-                                <a href={item.href}
+                                <a
+                                    href={item.href}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >

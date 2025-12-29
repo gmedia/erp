@@ -1,13 +1,13 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
+import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
+import { InputField } from '@/components/common/InputField';
 import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
-import { InputField } from '@/components/common/InputField';
-import { DatePickerField } from '@/components/common/DatePickerField';
 
 import { DEPARTMENTS, POSITIONS } from '@/constants';
 import { Employee, EmployeeFormData } from '@/types/entity';
@@ -24,7 +24,9 @@ interface EmployeeFormProps {
 /**
  * Helper function to get default values for employee form
  */
-const getEmployeeFormDefaults = (employee?: Employee | null): EmployeeFormData => {
+const getEmployeeFormDefaults = (
+    employee?: Employee | null,
+): EmployeeFormData => {
     if (!employee) {
         return {
             name: '',
@@ -69,11 +71,7 @@ export function EmployeeForm({
             onSubmit={onSubmit}
             isLoading={isLoading}
         >
-            <NameField
-                name="name"
-                label="Name"
-                placeholder="John Doe"
-            />
+            <NameField name="name" label="Name" placeholder="John Doe" />
 
             <InputField
                 control={form.control}
@@ -117,7 +115,9 @@ export function EmployeeForm({
                 name="hire_date"
                 label="Hire Date"
                 placeholder="Pick a date"
-                disabled={(date: Date) => date > new Date() || date < new Date('1900-01-01')}
+                disabled={(date: Date) =>
+                    date > new Date() || date < new Date('1900-01-01')
+                }
             />
         </EntityForm>
     );

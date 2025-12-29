@@ -40,7 +40,9 @@ export function DeleteConfirmationDialog<T>({
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel disabled={isLoading}>
+                        Cancel
+                    </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={onConfirm}
                         disabled={isLoading}

@@ -8,7 +8,9 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, variant = 'header' }: AppShellProps) {
-    const isOpen = usePage<SharedData>().props.sidebarOpen as boolean | undefined;
+    const isOpen = usePage<SharedData>().props.sidebarOpen as
+        | boolean
+        | undefined;
 
     if (variant === 'header') {
         return (

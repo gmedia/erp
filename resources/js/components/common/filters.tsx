@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -9,6 +8,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import * as React from 'react';
 
 export type FieldDescriptor = {
     name: string;
@@ -22,7 +22,9 @@ export type SelectOption = {
 };
 
 // Generic filter fields for simple entities
-export function createSimpleEntityFilterFields(placeholder: string): FieldDescriptor[] {
+export function createSimpleEntityFilterFields(
+    placeholder: string,
+): FieldDescriptor[] {
     return [
         {
             name: 'search',
@@ -37,7 +39,7 @@ export function createSelectFilterField(
     name: string,
     label: string,
     options: SelectOption[],
-    placeholder: string
+    placeholder: string,
 ): FieldDescriptor {
     return {
         name,
@@ -63,7 +65,7 @@ export function createSelectFilterField(
 export function createTextFilterField(
     name: string,
     label: string,
-    placeholder: string
+    placeholder: string,
 ): FieldDescriptor {
     return {
         name,

@@ -1,7 +1,7 @@
+import { type FormComponentType } from '@/components/common/EntityCrudPage';
+import { type FieldDescriptor } from '@/components/common/filters';
 import { type BreadcrumbItem } from '@/types';
 import { type ColumnDef } from '@tanstack/react-table';
-import { type FieldDescriptor } from '@/components/common/filters';
-import { type FormComponentType } from '@/components/common/EntityCrudPage';
 
 // Base configuration interface for all entities
 export interface BaseEntityConfig {
@@ -16,7 +16,8 @@ export interface BaseEntityConfig {
 }
 
 // Configuration for entities with custom components
-export interface CustomEntityConfig<T = any, FormData = any> extends BaseEntityConfig {
+export interface CustomEntityConfig<T = any, FormData = any>
+    extends BaseEntityConfig {
     // Column definitions for the data table
     columns: ColumnDef<T>[];
     // Filter field descriptors
@@ -30,18 +31,22 @@ export interface CustomEntityConfig<T = any, FormData = any> extends BaseEntityC
 }
 
 // Union type for all entity configurations
-export type EntityConfig<T = any, FormData = any> = CustomEntityConfig<T, FormData>;
+export type EntityConfig<T = any, FormData = any> = CustomEntityConfig<
+    T,
+    FormData
+>;
 
-import { createSimpleEntityColumns } from '@/utils/columns';
-import { createSimpleEntityFilterFields } from '@/components/common/filters';
 import { SimpleEntityForm } from '@/components/common/EntityForm';
-import { EmployeeForm } from '@/components/employees/EmployeeForm';
+import { createSimpleEntityFilterFields } from '@/components/common/filters';
 import { employeeColumns } from '@/components/employees/EmployeeColumns';
 import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
+import { EmployeeForm } from '@/components/employees/EmployeeForm';
+import { createSimpleEntityColumns } from '@/utils/columns';
 
 // Helper function to create generic delete messages
-const createGenericDeleteMessage = (entityName: string) => (item: { name?: string }) =>
-    `This action cannot be undone. This will permanently delete ${item.name || `this ${entityName.toLowerCase()}`}'s ${entityName.toLowerCase()} record.`;
+const createGenericDeleteMessage =
+    (entityName: string) => (item: { name?: string }) =>
+        `This action cannot be undone. This will permanently delete ${item.name || `this ${entityName.toLowerCase()}`}'s ${entityName.toLowerCase()} record.`;
 
 // Configuration builder options
 export interface SimpleEntityConfigOptions {
@@ -68,10 +73,11 @@ export interface ComplexEntityConfigOptions<T = any, FormData = any> {
 }
 
 // Enhanced helper function to create simple entity configs with consistent structure
-function createSimpleEntityConfig<T extends { name: string; created_at: string; updated_at: string }>(
-    options: SimpleEntityConfigOptions
-): CustomEntityConfig<T> {
-    const { entityName, entityNamePlural, apiBase, filterPlaceholder } = options;
+function createSimpleEntityConfig<
+    T extends { name: string; created_at: string; updated_at: string },
+>(options: SimpleEntityConfigOptions): CustomEntityConfig<T> {
+    const { entityName, entityNamePlural, apiBase, filterPlaceholder } =
+        options;
 
     return {
         entityName,
@@ -91,8 +97,11 @@ function createSimpleEntityConfig<T extends { name: string; created_at: string; 
 }
 
 // Factory function for complex entity configs
-function createComplexEntityConfig<T extends { id: number; name: string }, FormData>(
-    options: ComplexEntityConfigOptions<T, FormData>
+function createComplexEntityConfig<
+    T extends { id: number; name: string },
+    FormData,
+>(
+    options: ComplexEntityConfigOptions<T, FormData>,
 ): CustomEntityConfig<T, FormData> {
     return {
         entityName: options.entityName,
@@ -116,14 +125,14 @@ export const departmentConfig = createSimpleEntityConfig({
     entityName: 'Department',
     entityNamePlural: 'Departments',
     apiBase: 'departments',
-    filterPlaceholder: 'Search departments...'
+    filterPlaceholder: 'Search departments...',
 });
 
 export const positionConfig = createSimpleEntityConfig({
     entityName: 'Position',
     entityNamePlural: 'Positions',
     apiBase: 'positions',
-    filterPlaceholder: 'Search positions...'
+    filterPlaceholder: 'Search positions...',
 });
 
 // Configuration for complex entities (employees) - using factory for consistency

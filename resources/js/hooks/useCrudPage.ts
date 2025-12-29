@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
 import { useCrudFilters, type FilterState } from '@/hooks/useCrudFilters';
-import { useCrudQuery } from '@/hooks/useCrudQuery';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
+import { useCrudQuery } from '@/hooks/useCrudQuery';
 import { type ApiError } from '@/utils/errorHandling';
+import { useCallback, useMemo, useState } from 'react';
 
 export interface CrudPageConfig<
     T extends { id: number; name: string },
     FormData = unknown,
-    FilterType extends FilterState = FilterState
+    FilterType extends FilterState = FilterState,
 > {
     // Basic configuration
     entityName: string;
@@ -91,8 +91,10 @@ export interface CrudPageState<T, FormData, FilterType extends FilterState> {
 export function useCrudPage<
     T extends { id: number; name: string },
     FormData,
-    FilterType extends FilterState = FilterState
->(config: CrudPageConfig<T, FormData, FilterType>): CrudPageState<T, FormData, FilterType> {
+    FilterType extends FilterState = FilterState,
+>(
+    config: CrudPageConfig<T, FormData, FilterType>,
+): CrudPageState<T, FormData, FilterType> {
     // State management
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<T | null>(null);
@@ -109,16 +111,19 @@ export function useCrudPage<
         handlePageSizeChange,
         resetFilters,
     } = useCrudFilters<FilterType>({
-        initialFilters: config.initialFilters || ({ search: '' } as unknown as FilterType),
-        initialPagination: config.initialPagination || { page: 1, per_page: 15 },
+        initialFilters:
+            config.initialFilters || ({ search: '' } as unknown as FilterType),
+        initialPagination: config.initialPagination || {
+            page: 1,
+            per_page: 15,
+        },
     });
 
     // CRUD operations
-    const {
-        createMutation,
-        updateMutation,
-        deleteMutation,
-    } = useCrudMutations<T, FormData>({
+    const { createMutation, updateMutation, deleteMutation } = useCrudMutations<
+        T,
+        FormData
+    >({
         endpoint: config.apiEndpoint,
         queryKey: config.queryKey,
         entityName: config.entityName,
@@ -153,28 +158,31 @@ export function useCrudPage<
         setItemToDelete(item);
     }, []);
 
-    const handleFormSubmit = useCallback((data: FormData) => {
-        if (selectedItem) {
-            updateMutation.mutate(
-                { id: selectedItem.id, data },
-                {
+    const handleFormSubmit = useCallback(
+        (data: FormData) => {
+            if (selectedItem) {
+                updateMutation.mutate(
+                    { id: selectedItem.id, data },
+                    {
+                        onSuccess: () => {
+                            setIsFormOpen(false);
+                            setSelectedItem(null);
+                            config.onUpdateSuccess?.();
+                        },
+                    },
+                );
+            } else {
+                createMutation.mutate(data, {
                     onSuccess: () => {
                         setIsFormOpen(false);
                         setSelectedItem(null);
-                        config.onUpdateSuccess?.();
+                        config.onCreateSuccess?.();
                     },
-                }
-            );
-        } else {
-            createMutation.mutate(data, {
-                onSuccess: () => {
-                    setIsFormOpen(false);
-                    setSelectedItem(null);
-                    config.onCreateSuccess?.();
-                },
-            });
-        }
-    }, [selectedItem, updateMutation, createMutation, config]);
+                });
+            }
+        },
+        [selectedItem, updateMutation, createMutation, config],
+    );
 
     const handleDeleteConfirm = useCallback(() => {
         if (itemToDelete) {
@@ -199,24 +207,33 @@ export function useCrudPage<
     }, []);
 
     // Memoize expensive computations
-    const getDeleteMessage = useMemo(() =>
-        config.getDeleteMessage || ((item: T) => {
-            const name = item.name || `this ${config.entityName.toLowerCase()}`;
-            return `This action cannot be undone. This will permanently delete ${name}'s ${config.entityName.toLowerCase()} record.`;
-        }), [config.getDeleteMessage, config.entityName]);
+    const getDeleteMessage = useMemo(
+        () =>
+            config.getDeleteMessage ||
+            ((item: T) => {
+                const name =
+                    item.name || `this ${config.entityName.toLowerCase()}`;
+                return `This action cannot be undone. This will permanently delete ${name}'s ${config.entityName.toLowerCase()} record.`;
+            }),
+        [config.getDeleteMessage, config.entityName],
+    );
 
-    const tablePagination = useMemo(() => ({
-        page: meta.current_page,
-        per_page: meta.per_page,
-        total: meta.total,
-        last_page: meta.last_page,
-        from: meta.from || 0,
-        to: meta.to || 0,
-    }), [meta]);
+    const tablePagination = useMemo(
+        () => ({
+            page: meta.current_page,
+            per_page: meta.per_page,
+            total: meta.total,
+            last_page: meta.last_page,
+            from: meta.from || 0,
+            to: meta.to || 0,
+        }),
+        [meta],
+    );
 
-    const filterValue = useMemo(() =>
-        (filters as { search?: string }).search || '',
-        [filters]);
+    const filterValue = useMemo(
+        () => (filters as { search?: string }).search || '',
+        [filters],
+    );
 
     return {
         // State

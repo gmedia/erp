@@ -5,12 +5,15 @@ This directory contains reusable components for building CRUD (Create, Read, Upd
 ## Components Overview
 
 ### CrudPage
+
 A generic, reusable page component that handles complete CRUD workflows for any entity type.
 
 ### EntityCrudPage
+
 A factory function that creates CRUD pages for any entity type using configuration-driven approach. Eliminates code duplication by using unified entity configurations that include all necessary components, columns, and filters.
 
 ### DataTable & Related Components
+
 Reusable data table components with built-in filtering, pagination, sorting, and export functionality.
 
 ## Features
@@ -42,12 +45,10 @@ export default function MyEntityIndex() {
                 entityNamePlural: 'MyEntities',
                 apiEndpoint: '/api/my-entities',
                 queryKey: ['my-entities'],
-                breadcrumbs: [
-                    { title: 'My Entities', href: '/my-entities' }
-                ],
+                breadcrumbs: [{ title: 'My Entities', href: '/my-entities' }],
                 DataTableComponent: MyDataTable,
                 FormComponent: MyForm,
-                
+
                 // Map generic props to component-specific props
                 mapDataTableProps: (props) => ({
                     data: props.data,
@@ -56,7 +57,7 @@ export default function MyEntityIndex() {
                     onDelete: props.onDelete,
                     // ... other props
                 }),
-                
+
                 mapFormProps: (props) => ({
                     open: props.open,
                     onOpenChange: props.onOpenChange,
@@ -87,24 +88,22 @@ export default function ProductIndex() {
                 entityNamePlural: 'Products',
                 apiEndpoint: '/api/products',
                 queryKey: ['products'],
-                breadcrumbs: [
-                    { title: 'Products', href: '/products' }
-                ],
-                
+                breadcrumbs: [{ title: 'Products', href: '/products' }],
+
                 // Custom initial filters
                 initialFilters: {
                     search: '',
                     category: '',
                     status: 'active',
                 },
-                
+
                 DataTableComponent: ProductDataTable,
                 FormComponent: ProductForm,
-                
+
                 // Custom delete message
-                getDeleteMessage: (product) => 
+                getDeleteMessage: (product) =>
                     `Delete product "${product.name}"? This action cannot be undone.`,
-                
+
                 mapDataTableProps: (props) => ({
                     data: props.data,
                     onAddProduct: props.onAdd,
@@ -119,7 +118,7 @@ export default function ProductIndex() {
                     onFilterChange: props.onFilterChange,
                     onResetFilters: props.onResetFilters,
                 }),
-                
+
                 mapFormProps: (props) => ({
                     open: props.open,
                     onOpenChange: props.onOpenChange,
@@ -137,29 +136,29 @@ export default function ProductIndex() {
 
 ### Required Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `entityName` | string | Singular name of the entity (e.g., "Department") |
-| `entityNamePlural` | string | Plural name of the entity (e.g., "Departments") |
-| `apiEndpoint` | string | API endpoint for CRUD operations |
-| `queryKey` | string[] | React Query key for caching |
-| `breadcrumbs` | BreadcrumbItem[] | Navigation breadcrumbs |
-| `DataTableComponent` | React.ComponentType | Component for displaying data table |
-| `FormComponent` | React.ComponentType | Component for create/edit forms |
-| `mapDataTableProps` | function | Maps generic props to DataTable component props |
-| `mapFormProps` | function | Maps generic props to Form component props |
+| Property             | Type                | Description                                      |
+| -------------------- | ------------------- | ------------------------------------------------ |
+| `entityName`         | string              | Singular name of the entity (e.g., "Department") |
+| `entityNamePlural`   | string              | Plural name of the entity (e.g., "Departments")  |
+| `apiEndpoint`        | string              | API endpoint for CRUD operations                 |
+| `queryKey`           | string[]            | React Query key for caching                      |
+| `breadcrumbs`        | BreadcrumbItem[]    | Navigation breadcrumbs                           |
+| `DataTableComponent` | React.ComponentType | Component for displaying data table              |
+| `FormComponent`      | React.ComponentType | Component for create/edit forms                  |
+| `mapDataTableProps`  | function            | Maps generic props to DataTable component props  |
+| `mapFormProps`       | function            | Maps generic props to Form component props       |
 
 ### Optional Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `initialFilters` | object | Initial filter state |
-| `initialPagination` | object | Initial pagination state |
-| `getDeleteMessage` | function | Custom delete confirmation message |
-| `onCreateSuccess` | function | Callback after successful creation |
-| `onUpdateSuccess` | function | Callback after successful update |
-| `onDeleteSuccess` | function | Callback after successful deletion |
-| `onError` | function | Error callback |
+| Property            | Type     | Description                        |
+| ------------------- | -------- | ---------------------------------- |
+| `initialFilters`    | object   | Initial filter state               |
+| `initialPagination` | object   | Initial pagination state           |
+| `getDeleteMessage`  | function | Custom delete confirmation message |
+| `onCreateSuccess`   | function | Callback after successful creation |
+| `onUpdateSuccess`   | function | Callback after successful update   |
+| `onDeleteSuccess`   | function | Callback after successful deletion |
+| `onError`           | function | Error callback                     |
 
 ## Migration Guide
 
@@ -188,6 +187,7 @@ import { CrudPage } from '@/components/common/CrudPage';
 ## Component Interface Requirements
 
 ### DataTableComponent Props
+
 Your DataTable component should accept these props (mapped via `mapDataTableProps`):
 
 - `data`: Array of entity items
@@ -197,6 +197,7 @@ Your DataTable component should accept these props (mapped via `mapDataTableProp
 - Loading states
 
 ### FormComponent Props
+
 Your Form component should accept these props (mapped via `mapFormProps`):
 
 - `open`: Boolean for modal state
@@ -210,7 +211,7 @@ Your Form component should accept these props (mapped via `mapFormProps`):
 The component uses TypeScript generics for full type safety:
 
 ```tsx
-CrudPage<EntityType, FormDataType, FilterType>
+CrudPage<EntityType, FormDataType, FilterType>;
 ```
 
 - `EntityType`: Your entity interface (e.g., Department, Employee)
@@ -254,14 +255,45 @@ The factory function uses configuration-driven approach where all components, co
 - **Improved Type Safety**: Cleaner TypeScript interfaces and better type checking
 - **Reduced Coupling**: Eliminated tight coupling between factory and specific entity components
 
+## Component Architecture Refactoring
+
+### DataTableCore Breakdown
+
+The large `DataTableCore.tsx` component has been broken down into smaller, focused components:
+
+- **FilterModal.tsx**: Dedicated modal for advanced filtering with dynamic field rendering
+- **DataTableToolbar.tsx**: Toolbar containing search, filters, actions, and column visibility controls
+- **DataTableCore.tsx**: Core table functionality with pagination and data rendering
+
+### Benefits
+
+- **Improved Maintainability**: Smaller, single-responsibility components
+- **Better Reusability**: Components can be used independently
+- **Enhanced Testability**: Easier to test individual components
+- **Cleaner Code**: Reduced complexity and improved readability
+
+### EntityCrudPage Simplification
+
+- **Simplified Prop Mapping**: Streamlined prop mapping functions
+- **Better Type Safety**: Improved TypeScript interfaces with proper generics
+- **Cleaner Architecture**: More maintainable configuration system
+
+### Code Quality Improvements
+
+- **Linting Compliance**: Fixed TypeScript and ESLint issues
+- **Import Optimization**: Removed unused imports and dependencies
+- **Consistent Patterns**: Standardized component patterns across the codebase
+
 ## Architecture Changes
 
 ### Before (Registry-based)
+
 - Complex registry system with component lookups
 - Separate type definitions for simple vs complex entities
 - Tight coupling between factory and specific components
 
 ### After (Configuration-driven)
+
 - Unified `CustomEntityConfig` interface for all entities
 - Configuration includes all components, columns, and filters
 - Looser coupling with direct component references in config

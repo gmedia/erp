@@ -44,14 +44,10 @@ export function useEntityFilters(
             ] as const;
 
         case 'position':
-            return [
-                ...commonFields,
-            ] as const;
+            return [...commonFields] as const;
 
         case 'department':
-            return [
-                ...commonFields,
-            ] as const;
+            return [...commonFields] as const;
 
         default:
             return [] as const;

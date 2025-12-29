@@ -37,8 +37,14 @@ export function DataTablePagination({
     const renderPageNumbers = () => {
         const pages = [];
         const maxPages = 5;
-        const startPage = Math.max(1, pagination.page - Math.floor(maxPages / 2));
-        const endPage = Math.min(pagination.last_page, startPage + maxPages - 1);
+        const startPage = Math.max(
+            1,
+            pagination.page - Math.floor(maxPages / 2),
+        );
+        const endPage = Math.min(
+            pagination.last_page,
+            startPage + maxPages - 1,
+        );
 
         for (let i = startPage; i <= endPage; i++) {
             pages.push(
@@ -53,7 +59,7 @@ export function DataTablePagination({
                     >
                         {i}
                     </PaginationLink>
-                </PaginationItem>
+                </PaginationItem>,
             );
         }
         return pages;
@@ -119,7 +125,9 @@ export function DataTablePagination({
                                     onPageChange(pagination.page + 1);
                                 }
                             }}
-                            aria-disabled={pagination.page >= pagination.last_page}
+                            aria-disabled={
+                                pagination.page >= pagination.last_page
+                            }
                             className={
                                 pagination.page >= pagination.last_page
                                     ? 'pointer-events-none opacity-50'
