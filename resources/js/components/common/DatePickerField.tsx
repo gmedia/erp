@@ -17,30 +17,22 @@ import {
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
-import { Control, Path } from 'react-hook-form';
 
-interface DatePickerFieldProps<
-    TFieldValues extends Record<string, unknown> = Record<string, unknown>,
-> {
-    control: Control<TFieldValues>;
-    name: Path<TFieldValues>;
+interface DatePickerFieldProps {
+    name: string;
     label: string;
     placeholder?: string;
     disabled?: (date: Date) => boolean;
 }
 
-export function DatePickerField<
-    TFieldValues extends Record<string, unknown> = Record<string, unknown>,
->({
-    control,
+export function DatePickerField({
     name,
     label,
     placeholder = 'Pick a date',
     disabled,
-}: DatePickerFieldProps<TFieldValues>) {
+}: DatePickerFieldProps) {
     return (
         <FormField
-            control={control}
             name={name}
             render={({ field }) => (
                 <FormItem className="flex flex-col">

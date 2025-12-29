@@ -8,33 +8,31 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Control, Path } from 'react-hook-form';
+import { cn } from '@/lib/utils';
+import { type ReactNode } from 'react';
 
-interface InputFieldProps<
-    TFieldValues extends Record<string, unknown> = Record<string, unknown>,
-> extends Omit<React.ComponentProps<'input'>, 'name'> {
-    control: Control<TFieldValues>;
-    name: Path<TFieldValues>;
+interface InputFieldProps extends Omit<React.ComponentProps<'input'>, 'name'> {
+    name: string;
     label: string;
     placeholder?: string;
+    className?: string;
+    children?: ReactNode;
 }
 
-export function InputField<
-    TFieldValues extends Record<string, unknown> = Record<string, unknown>,
->({
-    control,
+export function InputField({
     name,
     label,
     placeholder,
     type = 'text',
+    className,
+    children,
     ...props
-}: InputFieldProps<TFieldValues>) {
+}: InputFieldProps) {
     return (
         <FormField
-            control={control}
             name={name}
             render={({ field }) => (
-                <FormItem>
+                <FormItem className={cn('space-y-2', className)}>
                     <FormLabel>{label}</FormLabel>
                     <FormControl>
                         <Input
@@ -54,7 +52,7 @@ export function InputField<
                             {...props}
                         />
                     </FormControl>
-                    <FormMessage />
+                    {children}
                 </FormItem>
             )}
         />

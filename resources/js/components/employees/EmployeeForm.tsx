@@ -31,14 +31,12 @@ const renderEmployeeBasicInfoSection = (
     <>
         <NameField name="name" label="Name" placeholder="John Doe" />
         <InputField
-            control={form.control}
             name="email"
             label="Email"
             type="email"
             placeholder="john.doe@example.com"
         />
         <InputField
-            control={form.control}
             name="phone"
             label="Phone"
             placeholder="+1 (555) 123-4567"
@@ -63,7 +61,6 @@ const renderEmployeeWorkInfoSection = (
             placeholder="Select a position"
         />
         <InputField
-            control={form.control}
             name="salary"
             label="Salary"
             type="number"
@@ -76,7 +73,6 @@ const renderEmployeeHireDateSection = (
     form: ReturnType<typeof useForm<EmployeeFormData>>,
 ) => (
     <DatePickerField
-        control={form.control}
         name="hire_date"
         label="Hire Date"
         placeholder="Pick a date"
