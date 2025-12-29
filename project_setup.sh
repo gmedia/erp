@@ -8,3 +8,6 @@ npm install
 
 # Copying .env.example to .env
 cp .env.example .env
+
+# Create symbolic link for storage
+php artisan storage:link

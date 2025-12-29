@@ -16,10 +16,6 @@
     ```
     sail npm run dev
     ```
-- Create symbolic link
-    ```
-    sail artisan storage:link
-    ```
 - Generate autocompletion for Facades
     ```
     sail artisan ide-helper:generate
