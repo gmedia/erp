@@ -1,5 +1,6 @@
-export interface Employee extends Record<string, unknown> {
-    id: number;
+import { BaseEntity } from './entity';
+
+export interface Employee extends BaseEntity {
     name: string;
     email: string;
     phone: string;
@@ -7,11 +8,9 @@ export interface Employee extends Record<string, unknown> {
     position: string;
     salary: string;
     hire_date: string;
-    created_at: string;
-    updated_at: string;
 }
 
-export interface EmployeeFormData extends Record<string, unknown> {
+export interface EmployeeFormData {
     name: string;
     email: string;
     phone: string;

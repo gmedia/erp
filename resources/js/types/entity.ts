@@ -1,8 +1,8 @@
-// Base entity interfaces
+// Base entity interfaces with stricter typing
 export interface BaseEntity {
-    id: number;
-    created_at: string;
-    updated_at: string;
+    readonly id: number;
+    readonly created_at: string;
+    readonly updated_at: string;
 }
 
 export interface SimpleEntity extends BaseEntity {
@@ -16,6 +16,13 @@ export interface SimpleEntityFormData {
 export interface SimpleEntityFilters {
     search: string;
 }
+
+// Common entity patterns
+export type EntityWithId<T = Record<string, unknown>> = T & BaseEntity;
+export type EntityFormData<T = Record<string, unknown>> = T;
+export type EntityFilters<T = Record<string, unknown>> = T & {
+    search?: string;
+};
 
 // Re-export entity types for convenience
 export type { Department, DepartmentFormData } from './department';

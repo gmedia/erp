@@ -1,8 +1,7 @@
-export interface Position extends Record<string, unknown> {
-    id: number;
+import { BaseEntity } from './entity';
+
+export interface Position extends BaseEntity {
     name: string;
-    created_at: string;
-    updated_at: string;
 }
 
 export interface PositionFormData {

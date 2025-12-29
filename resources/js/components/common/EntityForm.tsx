@@ -33,7 +33,7 @@ interface EntityFormProps<T extends FieldValues = FieldValues> {
 }
 
 /**
- * EntityForm – a reusable dialog‑form wrapper.
+ * EntityForm – a reusable dialog‑form wrapper with improved type safety.
  *
  * It renders a Dialog containing a Form (react‑hook‑form) and places any
  * field JSX passed as children inside the form. Validation is optional via a
@@ -48,16 +48,29 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
     isLoading = false,
     form,
 }: EntityFormProps<T>) {
-    const handleSubmit = (values: T) => {
-        onSubmit(values);
-    };
+    const handleSubmit = React.useCallback(
+        (values: T) => {
+            onSubmit(values);
+        },
+        [onSubmit],
+    );
+
+    // Determine submit button text based on title
+    const submitButtonText = React.useMemo(() => {
+        if (isLoading) return 'Saving...';
+
+        const lowerTitle = title.toLowerCase();
+        if (lowerTitle.includes('add')) return 'Add';
+        if (lowerTitle.includes('edit')) return 'Update';
+        if (lowerTitle.includes('create')) return 'Create';
+        return 'Submit';
+    }, [title, isLoading]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
-                    {/* Optional description can be added as a child of EntityForm if needed */}
                 </DialogHeader>
                 <Form {...form}>
                     <form
@@ -75,13 +88,7 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
                                 Cancel
                             </Button>
                             <Button type="submit" disabled={isLoading}>
-                                {isLoading
-                                    ? 'Saving...'
-                                    : title.toLowerCase().includes('add')
-                                      ? 'Add'
-                                      : title.toLowerCase().includes('edit')
-                                        ? 'Update'
-                                        : 'Submit'}
+                                {submitButtonText}
                             </Button>
                         </DialogFooter>
                     </form>

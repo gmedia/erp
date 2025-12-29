@@ -2,45 +2,48 @@ import { type FormComponentType } from '@/components/common/EntityCrudPage';
 import { type FieldDescriptor } from '@/components/common/filters';
 import { type FilterState } from '@/hooks/useCrudFilters';
 import { type BreadcrumbItem } from '@/types';
+import { type EntityWithId } from '@/types/entity';
 import { type ColumnDef } from '@tanstack/react-table';
 
-// Base configuration interface for all entities
+// Base configuration interface for all entities with improved typing
 export interface BaseEntityConfig<
     FilterType extends FilterState = FilterState,
 > {
-    entityName: string;
-    entityNamePlural: string;
-    apiEndpoint: string;
-    exportEndpoint: string;
-    queryKey: string[];
-    breadcrumbs: BreadcrumbItem[];
-    getDeleteMessage: (item: Record<string, unknown>) => string;
-    initialFilters?: FilterType;
+    readonly entityName: string;
+    readonly entityNamePlural: string;
+    readonly apiEndpoint: string;
+    readonly exportEndpoint: string;
+    readonly queryKey: readonly string[];
+    readonly breadcrumbs: readonly BreadcrumbItem[];
+    readonly getDeleteMessage: (item: Record<string, unknown>) => string;
+    readonly initialFilters?: FilterType;
 }
 
-// Configuration for entities with custom components
+// Configuration for entities with custom components and stricter typing
 export interface CustomEntityConfig<
     T extends Record<string, unknown> = Record<string, unknown>,
+    FormData = Record<string, unknown>,
     FilterType extends FilterState = FilterState,
 > extends BaseEntityConfig<FilterType> {
     // Column definitions for the data table
-    columns: ColumnDef<T>[];
+    readonly columns: ColumnDef<T>[];
     // Filter field descriptors
-    filterFields: FieldDescriptor[];
+    readonly filterFields: readonly FieldDescriptor[];
     // Form component (can be a React component or import path)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    formComponent: React.ComponentType<any>;
+    readonly formComponent: React.ComponentType<any>;
     // Form type for proper prop mapping
-    formType: FormComponentType;
+    readonly formType: FormComponentType;
     // Optional entity name for search placeholder
-    entityNameForSearch?: string;
+    readonly entityNameForSearch?: string;
 }
 
-// Union type for all entity configurations
+// Union type for all entity configurations with improved typing
 export type EntityConfig<
-    T extends Record<string, unknown> = Record<string, unknown>,
+    T extends EntityWithId = EntityWithId,
+    FormData = Record<string, unknown>,
     FilterType extends FilterState = FilterState,
-> = CustomEntityConfig<T, FilterType>;
+> = CustomEntityConfig<T, FormData, FilterType>;
 
 import { SimpleEntityForm } from '@/components/common/EntityForm';
 import { createSimpleEntityFilterFields } from '@/components/common/filters';
@@ -109,7 +112,7 @@ function createSimpleEntityConfig<
 }
 
 // Factory function for complex entity configs
-function createComplexEntityConfig<T extends { id: number; name: string }>(
+function createComplexEntityConfig<T extends EntityWithId>(
     options: ComplexEntityConfigOptions<T>,
 ): CustomEntityConfig<T> {
     return {
