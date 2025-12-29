@@ -1,10 +1,11 @@
 import { type FormComponentType } from '@/components/common/EntityCrudPage';
 import { type FieldDescriptor } from '@/components/common/filters';
+import { type FilterState } from '@/hooks/useCrudFilters';
 import { type BreadcrumbItem } from '@/types';
 import { type ColumnDef } from '@tanstack/react-table';
 
 // Base configuration interface for all entities
-export interface BaseEntityConfig {
+export interface BaseEntityConfig<FilterType extends FilterState = FilterState> {
     entityName: string;
     entityNamePlural: string;
     apiEndpoint: string;
@@ -12,21 +13,19 @@ export interface BaseEntityConfig {
     queryKey: string[];
     breadcrumbs: BreadcrumbItem[];
     getDeleteMessage: (item: Record<string, unknown>) => string;
-    initialFilters?: Record<string, string | number | undefined>;
+    initialFilters?: FilterType;
 }
 
 // Configuration for entities with custom components
 export interface CustomEntityConfig<
     T extends Record<string, unknown> = Record<string, unknown>,
-> extends BaseEntityConfig {
+    FilterType extends FilterState = FilterState,
+> extends BaseEntityConfig<FilterType> {
     // Column definitions for the data table
     columns: ColumnDef<T>[];
     // Filter field descriptors
     filterFields: FieldDescriptor[];
     // Form component (can be a React component or import path)
-
-
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     formComponent: React.ComponentType<any>;
     // Form type for proper prop mapping
@@ -38,7 +37,8 @@ export interface CustomEntityConfig<
 // Union type for all entity configurations
 export type EntityConfig<
     T extends Record<string, unknown> = Record<string, unknown>,
-> = CustomEntityConfig<T>;
+    FilterType extends FilterState = FilterState,
+> = CustomEntityConfig<T, FilterType>;
 
 import { SimpleEntityForm } from '@/components/common/EntityForm';
 import { createSimpleEntityFilterFields } from '@/components/common/filters';

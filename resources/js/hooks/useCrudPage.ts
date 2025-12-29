@@ -224,10 +224,10 @@ export function useCrudPage<
             per_page: meta.per_page,
             total: meta.total,
             last_page: meta.last_page,
-            from: meta.from || 0,
-            to: meta.to || 0,
+            from: meta.from ?? 0,
+            to: meta.to ?? 0,
         }),
-        [meta],
+        [meta.current_page, meta.per_page, meta.total, meta.last_page, meta.from, meta.to],
     );
 
     const filterValue = useMemo(
