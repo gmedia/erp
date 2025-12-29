@@ -7,7 +7,7 @@ import { type ApiError } from '@/utils/errorHandling';
 import { useCallback, useMemo, useState } from 'react';
 
 export interface CrudPageConfig<
-    T extends { id: number; name: string },
+    T extends Record<string, unknown>,
     FilterType extends FilterState = FilterState,
 > {
     // Basic configuration
@@ -88,7 +88,7 @@ export interface CrudPageState<T, FormData, FilterType extends FilterState> {
 }
 
 export function useCrudPage<
-    T extends { id: number; name: string },
+    T extends Record<string, unknown>,
     FormData,
     FilterType extends FilterState = FilterState,
 >(
@@ -161,7 +161,7 @@ export function useCrudPage<
         (data: FormData) => {
             if (selectedItem) {
                 updateMutation.mutate(
-                    { id: selectedItem.id, data },
+                    { id: selectedItem.id as number, data },
                     {
                         onSuccess: () => {
                             setIsFormOpen(false);
@@ -185,7 +185,7 @@ export function useCrudPage<
 
     const handleDeleteConfirm = useCallback(() => {
         if (itemToDelete) {
-            deleteMutation.mutate(itemToDelete.id, {
+            deleteMutation.mutate(itemToDelete.id as number, {
                 onSuccess: () => {
                     setItemToDelete(null);
                     config.onDeleteSuccess?.();
@@ -211,7 +211,7 @@ export function useCrudPage<
             config.getDeleteMessage ||
             ((item: T) => {
                 const name =
-                    item.name || `this ${config.entityName.toLowerCase()}`;
+                    (item as { name?: string }).name || `this ${config.entityName.toLowerCase()}`;
                 return `This action cannot be undone. This will permanently delete ${name}'s ${config.entityName.toLowerCase()} record.`;
             }),
         [config.getDeleteMessage, config.entityName],

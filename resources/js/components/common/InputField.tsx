@@ -11,22 +11,24 @@ import { Input } from '@/components/ui/input';
 import { Control, Path } from 'react-hook-form';
 
 interface InputFieldProps<
-    T extends Record<string, unknown> = Record<string, unknown>,
+    TFieldValues extends Record<string, unknown> = Record<string, unknown>,
 > extends Omit<React.ComponentProps<'input'>, 'name'> {
-    control: Control<T>;
-    name: Path<T>;
+    control: Control<TFieldValues>;
+    name: Path<TFieldValues>;
     label: string;
     placeholder?: string;
 }
 
-export function InputField<T extends Record<string, any>>({
+export function InputField<
+    TFieldValues extends Record<string, unknown> = Record<string, unknown>,
+>({
     control,
     name,
     label,
     placeholder,
     type = 'text',
     ...props
-}: InputFieldProps<T>) {
+}: InputFieldProps<TFieldValues>) {
     return (
         <FormField
             control={control}

@@ -20,22 +20,24 @@ import { CalendarIcon } from 'lucide-react';
 import { Control, Path } from 'react-hook-form';
 
 interface DatePickerFieldProps<
-    T extends Record<string, unknown> = Record<string, unknown>,
+    TFieldValues extends Record<string, unknown> = Record<string, unknown>,
 > {
-    control: Control<T>;
-    name: Path<T>;
+    control: Control<TFieldValues>;
+    name: Path<TFieldValues>;
     label: string;
     placeholder?: string;
     disabled?: (date: Date) => boolean;
 }
 
-export function DatePickerField<T extends Record<string, any>>({
+export function DatePickerField<
+    TFieldValues extends Record<string, unknown> = Record<string, unknown>,
+>({
     control,
     name,
     label,
     placeholder = 'Pick a date',
     disabled,
-}: DatePickerFieldProps<T>) {
+}: DatePickerFieldProps<TFieldValues>) {
     return (
         <FormField
             control={control}
@@ -65,8 +67,8 @@ export function DatePickerField<T extends Record<string, any>>({
                         <PopoverContent className="w-auto p-0" align="start">
                             <Calendar
                                 mode="single"
-                                selected={field.value}
-                                onSelect={field.onChange}
+                                selected={field.value as Date | undefined}
+                                onSelect={field.onChange as (date: Date | undefined) => void}
                                 disabled={disabled}
                                 initialFocus
                             />

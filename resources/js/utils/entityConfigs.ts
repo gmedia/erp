@@ -11,14 +11,13 @@ export interface BaseEntityConfig {
     exportEndpoint: string;
     queryKey: string[];
     breadcrumbs: BreadcrumbItem[];
-    getDeleteMessage: (item: { name?: string }) => string;
+    getDeleteMessage: (item: Record<string, unknown>) => string;
     initialFilters?: Record<string, string | number | undefined>;
 }
 
 // Configuration for entities with custom components
 export interface CustomEntityConfig<
     T extends Record<string, unknown> = Record<string, unknown>,
-    FormData = unknown,
 > extends BaseEntityConfig {
     // Column definitions for the data table
     columns: ColumnDef<T>[];
@@ -35,8 +34,7 @@ export interface CustomEntityConfig<
 // Union type for all entity configurations
 export type EntityConfig<
     T extends Record<string, unknown> = Record<string, unknown>,
-    FormData = unknown,
-> = CustomEntityConfig<T, FormData>;
+> = CustomEntityConfig<T>;
 
 import { SimpleEntityForm } from '@/components/common/EntityForm';
 import { createSimpleEntityFilterFields } from '@/components/common/filters';
@@ -58,20 +56,20 @@ export interface SimpleEntityConfigOptions {
     filterPlaceholder: string;
 }
 
-export interface ComplexEntityConfigOptions<T = any, FormData = any> {
+export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     entityName: string;
     entityNamePlural: string;
     apiEndpoint: string;
     exportEndpoint: string;
     queryKey: string[];
     breadcrumbs: BreadcrumbItem[];
-    initialFilters: Record<string, any>;
+    initialFilters: Record<string, unknown>;
     columns: ColumnDef<T>[];
     filterFields: FieldDescriptor[];
-    formComponent: any;
+    formComponent: React.ComponentType<unknown>;
     formType: FormComponentType;
     entityNameForSearch?: string;
-    getDeleteMessage: (item: { name?: string }) => string;
+    getDeleteMessage: (item: Record<string, unknown>) => string;
 }
 
 // Enhanced helper function to create simple entity configs with consistent structure
@@ -101,10 +99,9 @@ function createSimpleEntityConfig<
 // Factory function for complex entity configs
 function createComplexEntityConfig<
     T extends { id: number; name: string },
-    FormData,
 >(
-    options: ComplexEntityConfigOptions<T, FormData>,
-): CustomEntityConfig<T, FormData> {
+    options: ComplexEntityConfigOptions<T>,
+): CustomEntityConfig<T> {
     return {
         entityName: options.entityName,
         entityNamePlural: options.entityNamePlural,

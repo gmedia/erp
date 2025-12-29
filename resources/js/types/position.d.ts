@@ -1,4 +1,4 @@
-export interface Position {
+export interface Position extends Record<string, unknown> {
     id: number;
     name: string;
     created_at: string;

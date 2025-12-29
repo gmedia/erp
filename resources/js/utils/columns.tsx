@@ -38,7 +38,7 @@ export type LinkColumnOptions<T extends Record<string, unknown>> = ColumnBuilder
     linkClassName?: string;
 };
 
-export type ActionsColumnOptions<T> = {
+export type ActionsColumnOptions<T extends Record<string, unknown>> = {
     onEdit?: (row: T) => void;
     onDelete?: (row: T) => void;
     onView?: (row: T) => void;

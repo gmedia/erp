@@ -30,14 +30,13 @@ export type FormComponentType = 'simple' | 'complex';
 
 // Configuration interface for the CRUD page factory
 export interface EntityCrudConfig<
-    T extends { id: number; name: string },
-    FormData = unknown,
-> extends Omit<CustomEntityConfig<T, FormData>, 'columns'> {
+    T extends Record<string, unknown>,
+> extends Omit<CustomEntityConfig<T>, 'columns'> {
     columns: ColumnDef<T>[];
 }
 
 // Form props mapper factory - simplified to avoid generic complexity
-function createFormPropsMapper(config: EntityCrudConfig<any, any>) {
+function createFormPropsMapper(config: EntityCrudConfig<any>) {
     return (crudProps: {
         open: boolean;
         onOpenChange: (open: boolean) => void;
@@ -90,8 +89,7 @@ function createFormPropsMapper(config: EntityCrudConfig<any, any>) {
  */
 export function createEntityCrudPage<
     T extends { id: number; name: string },
-    FormData = unknown,
->(config: EntityCrudConfig<T, FormData>): () => React.JSX.Element {
+>(config: EntityCrudConfig<T>): () => React.JSX.Element {
     // Validate input configuration
     if (!config) {
         throw new Error('Entity configuration is required');

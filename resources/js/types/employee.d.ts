@@ -1,4 +1,4 @@
-export interface Employee {
+export interface Employee extends Record<string, unknown> {
     id: number;
     name: string;
     email: string;

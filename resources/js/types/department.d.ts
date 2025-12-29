@@ -1,4 +1,4 @@
-export interface Department {
+export interface Department extends Record<string, unknown> {
     id: number;
     name: string;
     created_at: string;
