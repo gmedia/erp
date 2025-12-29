@@ -63,10 +63,10 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     exportEndpoint: string;
     queryKey: string[];
     breadcrumbs: BreadcrumbItem[];
-    initialFilters: Record<string, unknown>;
+    initialFilters: Record<string, string | number | undefined>;
     columns: ColumnDef<T>[];
     filterFields: FieldDescriptor[];
-    formComponent: React.ComponentType<unknown>;
+    formComponent: React.ComponentType<any>;
     formType: FormComponentType;
     entityNameForSearch?: string;
     getDeleteMessage: (item: Record<string, unknown>) => string;
