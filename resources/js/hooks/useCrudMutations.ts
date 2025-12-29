@@ -27,10 +27,7 @@ export function useCrudMutations<Entity, FormData>({
     entityName,
     onSuccess,
     onError,
-}: UseCrudMutationsOptions): UseCrudMutationsResult<
-    Entity,
-    FormData
-> {
+}: UseCrudMutationsOptions): UseCrudMutationsResult<Entity, FormData> {
     const queryClient = useQueryClient();
 
     const createMutation = useMutation<Entity, Error, FormData>({

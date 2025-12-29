@@ -40,7 +40,13 @@ export function InputField<
                         <Input
                             type={type}
                             placeholder={placeholder}
-                            value={field.value as string | number | readonly string[] | undefined}
+                            value={
+                                field.value as
+                                    | string
+                                    | number
+                                    | readonly string[]
+                                    | undefined
+                            }
                             onChange={field.onChange}
                             onBlur={field.onBlur}
                             name={field.name}

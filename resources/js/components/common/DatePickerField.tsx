@@ -56,7 +56,10 @@ export function DatePickerField<
                                     )}
                                 >
                                     {field.value ? (
-                                        format(field.value as unknown as Date, 'PPP')
+                                        format(
+                                            field.value as unknown as Date,
+                                            'PPP',
+                                        )
                                     ) : (
                                         <span>{placeholder}</span>
                                     )}
@@ -68,7 +71,11 @@ export function DatePickerField<
                             <Calendar
                                 mode="single"
                                 selected={field.value as Date | undefined}
-                                onSelect={field.onChange as (date: Date | undefined) => void}
+                                onSelect={
+                                    field.onChange as (
+                                        date: Date | undefined,
+                                    ) => void
+                                }
                                 disabled={disabled}
                                 initialFocus
                             />

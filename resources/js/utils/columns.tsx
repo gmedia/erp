@@ -15,28 +15,32 @@ export type ColumnBuilderOptions<T extends Record<string, unknown>> = {
     className?: string;
 };
 
-export type DateColumnOptions<T extends Record<string, unknown>> = ColumnBuilderOptions<T> & {
-    dateFormat?: string;
-    locale?: string;
-};
+export type DateColumnOptions<T extends Record<string, unknown>> =
+    ColumnBuilderOptions<T> & {
+        dateFormat?: string;
+        locale?: string;
+    };
 
-export type CurrencyColumnOptions<T extends Record<string, unknown>> = ColumnBuilderOptions<T> & {
-    currency?: string;
-    locale?: string;
-    minimumFractionDigits?: number;
-    maximumFractionDigits?: number;
-};
+export type CurrencyColumnOptions<T extends Record<string, unknown>> =
+    ColumnBuilderOptions<T> & {
+        currency?: string;
+        locale?: string;
+        minimumFractionDigits?: number;
+        maximumFractionDigits?: number;
+    };
 
-export type NumberColumnOptions<T extends Record<string, unknown>> = ColumnBuilderOptions<T> & {
-    locale?: string;
-    minimumFractionDigits?: number;
-    maximumFractionDigits?: number;
-};
+export type NumberColumnOptions<T extends Record<string, unknown>> =
+    ColumnBuilderOptions<T> & {
+        locale?: string;
+        minimumFractionDigits?: number;
+        maximumFractionDigits?: number;
+    };
 
-export type LinkColumnOptions<T extends Record<string, unknown>> = ColumnBuilderOptions<T> & {
-    linkType: 'email' | 'phone' | 'url';
-    linkClassName?: string;
-};
+export type LinkColumnOptions<T extends Record<string, unknown>> =
+    ColumnBuilderOptions<T> & {
+        linkType: 'email' | 'phone' | 'url';
+        linkClassName?: string;
+    };
 
 export type ActionsColumnOptions<T extends Record<string, unknown>> = {
     onEdit?: (row: T) => void;
@@ -96,11 +100,7 @@ export function createTextColumn<T extends Record<string, unknown>>(
 export function createDateColumn<T extends Record<string, unknown>>(
     options: DateColumnOptions<T>,
 ): ColumnDef<T> {
-    const {
-        accessorKey,
-        label,
-        enableSorting = true,
-    } = options;
+    const { accessorKey, label, enableSorting = true } = options;
 
     const baseColumn: ColumnDef<T> = {
         accessorKey: accessorKey as string,
