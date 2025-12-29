@@ -35,13 +35,15 @@ export interface CrudPageConfig<
     T extends { id: number; name: string },
     FormData,
     FilterType extends FilterState = FilterState,
-> extends BaseCrudPageConfig<T, FormData, FilterType> {
+> extends BaseCrudPageConfig<T, FilterType> {
     // UI configuration
     entityNamePlural: string;
     breadcrumbs: BreadcrumbItem[];
 
     // Component configuration - using generic prop interfaces
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     DataTableComponent: React.ComponentType<any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     FormComponent: React.ComponentType<any>;
 
     // Props mapping functions to adapt generic props to component-specific props
@@ -66,7 +68,7 @@ export interface CrudPageConfig<
         filters: FilterType;
         onFilterChange: (filters: Partial<FilterType>) => void;
         onResetFilters: () => void;
-    }) => any;
+    }) => Record<string, unknown>;
 
     mapFormProps: (props: {
         open: boolean;
@@ -74,7 +76,7 @@ export interface CrudPageConfig<
         item?: T | null;
         onSubmit: (data: FormData) => void;
         isLoading: boolean;
-    }) => any;
+    }) => Record<string, unknown>;
 }
 
 interface CrudPageProps<

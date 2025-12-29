@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
 
-export interface UseCrudMutationsOptions<TData, FormData> {
+export interface UseCrudMutationsOptions<FormData> {
     endpoint: string;
     queryKey: string[];
     entityName: string;
@@ -27,7 +27,7 @@ export function useCrudMutations<Entity, FormData>({
     entityName,
     onSuccess,
     onError,
-}: UseCrudMutationsOptions<Entity, FormData>): UseCrudMutationsResult<
+}: UseCrudMutationsOptions<FormData>): UseCrudMutationsResult<
     Entity,
     FormData
 > {

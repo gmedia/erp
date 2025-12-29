@@ -26,7 +26,7 @@ export interface ApiResponse<T> {
     };
 }
 
-export interface UseCrudQueryOptions<Entity> {
+export interface UseCrudQueryOptions {
     endpoint: string;
     queryKey: string[];
     entityName: string;
@@ -42,7 +42,7 @@ export function useCrudQuery<Entity>({
     pagination,
     filters = {},
     enabled = true,
-}: UseCrudQueryOptions<Entity>): Omit<
+}: UseCrudQueryOptions): Omit<
     UseQueryResult<ApiResponse<Entity>, Error>,
     'data'
 > & {

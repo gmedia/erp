@@ -8,7 +8,6 @@ import { useCallback, useMemo, useState } from 'react';
 
 export interface CrudPageConfig<
     T extends { id: number; name: string },
-    FormData = unknown,
     FilterType extends FilterState = FilterState,
 > {
     // Basic configuration
@@ -93,7 +92,7 @@ export function useCrudPage<
     FormData,
     FilterType extends FilterState = FilterState,
 >(
-    config: CrudPageConfig<T, FormData, FilterType>,
+    config: CrudPageConfig<T, FilterType>,
 ): CrudPageState<T, FormData, FilterType> {
     // State management
     const [isFormOpen, setIsFormOpen] = useState(false);

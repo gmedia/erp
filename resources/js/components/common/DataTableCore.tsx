@@ -225,15 +225,11 @@ export function DataTable<T>({
         manualPagination: true,
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchValue(e.target.value);
-    };
-
-    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            onSearchChange(searchValue);
-        }
+        const value = e.target.value;
+        setSearchValue(value);
+        onSearchChange(value);
     };
 
     React.useEffect(() => {
