@@ -227,7 +227,14 @@ export function useCrudPage<
             from: meta.from ?? 0,
             to: meta.to ?? 0,
         }),
-        [meta.current_page, meta.per_page, meta.total, meta.last_page, meta.from, meta.to],
+        [
+            meta.current_page,
+            meta.per_page,
+            meta.total,
+            meta.last_page,
+            meta.from,
+            meta.to,
+        ],
     );
 
     const filterValue = useMemo(

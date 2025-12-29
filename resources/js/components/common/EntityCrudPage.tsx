@@ -16,7 +16,9 @@ export interface EntityCrudConfig<T extends Record<string, unknown>>
 }
 
 // Simplified form props mapper
-function createFormPropsMapper(config: EntityCrudConfig<Record<string, unknown>>) {
+function createFormPropsMapper(
+    config: EntityCrudConfig<Record<string, unknown>>,
+) {
     return (crudProps: {
         open: boolean;
         onOpenChange: (open: boolean) => void;
@@ -109,7 +111,9 @@ export function createEntityCrudPage<T extends { id: number; name: string }>(
                             entityName: config.entityNameForSearch,
                         }),
 
-                        mapFormProps: createFormPropsMapper(config as EntityCrudConfig<Record<string, unknown>>),
+                        mapFormProps: createFormPropsMapper(
+                            config as EntityCrudConfig<Record<string, unknown>>,
+                        ),
 
                         getDeleteMessage: config.getDeleteMessage,
                     }}

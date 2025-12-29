@@ -225,8 +225,6 @@ export function DataTable<T>({
         manualPagination: true,
     });
 
-
-
     React.useEffect(() => {
         setSearchValue(filterValue);
     }, [filterValue]);

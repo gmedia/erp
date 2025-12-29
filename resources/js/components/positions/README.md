@@ -20,6 +20,7 @@ export default createEntityCrudPage(positionConfig);
 ## Configuration
 
 Position configuration includes:
+
 - API endpoints (`/api/positions`)
 - Simple form with name field only
 - Basic table columns (select, name, created_at, updated_at, actions)

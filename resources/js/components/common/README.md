@@ -271,6 +271,7 @@ export default createEntityCrudPage(employeeConfig);
 ```
 
 This approach provides:
+
 - **Consistency**: Standardized patterns across all entities
 - **Maintainability**: Changes to common behavior affect all entities
 - **Extensibility**: New entities can be added with minimal code

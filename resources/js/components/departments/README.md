@@ -20,6 +20,7 @@ export default createEntityCrudPage(departmentConfig);
 ## Configuration
 
 Department configuration includes:
+
 - API endpoints (`/api/departments`)
 - Simple form with name field only
 - Basic table columns (select, name, created_at, updated_at, actions)

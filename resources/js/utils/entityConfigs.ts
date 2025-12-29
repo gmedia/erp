@@ -5,7 +5,9 @@ import { type BreadcrumbItem } from '@/types';
 import { type ColumnDef } from '@tanstack/react-table';
 
 // Base configuration interface for all entities
-export interface BaseEntityConfig<FilterType extends FilterState = FilterState> {
+export interface BaseEntityConfig<
+    FilterType extends FilterState = FilterState,
+> {
     entityName: string;
     entityNamePlural: string;
     apiEndpoint: string;

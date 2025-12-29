@@ -14,7 +14,9 @@ export const employeeFormSchema = z.object({
     phone: z
         .string()
         .min(10, { message: 'Phone number must be at least 10 digits.' })
-        .regex(/^[\d\s\-\+\(\)\.]+$/, { message: 'Please enter a valid phone number.' }),
+        .regex(/^[\d\s\-\+\(\)\.]+$/, {
+            message: 'Please enter a valid phone number.',
+        }),
     department: z.string().min(1, { message: 'Department is required.' }),
     position: z.string().min(1, { message: 'Position is required.' }),
     salary: z
@@ -23,8 +25,9 @@ export const employeeFormSchema = z.object({
         .transform((val) => val.replace(/[,\s]/g, ''))
         .pipe(
             z.string().regex(/^\d+(\.\d{1,2})?$/, {
-                message: 'Please enter a valid salary amount (e.g., 50000 or 50000.00).',
-            })
+                message:
+                    'Please enter a valid salary amount (e.g., 50000 or 50000.00).',
+            }),
         ),
     hire_date: z.date({ message: 'Hire date is required.' }),
 });
