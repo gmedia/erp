@@ -40,7 +40,11 @@ export function InputField<
                         <Input
                             type={type}
                             placeholder={placeholder}
-                            {...field}
+                            value={field.value as string | number | readonly string[] | undefined}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                            ref={field.ref}
                             {...props}
                         />
                     </FormControl>
