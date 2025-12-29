@@ -32,5 +32,10 @@ export interface SharedData {
     auth: {
         user: import('./user').User;
     };
+    name: string;
+    quote?: {
+        message: string;
+        author: string;
+    };
     [key: string]: unknown;
 }

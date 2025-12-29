@@ -11,7 +11,7 @@ export interface Employee extends Record<string, unknown> {
     updated_at: string;
 }
 
-export interface EmployeeFormData {
+export interface EmployeeFormData extends Record<string, unknown> {
     name: string;
     email: string;
     phone: string;

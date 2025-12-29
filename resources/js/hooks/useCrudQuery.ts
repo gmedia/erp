@@ -35,6 +35,12 @@ export interface UseCrudQueryOptions {
     enabled?: boolean;
 }
 
+export interface UseCrudQueryReturn<Entity>
+    extends Omit<UseQueryResult<ApiResponse<Entity>, Error>, 'data'> {
+    data: Entity[];
+    meta: ApiResponse<Entity>['meta'];
+}
+
 export function useCrudQuery<Entity>({
     endpoint,
     queryKey,
@@ -42,13 +48,7 @@ export function useCrudQuery<Entity>({
     pagination,
     filters = {},
     enabled = true,
-}: UseCrudQueryOptions): Omit<
-    UseQueryResult<ApiResponse<Entity>, Error>,
-    'data'
-> & {
-    data: Entity[];
-    meta: ApiResponse<Entity>['meta'];
-} {
+}: UseCrudQueryOptions): UseCrudQueryReturn<Entity> {
     const query = useQuery<ApiResponse<Entity>, Error>({
         queryKey: [...queryKey, pagination, filters],
         queryFn: async () => {

@@ -211,7 +211,8 @@ export function useCrudPage<
             config.getDeleteMessage ||
             ((item: T) => {
                 const name =
-                    (item as { name?: string }).name || `this ${config.entityName.toLowerCase()}`;
+                    (item as { name?: string }).name ||
+                    `this ${config.entityName.toLowerCase()}`;
                 return `This action cannot be undone. This will permanently delete ${name}'s ${config.entityName.toLowerCase()} record.`;
             }),
         [config.getDeleteMessage, config.entityName],

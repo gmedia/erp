@@ -24,6 +24,7 @@ export interface CustomEntityConfig<
     // Filter field descriptors
     filterFields: FieldDescriptor[];
     // Form component (can be a React component or import path)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     formComponent: React.ComponentType<any>;
     // Form type for proper prop mapping
     formType: FormComponentType;
@@ -74,7 +75,12 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
 
 // Enhanced helper function to create simple entity configs with consistent structure
 function createSimpleEntityConfig<
-    T extends { name: string; created_at: string; updated_at: string },
+    T extends {
+        id: number;
+        name: string;
+        created_at: string;
+        updated_at: string;
+    },
 >(options: SimpleEntityConfigOptions): CustomEntityConfig<T> {
     const { entityName, entityNamePlural, apiBase, filterPlaceholder } =
         options;
@@ -97,9 +103,7 @@ function createSimpleEntityConfig<
 }
 
 // Factory function for complex entity configs
-function createComplexEntityConfig<
-    T extends { id: number; name: string },
->(
+function createComplexEntityConfig<T extends { id: number; name: string }>(
     options: ComplexEntityConfigOptions<T>,
 ): CustomEntityConfig<T> {
     return {

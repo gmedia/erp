@@ -19,10 +19,8 @@ export interface SimpleFormProps extends BaseFormProps<{ name: string }> {
     entityName: string;
 }
 
-export interface ComplexFormProps<
-    T extends { id: number; name: string },
-    FormData = unknown,
-> extends BaseFormProps<FormData> {
+export interface ComplexFormProps<FormData = unknown>
+    extends BaseFormProps<FormData> {
     [key: string]: unknown; // Dynamic prop name based on entity
 }
 
@@ -36,11 +34,14 @@ export interface EntityCrudConfig<
 }
 
 // Form props mapper factory - simplified to avoid generic complexity
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createFormPropsMapper(config: EntityCrudConfig<any>) {
     return (crudProps: {
         open: boolean;
         onOpenChange: (open: boolean) => void;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         item?: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onSubmit: (data: any) => void;
         isLoading: boolean;
     }) => {
