@@ -56,7 +56,7 @@ export function DatePickerField<
                                     )}
                                 >
                                     {field.value ? (
-                                        format(field.value, 'PPP')
+                                        format(field.value as unknown as Date, 'PPP')
                                     ) : (
                                         <span>{placeholder}</span>
                                     )}
