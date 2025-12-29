@@ -31,15 +31,13 @@ class PositionExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
 
     /**
      * Build the query for the export.
-     *
-     * @return Builder
      */
     public function query(): Builder
     {
         $query = Position::query();
 
         // Apply name filter if provided
-        if (!empty($this->filters['name'])) {
+        if (! empty($this->filters['name'])) {
             $name = $this->filters['name'];
             $query->where('name', 'like', "%{$name}%");
         }
@@ -91,7 +89,6 @@ class PositionExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
     /**
      * Apply styles to the worksheet.
      *
-     * @param  Worksheet  $sheet
      * @return array<int, array<string, mixed>>
      */
     public function styles(Worksheet $sheet)

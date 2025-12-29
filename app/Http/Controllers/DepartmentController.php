@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Department;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use App\Exports\DepartmentExport;
+use App\Http\Requests\ExportDepartmentRequest;
 use App\Http\Requests\StoreDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
-use App\Http\Requests\ExportDepartmentRequest;
-use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\DepartmentCollection;
-use App\Exports\DepartmentExport;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\DepartmentResource;
+use App\Models\Department;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DepartmentController extends Controller
 {

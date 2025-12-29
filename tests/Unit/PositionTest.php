@@ -2,6 +2,7 @@
 
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Laravel\assertDatabaseHas;
 
 uses(RefreshDatabase::class);
@@ -13,7 +14,7 @@ test('factory creates a valid position', function () {
     assertDatabaseHas('positions', ['id' => $position->id]);
 
     expect($position->getAttributes())->toMatchArray([
-        'name'       => $position->name,
+        'name' => $position->name,
     ]);
 });
 

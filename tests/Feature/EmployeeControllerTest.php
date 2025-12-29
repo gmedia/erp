@@ -3,7 +3,13 @@
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\{getJson, postJson, putJson, deleteJson, assertDatabaseHas, assertDatabaseMissing};
+
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
+use function Pest\Laravel\deleteJson;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
 
@@ -39,13 +45,13 @@ test('store creates a new employee and returns 201', function () {
     $this->actingAs($user);
 
     $payload = [
-        'name'       => 'John Doe',
-        'email'      => 'john.doe@example.com',
-        'phone'      => '555-1234',
+        'name' => 'John Doe',
+        'email' => 'john.doe@example.com',
+        'phone' => '555-1234',
         'department' => 'engineering',
-        'position'   => 'Developer',
-        'salary'     => 75000.00,
-        'hire_date'  => '2023-01-15',
+        'position' => 'Developer',
+        'salary' => 75000.00,
+        'hire_date' => '2023-01-15',
     ];
 
     $response = postJson('/api/employees', $payload);

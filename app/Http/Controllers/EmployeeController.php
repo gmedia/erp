@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Employee;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use App\Http\Requests\ExportEmployeeRequest;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
-use App\Http\Requests\ExportEmployeeRequest;
-use App\Http\Resources\EmployeeResource;
 use App\Http\Resources\EmployeeCollection;
+use App\Http\Resources\EmployeeResource;
+use App\Models\Employee;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class EmployeeController extends Controller
 {
@@ -44,7 +44,7 @@ class EmployeeController extends Controller
         }
 
         // Apply department and position filters only when a search term is not provided.
-        if (!$request->filled('search')) {
+        if (! $request->filled('search')) {
             // Department filter - exact match
             if ($request->filled('department')) {
                 $query->where('department', 'like', $request->get('department'));

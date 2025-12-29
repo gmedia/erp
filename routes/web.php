@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PositionController;
-use App\Http\Controllers\DepartmentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 

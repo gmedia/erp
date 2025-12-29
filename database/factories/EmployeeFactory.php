@@ -23,15 +23,15 @@ class EmployeeFactory extends Factory
     public function definition(): array
     {
         return [
-            'name'       => $this->faker->name(),
-            'email'      => $this->faker->unique()->safeEmail(),
-            'phone'      => $this->faker->optional()->phoneNumber(),
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'phone' => $this->faker->optional()->phoneNumber(),
             'department' => $this->faker->randomElement(['Engineering', 'Marketing', 'Sales', 'HR', 'Finance']),
-            'position'   => $this->faker->jobTitle(),
+            'position' => $this->faker->jobTitle(),
             // Two‑decimal salary between 30 000 and 150 000
-            'salary'     => $this->faker->randomFloat(2, 30000, 150000),
+            'salary' => $this->faker->randomFloat(2, 30000, 150000),
             // Random hire date within the last 10 years
-            'hire_date'  => $this->faker->dateTimeBetween('-10 years', 'now')->format('Y-m-d'),
+            'hire_date' => $this->faker->dateTimeBetween('-10 years', 'now')->format('Y-m-d'),
         ];
     }
 }

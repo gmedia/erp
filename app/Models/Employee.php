@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon $hire_date
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Database\Factories\EmployeeFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newQuery()
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePosition($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereSalary($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Employee extends Model
@@ -58,7 +60,7 @@ class Employee extends Model
      */
     protected $casts = [
         'hire_date' => 'date',
-        'salary'    => 'decimal:2',
+        'salary' => 'decimal:2',
     ];
 
     /**

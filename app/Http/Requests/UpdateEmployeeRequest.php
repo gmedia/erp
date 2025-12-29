@@ -7,9 +7,9 @@ use Illuminate\Validation\Rule;
 
 /**
  * @property \App\Models\Employee $employee
+ *
  * @method \Illuminate\Routing\Route route($param = null)
  */
-
 class UpdateEmployeeRequest extends FormRequest
 {
     /**

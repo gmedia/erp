@@ -2,6 +2,7 @@
 
 use App\Models\Employee;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Laravel\assertDatabaseHas;
 
 uses(RefreshDatabase::class);
@@ -13,19 +14,19 @@ test('factory creates a valid employee', function () {
     assertDatabaseHas('employees', ['id' => $employee->id]);
 
     expect($employee->getAttributes())->toMatchArray([
-        'name'       => $employee->name,
-        'email'      => $employee->email,
-        'phone'      => $employee->phone,
+        'name' => $employee->name,
+        'email' => $employee->email,
+        'phone' => $employee->phone,
         'department' => $employee->department,
-        'position'   => $employee->position,
-        'salary'     => $employee->salary,
-        'hire_date'  => $employee->hire_date,
+        'position' => $employee->position,
+        'salary' => $employee->salary,
+        'hire_date' => $employee->hire_date,
     ]);
 });
 
 test('casts are applied correctly', function () {
     $employee = Employee::factory()->create([
-        'salary'    => 12345.67,
+        'salary' => 12345.67,
         'hire_date' => '2023-04-01',
     ]);
 

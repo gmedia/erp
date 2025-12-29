@@ -7,6 +7,7 @@ use Illuminate\Validation\Rule;
 
 /**
  * @property \App\Models\Position $position
+ *
  * @method \Illuminate\Routing\Route route($param = null)
  */
 class UpdatePositionRequest extends FormRequest

@@ -7,6 +7,7 @@ use Illuminate\Validation\Rule;
 
 /**
  * @property \App\Models\Department $department
+ *
  * @method \Illuminate\Routing\Route route($param = null)
  */
 class UpdateDepartmentRequest extends FormRequest
