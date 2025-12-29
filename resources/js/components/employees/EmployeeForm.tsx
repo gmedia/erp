@@ -25,9 +25,7 @@ interface EmployeeFormProps {
 /**
  * Employee form sections for better organization and maintainability
  */
-const renderEmployeeBasicInfoSection = (
-    form: ReturnType<typeof useForm<EmployeeFormData>>,
-) => (
+const renderEmployeeBasicInfoSection = () => (
     <>
         <NameField name="name" label="Name" placeholder="John Doe" />
         <InputField
@@ -44,9 +42,7 @@ const renderEmployeeBasicInfoSection = (
     </>
 );
 
-const renderEmployeeWorkInfoSection = (
-    form: ReturnType<typeof useForm<EmployeeFormData>>,
-) => (
+const renderEmployeeWorkInfoSection = () => (
     <>
         <SelectField
             name="department"
@@ -69,9 +65,7 @@ const renderEmployeeWorkInfoSection = (
     </>
 );
 
-const renderEmployeeHireDateSection = (
-    form: ReturnType<typeof useForm<EmployeeFormData>>,
-) => (
+const renderEmployeeHireDateSection = () => (
     <DatePickerField
         name="hire_date"
         label="Hire Date"
@@ -137,9 +131,9 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
             onSubmit={onSubmit}
             isLoading={isLoading}
         >
-            {renderEmployeeBasicInfoSection(form)}
-            {renderEmployeeWorkInfoSection(form)}
-            {renderEmployeeHireDateSection(form)}
+            {renderEmployeeBasicInfoSection()}
+            {renderEmployeeWorkInfoSection()}
+            {renderEmployeeHireDateSection()}
         </EntityForm>
     );
 });

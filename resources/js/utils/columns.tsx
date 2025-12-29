@@ -8,20 +8,20 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
 
 // Type definitions for better type safety
-export type ColumnBuilderOptions<T extends Record<string, unknown>> = {
+export type ColumnBuilderOptions<T = Record<string, unknown>> = {
     accessorKey: keyof T;
     label: string;
     enableSorting?: boolean;
     className?: string;
 };
 
-export type DateColumnOptions<T extends Record<string, unknown>> =
+export type DateColumnOptions<T = Record<string, unknown>> =
     ColumnBuilderOptions<T> & {
         dateFormat?: string;
         locale?: string;
     };
 
-export type CurrencyColumnOptions<T extends Record<string, unknown>> =
+export type CurrencyColumnOptions<T = Record<string, unknown>> =
     ColumnBuilderOptions<T> & {
         currency?: string;
         locale?: string;
@@ -29,20 +29,20 @@ export type CurrencyColumnOptions<T extends Record<string, unknown>> =
         maximumFractionDigits?: number;
     };
 
-export type NumberColumnOptions<T extends Record<string, unknown>> =
+export type NumberColumnOptions<T = Record<string, unknown>> =
     ColumnBuilderOptions<T> & {
         locale?: string;
         minimumFractionDigits?: number;
         maximumFractionDigits?: number;
     };
 
-export type LinkColumnOptions<T extends Record<string, unknown>> =
+export type LinkColumnOptions<T = Record<string, unknown>> =
     ColumnBuilderOptions<T> & {
         linkType: 'email' | 'phone' | 'url';
         linkClassName?: string;
     };
 
-export type ActionsColumnOptions<T extends Record<string, unknown>> = {
+export type ActionsColumnOptions<T = Record<string, unknown>> = {
     onEdit?: (row: T) => void;
     onDelete?: (row: T) => void;
     onView?: (row: T) => void;
@@ -74,7 +74,7 @@ export function createSortingHeader(label: string) {
 }
 
 // Basic text column with optional sorting
-export function createTextColumn<T extends Record<string, unknown>>(
+export function createTextColumn<T = Record<string, unknown>>(
     options: ColumnBuilderOptions<T>,
 ): ColumnDef<T> {
     const { accessorKey, label, enableSorting = true } = options;
@@ -97,7 +97,7 @@ export function createTextColumn<T extends Record<string, unknown>>(
 }
 
 // Date column with formatting
-export function createDateColumn<T extends Record<string, unknown>>(
+export function createDateColumn<T = Record<string, unknown>>(
     options: DateColumnOptions<T>,
 ): ColumnDef<T> {
     const { accessorKey, label, enableSorting = true } = options;
@@ -125,7 +125,7 @@ export function createDateColumn<T extends Record<string, unknown>>(
 }
 
 // Currency column with formatting
-export function createCurrencyColumn<T extends Record<string, unknown>>(
+export function createCurrencyColumn<T = Record<string, unknown>>(
     options: CurrencyColumnOptions<T>,
 ): ColumnDef<T> {
     const {
@@ -174,7 +174,7 @@ export function createCurrencyColumn<T extends Record<string, unknown>>(
 }
 
 // Number column with formatting
-export function createNumberColumn<T extends Record<string, unknown>>(
+export function createNumberColumn<T = Record<string, unknown>>(
     options: NumberColumnOptions<T>,
 ): ColumnDef<T> {
     const {
@@ -220,7 +220,7 @@ export function createNumberColumn<T extends Record<string, unknown>>(
 }
 
 // Link column for email, phone, or URL
-export function createLinkColumn<T extends Record<string, unknown>>(
+export function createLinkColumn<T = Record<string, unknown>>(
     options: LinkColumnOptions<T>,
 ): ColumnDef<T> {
     const {
@@ -272,7 +272,7 @@ export function createLinkColumn<T extends Record<string, unknown>>(
 }
 
 // Email column (convenience wrapper for createLinkColumn)
-export function createEmailColumn<T extends Record<string, unknown>>(
+export function createEmailColumn<T = Record<string, unknown>>(
     options: Omit<ColumnBuilderOptions<T>, 'accessorKey'> & {
         accessorKey: keyof T;
     },
@@ -284,7 +284,7 @@ export function createEmailColumn<T extends Record<string, unknown>>(
 }
 
 // Phone column (convenience wrapper for createLinkColumn)
-export function createPhoneColumn<T extends Record<string, unknown>>(
+export function createPhoneColumn<T = Record<string, unknown>>(
     options: Omit<ColumnBuilderOptions<T>, 'accessorKey'> & {
         accessorKey: keyof T;
     },
@@ -308,7 +308,7 @@ export function createUrlColumn<T extends Record<string, unknown>>(
 }
 
 // Actions column for edit/delete/view operations
-export function createActionsColumn<T extends Record<string, unknown>>(
+export function createActionsColumn<T = Record<string, unknown>>(
     options: ActionsColumnOptions<T> = {},
 ): ColumnDef<T> {
     const { onEdit, onDelete, onView, enableHiding = false } = options;
@@ -332,7 +332,7 @@ export function createActionsColumn<T extends Record<string, unknown>>(
 
 // Select column for row selection (checkbox)
 export function createSelectColumn<
-    T extends Record<string, unknown>,
+    T = Record<string, unknown>,
 >(): ColumnDef<T> {
     return {
         id: 'select',
@@ -361,7 +361,7 @@ export function createSelectColumn<
 }
 
 // Badge column for status-like values
-export function createBadgeColumn<T extends Record<string, unknown>>(
+export function createBadgeColumn<T = Record<string, unknown>>(
     options: ColumnBuilderOptions<T> & {
         colorMap?: Record<string, string>;
         defaultColor?: string;
@@ -407,7 +407,7 @@ export function createBadgeColumn<T extends Record<string, unknown>>(
 }
 
 // Simple text column without sorting (alias for createTextColumn with enableSorting: false)
-export const createSimpleTextColumn = <T extends Record<string, unknown>>(
+export const createSimpleTextColumn = <T = Record<string, unknown>,>(
     options: Omit<ColumnBuilderOptions<T>, 'enableSorting'>,
 ): ColumnDef<T> => createTextColumn<T>({ ...options, enableSorting: false });
 

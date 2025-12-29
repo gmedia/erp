@@ -21,7 +21,7 @@ export interface BaseEntityConfig<
 
 // Configuration for entities with custom components and stricter typing
 export interface CustomEntityConfig<
-    T extends Record<string, unknown> = Record<string, unknown>,
+    T = Record<string, unknown>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     FormData = Record<string, unknown>,
     FilterType extends FilterState = FilterState,
@@ -113,7 +113,7 @@ function createSimpleEntityConfig<
 }
 
 // Factory function for complex entity configs
-function createComplexEntityConfig<T extends Record<string, unknown>>(
+function createComplexEntityConfig<T = Record<string, unknown>>(
     options: ComplexEntityConfigOptions<T>,
 ): CustomEntityConfig<T> {
     return {
@@ -161,7 +161,7 @@ export const employeeConfig = createComplexEntityConfig({
         department: '',
         position: '',
     },
-    columns: employeeColumns as ColumnDef<Record<string, unknown>>[],
+    columns: employeeColumns,
     filterFields: createEmployeeFilterFields(),
     formComponent: EmployeeForm,
     formType: 'complex',

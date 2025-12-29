@@ -10,7 +10,7 @@ import React from 'react';
 export type FormComponentType = 'simple' | 'complex';
 
 // Configuration interface for the CRUD page factory
-export interface EntityCrudConfig<T extends Record<string, unknown>>
+export interface EntityCrudConfig<T = Record<string, unknown>>
     extends Omit<CustomEntityConfig<T>, 'columns'> {
     columns: ColumnDef<T>[];
 }
@@ -69,7 +69,7 @@ function createFormPropsMapper(
  * export default createEntityCrudPage(employeeConfig);
  * ```
  */
-export function createEntityCrudPage<T extends { id: number; name: string }>(
+export function createEntityCrudPage<T = Record<string, unknown>>(
     config: EntityCrudConfig<T>,
 ): () => React.JSX.Element {
     // Validate input configuration
@@ -96,8 +96,8 @@ export function createEntityCrudPage<T extends { id: number; name: string }>(
                         entityName: config.entityName,
                         entityNamePlural: config.entityNamePlural,
                         apiEndpoint: config.apiEndpoint,
-                        queryKey: config.queryKey,
-                        breadcrumbs: config.breadcrumbs,
+                        queryKey: [...config.queryKey],
+                        breadcrumbs: [...config.breadcrumbs],
                         initialFilters: config.initialFilters,
 
                         DataTableComponent: DataTable,

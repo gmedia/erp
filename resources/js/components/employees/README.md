@@ -47,6 +47,7 @@ export default createEntityCrudPage(employeeConfig);
 ## Recent Improvements
 
 ### EmployeeForm Refactoring
+
 - **Modular Form Sections**: Form is now organized into logical sections (Basic Info, Work Info, Hire Date)
 - **Performance Optimization**: Added memoization to prevent unnecessary re-renders
 - **Better Maintainability**: Separated form logic from presentation components
