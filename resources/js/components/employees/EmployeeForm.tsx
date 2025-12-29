@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useMemo } from 'react';
 
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
@@ -57,9 +58,14 @@ export function EmployeeForm({
     onSubmit,
     isLoading = false,
 }: EmployeeFormProps) {
+    const defaultValues = useMemo(
+        () => getEmployeeFormDefaults(employee),
+        [employee],
+    );
+
     const form = useForm<EmployeeFormData>({
         resolver: zodResolver(employeeFormSchema),
-        defaultValues: getEmployeeFormDefaults(employee),
+        defaultValues,
     });
 
     return (

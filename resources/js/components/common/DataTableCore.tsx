@@ -225,7 +225,6 @@ export function DataTable<T>({
         manualPagination: true,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearchValue(value);
