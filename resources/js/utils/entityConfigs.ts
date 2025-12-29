@@ -24,6 +24,9 @@ export interface CustomEntityConfig<
     // Filter field descriptors
     filterFields: FieldDescriptor[];
     // Form component (can be a React component or import path)
+
+
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     formComponent: React.ComponentType<any>;
     // Form type for proper prop mapping
@@ -67,6 +70,7 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     initialFilters: Record<string, string | number | undefined>;
     columns: ColumnDef<T>[];
     filterFields: FieldDescriptor[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     formComponent: React.ComponentType<any>;
     formType: FormComponentType;
     entityNameForSearch?: string;

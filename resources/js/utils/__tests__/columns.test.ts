@@ -82,4 +82,8 @@ const testColumns = [
 ];
 
 // This file is for type checking only - it should compile without errors
-console.log('Type checking passed for column utilities');
+// Use the columns to avoid unused variable warnings
+console.log('Department columns count:', departmentColumns.length);
+console.log('Employee columns count:', employeeColumns.length);
+console.log('Position columns count:', positionColumns.length);
+console.log('Test columns count:', testColumns.length);

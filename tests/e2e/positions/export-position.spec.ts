@@ -3,9 +3,9 @@ import { login, createPosition } from '../helpers';
 import * as fs from 'fs';
 import * as path from 'path';
 
-test('export positions to Excel works correctly', async ({ page, context }) => {
+test('export positions to Excel works correctly', async ({ page }) => {
   await login(page);
-  const name = await createPosition(page);
+  await createPosition(page);
   await page.goto('/positions');
 
   const exportBtn = page.getByRole('button', { name: /Export/i });

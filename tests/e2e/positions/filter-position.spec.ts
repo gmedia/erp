@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
-import { login, createPosition, searchPosition } from '../helpers';
+import { login, createPosition } from '../helpers';
 
 test('filter positions end‑to‑end', async ({ page }) => {
   // Log in
   await login(page);
 
   // Create positions with distinct department/position combos
-  const pos1 = await createPosition(page);
-  const pos2 = await createPosition(page);
+  await createPosition(page);
+  await createPosition(page);
   const pos3 = await createPosition(page);
 
   // Open filter dialog

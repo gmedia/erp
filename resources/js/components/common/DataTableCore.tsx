@@ -225,11 +225,7 @@ export function DataTable<T>({
         manualPagination: true,
     });
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setSearchValue(value);
-        onSearchChange(value);
-    };
+
 
     React.useEffect(() => {
         setSearchValue(filterValue);
