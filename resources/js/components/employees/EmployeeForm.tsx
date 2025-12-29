@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -21,6 +21,70 @@ interface EmployeeFormProps {
     onSubmit: (data: EmployeeFormData) => void;
     isLoading?: boolean;
 }
+
+/**
+ * Employee form sections for better organization and maintainability
+ */
+const renderEmployeeBasicInfoSection = (
+    form: ReturnType<typeof useForm<EmployeeFormData>>,
+) => (
+    <>
+        <NameField name="name" label="Name" placeholder="John Doe" />
+        <InputField
+            control={form.control}
+            name="email"
+            label="Email"
+            type="email"
+            placeholder="john.doe@example.com"
+        />
+        <InputField
+            control={form.control}
+            name="phone"
+            label="Phone"
+            placeholder="+1 (555) 123-4567"
+        />
+    </>
+);
+
+const renderEmployeeWorkInfoSection = (
+    form: ReturnType<typeof useForm<EmployeeFormData>>,
+) => (
+    <>
+        <SelectField
+            name="department"
+            label="Department"
+            options={DEPARTMENTS}
+            placeholder="Select a department"
+        />
+        <SelectField
+            name="position"
+            label="Position"
+            options={POSITIONS}
+            placeholder="Select a position"
+        />
+        <InputField
+            control={form.control}
+            name="salary"
+            label="Salary"
+            type="number"
+            placeholder="50000"
+        />
+    </>
+);
+
+const renderEmployeeHireDateSection = (
+    form: ReturnType<typeof useForm<EmployeeFormData>>,
+) => (
+    <DatePickerField
+        control={form.control}
+        name="hire_date"
+        label="Hire Date"
+        placeholder="Pick a date"
+        disabled={(date: Date) =>
+            date > new Date() || date < new Date('1900-01-01')
+        }
+    />
+);
 
 /**
  * Helper function to get default values for employee form
@@ -51,13 +115,13 @@ const getEmployeeFormDefaults = (
     };
 };
 
-export function EmployeeForm({
+export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
     open,
     onOpenChange,
     employee,
     onSubmit,
     isLoading = false,
-}: EmployeeFormProps) {
+}) {
     const defaultValues = useMemo(
         () => getEmployeeFormDefaults(employee),
         [employee],
@@ -77,54 +141,9 @@ export function EmployeeForm({
             onSubmit={onSubmit}
             isLoading={isLoading}
         >
-            <NameField name="name" label="Name" placeholder="John Doe" />
-
-            <InputField
-                control={form.control}
-                name="email"
-                label="Email"
-                type="email"
-                placeholder="john.doe@example.com"
-            />
-
-            <InputField
-                control={form.control}
-                name="phone"
-                label="Phone"
-                placeholder="+1 (555) 123-4567"
-            />
-
-            <SelectField
-                name="department"
-                label="Department"
-                options={DEPARTMENTS}
-                placeholder="Select a department"
-            />
-
-            <SelectField
-                name="position"
-                label="Position"
-                options={POSITIONS}
-                placeholder="Select a position"
-            />
-
-            <InputField
-                control={form.control}
-                name="salary"
-                label="Salary"
-                type="number"
-                placeholder="50000"
-            />
-
-            <DatePickerField
-                control={form.control}
-                name="hire_date"
-                label="Hire Date"
-                placeholder="Pick a date"
-                disabled={(date: Date) =>
-                    date > new Date() || date < new Date('1900-01-01')
-                }
-            />
+            {renderEmployeeBasicInfoSection(form)}
+            {renderEmployeeWorkInfoSection(form)}
+            {renderEmployeeHireDateSection(form)}
         </EntityForm>
     );
-}
+});

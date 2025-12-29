@@ -406,17 +406,10 @@ export function createBadgeColumn<T extends Record<string, unknown>>(
     };
 }
 
-// Simple text column without sorting
-export function createSimpleTextColumn<T extends Record<string, unknown>>(
-    options: ColumnBuilderOptions<T>,
-): ColumnDef<T> {
-    const { accessorKey, label } = options;
-
-    return {
-        accessorKey: accessorKey as string,
-        header: label,
-    };
-}
+// Simple text column without sorting (alias for createTextColumn with enableSorting: false)
+export const createSimpleTextColumn = <T extends Record<string, unknown>>(
+    options: Omit<ColumnBuilderOptions<T>, 'enableSorting'>,
+): ColumnDef<T> => createTextColumn<T>({ ...options, enableSorting: false });
 
 // Simple entity columns for basic CRUD entities (departments, positions)
 export function createSimpleEntityColumns<
