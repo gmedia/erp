@@ -155,7 +155,12 @@ abstract class BaseCrudController extends Controller
             'sort_direction' => $validated['sort_direction'] ?? null,
         ];
 
-        // Add name filter if it exists in validated data
+        // Add search filter if it exists in validated data (used by frontend)
+        if (isset($validated['search'])) {
+            $filters['search'] = $validated['search'];
+        }
+
+        // Add name filter if it exists in validated data (fallback for direct API calls)
         if (isset($validated['name'])) {
             $filters['name'] = $validated['name'];
         }

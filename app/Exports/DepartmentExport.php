@@ -36,7 +36,13 @@ class DepartmentExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
     {
         $query = Department::query();
 
-        // Apply name filter if provided
+        // Apply search filter if provided (used by frontend)
+        if (! empty($this->filters['search'])) {
+            $search = $this->filters['search'];
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        // Apply name filter if provided (fallback for direct API calls)
         if (! empty($this->filters['name'])) {
             $name = $this->filters['name'];
             $query->where('name', 'like', "%{$name}%");
