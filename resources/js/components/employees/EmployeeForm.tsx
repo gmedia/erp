@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -121,6 +121,11 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
         resolver: zodResolver(employeeFormSchema),
         defaultValues,
     });
+
+    // Reset form when employee changes (for edit mode)
+    useEffect(() => {
+        form.reset(defaultValues);
+    }, [form, defaultValues]);
 
     return (
         <EntityForm

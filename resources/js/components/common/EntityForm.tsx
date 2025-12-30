@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useEffect } from 'react';
 
 import NameField from '@/components/common/NameField';
 import { Button } from '@/components/ui/button';
@@ -124,8 +125,13 @@ export function SimpleEntityForm({
 }: SimpleEntityFormProps) {
     const form = useForm<SimpleEntityFormData>({
         resolver: zodResolver(simpleEntitySchema),
-        defaultValues: entity ? { name: entity.name } : undefined,
+        defaultValues: entity ? { name: entity.name } : { name: '' },
     });
+
+    // Reset form when entity changes (for edit mode)
+    useEffect(() => {
+        form.reset(entity ? { name: entity.name } : { name: '' });
+    }, [form, entity]);
 
     return (
         <EntityForm
