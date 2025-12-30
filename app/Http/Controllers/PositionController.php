@@ -9,65 +9,54 @@ use App\Http\Requests\UpdatePositionRequest;
 use App\Http\Resources\PositionCollection;
 use App\Http\Resources\PositionResource;
 use App\Models\Position;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 
-class PositionController extends Controller
+class PositionController extends BaseCrudController
 {
     /**
-     * Display a listing of the positions with optional search and sorting.
+     * Get the model class for this controller
      */
-    public function index(Request $request): JsonResponse
+    protected function getModelClass(): string
     {
-        $perPage = $request->get('per_page', 15);
-        $page = $request->get('page', 1);
-
-        // Validate sorting parameters
-        $allowedSorts = ['id', 'name', 'created_at', 'updated_at'];
-        $request->validate([
-            'sort_by' => ['sometimes', 'in:' . implode(',', $allowedSorts)],
-            'sort_direction' => ['sometimes', 'in:asc,desc'],
-        ]);
-
-        $query = Position::query();
-
-        // Search by name
-        if ($request->filled('search')) {
-            $search = $request->get('search');
-            $query->where('name', 'like', "%{$search}%");
-        }
-
-        // Apply sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
-        if (in_array($sortBy, $allowedSorts)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
-
-        $positions = $query->paginate($perPage, ['*'], 'page', $page);
-
-        return (new PositionCollection($positions))->response();
+        return Position::class;
     }
 
     /**
-     * Store a newly created position in storage.
+     * Get the resource class for this controller
      */
-    public function store(StorePositionRequest $request): JsonResponse
+    protected function getResourceClass(): string
     {
-        $position = Position::create($request->validated());
+        return PositionResource::class;
+    }
 
-        return (new PositionResource($position))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
+    /**
+     * Get the collection class for this controller
+     */
+    protected function getCollectionClass(): string
+    {
+        return PositionCollection::class;
+    }
+
+    /**
+     * Get the export class for this controller
+     */
+    protected function getExportClass(): string
+    {
+        return PositionExport::class;
+    }
+
+    /**
+     * Get the export request class for this controller
+     */
+    protected function getExportRequestClass(): string
+    {
+        return ExportPositionRequest::class;
     }
 
     /**
      * Display the specified position.
      */
-    public function show(Position $position): JsonResponse
+    public function show(Position $position)
     {
         return (new PositionResource($position))->response();
     }
@@ -75,53 +64,18 @@ class PositionController extends Controller
     /**
      * Update the specified position in storage.
      */
-    public function update(UpdatePositionRequest $request, Position $position): JsonResponse
+    public function update(UpdatePositionRequest $request, Position $position)
     {
         $position->update($request->validated());
-
         return (new PositionResource($position))->response();
     }
 
     /**
      * Remove the specified position from storage.
      */
-    public function destroy(Position $position): JsonResponse
+    public function destroy(Position $position)
     {
         $position->delete();
-
-        return response()->json(null, Response::HTTP_NO_CONTENT);
-    }
-
-    /**
-     * Export positions to Excel based on optional filters.
-     */
-    public function export(ExportPositionRequest $request): JsonResponse
-    {
-        $validated = $request->validated();
-
-        $filters = [
-            'name' => $validated['name'] ?? null,
-            'sort_by' => $validated['sort_by'] ?? null,
-            'sort_direction' => $validated['sort_direction'] ?? null,
-        ];
-
-        // Remove null values
-        $filters = array_filter($filters);
-
-        // Generate filename
-        $filename = 'positions_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-        $filePath = 'exports/' . $filename;
-
-        // Create export and store on public disk
-        $export = new PositionExport($filters);
-        Excel::store($export, $filePath, 'public');
-
-        // Generate public URL
-        $url = Storage::url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+        return response()->json(null, 204);
     }
 }

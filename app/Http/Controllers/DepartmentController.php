@@ -9,65 +9,54 @@ use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Resources\DepartmentCollection;
 use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 
-class DepartmentController extends Controller
+class DepartmentController extends BaseCrudController
 {
     /**
-     * Display a listing of the departments with optional search and sorting.
+     * Get the model class for this controller
      */
-    public function index(Request $request): JsonResponse
+    protected function getModelClass(): string
     {
-        $perPage = $request->get('per_page', 15);
-        $page = $request->get('page', 1);
-
-        // Validate sorting parameters
-        $allowedSorts = ['id', 'name', 'created_at', 'updated_at'];
-        $request->validate([
-            'sort_by' => ['sometimes', 'in:' . implode(',', $allowedSorts)],
-            'sort_direction' => ['sometimes', 'in:asc,desc'],
-        ]);
-
-        $query = Department::query();
-
-        // Search by name
-        if ($request->filled('search')) {
-            $search = $request->get('search');
-            $query->where('name', 'like', "%{$search}%");
-        }
-
-        // Apply sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
-        if (in_array($sortBy, $allowedSorts)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
-
-        $departments = $query->paginate($perPage, ['*'], 'page', $page);
-
-        return (new DepartmentCollection($departments))->response();
+        return Department::class;
     }
 
     /**
-     * Store a newly created department in storage.
+     * Get the resource class for this controller
      */
-    public function store(StoreDepartmentRequest $request): JsonResponse
+    protected function getResourceClass(): string
     {
-        $department = Department::create($request->validated());
+        return DepartmentResource::class;
+    }
 
-        return (new DepartmentResource($department))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
+    /**
+     * Get the collection class for this controller
+     */
+    protected function getCollectionClass(): string
+    {
+        return DepartmentCollection::class;
+    }
+
+    /**
+     * Get the export class for this controller
+     */
+    protected function getExportClass(): string
+    {
+        return DepartmentExport::class;
+    }
+
+    /**
+     * Get the export request class for this controller
+     */
+    protected function getExportRequestClass(): string
+    {
+        return ExportDepartmentRequest::class;
     }
 
     /**
      * Display the specified department.
      */
-    public function show(Department $department): JsonResponse
+    public function show(Department $department)
     {
         return (new DepartmentResource($department))->response();
     }
@@ -75,53 +64,18 @@ class DepartmentController extends Controller
     /**
      * Update the specified department in storage.
      */
-    public function update(UpdateDepartmentRequest $request, Department $department): JsonResponse
+    public function update(UpdateDepartmentRequest $request, Department $department)
     {
         $department->update($request->validated());
-
         return (new DepartmentResource($department))->response();
     }
 
     /**
      * Remove the specified department from storage.
      */
-    public function destroy(Department $department): JsonResponse
+    public function destroy(Department $department)
     {
         $department->delete();
-
-        return response()->json(null, Response::HTTP_NO_CONTENT);
-    }
-
-    /**
-     * Export departments to Excel based on optional filters.
-     */
-    public function export(ExportDepartmentRequest $request): JsonResponse
-    {
-        $validated = $request->validated();
-
-        $filters = [
-            'name' => $validated['name'] ?? null,
-            'sort_by' => $validated['sort_by'] ?? null,
-            'sort_direction' => $validated['sort_direction'] ?? null,
-        ];
-
-        // Remove null values
-        $filters = array_filter($filters);
-
-        // Generate filename
-        $filename = 'departments_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-        $filePath = 'exports/' . $filename;
-
-        // Create export and store on public disk
-        $export = new DepartmentExport($filters);
-        Excel::store($export, $filePath, 'public');
-
-        // Generate public URL
-        $url = Storage::url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+        return response()->json(null, 204);
     }
 }
