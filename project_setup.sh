@@ -10,4 +10,5 @@ npm install
 cp .env.example .env
 
 # Create symbolic link for storage
+rm -rf public/storage
 php artisan storage:link

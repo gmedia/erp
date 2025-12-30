@@ -47,7 +47,7 @@
     ```
 - Run Playwright e2e test
     ```
-    sail npm run test:e2e
+    npm run test:e2e
     ```
 - Start analyzing using the SonarQube scanner
     ```
