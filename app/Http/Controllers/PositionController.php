@@ -9,9 +9,10 @@ use App\Http\Requests\UpdatePositionRequest;
 use App\Http\Resources\PositionCollection;
 use App\Http\Resources\PositionResource;
 use App\Models\Position;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class PositionController extends BaseCrudController
+class PositionController extends Controller
 {
     /**
      * Get the model class for this controller
@@ -51,6 +52,88 @@ class PositionController extends BaseCrudController
     protected function getExportRequestClass(): string
     {
         return ExportPositionRequest::class;
+    }
+
+    /**
+     * Display a listing of the positions.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $perPage = $request->get('per_page', 15);
+        $page = $request->get('page', 1);
+
+        $query = Position::query();
+
+        // Apply search
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        // Apply sorting
+        $allowedSorts = ['id', 'name', 'created_at', 'updated_at'];
+        $request->validate([
+            'sort_by' => ['sometimes', 'in:' . implode(',', $allowedSorts)],
+            'sort_direction' => ['sometimes', 'in:asc,desc'],
+        ]);
+
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        if (in_array($sortBy, $allowedSorts)) {
+            $query->orderBy($sortBy, $sortDirection);
+        }
+
+        $positions = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return (new PositionCollection($positions))->response();
+    }
+
+    /**
+     * Store a newly created position in storage.
+     */
+    public function store(StorePositionRequest $request): JsonResponse
+    {
+        $position = Position::create($request->validated());
+
+        return (new PositionResource($position))
+            ->response()
+            ->setStatusCode(201);
+    }
+
+    /**
+     * Export positions to Excel based on filters.
+     */
+    public function export(ExportPositionRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+
+        $filters = [
+            'name' => $validated['name'] ?? null,
+            'sort_by' => $validated['sort_by'] ?? 'created_at',
+            'sort_direction' => $validated['sort_direction'] ?? 'desc',
+        ];
+
+        // Remove null values
+        $filters = array_filter($filters);
+
+        // Generate filename with timestamp
+        $filename = 'positions_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+
+        // Store the file in storage/app/public/exports/
+        $filePath = 'exports/' . $filename;
+
+        // Generate the Excel file using public disk
+        $export = new \App\Exports\PositionExport($filters);
+        \Maatwebsite\Excel\Facades\Excel::store($export, $filePath, 'public');
+
+        // Generate the public URL for download
+        $url = \Illuminate\Support\Facades\Storage::url($filePath);
+
+        return response()->json([
+            'url' => $url,
+            'filename' => $filename,
+        ]);
     }
 
     /**
