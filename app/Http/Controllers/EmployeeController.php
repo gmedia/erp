@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Actions\ExportEmployeesAction;
 use App\Http\Requests\ExportEmployeeRequest;
+use App\Http\Requests\IndexEmployeeRequest;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Resources\EmployeeCollection;
 use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class EmployeeController extends Controller
@@ -36,10 +36,10 @@ class EmployeeController extends Controller
     /**
      * Display a listing of the employees with filtering and sorting.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\IndexEmployeeRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index(IndexEmployeeRequest $request): JsonResponse
     {
         ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 

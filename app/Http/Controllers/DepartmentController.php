@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Actions\ExportDepartmentsAction;
 use App\Http\Requests\ExportDepartmentRequest;
+use App\Http\Requests\IndexDepartmentRequest;
 use App\Http\Requests\StoreDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Resources\DepartmentCollection;
 use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
@@ -35,10 +35,10 @@ class DepartmentController extends Controller
     /**
      * Display a listing of the departments.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\IndexDepartmentRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index(IndexDepartmentRequest $request): JsonResponse
     {
         ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 

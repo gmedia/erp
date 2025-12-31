@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Actions\ExportPositionsAction;
 use App\Http\Requests\ExportPositionRequest;
+use App\Http\Requests\IndexPositionRequest;
 use App\Http\Requests\StorePositionRequest;
 use App\Http\Requests\UpdatePositionRequest;
 use App\Http\Resources\PositionCollection;
 use App\Http\Resources\PositionResource;
 use App\Models\Position;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class PositionController extends Controller
 {
@@ -35,10 +35,10 @@ class PositionController extends Controller
     /**
      * Display a listing of the positions.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\IndexPositionRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index(IndexPositionRequest $request): JsonResponse
     {
         ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 
