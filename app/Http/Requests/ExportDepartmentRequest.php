@@ -20,8 +20,8 @@ class ExportDepartmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['nullable', 'string'],
-            'sort_by' => ['nullable', 'string', 'in:name,created_at,updated_at'],
+            'search' => ['nullable', 'string'],
+            'sort_by' => ['nullable', 'string', 'in:id,name,created_at,updated_at'],
             'sort_direction' => ['nullable', 'in:asc,desc'],
         ];
     }

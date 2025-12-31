@@ -78,7 +78,7 @@ class DepartmentController extends Controller
         $validated = $request->validated();
 
         $filters = [
-            'name' => $validated['name'] ?? null,
+            'search' => $validated['search'] ?? null,
             'sort_by' => $validated['sort_by'] ?? 'created_at',
             'sort_direction' => $validated['sort_direction'] ?? 'desc',
         ];

@@ -129,10 +129,6 @@ class EmployeeController extends Controller
             'search' => $validated['search'] ?? null,
             'department' => $validated['department'] ?? null,
             'position' => $validated['position'] ?? null,
-            'min_salary' => $validated['min_salary'] ?? null,
-            'max_salary' => $validated['max_salary'] ?? null,
-            'hire_date_from' => $validated['hire_date_from'] ?? null,
-            'hire_date_to' => $validated['hire_date_to'] ?? null,
             'sort_by' => $validated['sort_by'] ?? 'created_at',
             'sort_direction' => $validated['sort_direction'] ?? 'desc',
         ];
