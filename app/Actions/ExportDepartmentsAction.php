@@ -2,8 +2,11 @@
 
 namespace App\Actions;
 
+use App\Domain\DepartmentFilterService;
 use App\Exports\DepartmentExport;
 use App\Http\Requests\ExportDepartmentRequest;
+use App\Models\Department;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -12,6 +15,10 @@ use Maatwebsite\Excel\Facades\Excel;
  */
 class ExportDepartmentsAction
 {
+    public function __construct(
+        private DepartmentFilterService $filterService
+    ) {}
+
     /**
      * Execute the department export action
      *
@@ -22,14 +29,18 @@ class ExportDepartmentsAction
     {
         $validated = $request->validated();
 
-        $filters = [
-            'search' => $validated['search'] ?? null,
-            'sort_by' => $validated['sort_by'] ?? 'created_at',
-            'sort_direction' => $validated['sort_direction'] ?? 'desc',
-        ];
+        $query = Department::query();
 
-        // Remove null values
-        $filters = array_filter($filters);
+        if ($request->filled('search')) {
+            $this->filterService->applySearch($query, $validated['search'], ['name']);
+        }
+
+        $this->filterService->applySorting(
+            $query,
+            $validated['sort_by'] ?? 'created_at',
+            $validated['sort_direction'] ?? 'desc',
+            ['id', 'name', 'created_at', 'updated_at']
+        );
 
         // Generate filename with timestamp
         $filename = 'departments_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
@@ -38,7 +49,7 @@ class ExportDepartmentsAction
         $filePath = 'exports/' . $filename;
 
         // Generate the Excel file using public disk
-        $export = new \App\Exports\DepartmentExport($filters);
+        $export = new DepartmentExport([], $query);
         Excel::store($export, $filePath, 'public');
 
         // Generate the public URL for download

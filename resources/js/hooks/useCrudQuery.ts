@@ -88,8 +88,9 @@ export function useCrudQuery<Entity>({
         enabled,
     });
 
+    const { data: _, ...queryRest } = query;
     return {
-        ...query,
+        ...queryRest,
         data: query.data?.data || [],
         meta: query.data?.meta || {
             current_page: 1,

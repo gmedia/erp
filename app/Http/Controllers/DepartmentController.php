@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 
-use App\Actions\CreateDepartmentAction;
 use App\Actions\ExportDepartmentsAction;
-use App\Actions\IndexDepartmentsAction;
-use App\Actions\UpdateDepartmentAction;
 use App\Domain\DepartmentFilterService;
 use App\Http\Requests\ExportDepartmentRequest;
 use App\Http\Requests\IndexDepartmentRequest;
@@ -23,12 +20,26 @@ class DepartmentController extends Controller
     /**
      * Display a listing of the departments.
      *
+     * @queryParam search string Search departments by name. Example: marketing
+     * @queryParam sort_by string Sort by field. Enum: id,name,created_at,updated_at Example: created_at
+     * @queryParam sort_direction string Sort direction. Enum: asc,desc Example: desc
+     * @queryParam per_page int Number of items per page. Example: 15
+     * @queryParam page int Page number. Example: 1
+     *
      * @param \App\Http\Requests\IndexDepartmentRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(IndexDepartmentRequest $request): JsonResponse
     {
-        $departments = (new IndexDepartmentsAction(app(DepartmentFilterService::class)))->execute($request);
+        $query = Department::query();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', "%{$request->get('search')}%");
+        }
+
+        $query->orderBy($request->get('sort_by', 'created_at'), $request->get('sort_direction', 'desc'));
+
+        $departments = $query->paginate($request->get('per_page', 15));
 
         return (new DepartmentCollection($departments))->response();
     }
@@ -36,12 +47,14 @@ class DepartmentController extends Controller
     /**
      * Store a newly created department in storage.
      *
+     * @bodyParam name string required The name of the department. Example: Marketing
+     *
      * @param \App\Http\Requests\StoreDepartmentRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreDepartmentRequest $request): JsonResponse
     {
-        $department = (new CreateDepartmentAction())->execute($request->validated());
+        $department = Department::create($request->validated());
 
         return (new DepartmentResource($department))
             ->response()
@@ -51,12 +64,16 @@ class DepartmentController extends Controller
     /**
      * Export departments to Excel based on filters.
      *
+     * @bodyParam search string Search departments by name. Example: marketing
+     * @bodyParam sort_by string Sort by field. Enum: id,name,created_at,updated_at Example: created_at
+     * @bodyParam sort_direction string Sort direction. Enum: asc,desc Example: desc
+     *
      * @param \App\Http\Requests\ExportDepartmentRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function export(ExportDepartmentRequest $request): JsonResponse
     {
-        return (new ExportDepartmentsAction())->execute($request);
+        return (new ExportDepartmentsAction(app(DepartmentFilterService::class)))->execute($request);
     }
 
     /**
@@ -79,7 +96,7 @@ class DepartmentController extends Controller
      */
     public function update(UpdateDepartmentRequest $request, Department $department): JsonResponse
     {
-        $department = (new UpdateDepartmentAction())->execute($department, $request->validated());
+        $department->update($request->validated());
 
         return (new DepartmentResource($department))->response();
     }

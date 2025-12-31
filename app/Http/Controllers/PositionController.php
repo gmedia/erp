@@ -3,11 +3,7 @@
 namespace App\Http\Controllers;
 
 
-use App\Actions\CreatePositionAction;
 use App\Actions\ExportPositionsAction;
-use App\Actions\IndexPositionsAction;
-use App\Actions\UpdatePositionAction;
-use App\Domain\PositionFilterService;
 use App\Http\Requests\ExportPositionRequest;
 use App\Http\Requests\IndexPositionRequest;
 use App\Http\Requests\StorePositionRequest;
@@ -23,12 +19,26 @@ class PositionController extends Controller
     /**
      * Display a listing of the positions.
      *
+     * @queryParam search string Search positions by name. Example: manager
+     * @queryParam sort_by string Sort by field. Enum: id,name,created_at,updated_at Example: created_at
+     * @queryParam sort_direction string Sort direction. Enum: asc,desc Example: desc
+     * @queryParam per_page int Number of items per page. Example: 15
+     * @queryParam page int Page number. Example: 1
+     *
      * @param \App\Http\Requests\IndexPositionRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(IndexPositionRequest $request): JsonResponse
     {
-        $positions = (new IndexPositionsAction(app(PositionFilterService::class)))->execute($request);
+        $query = Position::query();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', "%{$request->get('search')}%");
+        }
+
+        $query->orderBy($request->get('sort_by', 'created_at'), $request->get('sort_direction', 'desc'));
+
+        $positions = $query->paginate($request->get('per_page', 15));
 
         return (new PositionCollection($positions))->response();
     }
@@ -36,12 +46,14 @@ class PositionController extends Controller
     /**
      * Store a newly created position in storage.
      *
+     * @bodyParam name string required The name of the position. Example: Manager
+     *
      * @param \App\Http\Requests\StorePositionRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(StorePositionRequest $request): JsonResponse
     {
-        $position = (new CreatePositionAction())->execute($request->validated());
+        $position = Position::create($request->validated());
 
         return (new PositionResource($position))
             ->response()
@@ -50,6 +62,10 @@ class PositionController extends Controller
 
     /**
      * Export positions to Excel based on filters.
+     *
+     * @bodyParam search string Search positions by name. Example: manager
+     * @bodyParam sort_by string Sort by field. Enum: id,name,created_at,updated_at Example: created_at
+     * @bodyParam sort_direction string Sort direction. Enum: asc,desc Example: desc
      *
      * @param \App\Http\Requests\ExportPositionRequest $request
      * @return \Illuminate\Http\JsonResponse
@@ -79,7 +95,7 @@ class PositionController extends Controller
      */
     public function update(UpdatePositionRequest $request, Position $position): JsonResponse
     {
-        $position = (new UpdatePositionAction())->execute($position, $request->validated());
+        $position->update($request->validated());
 
         return (new PositionResource($position))->response();
     }

@@ -19,14 +19,21 @@ class DepartmentExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
     protected $filters;
 
     /**
+     * @var Builder|null
+     */
+    protected $query;
+
+    /**
      * Create a new export instance.
      *
      * @param  array<string, mixed>  $filters
+     * @param  Builder|null  $query
      * @return void
      */
-    public function __construct(array $filters = [])
+    public function __construct(array $filters = [], ?Builder $query = null)
     {
         $this->filters = $filters;
+        $this->query = $query;
     }
 
     /**
@@ -34,6 +41,10 @@ class DepartmentExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
      */
     public function query(): Builder
     {
+        if ($this->query) {
+            return $this->query;
+        }
+
         $query = Department::query();
 
         // Apply search filter if provided (used by frontend)
