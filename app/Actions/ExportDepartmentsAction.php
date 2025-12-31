@@ -7,6 +7,7 @@ use App\Exports\DepartmentExport;
 use App\Http\Requests\ExportDepartmentRequest;
 use App\Models\Department;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 /**
@@ -49,7 +50,7 @@ class ExportDepartmentsAction
         Excel::store($export, $filePath, 'public');
 
         // Generate the public URL for download
-        $url = \Illuminate\Support\Facades\Storage::url($filePath);
+        $url = Storage::url($filePath);
 
         return response()->json([
             'url' => $url,

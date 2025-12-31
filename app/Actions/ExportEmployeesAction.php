@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Exports\EmployeeExport;
 use App\Http\Requests\ExportEmployeeRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 /**
@@ -38,11 +39,11 @@ class ExportEmployeesAction
         $filePath = 'exports/' . $filename;
 
         // Generate the Excel file using public disk
-        $export = new \App\Exports\EmployeeExport($filters);
+        $export = new EmployeeExport($filters);
         Excel::store($export, $filePath, 'public');
 
         // Generate the public URL for download
-        $url = \Illuminate\Support\Facades\Storage::url($filePath);
+        $url = Storage::url($filePath);
 
         return response()->json([
             'url' => $url,

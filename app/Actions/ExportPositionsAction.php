@@ -2,8 +2,10 @@
 
 namespace App\Actions;
 
+use App\Exports\PositionExport;
 use App\Http\Requests\ExportPositionRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 /**
@@ -34,11 +36,11 @@ class ExportPositionsAction
         $filePath = 'exports/' . $filename;
 
         // Generate the Excel file using public disk
-        $export = new \App\Exports\PositionExport($filters);
+        $export = new PositionExport($filters);
         Excel::store($export, $filePath, 'public');
 
         // Generate the public URL for download
-        $url = \Illuminate\Support\Facades\Storage::url($filePath);
+        $url = Storage::url($filePath);
 
         return response()->json([
             'url' => $url,
