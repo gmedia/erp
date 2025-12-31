@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Employees;
 
-use App\Domain\EmployeeFilterService;
+use App\Domain\Employees\EmployeeFilterService;
 use App\Http\Requests\Employees\IndexEmployeeRequest;
 use App\Models\Employee;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;

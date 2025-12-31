@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Departments;
 
-use App\Domain\PositionFilterService;
-use App\Http\Requests\Positions\IndexPositionRequest;
-use App\Models\Position;
+use App\Domain\Departments\DepartmentFilterService;
+use App\Http\Requests\Departments\IndexDepartmentRequest;
+use App\Models\Department;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class IndexPositionsAction
+class IndexDepartmentsAction
 {
     public function __construct(
-        private PositionFilterService $filterService
+        private DepartmentFilterService $filterService
     ) {}
 
     /**
-     * Execute the action to retrieve paginated positions with filters.
+     * Execute the action to retrieve paginated departments with filters.
      */
-    public function execute(IndexPositionRequest $request): LengthAwarePaginator
+    public function execute(IndexDepartmentRequest $request): LengthAwarePaginator
     {
         ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 
-        $query = Position::query();
+        $query = Department::query();
 
         if ($request->filled('search')) {
             $this->filterService->applySearch($query, $request->get('search'), ['name']);

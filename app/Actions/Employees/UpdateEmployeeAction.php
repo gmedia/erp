@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Employees;
 
-use App\DTOs\UpdateEmployeeData;
+use App\DTOs\Employees\UpdateEmployeeData;
 use App\Models\Employee;
 
 class UpdateEmployeeAction

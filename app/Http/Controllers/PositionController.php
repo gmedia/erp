@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\ExportPositionsAction;
+use App\Actions\Positions\ExportPositionsAction;
 use App\Http\Requests\Positions\ExportPositionRequest;
 use App\Http\Requests\Positions\IndexPositionRequest;
 use App\Http\Requests\Positions\StorePositionRequest;

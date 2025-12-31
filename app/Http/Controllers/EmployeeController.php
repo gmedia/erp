@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\CreateEmployeeAction;
-use App\Actions\ExportEmployeesAction;
-use App\Actions\IndexEmployeesAction;
-use App\Actions\UpdateEmployeeAction;
-use App\Domain\EmployeeFilterService;
-use App\DTOs\StoreEmployeeData;
-use App\DTOs\UpdateEmployeeData;
+use App\Actions\Employees\CreateEmployeeAction;
+use App\Actions\Employees\ExportEmployeesAction;
+use App\Actions\Employees\IndexEmployeesAction;
+use App\Actions\Employees\UpdateEmployeeAction;
+use App\Domain\Employees\EmployeeFilterService;
+use App\DTOs\Employees\StoreEmployeeData;
+use App\DTOs\Employees\UpdateEmployeeData;
 use App\Http\Requests\Employees\ExportEmployeeRequest;
 use App\Http\Requests\Employees\IndexEmployeeRequest;
 use App\Http\Requests\Employees\StoreEmployeeRequest;

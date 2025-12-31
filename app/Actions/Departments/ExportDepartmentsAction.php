@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Departments;
 
-use App\Domain\DepartmentFilterService;
+use App\Domain\Departments\DepartmentFilterService;
 use App\Exports\DepartmentExport;
 use App\Http\Requests\Departments\ExportDepartmentRequest;
 use App\Models\Department;

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\ExportDepartmentsAction;
-use App\Domain\DepartmentFilterService;
+use App\Actions\Departments\ExportDepartmentsAction;
+use App\Domain\Departments\DepartmentFilterService;
 use App\Http\Requests\Departments\ExportDepartmentRequest;
 use App\Http\Requests\Departments\IndexDepartmentRequest;
 use App\Http\Requests\Departments\StoreDepartmentRequest;

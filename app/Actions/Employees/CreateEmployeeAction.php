@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Employees;
 
-use App\DTOs\StoreEmployeeData;
+use App\DTOs\Employees\StoreEmployeeData;
 use App\Models\Employee;
 
 class CreateEmployeeAction
