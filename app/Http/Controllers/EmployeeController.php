@@ -14,87 +14,48 @@ use Illuminate\Http\Response;
 
 class EmployeeController extends Controller
 {
+    use CrudHelper;
+
+    /**
+     * Get the allowed sort fields for employees
+     */
+    protected function getAllowedSorts(): array
+    {
+        return ['id', 'name', 'email', 'phone', 'department', 'position', 'salary', 'hire_date', 'created_at', 'updated_at'];
+    }
+
+    /**
+     * Get the search fields for employees
+     */
+    protected function getSearchFields(): array
+    {
+        return ['name', 'email', 'phone', 'department', 'position'];
+    }
+
     /**
      * Display a listing of the employees with filtering and sorting.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
-        $perPage = $request->get('per_page', 15);
-        $page = $request->get('page', 1);
+        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 
-        // Start building the query
-        // Validate sorting parameters
-        $allowedSorts = ['id', 'name', 'email', 'phone', 'department', 'position', 'salary', 'hire_date', 'created_at', 'updated_at'];
-        $request->validate([
-            'sort_by' => ['sometimes', 'in:' . implode(',', $allowedSorts)],
-            'sort_direction' => ['sometimes', 'in:asc,desc'],
-        ]);
         $query = Employee::query();
 
         // Search functionality - search across name, email, phone, department, position
         if ($request->filled('search')) {
-            $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%")
-                    ->orWhere('department', 'like', "%{$search}%")
-                    ->orWhere('position', 'like', "%{$search}%");
-            });
+            $this->applySearch($query, $request, $this->getSearchFields());
+        } else {
+            // Apply department and position filters only when no search term is provided
+            $this->applyAdvancedFilters($query, $request, true);
         }
 
-        // Apply department and position filters only when a search term is not provided.
-        if (! $request->filled('search')) {
-            // Department filter - exact match
-            if ($request->filled('department')) {
-                $query->where('department', 'like', $request->get('department'));
-            }
+        // Apply salary and hire date filters (always applied)
+        $this->applyAdvancedFilters($query, $request, false);
 
-            // Position filter - exact match (updated to allow partial matches for robustness)
-            if ($request->filled('position')) {
-                $query->where('position', 'like', $request->get('position'));
-            }
-        }
-
-        // Salary range filtering
-        if ($request->filled('salary_min')) {
-            $query->where('salary', '>=', $request->get('salary_min'));
-        }
-
-        if ($request->filled('salary_max')) {
-            $query->where('salary', '<=', $request->get('salary_max'));
-        }
-
-        // Hire date range filtering
-        if ($request->filled('hire_date_from')) {
-            $query->whereDate('hire_date', '>=', $request->get('hire_date_from'));
-        }
-
-        if ($request->filled('hire_date_to')) {
-            $query->whereDate('hire_date', '<=', $request->get('hire_date_to'));
-        }
-
-        // Server-side sorting
-        $sortableColumns = [
-            'id',
-            'name',
-            'email',
-            'phone',
-            'department',
-            'position',
-            'salary',
-            'hire_date',
-            'created_at',
-            'updated_at',
-        ];
-        $sortBy = $request->get('sort_by', 'created_at');
-        // Accept both `sort_dir` and legacy `sort_order` parameters
-        $sortDir = $request->get('sort_direction', 'desc');
-        $sortOrder = strtolower($sortDir) === 'asc' ? 'asc' : 'desc';
-
-        if (in_array($sortBy, $sortableColumns)) {
-            $query->orderBy($sortBy, $sortOrder);
-        }
+        $this->applySorting($query, $request, $this->getAllowedSorts());
 
         // Execute paginated query
         $employees = $query->paginate($perPage, ['*'], 'page', $page);
@@ -104,6 +65,9 @@ class EmployeeController extends Controller
 
     /**
      * Store a newly created employee in storage.
+     *
+     * @param \App\Http\Requests\StoreEmployeeRequest $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreEmployeeRequest $request): JsonResponse
     {
@@ -114,6 +78,9 @@ class EmployeeController extends Controller
 
     /**
      * Display the specified employee.
+     *
+     * @param \App\Models\Employee $employee
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Employee $employee): JsonResponse
     {
@@ -122,6 +89,10 @@ class EmployeeController extends Controller
 
     /**
      * Update the specified employee in storage.
+     *
+     * @param \App\Http\Requests\UpdateEmployeeRequest $request
+     * @param \App\Models\Employee $employee
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateEmployeeRequest $request, Employee $employee): JsonResponse
     {
@@ -132,6 +103,9 @@ class EmployeeController extends Controller
 
     /**
      * Remove the specified employee from storage.
+     *
+     * @param \App\Models\Employee $employee
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Employee $employee): JsonResponse
     {
@@ -142,6 +116,9 @@ class EmployeeController extends Controller
 
     /**
      * Export employees to Excel based on filters.
+     *
+     * @param \App\Http\Requests\ExportEmployeeRequest $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function export(ExportEmployeeRequest $request): JsonResponse
     {

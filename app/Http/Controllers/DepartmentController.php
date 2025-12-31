@@ -14,75 +14,38 @@ use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
+    use CrudHelper;
+
     /**
-     * Get the model class for this controller
+     * Get the allowed sort fields for departments
      */
-    protected function getModelClass(): string
+    protected function getAllowedSorts(): array
     {
-        return Department::class;
+        return ['id', 'name', 'created_at', 'updated_at'];
     }
 
     /**
-     * Get the resource class for this controller
+     * Get the search fields for departments
      */
-    protected function getResourceClass(): string
+    protected function getSearchFields(): array
     {
-        return DepartmentResource::class;
-    }
-
-    /**
-     * Get the collection class for this controller
-     */
-    protected function getCollectionClass(): string
-    {
-        return DepartmentCollection::class;
-    }
-
-    /**
-     * Get the export class for this controller
-     */
-    protected function getExportClass(): string
-    {
-        return DepartmentExport::class;
-    }
-
-    /**
-     * Get the export request class for this controller
-     */
-    protected function getExportRequestClass(): string
-    {
-        return ExportDepartmentRequest::class;
+        return ['name'];
     }
 
     /**
      * Display a listing of the departments.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
-        $perPage = $request->get('per_page', 15);
-        $page = $request->get('page', 1);
+        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 
         $query = Department::query();
 
-        // Apply search
-        if ($request->filled('search')) {
-            $search = $request->get('search');
-            $query->where('name', 'like', "%{$search}%");
-        }
-
-        // Apply sorting
-        $allowedSorts = ['id', 'name', 'created_at', 'updated_at'];
-        $request->validate([
-            'sort_by' => ['sometimes', 'in:' . implode(',', $allowedSorts)],
-            'sort_direction' => ['sometimes', 'in:asc,desc'],
-        ]);
-
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
-
-        if (in_array($sortBy, $allowedSorts)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
+        $this->applySearch($query, $request, $this->getSearchFields());
+        $this->applySorting($query, $request, $this->getAllowedSorts());
 
         $departments = $query->paginate($perPage, ['*'], 'page', $page);
 
@@ -91,6 +54,9 @@ class DepartmentController extends Controller
 
     /**
      * Store a newly created department in storage.
+     *
+     * @param \App\Http\Requests\StoreDepartmentRequest $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreDepartmentRequest $request): JsonResponse
     {
@@ -103,6 +69,9 @@ class DepartmentController extends Controller
 
     /**
      * Export departments to Excel based on filters.
+     *
+     * @param \App\Http\Requests\ExportDepartmentRequest $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function export(ExportDepartmentRequest $request): JsonResponse
     {
@@ -138,16 +107,23 @@ class DepartmentController extends Controller
 
     /**
      * Display the specified department.
+     *
+     * @param \App\Models\Department $department
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Department $department)
+    public function show(Department $department): JsonResponse
     {
         return (new DepartmentResource($department))->response();
     }
 
     /**
      * Update the specified department in storage.
+     *
+     * @param \App\Http\Requests\UpdateDepartmentRequest $request
+     * @param \App\Models\Department $department
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateDepartmentRequest $request, Department $department)
+    public function update(UpdateDepartmentRequest $request, Department $department): JsonResponse
     {
         $department->update($request->validated());
         return (new DepartmentResource($department))->response();
@@ -155,8 +131,11 @@ class DepartmentController extends Controller
 
     /**
      * Remove the specified department from storage.
+     *
+     * @param \App\Models\Department $department
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Department $department)
+    public function destroy(Department $department): JsonResponse
     {
         $department->delete();
         return response()->json(null, 204);

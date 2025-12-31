@@ -14,75 +14,38 @@ use Illuminate\Http\Request;
 
 class PositionController extends Controller
 {
+    use CrudHelper;
+
     /**
-     * Get the model class for this controller
+     * Get the allowed sort fields for positions
      */
-    protected function getModelClass(): string
+    protected function getAllowedSorts(): array
     {
-        return Position::class;
+        return ['id', 'name', 'created_at', 'updated_at'];
     }
 
     /**
-     * Get the resource class for this controller
+     * Get the search fields for positions
      */
-    protected function getResourceClass(): string
+    protected function getSearchFields(): array
     {
-        return PositionResource::class;
-    }
-
-    /**
-     * Get the collection class for this controller
-     */
-    protected function getCollectionClass(): string
-    {
-        return PositionCollection::class;
-    }
-
-    /**
-     * Get the export class for this controller
-     */
-    protected function getExportClass(): string
-    {
-        return PositionExport::class;
-    }
-
-    /**
-     * Get the export request class for this controller
-     */
-    protected function getExportRequestClass(): string
-    {
-        return ExportPositionRequest::class;
+        return ['name'];
     }
 
     /**
      * Display a listing of the positions.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
-        $perPage = $request->get('per_page', 15);
-        $page = $request->get('page', 1);
+        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 
         $query = Position::query();
 
-        // Apply search
-        if ($request->filled('search')) {
-            $search = $request->get('search');
-            $query->where('name', 'like', "%{$search}%");
-        }
-
-        // Apply sorting
-        $allowedSorts = ['id', 'name', 'created_at', 'updated_at'];
-        $request->validate([
-            'sort_by' => ['sometimes', 'in:' . implode(',', $allowedSorts)],
-            'sort_direction' => ['sometimes', 'in:asc,desc'],
-        ]);
-
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
-
-        if (in_array($sortBy, $allowedSorts)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
+        $this->applySearch($query, $request, $this->getSearchFields());
+        $this->applySorting($query, $request, $this->getAllowedSorts());
 
         $positions = $query->paginate($perPage, ['*'], 'page', $page);
 
@@ -91,6 +54,9 @@ class PositionController extends Controller
 
     /**
      * Store a newly created position in storage.
+     *
+     * @param \App\Http\Requests\StorePositionRequest $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StorePositionRequest $request): JsonResponse
     {
@@ -103,6 +69,9 @@ class PositionController extends Controller
 
     /**
      * Export positions to Excel based on filters.
+     *
+     * @param \App\Http\Requests\ExportPositionRequest $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function export(ExportPositionRequest $request): JsonResponse
     {
@@ -138,16 +107,23 @@ class PositionController extends Controller
 
     /**
      * Display the specified position.
+     *
+     * @param \App\Models\Position $position
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Position $position)
+    public function show(Position $position): JsonResponse
     {
         return (new PositionResource($position))->response();
     }
 
     /**
      * Update the specified position in storage.
+     *
+     * @param \App\Http\Requests\UpdatePositionRequest $request
+     * @param \App\Models\Position $position
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdatePositionRequest $request, Position $position)
+    public function update(UpdatePositionRequest $request, Position $position): JsonResponse
     {
         $position->update($request->validated());
         return (new PositionResource($position))->response();
@@ -155,8 +131,11 @@ class PositionController extends Controller
 
     /**
      * Remove the specified position from storage.
+     *
+     * @param \App\Models\Position $position
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Position $position)
+    public function destroy(Position $position): JsonResponse
     {
         $position->delete();
         return response()->json(null, 204);
