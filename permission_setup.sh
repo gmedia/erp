@@ -19,6 +19,9 @@ chown -R 1337:1000 "node_modules"
 chmod ugo+rw "package-lock.json"
 chown 1337:1000 "package-lock.json"
 
+chmod ugo+rw "package.json"
+chown 1337:1000 "package.json"
+
 # Required by wayfinder
 
 rm -rf "resources/js/actions"
