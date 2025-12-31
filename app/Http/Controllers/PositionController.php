@@ -7,6 +7,7 @@ use App\Actions\CreatePositionAction;
 use App\Actions\ExportPositionsAction;
 use App\Actions\IndexPositionsAction;
 use App\Actions\UpdatePositionAction;
+use App\Domain\PositionFilterService;
 use App\Http\Requests\ExportPositionRequest;
 use App\Http\Requests\IndexPositionRequest;
 use App\Http\Requests\StorePositionRequest;
@@ -27,7 +28,7 @@ class PositionController extends Controller
      */
     public function index(IndexPositionRequest $request): JsonResponse
     {
-        $positions = (new IndexPositionsAction())->execute($request);
+        $positions = (new IndexPositionsAction(app(PositionFilterService::class)))->execute($request);
 
         return (new PositionCollection($positions))->response();
     }

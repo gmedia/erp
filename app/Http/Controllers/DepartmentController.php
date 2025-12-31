@@ -7,6 +7,7 @@ use App\Actions\CreateDepartmentAction;
 use App\Actions\ExportDepartmentsAction;
 use App\Actions\IndexDepartmentsAction;
 use App\Actions\UpdateDepartmentAction;
+use App\Domain\DepartmentFilterService;
 use App\Http\Requests\ExportDepartmentRequest;
 use App\Http\Requests\IndexDepartmentRequest;
 use App\Http\Requests\StoreDepartmentRequest;
@@ -27,7 +28,7 @@ class DepartmentController extends Controller
      */
     public function index(IndexDepartmentRequest $request): JsonResponse
     {
-        $departments = (new IndexDepartmentsAction())->execute($request);
+        $departments = (new IndexDepartmentsAction(app(DepartmentFilterService::class)))->execute($request);
 
         return (new DepartmentCollection($departments))->response();
     }

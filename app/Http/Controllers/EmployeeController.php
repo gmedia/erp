@@ -21,23 +21,6 @@ use Illuminate\Http\Response;
 
 class EmployeeController extends Controller
 {
-    use CrudHelper;
-
-    /**
-     * Get the allowed sort fields for employees
-     */
-    protected function getAllowedSorts(): array
-    {
-        return ['id', 'name', 'email', 'phone', 'department', 'position', 'salary', 'hire_date', 'created_at', 'updated_at'];
-    }
-
-    /**
-     * Get the search fields for employees
-     */
-    protected function getSearchFields(): array
-    {
-        return ['name', 'email', 'phone', 'department', 'position'];
-    }
 
     /**
      * Display a listing of the employees with filtering and sorting.

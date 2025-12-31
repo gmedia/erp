@@ -2,12 +2,17 @@
 
 namespace App\Actions;
 
+use App\Domain\PositionFilterService;
 use App\Http\Requests\IndexPositionRequest;
 use App\Models\Position;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexPositionsAction
 {
+    public function __construct(
+        private PositionFilterService $filterService
+    ) {}
+
     /**
      * Execute the action to retrieve paginated positions with filters.
      *
@@ -20,38 +25,18 @@ class IndexPositionsAction
 
         $query = Position::query();
 
-        $this->applySearch($query, $request, ['name']);
-        $this->applySorting($query, $request, ['id', 'name', 'created_at', 'updated_at']);
+        if ($request->filled('search')) {
+            $this->filterService->applySearch($query, $request->get('search'), ['name']);
+        }
+
+        $this->filterService->applySorting(
+            $query,
+            $request->get('sort_by', 'created_at'),
+            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
+            ['id', 'name', 'created_at', 'updated_at']
+        );
 
         return $query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    /**
-     * Apply search filters to a query builder
-     */
-    private function applySearch($query, $request, array $searchFields): void
-    {
-        if ($request->filled('search')) {
-            $search = $request->get('search');
-            $query->where(function ($q) use ($search, $searchFields) {
-                foreach ($searchFields as $field) {
-                    $q->orWhere($field, 'like', "%{$search}%");
-                }
-            });
-        }
-    }
-
-    /**
-     * Apply sorting to a query builder
-     */
-    private function applySorting($query, $request, array $allowedSorts): void
-    {
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
-
-        if (in_array($sortBy, $allowedSorts)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
     }
 
     /**
