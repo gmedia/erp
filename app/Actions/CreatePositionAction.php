@@ -9,7 +9,7 @@ class CreatePositionAction
     /**
      * Execute the action to create a new position.
      *
-     * @param array{name: string} $data
+     * @param array $data
      * @return Position
      */
     public function execute(array $data): Position

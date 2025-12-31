@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Actions\CreateEmployeeAction;
 use App\Actions\ExportEmployeesAction;
+use App\Actions\IndexEmployeesAction;
 use App\Actions\UpdateEmployeeAction;
+use App\Domain\EmployeeFilterService;
 use App\DTOs\StoreEmployeeData;
 use App\DTOs\UpdateEmployeeData;
 use App\Http\Requests\ExportEmployeeRequest;
@@ -45,25 +47,7 @@ class EmployeeController extends Controller
      */
     public function index(IndexEmployeeRequest $request): JsonResponse
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
-        $query = Employee::query();
-
-        // Search functionality - search across name, email, phone, department, position
-        if ($request->filled('search')) {
-            $this->applySearch($query, $request, $this->getSearchFields());
-        } else {
-            // Apply department and position filters only when no search term is provided
-            $this->applyAdvancedFilters($query, $request, true);
-        }
-
-        // Apply salary and hire date filters (always applied)
-        $this->applyAdvancedFilters($query, $request, false);
-
-        $this->applySorting($query, $request, $this->getAllowedSorts());
-
-        // Execute paginated query
-        $employees = $query->paginate($perPage, ['*'], 'page', $page);
+        $employees = (new IndexEmployeesAction(app(EmployeeFilterService::class)))->execute($request);
 
         return (new EmployeeCollection($employees))->response();
     }

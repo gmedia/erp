@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 
+use App\Actions\CreateDepartmentAction;
 use App\Actions\ExportDepartmentsAction;
+use App\Actions\IndexDepartmentsAction;
+use App\Actions\UpdateDepartmentAction;
 use App\Http\Requests\ExportDepartmentRequest;
 use App\Http\Requests\IndexDepartmentRequest;
 use App\Http\Requests\StoreDepartmentRequest;
@@ -15,23 +18,6 @@ use Illuminate\Http\JsonResponse;
 
 class DepartmentController extends Controller
 {
-    use CrudHelper;
-
-    /**
-     * Get the allowed sort fields for departments
-     */
-    protected function getAllowedSorts(): array
-    {
-        return ['id', 'name', 'created_at', 'updated_at'];
-    }
-
-    /**
-     * Get the search fields for departments
-     */
-    protected function getSearchFields(): array
-    {
-        return ['name'];
-    }
 
     /**
      * Display a listing of the departments.
@@ -41,14 +27,7 @@ class DepartmentController extends Controller
      */
     public function index(IndexDepartmentRequest $request): JsonResponse
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
-        $query = Department::query();
-
-        $this->applySearch($query, $request, $this->getSearchFields());
-        $this->applySorting($query, $request, $this->getAllowedSorts());
-
-        $departments = $query->paginate($perPage, ['*'], 'page', $page);
+        $departments = (new IndexDepartmentsAction())->execute($request);
 
         return (new DepartmentCollection($departments))->response();
     }
@@ -61,7 +40,7 @@ class DepartmentController extends Controller
      */
     public function store(StoreDepartmentRequest $request): JsonResponse
     {
-        $department = Department::create($request->validated());
+        $department = (new CreateDepartmentAction())->execute($request->validated());
 
         return (new DepartmentResource($department))
             ->response()
@@ -99,7 +78,7 @@ class DepartmentController extends Controller
      */
     public function update(UpdateDepartmentRequest $request, Department $department): JsonResponse
     {
-        $department->update($request->validated());
+        $department = (new UpdateDepartmentAction())->execute($department, $request->validated());
 
         return (new DepartmentResource($department))->response();
     }
