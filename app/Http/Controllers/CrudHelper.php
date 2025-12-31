@@ -30,11 +30,6 @@ trait CrudHelper
      */
     protected function applySorting(Builder $query, Request $request, array $allowedSorts): void
     {
-        $request->validate([
-            'sort_by' => ['sometimes', 'in:' . implode(',', $allowedSorts)],
-            'sort_direction' => ['sometimes', 'in:asc,desc'],
-        ]);
-
         $sortBy = $request->get('sort_by', 'created_at');
         $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
 
