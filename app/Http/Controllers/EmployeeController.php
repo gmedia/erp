@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateEmployeeAction;
 use App\Actions\ExportEmployeesAction;
+use App\Actions\UpdateEmployeeAction;
+use App\DTOs\StoreEmployeeData;
+use App\DTOs\UpdateEmployeeData;
 use App\Http\Requests\ExportEmployeeRequest;
 use App\Http\Requests\IndexEmployeeRequest;
 use App\Http\Requests\StoreEmployeeRequest;
@@ -72,7 +76,8 @@ class EmployeeController extends Controller
      */
     public function store(StoreEmployeeRequest $request): JsonResponse
     {
-        $employee = Employee::create($request->validated());
+        $data = StoreEmployeeData::fromArray($request->validated());
+        $employee = (new CreateEmployeeAction())->execute($data);
 
         return (new EmployeeResource($employee))->response()->setStatusCode(Response::HTTP_CREATED);
     }
@@ -97,7 +102,8 @@ class EmployeeController extends Controller
      */
     public function update(UpdateEmployeeRequest $request, Employee $employee): JsonResponse
     {
-        $employee->update($request->validated());
+        $data = UpdateEmployeeData::fromArray($request->validated());
+        $employee = (new UpdateEmployeeAction())->execute($employee, $data);
 
         return (new EmployeeResource($employee))->response();
     }
