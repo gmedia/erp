@@ -71,3 +71,7 @@ chown -R 1337:1000 "e2e"
 touch "_ide_helper.php"
 chmod ugo+rw "_ide_helper.php"
 chown 1337:1000 "_ide_helper.php"
+
+mkdir -p "app/Models"
+chmod -R ugo+rw "app/Models"
+chown -R 1337:1000 "app/Models"
