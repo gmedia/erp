@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\DepartmentExport;
+use App\Actions\ExportDepartmentsAction;
 use App\Http\Requests\ExportDepartmentRequest;
 use App\Http\Requests\StoreDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
@@ -75,34 +75,7 @@ class DepartmentController extends Controller
      */
     public function export(ExportDepartmentRequest $request): JsonResponse
     {
-        $validated = $request->validated();
-
-        $filters = [
-            'search' => $validated['search'] ?? null,
-            'sort_by' => $validated['sort_by'] ?? 'created_at',
-            'sort_direction' => $validated['sort_direction'] ?? 'desc',
-        ];
-
-        // Remove null values
-        $filters = array_filter($filters);
-
-        // Generate filename with timestamp
-        $filename = 'departments_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-
-        // Store the file in storage/app/public/exports/
-        $filePath = 'exports/' . $filename;
-
-        // Generate the Excel file using public disk
-        $export = new \App\Exports\DepartmentExport($filters);
-        \Maatwebsite\Excel\Facades\Excel::store($export, $filePath, 'public');
-
-        // Generate the public URL for download
-        $url = \Illuminate\Support\Facades\Storage::url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+        return (new ExportDepartmentsAction())->execute($request);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\ExportEmployeesAction;
 use App\Http\Requests\ExportEmployeeRequest;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
@@ -122,36 +123,6 @@ class EmployeeController extends Controller
      */
     public function export(ExportEmployeeRequest $request): JsonResponse
     {
-        $validated = $request->validated();
-
-        // Map request parameters to match EmployeeExport expectations
-        $filters = [
-            'search' => $validated['search'] ?? null,
-            'department' => $validated['department'] ?? null,
-            'position' => $validated['position'] ?? null,
-            'sort_by' => $validated['sort_by'] ?? 'created_at',
-            'sort_direction' => $validated['sort_direction'] ?? 'desc',
-        ];
-
-        // Remove null values
-        $filters = array_filter($filters);
-
-        // Generate filename with timestamp
-        $filename = 'employees_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-
-        // Store the file in storage/app/public/exports/
-        $filePath = 'exports/' . $filename;
-
-        // Generate the Excel file using public disk
-        $export = new \App\Exports\EmployeeExport($filters);
-        \Maatwebsite\Excel\Facades\Excel::store($export, $filePath, 'public');
-
-        // Generate the public URL for download
-        $url = \Illuminate\Support\Facades\Storage::url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+        return (new ExportEmployeesAction())->execute($request);
     }
 }
