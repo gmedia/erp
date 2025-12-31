@@ -64,3 +64,9 @@ rm -rf "e2e"
 mkdir -p "e2e"
 chmod -R ugo+rw "e2e"
 chown -R 1337:1000 "e2e"
+
+# Required by ide helper
+
+touch "_ide_helper.php"
+chmod ugo+rw "_ide_helper.php"
+chown 1337:1000 "_ide_helper.php"
