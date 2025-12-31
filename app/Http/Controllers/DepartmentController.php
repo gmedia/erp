@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\CreateDepartmentAction;
+
 use App\Actions\ExportDepartmentsAction;
-use App\Actions\UpdateDepartmentAction;
 use App\Http\Requests\ExportDepartmentRequest;
 use App\Http\Requests\IndexDepartmentRequest;
 use App\Http\Requests\StoreDepartmentRequest;
@@ -62,7 +61,7 @@ class DepartmentController extends Controller
      */
     public function store(StoreDepartmentRequest $request): JsonResponse
     {
-        $department = (new CreateDepartmentAction())->execute($request->validated());
+        $department = Department::create($request->validated());
 
         return (new DepartmentResource($department))
             ->response()
@@ -100,7 +99,7 @@ class DepartmentController extends Controller
      */
     public function update(UpdateDepartmentRequest $request, Department $department): JsonResponse
     {
-        $department = (new UpdateDepartmentAction())->execute($department, $request->validated());
+        $department->update($request->validated());
 
         return (new DepartmentResource($department))->response();
     }

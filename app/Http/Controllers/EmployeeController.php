@@ -79,7 +79,9 @@ class EmployeeController extends Controller
         $data = StoreEmployeeData::fromArray($request->validated());
         $employee = (new CreateEmployeeAction())->execute($data);
 
-        return (new EmployeeResource($employee))->response()->setStatusCode(Response::HTTP_CREATED);
+        return (new EmployeeResource($employee))
+            ->response()
+            ->setStatusCode(201);
     }
 
     /**

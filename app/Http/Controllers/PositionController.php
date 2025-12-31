@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\CreatePositionAction;
+
 use App\Actions\ExportPositionsAction;
-use App\Actions\UpdatePositionAction;
 use App\Http\Requests\ExportPositionRequest;
 use App\Http\Requests\IndexPositionRequest;
 use App\Http\Requests\StorePositionRequest;
@@ -62,7 +61,7 @@ class PositionController extends Controller
      */
     public function store(StorePositionRequest $request): JsonResponse
     {
-        $position = (new CreatePositionAction())->execute($request->validated());
+        $position = Position::create($request->validated());
 
         return (new PositionResource($position))
             ->response()
@@ -100,7 +99,7 @@ class PositionController extends Controller
      */
     public function update(UpdatePositionRequest $request, Position $position): JsonResponse
     {
-        $position = (new UpdatePositionAction())->execute($position, $request->validated());
+        $position->update($request->validated());
 
         return (new PositionResource($position))->response();
     }
