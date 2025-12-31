@@ -9,9 +9,7 @@ class UpdatePositionAction
     /**
      * Execute the action to update an existing position.
      *
-     * @param Position $position
-     * @param array{name?: string} $data
-     * @return Position
+     * @param  array{name?: string}  $data
      */
     public function execute(Position $position, array $data): Position
     {

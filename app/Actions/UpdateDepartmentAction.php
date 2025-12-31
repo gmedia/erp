@@ -9,9 +9,7 @@ class UpdateDepartmentAction
     /**
      * Execute the action to update an existing department.
      *
-     * @param Department $department
-     * @param array{name?: string} $data
-     * @return Department
+     * @param  array{name?: string}  $data
      */
     public function execute(Department $department, array $data): Department
     {

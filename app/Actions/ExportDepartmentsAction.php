@@ -6,7 +6,6 @@ use App\Domain\DepartmentFilterService;
 use App\Exports\DepartmentExport;
 use App\Http\Requests\ExportDepartmentRequest;
 use App\Models\Department;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -21,9 +20,6 @@ class ExportDepartmentsAction
 
     /**
      * Execute the department export action
-     *
-     * @param \App\Http\Requests\ExportDepartmentRequest $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function execute(ExportDepartmentRequest $request): JsonResponse
     {

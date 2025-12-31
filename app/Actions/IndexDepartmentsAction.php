@@ -15,9 +15,6 @@ class IndexDepartmentsAction
 
     /**
      * Execute the action to retrieve paginated departments with filters.
-     *
-     * @param IndexDepartmentRequest $request
-     * @return LengthAwarePaginator
      */
     public function execute(IndexDepartmentRequest $request): LengthAwarePaginator
     {

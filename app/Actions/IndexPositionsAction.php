@@ -15,9 +15,6 @@ class IndexPositionsAction
 
     /**
      * Execute the action to retrieve paginated positions with filters.
-     *
-     * @param IndexPositionRequest $request
-     * @return LengthAwarePaginator
      */
     public function execute(IndexPositionRequest $request): LengthAwarePaginator
     {

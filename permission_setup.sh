@@ -78,3 +78,9 @@ chown 1337:1000 "_ide_helper.php"
 mkdir -p "app/Models"
 chmod -R ugo+rw "app/Models"
 chown -R 1337:1000 "app/Models"
+
+# required by duster
+
+mkdir -p "app"
+chmod -R ugo+rw "app"
+chown -R 1337:1000 "app"

@@ -9,10 +9,6 @@ class UpdateEmployeeAction
 {
     /**
      * Execute the action to update an existing employee.
-     *
-     * @param Employee $employee
-     * @param UpdateEmployeeData $data
-     * @return Employee
      */
     public function execute(Employee $employee, UpdateEmployeeData $data): Employee
     {

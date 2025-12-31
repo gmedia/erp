@@ -5,9 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -20,6 +17,37 @@ abstract class BaseCrudController extends Controller
     protected string $exportRequestClass;
     protected array $allowedSorts = ['id', 'name', 'created_at', 'updated_at'];
     protected array $searchFields = ['name'];
+
+    /**
+     * Display a listing of the resource with optional search and sorting.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $perPage = $request->get('per_page', 15);
+        $page = $request->get('page', 1);
+
+        $modelClass = $this->getModelClass();
+        $collectionClass = $this->getCollectionClass();
+
+        $query = $modelClass::query();
+
+        $this->applySearch($query, $request);
+        $this->applySorting($query, $request);
+
+        $items = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return (new $collectionClass($items))->response();
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    abstract public function store($request);
+
+    /**
+     * Export resources to Excel based on optional filters.
+     */
+    abstract public function export($request);
 
     /**
      * Get the model class for this controller
@@ -98,35 +126,4 @@ abstract class BaseCrudController extends Controller
             $query->orderBy($sortBy, $sortDirection);
         }
     }
-
-    /**
-     * Display a listing of the resource with optional search and sorting.
-     */
-    public function index(Request $request): JsonResponse
-    {
-        $perPage = $request->get('per_page', 15);
-        $page = $request->get('page', 1);
-
-        $modelClass = $this->getModelClass();
-        $collectionClass = $this->getCollectionClass();
-
-        $query = $modelClass::query();
-
-        $this->applySearch($query, $request);
-        $this->applySorting($query, $request);
-
-        $items = $query->paginate($perPage, ['*'], 'page', $page);
-
-        return (new $collectionClass($items))->response();
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    abstract public function store($request);
-
-    /**
-     * Export resources to Excel based on optional filters.
-     */
-    abstract public function export($request);
 }

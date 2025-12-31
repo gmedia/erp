@@ -14,9 +14,6 @@ class ExportEmployeesAction
 {
     /**
      * Execute the employee export action
-     *
-     * @param \App\Http\Requests\ExportEmployeeRequest $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function execute(ExportEmployeeRequest $request): JsonResponse
     {

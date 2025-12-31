@@ -15,9 +15,6 @@ class IndexEmployeesAction
 
     /**
      * Execute the action to retrieve paginated employees with filters.
-     *
-     * @param IndexEmployeeRequest $request
-     * @return LengthAwarePaginator
      */
     public function execute(IndexEmployeeRequest $request): LengthAwarePaginator
     {

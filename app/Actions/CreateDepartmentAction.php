@@ -8,9 +8,6 @@ class CreateDepartmentAction
 {
     /**
      * Execute the action to create a new department.
-     *
-     * @param array $data
-     * @return Department
      */
     public function execute(array $data): Department
     {

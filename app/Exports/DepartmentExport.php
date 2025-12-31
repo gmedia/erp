@@ -27,7 +27,6 @@ class DepartmentExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
      * Create a new export instance.
      *
      * @param  array<string, mixed>  $filters
-     * @param  Builder|null  $query
      * @return void
      */
     public function __construct(array $filters = [], ?Builder $query = null)

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Actions\ExportDepartmentsAction;
 use App\Domain\DepartmentFilterService;
 use App\Http\Requests\ExportDepartmentRequest;
@@ -16,7 +15,6 @@ use Illuminate\Http\JsonResponse;
 
 class DepartmentController extends Controller
 {
-
     /**
      * Display a listing of the departments.
      *
@@ -25,9 +23,6 @@ class DepartmentController extends Controller
      * @queryParam sort_direction string Sort direction. Enum: asc,desc Example: desc
      * @queryParam per_page int Number of items per page. Example: 15
      * @queryParam page int Page number. Example: 1
-     *
-     * @param \App\Http\Requests\IndexDepartmentRequest $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function index(IndexDepartmentRequest $request): JsonResponse
     {
@@ -48,9 +43,6 @@ class DepartmentController extends Controller
      * Store a newly created department in storage.
      *
      * @bodyParam name string required The name of the department. Example: Marketing
-     *
-     * @param \App\Http\Requests\StoreDepartmentRequest $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreDepartmentRequest $request): JsonResponse
     {
@@ -62,25 +54,7 @@ class DepartmentController extends Controller
     }
 
     /**
-     * Export departments to Excel based on filters.
-     *
-     * @bodyParam search string Search departments by name. Example: marketing
-     * @bodyParam sort_by string Sort by field. Enum: id,name,created_at,updated_at Example: created_at
-     * @bodyParam sort_direction string Sort direction. Enum: asc,desc Example: desc
-     *
-     * @param \App\Http\Requests\ExportDepartmentRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function export(ExportDepartmentRequest $request): JsonResponse
-    {
-        return (new ExportDepartmentsAction(app(DepartmentFilterService::class)))->execute($request);
-    }
-
-    /**
      * Display the specified department.
-     *
-     * @param \App\Models\Department $department
-     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Department $department): JsonResponse
     {
@@ -89,10 +63,6 @@ class DepartmentController extends Controller
 
     /**
      * Update the specified department in storage.
-     *
-     * @param \App\Http\Requests\UpdateDepartmentRequest $request
-     * @param \App\Models\Department $department
-     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateDepartmentRequest $request, Department $department): JsonResponse
     {
@@ -103,13 +73,23 @@ class DepartmentController extends Controller
 
     /**
      * Remove the specified department from storage.
-     *
-     * @param \App\Models\Department $department
-     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Department $department): JsonResponse
     {
         $department->delete();
+
         return response()->json(null, 204);
+    }
+
+    /**
+     * Export departments to Excel based on filters.
+     *
+     * @bodyParam search string Search departments by name. Example: marketing
+     * @bodyParam sort_by string Sort by field. Enum: id,name,created_at,updated_at Example: created_at
+     * @bodyParam sort_direction string Sort direction. Enum: asc,desc Example: desc
+     */
+    public function export(ExportDepartmentRequest $request): JsonResponse
+    {
+        return (new ExportDepartmentsAction(app(DepartmentFilterService::class)))->execute($request);
     }
 }

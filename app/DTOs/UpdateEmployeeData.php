@@ -17,8 +17,7 @@ readonly class UpdateEmployeeData
     /**
      * Create DTO from request array.
      *
-     * @param array{name?: string, email?: string, phone?: string|null, department?: string, position?: string, salary?: string, hire_date?: string} $data
-     * @return self
+     * @param  array{name?: string, email?: string, phone?: string|null, department?: string, position?: string, salary?: string, hire_date?: string}  $data
      */
     public static function fromArray(array $data): self
     {

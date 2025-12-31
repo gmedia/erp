@@ -2,7 +2,6 @@
 
 namespace App\Actions;
 
-use App\Exports\PositionExport;
 use App\Http\Requests\ExportPositionRequest;
 use Illuminate\Http\JsonResponse;
 use Maatwebsite\Excel\Facades\Excel;
@@ -14,9 +13,6 @@ class ExportPositionsAction
 {
     /**
      * Execute the position export action
-     *
-     * @param \App\Http\Requests\ExportPositionRequest $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function execute(ExportPositionRequest $request): JsonResponse
     {
