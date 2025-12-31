@@ -4,7 +4,7 @@ namespace App\Actions;
 
 use App\Domain\DepartmentFilterService;
 use App\Exports\DepartmentExport;
-use App\Http\Requests\ExportDepartmentRequest;
+use App\Http\Requests\Departments\ExportDepartmentRequest;
 use App\Models\Department;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;

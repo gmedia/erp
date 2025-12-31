@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Actions\ExportPositionsAction;
-use App\Http\Requests\ExportPositionRequest;
-use App\Http\Requests\IndexPositionRequest;
-use App\Http\Requests\StorePositionRequest;
-use App\Http\Requests\UpdatePositionRequest;
-use App\Http\Resources\PositionCollection;
-use App\Http\Resources\PositionResource;
+use App\Http\Requests\Positions\ExportPositionRequest;
+use App\Http\Requests\Positions\IndexPositionRequest;
+use App\Http\Requests\Positions\StorePositionRequest;
+use App\Http\Requests\Positions\UpdatePositionRequest;
+use App\Http\Resources\Positions\PositionCollection;
+use App\Http\Resources\Positions\PositionResource;
 use App\Models\Position;
 use Illuminate\Http\JsonResponse;
 

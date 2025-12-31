@@ -3,7 +3,7 @@
 namespace App\Actions;
 
 use App\Exports\EmployeeExport;
-use App\Http\Requests\ExportEmployeeRequest;
+use App\Http\Requests\Employees\ExportEmployeeRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;

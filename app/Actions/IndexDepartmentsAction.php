@@ -3,7 +3,7 @@
 namespace App\Actions;
 
 use App\Domain\DepartmentFilterService;
-use App\Http\Requests\IndexDepartmentRequest;
+use App\Http\Requests\Departments\IndexDepartmentRequest;
 use App\Models\Department;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 

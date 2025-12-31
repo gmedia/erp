@@ -3,7 +3,7 @@
 namespace App\Actions;
 
 use App\Domain\EmployeeFilterService;
-use App\Http\Requests\IndexEmployeeRequest;
+use App\Http\Requests\Employees\IndexEmployeeRequest;
 use App\Models\Employee;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 

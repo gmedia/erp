@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Departments;
 
-use App\Models\Position;
+use App\Models\Department;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property Position $resource
+ * @property Department $resource
  */
-class PositionResource extends JsonResource
+class DepartmentResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

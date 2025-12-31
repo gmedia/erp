@@ -3,7 +3,7 @@
 namespace App\Actions;
 
 use App\Domain\PositionFilterService;
-use App\Http\Requests\IndexPositionRequest;
+use App\Http\Requests\Positions\IndexPositionRequest;
 use App\Models\Position;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 

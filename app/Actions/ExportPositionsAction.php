@@ -3,7 +3,7 @@
 namespace App\Actions;
 
 use App\Exports\PositionExport;
-use App\Http\Requests\ExportPositionRequest;
+use App\Http\Requests\Positions\ExportPositionRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;

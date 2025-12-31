@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Positions;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StorePositionRequest extends FormRequest
+class ExportPositionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,7 +20,13 @@ class StorePositionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:positions,name',
+            'search' => ['nullable', 'string'],
+            'sort_by' => [
+                'nullable',
+                'string',
+                'in:id,name,created_at,updated_at',
+            ],
+            'sort_direction' => ['nullable', 'in:asc,desc'],
         ];
     }
 }

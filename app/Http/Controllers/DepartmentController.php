@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Actions\ExportDepartmentsAction;
 use App\Domain\DepartmentFilterService;
-use App\Http\Requests\ExportDepartmentRequest;
-use App\Http\Requests\IndexDepartmentRequest;
-use App\Http\Requests\StoreDepartmentRequest;
-use App\Http\Requests\UpdateDepartmentRequest;
-use App\Http\Resources\DepartmentCollection;
-use App\Http\Resources\DepartmentResource;
+use App\Http\Requests\Departments\ExportDepartmentRequest;
+use App\Http\Requests\Departments\IndexDepartmentRequest;
+use App\Http\Requests\Departments\StoreDepartmentRequest;
+use App\Http\Requests\Departments\UpdateDepartmentRequest;
+use App\Http\Resources\Departments\DepartmentCollection;
+use App\Http\Resources\Departments\DepartmentResource;
 use App\Models\Department;
 use Illuminate\Http\JsonResponse;
 

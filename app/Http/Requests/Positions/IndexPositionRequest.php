@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Positions;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ExportEmployeeRequest extends FormRequest
+class IndexPositionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,10 +21,10 @@ class ExportEmployeeRequest extends FormRequest
     {
         return [
             'search' => ['nullable', 'string'],
-            'department' => ['nullable', 'string'],
-            'position' => ['nullable', 'string'],
-            'sort_by' => ['nullable', 'string', 'in:id,name,email,department,position,salary,hire_date,created_at,updated_at'],
+            'sort_by' => ['nullable', 'string', 'in:id,name,created_at,updated_at'],
             'sort_direction' => ['nullable', 'in:asc,desc'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'page' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }
