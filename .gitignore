@@ -39,7 +39,9 @@ test-results/
 
 # Pest artifacts
 coverage-html/
+coverage-html-new/
 coverage.xml
+coverage-new.xml
 
 # SonarQube artifacts
 sonar-project.properties
