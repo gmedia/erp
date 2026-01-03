@@ -43,7 +43,11 @@
     ```
 - Run PHPUnit test
     ```
-    sail test --coverage-clover=coverage.xml
+    sail test --coverage-clover=coverage.xml --coverage-html=coverage-html
+    ```
+- Run server for coverage report
+    ```
+    sail run php -S 0.0.0.0:9000 -t coverage-html
     ```
 - Run Playwright e2e test
     ```

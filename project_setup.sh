@@ -10,14 +10,14 @@ npm install
 cp .env.example .env
 
 # Starting Laravel Sail
-sail up -d
+./vendor/bin/sail up -d
 
 # Waiting for the database to be ready
 sleep 60
 
 # Running migrations
-sail artisan migrate:fresh --seed
+./vendor/bin/sail artisan migrate:fresh --seed
 
 # Create symbolic link for storage
-sail run rm -rf public/storage
-sail artisan storage:link
+./vendor/bin/sail run rm -rf public/storage
+./vendor/bin/sail artisan storage:link
