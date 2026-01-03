@@ -9,7 +9,6 @@ use App\Http\Requests\Departments\ExportDepartmentRequest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
-use Mockery;
 
 uses(RefreshDatabase::class);
 

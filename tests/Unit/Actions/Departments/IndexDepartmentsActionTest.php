@@ -5,7 +5,6 @@ use App\Domain\Departments\DepartmentFilterService;
 use App\Http\Requests\Departments\IndexDepartmentRequest;
 use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
 
 uses(RefreshDatabase::class);
 

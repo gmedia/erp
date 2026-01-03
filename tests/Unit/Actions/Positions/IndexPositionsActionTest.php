@@ -5,7 +5,6 @@ use App\Domain\Positions\PositionFilterService;
 use App\Http\Requests\Positions\IndexPositionRequest;
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
 
 uses(RefreshDatabase::class);
 

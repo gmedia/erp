@@ -5,7 +5,6 @@ use App\Domain\Employees\EmployeeFilterService;
 use App\Http\Requests\Employees\IndexEmployeeRequest;
 use App\Models\Employee;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
 
 uses(RefreshDatabase::class);
 
