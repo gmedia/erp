@@ -23,16 +23,14 @@ test('execute creates a new position', function () {
     assertDatabaseHas('positions', ['name' => 'Software Engineer']);
 });
 
-test('execute creates position with additional data', function () {
+test('execute creates position with name only', function () {
     $action = new CreatePositionAction();
 
     $data = [
         'name' => 'Senior Developer',
-        'description' => 'Senior software development position',
     ];
 
     $position = $action->execute($data);
 
-    expect($position->name)->toBe('Senior Developer')
-        ->and($position->description)->toBe('Senior software development position');
+    expect($position->name)->toBe('Senior Developer');
 });

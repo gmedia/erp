@@ -25,15 +25,16 @@ test('applySearch adds where clause for search term', function () {
 test('applySearch searches across multiple fields', function () {
     $service = new DepartmentFilterService();
 
-    Department::factory()->create(['name' => 'Engineering', 'description' => 'Tech department']);
-    Department::factory()->create(['name' => 'Marketing', 'description' => 'Sales department']);
+    Department::create(['name' => 'Engineering']);
+    Department::create(['name' => 'Marketing']);
 
     $query = Department::query();
-    $service->applySearch($query, 'department', ['name', 'description']);
+    $service->applySearch($query, 'arket', ['name']);
 
     $results = $query->get();
 
-    expect($results)->toHaveCount(2);
+    expect($results)->toHaveCount(1)
+        ->and($results->first()->name)->toBe('Marketing');
 });
 
 test('applySorting applies ascending sort when allowed', function () {

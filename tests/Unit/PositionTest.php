@@ -6,7 +6,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use function Pest\Laravel\assertDatabaseHas;
 
 uses(RefreshDatabase::class);
-uses(Position::class);
 
 test('factory creates a valid position', function () {
     $position = Position::factory()->create();

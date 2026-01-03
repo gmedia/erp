@@ -11,7 +11,7 @@ test('employee export query applies search filter', function () {
     Employee::factory()->create(['email' => 'jane@example.com']);
     Employee::factory()->create(['name' => 'Bob Smith']);
 
-    $export = new EmployeeExport(['search' => 'john']);
+    $export = new EmployeeExport(['search' => 'doe']);
 
     $query = $export->query();
 
@@ -151,7 +151,7 @@ test('employee export map transforms data correctly', function () {
         '555-1234',
         'Engineering',
         'Developer',
-        75000.00,
+        '75000.00',
         '2023-01-15',
         '2023-01-01 10:00:00',
     ]);

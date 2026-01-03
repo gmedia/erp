@@ -183,8 +183,7 @@ test('applySorting rejects invalid sort fields', function () {
     $method = $reflection->getMethod('applySorting');
     $method->setAccessible(true);
 
-    $method->invoke($controller, $query, $request);
-
-    // Query should remain unchanged
-    expect($query)->toBeInstanceOf(\Illuminate\Database\Eloquent\Builder::class);
+    // Should throw ValidationException for invalid sort field
+    expect(fn() => $method->invoke($controller, $query, $request))
+        ->toThrow(\Illuminate\Validation\ValidationException::class);
 });

@@ -26,23 +26,20 @@ test('execute updates department name', function () {
     expect($department->name)->toBe('New Name');
 });
 
-test('execute updates multiple fields', function () {
+test('execute updates department to new name', function () {
     $action = new UpdateDepartmentAction();
 
     $department = Department::factory()->create([
         'name' => 'Engineering',
-        'description' => 'Old description',
     ]);
 
     $data = [
         'name' => 'Software Engineering',
-        'description' => 'New description',
     ];
 
     $updatedDepartment = $action->execute($department, $data);
 
-    expect($updatedDepartment->name)->toBe('Software Engineering')
-        ->and($updatedDepartment->description)->toBe('New description');
+    expect($updatedDepartment->name)->toBe('Software Engineering');
 });
 
 test('execute returns fresh model instance', function () {

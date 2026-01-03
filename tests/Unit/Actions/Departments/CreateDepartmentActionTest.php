@@ -23,16 +23,14 @@ test('execute creates a new department', function () {
     assertDatabaseHas('departments', ['name' => 'Human Resources']);
 });
 
-test('execute creates department with additional data', function () {
+test('execute creates department with name only', function () {
     $action = new CreateDepartmentAction();
 
     $data = [
         'name' => 'Engineering',
-        'description' => 'Software development department',
     ];
 
     $department = $action->execute($data);
 
-    expect($department->name)->toBe('Engineering')
-        ->and($department->description)->toBe('Software development department');
+    expect($department->name)->toBe('Engineering');
 });

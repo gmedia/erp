@@ -57,6 +57,10 @@ test('execute applies search filter when provided', function () {
     $request = Mockery::mock(IndexEmployeeRequest::class);
     $request->shouldReceive('filled')->with('search')->andReturn(true);
     $request->shouldReceive('get')->with('search')->andReturn('john');
+    $request->shouldReceive('get')->with('salary_min')->andReturn(null);
+    $request->shouldReceive('get')->with('salary_max')->andReturn(null);
+    $request->shouldReceive('get')->with('hire_date_from')->andReturn(null);
+    $request->shouldReceive('get')->with('hire_date_to')->andReturn(null);
     $request->shouldReceive('get')->with('sort_by', 'created_at')->andReturn('created_at');
     $request->shouldReceive('get')->with('sort_direction', 'desc')->andReturn('desc');
     $request->shouldReceive('get')->with('per_page', 15)->andReturn(15);

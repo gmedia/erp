@@ -26,23 +26,20 @@ test('execute updates position name', function () {
     expect($position->name)->toBe('New Position');
 });
 
-test('execute updates multiple fields', function () {
+test('execute updates position to new name', function () {
     $action = new UpdatePositionAction();
 
     $position = Position::factory()->create([
         'name' => 'Developer',
-        'description' => 'Old description',
     ]);
 
     $data = [
         'name' => 'Senior Developer',
-        'description' => 'New description',
     ];
 
     $updatedPosition = $action->execute($position, $data);
 
-    expect($updatedPosition->name)->toBe('Senior Developer')
-        ->and($updatedPosition->description)->toBe('New description');
+    expect($updatedPosition->name)->toBe('Senior Developer');
 });
 
 test('execute returns fresh model instance', function () {

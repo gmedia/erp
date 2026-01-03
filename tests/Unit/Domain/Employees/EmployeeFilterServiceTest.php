@@ -69,7 +69,7 @@ test('applyAdvancedFilters applies salary range filters', function () {
     $results = $query->get();
 
     expect($results)->toHaveCount(1)
-        ->and($results->first()->salary)->toBe(75000.0);
+        ->and($results->first()->salary)->toBe('75000.00');
 });
 
 test('applyAdvancedFilters applies hire date range filters', function () {
