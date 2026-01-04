@@ -107,3 +107,24 @@ test('destroy deletes an employee and returns 204', function () {
 
     assertDatabaseMissing('employees', ['id' => $employee->id]);
 });
+
+test('export returns excel file url and filename', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    // Create some employees to export
+    Employee::factory()->count(3)->create();
+
+    $response = postJson('/api/employees/export', []);
+
+    $response->assertOk()
+        ->assertJsonStructure([
+            'url',
+            'filename',
+        ]);
+
+    $data = $response->json();
+    expect($data['url'])->toContain('storage/exports/');
+    expect($data['filename'])->toContain('employees_export_');
+    expect($data['filename'])->toContain('.xlsx');
+});

@@ -104,3 +104,24 @@ test('destroy deletes a department and returns 204', function () {
 
     assertDatabaseMissing('departments', ['id' => $department->id]);
 });
+
+test('export returns excel file url and filename', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    // Create some departments to export
+    Department::factory()->count(3)->create();
+
+    $response = postJson('/api/departments/export', []);
+
+    $response->assertOk()
+        ->assertJsonStructure([
+            'url',
+            'filename',
+        ]);
+
+    $data = $response->json();
+    expect($data['url'])->toContain('storage/exports/');
+    expect($data['filename'])->toContain('departments_export_');
+    expect($data['filename'])->toContain('.xlsx');
+});

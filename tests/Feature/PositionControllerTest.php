@@ -107,3 +107,24 @@ test('destroy deletes an position and returns 204', function () {
 
     assertDatabaseMissing('positions', ['id' => $position->id]);
 });
+
+test('export returns excel file url and filename', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    // Create some positions to export
+    Position::factory()->count(3)->create();
+
+    $response = postJson('/api/positions/export', []);
+
+    $response->assertOk()
+        ->assertJsonStructure([
+            'url',
+            'filename',
+        ]);
+
+    $data = $response->json();
+    expect($data['url'])->toContain('storage/exports/');
+    expect($data['filename'])->toContain('positions_export_');
+    expect($data['filename'])->toContain('.xlsx');
+});
