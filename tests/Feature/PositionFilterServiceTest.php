@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('applySearch adds where clause for search term', function () {
-    $service = new PositionFilterService();
+    $service = new PositionFilterService;
 
     Position::create(['name' => 'Software Engineer']);
     Position::create(['name' => 'Product Manager']);
@@ -23,7 +23,7 @@ test('applySearch adds where clause for search term', function () {
 });
 
 test('applySearch searches across multiple fields', function () {
-    $service = new PositionFilterService();
+    $service = new PositionFilterService;
 
     Position::create(['name' => 'Developer Position']);
     Position::create(['name' => 'Manager Position']);
@@ -37,7 +37,7 @@ test('applySearch searches across multiple fields', function () {
 });
 
 test('applySorting applies ascending sort when allowed', function () {
-    $service = new PositionFilterService();
+    $service = new PositionFilterService;
 
     Position::create(['name' => 'Z Position']);
     Position::create(['name' => 'A Position']);
@@ -52,7 +52,7 @@ test('applySorting applies ascending sort when allowed', function () {
 });
 
 test('applySorting applies descending sort when allowed', function () {
-    $service = new PositionFilterService();
+    $service = new PositionFilterService;
 
     Position::create(['name' => 'A Position']);
     Position::create(['name' => 'Z Position']);
@@ -67,7 +67,7 @@ test('applySorting applies descending sort when allowed', function () {
 });
 
 test('applySorting does not apply sort when field not allowed', function () {
-    $service = new PositionFilterService();
+    $service = new PositionFilterService;
 
     Position::create(['name' => 'Test Position']);
 

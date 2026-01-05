@@ -81,7 +81,7 @@ test('execute uses custom sort parameters', function () {
     $request = Mockery::mock(ExportDepartmentRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'sort_by' => 'name',
-        'sort_direction' => 'asc'
+        'sort_direction' => 'asc',
     ]);
     $request->shouldReceive('filled')->with('search')->andReturn(false);
 

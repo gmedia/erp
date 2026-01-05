@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('applySearch adds where clause for search term', function () {
-    $service = new DepartmentFilterService();
+    $service = new DepartmentFilterService;
 
     Department::factory()->create(['name' => 'Engineering']);
     Department::factory()->create(['name' => 'Marketing']);
@@ -23,7 +23,7 @@ test('applySearch adds where clause for search term', function () {
 });
 
 test('applySearch searches across multiple fields', function () {
-    $service = new DepartmentFilterService();
+    $service = new DepartmentFilterService;
 
     Department::create(['name' => 'Engineering']);
     Department::create(['name' => 'Marketing']);
@@ -38,7 +38,7 @@ test('applySearch searches across multiple fields', function () {
 });
 
 test('applySorting applies ascending sort when allowed', function () {
-    $service = new DepartmentFilterService();
+    $service = new DepartmentFilterService;
 
     Department::factory()->create(['name' => 'Z Department']);
     Department::factory()->create(['name' => 'A Department']);
@@ -53,7 +53,7 @@ test('applySorting applies ascending sort when allowed', function () {
 });
 
 test('applySorting applies descending sort when allowed', function () {
-    $service = new DepartmentFilterService();
+    $service = new DepartmentFilterService;
 
     Department::factory()->create(['name' => 'A Department']);
     Department::factory()->create(['name' => 'Z Department']);
@@ -68,7 +68,7 @@ test('applySorting applies descending sort when allowed', function () {
 });
 
 test('applySorting does not apply sort when field not allowed', function () {
-    $service = new DepartmentFilterService();
+    $service = new DepartmentFilterService;
 
     Department::factory()->create(['name' => 'Test Department']);
 

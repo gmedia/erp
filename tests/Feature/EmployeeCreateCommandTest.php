@@ -79,7 +79,7 @@ test('command generates employees with departments from realistic list', functio
 
     $expectedDepartments = [
         'Engineering', 'Sales', 'Marketing', 'HR', 'Finance',
-        'Operations', 'Customer Support', 'Product'
+        'Operations', 'Customer Support', 'Product',
     ];
 
     expect(in_array($employee->department, $expectedDepartments))->toBeTrue();

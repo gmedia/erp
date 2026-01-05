@@ -9,7 +9,7 @@ use function Pest\Laravel\assertDatabaseHas;
 uses(RefreshDatabase::class);
 
 test('execute creates a new department', function () {
-    $action = new CreateDepartmentAction();
+    $action = new CreateDepartmentAction;
 
     $data = [
         'name' => 'Human Resources',
@@ -24,7 +24,7 @@ test('execute creates a new department', function () {
 });
 
 test('execute creates department with name only', function () {
-    $action = new CreateDepartmentAction();
+    $action = new CreateDepartmentAction;
 
     $data = [
         'name' => 'Engineering',

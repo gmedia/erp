@@ -13,7 +13,7 @@ test('execute exports employees and returns file info', function () {
     Storage::fake('public');
     Excel::shouldReceive('store')->once();
 
-    $action = new ExportEmployeesAction();
+    $action = new ExportEmployeesAction;
 
     Employee::factory()->count(3)->create();
 
@@ -35,7 +35,7 @@ test('execute exports with search filter', function () {
     Storage::fake('public');
     Excel::shouldReceive('store')->once();
 
-    $action = new ExportEmployeesAction();
+    $action = new ExportEmployeesAction;
 
     Employee::factory()->create(['name' => 'John Doe']);
     Employee::factory()->create(['name' => 'Jane Smith']);
@@ -53,7 +53,7 @@ test('execute exports with department and position filters', function () {
     Storage::fake('public');
     Excel::shouldReceive('store')->once();
 
-    $action = new ExportEmployeesAction();
+    $action = new ExportEmployeesAction;
 
     Employee::factory()->count(2)->create();
 
@@ -63,7 +63,7 @@ test('execute exports with department and position filters', function () {
         'department' => 'Engineering',
         'position' => 'Developer',
         'sort_by' => 'name',
-        'sort_direction' => 'asc'
+        'sort_direction' => 'asc',
     ]);
 
     $result = $action->execute($request);
@@ -75,7 +75,7 @@ test('execute exports with custom sort parameters', function () {
     Storage::fake('public');
     Excel::shouldReceive('store')->once();
 
-    $action = new ExportEmployeesAction();
+    $action = new ExportEmployeesAction;
 
     Employee::factory()->count(2)->create();
 
@@ -83,7 +83,7 @@ test('execute exports with custom sort parameters', function () {
     $request = Mockery::mock(ExportEmployeeRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'sort_by' => 'salary',
-        'sort_direction' => 'desc'
+        'sort_direction' => 'desc',
     ]);
 
     $result = $action->execute($request);
@@ -95,7 +95,7 @@ test('execute filters out null values from filters', function () {
     Storage::fake('public');
     Excel::shouldReceive('store')->once();
 
-    $action = new ExportEmployeesAction();
+    $action = new ExportEmployeesAction;
 
     Employee::factory()->count(2)->create();
 

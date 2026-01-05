@@ -3,13 +3,13 @@
 use App\Http\Requests\Employees\ExportEmployeeRequest;
 
 test('authorize returns true', function () {
-    $request = new ExportEmployeeRequest();
+    $request = new ExportEmployeeRequest;
 
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns validation rules', function () {
-    $request = new ExportEmployeeRequest();
+    $request = new ExportEmployeeRequest;
 
     $rules = $request->rules();
 

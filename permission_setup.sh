@@ -84,3 +84,7 @@ chown -R 1337:1000 "app/Models"
 mkdir -p "app"
 chmod -R ugo+rw "app"
 chown -R 1337:1000 "app"
+
+mkdir -p "tests"
+chmod -R ugo+rw "tests"
+chown -R 1337:1000 "tests"

@@ -3,13 +3,13 @@
 use App\Http\Requests\Positions\ExportPositionRequest;
 
 test('authorize returns true', function () {
-    $request = new ExportPositionRequest();
+    $request = new ExportPositionRequest;
 
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns validation rules', function () {
-    $request = new ExportPositionRequest();
+    $request = new ExportPositionRequest;
 
     $rules = $request->rules();
 

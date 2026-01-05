@@ -57,7 +57,7 @@ test('employee export query applies salary range filters', function () {
 
     $export = new EmployeeExport([
         'min_salary' => 60000,
-        'max_salary' => 90000
+        'max_salary' => 90000,
     ]);
 
     $query = $export->query();
@@ -75,7 +75,7 @@ test('employee export query applies hire date range filters', function () {
 
     $export = new EmployeeExport([
         'hire_date_from' => '2023-03-01',
-        'hire_date_to' => '2023-09-01'
+        'hire_date_to' => '2023-09-01',
     ]);
 
     $query = $export->query();

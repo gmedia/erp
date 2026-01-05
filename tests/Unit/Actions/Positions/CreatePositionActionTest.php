@@ -9,7 +9,7 @@ use function Pest\Laravel\assertDatabaseHas;
 uses(RefreshDatabase::class);
 
 test('execute creates a new position', function () {
-    $action = new CreatePositionAction();
+    $action = new CreatePositionAction;
 
     $data = [
         'name' => 'Software Engineer',
@@ -24,7 +24,7 @@ test('execute creates a new position', function () {
 });
 
 test('execute creates position with name only', function () {
-    $action = new CreatePositionAction();
+    $action = new CreatePositionAction;
 
     $data = [
         'name' => 'Senior Developer',

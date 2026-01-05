@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('applySearch adds where clause for search term', function () {
-    $service = new EmployeeFilterService();
+    $service = new EmployeeFilterService;
 
     Employee::factory()->create(['name' => 'John Doe']);
     Employee::factory()->create(['name' => 'Jane Smith']);
@@ -23,7 +23,7 @@ test('applySearch adds where clause for search term', function () {
 });
 
 test('applyAdvancedFilters applies department filter', function () {
-    $service = new EmployeeFilterService();
+    $service = new EmployeeFilterService;
 
     Employee::factory()->create(['department' => 'Engineering']);
     Employee::factory()->create(['department' => 'Marketing']);
@@ -39,7 +39,7 @@ test('applyAdvancedFilters applies department filter', function () {
 });
 
 test('applyAdvancedFilters applies position filter', function () {
-    $service = new EmployeeFilterService();
+    $service = new EmployeeFilterService;
 
     Employee::factory()->create(['position' => 'Developer']);
     Employee::factory()->create(['position' => 'Manager']);
@@ -54,7 +54,7 @@ test('applyAdvancedFilters applies position filter', function () {
 });
 
 test('applyAdvancedFilters applies salary range filters', function () {
-    $service = new EmployeeFilterService();
+    $service = new EmployeeFilterService;
 
     Employee::factory()->create(['salary' => 50000.00]);
     Employee::factory()->create(['salary' => 75000.00]);
@@ -63,7 +63,7 @@ test('applyAdvancedFilters applies salary range filters', function () {
     $query = Employee::query();
     $service->applyAdvancedFilters($query, [
         'salary_min' => 60000,
-        'salary_max' => 90000
+        'salary_max' => 90000,
     ]);
 
     $results = $query->get();
@@ -73,7 +73,7 @@ test('applyAdvancedFilters applies salary range filters', function () {
 });
 
 test('applyAdvancedFilters applies hire date range filters', function () {
-    $service = new EmployeeFilterService();
+    $service = new EmployeeFilterService;
 
     Employee::factory()->create(['hire_date' => '2023-01-01']);
     Employee::factory()->create(['hire_date' => '2023-06-01']);
@@ -82,7 +82,7 @@ test('applyAdvancedFilters applies hire date range filters', function () {
     $query = Employee::query();
     $service->applyAdvancedFilters($query, [
         'hire_date_from' => '2023-03-01',
-        'hire_date_to' => '2023-09-01'
+        'hire_date_to' => '2023-09-01',
     ]);
 
     $results = $query->get();
@@ -92,7 +92,7 @@ test('applyAdvancedFilters applies hire date range filters', function () {
 });
 
 test('applyAdvancedFilters handles empty filters', function () {
-    $service = new EmployeeFilterService();
+    $service = new EmployeeFilterService;
 
     Employee::factory()->count(3)->create();
 
@@ -105,7 +105,7 @@ test('applyAdvancedFilters handles empty filters', function () {
 });
 
 test('applySorting applies ascending sort when allowed', function () {
-    $service = new EmployeeFilterService();
+    $service = new EmployeeFilterService;
 
     Employee::factory()->create(['name' => 'Z Employee']);
     Employee::factory()->create(['name' => 'A Employee']);
@@ -120,7 +120,7 @@ test('applySorting applies ascending sort when allowed', function () {
 });
 
 test('applySorting applies descending sort when allowed', function () {
-    $service = new EmployeeFilterService();
+    $service = new EmployeeFilterService;
 
     Employee::factory()->create(['name' => 'A Employee']);
     Employee::factory()->create(['name' => 'Z Employee']);
@@ -135,7 +135,7 @@ test('applySorting applies descending sort when allowed', function () {
 });
 
 test('applySorting does not apply sort when field not allowed', function () {
-    $service = new EmployeeFilterService();
+    $service = new EmployeeFilterService;
 
     Employee::factory()->create(['name' => 'Test Employee']);
 

@@ -3,13 +3,13 @@
 use App\Http\Requests\Departments\ExportDepartmentRequest;
 
 test('authorize returns true', function () {
-    $request = new ExportDepartmentRequest();
+    $request = new ExportDepartmentRequest;
 
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns validation rules', function () {
-    $request = new ExportDepartmentRequest();
+    $request = new ExportDepartmentRequest;
 
     $rules = $request->rules();
 

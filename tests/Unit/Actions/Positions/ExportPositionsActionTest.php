@@ -13,7 +13,7 @@ test('execute exports positions and returns file info', function () {
     Storage::fake('public');
     Excel::shouldReceive('store')->once();
 
-    $action = new ExportPositionsAction();
+    $action = new ExportPositionsAction;
 
     Position::factory()->count(3)->create();
 
@@ -35,7 +35,7 @@ test('execute exports with search filter', function () {
     Storage::fake('public');
     Excel::shouldReceive('store')->once();
 
-    $action = new ExportPositionsAction();
+    $action = new ExportPositionsAction;
 
     Position::factory()->create(['name' => 'Developer']);
     Position::factory()->create(['name' => 'Manager']);
@@ -53,7 +53,7 @@ test('execute exports with custom sort parameters', function () {
     Storage::fake('public');
     Excel::shouldReceive('store')->once();
 
-    $action = new ExportPositionsAction();
+    $action = new ExportPositionsAction;
 
     Position::factory()->count(2)->create();
 
@@ -61,7 +61,7 @@ test('execute exports with custom sort parameters', function () {
     $request = Mockery::mock(ExportPositionRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'sort_by' => 'name',
-        'sort_direction' => 'asc'
+        'sort_direction' => 'asc',
     ]);
 
     $result = $action->execute($request);
@@ -73,7 +73,7 @@ test('execute filters out null values from filters', function () {
     Storage::fake('public');
     Excel::shouldReceive('store')->once();
 
-    $action = new ExportPositionsAction();
+    $action = new ExportPositionsAction;
 
     Position::factory()->count(2)->create();
 

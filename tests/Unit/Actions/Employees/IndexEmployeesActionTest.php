@@ -37,7 +37,7 @@ test('execute returns paginated employees without filters', function () {
     $filterService->shouldReceive('applySorting')
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
-               ['id', 'name', 'email', 'phone', 'department', 'position', 'salary', 'hire_date', 'created_at', 'updated_at']);
+            ['id', 'name', 'email', 'phone', 'department', 'position', 'salary', 'hire_date', 'created_at', 'updated_at']);
 
     $result = $action->execute($request);
 
@@ -69,7 +69,7 @@ test('execute applies search filter when provided', function () {
     $filterService->shouldReceive('applySearch')
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'john',
-               ['name', 'email', 'phone', 'department', 'position']);
+            ['name', 'email', 'phone', 'department', 'position']);
 
     $filterService->shouldReceive('applyAdvancedFilters')
         ->once()
@@ -83,7 +83,7 @@ test('execute applies search filter when provided', function () {
     $filterService->shouldReceive('applySorting')
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
-               ['id', 'name', 'email', 'phone', 'department', 'position', 'salary', 'hire_date', 'created_at', 'updated_at']);
+            ['id', 'name', 'email', 'phone', 'department', 'position', 'salary', 'hire_date', 'created_at', 'updated_at']);
 
     $result = $action->execute($request);
 
@@ -131,7 +131,7 @@ test('execute applies advanced filters when no search provided', function () {
     $filterService->shouldReceive('applySorting')
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
-               ['id', 'name', 'email', 'phone', 'department', 'position', 'salary', 'hire_date', 'created_at', 'updated_at']);
+            ['id', 'name', 'email', 'phone', 'department', 'position', 'salary', 'hire_date', 'created_at', 'updated_at']);
 
     $result = $action->execute($request);
 

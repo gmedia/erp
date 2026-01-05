@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('execute updates department name', function () {
-    $action = new UpdateDepartmentAction();
+    $action = new UpdateDepartmentAction;
 
     $department = Department::factory()->create([
         'name' => 'Old Name',
@@ -27,7 +27,7 @@ test('execute updates department name', function () {
 });
 
 test('execute updates department to new name', function () {
-    $action = new UpdateDepartmentAction();
+    $action = new UpdateDepartmentAction;
 
     $department = Department::factory()->create([
         'name' => 'Engineering',
@@ -43,7 +43,7 @@ test('execute updates department to new name', function () {
 });
 
 test('execute returns fresh model instance', function () {
-    $action = new UpdateDepartmentAction();
+    $action = new UpdateDepartmentAction;
 
     $department = Department::factory()->create();
 
