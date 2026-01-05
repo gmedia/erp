@@ -85,19 +85,6 @@ test('command generates employees with departments from realistic list', functio
     expect(in_array($employee->department, $expectedDepartments))->toBeTrue();
 });
 
-test('command handles database errors gracefully', function () {
-    // This test ensures the exception handling in the transaction is covered
-    // We'll use a mock to simulate a database error
-
-    // First create a valid employee to ensure the command works normally
-    Artisan::call(EmployeeCreateCommand::class, ['count' => 1]);
-
-    expect(Employee::count())->toBe(1);
-
-    // The exception handling code (lines 63-65) gets covered during normal operation
-    // when database operations succeed, but we can ensure it's tested
-})->skip('Exception handling is tested indirectly through successful operations');
-
 test('command generates unique emails with fallback mechanism', function () {
     // Test the email generation fallback by creating many employees
     // This will test the generateUniqueEmail method thoroughly
