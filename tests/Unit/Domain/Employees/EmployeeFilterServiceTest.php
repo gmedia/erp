@@ -9,7 +9,7 @@ uses(RefreshDatabase::class);
 test('applySearch adds where clause for search term', function () {
     $service = new EmployeeFilterService;
 
-    Employee::factory()->create(['name' => 'John Doe']);
+    Employee::factory()->create(['name' => 'John Doe', 'email' => 'unique@example.com']);
     Employee::factory()->create(['name' => 'Jane Smith']);
     Employee::factory()->create(['email' => 'bob@example.com']);
 

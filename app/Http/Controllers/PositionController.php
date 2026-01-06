@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Positions\ExportPositionsAction;
+use App\Domain\Positions\PositionFilterService;
 use App\Http\Requests\Positions\ExportPositionRequest;
 use App\Http\Requests\Positions\IndexPositionRequest;
 use App\Http\Requests\Positions\StorePositionRequest;
@@ -23,15 +24,20 @@ class PositionController extends Controller
      * @queryParam per_page int Number of items per page. Example: 15
      * @queryParam page int Page number. Example: 1
      */
-    public function index(IndexPositionRequest $request): JsonResponse
+    public function index(IndexPositionRequest $request, PositionFilterService $filterService): JsonResponse
     {
         $query = Position::query();
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', "%{$request->get('search')}%");
+            $filterService->applySearch($query, $request->get('search'), ['name']);
         }
 
-        $query->orderBy($request->get('sort_by', 'created_at'), $request->get('sort_direction', 'desc'));
+        $filterService->applySorting(
+            $query,
+            $request->get('sort_by', 'created_at'),
+            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
+            ['id', 'name', 'created_at', 'updated_at']
+        );
 
         $positions = $query->paginate($request->get('per_page', 15));
 

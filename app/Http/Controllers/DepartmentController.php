@@ -12,6 +12,7 @@ use App\Http\Resources\Departments\DepartmentCollection;
 use App\Http\Resources\Departments\DepartmentResource;
 use App\Models\Department;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class DepartmentController extends Controller
 {
@@ -24,15 +25,20 @@ class DepartmentController extends Controller
      * @queryParam per_page int Number of items per page. Example: 15
      * @queryParam page int Page number. Example: 1
      */
-    public function index(IndexDepartmentRequest $request): JsonResponse
+    public function index(IndexDepartmentRequest $request, DepartmentFilterService $filterService): JsonResponse
     {
         $query = Department::query();
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', "%{$request->get('search')}%");
+            $filterService->applySearch($query, $request->get('search'), ['name']);
         }
 
-        $query->orderBy($request->get('sort_by', 'created_at'), $request->get('sort_direction', 'desc'));
+        $filterService->applySorting(
+            $query,
+            $request->get('sort_by', 'created_at'),
+            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
+            ['id', 'name', 'created_at', 'updated_at']
+        );
 
         $departments = $query->paginate($request->get('per_page', 15));
 
