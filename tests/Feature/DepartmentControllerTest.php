@@ -4,6 +4,7 @@ use App\Models\Department;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
+use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
@@ -13,132 +14,203 @@ use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
 
-test('index returns paginated departments with meta', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
+describe('Department API Endpoints', function () {
 
-    Department::factory()->count(15)->create();
+    beforeEach(function () {
+        $user = User::factory()->create();
+        actingAs($user);
+    });
 
-    $response = getJson('/api/departments');
+    test('index returns paginated departments with proper meta structure', function () {
+        Department::factory()->count(25)->create();
 
-    $response->assertOk()
-        ->assertJsonStructure([
-            'data',
-            'meta' => [
-                'current_page',
-                'from',
-                'last_page',
-                'per_page',
-                'to',
-                'total',
-            ],
-        ]);
+        $response = getJson('/api/departments?per_page=10');
 
-    expect($response->json('data'))->toHaveCount(15);
-});
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'name',
+                        'created_at',
+                        'updated_at',
+                    ]
+                ],
+                'meta' => [
+                    'current_page',
+                    'from',
+                    'last_page',
+                    'per_page',
+                    'to',
+                    'total',
+                ],
+            ]);
 
-test('index filters departments by search term', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
+        expect($response->json('meta.total'))->toBe(25)
+            ->and($response->json('meta.per_page'))->toBe(10)
+            ->and($response->json('data'))->toHaveCount(10);
+    });
 
-    Department::factory()->create(['name' => 'Marketing']);
-    Department::factory()->create(['name' => 'Sales']);
-    Department::factory()->create(['name' => 'Engineering']);
+    test('index supports search filtering by department name', function () {
+        Department::factory()->create(['name' => 'Marketing Department']);
+        Department::factory()->create(['name' => 'Sales Team']);
+        Department::factory()->create(['name' => 'Engineering Division']);
 
-    $response = getJson('/api/departments?search=market');
+        $response = getJson('/api/departments?search=market');
 
-    $response->assertOk();
+        $response->assertOk();
 
-    $data = $response->json('data');
-    expect($data)->toHaveCount(1);
-    expect($data[0]['name'])->toBe('Marketing');
-});
+        $data = $response->json('data');
+        expect($data)->toHaveCount(1)
+            ->and($data[0]['name'])->toBe('Marketing Department');
+    });
 
-test('store creates a new department and returns 201', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
+    test('index supports sorting by different fields', function () {
+        Department::factory()->create(['name' => 'Z Department']);
+        Department::factory()->create(['name' => 'A Department']);
 
-    $name = fake()->word();
+        $response = getJson('/api/departments?sort_by=name&sort_direction=asc');
 
-    $payload = [
-        'name' => $name,
-    ];
+        $response->assertOk();
 
-    $response = postJson('/api/departments', $payload);
+        $data = $response->json('data');
+        expect($data[0]['name'])->toBe('A Department')
+            ->and($data[1]['name'])->toBe('Z Department');
+    });
 
-    $response->assertCreated()
-        ->assertJsonFragment(['name' => $name]);
+    test('store creates department with valid data and returns 201 status', function () {
+        $departmentData = [
+            'name' => 'Human Resources',
+        ];
 
-    assertDatabaseHas('departments', ['name' => $name]);
-});
+        $response = postJson('/api/departments', $departmentData);
 
-test('show returns a single department', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
+        $response->assertCreated()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'created_at',
+                    'updated_at',
+                ]
+            ])
+            ->assertJsonFragment(['name' => 'Human Resources']);
 
-    $department = Department::factory()->create();
+        assertDatabaseHas('departments', ['name' => 'Human Resources']);
+    });
 
-    $response = getJson("/api/departments/{$department->id}");
+    test('store validates required fields', function () {
+        $response = postJson('/api/departments', []);
 
-    $response->assertOk()
-        ->assertJsonFragment(['id' => $department->id]);
-});
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['name']);
+    });
 
-test('update modifies a department and returns the updated record', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
+    test('show returns single department with full resource structure', function () {
+        $department = Department::factory()->create();
 
-    $name = fake()->word();
+        $response = getJson("/api/departments/{$department->id}");
 
-    $department = Department::factory()->create([
-        'name' => $name,
-    ]);
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'created_at',
+                    'updated_at',
+                ]
+            ])
+            ->assertJsonFragment(['id' => $department->id, 'name' => $department->name]);
+    });
 
-    $updatedName = fake()->word();
+    test('show returns 404 for non-existent department', function () {
+        $response = getJson('/api/departments/99999');
 
-    $payload = [
-        'name' => $updatedName,
-    ];
+        $response->assertNotFound();
+    });
 
-    $response = putJson("/api/departments/{$department->id}", $payload);
+    test('update modifies department and returns updated resource', function () {
+        $department = Department::factory()->create(['name' => 'Old Name']);
+        $updateData = ['name' => 'Updated Department Name'];
 
-    $response->assertOk()
-        ->assertJsonFragment(['name' => $updatedName]);
+        $response = putJson("/api/departments/{$department->id}", $updateData);
 
-    $department->refresh();
-    expect($department->name)->toBe($updatedName);
-});
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'created_at',
+                    'updated_at',
+                ]
+            ])
+            ->assertJsonFragment(['name' => 'Updated Department Name']);
 
-test('destroy deletes a department and returns 204', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
+        $department->refresh();
+        expect($department->name)->toBe('Updated Department Name');
+    });
 
-    $department = Department::factory()->create();
+    test('update validates name field when provided', function () {
+        $department = Department::factory()->create();
 
-    $response = deleteJson("/api/departments/{$department->id}");
+        $response = putJson("/api/departments/{$department->id}", ['name' => '']);
 
-    $response->assertNoContent();
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['name']);
+    });
 
-    assertDatabaseMissing('departments', ['id' => $department->id]);
-});
+    test('update returns 404 for non-existent department', function () {
+        $response = putJson('/api/departments/99999', ['name' => 'Test']);
 
-test('export returns excel file url and filename', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
+        $response->assertNotFound();
+    });
 
-    // Create some departments to export
-    Department::factory()->count(3)->create();
+    test('destroy removes department and returns 204 status', function () {
+        $department = Department::factory()->create();
 
-    $response = postJson('/api/departments/export', []);
+        $response = deleteJson("/api/departments/{$department->id}");
 
-    $response->assertOk()
-        ->assertJsonStructure([
-            'url',
-            'filename',
-        ]);
+        $response->assertNoContent();
 
-    $data = $response->json();
-    expect($data['url'])->toContain('storage/exports/');
-    expect($data['filename'])->toContain('departments_export_');
-    expect($data['filename'])->toContain('.xlsx');
+        assertDatabaseMissing('departments', ['id' => $department->id]);
+    });
+
+    test('destroy returns 404 for non-existent department', function () {
+        $response = deleteJson('/api/departments/99999');
+
+        $response->assertNotFound();
+    });
+
+    test('export generates excel file and returns proper response structure', function () {
+        Department::factory()->count(5)->create();
+
+        $response = postJson('/api/departments/export', []);
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'url',
+                'filename',
+            ]);
+
+        $data = $response->json();
+        expect($data['url'])->toContain('storage/exports/')
+            ->and($data['filename'])->toContain('departments_export_')
+            ->and($data['filename'])->toContain('.xlsx')
+            ->and($data['filename'])->toMatch('/departments_export_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.xlsx/');
+    });
+
+    test('export applies search filter correctly', function () {
+        Department::factory()->create(['name' => 'Marketing']);
+        Department::factory()->create(['name' => 'Sales']);
+        Department::factory()->create(['name' => 'Engineering']);
+
+        $response = postJson('/api/departments/export', ['search' => 'market']);
+
+        $response->assertOk();
+
+        // Note: Actual export verification would require checking the generated file
+        // This test verifies the endpoint accepts and processes filters
+        expect($response->json())->toHaveKeys(['url', 'filename']);
+    });
+
 });

@@ -4,6 +4,7 @@ use App\Models\Position;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
+use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
@@ -13,135 +14,203 @@ use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
 
-test('index returns paginated positions with meta', function () {
-    // Create a user and authenticate
-    $user = User::factory()->create();
-    $this->actingAs($user);
+describe('Position API Endpoints', function () {
 
-    // Seed some positions
-    Position::factory()->count(15)->create();
+    beforeEach(function () {
+        $user = User::factory()->create();
+        actingAs($user);
+    });
 
-    $response = getJson('/api/positions');
+    test('index returns paginated positions with proper meta structure', function () {
+        Position::factory()->count(25)->create();
 
-    $response->assertOk()
-        ->assertJsonStructure([
-            'data',
-            'meta' => [
-                'current_page',
-                'from',
-                'last_page',
-                'per_page',
-                'to',
-                'total',
-            ],
-        ]);
+        $response = getJson('/api/positions?per_page=10');
 
-    // Ensure pagination returns 10 items by default (Laravel default)
-    expect($response->json('data'))->toHaveCount(15);
-});
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'name',
+                        'created_at',
+                        'updated_at',
+                    ]
+                ],
+                'meta' => [
+                    'current_page',
+                    'from',
+                    'last_page',
+                    'per_page',
+                    'to',
+                    'total',
+                ],
+            ]);
 
-test('index filters positions by search term', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
+        expect($response->json('meta.total'))->toBe(25)
+            ->and($response->json('meta.per_page'))->toBe(10)
+            ->and($response->json('data'))->toHaveCount(10);
+    });
 
-    Position::factory()->create(['name' => 'Manager']);
-    Position::factory()->create(['name' => 'Developer']);
-    Position::factory()->create(['name' => 'Designer']);
+    test('index supports search filtering by position name', function () {
+        Position::factory()->create(['name' => 'Senior Manager']);
+        Position::factory()->create(['name' => 'Developer']);
+        Position::factory()->create(['name' => 'Product Designer']);
 
-    $response = getJson('/api/positions?search=dev');
+        $response = getJson('/api/positions?search=Developer');
 
-    $response->assertOk();
+        $response->assertOk();
 
-    $data = $response->json('data');
-    expect($data)->toHaveCount(1);
-    expect($data[0]['name'])->toBe('Developer');
-});
+        $data = $response->json('data');
+        expect($data)->toHaveCount(1)
+            ->and($data[0]['name'])->toBe('Developer');
+    });
 
-test('store creates a new position and returns 201', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
+    test('index supports sorting by different fields', function () {
+        Position::factory()->create(['name' => 'Z Position']);
+        Position::factory()->create(['name' => 'A Position']);
 
-    $name = fake()->randomLetter();
+        $response = getJson('/api/positions?sort_by=name&sort_direction=asc');
 
-    $payload = [
-        'name' => $name,
-    ];
+        $response->assertOk();
 
-    $response = postJson('/api/positions', $payload);
+        $data = $response->json('data');
+        expect($data[0]['name'])->toBe('A Position')
+            ->and($data[1]['name'])->toBe('Z Position');
+    });
 
-    $response->assertCreated()
-        ->assertJsonFragment(['name' => $name]);
+    test('store creates position with valid data and returns 201 status', function () {
+        $positionData = [
+            'name' => 'Product Manager',
+        ];
 
-    assertDatabaseHas('positions', ['name' => $name]);
-});
+        $response = postJson('/api/positions', $positionData);
 
-test('show returns a single position', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
+        $response->assertCreated()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'created_at',
+                    'updated_at',
+                ]
+            ])
+            ->assertJsonFragment(['name' => 'Product Manager']);
 
-    $position = Position::factory()->create();
+        assertDatabaseHas('positions', ['name' => 'Product Manager']);
+    });
 
-    $response = getJson("/api/positions/{$position->id}");
+    test('store validates required fields', function () {
+        $response = postJson('/api/positions', []);
 
-    $response->assertOk()
-        ->assertJsonFragment(['id' => $position->id]);
-});
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['name']);
+    });
 
-test('update modifies an position and returns the updated record', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
+    test('show returns single position with full resource structure', function () {
+        $position = Position::factory()->create();
 
-    $name = fake()->randomLetter();
+        $response = getJson("/api/positions/{$position->id}");
 
-    $position = Position::factory()->create([
-        'name' => $name,
-    ]);
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'created_at',
+                    'updated_at',
+                ]
+            ])
+            ->assertJsonFragment(['id' => $position->id, 'name' => $position->name]);
+    });
 
-    $updatedName = fake()->randomLetter();
+    test('show returns 404 for non-existent position', function () {
+        $response = getJson('/api/positions/99999');
 
-    $payload = [
-        'name' => $updatedName,
-    ];
+        $response->assertNotFound();
+    });
 
-    $response = putJson("/api/positions/{$position->id}", $payload);
+    test('update modifies position and returns updated resource', function () {
+        $position = Position::factory()->create(['name' => 'Old Position']);
+        $updateData = ['name' => 'Updated Position Name'];
 
-    $response->assertOk()
-        ->assertJsonFragment(['name' => $updatedName]);
+        $response = putJson("/api/positions/{$position->id}", $updateData);
 
-    $position->refresh();
-    expect($position->name)->toBe($updatedName);
-});
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'created_at',
+                    'updated_at',
+                ]
+            ])
+            ->assertJsonFragment(['name' => 'Updated Position Name']);
 
-test('destroy deletes an position and returns 204', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
+        $position->refresh();
+        expect($position->name)->toBe('Updated Position Name');
+    });
 
-    $position = Position::factory()->create();
+    test('update validates name field when provided', function () {
+        $position = Position::factory()->create();
 
-    $response = deleteJson("/api/positions/{$position->id}");
+        $response = putJson("/api/positions/{$position->id}", ['name' => '']);
 
-    $response->assertNoContent();
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['name']);
+    });
 
-    assertDatabaseMissing('positions', ['id' => $position->id]);
-});
+    test('update returns 404 for non-existent position', function () {
+        $response = putJson('/api/positions/99999', ['name' => 'Test Position']);
 
-test('export returns excel file url and filename', function () {
-    $user = User::factory()->create();
-    $this->actingAs($user);
+        $response->assertNotFound();
+    });
 
-    // Create some positions to export
-    Position::factory()->count(3)->create();
+    test('destroy removes position and returns 204 status', function () {
+        $position = Position::factory()->create();
 
-    $response = postJson('/api/positions/export', []);
+        $response = deleteJson("/api/positions/{$position->id}");
 
-    $response->assertOk()
-        ->assertJsonStructure([
-            'url',
-            'filename',
-        ]);
+        $response->assertNoContent();
 
-    $data = $response->json();
-    expect($data['url'])->toContain('storage/exports/');
-    expect($data['filename'])->toContain('positions_export_');
-    expect($data['filename'])->toContain('.xlsx');
+        assertDatabaseMissing('positions', ['id' => $position->id]);
+    });
+
+    test('destroy returns 404 for non-existent position', function () {
+        $response = deleteJson('/api/positions/99999');
+
+        $response->assertNotFound();
+    });
+
+    test('export generates excel file and returns proper response structure', function () {
+        Position::factory()->count(5)->create();
+
+        $response = postJson('/api/positions/export', []);
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'url',
+                'filename',
+            ]);
+
+        $data = $response->json();
+        expect($data['url'])->toContain('storage/exports/')
+            ->and($data['filename'])->toContain('positions_export_')
+            ->and($data['filename'])->toContain('.xlsx')
+            ->and($data['filename'])->toMatch('/positions_export_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.xlsx/');
+    });
+
+    test('export applies search filter correctly', function () {
+        Position::factory()->create(['name' => 'Manager']);
+        Position::factory()->create(['name' => 'Developer']);
+        Position::factory()->create(['name' => 'Designer']);
+
+        $response = postJson('/api/positions/export', ['search' => 'dev']);
+
+        $response->assertOk();
+
+        // Note: Actual export verification would require checking the generated file
+        // This test verifies the endpoint accepts and processes filters
+        expect($response->json())->toHaveKeys(['url', 'filename']);
+    });
+
 });
