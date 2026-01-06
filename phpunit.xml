@@ -16,6 +16,9 @@
         <include>
             <directory>app</directory>
         </include>
+        <exclude>
+            <file>app/Providers/FortifyServiceProvider.php</file>
+        </exclude>
     </source>
 
     <!-- BEGIN COVERAGE CONFIGURATION -->

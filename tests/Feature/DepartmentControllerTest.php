@@ -37,6 +37,23 @@ test('index returns paginated departments with meta', function () {
     expect($response->json('data'))->toHaveCount(15);
 });
 
+test('index filters departments by search term', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    Department::factory()->create(['name' => 'Marketing']);
+    Department::factory()->create(['name' => 'Sales']);
+    Department::factory()->create(['name' => 'Engineering']);
+
+    $response = getJson('/api/departments?search=market');
+
+    $response->assertOk();
+
+    $data = $response->json('data');
+    expect($data)->toHaveCount(1);
+    expect($data[0]['name'])->toBe('Marketing');
+});
+
 test('store creates a new department and returns 201', function () {
     $user = User::factory()->create();
     $this->actingAs($user);

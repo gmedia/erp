@@ -40,6 +40,23 @@ test('index returns paginated positions with meta', function () {
     expect($response->json('data'))->toHaveCount(15);
 });
 
+test('index filters positions by search term', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    Position::factory()->create(['name' => 'Manager']);
+    Position::factory()->create(['name' => 'Developer']);
+    Position::factory()->create(['name' => 'Designer']);
+
+    $response = getJson('/api/positions?search=dev');
+
+    $response->assertOk();
+
+    $data = $response->json('data');
+    expect($data)->toHaveCount(1);
+    expect($data[0]['name'])->toBe('Developer');
+});
+
 test('store creates a new position and returns 201', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
