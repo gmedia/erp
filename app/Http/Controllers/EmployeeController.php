@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Employees\CreateEmployeeAction;
 use App\Actions\Employees\ExportEmployeesAction;
 use App\Actions\Employees\IndexEmployeesAction;
-use App\Actions\Employees\UpdateEmployeeAction;
 use App\Domain\Employees\EmployeeFilterService;
-use App\DTOs\Employees\StoreEmployeeData;
-use App\DTOs\Employees\UpdateEmployeeData;
 use App\Http\Requests\Employees\ExportEmployeeRequest;
 use App\Http\Requests\Employees\IndexEmployeeRequest;
 use App\Http\Requests\Employees\StoreEmployeeRequest;
@@ -33,11 +29,18 @@ class EmployeeController extends Controller
 
     /**
      * Store a newly created employee in storage.
+     *
+     * @bodyParam name string required The employee's name. Example: John Doe
+     * @bodyParam email string required The employee's email. Example: john.doe@example.com
+     * @bodyParam phone string The employee's phone number. Example: 555-1234
+     * @bodyParam department string The employee's department. Example: Engineering
+     * @bodyParam position string The employee's position. Example: Developer
+     * @bodyParam salary numeric The employee's salary. Example: 75000.00
+     * @bodyParam hire_date date The employee's hire date. Example: 2023-01-15
      */
     public function store(StoreEmployeeRequest $request): JsonResponse
     {
-        $data = StoreEmployeeData::fromArray($request->validated());
-        $employee = (new CreateEmployeeAction)->execute($data);
+        $employee = Employee::create($request->validated());
 
         return (new EmployeeResource($employee))
             ->response()
@@ -57,8 +60,7 @@ class EmployeeController extends Controller
      */
     public function update(UpdateEmployeeRequest $request, Employee $employee): JsonResponse
     {
-        $data = UpdateEmployeeData::fromArray($request->validated());
-        $employee = (new UpdateEmployeeAction)->execute($employee, $data);
+        $employee->update($request->validated());
 
         return (new EmployeeResource($employee))->response();
     }
