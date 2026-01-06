@@ -15,7 +15,7 @@ class EmployeeCreateCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'employee:create {count=1}';
+    protected $signature = 'employee:create {count=1} {--test-exception=0}';
 
     /**
      * The console command description.
@@ -78,10 +78,17 @@ class EmployeeCreateCommand extends Command
         $created = 0;
         $failed = 0;
 
+        $testExceptionOn = (int) $this->option('test-exception');
+
         // Use transaction for better performance
-        DB::transaction(function () use ($count, $faker, $departments, &$created, &$failed, $progressBar) {
+        DB::transaction(function () use ($count, $faker, $departments, &$created, &$failed, $progressBar, $testExceptionOn) {
             for ($i = 0; $i < $count; $i++) {
                 try {
+                    // For testing: force exception on specific iteration
+                    if ($testExceptionOn > 0 && ($i + 1) === $testExceptionOn) {
+                        throw new Exception('Test exception for coverage');
+                    }
+
                     // Select random department and position
                     $department = array_rand($departments);
                     $position = $departments[$department][array_rand($departments[$department])];

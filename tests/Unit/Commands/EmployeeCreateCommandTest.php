@@ -119,3 +119,52 @@ test('generateSalaryForPosition formats salary correctly', function () {
     // Should be formatted as string with 2 decimal places
     expect($salary)->toBe('75000.00');
 });
+
+// Custom faker-like class for testing the fallback mechanism
+class TestFaker {
+    private $callCount = 0;
+
+    public function unique() {
+        return $this;
+    }
+
+    public function __get($name) {
+        if ($name === 'safeEmail') {
+            return $this->safeEmail();
+        }
+        throw new \Exception("Property $name not found");
+    }
+
+    private function safeEmail() {
+        $this->callCount++;
+        // Always return the same existing email to force max attempts
+        return 'existing@example.com';
+    }
+}
+
+test('generateUniqueEmail uses fallback mechanism when max attempts reached', function () {
+    // Create an existing employee to force duplicate detection
+    Employee::factory()->create(['email' => 'existing@example.com']);
+
+    $command = new EmployeeCreateCommand();
+
+    // Use reflection to access private method
+    $reflection = new ReflectionClass($command);
+    $method = $reflection->getMethod('generateUniqueEmail');
+    $method->setAccessible(true);
+
+    // Use our custom test faker that always returns existing emails
+    $testFaker = new TestFaker();
+
+    // Call the method - it should eventually use the fallback mechanism after 100 attempts
+    $email = $method->invoke($command, $testFaker);
+
+    // The email should be in the fallback format: employee_TIMESTAMP_RANDOM@example.com
+    expect($email)->toMatch('/^employee_\d+_\d{4}@example\.com$/');
+
+    // Should be valid email format
+    expect(filter_var($email, FILTER_VALIDATE_EMAIL))->toBeTruthy();
+
+    // Should be different from the existing email
+    expect($email)->not->toBe('existing@example.com');
+});

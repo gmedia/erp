@@ -2,6 +2,7 @@
 
 use App\Console\Commands\EmployeeCreateCommand;
 use App\Models\Employee;
+use Faker\Factory as Faker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 
@@ -102,4 +103,96 @@ test('command generates unique emails with fallback mechanism', function () {
     foreach ($emails as $email) {
         expect(filter_var($email, FILTER_VALIDATE_EMAIL))->not->toBeFalse();
     }
+});
+
+test('command handles database transactions properly', function () {
+    $initialCount = Employee::count();
+
+    $exitCode = Artisan::call(EmployeeCreateCommand::class, ['count' => 3]);
+
+    expect($exitCode)->toBe(EmployeeCreateCommand::SUCCESS);
+    expect(Employee::count())->toBe($initialCount + 3);
+
+    // Ensure all created employees have valid data
+    $newEmployees = Employee::skip($initialCount)->take(3)->get();
+    foreach ($newEmployees as $employee) {
+        expect($employee->email)->toBeString();
+        expect($employee->name)->toBeString();
+    }
+});
+
+test('command executes all code paths for coverage', function () {
+    $initialCount = Employee::count();
+
+    // Run with multiple employees to ensure progress bar advances
+    $exitCode = Artisan::call(EmployeeCreateCommand::class, ['count' => 3]);
+
+    expect($exitCode)->toBe(EmployeeCreateCommand::SUCCESS);
+    expect(Employee::count())->toBe($initialCount + 3);
+
+    // Test output contains expected messages
+    $outputContent = Artisan::output();
+    expect($outputContent)->toContain("Found {$initialCount} existing employees.")
+        ->and($outputContent)->toContain('Generating 3 dummy employees...')
+        ->and($outputContent)->toContain('✅ Successfully created 3 employees.')
+        ->and($outputContent)->toContain('📊 Total employees in database: ' . ($initialCount + 3));
+});
+
+test('command handles exceptions and shows failure messages', function () {
+    $initialCount = Employee::count();
+
+    // Use the test-exception option to force an exception on the 2nd employee
+    $exitCode = Artisan::call(EmployeeCreateCommand::class, [
+        'count' => 3,
+        '--test-exception' => 2
+    ]);
+
+    expect($exitCode)->toBe(EmployeeCreateCommand::SUCCESS);
+    expect(Employee::count())->toBe($initialCount + 2); // Only 1st and 3rd should succeed
+
+    $outputContent = Artisan::output();
+
+    // Should show error message for failed creation
+    expect($outputContent)->toContain('Failed to create employee: Test exception for coverage')
+        ->and($outputContent)->toContain('⚠️ Failed to create 1 employees');
+});
+
+test('command fails when email limit is completely reached', function () {
+    // Create employees at the exact limit
+    $existingCount = 10000; // At the 10000 limit
+    Employee::factory()->count($existingCount)->create();
+
+    $exitCode = Artisan::call(EmployeeCreateCommand::class, ['count' => 1]);
+
+    expect($exitCode)->toBe(EmployeeCreateCommand::FAILURE);
+
+    $outputContent = Artisan::output();
+    expect($outputContent)->toContain('Maximum unique email limit reached. Cannot generate more employees.');
+});
+
+test('command handles email limit and reduces count appropriately', function () {
+    // Create employees close to the limit
+    $existingCount = 9997; // Very close to 10000 limit
+    Employee::factory()->count($existingCount)->create();
+
+    Artisan::call(EmployeeCreateCommand::class, ['count' => 10]);
+
+    $outputContent = Artisan::output();
+
+    expect($outputContent)->toContain('Requested 10 employees, but only 3 unique emails available');
+    expect($outputContent)->toContain('Generating 3 dummy employees...');
+    expect($outputContent)->toContain('✅ Successfully created 3 employees.');
+});
+
+test('command handles high employee counts efficiently', function () {
+    $initialCount = Employee::count();
+
+    // Test with a reasonable number that exercises the loop
+    $exitCode = Artisan::call(EmployeeCreateCommand::class, ['count' => 50]);
+
+    expect($exitCode)->toBe(EmployeeCreateCommand::SUCCESS);
+    expect(Employee::count())->toBe($initialCount + 50);
+
+    $outputContent = Artisan::output();
+    expect($outputContent)->toContain('✅ Successfully created 50 employees.');
 });
