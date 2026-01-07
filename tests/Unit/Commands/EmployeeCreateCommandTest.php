@@ -4,6 +4,7 @@ use App\Console\Commands\EmployeeCreateCommand;
 use App\Models\Employee;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use Tests\Unit\Commands\TestFaker;
 
 uses(RefreshDatabase::class);
 
@@ -120,28 +121,6 @@ test('generateSalaryForPosition formats salary correctly', function () {
     expect($salary)->toBe('75000.00');
 });
 
-// Custom faker-like class for testing the fallback mechanism
-class TestFaker {
-    private $callCount = 0;
-
-    public function unique() {
-        return $this;
-    }
-
-    public function __get($name) {
-        if ($name === 'safeEmail') {
-            return $this->safeEmail();
-        }
-        throw new \Exception("Property $name not found");
-    }
-
-    private function safeEmail() {
-        $this->callCount++;
-        // Always return the same existing email to force max attempts
-        return 'existing@example.com';
-    }
-}
-
 test('generateUniqueEmail uses fallback mechanism when max attempts reached', function () {
     // Create an existing employee to force duplicate detection
     Employee::factory()->create(['email' => 'existing@example.com']);
@@ -168,3 +147,4 @@ test('generateUniqueEmail uses fallback mechanism when max attempts reached', fu
     // Should be different from the existing email
     expect($email)->not->toBe('existing@example.com');
 });
+
