@@ -9,9 +9,9 @@ uses(RefreshDatabase::class);
 test('applySearch adds where clause for search term', function () {
     $service = new PositionFilterService;
 
-    Position::create(['name' => 'Software Engineer']);
-    Position::create(['name' => 'Product Manager']);
-    Position::create(['name' => 'Designer']);
+    Position::factory()->create(['name' => 'Software Engineer']);
+    Position::factory()->create(['name' => 'Product Manager']);
+    Position::factory()->create(['name' => 'Designer']);
 
     $query = Position::query();
     $service->applySearch($query, 'engineer', ['name']);
@@ -25,8 +25,8 @@ test('applySearch adds where clause for search term', function () {
 test('applySearch searches across multiple fields', function () {
     $service = new PositionFilterService;
 
-    Position::create(['name' => 'Developer Position']);
-    Position::create(['name' => 'Manager Position']);
+    Position::factory()->create(['name' => 'Developer Position']);
+    Position::factory()->create(['name' => 'Manager Position']);
 
     $query = Position::query();
     $service->applySearch($query, 'Position', ['name']);
@@ -39,8 +39,8 @@ test('applySearch searches across multiple fields', function () {
 test('applySorting applies ascending sort when allowed', function () {
     $service = new PositionFilterService;
 
-    Position::create(['name' => 'Z Position']);
-    Position::create(['name' => 'A Position']);
+    Position::factory()->create(['name' => 'Z Position']);
+    Position::factory()->create(['name' => 'A Position']);
 
     $query = Position::query();
     $service->applySorting($query, 'name', 'asc', ['id', 'name', 'created_at', 'updated_at']);
@@ -54,8 +54,8 @@ test('applySorting applies ascending sort when allowed', function () {
 test('applySorting applies descending sort when allowed', function () {
     $service = new PositionFilterService;
 
-    Position::create(['name' => 'A Position']);
-    Position::create(['name' => 'Z Position']);
+    Position::factory()->create(['name' => 'A Position']);
+    Position::factory()->create(['name' => 'Z Position']);
 
     $query = Position::query();
     $service->applySorting($query, 'name', 'desc', ['id', 'name', 'created_at', 'updated_at']);
@@ -69,7 +69,7 @@ test('applySorting applies descending sort when allowed', function () {
 test('applySorting does not apply sort when field not allowed', function () {
     $service = new PositionFilterService;
 
-    Position::create(['name' => 'Test Position']);
+    Position::factory()->create(['name' => 'Test Position']);
 
     $query = Position::query();
     $originalSql = $query->toSql();

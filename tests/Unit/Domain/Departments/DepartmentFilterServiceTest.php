@@ -25,8 +25,8 @@ test('applySearch adds where clause for search term', function () {
 test('applySearch searches across multiple fields', function () {
     $service = new DepartmentFilterService;
 
-    Department::create(['name' => 'Engineering']);
-    Department::create(['name' => 'Marketing']);
+    Department::factory()->create(['name' => 'Engineering']);
+    Department::factory()->create(['name' => 'Marketing']);
 
     $query = Department::query();
     $service->applySearch($query, 'arket', ['name']);
