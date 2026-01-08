@@ -8,29 +8,42 @@ use function Pest\Laravel\assertDatabaseHas;
 
 uses(RefreshDatabase::class);
 
-describe('CRUD Model Tests', function () {
+describe('Department Model', function () {
+    test('factory creates a valid department', function () {
+        $department = Department::factory()->create();
 
-    dataset('crud_models', [
-        [Department::class, 'departments', 'Department'],
-        [Position::class, 'positions', 'Position'],
-    ]);
+        assertDatabaseHas('departments', ['id' => $department->id]);
 
-    test('{2} factory creates a valid item', function ($model, $table, $name) {
-        $item = $model::factory()->create();
-
-        assertDatabaseHas($table, ['id' => $item->id]);
-
-        expect($item->getAttributes())->toMatchArray([
-            'name' => $item->name,
+        expect($department->getAttributes())->toMatchArray([
+            'name' => $department->name,
         ]);
-    })->with('crud_models');
+    });
 
-    test('{2} fillable attributes are defined correctly', function ($model, $table, $name) {
-        $fillable = (new $model)->getFillable();
+    test('fillable attributes are defined correctly', function () {
+        $fillable = (new Department)->getFillable();
 
         expect($fillable)->toBe([
             'name',
         ]);
-    })->with('crud_models');
+    });
+});
 
+describe('Position Model', function () {
+    test('factory creates a valid position', function () {
+        $position = Position::factory()->create();
+
+        assertDatabaseHas('positions', ['id' => $position->id]);
+
+        expect($position->getAttributes())->toMatchArray([
+            'name' => $position->name,
+        ]);
+    });
+
+    test('fillable attributes are defined correctly', function () {
+        $fillable = (new Position)->getFillable();
+
+        expect($fillable)->toBe([
+            'name',
+        ]);
+    });
 });

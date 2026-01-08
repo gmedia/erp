@@ -15,22 +15,16 @@ use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
 
-describe('CRUD API Endpoints', function () {
-
-    dataset('crud_models', [
-        [Department::class, 'departments', 'departments', 'Department'],
-        [Position::class, 'positions', 'positions', 'Position'],
-    ]);
-
+describe('Department API Endpoints', function () {
     beforeEach(function () {
         $user = User::factory()->create();
         actingAs($user);
     });
 
-    test('{3} index returns paginated items with proper meta structure', function ($model, $route, $table, $name) {
-        $model::factory()->count(25)->create();
+    test('index returns paginated departments with proper meta structure', function () {
+        Department::factory()->count(25)->create();
 
-        $response = getJson("/api/{$route}?per_page=10");
+        $response = getJson('/api/departments?per_page=10');
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -55,41 +49,39 @@ describe('CRUD API Endpoints', function () {
         expect($response->json('meta.total'))->toBe(25)
             ->and($response->json('meta.per_page'))->toBe(10)
             ->and($response->json('data'))->toHaveCount(10);
-    })->with('crud_models');
+    });
 
-    test('{3} index supports search filtering by name', function ($model, $route, $table, $name) {
-        $model::factory()->create(['name' => 'Marketing ' . $name]);
-        $model::factory()->create(['name' => 'Sales ' . $name]);
-        $model::factory()->create(['name' => 'Engineering ' . $name]);
+    test('index supports search filtering by name', function () {
+        Department::factory()->create(['name' => 'Marketing Department']);
+        Department::factory()->create(['name' => 'Sales Department']);
+        Department::factory()->create(['name' => 'Engineering Department']);
 
-        $response = getJson("/api/{$route}?search=market");
+        $response = getJson('/api/departments?search=market');
 
         $response->assertOk();
 
         $data = $response->json('data');
         expect($data)->toHaveCount(1)
-            ->and($data[0]['name'])->toBe('Marketing ' . $name);
-    })->with('crud_models');
+            ->and($data[0]['name'])->toBe('Marketing Department');
+    });
 
-    test('{3} index supports sorting by different fields', function ($model, $route, $table, $name) {
-        $model::factory()->create(['name' => 'Z ' . $name]);
-        $model::factory()->create(['name' => 'A ' . $name]);
+    test('index supports sorting by different fields', function () {
+        Department::factory()->create(['name' => 'Z Department']);
+        Department::factory()->create(['name' => 'A Department']);
 
-        $response = getJson("/api/{$route}?sort_by=name&sort_direction=asc");
+        $response = getJson('/api/departments?sort_by=name&sort_direction=asc');
 
         $response->assertOk();
 
         $data = $response->json('data');
-        expect($data[0]['name'])->toBe('A ' . $name)
-            ->and($data[1]['name'])->toBe('Z ' . $name);
-    })->with('crud_models');
+        expect($data[0]['name'])->toBe('A Department')
+            ->and($data[1]['name'])->toBe('Z Department');
+    });
 
-    test('{3} store creates item with valid data and returns 201 status', function ($model, $route, $table, $name) {
-        $data = [
-            'name' => 'Test ' . $name,
-        ];
+    test('store creates department with valid data and returns 201 status', function () {
+        $data = ['name' => 'Test Department'];
 
-        $response = postJson("/api/{$route}", $data);
+        $response = postJson('/api/departments', $data);
 
         $response->assertCreated()
             ->assertJsonStructure([
@@ -100,22 +92,22 @@ describe('CRUD API Endpoints', function () {
                     'updated_at',
                 ]
             ])
-            ->assertJsonFragment(['name' => 'Test ' . $name]);
+            ->assertJsonFragment(['name' => 'Test Department']);
 
-        assertDatabaseHas($table, ['name' => 'Test ' . $name]);
-    })->with('crud_models');
+        assertDatabaseHas('departments', ['name' => 'Test Department']);
+    });
 
-    test('{3} store validates required fields', function ($model, $route, $table, $name) {
-        $response = postJson("/api/{$route}", []);
+    test('store validates required fields', function () {
+        $response = postJson('/api/departments', []);
 
         $response->assertUnprocessable()
             ->assertJsonValidationErrors(['name']);
-    })->with('crud_models');
+    });
 
-    test('{3} show returns single item with full resource structure', function ($model, $route, $table, $name) {
-        $item = $model::factory()->create();
+    test('show returns single department with full resource structure', function () {
+        $department = Department::factory()->create();
 
-        $response = getJson("/api/{$route}/{$item->id}");
+        $response = getJson("/api/departments/{$department->id}");
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -126,20 +118,20 @@ describe('CRUD API Endpoints', function () {
                     'updated_at',
                 ]
             ])
-            ->assertJsonFragment(['id' => $item->id, 'name' => $item->name]);
-    })->with('crud_models');
+            ->assertJsonFragment(['id' => $department->id, 'name' => $department->name]);
+    });
 
-    test('{3} show returns 404 for non-existent item', function ($model, $route, $table, $name) {
-        $response = getJson("/api/{$route}/99999");
+    test('show returns 404 for non-existent department', function () {
+        $response = getJson('/api/departments/99999');
 
         $response->assertNotFound();
-    })->with('crud_models');
+    });
 
-    test('{3} update modifies item and returns updated resource', function ($model, $route, $table, $name) {
-        $item = $model::factory()->create(['name' => 'Old Name']);
-        $updateData = ['name' => 'Updated ' . $name . ' Name'];
+    test('update modifies department and returns updated resource', function () {
+        $department = Department::factory()->create(['name' => 'Old Name']);
+        $updateData = ['name' => 'Updated Department Name'];
 
-        $response = putJson("/api/{$route}/{$item->id}", $updateData);
+        $response = putJson("/api/departments/{$department->id}", $updateData);
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -150,47 +142,47 @@ describe('CRUD API Endpoints', function () {
                     'updated_at',
                 ]
             ])
-            ->assertJsonFragment(['name' => 'Updated ' . $name . ' Name']);
+            ->assertJsonFragment(['name' => 'Updated Department Name']);
 
-        $item->refresh();
-        expect($item->name)->toBe('Updated ' . $name . ' Name');
-    })->with('crud_models');
+        $department->refresh();
+        expect($department->name)->toBe('Updated Department Name');
+    });
 
-    test('{3} update validates name field when provided', function ($model, $route, $table, $name) {
-        $item = $model::factory()->create();
+    test('update validates name field when provided', function () {
+        $department = Department::factory()->create();
 
-        $response = putJson("/api/{$route}/{$item->id}", ['name' => '']);
+        $response = putJson("/api/departments/{$department->id}", ['name' => '']);
 
         $response->assertUnprocessable()
             ->assertJsonValidationErrors(['name']);
-    })->with('crud_models');
+    });
 
-    test('{3} update returns 404 for non-existent item', function ($model, $route, $table, $name) {
-        $response = putJson("/api/{$route}/99999", ['name' => 'Test']);
+    test('update returns 404 for non-existent department', function () {
+        $response = putJson('/api/departments/99999', ['name' => 'Test']);
 
         $response->assertNotFound();
-    })->with('crud_models');
+    });
 
-    test('{3} destroy removes item and returns 204 status', function ($model, $route, $table, $name) {
-        $item = $model::factory()->create();
+    test('destroy removes department and returns 204 status', function () {
+        $department = Department::factory()->create();
 
-        $response = deleteJson("/api/{$route}/{$item->id}");
+        $response = deleteJson("/api/departments/{$department->id}");
 
         $response->assertNoContent();
 
-        assertDatabaseMissing($table, ['id' => $item->id]);
-    })->with('crud_models');
+        assertDatabaseMissing('departments', ['id' => $department->id]);
+    });
 
-    test('{3} destroy returns 404 for non-existent item', function ($model, $route, $table, $name) {
-        $response = deleteJson("/api/{$route}/99999");
+    test('destroy returns 404 for non-existent department', function () {
+        $response = deleteJson('/api/departments/99999');
 
         $response->assertNotFound();
-    })->with('crud_models');
+    });
 
-    test('{3} export generates excel file and returns proper response structure', function ($model, $route, $table, $name) {
-        $model::factory()->count(5)->create();
+    test('export generates excel file and returns proper response structure', function () {
+        Department::factory()->count(5)->create();
 
-        $response = postJson("/api/{$route}/export", []);
+        $response = postJson('/api/departments/export', []);
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -200,23 +192,219 @@ describe('CRUD API Endpoints', function () {
 
         $data = $response->json();
         expect($data['url'])->toContain('storage/exports/')
-            ->and($data['filename'])->toContain("{$route}_export_")
+            ->and($data['filename'])->toContain('departments_export_')
             ->and($data['filename'])->toContain('.xlsx')
-            ->and($data['filename'])->toMatch("/{$route}_export_\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}-\\d{2}\\.xlsx/");
-    })->with('crud_models');
+            ->and($data['filename'])->toMatch('/departments_export_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.xlsx/');
+    });
 
-    test('{3} export applies search filter correctly', function ($model, $route, $table, $name) {
-        $model::factory()->create(['name' => 'Manager']);
-        $model::factory()->create(['name' => 'Developer']);
-        $model::factory()->create(['name' => 'Designer']);
+    test('export applies search filter correctly', function () {
+        Department::factory()->create(['name' => 'Manager']);
+        Department::factory()->create(['name' => 'Developer']);
+        Department::factory()->create(['name' => 'Designer']);
 
-        $response = postJson("/api/{$route}/export", ['search' => 'dev']);
+        $response = postJson('/api/departments/export', ['search' => 'dev']);
 
         $response->assertOk();
 
         // Note: Actual export verification would require checking the generated file
         // This test verifies the endpoint accepts and processes filters
         expect($response->json())->toHaveKeys(['url', 'filename']);
-    })->with('crud_models');
+    });
+});
 
+describe('Position API Endpoints', function () {
+    beforeEach(function () {
+        $user = User::factory()->create();
+        actingAs($user);
+    });
+
+    test('index returns paginated positions with proper meta structure', function () {
+        Position::factory()->count(25)->create();
+
+        $response = getJson('/api/positions?per_page=10');
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'name',
+                        'created_at',
+                        'updated_at',
+                    ]
+                ],
+                'meta' => [
+                    'current_page',
+                    'from',
+                    'last_page',
+                    'per_page',
+                    'to',
+                    'total',
+                ],
+            ]);
+
+        expect($response->json('meta.total'))->toBe(25)
+            ->and($response->json('meta.per_page'))->toBe(10)
+            ->and($response->json('data'))->toHaveCount(10);
+    });
+
+    test('index supports search filtering by name', function () {
+        Position::factory()->create(['name' => 'Marketing Position']);
+        Position::factory()->create(['name' => 'Sales Position']);
+        Position::factory()->create(['name' => 'Engineering Position']);
+
+        $response = getJson('/api/positions?search=market');
+
+        $response->assertOk();
+
+        $data = $response->json('data');
+        expect($data)->toHaveCount(1)
+            ->and($data[0]['name'])->toBe('Marketing Position');
+    });
+
+    test('index supports sorting by different fields', function () {
+        Position::factory()->create(['name' => 'Z Position']);
+        Position::factory()->create(['name' => 'A Position']);
+
+        $response = getJson('/api/positions?sort_by=name&sort_direction=asc');
+
+        $response->assertOk();
+
+        $data = $response->json('data');
+        expect($data[0]['name'])->toBe('A Position')
+            ->and($data[1]['name'])->toBe('Z Position');
+    });
+
+    test('store creates position with valid data and returns 201 status', function () {
+        $data = ['name' => 'Test Position'];
+
+        $response = postJson('/api/positions', $data);
+
+        $response->assertCreated()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'created_at',
+                    'updated_at',
+                ]
+            ])
+            ->assertJsonFragment(['name' => 'Test Position']);
+
+        assertDatabaseHas('positions', ['name' => 'Test Position']);
+    });
+
+    test('store validates required fields', function () {
+        $response = postJson('/api/positions', []);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['name']);
+    });
+
+    test('show returns single position with full resource structure', function () {
+        $position = Position::factory()->create();
+
+        $response = getJson("/api/positions/{$position->id}");
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'created_at',
+                    'updated_at',
+                ]
+            ])
+            ->assertJsonFragment(['id' => $position->id, 'name' => $position->name]);
+    });
+
+    test('show returns 404 for non-existent position', function () {
+        $response = getJson('/api/positions/99999');
+
+        $response->assertNotFound();
+    });
+
+    test('update modifies position and returns updated resource', function () {
+        $position = Position::factory()->create(['name' => 'Old Name']);
+        $updateData = ['name' => 'Updated Position Name'];
+
+        $response = putJson("/api/positions/{$position->id}", $updateData);
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'created_at',
+                    'updated_at',
+                ]
+            ])
+            ->assertJsonFragment(['name' => 'Updated Position Name']);
+
+        $position->refresh();
+        expect($position->name)->toBe('Updated Position Name');
+    });
+
+    test('update validates name field when provided', function () {
+        $position = Position::factory()->create();
+
+        $response = putJson("/api/positions/{$position->id}", ['name' => '']);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['name']);
+    });
+
+    test('update returns 404 for non-existent position', function () {
+        $response = putJson('/api/positions/99999', ['name' => 'Test']);
+
+        $response->assertNotFound();
+    });
+
+    test('destroy removes position and returns 204 status', function () {
+        $position = Position::factory()->create();
+
+        $response = deleteJson("/api/positions/{$position->id}");
+
+        $response->assertNoContent();
+
+        assertDatabaseMissing('positions', ['id' => $position->id]);
+    });
+
+    test('destroy returns 404 for non-existent position', function () {
+        $response = deleteJson('/api/positions/99999');
+
+        $response->assertNotFound();
+    });
+
+    test('export generates excel file and returns proper response structure', function () {
+        Position::factory()->count(5)->create();
+
+        $response = postJson('/api/positions/export', []);
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'url',
+                'filename',
+            ]);
+
+        $data = $response->json();
+        expect($data['url'])->toContain('storage/exports/')
+            ->and($data['filename'])->toContain('positions_export_')
+            ->and($data['filename'])->toContain('.xlsx')
+            ->and($data['filename'])->toMatch('/positions_export_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.xlsx/');
+    });
+
+    test('export applies search filter correctly', function () {
+        Position::factory()->create(['name' => 'Manager']);
+        Position::factory()->create(['name' => 'Developer']);
+        Position::factory()->create(['name' => 'Designer']);
+
+        $response = postJson('/api/positions/export', ['search' => 'dev']);
+
+        $response->assertOk();
+
+        // Note: Actual export verification would require checking the generated file
+        // This test verifies the endpoint accepts and processes filters
+        expect($response->json())->toHaveKeys(['url', 'filename']);
+    });
 });
