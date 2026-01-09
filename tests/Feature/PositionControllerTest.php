@@ -103,6 +103,15 @@ describe('Position API Endpoints', function () {
             ->assertJsonValidationErrors(['name']);
     });
 
+    test('store validates unique name constraint', function () {
+        Position::factory()->create(['name' => 'Existing Position']);
+
+        $response = postJson('/api/positions', ['name' => 'Existing Position']);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['name']);
+    });
+
     test('show returns single position with full resource structure', function () {
         $position = Position::factory()->create();
 
@@ -147,10 +156,34 @@ describe('Position API Endpoints', function () {
         expect($position->name)->toBe('Updated Position Name');
     });
 
-    test('update validates name field when provided', function () {
+    test('update validates fields when provided with invalid data', function () {
         $position = Position::factory()->create();
 
-        $response = putJson("/api/positions/{$position->id}", ['name' => '']);
+        $response = putJson("/api/positions/{$position->id}", [
+            'name' => '', // Empty name
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['name']);
+    });
+
+    test('update ignores unique name validation for same position', function () {
+        $position = Position::factory()->create(['name' => 'Test Position']);
+
+        $response = putJson("/api/positions/{$position->id}", [
+            'name' => 'Test Position', // Same name should be allowed
+        ]);
+
+        $response->assertOk();
+    });
+
+    test('update validates unique name constraint for different position', function () {
+        $position1 = Position::factory()->create(['name' => 'Position One']);
+        $position2 = Position::factory()->create(['name' => 'Position Two']);
+
+        $response = putJson("/api/positions/{$position1->id}", [
+            'name' => 'Position Two', // Name from different position should fail
+        ]);
 
         $response->assertUnprocessable()
             ->assertJsonValidationErrors(['name']);

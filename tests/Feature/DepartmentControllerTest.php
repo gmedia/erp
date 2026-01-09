@@ -103,6 +103,15 @@ describe('Department API Endpoints', function () {
             ->assertJsonValidationErrors(['name']);
     });
 
+    test('store validates unique name constraint', function () {
+        Department::factory()->create(['name' => 'Existing Department']);
+
+        $response = postJson('/api/departments', ['name' => 'Existing Department']);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['name']);
+    });
+
     test('show returns single department with full resource structure', function () {
         $department = Department::factory()->create();
 
@@ -147,10 +156,34 @@ describe('Department API Endpoints', function () {
         expect($department->name)->toBe('Updated Department Name');
     });
 
-    test('update validates name field when provided', function () {
+    test('update validates fields when provided with invalid data', function () {
         $department = Department::factory()->create();
 
-        $response = putJson("/api/departments/{$department->id}", ['name' => '']);
+        $response = putJson("/api/departments/{$department->id}", [
+            'name' => '', // Empty name
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['name']);
+    });
+
+    test('update ignores unique name validation for same department', function () {
+        $department = Department::factory()->create(['name' => 'Test Department']);
+
+        $response = putJson("/api/departments/{$department->id}", [
+            'name' => 'Test Department', // Same name should be allowed
+        ]);
+
+        $response->assertOk();
+    });
+
+    test('update validates unique name constraint for different department', function () {
+        $department1 = Department::factory()->create(['name' => 'Department One']);
+        $department2 = Department::factory()->create(['name' => 'Department Two']);
+
+        $response = putJson("/api/departments/{$department1->id}", [
+            'name' => 'Department Two', // Name from different department should fail
+        ]);
 
         $response->assertUnprocessable()
             ->assertJsonValidationErrors(['name']);
