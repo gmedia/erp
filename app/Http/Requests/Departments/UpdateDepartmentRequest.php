@@ -28,6 +28,7 @@ class UpdateDepartmentRequest extends FormRequest
         return [
             'name' => [
                 'sometimes',
+                'filled',
                 'string',
                 'max:255',
                 Rule::unique('departments', 'name')->ignore($this->route('department')->id),

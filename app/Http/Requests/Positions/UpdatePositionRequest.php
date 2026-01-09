@@ -28,6 +28,7 @@ class UpdatePositionRequest extends FormRequest
         return [
             'name' => [
                 'sometimes',
+                'filled',
                 'string',
                 'max:255',
                 Rule::unique('positions', 'name')->ignore($this->route('position')->id),
