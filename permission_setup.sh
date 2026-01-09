@@ -69,6 +69,17 @@ mkdir -p "e2e"
 chmod -R ugo+rw "e2e"
 chown -R 1337:1000 "e2e"
 
+# Required by test
+
+rm -rf "coverage-html"
+mkdir -p "coverage-html"
+chmod -R ugo+rw "coverage-html"
+chown -R 1337:1000 "coverage-html"
+
+touch "coverage.xml"
+chmod ugo+rw "coverage.xml"
+chown 1337:1000 "coverage.xml"
+
 # Required by ide helper
 
 touch "_ide_helper.php"
