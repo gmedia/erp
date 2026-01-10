@@ -5,7 +5,7 @@ test('filter departments end‑to‑end', async ({ page }) => {
   // Log in
   await login(page);
 
-  // Create departments with distinct department/position combos
+  // Create departments
   await createDepartment(page);
   await createDepartment(page);
   const pos3 = await createDepartment(page);
