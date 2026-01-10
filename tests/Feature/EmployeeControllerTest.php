@@ -15,7 +15,6 @@ use function Pest\Laravel\putJson;
 uses(RefreshDatabase::class);
 
 describe('Employee API Endpoints', function () {
-
     beforeEach(function () {
         $user = User::factory()->create();
         actingAs($user);
