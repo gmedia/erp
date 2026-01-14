@@ -21,3 +21,6 @@ sleep 60
 # Create symbolic link for storage
 ./vendor/bin/sail run rm -rf public/storage
 ./vendor/bin/sail artisan storage:link
+
+# Generate ide helper
+./vendor/bin/sail artisan ide-helper:generate
