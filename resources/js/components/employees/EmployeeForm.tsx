@@ -97,8 +97,14 @@ const getEmployeeFormDefaults = (
         name: employee.name,
         email: employee.email,
         phone: employee.phone,
-        department: employee.department,
-        position: employee.position,
+        department:
+            typeof employee.department === 'object'
+                ? employee.department.id
+                : employee.department,
+        position:
+            typeof employee.position === 'object'
+                ? employee.position.id
+                : employee.position,
         salary: employee.salary,
         hire_date: new Date(employee.hire_date),
     };

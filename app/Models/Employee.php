@@ -82,4 +82,14 @@ class Employee extends Model
     {
         return number_format($value, 2, '.', '');
     }
+
+    public function departmentRel()
+    {
+        return $this->belongsTo(Department::class, 'department');
+    }
+
+    public function positionRel()
+    {
+        return $this->belongsTo(Position::class, 'position');
+    }
 }

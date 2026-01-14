@@ -20,7 +20,7 @@ class IndexEmployeesAction
     {
         ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 
-        $query = Employee::query();
+        $query = Employee::query()->with(['departmentRel', 'positionRel']);
 
         // Search functionality - search across name, email, phone, department, position
         if ($request->filled('search')) {

@@ -9,6 +9,7 @@ import {
     createEmailColumn,
     createPhoneColumn,
     createSelectColumn,
+    createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
 
@@ -19,11 +20,22 @@ export const employeeColumns: ColumnDef<Employee>[] = [
     createTextColumn<Employee>({ accessorKey: 'name', label: 'Name' }),
     createEmailColumn<Employee>({ accessorKey: 'email', label: 'Email' }),
     createPhoneColumn<Employee>({ accessorKey: 'phone', label: 'Phone' }),
-    createTextColumn<Employee>({
+    {
         accessorKey: 'department',
-        label: 'Department',
-    }),
-    createTextColumn<Employee>({ accessorKey: 'position', label: 'Position' }),
+        ...createSortingHeader('Department'),
+        cell: ({ row }) => {
+            const val = row.original.department;
+            return <div>{typeof val === 'object' ? val.name : val}</div>;
+        },
+    },
+    {
+        accessorKey: 'position',
+        ...createSortingHeader('Position'),
+        cell: ({ row }) => {
+            const val = row.original.position;
+            return <div>{typeof val === 'object' ? val.name : val}</div>;
+        },
+    },
     createCurrencyColumn<Employee>({ accessorKey: 'salary', label: 'Salary' }),
     createDateColumn<Employee>({
         accessorKey: 'hire_date',
