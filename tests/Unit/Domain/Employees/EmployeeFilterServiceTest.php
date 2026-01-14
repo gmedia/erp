@@ -10,8 +10,8 @@ test('applySearch adds where clause for search term', function () {
     $service = new EmployeeFilterService;
 
     Employee::factory()->create(['name' => 'John Doe', 'email' => 'unique@example.com']);
-    Employee::factory()->create(['name' => 'Jane Smith']);
-    Employee::factory()->create(['email' => 'bob@example.com']);
+    Employee::factory()->create(['name' => 'Jane Smith', 'email' => 'jane@example.com']);
+    Employee::factory()->create(['name' => 'Bob Builder', 'email' => 'bob@example.com']);
 
     $query = Employee::query();
     $service->applySearch($query, 'john', ['name', 'email']);

@@ -190,29 +190,24 @@ describe('UpdateEmployeeRequest', function () {
             ->and($validator->errors()->has('hire_date'))->toBeTrue();
     });
 
-    test('rules validation passes with valid departments', function () {
+    test('rules validation passes with valid department id', function () {
         $employee = Employee::factory()->create();
-        $validDepartments = [
-            'hr', 'engineering', 'sales', 'marketing', 'finance',
-            'operations', 'customer_support', 'product', 'design', 'legal'
-        ];
+        $department = \App\Models\Department::factory()->create();
+        
+        $data = ['department' => $department->id];
 
-        foreach ($validDepartments as $department) {
-            $data = ['department' => $department];
+        $request = new UpdateEmployeeRequest;
+        $request->setRouteResolver(function () use ($employee) {
+            return new class($employee) {
+                private $employee;
+                public function __construct($employee) { $this->employee = $employee; }
+                public function parameter($name) { return $this->employee; }
+            };
+        });
 
-            $request = new UpdateEmployeeRequest;
-            $request->setRouteResolver(function () use ($employee) {
-                return new class($employee) {
-                    private $employee;
-                    public function __construct($employee) { $this->employee = $employee; }
-                    public function parameter($name) { return $this->employee; }
-                };
-            });
+        $validator = validator($data, $request->rules());
 
-            $validator = validator($data, $request->rules());
-
-            expect($validator->passes())->toBeTrue();
-        }
+        expect($validator->passes())->toBeTrue();
     });
 
     test('rules validation passes with phone update', function () {

@@ -31,12 +31,15 @@ describe('StoreEmployeeRequest', function () {
     });
 
     test('rules validation passes with valid data', function () {
+        $department = \App\Models\Department::factory()->create();
+        $position = \App\Models\Position::factory()->create();
+
         $data = [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'phone' => '555-1234',
-            'department' => 'engineering',
-            'position' => 'Software Engineer',
+            'department' => $department->id,
+            'position' => $position->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];
@@ -143,12 +146,15 @@ describe('StoreEmployeeRequest', function () {
     });
 
     test('rules validation passes with phone field', function () {
+        $department = \App\Models\Department::factory()->create();
+        $position = \App\Models\Position::factory()->create();
+
         $data = [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'phone' => '555-1234',
-            'department' => 'engineering',
-            'position' => 'Software Engineer',
+            'department' => $department->id,
+            'position' => $position->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];
@@ -159,11 +165,14 @@ describe('StoreEmployeeRequest', function () {
     });
 
     test('rules validation passes without phone field', function () {
+        $department = \App\Models\Department::factory()->create();
+        $position = \App\Models\Position::factory()->create();
+
         $data = [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'department' => 'engineering',
-            'position' => 'Software Engineer',
+            'department' => $department->id,
+            'position' => $position->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];
@@ -173,25 +182,21 @@ describe('StoreEmployeeRequest', function () {
         expect($validator->passes())->toBeTrue();
     });
 
-    test('rules validation passes with valid departments', function () {
-        $validDepartments = [
-            'hr', 'engineering', 'sales', 'marketing', 'finance',
-            'operations', 'customer_support', 'product', 'design', 'legal'
+    test('rules validation passes with valid department id', function () {
+        $department = \App\Models\Department::factory()->create();
+        $position = \App\Models\Position::factory()->create();
+
+        $data = [
+            'name' => 'John Doe',
+            'email' => 'john.doe@example.com',
+            'department' => $department->id,
+            'position' => $position->id,
+            'salary' => '75000.00',
+            'hire_date' => '2023-01-15',
         ];
 
-        foreach ($validDepartments as $department) {
-            $data = [
-                'name' => 'John Doe',
-                'email' => "john.{$department}@example.com",
-                'department' => $department,
-                'position' => 'Software Engineer',
-                'salary' => '75000.00',
-                'hire_date' => '2023-01-15',
-            ];
+        $validator = validator($data, (new StoreEmployeeRequest)->rules());
 
-            $validator = validator($data, (new StoreEmployeeRequest)->rules());
-
-            expect($validator->passes())->toBeTrue();
-        }
+        expect($validator->passes())->toBeTrue();
     });
 });

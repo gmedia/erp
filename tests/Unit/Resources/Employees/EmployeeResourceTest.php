@@ -8,12 +8,15 @@ use Illuminate\Http\Request;
 uses(RefreshDatabase::class);
 
 test('toArray transforms employee correctly', function () {
+    $department = \App\Models\Department::factory()->create();
+    $position = \App\Models\Position::factory()->create();
+
     $employee = Employee::factory()->create([
         'name' => 'John Doe',
         'email' => 'john@example.com',
         'phone' => '555-1234',
-        'department' => 'engineering',
-        'position' => 'Software Engineer',
+        'department' => $department->id,
+        'position' => $position->id,
         'salary' => 75000.50,
         'hire_date' => '2023-03-15',
         'created_at' => '2023-01-10 14:30:00',
@@ -29,8 +32,12 @@ test('toArray transforms employee correctly', function () {
         ->and($result)->toHaveKey('name', 'John Doe')
         ->and($result)->toHaveKey('email', 'john@example.com')
         ->and($result)->toHaveKey('phone', '555-1234')
-        ->and($result)->toHaveKey('department', 'engineering')
-        ->and($result)->toHaveKey('position', 'Software Engineer')
+        ->and($result['department'])->toBeArray()
+        ->and($result['department']['id'])->toBe($department->id)
+        ->and($result['department']['name'])->toBe($department->name)
+        ->and($result['position'])->toBeArray()
+        ->and($result['position']['id'])->toBe($position->id)
+        ->and($result['position']['name'])->toBe($position->name)
         ->and($result)->toHaveKey('salary', '75000.50')
         ->and($result)->toHaveKey('hire_date')
         ->and($result)->toHaveKey('created_at')
