@@ -4,13 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 
+import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import NameField from '@/components/common/NameField';
-import SelectField from '@/components/common/SelectField';
 
-import { DEPARTMENTS, POSITIONS } from '@/constants';
 import { Employee, EmployeeFormData } from '@/types/entity';
 import { employeeFormSchema } from '@/utils/schemas';
 
@@ -44,16 +43,16 @@ const renderEmployeeBasicInfoSection = () => (
 
 const renderEmployeeWorkInfoSection = () => (
     <>
-        <SelectField
+        <AsyncSelectField
             name="department"
             label="Department"
-            options={DEPARTMENTS}
+            url="/api/departments"
             placeholder="Select a department"
         />
-        <SelectField
+        <AsyncSelectField
             name="position"
             label="Position"
-            options={POSITIONS}
+            url="/api/positions"
             placeholder="Select a position"
         />
         <InputField

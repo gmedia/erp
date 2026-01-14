@@ -1,27 +1,25 @@
 'use client';
 
 import {
-    createSelectFilterField,
+    createAsyncSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
-
-import { DEPARTMENTS, POSITIONS } from '@/constants';
 
 // Employee-specific filter fields
 export function createEmployeeFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField('search', 'Search', 'Search employees...'),
-        createSelectFilterField(
+        createAsyncSelectFilterField(
             'department',
             'Department',
-            DEPARTMENTS,
+            '/api/departments',
             'Select a department',
         ),
-        createSelectFilterField(
+        createAsyncSelectFilterField(
             'position',
             'Position',
-            POSITIONS,
+            '/api/positions',
             'Select a position',
         ),
     ];

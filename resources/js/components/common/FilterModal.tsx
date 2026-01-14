@@ -57,7 +57,9 @@ export function FilterModal({
                             element &&
                             (element.type === Select ||
                                 (element.type as { displayName?: string })
-                                    ?.displayName === 'Select');
+                                    ?.displayName === 'Select' ||
+                                (element.type as { displayName?: string })
+                                    ?.displayName === 'AsyncSelect');
 
                         const commonProps = {
                             value: tempFilters[field.name] ?? '',

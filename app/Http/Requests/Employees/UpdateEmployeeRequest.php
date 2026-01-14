@@ -33,8 +33,8 @@ class UpdateEmployeeRequest extends FormRequest
                 Rule::unique('employees', 'email')->ignore($this->route('employee')->id),
             ],
             'phone' => ['sometimes', 'nullable', 'string', 'max:20'],
-            'department' => ['sometimes', 'string', 'in:hr,engineering,sales,marketing,finance,operations,customer_support,product,design,legal'],
-            'position' => ['sometimes', 'string', 'max:255'],
+            'department' => ['sometimes', 'exists:departments,id'],
+            'position' => ['sometimes', 'exists:positions,id'],
             'salary' => ['sometimes', 'numeric', 'min:0'],
             'hire_date' => ['sometimes', 'date'],
         ];

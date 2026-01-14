@@ -97,12 +97,15 @@ describe('Employee API Endpoints', function () {
     });
 
     test('store creates employee with valid data and returns 201 status', function () {
+        $department = \App\Models\Department::factory()->create();
+        $position = \App\Models\Position::factory()->create();
+
         $employeeData = [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'phone' => '555-1234',
-            'department' => 'engineering',
-            'position' => 'Developer',
+            'department' => $department->id,
+            'position' => $position->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];
@@ -127,7 +130,7 @@ describe('Employee API Endpoints', function () {
             ->assertJsonFragment([
                 'name' => 'John Doe',
                 'email' => 'john.doe@example.com',
-                'department' => 'engineering',
+                'department' => $department->id,
             ]);
 
         assertDatabaseHas('employees', [
@@ -205,9 +208,16 @@ describe('Employee API Endpoints', function () {
             'position' => 'Junior Developer'
         ]);
 
+        $position = \App\Models\Position::factory()->create(['name' => 'Senior Developer']);
+        // Need valid department for update pass? UpdateRequest says 'sometimes'. 
+        // If we don't send department, it keeps old. Old might be 'engineering' string from factory. 
+        // But if we send position, we must send ID if we want to change it.
+        // UpdateEmployeeRequest validates 'position' => exists:positions,id.
+        // 'Senior Developer' string will fail. We need ID.
+
         $updateData = [
             'name' => 'Updated Name',
-            'position' => 'Senior Developer'
+            'position' => $position->id
         ];
 
         $response = putJson("/api/employees/{$employee->id}", $updateData);
@@ -229,12 +239,12 @@ describe('Employee API Endpoints', function () {
             ])
             ->assertJsonFragment([
                 'name' => 'Updated Name',
-                'position' => 'Senior Developer'
+                'position' => $position->id
             ]);
 
         $employee->refresh();
         expect($employee->name)->toBe('Updated Name')
-            ->and($employee->position)->toBe('Senior Developer');
+            ->and($employee->position)->toBe((string) $position->id); // DB returns string for varchar col
     });
 
     test('update validates fields when provided with invalid data', function () {
@@ -260,12 +270,14 @@ describe('Employee API Endpoints', function () {
 
     test('update ignores unique email validation for same employee', function () {
         $employee = Employee::factory()->create(['email' => 'john@example.com']);
+        $department = \App\Models\Department::factory()->create();
+        $position = \App\Models\Position::factory()->create();
 
         $response = putJson("/api/employees/{$employee->id}", [
             'name' => 'Updated Name',
             'email' => 'john@example.com', // Same email should be allowed
-            'department' => 'engineering',
-            'position' => 'Developer',
+            'department' => $department->id,
+            'position' => $position->id,
             'salary' => '60000.00',
             'hire_date' => '2023-01-01',
         ]);

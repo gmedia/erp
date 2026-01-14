@@ -1,5 +1,7 @@
 'use client';
 
+import { AsyncSelect } from '@/components/common/AsyncSelect';
+
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -71,5 +73,27 @@ export function createTextFilterField(
         name,
         label,
         component: <Input placeholder={placeholder} />,
+    };
+}
+
+// Generic async select filter field creator
+export function createAsyncSelectFilterField(
+    name: string,
+    label: string,
+    url: string,
+    placeholder: string,
+): FieldDescriptor {
+    return {
+        name,
+        label,
+        // @ts-ignore - onValueChange will be injected by FilterModal
+        component: (
+            // @ts-ignore
+            <AsyncSelect
+                url={url}
+                onValueChange={() => {}} 
+                placeholder={placeholder}
+            />
+        ),
     };
 }
