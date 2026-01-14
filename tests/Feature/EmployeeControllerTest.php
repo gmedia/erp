@@ -33,8 +33,8 @@ describe('Employee API Endpoints', function () {
                         'name',
                         'email',
                         'phone',
-                        'department',
-                        'position',
+                        'department' => ['id', 'name'],
+                        'position' => ['id', 'name'],
                         'salary',
                         'hire_date',
                         'created_at',
@@ -80,7 +80,7 @@ describe('Employee API Endpoints', function () {
 
         $data = $response->json('data');
         expect($data)->toHaveCount(1)
-            ->and($data[0]['department'])->toBe('Engineering');
+            ->and($data[0]['department']['id'])->toBe('Engineering');
     });
 
     test('index supports sorting by different fields', function () {
@@ -130,7 +130,10 @@ describe('Employee API Endpoints', function () {
             ->assertJsonFragment([
                 'name' => 'John Doe',
                 'email' => 'john.doe@example.com',
-                'department' => $department->id,
+                'department' => [
+                    'id' => $department->id,
+                    'name' => $department->name,
+                ],
             ]);
 
         assertDatabaseHas('employees', [
@@ -239,7 +242,10 @@ describe('Employee API Endpoints', function () {
             ])
             ->assertJsonFragment([
                 'name' => 'Updated Name',
-                'position' => $position->id
+                'position' => [
+                    'id' => $position->id,
+                    'name' => $position->name,
+                ],
             ]);
 
         $employee->refresh();
