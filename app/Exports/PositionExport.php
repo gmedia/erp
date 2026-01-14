@@ -19,14 +19,20 @@ class PositionExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
     protected $filters;
 
     /**
+     * @var Builder|null
+     */
+    protected $query;
+
+    /**
      * Create a new export instance.
      *
      * @param  array<string, mixed>  $filters
      * @return void
      */
-    public function __construct(array $filters = [])
+    public function __construct(array $filters = [], ?Builder $query = null)
     {
         $this->filters = $filters;
+        $this->query = $query;
     }
 
     /**
@@ -34,6 +40,10 @@ class PositionExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
      */
     public function query(): Builder
     {
+        if ($this->query) {
+            return $this->query;
+        }
+
         $query = Position::query();
 
         // Apply search filter if provided (used by frontend)

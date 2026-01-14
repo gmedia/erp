@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Departments\ExportDepartmentsAction;
+use App\Actions\Departments\IndexDepartmentsAction;
 use App\Domain\Departments\DepartmentFilterService;
 use App\Http\Requests\Departments\ExportDepartmentRequest;
 use App\Http\Requests\Departments\IndexDepartmentRequest;
@@ -12,35 +13,25 @@ use App\Http\Resources\Departments\DepartmentCollection;
 use App\Http\Resources\Departments\DepartmentResource;
 use App\Models\Department;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
+/**
+ * Controller for department management operations.
+ *
+ * Handles CRUD operations and export functionality for departments.
+ */
 class DepartmentController extends Controller
 {
     /**
      * Display a listing of the departments.
      *
-     * @queryParam search string Search departments by name. Example: marketing
-     * @queryParam sort_by string Sort by field. Enum: id,name,created_at,updated_at Example: created_at
-     * @queryParam sort_direction string Sort direction. Enum: asc,desc Example: desc
-     * @queryParam per_page int Number of items per page. Example: 15
-     * @queryParam page int Page number. Example: 1
+     * Supports pagination, search filtering, and sorting.
+     *
+     * @param  \App\Http\Requests\Departments\IndexDepartmentRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index(IndexDepartmentRequest $request, DepartmentFilterService $filterService): JsonResponse
+    public function index(IndexDepartmentRequest $request): JsonResponse
     {
-        $query = Department::query();
-
-        if ($request->filled('search')) {
-            $filterService->applySearch($query, $request->get('search'), ['name']);
-        }
-
-        $filterService->applySorting(
-            $query,
-            $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'name', 'created_at', 'updated_at']
-        );
-
-        $departments = $query->paginate($request->get('per_page', 15));
+        $departments = (new IndexDepartmentsAction(app(DepartmentFilterService::class)))->execute($request);
 
         return (new DepartmentCollection($departments))->response();
     }
@@ -48,7 +39,8 @@ class DepartmentController extends Controller
     /**
      * Store a newly created department in storage.
      *
-     * @bodyParam name string required The name of the department. Example: Marketing
+     * @param  \App\Http\Requests\Departments\StoreDepartmentRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreDepartmentRequest $request): JsonResponse
     {
@@ -61,6 +53,9 @@ class DepartmentController extends Controller
 
     /**
      * Display the specified department.
+     *
+     * @param  \App\Models\Department  $department
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Department $department): JsonResponse
     {
@@ -69,6 +64,10 @@ class DepartmentController extends Controller
 
     /**
      * Update the specified department in storage.
+     *
+     * @param  \App\Http\Requests\Departments\UpdateDepartmentRequest  $request
+     * @param  \App\Models\Department  $department
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateDepartmentRequest $request, Department $department): JsonResponse
     {
@@ -79,6 +78,9 @@ class DepartmentController extends Controller
 
     /**
      * Remove the specified department from storage.
+     *
+     * @param  \App\Models\Department  $department
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Department $department): JsonResponse
     {
@@ -90,9 +92,8 @@ class DepartmentController extends Controller
     /**
      * Export departments to Excel based on filters.
      *
-     * @bodyParam search string Search departments by name. Example: marketing
-     * @bodyParam sort_by string Sort by field. Enum: id,name,created_at,updated_at Example: created_at
-     * @bodyParam sort_direction string Sort direction. Enum: asc,desc Example: desc
+     * @param  \App\Http\Requests\Departments\ExportDepartmentRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function export(ExportDepartmentRequest $request): JsonResponse
     {

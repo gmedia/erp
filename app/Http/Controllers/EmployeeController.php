@@ -13,12 +13,21 @@ use App\Http\Resources\Employees\EmployeeCollection;
 use App\Http\Resources\Employees\EmployeeResource;
 use App\Models\Employee;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 
+/**
+ * Controller for employee management operations.
+ *
+ * Handles CRUD operations and export functionality for employees.
+ */
 class EmployeeController extends Controller
 {
     /**
      * Display a listing of the employees with filtering and sorting.
+     *
+     * Supports pagination, search, advanced filters (department, position, salary, hire date), and sorting.
+     *
+     * @param  \App\Http\Requests\Employees\IndexEmployeeRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(IndexEmployeeRequest $request): JsonResponse
     {
@@ -30,13 +39,8 @@ class EmployeeController extends Controller
     /**
      * Store a newly created employee in storage.
      *
-     * @bodyParam name string required The employee's name. Example: John Doe
-     * @bodyParam email string required The employee's email. Example: john.doe@example.com
-     * @bodyParam phone string The employee's phone number. Example: 555-1234
-     * @bodyParam department string The employee's department. Example: Engineering
-     * @bodyParam position string The employee's position. Example: Developer
-     * @bodyParam salary numeric The employee's salary. Example: 75000.00
-     * @bodyParam hire_date date The employee's hire date. Example: 2023-01-15
+     * @param  \App\Http\Requests\Employees\StoreEmployeeRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreEmployeeRequest $request): JsonResponse
     {
@@ -49,6 +53,9 @@ class EmployeeController extends Controller
 
     /**
      * Display the specified employee.
+     *
+     * @param  \App\Models\Employee  $employee
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Employee $employee): JsonResponse
     {
@@ -57,6 +64,10 @@ class EmployeeController extends Controller
 
     /**
      * Update the specified employee in storage.
+     *
+     * @param  \App\Http\Requests\Employees\UpdateEmployeeRequest  $request
+     * @param  \App\Models\Employee  $employee
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateEmployeeRequest $request, Employee $employee): JsonResponse
     {
@@ -67,16 +78,22 @@ class EmployeeController extends Controller
 
     /**
      * Remove the specified employee from storage.
+     *
+     * @param  \App\Models\Employee  $employee
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Employee $employee): JsonResponse
     {
         $employee->delete();
 
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        return response()->json(null, 204);
     }
 
     /**
      * Export employees to Excel based on filters.
+     *
+     * @param  \App\Http\Requests\Employees\ExportEmployeeRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function export(ExportEmployeeRequest $request): JsonResponse
     {

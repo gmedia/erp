@@ -20,7 +20,10 @@ class ExportDepartmentsAction
     ) {}
 
     /**
-     * Execute the department export action
+     * Execute the department export action.
+     *
+     * @param  \App\Http\Requests\Departments\ExportDepartmentRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function execute(ExportDepartmentRequest $request): JsonResponse
     {

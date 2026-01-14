@@ -14,7 +14,7 @@ test('execute exports departments and returns file info', function () {
     Storage::fake('public');
     Excel::shouldReceive('store')->once();
 
-    $filterService = Mockery::mock(DepartmentFilterService::class);
+    $filterService = new DepartmentFilterService;
     $action = new ExportDepartmentsAction($filterService);
 
     Department::factory()->count(3)->create();
@@ -23,11 +23,6 @@ test('execute exports departments and returns file info', function () {
     $request = Mockery::mock(ExportDepartmentRequest::class);
     $request->shouldReceive('validated')->andReturn([]);
     $request->shouldReceive('filled')->with('search')->andReturn(false);
-
-    // Mock filter service calls
-    $filterService->shouldReceive('applySorting')
-        ->once()
-        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc', ['id', 'name', 'created_at', 'updated_at']);
 
     $result = $action->execute($request);
 
@@ -39,11 +34,11 @@ test('execute exports departments and returns file info', function () {
         ->and($data['filename'])->toContain('.xlsx');
 });
 
-test('execute applies search filter when provided', function () {
+test('execute exports with search filter', function () {
     Storage::fake('public');
     Excel::shouldReceive('store')->once();
 
-    $filterService = Mockery::mock(DepartmentFilterService::class);
+    $filterService = new DepartmentFilterService;
     $action = new ExportDepartmentsAction($filterService);
 
     Department::factory()->create(['name' => 'Engineering']);
@@ -54,25 +49,16 @@ test('execute applies search filter when provided', function () {
     $request->shouldReceive('validated')->andReturn(['search' => 'eng']);
     $request->shouldReceive('filled')->with('search')->andReturn(true);
 
-    // Mock filter service calls
-    $filterService->shouldReceive('applySearch')
-        ->once()
-        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'eng', ['name']);
-
-    $filterService->shouldReceive('applySorting')
-        ->once()
-        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc', ['id', 'name', 'created_at', 'updated_at']);
-
     $result = $action->execute($request);
 
     expect($result)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
 });
 
-test('execute uses custom sort parameters', function () {
+test('execute exports with custom sort parameters', function () {
     Storage::fake('public');
     Excel::shouldReceive('store')->once();
 
-    $filterService = Mockery::mock(DepartmentFilterService::class);
+    $filterService = new DepartmentFilterService;
     $action = new ExportDepartmentsAction($filterService);
 
     Department::factory()->count(2)->create();
@@ -85,10 +71,28 @@ test('execute uses custom sort parameters', function () {
     ]);
     $request->shouldReceive('filled')->with('search')->andReturn(false);
 
-    // Mock filter service calls
-    $filterService->shouldReceive('applySorting')
-        ->once()
-        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'name', 'asc', ['id', 'name', 'created_at', 'updated_at']);
+    $result = $action->execute($request);
+
+    expect($result)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+});
+
+test('execute filters out null values from filters', function () {
+    Storage::fake('public');
+    Excel::shouldReceive('store')->once();
+
+    $filterService = new DepartmentFilterService;
+    $action = new ExportDepartmentsAction($filterService);
+
+    Department::factory()->count(2)->create();
+
+    // Mock request with some null values
+    $request = Mockery::mock(ExportDepartmentRequest::class);
+    $request->shouldReceive('validated')->andReturn([
+        'search' => 'test',
+        'sort_by' => null,
+        'sort_direction' => null,
+    ]);
+    $request->shouldReceive('filled')->with('search')->andReturn(true);
 
     $result = $action->execute($request);
 

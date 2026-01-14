@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Positions\ExportPositionsAction;
+use App\Actions\Positions\IndexPositionsAction;
 use App\Domain\Positions\PositionFilterService;
 use App\Http\Requests\Positions\ExportPositionRequest;
 use App\Http\Requests\Positions\IndexPositionRequest;
@@ -13,33 +14,24 @@ use App\Http\Resources\Positions\PositionResource;
 use App\Models\Position;
 use Illuminate\Http\JsonResponse;
 
+/**
+ * Controller for position management operations.
+ *
+ * Handles CRUD operations and export functionality for positions.
+ */
 class PositionController extends Controller
 {
     /**
      * Display a listing of the positions.
      *
-     * @queryParam search string Search positions by name. Example: manager
-     * @queryParam sort_by string Sort by field. Enum: id,name,created_at,updated_at Example: created_at
-     * @queryParam sort_direction string Sort direction. Enum: asc,desc Example: desc
-     * @queryParam per_page int Number of items per page. Example: 15
-     * @queryParam page int Page number. Example: 1
+     * Supports pagination, search filtering, and sorting.
+     *
+     * @param  \App\Http\Requests\Positions\IndexPositionRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index(IndexPositionRequest $request, PositionFilterService $filterService): JsonResponse
+    public function index(IndexPositionRequest $request): JsonResponse
     {
-        $query = Position::query();
-
-        if ($request->filled('search')) {
-            $filterService->applySearch($query, $request->get('search'), ['name']);
-        }
-
-        $filterService->applySorting(
-            $query,
-            $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'name', 'created_at', 'updated_at']
-        );
-
-        $positions = $query->paginate($request->get('per_page', 15));
+        $positions = (new IndexPositionsAction(app(PositionFilterService::class)))->execute($request);
 
         return (new PositionCollection($positions))->response();
     }
@@ -47,7 +39,8 @@ class PositionController extends Controller
     /**
      * Store a newly created position in storage.
      *
-     * @bodyParam name string required The name of the position. Example: Manager
+     * @param  \App\Http\Requests\Positions\StorePositionRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StorePositionRequest $request): JsonResponse
     {
@@ -60,6 +53,9 @@ class PositionController extends Controller
 
     /**
      * Display the specified position.
+     *
+     * @param  \App\Models\Position  $position
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Position $position): JsonResponse
     {
@@ -68,6 +64,10 @@ class PositionController extends Controller
 
     /**
      * Update the specified position in storage.
+     *
+     * @param  \App\Http\Requests\Positions\UpdatePositionRequest  $request
+     * @param  \App\Models\Position  $position
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdatePositionRequest $request, Position $position): JsonResponse
     {
@@ -78,6 +78,9 @@ class PositionController extends Controller
 
     /**
      * Remove the specified position from storage.
+     *
+     * @param  \App\Models\Position  $position
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Position $position): JsonResponse
     {
@@ -89,12 +92,11 @@ class PositionController extends Controller
     /**
      * Export positions to Excel based on filters.
      *
-     * @bodyParam search string Search positions by name. Example: manager
-     * @bodyParam sort_by string Sort by field. Enum: id,name,created_at,updated_at Example: created_at
-     * @bodyParam sort_direction string Sort direction. Enum: asc,desc Example: desc
+     * @param  \App\Http\Requests\Positions\ExportPositionRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function export(ExportPositionRequest $request): JsonResponse
     {
-        return (new ExportPositionsAction)->execute($request);
+        return (new ExportPositionsAction(app(PositionFilterService::class)))->execute($request);
     }
 }

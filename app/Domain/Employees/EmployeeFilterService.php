@@ -2,24 +2,23 @@
 
 namespace App\Domain\Employees;
 
+use App\Domain\Concerns\BaseFilterService;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * Filter service for employee queries.
+ *
+ * Provides search, advanced filtering, and sorting functionality for employee listings.
+ */
 class EmployeeFilterService
 {
-    /**
-     * Apply search filters to employee query
-     */
-    public function applySearch(Builder $query, string $search, array $searchFields): void
-    {
-        $query->where(function ($q) use ($search, $searchFields) {
-            foreach ($searchFields as $field) {
-                $q->orWhere($field, 'like', "%{$search}%");
-            }
-        });
-    }
+    use BaseFilterService;
 
     /**
-     * Apply advanced filters for employees (department, position, salary, hire date)
+     * Apply advanced filters for employees (department, position, salary, hire date).
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\Employee>  $query
+     * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
@@ -49,16 +48,6 @@ class EmployeeFilterService
 
         if (! empty($filters['hire_date_to'])) {
             $query->whereDate('hire_date', '<=', $filters['hire_date_to']);
-        }
-    }
-
-    /**
-     * Apply sorting to employee query
-     */
-    public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
-    {
-        if (in_array($sortBy, $allowedSorts)) {
-            $query->orderBy($sortBy, $sortDirection);
         }
     }
 }
