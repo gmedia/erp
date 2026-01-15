@@ -26,7 +26,7 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
-running_task.md
+running_task.*
 .kilocode*
 .roo*
 
