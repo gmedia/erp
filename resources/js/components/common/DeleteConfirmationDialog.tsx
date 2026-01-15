@@ -46,7 +46,7 @@ export function DeleteConfirmationDialog<T>({
                     <AlertDialogAction
                         onClick={onConfirm}
                         disabled={isLoading}
-                        className="bg-destructive hover:bg-destructive/80"
+                        className="bg-destructive hover:bg-destructive/80 text-white"
                     >
                         {isLoading ? 'Deleting...' : 'Delete'}
                     </AlertDialogAction>

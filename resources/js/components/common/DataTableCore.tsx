@@ -288,12 +288,18 @@ export function DataTable<T>({
                                 {headerGroup.headers.map((header) => (
                                     <TableHead
                                         key={header.id}
-                                        className="cursor-pointer border-border select-none"
-                                        onClick={() =>
-                                            handleSortingChange(
-                                                header.column.id,
-                                            )
-                                        }
+                                        className={`border-border select-none ${
+                                            header.column.getCanSort()
+                                                ? 'cursor-pointer'
+                                                : ''
+                                        }`}
+                                        onClick={() => {
+                                            if (header.column.getCanSort()) {
+                                                handleSortingChange(
+                                                    header.column.id,
+                                                );
+                                            }
+                                        }}
                                     >
                                         {header.isPlaceholder
                                             ? null

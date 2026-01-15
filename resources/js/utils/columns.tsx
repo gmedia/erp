@@ -331,23 +331,14 @@ export function createActionsColumn<T = Record<string, unknown>>(
 }
 
 // Select column for row selection (checkbox)
+// Note: Header checkbox removed because it's misleading with remote data source
+// (only selects current page, not all data across all pages)
 export function createSelectColumn<
     T = Record<string, unknown>,
 >(): ColumnDef<T> {
     return {
         id: 'select',
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && 'indeterminate')
-                }
-                onCheckedChange={(value) =>
-                    table.toggleAllPageRowsSelected(!!value)
-                }
-                aria-label="Select all"
-            />
-        ),
+        header: () => null,
         cell: ({ row }) => (
             <Checkbox
                 checked={row.getIsSelected()}
