@@ -1,0 +1,126 @@
+{
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "add": "Add",
+        "create": "Create",
+        "update": "Update",
+        "submit": "Submit",
+        "view": "View",
+        "close": "Close",
+        "loading": "Loading...",
+        "saving": "Saving...",
+        "deleting": "Deleting...",
+        "search": "Search",
+        "actions": "Actions",
+        "export": "Export",
+        "reset_filters": "Reset Filters",
+        "no_results": "No results found",
+        "confirm": "Confirm",
+        "success": "Success",
+        "error": "Error",
+        "warning": "Warning"
+    },
+    "nav": {
+        "platform": "Platform",
+        "dashboard": "Dashboard",
+        "employees": "Employees",
+        "positions": "Positions",
+        "departments": "Departments",
+        "repository": "Repository",
+        "documentation": "Documentation",
+        "settings": "Settings",
+        "logout": "Log Out",
+        "profile": "Profile"
+    },
+    "auth": {
+        "login": "Log in",
+        "login_title": "Log in to your account",
+        "login_description": "Enter your email and password below to log in",
+        "email": "Email address",
+        "password": "Password",
+        "remember_me": "Remember me",
+        "forgot_password": "Forgot password?",
+        "sign_up": "Sign up",
+        "no_account": "Don't have an account?",
+        "register": "Register",
+        "register_title": "Create an account",
+        "register_description": "Enter your details below to create your account"
+    },
+    "employees": {
+        "title": "Employees",
+        "add": "Add Employee",
+        "edit": "Edit Employee",
+        "view": "View Employee",
+        "search_placeholder": "Search employees...",
+        "delete_confirm": "This action cannot be undone. This will permanently delete {name}'s employee record.",
+        "columns": {
+            "name": "Name",
+            "email": "Email",
+            "department": "Department",
+            "position": "Position",
+            "hire_date": "Hire Date",
+            "created_at": "Created At",
+            "updated_at": "Updated At"
+        }
+    },
+    "departments": {
+        "title": "Departments",
+        "add": "Add Department",
+        "edit": "Edit Department",
+        "view": "View Department",
+        "search_placeholder": "Search departments...",
+        "delete_confirm": "This action cannot be undone. This will permanently delete {name}'s department record.",
+        "columns": {
+            "name": "Name",
+            "created_at": "Created At",
+            "updated_at": "Updated At"
+        }
+    },
+    "positions": {
+        "title": "Positions",
+        "add": "Add Position",
+        "edit": "Edit Position",
+        "view": "View Position",
+        "search_placeholder": "Search positions...",
+        "delete_confirm": "This action cannot be undone. This will permanently delete {name}'s position record.",
+        "columns": {
+            "name": "Name",
+            "created_at": "Created At",
+            "updated_at": "Updated At"
+        }
+    },
+    "form": {
+        "name": "Name",
+        "name_placeholder": "Enter name",
+        "email": "Email",
+        "email_placeholder": "Enter email",
+        "required": "This field is required"
+    },
+    "dialog": {
+        "are_you_sure": "Are you sure?",
+        "delete_title": "Delete Confirmation"
+    },
+    "pagination": {
+        "previous": "Previous",
+        "next": "Next",
+        "page": "Page",
+        "of": "of",
+        "rows_per_page": "Rows per page",
+        "showing": "Showing",
+        "to": "to",
+        "entries": "entries"
+    },
+    "table": {
+        "no_data": "No data available",
+        "select_all": "Select all",
+        "selected": "selected"
+    },
+    "language": {
+        "switch": "Language",
+        "en": "English",
+        "id": "Indonesian"
+    }
+}

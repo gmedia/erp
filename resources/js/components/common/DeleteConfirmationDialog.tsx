@@ -10,6 +10,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useTranslation } from '@/contexts/i18n-context';
 
 interface DeleteConfirmationDialogProps<T> {
     open: boolean;
@@ -28,27 +29,31 @@ export function DeleteConfirmationDialog<T>({
     onConfirm,
     isLoading = false,
     getDeleteMessage,
-    title = 'Are you sure?',
+    title,
 }: DeleteConfirmationDialogProps<T>) {
+    const { t } = useTranslation();
+
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{title}</AlertDialogTitle>
+                    <AlertDialogTitle>
+                        {title || t('dialog.are_you_sure')}
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
                         {item && getDeleteMessage(item)}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={isLoading}>
-                        Cancel
+                        {t('common.cancel')}
                     </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={onConfirm}
                         disabled={isLoading}
                         className="bg-destructive hover:bg-destructive/80 text-white"
                     >
-                        {isLoading ? 'Deleting...' : 'Delete'}
+                        {isLoading ? t('common.deleting') : t('common.delete')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

@@ -1,0 +1,126 @@
+{
+    "common": {
+        "save": "Simpan",
+        "cancel": "Batal",
+        "delete": "Hapus",
+        "edit": "Ubah",
+        "add": "Tambah",
+        "create": "Buat",
+        "update": "Perbarui",
+        "submit": "Kirim",
+        "view": "Lihat",
+        "close": "Tutup",
+        "loading": "Memuat...",
+        "saving": "Menyimpan...",
+        "deleting": "Menghapus...",
+        "search": "Cari",
+        "actions": "Aksi",
+        "export": "Ekspor",
+        "reset_filters": "Reset Filter",
+        "no_results": "Tidak ada hasil",
+        "confirm": "Konfirmasi",
+        "success": "Berhasil",
+        "error": "Kesalahan",
+        "warning": "Peringatan"
+    },
+    "nav": {
+        "platform": "Platform",
+        "dashboard": "Dasbor",
+        "employees": "Karyawan",
+        "positions": "Jabatan",
+        "departments": "Departemen",
+        "repository": "Repositori",
+        "documentation": "Dokumentasi",
+        "settings": "Pengaturan",
+        "logout": "Keluar",
+        "profile": "Profil"
+    },
+    "auth": {
+        "login": "Masuk",
+        "login_title": "Masuk ke akun Anda",
+        "login_description": "Masukkan email dan kata sandi Anda di bawah ini untuk masuk",
+        "email": "Alamat email",
+        "password": "Kata sandi",
+        "remember_me": "Ingat saya",
+        "forgot_password": "Lupa kata sandi?",
+        "sign_up": "Daftar",
+        "no_account": "Belum punya akun?",
+        "register": "Daftar",
+        "register_title": "Buat akun",
+        "register_description": "Masukkan detail Anda di bawah ini untuk membuat akun"
+    },
+    "employees": {
+        "title": "Karyawan",
+        "add": "Tambah Karyawan",
+        "edit": "Ubah Karyawan",
+        "view": "Lihat Karyawan",
+        "search_placeholder": "Cari karyawan...",
+        "delete_confirm": "Tindakan ini tidak dapat dibatalkan. Ini akan menghapus secara permanen data karyawan {name}.",
+        "columns": {
+            "name": "Nama",
+            "email": "Email",
+            "department": "Departemen",
+            "position": "Jabatan",
+            "hire_date": "Tanggal Masuk",
+            "created_at": "Dibuat",
+            "updated_at": "Diperbarui"
+        }
+    },
+    "departments": {
+        "title": "Departemen",
+        "add": "Tambah Departemen",
+        "edit": "Ubah Departemen",
+        "view": "Lihat Departemen",
+        "search_placeholder": "Cari departemen...",
+        "delete_confirm": "Tindakan ini tidak dapat dibatalkan. Ini akan menghapus secara permanen data departemen {name}.",
+        "columns": {
+            "name": "Nama",
+            "created_at": "Dibuat",
+            "updated_at": "Diperbarui"
+        }
+    },
+    "positions": {
+        "title": "Jabatan",
+        "add": "Tambah Jabatan",
+        "edit": "Ubah Jabatan",
+        "view": "Lihat Jabatan",
+        "search_placeholder": "Cari jabatan...",
+        "delete_confirm": "Tindakan ini tidak dapat dibatalkan. Ini akan menghapus secara permanen data jabatan {name}.",
+        "columns": {
+            "name": "Nama",
+            "created_at": "Dibuat",
+            "updated_at": "Diperbarui"
+        }
+    },
+    "form": {
+        "name": "Nama",
+        "name_placeholder": "Masukkan nama",
+        "email": "Email",
+        "email_placeholder": "Masukkan email",
+        "required": "Kolom ini wajib diisi"
+    },
+    "dialog": {
+        "are_you_sure": "Apakah Anda yakin?",
+        "delete_title": "Konfirmasi Hapus"
+    },
+    "pagination": {
+        "previous": "Sebelumnya",
+        "next": "Selanjutnya",
+        "page": "Halaman",
+        "of": "dari",
+        "rows_per_page": "Baris per halaman",
+        "showing": "Menampilkan",
+        "to": "sampai",
+        "entries": "data"
+    },
+    "table": {
+        "no_data": "Tidak ada data tersedia",
+        "select_all": "Pilih semua",
+        "selected": "dipilih"
+    },
+    "language": {
+        "switch": "Bahasa",
+        "en": "Inggris",
+        "id": "Indonesia"
+    }
+}

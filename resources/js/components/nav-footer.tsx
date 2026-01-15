@@ -1,4 +1,5 @@
 import { Icon } from '@/components/icon';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -23,6 +24,9 @@ export function NavFooter({
         >
             <SidebarGroupContent>
                 <SidebarMenu>
+                    <SidebarMenuItem>
+                        <LanguageSwitcher />
+                    </SidebarMenuItem>
                     {items.map((item) => (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton

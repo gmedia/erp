@@ -10,49 +10,52 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useTranslation } from '@/contexts/i18n-context';
 import { dashboard, departments, employees, positions } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, IdCard, LayoutGrid, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard.url(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Employees',
-        href: employees.url(),
-        icon: Users,
-    },
-    {
-        title: 'Positions',
-        href: positions.url(),
-        icon: IdCard,
-    },
-    {
-        title: 'Departments',
-        href: departments.url(),
-        icon: IdCard,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
-
 export function AppSidebar() {
+    const { t } = useTranslation();
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: t('nav.dashboard'),
+            href: dashboard.url(),
+            icon: LayoutGrid,
+        },
+        {
+            title: t('nav.employees'),
+            href: employees.url(),
+            icon: Users,
+        },
+        {
+            title: t('nav.positions'),
+            href: positions.url(),
+            icon: IdCard,
+        },
+        {
+            title: t('nav.departments'),
+            href: departments.url(),
+            icon: IdCard,
+        },
+    ];
+
+    const footerNavItems: NavItem[] = [
+        {
+            title: t('nav.repository'),
+            href: 'https://github.com/laravel/react-starter-kit',
+            icon: Folder,
+        },
+        {
+            title: t('nav.documentation'),
+            href: 'https://laravel.com/docs/starter-kits#react',
+            icon: BookOpen,
+        },
+    ];
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>

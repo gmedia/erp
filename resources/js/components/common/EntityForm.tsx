@@ -13,6 +13,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form, FormMessage } from '@/components/ui/form';
+import { useTranslation } from '@/contexts/i18n-context';
 import { simpleEntitySchema } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FieldValues, useForm, UseFormReturn } from 'react-hook-form';
@@ -49,6 +50,8 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
     isLoading = false,
     form,
 }: EntityFormProps<T>) {
+    const { t } = useTranslation();
+
     const handleSubmit = React.useCallback(
         (values: T) => {
             onSubmit(values);
@@ -58,14 +61,17 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
 
     // Determine submit button text based on title
     const submitButtonText = React.useMemo(() => {
-        if (isLoading) return 'Saving...';
+        if (isLoading) return t('common.saving');
 
         const lowerTitle = title.toLowerCase();
-        if (lowerTitle.includes('add')) return 'Add';
-        if (lowerTitle.includes('edit')) return 'Update';
-        if (lowerTitle.includes('create')) return 'Create';
-        return 'Submit';
-    }, [title, isLoading]);
+        if (lowerTitle.includes('add') || lowerTitle.includes('tambah'))
+            return t('common.add');
+        if (lowerTitle.includes('edit') || lowerTitle.includes('ubah'))
+            return t('common.update');
+        if (lowerTitle.includes('create') || lowerTitle.includes('buat'))
+            return t('common.create');
+        return t('common.submit');
+    }, [title, isLoading, t]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -86,7 +92,7 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
                                 onClick={() => onOpenChange(false)}
                                 disabled={isLoading}
                             >
-                                Cancel
+                                {t('common.cancel')}
                             </Button>
                             <Button type="submit" disabled={isLoading}>
                                 {submitButtonText}

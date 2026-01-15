@@ -204,22 +204,23 @@ export function CrudPage<
                         <config.DataTableComponent {...dataTableProps} />
                     </div>
                 </div>
+
+                {/* Modals are rendered inside AppLayout to be within I18nProvider scope */}
+                <config.FormComponent {...formProps} />
+
+                <DeleteConfirmationDialog
+                    open={!!crudState.itemToDelete}
+                    onOpenChange={(open) => !open && crudState.handleDeleteCancel()}
+                    item={crudState.itemToDelete}
+                    onConfirm={crudState.handleDeleteConfirm}
+                    isLoading={crudState.isDeleting}
+                    getDeleteMessage={crudState.getDeleteMessage}
+                />
+
+                {config.ViewModalComponent && (
+                    <config.ViewModalComponent {...viewModalProps} />
+                )}
             </AppLayout>
-
-            <config.FormComponent {...formProps} />
-
-            <DeleteConfirmationDialog
-                open={!!crudState.itemToDelete}
-                onOpenChange={(open) => !open && crudState.handleDeleteCancel()}
-                item={crudState.itemToDelete}
-                onConfirm={crudState.handleDeleteConfirm}
-                isLoading={crudState.isDeleting}
-                getDeleteMessage={crudState.getDeleteMessage}
-            />
-
-            {config.ViewModalComponent && (
-                <config.ViewModalComponent {...viewModalProps} />
-            )}
         </>
     );
 }
