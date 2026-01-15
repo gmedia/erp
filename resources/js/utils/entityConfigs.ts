@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { type FormComponentType } from '@/components/common/EntityCrudPage';
 import { type FieldDescriptor } from '@/components/common/filters';
 import { type FilterState } from '@/hooks/useCrudFilters';
@@ -55,8 +56,7 @@ import { employeeColumns } from '@/components/employees/EmployeeColumns';
 import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
 import { EmployeeForm } from '@/components/employees/EmployeeForm';
 import { EmployeeViewModal } from '@/components/employees/EmployeeViewModal';
-import { DepartmentViewModal } from '@/components/departments/DepartmentViewModal';
-import { PositionViewModal } from '@/components/positions/PositionViewModal';
+import { SimpleEntityViewModal } from '@/components/common/SimpleEntityViewModal';
 import { createSimpleEntityColumns } from '@/utils/columns';
 
 // Helper function to create generic delete messages
@@ -93,6 +93,17 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     viewModalComponent?: React.ComponentType<any>;
 }
 
+// Factory to create a bound SimpleEntityViewModal for a specific entity
+function createSimpleEntityViewModal(entityName: string) {
+    return function BoundSimpleEntityViewModal(props: {
+        open: boolean;
+        onClose: () => void;
+        item: { id: number; name: string; created_at: string; updated_at: string } | null;
+    }) {
+        return React.createElement(SimpleEntityViewModal, { ...props, entityName });
+    };
+}
+
 // Enhanced helper function to create simple entity configs with consistent structure
 function createSimpleEntityConfig<
     T extends {
@@ -101,7 +112,7 @@ function createSimpleEntityConfig<
         created_at: string;
         updated_at: string;
     },
->(options: SimpleEntityConfigOptions): CustomEntityConfig<T> {
+>(options: Omit<SimpleEntityConfigOptions, 'viewModalComponent'>): CustomEntityConfig<T> {
     const { entityName, entityNamePlural, apiBase, filterPlaceholder } =
         options;
 
@@ -119,7 +130,7 @@ function createSimpleEntityConfig<
         formType: 'simple',
         entityNameForSearch: entityName.toLowerCase(),
         getDeleteMessage: createGenericDeleteMessage(entityName),
-        viewModalComponent: options.viewModalComponent,
+        viewModalComponent: createSimpleEntityViewModal(entityName),
     };
 }
 
@@ -151,7 +162,6 @@ export const departmentConfig = createSimpleEntityConfig({
     entityNamePlural: 'Departments',
     apiBase: 'departments',
     filterPlaceholder: 'Search departments...',
-    viewModalComponent: DepartmentViewModal,
 });
 
 export const positionConfig = createSimpleEntityConfig({
@@ -159,7 +169,6 @@ export const positionConfig = createSimpleEntityConfig({
     entityNamePlural: 'Positions',
     apiBase: 'positions',
     filterPlaceholder: 'Search positions...',
-    viewModalComponent: PositionViewModal,
 });
 
 // Configuration for complex entities (employees) - using factory for consistency
