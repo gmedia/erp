@@ -86,12 +86,9 @@ export function createAsyncSelectFilterField(
     return {
         name,
         label,
-        // @ts-ignore - onValueChange will be injected by FilterModal
         component: (
-            // @ts-ignore
             <AsyncSelect
                 url={url}
-                onValueChange={() => {}} 
                 placeholder={placeholder}
             />
         ),

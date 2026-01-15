@@ -14,7 +14,8 @@ import { cn } from '@/lib/utils';
 
 export interface AsyncSelectProps {
     value?: string;
-    onValueChange: (value: string) => void;
+    /** Handler for value changes. Optional when used in filter descriptors (injected by FilterModal). */
+    onValueChange?: (value: string) => void;
     url: string;
     placeholder?: string;
     className?: string;
@@ -148,7 +149,7 @@ export function AsyncSelect({
                                         itemValue === value ? "bg-accent text-accent-foreground" : ""
                                     )}
                                     onClick={() => {
-                                        onValueChange(itemValue);
+                                        onValueChange?.(itemValue);
                                         setSelectedLabel(itemLabel);
                                         setOpen(false);
                                     }}
