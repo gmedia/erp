@@ -11,6 +11,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { formatDate } from '@/lib/utils';
+import { ViewField } from '@/components/common/ViewField';
+import { formatCurrency } from '@/utils/formatters';
 
 import { Employee } from '@/types/entity';
 
@@ -19,36 +21,6 @@ interface EmployeeViewModalProps {
     onClose: () => void;
     item: Employee | null;
 }
-
-/**
- * Helper function to format currency values
- */
-const formatCurrency = (value: string | number): string => {
-    const numValue = typeof value === 'number' ? value : parseFloat(value);
-    if (isNaN(numValue)) return '-';
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-    }).format(numValue);
-};
-
-/**
- * Individual field display component for consistent styling
- */
-const ViewField = ({
-    label,
-    value,
-}: {
-    label: string;
-    value: React.ReactNode;
-}) => (
-    <div className="space-y-1">
-        <label className="text-sm font-medium text-muted-foreground">
-            {label}
-        </label>
-        <p className="text-sm font-medium">{value || '-'}</p>
-    </div>
-);
 
 /**
  * EmployeeViewModal - A read-only modal to display employee details.

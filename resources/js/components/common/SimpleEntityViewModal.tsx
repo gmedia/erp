@@ -11,6 +11,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { formatDate } from '@/lib/utils';
+import { ViewField } from '@/components/common/ViewField';
 
 interface SimpleEntity {
     id: number;
@@ -25,24 +26,6 @@ interface SimpleEntityViewModalProps {
     item: SimpleEntity | null;
     entityName: string;
 }
-
-/**
- * Individual field display component for consistent styling
- */
-const ViewField = ({
-    label,
-    value,
-}: {
-    label: string;
-    value: React.ReactNode;
-}) => (
-    <div className="space-y-1">
-        <label className="text-sm font-medium text-muted-foreground">
-            {label}
-        </label>
-        <p className="text-sm font-medium">{value || '-'}</p>
-    </div>
-);
 
 /**
  * SimpleEntityViewModal - A read-only modal to display simple entity details.
