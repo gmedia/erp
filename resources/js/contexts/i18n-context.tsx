@@ -306,14 +306,17 @@ export function I18nProvider({
     availableLocales = ['en', 'id'],
     translations = defaultTranslations,
 }: I18nProviderProps) {
-    // Function to switch locale
+    // Function to switch locale - triggers full page reload to ensure all translations are updated
     const setLocale = useCallback((newLocale: string) => {
         router.post(
             `/locale/${newLocale}`,
             {},
             {
-                preserveState: true,
-                preserveScroll: true,
+                preserveState: false,
+                preserveScroll: false,
+                onSuccess: () => {
+                    window.location.reload();
+                },
             },
         );
     }, []);
