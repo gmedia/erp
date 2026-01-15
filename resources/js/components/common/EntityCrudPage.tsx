@@ -13,6 +13,8 @@ export type FormComponentType = 'simple' | 'complex';
 export interface EntityCrudConfig<T = Record<string, unknown>>
     extends Omit<CustomEntityConfig<T>, 'columns'> {
     columns: ColumnDef<T>[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    viewModalComponent?: React.ComponentType<any>;
 }
 
 // Simplified form props mapper
@@ -109,11 +111,14 @@ export function createEntityCrudPage<T = Record<string, unknown>>(
                             exportEndpoint: config.exportEndpoint,
                             filterFields: config.filterFields,
                             entityName: config.entityNameForSearch,
+                            onView: props.onView,
                         }),
 
                         mapFormProps: createFormPropsMapper(
                             config as EntityCrudConfig<Record<string, unknown>>,
                         ),
+
+                        ViewModalComponent: config.viewModalComponent,
 
                         getDeleteMessage: config.getDeleteMessage,
                     }}

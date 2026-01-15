@@ -40,18 +40,19 @@ export interface CrudPageConfig<
     entityNamePlural: string;
     breadcrumbs: BreadcrumbItem[];
 
-    // Component configuration - using generic prop interfaces
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     DataTableComponent: React.ComponentType<any>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     FormComponent: React.ComponentType<any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ViewModalComponent?: React.ComponentType<any>;
 
-    // Props mapping functions to adapt generic props to component-specific props
     mapDataTableProps: (props: {
         data: T[];
         onAdd: () => void;
         onEdit: (item: T) => void;
         onDelete: (item: T) => void;
+        onView: (item: T) => void;
         pagination: {
             page: number;
             per_page: number;
@@ -68,6 +69,12 @@ export interface CrudPageConfig<
         filters: FilterType;
         onFilterChange: (filters: Partial<FilterType>) => void;
         onResetFilters: () => void;
+    }) => Record<string, unknown>;
+
+    mapViewModalProps?: (props: {
+        open: boolean;
+        onClose: () => void;
+        item: T | null;
     }) => Record<string, unknown>;
 
     mapFormProps: (props: {
@@ -114,6 +121,7 @@ export function CrudPage<
                 onAdd: crudState.handleAdd,
                 onEdit: crudState.handleEdit,
                 onDelete: crudState.handleDelete,
+                onView: crudState.handleView,
                 pagination: crudState.tablePagination,
                 onPageChange: crudState.handlePageChange,
                 onPageSizeChange: crudState.handlePageSizeChange,
@@ -130,6 +138,7 @@ export function CrudPage<
             crudState.handleAdd,
             crudState.handleEdit,
             crudState.handleDelete,
+            crudState.handleView,
             crudState.tablePagination,
             crudState.handlePageChange,
             crudState.handlePageSizeChange,
@@ -163,6 +172,28 @@ export function CrudPage<
         ],
     );
 
+    // Prepare view modal props
+    const viewModalProps = useMemo(
+        () =>
+            config.mapViewModalProps
+                ? config.mapViewModalProps({
+                      open: crudState.isViewModalOpen,
+                      onClose: crudState.handleViewClose,
+                      item: crudState.viewItem,
+                  })
+                : {
+                      open: crudState.isViewModalOpen,
+                      onClose: crudState.handleViewClose,
+                      item: crudState.viewItem,
+                  },
+        [
+            config,
+            crudState.isViewModalOpen,
+            crudState.handleViewClose,
+            crudState.viewItem,
+        ],
+    );
+
     return (
         <>
             <Head title={config.entityNamePlural} />
@@ -185,6 +216,10 @@ export function CrudPage<
                 isLoading={crudState.isDeleting}
                 getDeleteMessage={crudState.getDeleteMessage}
             />
+
+            {config.ViewModalComponent && (
+                <config.ViewModalComponent {...viewModalProps} />
+            )}
         </>
     );
 }

@@ -37,6 +37,9 @@ export interface CustomEntityConfig<
     readonly formType: FormComponentType;
     // Optional entity name for search placeholder
     readonly entityNameForSearch?: string;
+    // Optional view modal component for displaying item details
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    readonly viewModalComponent?: React.ComponentType<any>;
 }
 
 // Union type for all entity configurations with improved typing
@@ -51,6 +54,9 @@ import { createSimpleEntityFilterFields } from '@/components/common/filters';
 import { employeeColumns } from '@/components/employees/EmployeeColumns';
 import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
 import { EmployeeForm } from '@/components/employees/EmployeeForm';
+import { EmployeeViewModal } from '@/components/employees/EmployeeViewModal';
+import { DepartmentViewModal } from '@/components/departments/DepartmentViewModal';
+import { PositionViewModal } from '@/components/positions/PositionViewModal';
 import { createSimpleEntityColumns } from '@/utils/columns';
 
 // Helper function to create generic delete messages
@@ -64,6 +70,8 @@ export interface SimpleEntityConfigOptions {
     entityNamePlural: string;
     apiBase: string;
     filterPlaceholder: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    viewModalComponent?: React.ComponentType<any>;
 }
 
 export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
@@ -81,6 +89,8 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     formType: FormComponentType;
     entityNameForSearch?: string;
     getDeleteMessage: (item: Record<string, unknown>) => string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    viewModalComponent?: React.ComponentType<any>;
 }
 
 // Enhanced helper function to create simple entity configs with consistent structure
@@ -109,6 +119,7 @@ function createSimpleEntityConfig<
         formType: 'simple',
         entityNameForSearch: entityName.toLowerCase(),
         getDeleteMessage: createGenericDeleteMessage(entityName),
+        viewModalComponent: options.viewModalComponent,
     };
 }
 
@@ -130,6 +141,7 @@ function createComplexEntityConfig<T = Record<string, unknown>>(
         formType: options.formType,
         entityNameForSearch: options.entityNameForSearch,
         getDeleteMessage: options.getDeleteMessage,
+        viewModalComponent: options.viewModalComponent,
     };
 }
 
@@ -139,6 +151,7 @@ export const departmentConfig = createSimpleEntityConfig({
     entityNamePlural: 'Departments',
     apiBase: 'departments',
     filterPlaceholder: 'Search departments...',
+    viewModalComponent: DepartmentViewModal,
 });
 
 export const positionConfig = createSimpleEntityConfig({
@@ -146,6 +159,7 @@ export const positionConfig = createSimpleEntityConfig({
     entityNamePlural: 'Positions',
     apiBase: 'positions',
     filterPlaceholder: 'Search positions...',
+    viewModalComponent: PositionViewModal,
 });
 
 // Configuration for complex entities (employees) - using factory for consistency
@@ -166,6 +180,7 @@ export const employeeConfig = createComplexEntityConfig({
     formComponent: EmployeeForm,
     formType: 'complex',
     entityNameForSearch: 'employee',
+    viewModalComponent: EmployeeViewModal,
     getDeleteMessage: (employee: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${employee.name}'s employee record.`,
 });

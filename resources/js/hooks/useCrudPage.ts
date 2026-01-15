@@ -38,6 +38,8 @@ export interface CrudPageState<T, FormData, FilterType extends FilterState> {
     isFormOpen: boolean;
     selectedItem: T | null;
     itemToDelete: T | null;
+    isViewModalOpen: boolean;
+    viewItem: T | null;
 
     // Data and loading states
     data: T[];
@@ -85,6 +87,8 @@ export interface CrudPageState<T, FormData, FilterType extends FilterState> {
     handlePageChange: (page: number) => void;
     handlePageSizeChange: (per_page: number) => void;
     resetFilters: () => void;
+    handleView: (item: T) => void;
+    handleViewClose: () => void;
 }
 
 export function useCrudPage<
@@ -98,6 +102,8 @@ export function useCrudPage<
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<T | null>(null);
     const [itemToDelete, setItemToDelete] = useState<T | null>(null);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [viewItem, setViewItem] = useState<T | null>(null);
 
     // Filter and pagination management
     const {
@@ -205,6 +211,16 @@ export function useCrudPage<
         }
     }, []);
 
+    const handleView = useCallback((item: T) => {
+        setViewItem(item);
+        setIsViewModalOpen(true);
+    }, []);
+
+    const handleViewClose = useCallback(() => {
+        setIsViewModalOpen(false);
+        setViewItem(null);
+    }, []);
+
     // Memoize expensive computations
     const getDeleteMessage = useMemo(
         () =>
@@ -247,6 +263,8 @@ export function useCrudPage<
         isFormOpen,
         selectedItem,
         itemToDelete,
+        isViewModalOpen,
+        viewItem,
 
         // Data and loading states
         data,
@@ -280,5 +298,7 @@ export function useCrudPage<
         handlePageChange,
         handlePageSizeChange,
         resetFilters,
+        handleView,
+        handleViewClose,
     };
 }
