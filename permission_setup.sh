@@ -90,7 +90,7 @@ mkdir -p "app/Models"
 chmod -R ugo+rw "app/Models"
 chown -R 1337:1000 "app/Models"
 
-# required by duster
+# Required by duster
 
 mkdir -p "app"
 chmod -R ugo+rw "app"
@@ -99,3 +99,8 @@ chown -R 1337:1000 "app"
 mkdir -p "tests"
 chmod -R ugo+rw "tests"
 chown -R 1337:1000 "tests"
+
+# Required by Laravel
+
+chmod -R ugo+rw "database"
+chown -R 1337:1000 "database"
