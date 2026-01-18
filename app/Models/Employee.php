@@ -47,8 +47,8 @@ class Employee extends Model
         'name',
         'email',
         'phone',
-        'department',
-        'position',
+        'department_id',
+        'position_id',
         'salary',
         'hire_date',
     ];
@@ -83,13 +83,13 @@ class Employee extends Model
         return number_format($value, 2, '.', '');
     }
 
-    public function departmentRel()
+    public function department()
     {
-        return $this->belongsTo(Department::class, 'department');
+        return $this->belongsTo(Department::class);
     }
 
-    public function positionRel()
+    public function position()
     {
-        return $this->belongsTo(Position::class, 'position');
+        return $this->belongsTo(Position::class);
     }
 }
