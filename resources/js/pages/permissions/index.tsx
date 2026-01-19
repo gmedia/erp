@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
 import { TreeView } from '@/components/tree/tree-view';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from '@/components/ui/breadcrumb';
+import { BreadcrumbItem } from '@/types';
 import { useState } from 'react';
 
 interface Permission {
@@ -17,14 +17,15 @@ interface Props {
 }
 
 export default function PermissionsIndex({ permissions }: Props) {
-    const breadcrumbs = [
-        <BreadcrumbItem key="dashboard">
-            <BreadcrumbLink href={dashboard().url}>Dashboard</BreadcrumbLink>
-        </BreadcrumbItem>,
-        <BreadcrumbSeparator key="separator" />,
-        <BreadcrumbItem key="permissions">
-            <BreadcrumbPage>Permissions</BreadcrumbPage>
-        </BreadcrumbItem>,
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Dashboard',
+            href: dashboard().url,
+        },
+        {
+            title: 'Permissions',
+            href: '/permissions',
+        },
     ];
 
     const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
