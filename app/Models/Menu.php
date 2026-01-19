@@ -37,6 +37,8 @@ class Menu extends Model
         'name',
         'display_name',
         'parent_id',
+        'icon',
+        'url',
     ];
 
     public function parent(): BelongsTo

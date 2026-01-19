@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('display_name');
+            $table->string('icon');
+            $table->string('url')->nullable();
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
 

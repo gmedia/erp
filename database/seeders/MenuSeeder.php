@@ -16,6 +16,7 @@ class MenuSeeder extends Seeder
                 'display_name' => 'Dashboard',
                 'permissions' => [],
                 'icon' => 'LayoutGrid',
+                'url' => 'dashboard',
                 'child' => [],
             ],
             [
@@ -23,6 +24,7 @@ class MenuSeeder extends Seeder
                 'display_name' => 'Department',
                 'permissions' => ['department', 'department.create', 'department.edit', 'department.delete'],
                 'icon' => 'IdCard',
+                'url' => 'departments',
                 'child' => [],
             ],
             [
@@ -30,6 +32,7 @@ class MenuSeeder extends Seeder
                 'display_name' => 'Position',
                 'permissions' => ['position', 'position.create', 'position.edit', 'position.delete'],
                 'icon' => 'IdCard',
+                'url' => 'positions',
                 'child' => [],
             ],
             [
@@ -37,6 +40,7 @@ class MenuSeeder extends Seeder
                 'display_name' => 'Employee',
                 'permissions' => ['employee', 'employee.create', 'employee.edit', 'employee.delete'],
                 'icon' => 'Users',
+                'url' => 'employees',
                 'child' => [],
             ],
             [
@@ -44,12 +48,14 @@ class MenuSeeder extends Seeder
                 'display_name' => 'Admin',
                 'permissions' => ['permission'],
                 'icon' => 'Settings2',
+                'url' => null,
                 'child' => [
                     [
                         'name' => 'permission',
                         'display_name' => 'Permission',
                         'permissions' => ['permission'],
                         'icon' => 'Settings2',
+                        'url' => 'permissions',
                         'child' => [],
                     ],
                 ],
@@ -65,6 +71,8 @@ class MenuSeeder extends Seeder
             $newParent = Menu::firstOrCreate([
                 'name' => $item['name'],
                 'display_name' => $item['display_name'],
+                'icon' => $item['icon'],
+                'url' => $item['url'],
                 'parent_id' => $parent?->id,
             ]);
 
