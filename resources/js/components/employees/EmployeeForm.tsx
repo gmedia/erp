@@ -99,11 +99,11 @@ const getEmployeeFormDefaults = (
         phone: employee.phone,
         department:
             typeof employee.department === 'object'
-                ? employee.department.id
+                ? String(employee.department.id)
                 : employee.department,
         position:
             typeof employee.position === 'object'
-                ? employee.position.id
+                ? String(employee.position.id)
                 : employee.position,
         salary: employee.salary,
         hire_date: new Date(employee.hire_date),

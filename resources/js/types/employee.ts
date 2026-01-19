@@ -4,8 +4,8 @@ export interface Employee extends BaseEntity {
     name: string;
     email: string;
     phone: string;
-    department: { id: string; name: string } | string;
-    position: { id: string; name: string } | string;
+    department: { id: number; name: string } | string;
+    position: { id: number; name: string } | string;
     salary: string;
     hire_date: string;
 }
