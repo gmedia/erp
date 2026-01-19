@@ -10,6 +10,7 @@ npm install
 cp .env.example .env
 
 # Starting Laravel Sail
+./vendor/bin/sail down -v
 ./vendor/bin/sail up -d
 
 # Waiting for the database to be ready
