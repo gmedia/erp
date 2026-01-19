@@ -31,6 +31,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('departments', function () {
         return Inertia::render('departments/index');
     })->name('departments');
+
+    Route::get('permissions', [\App\Http\Controllers\PermissionController::class, 'index'])->name('permissions.index');
 });
 
 // API routes for employee CRUD operations
