@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -30,6 +31,7 @@ class EmployeeFactory extends Factory
             'phone' => $this->faker->optional()->phoneNumber(),
             'department_id' => Department::factory(),
             'position_id' => Position::factory(),
+            'user_id' => User::factory(),
             // Two‑decimal salary between 30 000 and 150 000
             'salary' => $this->faker->randomFloat(2, 30000, 150000),
             // Random hire date within the last 10 years

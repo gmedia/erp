@@ -1,0 +1,78 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Menu;
+use App\Models\Permission;
+use Illuminate\Database\Seeder;
+
+class MenuSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $menus = [
+            [
+                'name' => 'dashboard',
+                'display_name' => 'Dashboard',
+                'permissions' => [],
+                'icon' => 'LayoutGrid',
+                'child' => [],
+            ],
+            [
+                'name' => 'department',
+                'display_name' => 'Department',
+                'permissions' => ['department', 'department.create', 'department.edit', 'department.delete'],
+                'icon' => 'IdCard',
+                'child' => [],
+            ],
+            [
+                'name' => 'position',
+                'display_name' => 'Position',
+                'permissions' => ['position', 'position.create', 'position.edit', 'position.delete'],
+                'icon' => 'IdCard',
+                'child' => [],
+            ],
+            [
+                'name' => 'employee',
+                'display_name' => 'Employee',
+                'permissions' => ['employee', 'employee.create', 'employee.edit', 'employee.delete'],
+                'icon' => 'Users',
+                'child' => [],
+            ],
+            [
+                'name' => 'admin',
+                'display_name' => 'Admin',
+                'permissions' => ['permission'],
+                'icon' => 'Settings2',
+                'child' => [
+                    [
+                        'name' => 'permission',
+                        'display_name' => 'Permission',
+                        'permissions' => ['permission'],
+                        'icon' => 'Settings2',
+                        'child' => [],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->createMenus($menus);
+    }
+
+    private function createMenus(array $items, ?Menu $parent = null)
+    {
+        foreach ($items as $item) {            
+            $newParent = Menu::firstOrCreate([
+                'name' => $item['name'],
+                'display_name' => $item['display_name'],
+                'parent_id' => $parent?->id,
+            ]);
+
+            foreach ($item['permissions'] as $permission) {
+                $newParent->permissions()->attach(Permission::where('name', $permission)->first());
+            }
+
+            $this->createMenus($item['child'], $newParent);
+        }
+    }
+}

@@ -73,6 +73,11 @@ class PermissionSeeder extends Seeder
                     ],
                 ],
             ],
+            [
+                'name' => 'permission',
+                'display_name' => 'Permission',
+                'child' => [],
+            ],
         ];
 
         $this->createPermissions($permissions);
