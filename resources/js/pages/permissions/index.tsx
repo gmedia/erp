@@ -9,6 +9,7 @@ import { useState } from 'react';
 interface Permission {
     id: number;
     name: string;
+    display_name: string;
     parent_id: number | null;
 }
 

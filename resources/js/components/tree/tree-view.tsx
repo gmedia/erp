@@ -14,7 +14,7 @@ export function TreeView({ data, selectedIds, onSelectionChange }: TreeViewProps
                 .filter(item => item.parent_id === parentId)
                 .map(item => ({
                     id: item.id,
-                    name: item.name,
+                    name: item.display_name || item.name,
                     children: buildTree(items, item.id)
                 }));
         };
