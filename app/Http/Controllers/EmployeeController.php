@@ -119,8 +119,13 @@ class EmployeeController extends Controller
             'permissions.*' => 'exists:permissions,id',
         ]);
 
-        $employee->permissions()->sync($request->input('permissions', []));
+        $syncData = collect($request->input('permissions', []))
+            ->mapWithKeys(fn ($permissionId) => [$permissionId => ['user_id' => $request->user()->id]])
+            ->all();
+
+        $employee->permissions()->sync($syncData);
 
         return response()->json(['message' => 'Permissions updated successfully.']);
     }
+
 }
