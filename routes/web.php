@@ -43,6 +43,9 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::post('positions/export', [PositionController::class, 'export']);
     Route::apiResource('departments', DepartmentController::class);
     Route::post('departments/export', [DepartmentController::class, 'export']);
+
+    Route::get('employees/{employee}/permissions', [EmployeeController::class, 'permissions']);
+    Route::post('employees/{employee}/permissions', [EmployeeController::class, 'syncPermissions']);
 });
 
 require __DIR__ . '/settings.php';

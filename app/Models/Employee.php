@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @property int $id
@@ -34,9 +36,22 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @mixin \Eloquent
  */
+/**
+ * Class Employee
+ *
+ * Represents an employee in the system.
+ *
+ * @package App\Models
+ */
 class Employee extends Model
 {
+    /** @use HasFactory<\Database\Factories\EmployeeFactory> */
     use HasFactory;
+
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class);
+    }
 
     /**
      * The attributes that are mass assignable.

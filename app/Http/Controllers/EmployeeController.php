@@ -13,6 +13,7 @@ use App\Http\Resources\Employees\EmployeeCollection;
 use App\Http\Resources\Employees\EmployeeResource;
 use App\Models\Employee;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 /**
  * Controller for employee management operations.
@@ -98,5 +99,28 @@ class EmployeeController extends Controller
     public function export(ExportEmployeeRequest $request): JsonResponse
     {
         return (new ExportEmployeesAction)->execute($request);
+    }
+
+    /**
+     * Get permissions for the specified employee.
+     */
+    public function permissions(Employee $employee): JsonResponse
+    {
+        return response()->json($employee->permissions()->pluck('id'));
+    }
+
+    /**
+     * Sync permissions for the specified employee.
+     */
+    public function syncPermissions(Request $request, Employee $employee): JsonResponse
+    {
+        $request->validate([
+            'permissions' => 'array',
+            'permissions.*' => 'exists:permissions,id',
+        ]);
+
+        $employee->permissions()->sync($request->input('permissions', []));
+
+        return response()->json(['message' => 'Permissions updated successfully.']);
     }
 }

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @property int $id
@@ -37,7 +39,12 @@ class Permission extends Model
         'parent_id',
     ];
 
-    public function parent()
+    public function employees(): BelongsToMany
+    {
+        return $this->belongsToMany(Employee::class);
+    }
+
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(Permission::class);
     }
