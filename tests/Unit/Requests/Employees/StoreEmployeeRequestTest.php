@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Requests\Employees\StoreEmployeeRequest;
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -31,8 +33,8 @@ describe('StoreEmployeeRequest', function () {
     });
 
     test('rules validation passes with valid data', function () {
-        $department = \App\Models\Department::factory()->create();
-        $position = \App\Models\Position::factory()->create();
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
 
         $data = [
             'name' => 'John Doe',
@@ -64,11 +66,14 @@ describe('StoreEmployeeRequest', function () {
     });
 
     test('rules validation fails with invalid email', function () {
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
+
         $data = [
             'name' => 'John Doe',
             'email' => 'invalid-email',
-            'department' => 'engineering',
-            'position' => 'Software Engineer',
+            'department' => $department->id,
+            'position' => $position->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];
@@ -81,12 +86,14 @@ describe('StoreEmployeeRequest', function () {
 
     test('rules validation fails with duplicate email', function () {
         Employee::factory()->create(['email' => 'existing@example.com']);
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
 
         $data = [
             'name' => 'John Doe',
             'email' => 'existing@example.com',
-            'department' => 'engineering',
-            'position' => 'Software Engineer',
+            'department' => $department->id,
+            'position' => $position->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];
@@ -98,11 +105,13 @@ describe('StoreEmployeeRequest', function () {
     });
 
     test('rules validation fails with invalid department', function () {
+        $position = Position::factory()->create();
+
         $data = [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'department' => 'invalid_dept',
-            'position' => 'Software Engineer',
+            'department' => 999999, // non-existent department id
+            'position' => $position->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];
@@ -114,11 +123,14 @@ describe('StoreEmployeeRequest', function () {
     });
 
     test('rules validation fails with negative salary', function () {
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
+
         $data = [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'department' => 'engineering',
-            'position' => 'Software Engineer',
+            'department' => $department->id,
+            'position' => $position->id,
             'salary' => '-1000',
             'hire_date' => '2023-01-15',
         ];
@@ -130,11 +142,14 @@ describe('StoreEmployeeRequest', function () {
     });
 
     test('rules validation fails with invalid hire_date', function () {
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
+
         $data = [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'department' => 'engineering',
-            'position' => 'Software Engineer',
+            'department' => $department->id,
+            'position' => $position->id,
             'salary' => '75000.00',
             'hire_date' => 'invalid-date',
         ];
@@ -146,8 +161,8 @@ describe('StoreEmployeeRequest', function () {
     });
 
     test('rules validation passes with phone field', function () {
-        $department = \App\Models\Department::factory()->create();
-        $position = \App\Models\Position::factory()->create();
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
 
         $data = [
             'name' => 'John Doe',
@@ -165,8 +180,8 @@ describe('StoreEmployeeRequest', function () {
     });
 
     test('rules validation passes without phone field', function () {
-        $department = \App\Models\Department::factory()->create();
-        $position = \App\Models\Position::factory()->create();
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
 
         $data = [
             'name' => 'John Doe',
@@ -183,8 +198,8 @@ describe('StoreEmployeeRequest', function () {
     });
 
     test('rules validation passes with valid department id', function () {
-        $department = \App\Models\Department::factory()->create();
-        $position = \App\Models\Position::factory()->create();
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
 
         $data = [
             'name' => 'John Doe',

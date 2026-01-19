@@ -22,7 +22,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
 
     public function query(): Builder
     {
-        $query = Employee::query();
+        $query = Employee::query()->with(['department', 'position']);
 
         // Apply search filter
         if (! empty($this->filters['search'])) {
@@ -34,14 +34,14 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             });
         }
 
-        // Apply department filter
+        // Apply department filter (by department_id)
         if (! empty($this->filters['department'])) {
-            $query->where('department', $this->filters['department']);
+            $query->where('department_id', $this->filters['department']);
         }
 
-        // Apply position filter
+        // Apply position filter (by position_id)
         if (! empty($this->filters['position'])) {
-            $query->where('position', $this->filters['position']);
+            $query->where('position_id', $this->filters['position']);
         }
 
         // Apply salary range filters
@@ -67,7 +67,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
 
         // Validate sort_by to prevent SQL injection
-        $allowedSortColumns = ['name', 'email', 'department', 'position', 'salary', 'hire_date', 'created_at'];
+        $allowedSortColumns = ['name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at'];
         if (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);
         }
@@ -97,8 +97,8 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             $employee->name,
             $employee->email,
             $employee->phone,
-            $employee->department,
-            $employee->position,
+            $employee->department?->name,
+            $employee->position?->name,
             $employee->salary,
             $employee->hire_date->format('Y-m-d'),
             $employee->created_at->format('Y-m-d H:i:s'),

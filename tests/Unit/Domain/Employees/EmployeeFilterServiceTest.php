@@ -1,7 +1,9 @@
 <?php
 
 use App\Domain\Employees\EmployeeFilterService;
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -25,32 +27,39 @@ test('applySearch adds where clause for search term', function () {
 test('applyAdvancedFilters applies department filter', function () {
     $service = new EmployeeFilterService;
 
-    Employee::factory()->create(['department' => 'Engineering']);
-    Employee::factory()->create(['department' => 'Marketing']);
-    Employee::factory()->create(['department' => 'Sales']);
+    $engineering = Department::factory()->create(['name' => 'Engineering']);
+    $marketing = Department::factory()->create(['name' => 'Marketing']);
+    $sales = Department::factory()->create(['name' => 'Sales']);
+
+    Employee::factory()->create(['department_id' => $engineering->id]);
+    Employee::factory()->create(['department_id' => $marketing->id]);
+    Employee::factory()->create(['department_id' => $sales->id]);
 
     $query = Employee::query();
-    $service->applyAdvancedFilters($query, ['department' => 'Engineering']);
+    $service->applyAdvancedFilters($query, ['department_id' => $engineering->id]);
 
     $results = $query->get();
 
     expect($results)->toHaveCount(1)
-        ->and($results->first()->department)->toBe('Engineering');
+        ->and($results->first()->department_id)->toBe($engineering->id);
 });
 
 test('applyAdvancedFilters applies position filter', function () {
     $service = new EmployeeFilterService;
 
-    Employee::factory()->create(['position' => 'Developer']);
-    Employee::factory()->create(['position' => 'Manager']);
+    $developer = Position::factory()->create(['name' => 'Developer']);
+    $manager = Position::factory()->create(['name' => 'Manager']);
+
+    Employee::factory()->create(['position_id' => $developer->id]);
+    Employee::factory()->create(['position_id' => $manager->id]);
 
     $query = Employee::query();
-    $service->applyAdvancedFilters($query, ['position' => 'Developer']);
+    $service->applyAdvancedFilters($query, ['position_id' => $developer->id]);
 
     $results = $query->get();
 
     expect($results)->toHaveCount(1)
-        ->and($results->first()->position)->toBe('Developer');
+        ->and($results->first()->position_id)->toBe($developer->id);
 });
 
 test('applyAdvancedFilters applies salary range filters', function () {
@@ -111,7 +120,7 @@ test('applySorting applies ascending sort when allowed', function () {
     Employee::factory()->create(['name' => 'A Employee']);
 
     $query = Employee::query();
-    $service->applySorting($query, 'name', 'asc', ['id', 'name', 'email', 'department', 'position', 'salary', 'hire_date', 'created_at', 'updated_at']);
+    $service->applySorting($query, 'name', 'asc', ['id', 'name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']);
 
     $results = $query->get();
 
@@ -126,7 +135,7 @@ test('applySorting applies descending sort when allowed', function () {
     Employee::factory()->create(['name' => 'Z Employee']);
 
     $query = Employee::query();
-    $service->applySorting($query, 'name', 'desc', ['id', 'name', 'email', 'department', 'position', 'salary', 'hire_date', 'created_at', 'updated_at']);
+    $service->applySorting($query, 'name', 'desc', ['id', 'name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']);
 
     $results = $query->get();
 
@@ -142,7 +151,7 @@ test('applySorting does not apply sort when field not allowed', function () {
     $query = Employee::query();
     $originalSql = $query->toSql();
 
-    $service->applySorting($query, 'invalid_field', 'asc', ['id', 'name', 'email', 'department', 'position', 'salary', 'hire_date', 'created_at', 'updated_at']);
+    $service->applySorting($query, 'invalid_field', 'asc', ['id', 'name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']);
 
     // SQL should remain unchanged since invalid field
     expect($query->toSql())->toBe($originalSql);

@@ -22,14 +22,14 @@ class EmployeeFilterService
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        // Department filter (exact match)
-        if (! empty($filters['department'])) {
-            $query->where('department', 'like', $filters['department']);
+        // Department filter (by foreign key)
+        if (! empty($filters['department_id'])) {
+            $query->where('department_id', $filters['department_id']);
         }
 
-        // Position filter (exact match)
-        if (! empty($filters['position'])) {
-            $query->where('position', 'like', $filters['position']);
+        // Position filter (by foreign key)
+        if (! empty($filters['position_id'])) {
+            $query->where('position_id', $filters['position_id']);
         }
 
         // Salary range filtering

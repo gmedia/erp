@@ -29,4 +29,29 @@ class StoreEmployeeRequest extends FormRequest
             'hire_date' => 'required|date',
         ];
     }
+
+    /**
+     * Get the validated data and map department/position to FK columns.
+     */
+    public function validated($key = null, $default = null): mixed
+    {
+        $validated = parent::validated($key, $default);
+
+        if ($key !== null) {
+            return $validated;
+        }
+
+        // Map department to department_id and position to position_id
+        if (isset($validated['department'])) {
+            $validated['department_id'] = $validated['department'];
+            unset($validated['department']);
+        }
+
+        if (isset($validated['position'])) {
+            $validated['position_id'] = $validated['position'];
+            unset($validated['position']);
+        }
+
+        return $validated;
+    }
 }

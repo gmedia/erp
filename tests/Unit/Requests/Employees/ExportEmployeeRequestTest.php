@@ -20,10 +20,10 @@ test('rules returns validation rules', function () {
         ->and($rules)->toHaveKey('sort_by')
         ->and($rules)->toHaveKey('sort_direction');
 
-    // Check specific validation rules
+    // Check specific validation rules - department and position expect FK IDs
     expect($rules['search'])->toBe(['nullable', 'string']);
-    expect($rules['department'])->toBe(['nullable', 'string']);
-    expect($rules['position'])->toBe(['nullable', 'string']);
-    expect($rules['sort_by'])->toBe(['nullable', 'string', 'in:id,name,email,department,position,salary,hire_date,created_at,updated_at']);
+    expect($rules['department'])->toBe(['nullable', 'integer', 'exists:departments,id']);
+    expect($rules['position'])->toBe(['nullable', 'integer', 'exists:positions,id']);
+    expect($rules['sort_by'])->toBe(['nullable', 'string', 'in:id,name,email,department_id,position_id,salary,hire_date,created_at,updated_at']);
     expect($rules['sort_direction'])->toBe(['nullable', 'in:asc,desc']);
 });

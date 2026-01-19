@@ -2,7 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Position;
 use Exception;
 use Faker\Factory as Faker;
 use Illuminate\Console\Command;
@@ -44,7 +46,7 @@ class EmployeeCreateCommand extends Command
         $this->info("Found {$existingCount} existing employees.");
 
         // Define realistic departments and positions
-        $departments = [
+        $departmentPositions = [
             'Engineering' => ['Software Engineer', 'Senior Software Engineer', 'Tech Lead', 'Principal Engineer', 'DevOps Engineer', 'QA Engineer'],
             'Sales' => ['Sales Representative', 'Sales Manager', 'Account Executive', 'Business Development Manager'],
             'Marketing' => ['Marketing Coordinator', 'Marketing Manager', 'Content Writer', 'SEO Specialist', 'Social Media Manager'],
@@ -54,6 +56,20 @@ class EmployeeCreateCommand extends Command
             'Customer Support' => ['Support Agent', 'Support Manager', 'Customer Success Manager'],
             'Product' => ['Product Manager', 'Product Owner', 'UX Designer', 'UI Designer'],
         ];
+
+        // Create departments and positions if they don't exist
+        $departmentModels = [];
+        $positionModels = [];
+
+        foreach ($departmentPositions as $deptName => $positions) {
+            $dept = Department::firstOrCreate(['name' => $deptName]);
+            $departmentModels[$deptName] = $dept;
+
+            foreach ($positions as $posName) {
+                $pos = Position::firstOrCreate(['name' => $posName]);
+                $positionModels[$posName] = $pos;
+            }
+        }
 
         // Calculate max possible unique emails
         $maxPossibleEmails = 10000; // Reasonable limit for dummy data
@@ -81,7 +97,7 @@ class EmployeeCreateCommand extends Command
         $testExceptionOn = (int) $this->option('test-exception');
 
         // Use transaction for better performance
-        DB::transaction(function () use ($count, $faker, $departments, &$created, &$failed, $progressBar, $testExceptionOn) {
+        DB::transaction(function () use ($count, $faker, $departmentPositions, $departmentModels, $positionModels, &$created, &$failed, $progressBar, $testExceptionOn) {
             for ($i = 0; $i < $count; $i++) {
                 try {
                     // For testing: force exception on specific iteration
@@ -90,14 +106,17 @@ class EmployeeCreateCommand extends Command
                     }
 
                     // Select random department and position
-                    $department = array_rand($departments);
-                    $position = $departments[$department][array_rand($departments[$department])];
+                    $departmentName = array_rand($departmentPositions);
+                    $positionName = $departmentPositions[$departmentName][array_rand($departmentPositions[$departmentName])];
+
+                    $department = $departmentModels[$departmentName];
+                    $position = $positionModels[$positionName];
 
                     // Generate unique email
                     $email = $this->generateUniqueEmail($faker);
 
                     // Generate realistic salary based on position
-                    $salary = $this->generateSalaryForPosition($position, $faker);
+                    $salary = $this->generateSalaryForPosition($positionName, $faker);
 
                     // Generate hire date within last 5 years
                     $hireDate = $faker->dateTimeBetween('-5 years', 'now');
@@ -106,8 +125,8 @@ class EmployeeCreateCommand extends Command
                         'name' => $faker->name,
                         'email' => $email,
                         'phone' => $faker->optional()->phoneNumber,
-                        'department' => $department,
-                        'position' => $position,
+                        'department_id' => $department->id,
+                        'position_id' => $position->id,
                         'salary' => $salary,
                         'hire_date' => $hireDate->format('Y-m-d'),
                     ]);

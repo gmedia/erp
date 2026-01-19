@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Position;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -70,17 +72,21 @@ describe('Employee API Endpoints', function () {
     });
 
     test('index supports advanced filtering by department', function () {
-        Employee::factory()->create(['department' => 'Engineering']);
-        Employee::factory()->create(['department' => 'Marketing']);
-        Employee::factory()->create(['department' => 'Sales']);
+        $engineering = Department::factory()->create(['name' => 'Engineering']);
+        $marketing = Department::factory()->create(['name' => 'Marketing']);
+        $sales = Department::factory()->create(['name' => 'Sales']);
 
-        $response = getJson('/api/employees?department=Engineering');
+        Employee::factory()->create(['department_id' => $engineering->id]);
+        Employee::factory()->create(['department_id' => $marketing->id]);
+        Employee::factory()->create(['department_id' => $sales->id]);
+
+        $response = getJson('/api/employees?department=' . $engineering->id);
 
         $response->assertOk();
 
         $data = $response->json('data');
         expect($data)->toHaveCount(1)
-            ->and($data[0]['department']['id'])->toBe('Engineering');
+            ->and($data[0]['department']['id'])->toBe($engineering->id);
     });
 
     test('index supports sorting by different fields', function () {
@@ -97,8 +103,8 @@ describe('Employee API Endpoints', function () {
     });
 
     test('store creates employee with valid data and returns 201 status', function () {
-        $department = \App\Models\Department::factory()->create();
-        $position = \App\Models\Position::factory()->create();
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
 
         $employeeData = [
             'name' => 'John Doe',
@@ -158,12 +164,14 @@ describe('Employee API Endpoints', function () {
 
     test('store validates unique email constraint', function () {
         Employee::factory()->create(['email' => 'existing@example.com']);
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
 
         $response = postJson('/api/employees', [
             'name' => 'New Employee',
             'email' => 'existing@example.com',
-            'department' => 'engineering',
-            'position' => 'Developer',
+            'department' => $department->id,
+            'position' => $position->id,
             'salary' => '50000.00',
             'hire_date' => '2023-01-01',
         ]);
@@ -206,21 +214,19 @@ describe('Employee API Endpoints', function () {
     });
 
     test('update modifies employee and returns updated resource', function () {
+        $department = Department::factory()->create();
+        $position = Position::factory()->create(['name' => 'Junior Developer']);
         $employee = Employee::factory()->create([
             'name' => 'Old Name',
-            'position' => 'Junior Developer'
+            'department_id' => $department->id,
+            'position_id' => $position->id,
         ]);
 
-        $position = \App\Models\Position::factory()->create(['name' => 'Senior Developer']);
-        // Need valid department for update pass? UpdateRequest says 'sometimes'. 
-        // If we don't send department, it keeps old. Old might be 'engineering' string from factory. 
-        // But if we send position, we must send ID if we want to change it.
-        // UpdateEmployeeRequest validates 'position' => exists:positions,id.
-        // 'Senior Developer' string will fail. We need ID.
+        $newPosition = Position::factory()->create(['name' => 'Senior Developer']);
 
         $updateData = [
             'name' => 'Updated Name',
-            'position' => $position->id
+            'position' => $newPosition->id
         ];
 
         $response = putJson("/api/employees/{$employee->id}", $updateData);
@@ -243,14 +249,14 @@ describe('Employee API Endpoints', function () {
             ->assertJsonFragment([
                 'name' => 'Updated Name',
                 'position' => [
-                    'id' => $position->id,
-                    'name' => $position->name,
+                    'id' => $newPosition->id,
+                    'name' => $newPosition->name,
                 ],
             ]);
 
         $employee->refresh();
         expect($employee->name)->toBe('Updated Name')
-            ->and($employee->position)->toBe((string) $position->id); // DB returns string for varchar col
+            ->and($employee->position_id)->toBe($newPosition->id);
     });
 
     test('update validates fields when provided with invalid data', function () {
@@ -276,8 +282,8 @@ describe('Employee API Endpoints', function () {
 
     test('update ignores unique email validation for same employee', function () {
         $employee = Employee::factory()->create(['email' => 'john@example.com']);
-        $department = \App\Models\Department::factory()->create();
-        $position = \App\Models\Position::factory()->create();
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
 
         $response = putJson("/api/employees/{$employee->id}", [
             'name' => 'Updated Name',
@@ -292,11 +298,14 @@ describe('Employee API Endpoints', function () {
     });
 
     test('update returns 404 for non-existent employee', function () {
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
+
         $response = putJson('/api/employees/99999', [
             'name' => 'Test Employee',
             'email' => 'test@example.com',
-            'department' => 'Engineering',
-            'position' => 'Developer',
+            'department' => $department->id,
+            'position' => $position->id,
             'salary' => '50000.00',
             'hire_date' => '2023-01-01',
         ]);
@@ -339,13 +348,18 @@ describe('Employee API Endpoints', function () {
     });
 
     test('export applies filters correctly', function () {
-        Employee::factory()->create(['department' => 'Engineering']);
-        Employee::factory()->create(['department' => 'Marketing']);
-        Employee::factory()->create(['position' => 'Manager']);
+        $engineering = Department::factory()->create(['name' => 'Engineering']);
+        $marketing = Department::factory()->create(['name' => 'Marketing']);
+        $developer = Position::factory()->create(['name' => 'Developer']);
+        $manager = Position::factory()->create(['name' => 'Manager']);
+
+        Employee::factory()->create(['department_id' => $engineering->id, 'position_id' => $developer->id]);
+        Employee::factory()->create(['department_id' => $marketing->id, 'position_id' => $manager->id]);
+        Employee::factory()->create(['position_id' => $manager->id]);
 
         $response = postJson('/api/employees/export', [
-            'department' => 'Engineering',
-            'position' => 'Developer'
+            'department' => $engineering->id,
+            'position' => $developer->id
         ]);
 
         $response->assertOk();

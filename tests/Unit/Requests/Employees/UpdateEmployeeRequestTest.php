@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Requests\Employees\UpdateEmployeeRequest;
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -135,7 +137,7 @@ describe('UpdateEmployeeRequest', function () {
 
     test('rules validation fails with invalid department', function () {
         $employee = Employee::factory()->create();
-        $data = ['department' => 'invalid_dept'];
+        $data = ['department' => 999999]; // non-existent department id
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
@@ -192,7 +194,7 @@ describe('UpdateEmployeeRequest', function () {
 
     test('rules validation passes with valid department id', function () {
         $employee = Employee::factory()->create();
-        $department = \App\Models\Department::factory()->create();
+        $department = Department::factory()->create();
         
         $data = ['department' => $department->id];
 

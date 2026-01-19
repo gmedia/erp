@@ -24,12 +24,12 @@ class EmployeeResource extends JsonResource
             'email' => $this->resource->email,
             'phone' => $this->resource->phone,
             'department' => [
-                'id' => $this->resource->department,
-                'name' => $this->resource->departmentRel ? $this->resource->departmentRel->name : $this->resource->department,
+                'id' => $this->resource->department_id,
+                'name' => $this->resource->department?->name,
             ],
             'position' => [
-                'id' => $this->resource->position,
-                'name' => $this->resource->positionRel ? $this->resource->positionRel->name : $this->resource->position,
+                'id' => $this->resource->position_id,
+                'name' => $this->resource->position?->name,
             ],
             'salary' => (string) $this->resource->salary,
             'hire_date' => $this->resource->hire_date->toIso8601String(),

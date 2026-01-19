@@ -1,7 +1,9 @@
 <?php
 
 use App\Exports\EmployeeExport;
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -22,29 +24,37 @@ describe('EmployeeExport', function () {
     });
 
     test('query applies exact department filter', function () {
-        Employee::factory()->create(['department' => 'engineering']);
-        Employee::factory()->create(['department' => 'marketing']);
-        Employee::factory()->create(['department' => 'sales']);
+        $engineering = Department::factory()->create(['name' => 'Engineering']);
+        $marketing = Department::factory()->create(['name' => 'Marketing']);
+        $sales = Department::factory()->create(['name' => 'Sales']);
 
-        $export = new EmployeeExport(['department' => 'engineering']);
+        Employee::factory()->create(['department_id' => $engineering->id]);
+        Employee::factory()->create(['department_id' => $marketing->id]);
+        Employee::factory()->create(['department_id' => $sales->id]);
+
+        $export = new EmployeeExport(['department' => $engineering->id]);
 
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(1)
-            ->and($results->first()->department)->toBe('engineering');
+            ->and($results->first()->department->name)->toBe('Engineering');
     });
 
     test('query applies exact position filter', function () {
-        Employee::factory()->create(['position' => 'Senior Developer']);
-        Employee::factory()->create(['position' => 'Product Manager']);
-        Employee::factory()->create(['position' => 'Designer']);
+        $seniorDev = Position::factory()->create(['name' => 'Senior Developer']);
+        $productManager = Position::factory()->create(['name' => 'Product Manager']);
+        $designer = Position::factory()->create(['name' => 'Designer']);
 
-        $export = new EmployeeExport(['position' => 'Senior Developer']);
+        Employee::factory()->create(['position_id' => $seniorDev->id]);
+        Employee::factory()->create(['position_id' => $productManager->id]);
+        Employee::factory()->create(['position_id' => $designer->id]);
+
+        $export = new EmployeeExport(['position' => $seniorDev->id]);
 
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(1)
-            ->and($results->first()->position)->toBe('Senior Developer');
+            ->and($results->first()->position->name)->toBe('Senior Developer');
     });
 
     test('query applies minimum salary filter', function () {
@@ -181,27 +191,33 @@ describe('EmployeeExport', function () {
     });
 
     test('query combines multiple filters correctly', function () {
+        $engineering = Department::factory()->create(['name' => 'Engineering']);
+        $marketing = Department::factory()->create(['name' => 'Marketing']);
+        $seniorDev = Position::factory()->create(['name' => 'Senior Developer']);
+        $marketingManager = Position::factory()->create(['name' => 'Marketing Manager']);
+        $developer = Position::factory()->create(['name' => 'Developer']);
+
         Employee::factory()->create([
             'name' => 'John Developer',
-            'department' => 'engineering',
-            'position' => 'Senior Developer',
+            'department_id' => $engineering->id,
+            'position_id' => $seniorDev->id,
             'salary' => 75000.00,
         ]);
         Employee::factory()->create([
             'name' => 'Jane Manager',
-            'department' => 'marketing',
-            'position' => 'Marketing Manager',
+            'department_id' => $marketing->id,
+            'position_id' => $marketingManager->id,
             'salary' => 65000.00,
         ]);
         Employee::factory()->create([
             'name' => 'Bob Developer',
-            'department' => 'engineering',
-            'position' => 'Developer',
+            'department_id' => $engineering->id,
+            'position_id' => $developer->id,
             'salary' => 55000.00,
         ]);
 
         $export = new EmployeeExport([
-            'department' => 'engineering',
+            'department' => $engineering->id,
             'min_salary' => 60000,
             'sort_by' => 'name',
             'sort_direction' => 'asc'
@@ -232,12 +248,15 @@ describe('EmployeeExport', function () {
     });
 
     test('map transforms employee data correctly with all fields', function () {
+        $department = Department::factory()->create(['name' => 'Engineering']);
+        $position = Position::factory()->create(['name' => 'Senior Developer']);
+
         $employee = Employee::factory()->create([
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'phone' => '555-1234',
-            'department' => 'engineering',
-            'position' => 'Senior Developer',
+            'department_id' => $department->id,
+            'position_id' => $position->id,
             'salary' => 85000.50,
             'hire_date' => '2023-03-15',
             'created_at' => '2023-01-10 14:30:00',
@@ -251,7 +270,7 @@ describe('EmployeeExport', function () {
             'John Doe',
             'john@example.com',
             '555-1234',
-            'engineering',
+            'Engineering',
             'Senior Developer',
             '85000.50',
             '2023-03-15',
@@ -260,12 +279,15 @@ describe('EmployeeExport', function () {
     });
 
     test('map handles null phone field', function () {
+        $department = Department::factory()->create(['name' => 'Marketing']);
+        $position = Position::factory()->create(['name' => 'Manager']);
+
         $employee = Employee::factory()->create([
             'name' => 'Jane Doe',
             'email' => 'jane@example.com',
             'phone' => null,
-            'department' => 'marketing',
-            'position' => 'Manager',
+            'department_id' => $department->id,
+            'position_id' => $position->id,
             'salary' => 70000.00,
             'hire_date' => '2023-02-01',
         ]);

@@ -28,12 +28,14 @@ test('command generates unique emails', function () {
 test('command generates realistic employee data', function () {
     Artisan::call(EmployeeCreateCommand::class, ['count' => 1]);
 
-    $employee = Employee::first();
+    $employee = Employee::with(['department', 'position'])->first();
 
     expect($employee->name)->toBeString()
         ->and($employee->email)->toBeString()
-        ->and($employee->department)->toBeString()
-        ->and($employee->position)->toBeString()
+        ->and($employee->department_id)->toBeInt()
+        ->and($employee->position_id)->toBeInt()
+        ->and($employee->department)->not->toBeNull()
+        ->and($employee->position)->not->toBeNull()
         ->and($employee->salary)->toBeString()
         ->and($employee->hire_date)->toBeInstanceOf(\Illuminate\Support\Carbon::class);
 });
@@ -76,14 +78,14 @@ test('command succeeds with valid count', function () {
 test('command generates employees with departments from realistic list', function () {
     Artisan::call(EmployeeCreateCommand::class, ['count' => 1]);
 
-    $employee = Employee::first();
+    $employee = Employee::with('department')->first();
 
     $expectedDepartments = [
         'Engineering', 'Sales', 'Marketing', 'HR', 'Finance',
         'Operations', 'Customer Support', 'Product',
     ];
 
-    expect(in_array($employee->department, $expectedDepartments))->toBeTrue();
+    expect(in_array($employee->department->name, $expectedDepartments))->toBeTrue();
 });
 
 test('command generates unique emails with fallback mechanism', function () {

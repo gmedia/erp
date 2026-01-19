@@ -1,22 +1,24 @@
 <?php
 
 use App\Http\Resources\Employees\EmployeeResource;
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
 uses(RefreshDatabase::class);
 
 test('toArray transforms employee correctly', function () {
-    $department = \App\Models\Department::factory()->create();
-    $position = \App\Models\Position::factory()->create();
+    $department = Department::factory()->create();
+    $position = Position::factory()->create();
 
     $employee = Employee::factory()->create([
         'name' => 'John Doe',
         'email' => 'john@example.com',
         'phone' => '555-1234',
-        'department' => $department->id,
-        'position' => $position->id,
+        'department_id' => $department->id,
+        'position_id' => $position->id,
         'salary' => 75000.50,
         'hire_date' => '2023-03-15',
         'created_at' => '2023-01-10 14:30:00',
