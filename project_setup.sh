@@ -11,7 +11,7 @@ cp .env.example .env
 
 # Starting Laravel Sail
 ./vendor/bin/sail down -v
-./vendor/bin/sail up -d
+./vendor/bin/sail up -d --build
 
 # Waiting for the database to be ready
 sleep 60
