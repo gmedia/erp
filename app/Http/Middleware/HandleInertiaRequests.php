@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Http\Resources\MenuResource;
+use App\Models\Employee;
 use App\Models\Menu;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -63,11 +64,43 @@ class HandleInertiaRequests extends Middleware
      */
     protected function getMenus(): array
     {
-        return MenuResource::collection(
-            Menu::with('children')
-                ->whereNull('parent_id')
-                ->get()
-        )->resolve();
+        $user = auth()->user();
+
+        if (!$user) {
+            return [];
+        }
+
+        // Get employee by user_id
+        $employee = Employee::where('user_id', $user->id)->first();
+
+        if (!$employee) {
+            return [];
+        }
+
+        // Get employee's permission IDs
+        $permissionIds = $employee->permissions()->pluck('permissions.id')->toArray();
+
+        // Get menus that:
+        // 1. Have no permissions (public menus accessible to all authenticated users)
+        // 2. OR have at least one of the employee's permissions
+        $menus = Menu::with(['children' => function ($query) use ($permissionIds) {
+            $query->where(function ($q) use ($permissionIds) {
+                $q->whereDoesntHave('permissions')
+                    ->orWhereHas('permissions', function ($subQ) use ($permissionIds) {
+                        $subQ->whereIn('permissions.id', $permissionIds);
+                    });
+            });
+        }])
+            ->whereNull('parent_id')
+            ->where(function ($query) use ($permissionIds) {
+                $query->whereDoesntHave('permissions')
+                    ->orWhereHas('permissions', function ($q) use ($permissionIds) {
+                        $q->whereIn('permissions.id', $permissionIds);
+                    });
+            })
+            ->get();
+
+        return MenuResource::collection($menus)->resolve();
     }
 
     /**
