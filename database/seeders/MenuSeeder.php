@@ -58,6 +58,14 @@ class MenuSeeder extends Seeder
                         'url' => 'permissions',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'user',
+                        'display_name' => 'User',
+                        'permissions' => ['user'],
+                        'icon' => 'Settings2',
+                        'url' => 'users',
+                        'child' => [],
+                    ],
                 ],
             ],
         ];
