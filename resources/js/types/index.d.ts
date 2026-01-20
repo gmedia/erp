@@ -23,6 +23,15 @@ export interface NavItem {
     title: string;
     href: string;
     icon?: React.ComponentType<{ className?: string }> | null;
+    children?: NavItem[];
+}
+
+export interface MenuItem {
+    name: string;
+    display_name: string;
+    icon: string | null;
+    url: string | null;
+    children: MenuItem[];
 }
 
 // Re-export User type for convenience
@@ -37,5 +46,7 @@ export interface SharedData {
         message: string;
         author: string;
     };
+    menus: MenuItem[];
     [key: string]: unknown;
 }
+

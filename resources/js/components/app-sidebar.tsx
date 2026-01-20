@@ -11,37 +11,27 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useTranslation } from '@/contexts/i18n-context';
-import { dashboard, departments, employees, positions } from '@/routes';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, IdCard, LayoutGrid, Users } from 'lucide-react';
+import { getIcon } from '@/lib/icon-map';
+import { dashboard } from '@/routes';
+import { type MenuItem, type NavItem } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { BookOpen, Folder } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
     const { t } = useTranslation();
+    const { menus } = usePage<{ menus: MenuItem[] }>().props;
 
-    const mainNavItems: NavItem[] = [
-        {
-            title: t('nav.dashboard'),
-            href: dashboard.url(),
-            icon: LayoutGrid,
-        },
-        {
-            title: t('nav.employees'),
-            href: employees.url(),
-            icon: Users,
-        },
-        {
-            title: t('nav.positions'),
-            href: positions.url(),
-            icon: IdCard,
-        },
-        {
-            title: t('nav.departments'),
-            href: departments.url(),
-            icon: IdCard,
-        },
-    ];
+    const mainNavItems: NavItem[] = menus.map((menu) => ({
+        title: menu.display_name,
+        href: menu.url ?? '#',
+        icon: getIcon(menu.icon),
+        children: menu.children?.map((child) => ({
+            title: child.display_name,
+            href: child.url ?? '#',
+            icon: getIcon(child.icon),
+        })),
+    }));
 
     const footerNavItems: NavItem[] = [
         {
@@ -81,3 +71,4 @@ export function AppSidebar() {
         </Sidebar>
     );
 }
+

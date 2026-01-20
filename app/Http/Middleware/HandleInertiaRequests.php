@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Resources\MenuResource;
+use App\Models\Menu;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -50,7 +52,22 @@ class HandleInertiaRequests extends Middleware
             'locale' => app()->getLocale(),
             'availableLocales' => config('app.available_locales', ['en', 'id']),
             'translations' => $this->getTranslations(),
+            'menus' => $this->getMenus(),
         ];
+    }
+
+    /**
+     * Get menus for sidebar navigation.
+     *
+     * @return array<int, mixed>
+     */
+    protected function getMenus(): array
+    {
+        return MenuResource::collection(
+            Menu::with('children')
+                ->whereNull('parent_id')
+                ->get()
+        )->resolve();
     }
 
     /**
