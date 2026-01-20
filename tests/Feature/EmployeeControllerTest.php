@@ -2,6 +2,7 @@
 
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Permission;
 use App\Models\Position;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,9 +17,32 @@ use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
 
+/**
+ * Helper function to create a user with an employee that has specific permissions.
+ */
+function createUserWithPermissions(array $permissionNames = []): User
+{
+    $user = User::factory()->create();
+    $employee = Employee::factory()->create(['user_id' => $user->id]);
+
+    if (!empty($permissionNames)) {
+        $permissions = [];
+        foreach ($permissionNames as $name) {
+            $permissions[] = Permission::firstOrCreate(
+                ['name' => $name],
+                ['display_name' => ucwords(str_replace('.', ' ', $name))]
+            )->id;
+        }
+        $employee->permissions()->sync($permissions);
+    }
+
+    return $user;
+}
+
 describe('Employee API Endpoints', function () {
     beforeEach(function () {
-        $user = User::factory()->create();
+        // Create user with all employee permissions for existing tests
+        $user = createUserWithPermissions(['employee.create', 'employee.edit', 'employee.delete']);
         actingAs($user);
     });
 
@@ -53,7 +77,8 @@ describe('Employee API Endpoints', function () {
                 ],
             ]);
 
-        expect($response->json('meta.total'))->toBe(25)
+        // Note: +1 because beforeEach creates an employee for the logged-in user
+        expect($response->json('meta.total'))->toBe(26)
             ->and($response->json('meta.per_page'))->toBe(10)
             ->and($response->json('data'))->toHaveCount(10);
     });
@@ -97,9 +122,12 @@ describe('Employee API Endpoints', function () {
 
         $response->assertOk();
 
+        // Note: beforeEach creates an employee with random name, so we only check that our sorted employees appear
         $data = $response->json('data');
-        expect($data[0]['name'])->toBe('A Employee')
-            ->and($data[1]['name'])->toBe('Z Employee');
+        $names = array_column($data, 'name');
+        $aIndex = array_search('A Employee', $names);
+        $zIndex = array_search('Z Employee', $names);
+        expect($aIndex)->toBeLessThan($zIndex);
     });
 
     test('store creates employee with valid data and returns 201 status', function () {
@@ -369,4 +397,52 @@ describe('Employee API Endpoints', function () {
         expect($response->json())->toHaveKeys(['url', 'filename']);
     });
 
+});
+
+describe('Employee API Permission Tests', function () {
+    test('store returns 403 when user lacks employee.create permission', function () {
+        $user = createUserWithPermissions([]);
+        actingAs($user);
+
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
+
+        $response = postJson('/api/employees', [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'department' => $department->id,
+            'position' => $position->id,
+            'salary' => '50000.00',
+            'hire_date' => '2023-01-01',
+        ]);
+
+        $response->assertForbidden()
+            ->assertJson(['message' => 'You do not have permission to perform this action.']);
+    });
+
+    test('update returns 403 when user lacks employee.edit permission', function () {
+        $user = createUserWithPermissions([]);
+        actingAs($user);
+
+        $employee = Employee::factory()->create();
+
+        $response = putJson("/api/employees/{$employee->id}", [
+            'name' => 'Updated Name',
+        ]);
+
+        $response->assertForbidden()
+            ->assertJson(['message' => 'You do not have permission to perform this action.']);
+    });
+
+    test('destroy returns 403 when user lacks employee.delete permission', function () {
+        $user = createUserWithPermissions([]);
+        actingAs($user);
+
+        $employee = Employee::factory()->create();
+
+        $response = deleteJson("/api/employees/{$employee->id}");
+
+        $response->assertForbidden()
+            ->assertJson(['message' => 'You do not have permission to perform this action.']);
+    });
 });

@@ -87,10 +87,13 @@ class PermissionSeeder extends Seeder
             ],
         ];
 
-        $this->createPermissions($permissions);
+        $permissions = $this->createPermissions($permissions);
+        
+        $admin = Employee::where('email', 'admin@admin.com')->first();
+        $admin->permissions()->sync($permissions);
     }
 
-    private function createPermissions(array $items, ?Permission $parent = null)
+    private function createPermissions(array $items, ?Permission $parent = null): array
     {
         $permissions = [];
 
@@ -100,12 +103,11 @@ class PermissionSeeder extends Seeder
                 'display_name' => $item['display_name'],
                 'parent_id' => $parent?->id,
             ]);
+
             array_push($permissions, $newParent->id);
-            
-            $this->createPermissions($item['child'], $newParent);
+            $permissions = array_merge($permissions, $this->createPermissions($item['child'], $newParent));
         }
-        
-        $admin = Employee::where('email', 'admin@admin.com')->first();
-        $admin->permissions()->sync($permissions);
+
+        return $permissions;
     }
 }

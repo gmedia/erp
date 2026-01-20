@@ -40,13 +40,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // API routes for employee CRUD operations
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
-    Route::apiResource('employees', EmployeeController::class);
+    // Employees
+    Route::get('employees', [EmployeeController::class, 'index']);
+    Route::get('employees/{employee}', [EmployeeController::class, 'show']);
+    Route::post('employees', [EmployeeController::class, 'store'])->middleware('permission:employee.create');
+    Route::put('employees/{employee}', [EmployeeController::class, 'update'])->middleware('permission:employee.edit');
+    Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->middleware('permission:employee.delete');
     Route::post('employees/export', [EmployeeController::class, 'export']);
-    Route::apiResource('positions', PositionController::class);
+
+    // Positions
+    Route::get('positions', [PositionController::class, 'index']);
+    Route::get('positions/{position}', [PositionController::class, 'show']);
+    Route::post('positions', [PositionController::class, 'store'])->middleware('permission:position.create');
+    Route::put('positions/{position}', [PositionController::class, 'update'])->middleware('permission:position.edit');
+    Route::delete('positions/{position}', [PositionController::class, 'destroy'])->middleware('permission:position.delete');
     Route::post('positions/export', [PositionController::class, 'export']);
-    Route::apiResource('departments', DepartmentController::class);
+
+    // Departments
+    Route::get('departments', [DepartmentController::class, 'index']);
+    Route::get('departments/{department}', [DepartmentController::class, 'show']);
+    Route::post('departments', [DepartmentController::class, 'store'])->middleware('permission:department.create');
+    Route::put('departments/{department}', [DepartmentController::class, 'update'])->middleware('permission:department.edit');
+    Route::delete('departments/{department}', [DepartmentController::class, 'destroy'])->middleware('permission:department.delete');
     Route::post('departments/export', [DepartmentController::class, 'export']);
 
+    // Employee permissions management
     Route::get('employees/{employee}/permissions', [EmployeeController::class, 'permissions']);
     Route::post('employees/{employee}/permissions', [EmployeeController::class, 'syncPermissions']);
 

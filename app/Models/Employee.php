@@ -54,6 +54,14 @@ class Employee extends Model
     }
 
     /**
+     * Check if the employee has a specific permission.
+     */
+    public function hasPermission(string $permission): bool
+    {
+        return $this->permissions()->where('name', $permission)->exists();
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

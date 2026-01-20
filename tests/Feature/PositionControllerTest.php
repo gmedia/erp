@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Employee;
+use App\Models\Permission;
 use App\Models\Position;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,9 +16,32 @@ use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
 
+/**
+ * Helper function to create a user with an employee that has specific permissions.
+ */
+function createUserWithPositionPermissions(array $permissionNames = []): User
+{
+    $user = User::factory()->create();
+    $employee = Employee::factory()->create(['user_id' => $user->id]);
+
+    if (!empty($permissionNames)) {
+        $permissions = [];
+        foreach ($permissionNames as $name) {
+            $permissions[] = Permission::firstOrCreate(
+                ['name' => $name],
+                ['display_name' => ucwords(str_replace('.', ' ', $name))]
+            )->id;
+        }
+        $employee->permissions()->sync($permissions);
+    }
+
+    return $user;
+}
+
 describe('Position API Endpoints', function () {
     beforeEach(function () {
-        $user = User::factory()->create();
+        // Create user with all position permissions for existing tests
+        $user = createUserWithPositionPermissions(['position.create', 'position.edit', 'position.delete']);
         actingAs($user);
     });
 
@@ -45,7 +70,8 @@ describe('Position API Endpoints', function () {
                 ],
             ]);
 
-        expect($response->json('meta.total'))->toBe(25)
+        // Note: +1 because beforeEach creates a position for the employee's user
+        expect($response->json('meta.total'))->toBe(26)
             ->and($response->json('meta.per_page'))->toBe(10)
             ->and($response->json('data'))->toHaveCount(10);
     });
@@ -72,9 +98,12 @@ describe('Position API Endpoints', function () {
 
         $response->assertOk();
 
+        // Note: beforeEach creates a position with random name, so we only check relative order
         $data = $response->json('data');
-        expect($data[0]['name'])->toBe('A Position')
-            ->and($data[1]['name'])->toBe('Z Position');
+        $names = array_column($data, 'name');
+        $aIndex = array_search('A Position', $names);
+        $zIndex = array_search('Z Position', $names);
+        expect($aIndex)->toBeLessThan($zIndex);
     });
 
     test('store creates position with valid data and returns 201 status', function () {
@@ -243,3 +272,40 @@ describe('Position API Endpoints', function () {
         expect($response->json())->toHaveKeys(['url', 'filename']);
     });
 });
+
+describe('Position API Permission Tests', function () {
+    test('store returns 403 when user lacks position.create permission', function () {
+        $user = createUserWithPositionPermissions([]);
+        actingAs($user);
+
+        $response = postJson('/api/positions', ['name' => 'Test Position']);
+
+        $response->assertForbidden()
+            ->assertJson(['message' => 'You do not have permission to perform this action.']);
+    });
+
+    test('update returns 403 when user lacks position.edit permission', function () {
+        $user = createUserWithPositionPermissions([]);
+        actingAs($user);
+
+        $position = Position::factory()->create();
+
+        $response = putJson("/api/positions/{$position->id}", ['name' => 'Updated Name']);
+
+        $response->assertForbidden()
+            ->assertJson(['message' => 'You do not have permission to perform this action.']);
+    });
+
+    test('destroy returns 403 when user lacks position.delete permission', function () {
+        $user = createUserWithPositionPermissions([]);
+        actingAs($user);
+
+        $position = Position::factory()->create();
+
+        $response = deleteJson("/api/positions/{$position->id}");
+
+        $response->assertForbidden()
+            ->assertJson(['message' => 'You do not have permission to perform this action.']);
+    });
+});
+

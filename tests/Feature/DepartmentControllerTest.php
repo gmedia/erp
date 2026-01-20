@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Department;
+use App\Models\Employee;
+use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -14,9 +16,32 @@ use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class);
 
+/**
+ * Helper function to create a user with an employee that has specific permissions.
+ */
+function createUserWithDepartmentPermissions(array $permissionNames = []): User
+{
+    $user = User::factory()->create();
+    $employee = Employee::factory()->create(['user_id' => $user->id]);
+
+    if (!empty($permissionNames)) {
+        $permissions = [];
+        foreach ($permissionNames as $name) {
+            $permissions[] = Permission::firstOrCreate(
+                ['name' => $name],
+                ['display_name' => ucwords(str_replace('.', ' ', $name))]
+            )->id;
+        }
+        $employee->permissions()->sync($permissions);
+    }
+
+    return $user;
+}
+
 describe('Department API Endpoints', function () {
     beforeEach(function () {
-        $user = User::factory()->create();
+        // Create user with all department permissions for existing tests
+        $user = createUserWithDepartmentPermissions(['department.create', 'department.edit', 'department.delete']);
         actingAs($user);
     });
 
@@ -45,7 +70,8 @@ describe('Department API Endpoints', function () {
                 ],
             ]);
 
-        expect($response->json('meta.total'))->toBe(25)
+        // Note: +1 because beforeEach creates a department for the employee's user
+        expect($response->json('meta.total'))->toBe(26)
             ->and($response->json('meta.per_page'))->toBe(10)
             ->and($response->json('data'))->toHaveCount(10);
     });
@@ -72,9 +98,12 @@ describe('Department API Endpoints', function () {
 
         $response->assertOk();
 
+        // Note: beforeEach creates a department with random name, so we only check relative order
         $data = $response->json('data');
-        expect($data[0]['name'])->toBe('A Department')
-            ->and($data[1]['name'])->toBe('Z Department');
+        $names = array_column($data, 'name');
+        $aIndex = array_search('A Department', $names);
+        $zIndex = array_search('Z Department', $names);
+        expect($aIndex)->toBeLessThan($zIndex);
     });
 
     test('store creates department with valid data and returns 201 status', function () {
@@ -243,3 +272,40 @@ describe('Department API Endpoints', function () {
         expect($response->json())->toHaveKeys(['url', 'filename']);
     });
 });
+
+describe('Department API Permission Tests', function () {
+    test('store returns 403 when user lacks department.create permission', function () {
+        $user = createUserWithDepartmentPermissions([]);
+        actingAs($user);
+
+        $response = postJson('/api/departments', ['name' => 'Test Department']);
+
+        $response->assertForbidden()
+            ->assertJson(['message' => 'You do not have permission to perform this action.']);
+    });
+
+    test('update returns 403 when user lacks department.edit permission', function () {
+        $user = createUserWithDepartmentPermissions([]);
+        actingAs($user);
+
+        $department = Department::factory()->create();
+
+        $response = putJson("/api/departments/{$department->id}", ['name' => 'Updated Name']);
+
+        $response->assertForbidden()
+            ->assertJson(['message' => 'You do not have permission to perform this action.']);
+    });
+
+    test('destroy returns 403 when user lacks department.delete permission', function () {
+        $user = createUserWithDepartmentPermissions([]);
+        actingAs($user);
+
+        $department = Department::factory()->create();
+
+        $response = deleteJson("/api/departments/{$department->id}");
+
+        $response->assertForbidden()
+            ->assertJson(['message' => 'You do not have permission to perform this action.']);
+    });
+});
+
