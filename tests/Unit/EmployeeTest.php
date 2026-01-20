@@ -46,6 +46,7 @@ test('fillable attributes are defined correctly', function () {
         'phone',
         'department_id',
         'position_id',
+        'user_id',
         'salary',
         'hire_date',
     ]);
