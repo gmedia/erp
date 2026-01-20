@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Employee;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -27,7 +28,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // Seed admin user for Playwright test
-        User::firstOrCreate(
+        $admin = User::firstOrCreate(
             ['email' => 'admin@admin.com'],
             [
                 'name' => 'Admin User',
@@ -39,6 +40,20 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DepartmentSeeder::class,
             PositionSeeder::class,
+        ]);
+
+        Employee::firstOrCreate([
+            'user_id' => $admin->id,
+            'name' => 'Admin User',
+            'email' => 'admin@admin.com',
+            'phone' => '1234567890',
+            'department_id' => 1,
+            'position_id' => 1,
+            'salary' => 100000,
+            'hire_date' => now(),
+        ]);
+
+        $this->call([
             PermissionSeeder::class,
             MenuSeeder::class,
         ]);

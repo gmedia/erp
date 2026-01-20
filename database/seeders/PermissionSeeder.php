@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Employee;
 use App\Models\Permission;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class PermissionSeeder extends Seeder
@@ -90,14 +92,20 @@ class PermissionSeeder extends Seeder
 
     private function createPermissions(array $items, ?Permission $parent = null)
     {
+        $permissions = [];
+
         foreach ($items as $item) {
             $newParent = Permission::firstOrCreate([
                 'name' => $item['name'],
                 'display_name' => $item['display_name'],
                 'parent_id' => $parent?->id,
             ]);
-
+            array_push($permissions, $newParent->id);
+            
             $this->createPermissions($item['child'], $newParent);
         }
+        
+        $admin = Employee::where('email', 'admin@admin.com')->first();
+        $admin->permissions()->sync($permissions);
     }
 }

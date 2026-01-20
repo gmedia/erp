@@ -90,7 +90,7 @@ export async function login(
   }
 
   // Navigate to the login page
-  await page.goto('/login');
+  await page.goto('/login', { timeout: 100000 });
 
   // Wait for either a redirect to the dashboard or the email input to become visible
   const dashboardWait = page.waitForURL('**/dashboard', { timeout: 100000 }).catch(() => null);
