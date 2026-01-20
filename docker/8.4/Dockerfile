@@ -46,7 +46,7 @@ RUN apt-get update && apt-get upgrade -y \
     && npm install -g bun \
     && mkdir -p $PLAYWRIGHT_BROWSERS_PATH \
     && npx playwright install-deps \
-    && npx playwright install chromium \
+    && npx playwright install chromium chromium-headless-shell \
     && chmod -R 777 $PLAYWRIGHT_BROWSERS_PATH \
     && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | tee /etc/apt/keyrings/yarn.gpg >/dev/null \
     && echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
