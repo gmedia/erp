@@ -14,14 +14,14 @@ class CheckPermission
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      * @param  string  $permission  The permission name to check
      */
-    public function handle(Request $request, Closure $next, string $permission): Response
+    public function handle(Request $request, Closure $next, string $permission, bool $isApi = false): Response
     {
         $employee = $request->user()?->employee;
 
         if (!$employee || !$employee->hasPermission($permission)) {
-            return response()->json([
+            return $isApi ? response()->json([
                 'message' => __('You do not have permission to perform this action.'),
-            ], 403);
+            ], 403) : abort(403);
         }
 
         return $next($request);
