@@ -154,6 +154,7 @@ export default function UsersIndex() {
                                             type="text"
                                             {...form.register('name')}
                                             placeholder="Enter user name"
+                                            disabled={loading}
                                         />
                                         {errors.name && (
                                             <p className="text-sm text-destructive">{errors.name[0]}</p>
@@ -167,6 +168,7 @@ export default function UsersIndex() {
                                             type="email"
                                             {...form.register('email')}
                                             placeholder="Enter user email"
+                                            disabled={loading}
                                         />
                                         {errors.email && (
                                             <p className="text-sm text-destructive">{errors.email[0]}</p>
@@ -182,6 +184,7 @@ export default function UsersIndex() {
                                             type="password"
                                             {...form.register('password')}
                                             placeholder={userExists ? 'Leave empty to keep current password' : 'Enter password (required for new user)'}
+                                            disabled={loading}
                                         />
                                         {errors.password && (
                                             <p className="text-sm text-destructive">{errors.password[0]}</p>
