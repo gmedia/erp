@@ -41,7 +41,7 @@ function createUserWithPositionPermissions(array $permissionNames = []): User
 describe('Position API Endpoints', function () {
     beforeEach(function () {
         // Create user with all position permissions for existing tests
-        $user = createUserWithPositionPermissions(['position.create', 'position.edit', 'position.delete']);
+        $user = createUserWithPositionPermissions(['position', 'position.create', 'position.edit', 'position.delete']);
         actingAs($user);
     });
 
@@ -275,7 +275,7 @@ describe('Position API Endpoints', function () {
 
 describe('Position API Permission Tests', function () {
     test('store returns 403 when user lacks position.create permission', function () {
-        $user = createUserWithPositionPermissions([]);
+        $user = createUserWithPositionPermissions(['position']);
         actingAs($user);
 
         $response = postJson('/api/positions', ['name' => 'Test Position']);
@@ -285,7 +285,7 @@ describe('Position API Permission Tests', function () {
     });
 
     test('update returns 403 when user lacks position.edit permission', function () {
-        $user = createUserWithPositionPermissions([]);
+        $user = createUserWithPositionPermissions(['position']);
         actingAs($user);
 
         $position = Position::factory()->create();
@@ -297,7 +297,7 @@ describe('Position API Permission Tests', function () {
     });
 
     test('destroy returns 403 when user lacks position.delete permission', function () {
-        $user = createUserWithPositionPermissions([]);
+        $user = createUserWithPositionPermissions(['position']);
         actingAs($user);
 
         $position = Position::factory()->create();

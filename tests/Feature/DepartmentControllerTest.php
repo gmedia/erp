@@ -41,7 +41,7 @@ function createUserWithDepartmentPermissions(array $permissionNames = []): User
 describe('Department API Endpoints', function () {
     beforeEach(function () {
         // Create user with all department permissions for existing tests
-        $user = createUserWithDepartmentPermissions(['department.create', 'department.edit', 'department.delete']);
+        $user = createUserWithDepartmentPermissions(['department', 'department.create', 'department.edit', 'department.delete']);
         actingAs($user);
     });
 
@@ -275,7 +275,7 @@ describe('Department API Endpoints', function () {
 
 describe('Department API Permission Tests', function () {
     test('store returns 403 when user lacks department.create permission', function () {
-        $user = createUserWithDepartmentPermissions([]);
+        $user = createUserWithDepartmentPermissions(['department']);
         actingAs($user);
 
         $response = postJson('/api/departments', ['name' => 'Test Department']);
@@ -285,7 +285,7 @@ describe('Department API Permission Tests', function () {
     });
 
     test('update returns 403 when user lacks department.edit permission', function () {
-        $user = createUserWithDepartmentPermissions([]);
+        $user = createUserWithDepartmentPermissions(['department']);
         actingAs($user);
 
         $department = Department::factory()->create();
@@ -297,7 +297,7 @@ describe('Department API Permission Tests', function () {
     });
 
     test('destroy returns 403 when user lacks department.delete permission', function () {
-        $user = createUserWithDepartmentPermissions([]);
+        $user = createUserWithDepartmentPermissions(['department']);
         actingAs($user);
 
         $department = Department::factory()->create();

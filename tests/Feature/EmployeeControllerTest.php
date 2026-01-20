@@ -42,7 +42,7 @@ function createUserWithPermissions(array $permissionNames = []): User
 describe('Employee API Endpoints', function () {
     beforeEach(function () {
         // Create user with all employee permissions for existing tests
-        $user = createUserWithPermissions(['employee.create', 'employee.edit', 'employee.delete']);
+        $user = createUserWithPermissions(['employee', 'employee.create', 'employee.edit', 'employee.delete']);
         actingAs($user);
     });
 
@@ -401,7 +401,7 @@ describe('Employee API Endpoints', function () {
 
 describe('Employee API Permission Tests', function () {
     test('store returns 403 when user lacks employee.create permission', function () {
-        $user = createUserWithPermissions([]);
+        $user = createUserWithPermissions(['employee']);
         actingAs($user);
 
         $department = Department::factory()->create();
@@ -421,7 +421,7 @@ describe('Employee API Permission Tests', function () {
     });
 
     test('update returns 403 when user lacks employee.edit permission', function () {
-        $user = createUserWithPermissions([]);
+        $user = createUserWithPermissions(['employee']);
         actingAs($user);
 
         $employee = Employee::factory()->create();
@@ -435,7 +435,7 @@ describe('Employee API Permission Tests', function () {
     });
 
     test('destroy returns 403 when user lacks employee.delete permission', function () {
-        $user = createUserWithPermissions([]);
+        $user = createUserWithPermissions(['employee']);
         actingAs($user);
 
         $employee = Employee::factory()->create();
