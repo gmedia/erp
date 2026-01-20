@@ -4,6 +4,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PositionController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -33,6 +34,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('departments');
 
     Route::get('permissions', [\App\Http\Controllers\PermissionController::class, 'index'])->name('permissions.index');
+
+    Route::get('users', [UserController::class, 'index'])->name('users');
 });
 
 // API routes for employee CRUD operations
@@ -46,6 +49,9 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
 
     Route::get('employees/{employee}/permissions', [EmployeeController::class, 'permissions']);
     Route::post('employees/{employee}/permissions', [EmployeeController::class, 'syncPermissions']);
+
+    Route::get('employees/{employee}/user', [UserController::class, 'getUserByEmployee']);
+    Route::post('employees/{employee}/user', [UserController::class, 'updateUser']);
 });
 
 require __DIR__ . '/settings.php';
