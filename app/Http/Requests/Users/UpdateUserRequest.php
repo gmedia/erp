@@ -54,10 +54,10 @@ class UpdateUserRequest extends FormRequest
         return [
             'name.required' => 'The name field is required.',
             'email.required' => 'The email field is required.',
-            'email.email' => 'Please enter a valid email address.',
-            'email.unique' => 'This email is already in use by another user.',
-            'password.required' => 'A password is required when creating a new user.',
-            'password.min' => 'The password must be at least 8 characters.',
+            'email.email' => 'The email field must be a valid email address.',
+            'email.unique' => 'The email has already been taken.',
+            'password.required' => 'The password field is required.',
+            'password.min' => 'The password field must be at least 8 characters.',
         ];
     }
 }
