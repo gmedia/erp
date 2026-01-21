@@ -29,6 +29,7 @@ yarn-error.log
 task.*
 .kilocode*
 .roo*
+.agent/example_skills
 
 # IDE helper
 _ide_helper.php
