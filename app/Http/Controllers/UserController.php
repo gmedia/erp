@@ -41,22 +41,8 @@ class UserController extends Controller
     {
         $user = $employee->user;
 
-        if (!$user) {
-            return response()->json([
-                'user' => null,
-                'employee' => [
-                    'name' => $employee->name,
-                    'email' => $employee->email,
-                ],
-            ]);
-        }
-
         return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ],
+            'user' => $user ? new UserResource($user) : null,
             'employee' => [
                 'name' => $employee->name,
                 'email' => $employee->email,
@@ -74,7 +60,6 @@ class UserController extends Controller
      * @param  \App\Models\Employee  $employee
      * @return \Illuminate\Http\JsonResponse
      */
-
     public function updateUser(UpdateUserRequest $request, Employee $employee): JsonResponse
     {
         $user = (new SyncUserForEmployeeAction())->execute($employee, $request->validated());
