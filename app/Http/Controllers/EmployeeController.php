@@ -8,17 +8,17 @@ use App\Domain\Employees\EmployeeFilterService;
 use App\Http\Requests\Employees\ExportEmployeeRequest;
 use App\Http\Requests\Employees\IndexEmployeeRequest;
 use App\Http\Requests\Employees\StoreEmployeeRequest;
+use App\Http\Requests\Employees\SyncPermissionsRequest;
 use App\Http\Requests\Employees\UpdateEmployeeRequest;
 use App\Http\Resources\Employees\EmployeeCollection;
 use App\Http\Resources\Employees\EmployeeResource;
 use App\Models\Employee;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * Controller for employee management operations.
  *
- * Handles CRUD operations and export functionality for employees.
+ * Handles CRUD operations, export functionality, and permission management for employees.
  */
 class EmployeeController extends Controller
 {
@@ -103,6 +103,11 @@ class EmployeeController extends Controller
 
     /**
      * Get permissions for the specified employee.
+     *
+     * Returns an array of permission IDs assigned to the employee.
+     *
+     * @param  \App\Models\Employee  $employee
+     * @return \Illuminate\Http\JsonResponse
      */
     public function permissions(Employee $employee): JsonResponse
     {
@@ -111,15 +116,16 @@ class EmployeeController extends Controller
 
     /**
      * Sync permissions for the specified employee.
+     *
+     * Replaces all current permissions with the provided permission IDs.
+     *
+     * @param  \App\Http\Requests\Employees\SyncPermissionsRequest  $request
+     * @param  \App\Models\Employee  $employee
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function syncPermissions(Request $request, Employee $employee): JsonResponse
+    public function syncPermissions(SyncPermissionsRequest $request, Employee $employee): JsonResponse
     {
-        $request->validate([
-            'permissions' => 'array',
-            'permissions.*' => 'exists:permissions,id',
-        ]);
-
-        $employee->permissions()->sync($request->input('permissions', []));
+        $employee->permissions()->sync($request->validated('permissions', []));
 
         return response()->json(['message' => 'Permissions updated successfully.']);
     }
