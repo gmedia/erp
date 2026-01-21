@@ -41,7 +41,16 @@ Fitur ini NON-CRUD jika:
 
 ---
 
-## 3. Struktur File (bervariasi per pattern)
+## 3. Quick Start
+
+### Template Files
+Gunakan template dari folder `resources/` sebagai referensi:
+- [CustomController.php.template](file:///home/ariefn/project/erp/.agent/skills/feature-non-crud/resources/CustomController.php.template)
+- [CustomRoutes.php.template](file:///home/ariefn/project/erp/.agent/skills/feature-non-crud/resources/CustomRoutes.php.template)
+
+---
+
+## 4. Struktur File (bervariasi per pattern)
 
 | Layer | Path | Notes |
 |-------|------|-------|
@@ -55,7 +64,7 @@ Fitur ini NON-CRUD jika:
 
 ---
 
-## 4. Referensi Contoh
+## 5. Referensi Contoh
 
 ### Users Module (Pattern A)
 - [UserController.php](file:///home/ariefn/project/erp/app/Http/Controllers/UserController.php) - Custom methods, no standard CRUD
@@ -68,7 +77,7 @@ Fitur ini NON-CRUD jika:
 
 ---
 
-## 5. Langkah Implementasi
+## 6. Langkah Implementasi
 
 ### Phase 1: Define Scope
 1. Tentukan tipe pattern (A, B, atau C)
@@ -91,7 +100,7 @@ Fitur ini NON-CRUD jika:
 
 ---
 
-## 6. Contoh Code Patterns
+## 7. Contoh Code Patterns
 
 ### Custom Controller (Pattern A: User Management)
 ```php
@@ -134,7 +143,7 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
 
 ---
 
-## 7. Verification Checklist
+## 8. Verification Checklist
 
 - [ ] Halaman bisa diakses (Status 200)
 - [ ] Custom operasi bekerja dengan benar

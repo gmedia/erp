@@ -35,7 +35,29 @@ Modul ini COMPLEX jika salah satu berikut:
 
 ---
 
-## 3. Struktur File yang Harus Dibuat
+## 3. Quick Start
+
+### Jalankan Scaffold Script
+```bash
+# Lihat opsi
+bash .agent/skills/feature-crud-complex/scripts/scaffold.sh --help
+
+# Dry run (lihat apa yang akan dibuat)
+bash .agent/skills/feature-crud-complex/scripts/scaffold.sh Product --dry-run
+
+# Buat struktur folder
+bash .agent/skills/feature-crud-complex/scripts/scaffold.sh Product
+```
+
+### Template Files
+Gunakan template dari folder `resources/` sebagai referensi:
+- [ExtendedFilterService.php.template](file:///home/ariefn/project/erp/.agent/skills/feature-crud-complex/resources/ExtendedFilterService.php.template)
+- [UpdateData.php.template](file:///home/ariefn/project/erp/.agent/skills/feature-crud-complex/resources/UpdateData.php.template)
+- [Columns.tsx.template](file:///home/ariefn/project/erp/.agent/skills/feature-crud-complex/resources/Columns.tsx.template)
+
+---
+
+## 4. Struktur File yang Harus Dibuat
 
 ### Backend (Laravel)
 
@@ -67,7 +89,7 @@ Sama seperti Simple CRUD + tests untuk custom actions.
 
 ---
 
-## 4. Referensi Contoh
+## 5. Referensi Contoh
 
 Lihat modul `employees` sebagai referensi:
 
@@ -80,7 +102,7 @@ Lihat modul `employees` sebagai referensi:
 
 ---
 
-## 5. Langkah Implementasi
+## 6. Langkah Implementasi
 
 ### Phase 1: Database & Model
 1. Buat migration dengan foreign keys
@@ -112,7 +134,7 @@ Lihat modul `employees` sebagai referensi:
 
 ---
 
-## 6. Contoh Code Pattern
+## 7. Contoh Code Pattern
 
 ### Extended FilterService
 ```php
@@ -180,7 +202,7 @@ public function toArray(Request $request): array
 
 ---
 
-## 7. Verification Checklist
+## 8. Verification Checklist
 
 ```
 // turbo-all

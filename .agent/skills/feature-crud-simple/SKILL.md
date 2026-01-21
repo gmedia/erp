@@ -22,7 +22,29 @@ Apakah modul ini:
 
 ---
 
-## 2. Struktur File yang Harus Dibuat
+## 2. Quick Start
+
+### Jalankan Scaffold Script
+```bash
+# Lihat opsi
+bash .agent/skills/feature-crud-simple/scripts/scaffold.sh --help
+
+# Dry run (lihat apa yang akan dibuat)
+bash .agent/skills/feature-crud-simple/scripts/scaffold.sh Category --dry-run
+
+# Buat struktur folder
+bash .agent/skills/feature-crud-simple/scripts/scaffold.sh Category
+```
+
+### Template Files
+Gunakan template dari folder `resources/` sebagai referensi:
+- [IndexAction.php.template](file:///home/ariefn/project/erp/.agent/skills/feature-crud-simple/resources/IndexAction.php.template)
+- [FilterService.php.template](file:///home/ariefn/project/erp/.agent/skills/feature-crud-simple/resources/FilterService.php.template)
+- [routes.php.template](file:///home/ariefn/project/erp/.agent/skills/feature-crud-simple/resources/routes.php.template)
+
+---
+
+## 3. Struktur File yang Harus Dibuat
 
 ### Backend (Laravel)
 
