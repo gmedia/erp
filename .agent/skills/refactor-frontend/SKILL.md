@@ -461,7 +461,7 @@ Untuk setiap modul, jelaskan:
 
 ## 📚 CHECKLIST REFACTOR
 
-### Per Modul (Departments / Positions / Employees):
+### Per Modul:
 
 **Component Structure:**
 
