@@ -18,6 +18,9 @@ Apa yang ingin dilakukan?
 │   ├── Backend (Laravel/PHP)? ───────────────────→ /refactor-backend
 │   └── Frontend (React/TypeScript)? ─────────────→ /refactor-frontend
 │
+├── Database
+│   └── Migration, seeder, factory? ──────────────→ /database-migration
+│
 └── Testing
     └── Buat test untuk fitur? ───────────────────→ /testing-strategy
 ```
@@ -33,6 +36,7 @@ Apa yang ingin dilakukan?
 | Dashboard, Settings, Matrix view | `feature-non-crud` | - |
 | Perbaiki arsitektur backend | `refactor-backend` | `check-architecture.sh Employee` |
 | Perbaiki struktur komponen frontend | `refactor-frontend` | - |
+| Migration, seeder, factory | `database-migration` | `artisan make:model -mf` |
 | Buat unit/feature/e2e test | `testing-strategy` | - |
 
 ---
@@ -78,6 +82,7 @@ Apa yang ingin dilakukan?
 ├── feature-non-crud/        # Non-CRUD pages
 ├── refactor-backend/        # Backend refactoring
 ├── refactor-frontend/       # Frontend refactoring
+├── database-migration/      # Database migrations
 └── testing-strategy/        # Testing guidelines
 ```
 

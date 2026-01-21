@@ -1,0 +1,66 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\{{Feature}};
+use Illuminate\Database\Seeder;
+
+/**
+ * Seeder for {{Feature}} model.
+ *
+ * SEEDER GUIDELINES:
+ * - Gunakan factory untuk data random
+ * - Buat specific data untuk master data
+ * - Idempotent: bisa dijalankan berkali-kali tanpa duplikat
+ */
+class {{Feature}}Seeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        // Option 1: Factory - random data untuk development/testing
+        {{Feature}}::factory()->count(20)->create();
+
+        // Option 2: Specific data - master data
+        // $this->seedMasterData();
+
+        // Option 3: Idempotent seeding - check before create
+        // $this->seedIdempotent();
+    }
+
+    /**
+     * Seed master data (specific records).
+     */
+    private function seedMasterData(): void
+    {
+        $items = [
+            ['name' => 'Item A', 'description' => 'Description A'],
+            ['name' => 'Item B', 'description' => 'Description B'],
+            ['name' => 'Item C', 'description' => 'Description C'],
+        ];
+
+        foreach ($items as $item) {
+            {{Feature}}::create($item);
+        }
+    }
+
+    /**
+     * Idempotent seeding - won't create duplicates.
+     */
+    private function seedIdempotent(): void
+    {
+        $items = [
+            ['name' => 'Item A', 'description' => 'Description A'],
+            ['name' => 'Item B', 'description' => 'Description B'],
+        ];
+
+        foreach ($items as $item) {
+            {{Feature}}::firstOrCreate(
+                ['name' => $item['name']], // Unique key
+                $item // All attributes
+            );
+        }
+    }
+}
