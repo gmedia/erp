@@ -47,3 +47,10 @@ public function store(StoreEmployeeRequest $request, CreateEmployeeAction $actio
 ## 5. Verifikasi
 - [ ] `./vendor/bin/sail test` (Test Backend).
 - [ ] `./vendor/bin/sail npm run test:e2e` (Test E2E).
+
+## 🛠️ MCP Tools Support
+- **laravel-boost**: 
+    - Gunakan `database_schema` untuk melihat relasi foreign key yang ada.
+    - Gunakan `tinker` untuk mencoba factory atau eloquent query kompleks.
+- **shadcn-ui-mcp-server**: 
+    - Gunakan `get_block` (misal: `dashboard-05` atau `form-layouts`) sebagai base template halaman kompleks.

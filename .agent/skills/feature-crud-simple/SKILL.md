@@ -45,3 +45,7 @@ public function store(StoreDepartmentRequest $request): JsonResponse
 ## 5. Verifikasi
 - [ ] Pastikan CRUD berjalan lancar di browser.
 - [ ] `./vendor/bin/sail test` harus PASS.
+
+## 🛠️ MCP Tools Support
+- **laravel-boost**: Gunakan `list_artisan_commands` jika lupa nama command generator.
+- **shadcn-ui-mcp-server**: Gunakan `get_component` (misal: `button`, `dialog`, `input`) untuk mempercepat pembuatan UI.

@@ -599,3 +599,10 @@ export function DepartmentPage() {
 ---
 
 **END OF DOCUMENT**
+
+---
+
+## 🛠️ MCP Tools Support (Shadcn UI)
+Manfaatkan tools ini untuk UI yang konsisten:
+1. **get_component**: Jangan copy-paste manual dari web. Gunakan tool ini untuk tarik code komponen akurat.
+2. **get_block**: Gunakan untuk scaffold halaman dashboard/login jika diminta user (misal: "dashboard-01").

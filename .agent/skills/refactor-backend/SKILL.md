@@ -687,3 +687,11 @@ public function store(StoreDepartmentRequest $request): JsonResponse
 ---
 
 **END OF DOCUMENT**
+
+---
+
+## 🛠️ MCP Tools Support (Laravel Boost)
+Manfaatkan tools ini untuk meningkatkan akurasi refactoring:
+1. **database_schema**: WAJIB cek struktur database aktual sebelum mengubah Model/Factory.
+2. **search_docs**: Gunakan untuk mencari dokumentasi versi spesifik package jika ragu (misal: "pestphp/pest syntax").
+3. **tinker**: Gunakan untuk test query Eloquent kompleks atau logic scope sebelum di-commit ke code.
