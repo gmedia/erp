@@ -104,3 +104,9 @@ chown -R 1337:1000 "tests"
 
 chmod -R ugo+rw "database"
 chown -R 1337:1000 "database"
+
+# Fix script permissions
+chmod +x \
+    .agent/skills/feature-crud-simple/scripts/scaffold.sh \
+    .agent/skills/feature-crud-complex/scripts/scaffold.sh \
+    .agent/skills/refactor-backend/scripts/check-architecture.sh
