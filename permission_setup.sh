@@ -107,6 +107,7 @@ chown -R 1337:1000 "database"
 
 # Fix agent skill script permissions
 chmod +x \
+    .agent/skills/wizard.sh \
     .agent/skills/feature-crud-simple/scripts/scaffold.sh \
     .agent/skills/feature-crud-simple/scripts/generate.sh \
     .agent/skills/feature-crud-complex/scripts/scaffold.sh \
