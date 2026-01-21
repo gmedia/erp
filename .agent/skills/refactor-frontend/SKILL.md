@@ -22,6 +22,15 @@ Lakukan **ANALISA dan REFACTOR** kode frontend secara **TERKONTROL dan TERSTRUKT
 
 ---
 
+## 🚀 Quick Start
+
+### Template Files
+Gunakan template dari folder `resources/` sebagai referensi:
+- [Component.tsx.template](file:///home/ariefn/project/erp/.agent/skills/refactor-frontend/resources/Component.tsx.template)
+- [Columns.tsx.template](file:///home/ariefn/project/erp/.agent/skills/refactor-frontend/resources/Columns.tsx.template)
+
+---
+
 ## 🚫 ATURAN PALING PENTING: BEHAVIOR COMPATIBILITY
 
 ### DILARANG KERAS Mengubah:

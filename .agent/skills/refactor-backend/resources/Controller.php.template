@@ -1,0 +1,106 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\{{Features}}\Index{{Feature}}Request;
+use App\Http\Requests\{{Features}}\Store{{Feature}}Request;
+use App\Http\Requests\{{Features}}\Update{{Feature}}Request;
+use App\Http\Requests\{{Features}}\Export{{Feature}}Request;
+use App\Http\Resources\{{Features}}\{{Feature}}Collection;
+use App\Http\Resources\{{Features}}\{{Feature}}Resource;
+use App\Actions\{{Features}}\Index{{Features}}Action;
+use App\Actions\{{Features}}\Export{{Features}}Action;
+use App\Domain\{{Features}}\{{Feature}}FilterService;
+use App\Models\{{Feature}};
+use Illuminate\Http\JsonResponse;
+
+/**
+ * Controller for {{feature}} management operations.
+ *
+ * Handles CRUD operations and export functionality for {{features}}.
+ * 
+ * REFACTOR GUIDELINES:
+ * - Controller HARUS tipis (thin controller, fat model)
+ * - Validasi di FormRequest
+ * - Business logic di Action/Domain
+ * - Response pakai Resource
+ */
+class {{Feature}}Controller extends Controller
+{
+    /**
+     * Display a listing of the {{features}}.
+     *
+     * @param  \App\Http\Requests\{{Features}}\Index{{Feature}}Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index(Index{{Feature}}Request $request): JsonResponse
+    {
+        ${{features}} = (new Index{{Features}}Action(app({{Feature}}FilterService::class)))->execute($request);
+
+        return (new {{Feature}}Collection(${{features}}))->response();
+    }
+
+    /**
+     * Store a newly created {{feature}} in storage.
+     *
+     * @param  \App\Http\Requests\{{Features}}\Store{{Feature}}Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(Store{{Feature}}Request $request): JsonResponse
+    {
+        ${{feature}} = {{Feature}}::create($request->validated());
+
+        return (new {{Feature}}Resource(${{feature}}))
+            ->response()
+            ->setStatusCode(201);
+    }
+
+    /**
+     * Display the specified {{feature}}.
+     *
+     * @param  \App\Models\{{Feature}}  ${{feature}}
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show({{Feature}} ${{feature}}): JsonResponse
+    {
+        return (new {{Feature}}Resource(${{feature}}))->response();
+    }
+
+    /**
+     * Update the specified {{feature}} in storage.
+     *
+     * @param  \App\Http\Requests\{{Features}}\Update{{Feature}}Request  $request
+     * @param  \App\Models\{{Feature}}  ${{feature}}
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Update{{Feature}}Request $request, {{Feature}} ${{feature}}): JsonResponse
+    {
+        ${{feature}}->update($request->validated());
+
+        return (new {{Feature}}Resource(${{feature}}))->response();
+    }
+
+    /**
+     * Remove the specified {{feature}} from storage.
+     *
+     * @param  \App\Models\{{Feature}}  ${{feature}}
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy({{Feature}} ${{feature}}): JsonResponse
+    {
+        ${{feature}}->delete();
+
+        return response()->json(null, 204);
+    }
+
+    /**
+     * Export {{features}} to Excel based on filters.
+     *
+     * @param  \App\Http\Requests\{{Features}}\Export{{Feature}}Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function export(Export{{Feature}}Request $request): JsonResponse
+    {
+        return (new Export{{Features}}Action(app({{Feature}}FilterService::class)))->execute($request);
+    }
+}

@@ -22,6 +22,25 @@ Lakukan **ANALISA dan REFACTOR** kode backend secara **TERKONTROL dan TERSTRUKTU
 
 ---
 
+## 🚀 Quick Start
+
+### Check Architecture Script
+```bash
+# Lihat opsi
+bash .agent/skills/refactor-backend/scripts/check-architecture.sh --help
+
+# Cek arsitektur modul
+bash .agent/skills/refactor-backend/scripts/check-architecture.sh Employee
+```
+
+### Template Files
+Gunakan template dari folder `resources/` sebagai referensi:
+- [Controller.php.template](file:///home/ariefn/project/erp/.agent/skills/refactor-backend/resources/Controller.php.template)
+- [FormRequest.php.template](file:///home/ariefn/project/erp/.agent/skills/refactor-backend/resources/FormRequest.php.template)
+- [Resource.php.template](file:///home/ariefn/project/erp/.agent/skills/refactor-backend/resources/Resource.php.template)
+
+---
+
 
 ## 🚫 ATURAN PALING PENTING: API COMPATIBILITY
 
