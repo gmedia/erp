@@ -51,6 +51,13 @@ async function createEntity(
 
     if (field.type === 'select') {
       await page.click(`button:has-text("${field.selector}")`);
+      
+      // Type in the search box to filter results (handles pagination)
+      const searchInput = page.getByPlaceholder('Search...');
+      if (await searchInput.isVisible()) {
+        await searchInput.fill(value);
+      }
+      
       await page.getByRole('option', { name: value }).click();
     } else {
       await page.fill(`input[name="${field.name}"]`, value);

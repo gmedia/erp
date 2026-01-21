@@ -26,10 +26,18 @@ test('filter employees end‑to‑end', async ({ page }) => {
 
   // Set Department filter to Engineering
   await page.click('button:has-text("Select a department")');
+  const deptSearch = page.getByPlaceholder('Search...');
+  if (await deptSearch.isVisible()) {
+    await deptSearch.fill('Engineering');
+  }
   await page.getByRole('option', { name: 'Engineering' }).click();
 
   // Set Position filter to Manager
   await page.click('button:has-text("Select a position")');
+  const posSearch = page.getByPlaceholder('Search...');
+  if (await posSearch.isVisible()) {
+      await posSearch.fill('Manager');
+  }
   await page.getByRole('option', { name: 'Manager' }).click();
 
   // Apply filters
