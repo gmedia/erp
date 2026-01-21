@@ -133,7 +133,7 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
     }, [form, defaultValues]);
 
     return (
-        <EntityForm
+        <EntityForm<EmployeeFormData>
             form={form}
             open={open}
             onOpenChange={onOpenChange}

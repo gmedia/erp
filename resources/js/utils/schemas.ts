@@ -17,8 +17,8 @@ export const employeeFormSchema = z.object({
         .regex(/^[\d\s\-+().]+$/, {
             message: 'Please enter a valid phone number.',
         }),
-    department: z.coerce.string().min(1, { message: 'Department is required.' }),
-    position: z.coerce.string().min(1, { message: 'Position is required.' }),
+    department: z.string().min(1, { message: 'Department is required.' }),
+    position: z.string().min(1, { message: 'Position is required.' }),
     salary: z
         .string()
         .min(1, { message: 'Salary is required.' })
