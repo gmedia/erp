@@ -33,6 +33,18 @@ bash .agent/skills/refactor-backend/scripts/check-architecture.sh --help
 bash .agent/skills/refactor-backend/scripts/check-architecture.sh Employee
 ```
 
+### Generate Files dari Template
+```bash
+# Lihat opsi
+bash .agent/skills/refactor-backend/scripts/generate.sh --help
+
+# Dry run
+bash .agent/skills/refactor-backend/scripts/generate.sh Employee --dry-run
+
+# Generate Controller, Request, Resource
+bash .agent/skills/refactor-backend/scripts/generate.sh Employee --all
+```
+
 ### Template Files
 Gunakan template dari folder `resources/` sebagai referensi:
 - [Controller.php.template](file:///home/ariefn/project/erp/.agent/skills/refactor-backend/resources/Controller.php.template)

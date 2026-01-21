@@ -49,6 +49,18 @@ bash .agent/skills/feature-crud-complex/scripts/scaffold.sh Product --dry-run
 bash .agent/skills/feature-crud-complex/scripts/scaffold.sh Product
 ```
 
+### Generate Files dari Template
+```bash
+# Lihat opsi
+bash .agent/skills/feature-crud-complex/scripts/generate.sh --help
+
+# Dry run
+bash .agent/skills/feature-crud-complex/scripts/generate.sh Product --dry-run
+
+# Generate semua files
+bash .agent/skills/feature-crud-complex/scripts/generate.sh Product --all
+```
+
 ### Template Files
 Gunakan template dari folder `resources/` sebagai referensi:
 - [ExtendedFilterService.php.template](file:///home/ariefn/project/erp/.agent/skills/feature-crud-complex/resources/ExtendedFilterService.php.template)

@@ -36,6 +36,18 @@ bash .agent/skills/feature-crud-simple/scripts/scaffold.sh Category --dry-run
 bash .agent/skills/feature-crud-simple/scripts/scaffold.sh Category
 ```
 
+### Generate Files dari Template
+```bash
+# Lihat opsi
+bash .agent/skills/feature-crud-simple/scripts/generate.sh --help
+
+# Dry run
+bash .agent/skills/feature-crud-simple/scripts/generate.sh Category --dry-run
+
+# Generate semua files
+bash .agent/skills/feature-crud-simple/scripts/generate.sh Category --all
+```
+
 ### Template Files
 Gunakan template dari folder `resources/` sebagai referensi:
 - [IndexAction.php.template](file:///home/ariefn/project/erp/.agent/skills/feature-crud-simple/resources/IndexAction.php.template)

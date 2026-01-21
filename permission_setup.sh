@@ -110,3 +110,8 @@ chmod +x \
     .agent/skills/feature-crud-simple/scripts/scaffold.sh \
     .agent/skills/feature-crud-complex/scripts/scaffold.sh \
     .agent/skills/refactor-backend/scripts/check-architecture.sh
+
+chmod +x \
+    .agent/skills/feature-crud-simple/scripts/generate.sh \
+    .agent/skills/feature-crud-complex/scripts/generate.sh \
+    .agent/skills/refactor-backend/scripts/generate.sh
