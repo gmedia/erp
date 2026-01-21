@@ -1,51 +1,158 @@
 ---
 name: Feature CRUD Simple
-description: Workflow untuk membuat fitur CRUD sederhana (misal: Departments, Positions) menggunakan standar Laravel minimalis.
+description: Workflow untuk membuat fitur CRUD sederhana (misal: Departments, Positions) dengan satu tabel utama tanpa relasi kompleks.
 ---
 
 # Feature CRUD Simple
 
-Gunakan skill ini untuk membuat fitur CRUD sederhana yang tidak melibatkan logika bisnis kompleks atau orkestrasi multi-tabel.
+Gunakan skill ini untuk membuat fitur CRUD sederhana yang hanya melibatkan satu tabel utama tanpa relasi foreign key atau logika bisnis kompleks.
 
-## 1. Kriteria "Simple"
-- Hanya satu tabel utama.
-- Tidak ada logic kompleks (hanya Create, Read, Update, Delete).
-- Field sedikit (< 5 field penting).
-- Tidak menggunakan DTO atau Action Class (cukup Controller + Model).
+## 1. Decision Tree: Simple vs Complex?
 
-## 2. Struktur Backend
-- **Controller**: Extends `App\Http\Controllers\Controller`. Method `index`, `store`, `update`, `destroy`.
-- **Request**: `Store{Feature}Request` dan `Update{Feature}Request` di `App\Http\Requests\{Feature}`.
-- **Resource**: `{Feature}Resource` dan `{Feature}Collection` di `App\Http\Resources\{Feature}`.
-- **Model**: Langsung dipanggil di Controller.
+```
+Apakah modul ini:
+├── Punya relasi foreign key? → Complex CRUD
+├── Butuh filter multi-field (range, date, dropdown)? → Complex CRUD
+├── Perlu komponen React terpisah (Form, Filters, Modal)? → Complex CRUD
+└── Hanya 1 tabel, filter search saja? → ✅ Simple CRUD
+```
 
-### Contoh Controller (Simple)
+**Contoh Simple**: `positions`, `departments` (1 tabel, hanya field name)
+**Contoh Complex**: `employees` (relasi ke department/position, filter salary/date)
+
+---
+
+## 2. Struktur File yang Harus Dibuat
+
+### Backend (Laravel)
+
+| Layer | Path | Deskripsi |
+|-------|------|-----------|
+| Model | `app/Models/{Feature}.php` | Eloquent model |
+| Controller | `app/Http/Controllers/{Feature}Controller.php` | CRUD + Export |
+| Requests | `app/Http/Requests/{Features}/` | Index, Store, Update, Export |
+| Resources | `app/Http/Resources/{Features}/` | Resource + Collection |
+| Actions | `app/Actions/{Features}/` | IndexAction, ExportAction |
+| Domain | `app/Domain/{Features}/` | FilterService (use trait) |
+| Exports | `app/Exports/{Features}/` | Excel export class |
+| Routes | `routes/{feature}.php` | Route definitions |
+
+### Frontend (React/Inertia)
+
+| Path | Deskripsi |
+|------|-----------|
+| `resources/js/pages/{features}/index.tsx` | Halaman utama dengan DataTable |
+
+### Tests
+
+| Path | Deskripsi |
+|------|-----------|
+| `tests/Feature/{Feature}ControllerTest.php` | Integration test |
+| `tests/Unit/Actions/{Features}/` | Unit test untuk Actions |
+| `tests/Unit/Requests/{Features}/` | Unit test untuk Requests |
+| `tests/Unit/Resources/{Features}/` | Unit test untuk Resources |
+| `tests/e2e/{features}/` | E2E tests (Playwright) |
+
+---
+
+## 3. Referensi Contoh
+
+Lihat modul `positions` sebagai referensi:
+
+- [PositionController.php](file:///home/ariefn/project/erp/app/Http/Controllers/PositionController.php)
+- [IndexPositionsAction.php](file:///home/ariefn/project/erp/app/Actions/Positions/IndexPositionsAction.php)  
+- [PositionFilterService.php](file:///home/ariefn/project/erp/app/Domain/Positions/PositionFilterService.php)
+- [routes/position.php](file:///home/ariefn/project/erp/routes/position.php)
+
+---
+
+## 4. Langkah Implementasi
+
+### Phase 1: Database & Model
+1. Buat migration: `./vendor/bin/sail artisan make:migration create_{features}_table`
+2. Buat model: `./vendor/bin/sail artisan make:model {Feature}`
+3. Buat factory: `./vendor/bin/sail artisan make:factory {Feature}Factory`
+
+### Phase 2: Backend Logic
+4. Buat Requests di `app/Http/Requests/{Features}/`
+5. Buat Resources di `app/Http/Resources/{Features}/`
+6. Buat FilterService di `app/Domain/{Features}/` (use `BaseFilterService` trait)
+7. Buat Actions di `app/Actions/{Features}/`
+8. Buat Controller di `app/Http/Controllers/`
+9. Buat Export class di `app/Exports/{Features}/`
+10. Definisikan routes di `routes/{feature}.php`
+11. Include route di `routes/web.php`
+
+### Phase 3: Frontend
+12. Buat halaman index di `resources/js/pages/{features}/index.tsx`
+
+### Phase 4: Testing
+13. Buat Feature Test untuk Controller
+14. Buat Unit Tests untuk Actions, Requests, Resources
+15. Buat E2E Tests
+
+---
+
+## 5. Contoh Code Pattern
+
+### Controller Method (Store)
 ```php
-public function store(StoreDepartmentRequest $request): JsonResponse
+public function store(Store{Feature}Request $request): JsonResponse
 {
-    $department = Department::create($request->validated());
-    return (new DepartmentResource($department))->response()->setStatusCode(201);
+    ${feature} = {Feature}::create($request->validated());
+    
+    return (new {Feature}Resource(${feature}))
+        ->response()
+        ->setStatusCode(201);
 }
 ```
 
-## 3. Struktur Frontend (Inertia + React)
-- **Pages**: `resources/js/pages/{feature}/index.tsx` (List + Modal Form).
-- **Components**: `UseShadcnUI` components. Gunakan `DataTable` untuk list.
+### FilterService (Simple)
+```php
+<?php
 
-## 4. Langkah Implementasi
-1.  **Model & Migration**: Buat model dan file migrasi.
-2.  **Requests**: Buat FormRequest untuk validasi.
-3.  **Controller**: Buat Resource Controller.
-4.  **Routes**: Daftarkan di `routes/web.php`.
-5.  **Frontend**: Buat halaman index dan form modal.
-6.  **Tests**:
-    - `Feature/{Feature}ControllerTest.php`
-    - Jalankan `./vendor/bin/sail test`
+namespace App\Domain\{Features};
 
-## 5. Verifikasi
-- [ ] Pastikan CRUD berjalan lancar di browser.
-- [ ] `./vendor/bin/sail test` harus PASS.
+use App\Domain\Concerns\BaseFilterService;
 
-## 🛠️ MCP Tools Support
-- **laravel-boost**: Gunakan `list_artisan_commands` jika lupa nama command generator.
-- **shadcn-ui-mcp-server**: Gunakan `get_component` (misal: `button`, `dialog`, `input`) untuk mempercepat pembuatan UI.
+class {Feature}FilterService
+{
+    use BaseFilterService;
+}
+```
+
+### Route Pattern
+```php
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('{features}', function () {
+        return Inertia::render('{features}/index');
+    })->name('{features}')->middleware('permission:{feature}');
+});
+
+Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
+    Route::middleware('permission:{feature},true')->group(function () {
+        Route::get('{features}', [{Feature}Controller::class, 'index']);
+        Route::get('{features}/{{feature}}', [{Feature}Controller::class, 'show']);
+        Route::post('{features}', [{Feature}Controller::class, 'store'])
+            ->middleware('permission:{feature}.create,true');
+        Route::put('{features}/{{feature}}', [{Feature}Controller::class, 'update'])
+            ->middleware('permission:{feature}.edit,true');
+        Route::delete('{features}/{{feature}}', [{Feature}Controller::class, 'destroy'])
+            ->middleware('permission:{feature}.delete,true');
+        Route::post('{features}/export', [{Feature}Controller::class, 'export']);
+    });
+});
+```
+
+---
+
+## 6. Verification Checklist
+
+```
+// turbo-all
+```
+
+- [ ] `./vendor/bin/sail artisan migrate` - Migration berhasil
+- [ ] `./vendor/bin/sail test --filter={Feature}` - Tests PASS
+- [ ] Buka browser, test CRUD manual
+- [ ] `./vendor/bin/sail npm run test:e2e -- --grep={feature}` - E2E PASS

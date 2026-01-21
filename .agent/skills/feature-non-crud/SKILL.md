@@ -1,35 +1,142 @@
 ---
 name: Feature Custom / Non-CRUD
-description: Workflow untuk fitur non-standar seperti Dashboard, Settings, atau Halaman Khusus.
+description: Workflow untuk fitur non-standar seperti Dashboard, Settings, User Management, atau Halaman Khusus.
 ---
 
 # Feature Custom / Non-CRUD
 
-Gunakan skill ini untuk membuat halaman atau fitur yang tidak mengikuti pola CRUD standar (misalnya: Dashboard, Report, Permissions Matrix, User Settings).
+Gunakan skill ini untuk membuat halaman atau fitur yang tidak mengikuti pola CRUD standar.
 
-## 1. Kriteria
-- Tidak ada resource `create/edit` standar.
-- Mungkin hanya `index` (Dashboard) atau `update` (Settings).
-- Routing custom (tidak pakai `Route::resource`).
+## 1. Decision Tree: Kapan Non-CRUD?
 
-## 2. Strategi Backend
-- **Controller**: Bisa `Single Action Controller` (`__invoke`) jika hanya satu fungsi.
-- **Service**: Gunakan Service Class jika logic pengolahan data rumit (misal: `ReportService`).
-- **Query**: Hati-hati dengan N+1 problem saat load data untuk dashboard.
+```
+Fitur ini NON-CRUD jika:
+├── Tidak ada entity/model utama baru
+├── Bekerja dengan model existing (e.g., User Management → Employee)
+├── Custom UI yang tidak fit pola create/edit/delete
+├── Dashboard, Report, Settings, Matrix views
+└── Routing tidak pakai Route::resource
+```
 
-## 3. Strategi Frontend
-- **Layout**: Apakah perlu layout khusus?
-- **Components**: Buat komponen spesifik fitur di `resources/js/components/{feature}`.
-- **Charts/Widgets**: Jika dashboard, pastikan performa rendering.
+**Contoh**: `users` (manage User via Employee), `permissions` (matrix view), Dashboard
 
-## 4. Langkah Implementasi
-1.  **Route Definition**: Tentukan URL di `routes/web.php`.
-2.  **Controller**: Buat logic pengambilan data.
-3.  **Frontend**: Buat UI sesuai mockup/kebutuhan.
-4.  **Tests**:
-    - Fokus pada **Smoke Testing**: Pastikan halaman bisa dibuka (Status 200).
-    - Tes interaksi kunci (misal: ganti filter report).
+---
 
-## 5. Verification
-- [ ] Manual Check di browser.
-- [ ] Smoke Test (Feature Test).
+## 2. Jenis Non-CRUD Patterns
+
+### Pattern A: Related Entity Management (contoh: `users`)
+- Tidak ada model `User` CRUD standar
+- Manage via parent entity (`Employee`)
+- Custom routes: `employees/{employee}/user`
+
+### Pattern B: Matrix/Permission View (contoh: `permissions`)
+- Display many-to-many relations
+- Bulk update operations
+- Custom UI components
+
+### Pattern C: Dashboard/Report
+- Aggregation queries
+- Charts and widgets
+- Read-only atau minimal interaction
+
+---
+
+## 3. Struktur File (bervariasi per pattern)
+
+| Layer | Path | Notes |
+|-------|------|-------|
+| Controller | `app/Http/Controllers/` | Custom methods, tidak pakai resource |
+| Actions | `app/Actions/{Feature}/` | Business logic terpisah |
+| Requests | `app/Http/Requests/{Feature}/` | Untuk operasi custom |
+| Resources | `app/Http/Resources/{Feature}/` | Jika ada API response |
+| Routes | `routes/{feature}.php` | Custom route definitions |
+| Pages | `resources/js/pages/{feature}/` | UI pages |
+| Components | `resources/js/components/{feature}/` | Reusable UI components |
+
+---
+
+## 4. Referensi Contoh
+
+### Users Module (Pattern A)
+- [UserController.php](file:///home/ariefn/project/erp/app/Http/Controllers/UserController.php) - Custom methods, no standard CRUD
+- [routes/user.php](file:///home/ariefn/project/erp/routes/user.php) - Custom routes via Employee
+- [SyncUserForEmployeeAction.php](file:///home/ariefn/project/erp/app/Actions/Users/SyncUserForEmployeeAction.php) - Business logic
+
+### Permissions Module (Pattern B)
+- [PermissionController.php](file:///home/ariefn/project/erp/app/Http/Controllers/PermissionController.php)
+- [routes/permission.php](file:///home/ariefn/project/erp/routes/permission.php)
+
+---
+
+## 5. Langkah Implementasi
+
+### Phase 1: Define Scope
+1. Tentukan tipe pattern (A, B, atau C)
+2. List operasi yang dibutuhkan (bukan CRUD standar)
+3. Desain custom routes
+
+### Phase 2: Backend
+4. Buat Controller dengan custom methods
+5. Buat Actions untuk business logic kompleks
+6. Buat Requests untuk validasi
+7. Definisikan routes custom
+
+### Phase 3: Frontend
+8. Buat halaman index/main page
+9. Buat komponen custom sesuai kebutuhan
+
+### Phase 4: Testing
+10. Fokus pada **Smoke Testing** (halaman bisa dibuka)
+11. Test interaksi kunci (filter, save, etc.)
+
+---
+
+## 6. Contoh Code Patterns
+
+### Custom Controller (Pattern A: User Management)
+```php
+class UserController extends Controller
+{
+    public function index(): Response
+    {
+        return Inertia::render('users/index');
+    }
+
+    public function getUserByEmployee(Employee $employee): JsonResponse
+    {
+        return response()->json([
+            'user' => $employee->user ? new UserResource($employee->user) : null,
+            'employee' => ['name' => $employee->name, 'email' => $employee->email],
+        ]);
+    }
+
+    public function updateUser(UpdateUserRequest $request, Employee $employee): JsonResponse
+    {
+        $user = (new SyncUserForEmployeeAction())->execute($employee, $request->validated());
+        return response()->json(['message' => 'User updated successfully.', 'user' => new UserResource($user)]);
+    }
+}
+```
+
+### Custom Routes (Non-Resource)
+```php
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('users', [UserController::class, 'index'])->name('users')->middleware('permission:user');
+});
+
+Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
+    Route::middleware('permission:user,true')->group(function () {
+        Route::get('employees/{employee}/user', [UserController::class, 'getUserByEmployee']);
+        Route::post('employees/{employee}/user', [UserController::class, 'updateUser']);
+    });
+});
+```
+
+---
+
+## 7. Verification Checklist
+
+- [ ] Halaman bisa diakses (Status 200)
+- [ ] Custom operasi bekerja dengan benar
+- [ ] Permission middleware berfungsi
+- [ ] Smoke test + interaction tests pass
