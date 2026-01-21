@@ -16,14 +16,15 @@ class PermissionController extends Controller
     /**
      * Display a listing of all permissions.
      *
-     * Returns all permissions ordered by ID for permission management interface.
+     * Returns all permissions for the permission management interface.
+     * Ordered by name for better readability.
      *
      * @return \Inertia\Response
      */
     public function index(): Response
     {
         $permissions = Permission::query()
-            ->orderBy('id')
+            ->orderBy('name')
             ->get();
 
         return Inertia::render('permissions/index', [

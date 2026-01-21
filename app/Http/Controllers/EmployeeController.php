@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Employees\ExportEmployeesAction;
 use App\Actions\Employees\IndexEmployeesAction;
+use App\Actions\Employees\SyncEmployeePermissionsAction;
 use App\Domain\Employees\EmployeeFilterService;
 use App\Http\Requests\Employees\ExportEmployeeRequest;
 use App\Http\Requests\Employees\IndexEmployeeRequest;
@@ -125,7 +126,7 @@ class EmployeeController extends Controller
      */
     public function syncPermissions(SyncPermissionsRequest $request, Employee $employee): JsonResponse
     {
-        $employee->permissions()->sync($request->validated('permissions', []));
+        (new SyncEmployeePermissionsAction())->execute($employee, $request->validated('permissions', []));
 
         return response()->json(['message' => 'Permissions updated successfully.']);
     }

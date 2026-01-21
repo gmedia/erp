@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Users\SyncUserForEmployeeAction;
 use App\Http\Requests\Users\UpdateUserRequest;
+use App\Http\Resources\Users\UserResource;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -72,43 +74,14 @@ class UserController extends Controller
      * @param  \App\Models\Employee  $employee
      * @return \Illuminate\Http\JsonResponse
      */
+
     public function updateUser(UpdateUserRequest $request, Employee $employee): JsonResponse
     {
-        $existingUser = $employee->user;
-        $validated = $request->validated();
-
-        if ($existingUser) {
-            // Update existing user
-            $userData = [
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-            ];
-
-            if (!empty($validated['password'])) {
-                $userData['password'] = $validated['password'];
-            }
-
-            $existingUser->update($userData);
-            $user = $existingUser;
-        } else {
-            // Create new user
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => $validated['password'],
-            ]);
-
-            // Link user to employee
-            $employee->update(['user_id' => $user->id]);
-        }
+        $user = (new SyncUserForEmployeeAction())->execute($employee, $request->validated());
 
         return response()->json([
             'message' => 'User updated successfully.',
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ],
+            'user' => new UserResource($user),
         ]);
     }
 }

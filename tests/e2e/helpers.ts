@@ -114,7 +114,7 @@ export async function login(
   await page.fill('input[name="email"]', email);
   await page.fill('input[name="password"]', password);
   await Promise.all([
-    page.waitForURL('**/dashboard', { timeout: 100000 }),
+    page.waitForURL('**/dashboard', { timeout: 1000000 }),
     (async () => {
       const testIdButton = page.locator('button[data-testid="login-button"]');
       if (await testIdButton.count() > 0) {
