@@ -1,6 +1,6 @@
 ---
 name: Feature CRUD Simple
-description: Workflow untuk membuat fitur CRUD sederhana (misal: Departments, Positions) dengan satu tabel utama tanpa relasi kompleks.
+description: Workflow untuk membuat fitur CRUD sederhana (Departments, Positions) dengan satu tabel utama tanpa relasi kompleks.
 ---
 
 # Feature CRUD Simple
