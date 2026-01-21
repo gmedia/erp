@@ -22,34 +22,6 @@ Lakukan **ANALISA dan REFACTOR** kode frontend secara **TERKONTROL dan TERSTRUKT
 
 ---
 
-## 📦 SCOPE REFACTOR
-
-### Frontend Modules
-
-**Modul Departments:**
-
-- `@/resources/js/pages/departments`
-- `@/resources/js/components/departments`
-- `@/tests/e2e/departments`
-
-**Modul Positions:**
-
-- `@/resources/js/pages/positions`
-- `@/resources/js/components/positions`
-- `@/tests/e2e/positions`
-
-**Modul Employees:**
-
-- `@/resources/js/pages/employees`
-- `@/resources/js/components/employees`
-- `@/tests/e2e/employees`
-
-### Shared Code
-
-- `@/resources/js/components/common`
-
----
-
 ## 🚫 ATURAN PALING PENTING: BEHAVIOR COMPATIBILITY
 
 ### DILARANG KERAS Mengubah:
