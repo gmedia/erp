@@ -80,6 +80,8 @@ touch "coverage.xml"
 chmod ugo+rw "coverage.xml"
 chown 1000:1000 "coverage.xml"
 
+rm -rf "vendor/pestphp/pest/.temp"
+
 # Required by ide helper
 
 touch "_ide_helper.php"
