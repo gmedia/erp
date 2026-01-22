@@ -5,147 +5,107 @@ description: Workflow untuk fitur non-standar seperti Dashboard, Settings, User 
 
 # Feature Custom / Non-CRUD
 
-Gunakan skill ini untuk membuat halaman atau fitur yang tidak mengikuti pola CRUD standar.
+Gunakan skill ini untuk halaman atau fitur yang tidak mengikuti pola CRUD standar.
 
-## 1. Decision Tree: Kapan Non-CRUD?
+## 🔌 MCP Tools yang Digunakan
+
+| Tool | Kapan Digunakan |
+|------|-----------------|
+| `mcp_laravel-boost_database-schema` | Lihat model/tabel existing |
+| `mcp_laravel-boost_list-routes` | Lihat routes existing, plan custom routes |
+| `mcp_laravel-boost_search-docs` | Cari dokumentasi Inertia, custom routing |
+| `mcp_shadcn-ui-mcp-server_list_blocks` | Cari dashboard/UI blocks |
+| `mcp_shadcn-ui-mcp-server_get_block` | Ambil complex UI blocks |
+| `mcp_shadcn-ui-mcp-server_get_component` | Ambil komponen UI |
+| `mcp_filesystem_read_file` | Baca file referensi |
+
+---
+
+## 🎯 Decision Tree: Kapan Non-CRUD?
 
 ```
 Fitur ini NON-CRUD jika:
-├── Tidak ada entity/model utama baru
-├── Bekerja dengan model existing (e.g., User Management → Employee)
-├── Custom UI yang tidak fit pola create/edit/delete
-├── Dashboard, Report, Settings, Matrix views
+├── Tidak ada model baru
+├── Bekerja dengan model existing
+├── Custom UI (dashboard, matrix, wizard)
 └── Routing tidak pakai Route::resource
 ```
 
-**Contoh**: `users` (manage User via Employee), `permissions` (matrix view), Dashboard
+**Contoh**: `users`, `permissions`, Dashboard
 
 ---
 
-## 2. Jenis Non-CRUD Patterns
+## 📊 Jenis Non-CRUD Patterns
 
-### Pattern A: Related Entity Management (contoh: `users`)
-- Tidak ada model `User` CRUD standar
-- Manage via parent entity (`Employee`)
-- Custom routes: `employees/{employee}/user`
-
-### Pattern B: Matrix/Permission View (contoh: `permissions`)
-- Display many-to-many relations
-- Bulk update operations
-- Custom UI components
-
-### Pattern C: Dashboard/Report
-- Aggregation queries
-- Charts and widgets
-- Read-only atau minimal interaction
+| Pattern | Contoh | Ciri |
+|---------|--------|------|
+| A: Related Entity | `users` | Manage via parent entity |
+| B: Matrix View | `permissions` | Many-to-many, bulk update |
+| C: Dashboard | Dashboard | Aggregation, charts |
 
 ---
 
-## 3. Quick Start
+## 📁 Struktur File
 
-### Template Files
-Gunakan template dari folder `resources/` sebagai referensi:
-- [CustomController.php.template](file:///home/ariefn/project/erp/.agent/skills/feature-non-crud/resources/CustomController.php.template)
-- [CustomRoutes.php.template](file:///home/ariefn/project/erp/.agent/skills/feature-non-crud/resources/CustomRoutes.php.template)
-
----
-
-## 4. Struktur File (bervariasi per pattern)
-
-| Layer | Path | Notes |
-|-------|------|-------|
-| Controller | `app/Http/Controllers/` | Custom methods, tidak pakai resource |
-| Actions | `app/Actions/{Feature}/` | Business logic terpisah |
-| Requests | `app/Http/Requests/{Feature}/` | Untuk operasi custom |
-| Resources | `app/Http/Resources/{Feature}/` | Jika ada API response |
-| Routes | `routes/{feature}.php` | Custom route definitions |
-| Pages | `resources/js/pages/{feature}/` | UI pages |
-| Components | `resources/js/components/{feature}/` | Reusable UI components |
+| Layer | Path |
+|-------|------|
+| Controller | `app/Http/Controllers/` (custom methods) |
+| Actions | `app/Actions/{Feature}/` |
+| Routes | `routes/{feature}.php` (custom) |
+| Pages | `resources/js/pages/{feature}/` |
 
 ---
 
-## 5. Referensi Contoh
+## 📖 Referensi Pattern
 
-### Users Module (Pattern A)
-- [UserController.php](file:///home/ariefn/project/erp/app/Http/Controllers/UserController.php) - Custom methods, no standard CRUD
-- [routes/user.php](file:///home/ariefn/project/erp/routes/user.php) - Custom routes via Employee
-- [SyncUserForEmployeeAction.php](file:///home/ariefn/project/erp/app/Actions/Users/SyncUserForEmployeeAction.php) - Business logic
+```
+# Gunakan MCP untuk baca referensi:
+mcp_filesystem_read_file(path: "app/Http/Controllers/UserController.php")
+mcp_filesystem_read_file(path: "app/Http/Controllers/PermissionController.php")
 
-### Permissions Module (Pattern B)
-- [PermissionController.php](file:///home/ariefn/project/erp/app/Http/Controllers/PermissionController.php)
-- [routes/permission.php](file:///home/ariefn/project/erp/routes/permission.php)
+# Cari dashboard blocks:
+mcp_shadcn-ui-mcp-server_list_blocks(category: "dashboard")
+```
+
+| Pattern | File Referensi |
+|---------|---------------|
+| User Management | `app/Http/Controllers/UserController.php` |
+| Permission Matrix | `app/Http/Controllers/PermissionController.php` |
+| Custom Routes | `routes/user.php`, `routes/permission.php` |
 
 ---
 
-## 6. Langkah Implementasi
+## 🚀 Langkah Implementasi
 
 ### Phase 1: Define Scope
-1. Tentukan tipe pattern (A, B, atau C)
-2. List operasi yang dibutuhkan (bukan CRUD standar)
+1. Tentukan pattern (A, B, atau C)
+2. List operasi yang dibutuhkan
 3. Desain custom routes
 
 ### Phase 2: Backend
 4. Buat Controller dengan custom methods
-5. Buat Actions untuk business logic kompleks
-6. Buat Requests untuk validasi
-7. Definisikan routes custom
+5. Buat Actions untuk business logic
+6. Definisikan routes
 
 ### Phase 3: Frontend
-8. Buat halaman index/main page
-9. Buat komponen custom sesuai kebutuhan
+```
+# Ambil UI blocks jika perlu:
+mcp_shadcn-ui-mcp-server_get_block(blockName: "dashboard-01")
+```
+
+Buat halaman dan komponen custom
 
 ### Phase 4: Testing
-10. Fokus pada **Smoke Testing** (halaman bisa dibuka)
-11. Test interaksi kunci (filter, save, etc.)
+- Smoke test (halaman bisa dibuka)
+- Test interaksi kunci
 
 ---
 
-## 7. Contoh Code Patterns
+## ✅ Verification
 
-### Custom Controller (Pattern A: User Management)
-```php
-class UserController extends Controller
-{
-    public function index(): Response
-    {
-        return Inertia::render('users/index');
-    }
-
-    public function getUserByEmployee(Employee $employee): JsonResponse
-    {
-        return response()->json([
-            'user' => $employee->user ? new UserResource($employee->user) : null,
-            'employee' => ['name' => $employee->name, 'email' => $employee->email],
-        ]);
-    }
-
-    public function updateUser(UpdateUserRequest $request, Employee $employee): JsonResponse
-    {
-        $user = (new SyncUserForEmployeeAction())->execute($employee, $request->validated());
-        return response()->json(['message' => 'User updated successfully.', 'user' => new UserResource($user)]);
-    }
-}
+```bash
+// turbo-all
+./vendor/bin/sail test --filter={Feature}
 ```
 
-### Custom Routes (Non-Resource)
-```php
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('users', [UserController::class, 'index'])->name('users')->middleware('permission:user');
-});
-
-Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
-    Route::middleware('permission:user,true')->group(function () {
-        Route::get('employees/{employee}/user', [UserController::class, 'getUserByEmployee']);
-        Route::post('employees/{employee}/user', [UserController::class, 'updateUser']);
-    });
-});
-```
-
----
-
-## 8. Verification Checklist
-
-- [ ] Halaman bisa diakses (Status 200)
-- [ ] Custom operasi bekerja dengan benar
-- [ ] Permission middleware berfungsi
-- [ ] Smoke test + interaction tests pass
+Gunakan `mcp_laravel-boost_list-routes` untuk verify routes terdaftar.

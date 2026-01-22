@@ -2,6 +2,20 @@
 
 Gunakan tabel ini untuk memilih skill yang tepat berdasarkan kebutuhan task.
 
+## 🔌 MCP Tools - Selalu Gunakan Ini!
+
+> **PENTING**: Selalu gunakan MCP tools, bukan command manual. Ini lebih efisien dan menghemat token.
+
+| Kebutuhan | MCP Tool |
+|-----------|----------|
+| Lihat DB schema | `mcp_laravel-boost_database-schema()` |
+| Lihat routes | `mcp_laravel-boost_list-routes()` |
+| Cari docs | `mcp_laravel-boost_search-docs(queries: [...])` |
+| Test code | `mcp_laravel-boost_tinker(code: "...")` |
+| Debug error | `mcp_laravel-boost_last-error()` |
+| Ambil komponen UI | `mcp_shadcn-ui-mcp-server_get_component(componentName: "...")` |
+| Baca file referensi | `mcp_filesystem_read_file(path: "...")` |
+
 ---
 
 ## 🎯 Quick Decision Tree
@@ -10,34 +24,33 @@ Gunakan tabel ini untuk memilih skill yang tepat berdasarkan kebutuhan task.
 Apa yang ingin dilakukan?
 │
 ├── Buat fitur baru
-│   ├── CRUD 1 tabel, tanpa foreign key? ──────────→ /feature-crud-simple
-│   ├── CRUD dengan relasi, filter kompleks? ─────→ /feature-crud-complex
-│   └── Bukan CRUD (dashboard, settings, dll)? ───→ /feature-non-crud
+│   ├── CRUD 1 tabel, tanpa FK? ────→ feature-crud-simple
+│   ├── CRUD dengan relasi? ────────→ feature-crud-complex
+│   └── Non-CRUD (dashboard, dll)? ─→ feature-non-crud
 │
 ├── Refactor kode existing
-│   ├── Backend (Laravel/PHP)? ───────────────────→ /refactor-backend
-│   └── Frontend (React/TypeScript)? ─────────────→ /refactor-frontend
+│   ├── Backend (Laravel)? ─────────→ refactor-backend
+│   └── Frontend (React)? ──────────→ refactor-frontend
 │
 ├── Database
-│   └── Migration, seeder, factory? ──────────────→ /database-migration
+│   └── Migration, seeder? ─────────→ database-migration
 │
-└── Testing
-    └── Buat test untuk fitur? ───────────────────→ /testing-strategy
+└── Testing ────────────────────────→ testing-strategy
 ```
 
 ---
 
 ## 📊 Decision Matrix
 
-| Kondisi / Kebutuhan | Skill | Quick Command |
-|---------------------|-------|---------------|
-| CRUD 1 tabel, field sederhana | `feature-crud-simple` | `scaffold.sh Category` |
-| CRUD dengan FK, filter range/date | `feature-crud-complex` | `scaffold.sh Product` |
-| Dashboard, Settings, Matrix view | `feature-non-crud` | - |
-| Perbaiki arsitektur backend | `refactor-backend` | `check-architecture.sh Employee` |
-| Perbaiki struktur komponen frontend | `refactor-frontend` | - |
-| Migration, seeder, factory | `database-migration` | `artisan make:model -mf` |
-| Buat unit/feature/e2e test | `testing-strategy` | - |
+| Kondisi | Skill |
+|---------|-------|
+| CRUD 1 tabel | `feature-crud-simple` |
+| CRUD dengan FK, filter range | `feature-crud-complex` |
+| Dashboard, Settings | `feature-non-crud` |
+| Perbaiki arsitektur backend | `refactor-backend` |
+| Perbaiki struktur komponen | `refactor-frontend` |
+| Migration, seeder | `database-migration` |
+| Buat tests | `testing-strategy` |
 
 ---
 
@@ -45,53 +58,30 @@ Apa yang ingin dilakukan?
 
 ### feature-crud-simple
 - ✅ Hanya 1 tabel utama
-- ✅ Tidak ada relasi foreign key
-- ✅ Filter hanya search text
-- ✅ Form sederhana (< 5 field)
+- ✅ Tidak ada relasi FK
+- ✅ Filter hanya search
 
 ### feature-crud-complex
-- ✅ Ada relasi belongsTo ke tabel lain
-- ✅ Filter: dropdown, range (salary, date)
-- ✅ Butuh komponen React terpisah (Form, Filters, Columns)
-- ✅ Mungkin butuh DTO
+- ✅ Ada relasi belongsTo
+- ✅ Filter: dropdown, range
 
 ### feature-non-crud
-- ✅ Tidak ada model/resource baru
-- ✅ Bekerja dengan existing models
-- ✅ Custom UI (matrix, dashboard, wizard)
-- ✅ Routing tidak standar
+- ✅ Tidak ada model baru
+- ✅ Custom UI
 
 ### refactor-backend
-- ✅ Merapikan struktur Controller/Action/Domain
-- ✅ Menambah FormRequest/Resource
-- ✅ TIDAK mengubah API contract
+- ✅ Merapikan Controller/Action
+- ✅ TIDAK mengubah API
 
 ### refactor-frontend
-- ✅ Merapikan struktur komponen
-- ✅ Extract logic ke hooks
+- ✅ Merapikan komponen
 - ✅ TIDAK mengubah data-testid
-
----
-
-## 📁 Skill Locations
-
-```
-.agent/skills/
-├── feature-crud-simple/     # Simple CRUD
-├── feature-crud-complex/    # Complex CRUD with relations
-├── feature-non-crud/        # Non-CRUD pages
-├── refactor-backend/        # Backend refactoring
-├── refactor-frontend/       # Frontend refactoring
-├── database-migration/      # Database migrations
-└── testing-strategy/        # Testing guidelines
-```
 
 ---
 
 ## 🚀 Cara Menggunakan
 
-1. **Identifikasi kebutuhan** dari request user
-2. **Pilih skill** berdasarkan decision tree di atas
-3. **Baca SKILL.md** untuk panduan lengkap: `view_file .agent/skills/<skill-name>/SKILL.md`
-4. **Jalankan script** jika tersedia (dengan `--help` dulu)
-5. **Gunakan templates** dari folder `resources/`
+1. **Pilih skill** dari decision tree
+2. **Baca SKILL.md**: `mcp_filesystem_read_file(path: ".agent/skills/{skill}/SKILL.md")`
+3. **Gunakan MCP tools** sesuai instruksi di SKILL.md
+4. **Referensi files existing**, bukan template

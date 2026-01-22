@@ -2,6 +2,31 @@
 
 Skills adalah panduan terstruktur yang membantu AI dalam menyelesaikan task dengan konsisten dan sesuai arsitektur codebase.
 
+## 🔌 Available MCP Servers
+
+**PENTING**: Gunakan MCP tools, bukan command manual!
+
+| Server | Tools Utama |
+|--------|-------------|
+| **Laravel Boost** | `database-schema`, `list-routes`, `search-docs`, `tinker`, `last-error`, `read-log-entries`, `browser-logs` |
+| **Filesystem** | `read_file`, `write_file`, `edit_file`, `directory_tree` |
+| **Shadcn UI** | `get_component`, `get_component_demo`, `list_blocks`, `get_block` |
+
+### Contoh Penggunaan MCP
+
+```
+# Lihat schema database (bukan artisan command)
+mcp_laravel-boost_database-schema()
+
+# Cari dokumentasi Laravel
+mcp_laravel-boost_search-docs(queries: ["migration foreign key"])
+
+# Ambil komponen UI
+mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
+```
+
+---
+
 ## 📁 Struktur
 
 ```
@@ -9,107 +34,48 @@ Skills adalah panduan terstruktur yang membantu AI dalam menyelesaikan task deng
 ├── skills/
 │   ├── README.md              # Dokumentasi ini
 │   ├── DECISION.md            # Matrix pemilihan skill
-│   │
-│   ├── feature-crud-simple/   # CRUD sederhana (1 tabel)
-│   ├── feature-crud-complex/  # CRUD dengan relasi & filter
-│   ├── feature-non-crud/      # Non-CRUD (dashboard, settings)
-│   │
+│   ├── feature-crud-simple/   # CRUD sederhana
+│   ├── feature-crud-complex/  # CRUD dengan relasi
+│   ├── feature-non-crud/      # Non-CRUD pages
 │   ├── refactor-backend/      # Refactor Laravel
 │   ├── refactor-frontend/     # Refactor React
-│   │
-│   ├── database-migration/    # Migration, seeder, factory
-│   └── testing-strategy/      # Unit, feature, e2e tests
-│
+│   ├── database-migration/    # Migration, seeder
+│   └── testing-strategy/      # Tests
 └── workflows/
-    ├── create-feature.md      # /create-feature
-    ├── refactor-module.md     # /refactor-module
-    └── create-tests.md        # /create-tests
+    ├── create-feature.md
+    ├── refactor-module.md
+    └── create-tests.md
 ```
 
-## 🚀 Quick Start
-
-### 1. Pilih Skill yang Tepat
-
-Lihat [DECISION.md](./DECISION.md) untuk decision tree dan matrix pemilihan skill.
-
-### 2. Baca SKILL.md
-
-Setiap skill folder berisi:
-- `SKILL.md` - Panduan lengkap
-- `scripts/` - Helper scripts (scaffold, generate, check)
-- `resources/` - Template files
-
-### 3. Gunakan Scripts
-
-```bash
-# Scaffold (buat folder structure)
-bash .agent/skills/feature-crud-simple/scripts/scaffold.sh Category --dry-run
-
-# Generate (buat files dari template)
-bash .agent/skills/feature-crud-simple/scripts/generate.sh Category --dry-run
-
-# Check architecture
-bash .agent/skills/refactor-backend/scripts/check-architecture.sh Employee
-```
+---
 
 ## 📋 Daftar Skills
 
-| Skill | Deskripsi | Scripts |
-|-------|-----------|---------|
-| `feature-crud-simple` | CRUD 1 tabel tanpa relasi | `scaffold.sh`, `generate.sh` |
-| `feature-crud-complex` | CRUD dengan FK & filter | `scaffold.sh`, `generate.sh` |
-| `feature-non-crud` | Dashboard, settings, matrix | - |
-| `refactor-backend` | Refactor Laravel | `check-architecture.sh`, `generate.sh` |
-| `refactor-frontend` | Refactor React | - |
-| `database-migration` | Migration & seeder | - |
-| `testing-strategy` | Unit, feature, e2e tests | - |
+| Skill | Deskripsi | MCP Tools |
+|-------|-----------|-----------|
+| `feature-crud-simple` | CRUD 1 tabel | database-schema, list-routes, shadcn |
+| `feature-crud-complex` | CRUD + relasi | database-schema, tinker, shadcn |
+| `feature-non-crud` | Dashboard, settings | list-routes, shadcn blocks |
+| `refactor-backend` | Refactor Laravel | database-schema, list-routes, search-docs |
+| `refactor-frontend` | Refactor React | shadcn, browser-logs |
+| `database-migration` | Migration | database-schema, search-docs |
+| `testing-strategy` | Tests | last-error, read-log-entries |
+
+---
+
+## 🚀 Quick Start
+
+1. **Pilih skill** → lihat [DECISION.md](./DECISION.md)
+2. **Baca SKILL.md** → `mcp_filesystem_read_file(path: ".agent/skills/{skill}/SKILL.md")`
+3. **Gunakan MCP tools** → bukan command manual
+4. **Referensi files existing** → bukan template
+
+---
 
 ## 🔄 Workflows
-
-Gunakan slash commands untuk workflow terintegrasi:
 
 | Command | Deskripsi |
 |---------|-----------|
 | `/create-feature` | Buat fitur CRUD baru |
 | `/refactor-module` | Refactor modul existing |
 | `/create-tests` | Buat test untuk fitur |
-
-## 📝 Cara Membuat Skill Baru
-
-1. Buat folder di `.agent/skills/{skill-name}/`
-2. Buat `SKILL.md` dengan format:
-
-```markdown
----
-name: Skill Name
-description: Deskripsi singkat
----
-
-# Skill Name
-
-## 1. Quick Start
-...
-
-## 2. Panduan
-...
-```
-
-3. (Optional) Buat `scripts/` untuk automation
-4. (Optional) Buat `resources/` untuk templates
-5. Update `DECISION.md` dengan skill baru
-
-## 🛠️ Script Options
-
-Semua scripts mendukung:
-
-| Option | Deskripsi |
-|--------|-----------|
-| `--help` | Tampilkan bantuan |
-| `--dry-run` | Preview tanpa buat files |
-| `--all` | Generate semua files |
-
-## 📚 Referensi
-
-- [Laravel Documentation](https://laravel.com/docs)
-- [React Documentation](https://react.dev)
-- [Inertia.js Documentation](https://inertiajs.com)
