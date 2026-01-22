@@ -1,7 +1,7 @@
 'use client';
 
 import { router, usePage } from '@inertiajs/react';
-import React, {
+import {
     createContext,
     ReactNode,
     useCallback,
@@ -346,9 +346,15 @@ export function I18nProvider({
 
             // Interpolate parameters
             if (params) {
-                return Object.entries(params).reduce((str, [paramKey, paramValue]) => {
-                    return str.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), paramValue);
-                }, value);
+                return Object.entries(params).reduce(
+                    (str, [paramKey, paramValue]) => {
+                        return str.replace(
+                            new RegExp(`\\{${paramKey}\\}`, 'g'),
+                            paramValue,
+                        );
+                    },
+                    value,
+                );
             }
 
             return value;

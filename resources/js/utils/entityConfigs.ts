@@ -1,10 +1,10 @@
-import * as React from 'react';
 import { type FormComponentType } from '@/components/common/EntityCrudPage';
 import { type FieldDescriptor } from '@/components/common/filters';
 import { type FilterState } from '@/hooks/useCrudFilters';
 import { type BreadcrumbItem } from '@/types';
 import { type EntityWithId } from '@/types/entity';
 import { type ColumnDef } from '@tanstack/react-table';
+import * as React from 'react';
 
 // Base configuration interface for all entities with improved typing
 export interface BaseEntityConfig<
@@ -52,11 +52,11 @@ export type EntityConfig<
 
 import { SimpleEntityForm } from '@/components/common/EntityForm';
 import { createSimpleEntityFilterFields } from '@/components/common/filters';
+import { SimpleEntityViewModal } from '@/components/common/SimpleEntityViewModal';
 import { employeeColumns } from '@/components/employees/EmployeeColumns';
 import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
 import { EmployeeForm } from '@/components/employees/EmployeeForm';
 import { EmployeeViewModal } from '@/components/employees/EmployeeViewModal';
-import { SimpleEntityViewModal } from '@/components/common/SimpleEntityViewModal';
 import { createSimpleEntityColumns } from '@/utils/columns';
 
 // Helper function to create generic delete messages
@@ -98,9 +98,17 @@ function createSimpleEntityViewModal(entityName: string) {
     return function BoundSimpleEntityViewModal(props: {
         open: boolean;
         onClose: () => void;
-        item: { id: number; name: string; created_at: string; updated_at: string } | null;
+        item: {
+            id: number;
+            name: string;
+            created_at: string;
+            updated_at: string;
+        } | null;
     }) {
-        return React.createElement(SimpleEntityViewModal, { ...props, entityName });
+        return React.createElement(SimpleEntityViewModal, {
+            ...props,
+            entityName,
+        });
     };
 }
 
@@ -112,7 +120,9 @@ function createSimpleEntityConfig<
         created_at: string;
         updated_at: string;
     },
->(options: Omit<SimpleEntityConfigOptions, 'viewModalComponent'>): CustomEntityConfig<T> {
+>(
+    options: Omit<SimpleEntityConfigOptions, 'viewModalComponent'>,
+): CustomEntityConfig<T> {
     const { entityName, entityNamePlural, apiBase, filterPlaceholder } =
         options;
 

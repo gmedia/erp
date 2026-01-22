@@ -1,8 +1,8 @@
-import React from 'react';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
-import { ChevronRight, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ChevronDown, ChevronRight } from 'lucide-react';
+import React from 'react';
 
 export interface TreeNodeData {
     id: number;
@@ -17,7 +17,12 @@ interface TreeNodeProps {
     level?: number;
 }
 
-export function TreeNode({ node, selectedIds, onToggle, level = 0 }: TreeNodeProps) {
+export function TreeNode({
+    node,
+    selectedIds,
+    onToggle,
+    level = 0,
+}: TreeNodeProps) {
     const [isExpanded, setIsExpanded] = React.useState(true);
     const hasChildren = node.children && node.children.length > 0;
     const isSelected = selectedIds.includes(node.id);
@@ -35,12 +40,12 @@ export function TreeNode({ node, selectedIds, onToggle, level = 0 }: TreeNodePro
         <div className="select-none">
             <div
                 className={cn(
-                    "flex items-center py-1 px-2 hover:bg-muted/50 rounded-sm cursor-pointer",
+                    'flex cursor-pointer items-center rounded-sm px-2 py-1 hover:bg-muted/50',
                 )}
                 style={{ paddingLeft: `${level * 20 + 8}px` }}
                 onClick={() => handleCheckChange(!isSelected)}
             >
-                <div className="w-4 h-4 mr-2 flex items-center justify-center">
+                <div className="mr-2 flex h-4 w-4 items-center justify-center">
                     {hasChildren && (
                         <Button
                             variant="ghost"
@@ -56,14 +61,14 @@ export function TreeNode({ node, selectedIds, onToggle, level = 0 }: TreeNodePro
                         </Button>
                     )}
                 </div>
-                
+
                 <Checkbox
                     checked={isSelected}
                     onCheckedChange={handleCheckChange}
                     className="mr-2"
                     onClick={(e) => e.stopPropagation()}
                 />
-                
+
                 <span className="text-sm font-medium">{node.name}</span>
             </div>
 

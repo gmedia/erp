@@ -210,7 +210,9 @@ export function CrudPage<
 
                 <DeleteConfirmationDialog
                     open={!!crudState.itemToDelete}
-                    onOpenChange={(open) => !open && crudState.handleDeleteCancel()}
+                    onOpenChange={(open) =>
+                        !open && crudState.handleDeleteCancel()
+                    }
                     item={crudState.itemToDelete}
                     onConfirm={crudState.handleDeleteConfirm}
                     isLoading={crudState.isDeleting}

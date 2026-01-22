@@ -86,11 +86,6 @@ export function createAsyncSelectFilterField(
     return {
         name,
         label,
-        component: (
-            <AsyncSelect
-                url={url}
-                placeholder={placeholder}
-            />
-        ),
+        component: <AsyncSelect url={url} placeholder={placeholder} />,
     };
 }

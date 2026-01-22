@@ -1,13 +1,19 @@
-import { dashboard } from '@/routes';
+import { EmployeeSelector } from '@/components/permissions/EmployeeSelector'; // Reuse EmployeeSelector
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { UserForm } from '@/components/users/UserForm';
+import { useEmployeeUser } from '@/hooks/users/useEmployeeUser';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { dashboard } from '@/routes';
 import { BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { EmployeeSelector } from '@/components/permissions/EmployeeSelector'; // Reuse EmployeeSelector
-import { useEmployeeUser } from '@/hooks/users/useEmployeeUser';
-import { UserForm } from '@/components/users/UserForm';
 
 interface UserFormData {
     employee_id: string;
@@ -37,7 +43,8 @@ export default function UsersIndex() {
         },
     });
 
-    const { loading, userExists, errors, fetchUser, saveUser } = useEmployeeUser(form);
+    const { loading, userExists, errors, fetchUser, saveUser } =
+        useEmployeeUser(form);
     const selectedEmployeeId = form.watch('employee_id');
 
     useEffect(() => {
@@ -71,11 +78,11 @@ export default function UsersIndex() {
 
                             {selectedEmployeeId && (
                                 <FormProvider {...form}>
-                                    <UserForm 
-                                        loading={loading} 
-                                        userExists={userExists} 
-                                        errors={errors} 
-                                        onSave={handleSave} 
+                                    <UserForm
+                                        loading={loading}
+                                        userExists={userExists}
+                                        errors={errors}
+                                        onSave={handleSave}
                                     />
                                 </FormProvider>
                             )}
@@ -86,4 +93,3 @@ export default function UsersIndex() {
         </AppLayout>
     );
 }
-

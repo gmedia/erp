@@ -15,7 +15,12 @@ interface UserFormProps {
     onSave: () => void;
 }
 
-export function UserForm({ loading, userExists, errors, onSave }: UserFormProps) {
+export function UserForm({
+    loading,
+    userExists,
+    errors,
+    onSave,
+}: UserFormProps) {
     const { register } = useFormContext();
 
     return (
@@ -44,23 +49,32 @@ export function UserForm({ loading, userExists, errors, onSave }: UserFormProps)
                     disabled={loading}
                 />
                 {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email[0]}</p>
+                    <p className="text-sm text-destructive">
+                        {errors.email[0]}
+                    </p>
                 )}
             </div>
 
             <div className="space-y-2">
                 <Label htmlFor="password">
-                    User Password {!userExists && <span className="text-destructive">*</span>}
+                    User Password{' '}
+                    {!userExists && <span className="text-destructive">*</span>}
                 </Label>
                 <Input
                     id="password"
                     type="password"
                     {...register('password')}
-                    placeholder={userExists ? 'Leave empty to keep current password' : 'Enter password (required for new user)'}
+                    placeholder={
+                        userExists
+                            ? 'Leave empty to keep current password'
+                            : 'Enter password (required for new user)'
+                    }
                     disabled={loading}
                 />
                 {errors.password && (
-                    <p className="text-sm text-destructive">{errors.password[0]}</p>
+                    <p className="text-sm text-destructive">
+                        {errors.password[0]}
+                    </p>
                 )}
             </div>
 

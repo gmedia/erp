@@ -49,4 +49,3 @@ export interface SharedData {
     menus: MenuItem[];
     [key: string]: unknown;
 }
-

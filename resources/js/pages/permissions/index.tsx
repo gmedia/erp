@@ -1,17 +1,20 @@
-import { dashboard } from '@/routes';
-import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
-import { TreeView } from '@/components/tree/tree-view';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BreadcrumbItem } from '@/types';
-import { useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Zap } from 'lucide-react';
-import { FormProvider, useForm } from 'react-hook-form';
-import { Permission } from '@/types/permission';
-import { useEmployeePermissions } from '@/hooks/permissions/useEmployeePermissions';
 import { EmployeeSelector } from '@/components/permissions/EmployeeSelector';
 import { PermissionManager } from '@/components/permissions/PermissionManager';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { useEmployeePermissions } from '@/hooks/permissions/useEmployeePermissions';
+import AppLayout from '@/layouts/app-layout';
+import { dashboard } from '@/routes';
+import { BreadcrumbItem } from '@/types';
+import { Permission } from '@/types/permission';
+import { Head } from '@inertiajs/react';
+import { useEffect } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 
 interface Props {
     permissions: Permission[];
@@ -29,18 +32,18 @@ export default function PermissionsIndex({ permissions }: Props) {
         },
     ];
 
-    const { 
-        loading, 
-        selectedPermissions, 
-        setSelectedPermissions, 
-        fetchPermissions, 
-        updatePermissions 
+    const {
+        loading,
+        selectedPermissions,
+        setSelectedPermissions,
+        fetchPermissions,
+        updatePermissions,
     } = useEmployeePermissions();
-    
+
     const form = useForm({
         defaultValues: {
             employee_id: '',
-        }
+        },
     });
 
     const selectedEmployeeId = form.watch('employee_id');
@@ -79,7 +82,7 @@ export default function PermissionsIndex({ permissions }: Props) {
                             </div>
 
                             {selectedEmployeeId && (
-                                <PermissionManager 
+                                <PermissionManager
                                     permissions={permissions}
                                     selectedPermissions={selectedPermissions}
                                     onSelectionChange={setSelectedPermissions}

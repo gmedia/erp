@@ -24,7 +24,11 @@ export function LanguageSwitcher() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="w-full justify-start gap-2">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start gap-2"
+                >
                     <Globe className="h-4 w-4" />
                     <span className="flex items-center gap-2">
                         <span>{currentLocale.flag}</span>
@@ -36,7 +40,10 @@ export function LanguageSwitcher() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-40">
                 {availableLocales.map((loc) => {
-                    const localeInfo = localeLabels[loc] || { label: loc, flag: '🌐' };
+                    const localeInfo = localeLabels[loc] || {
+                        label: loc,
+                        flag: '🌐',
+                    };
                     return (
                         <DropdownMenuItem
                             key={loc}

@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 
+import { ViewField } from '@/components/common/ViewField';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -11,7 +12,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { formatDate } from '@/lib/utils';
-import { ViewField } from '@/components/common/ViewField';
 
 interface SimpleEntity {
     id: number;
