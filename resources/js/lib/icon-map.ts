@@ -5,6 +5,7 @@ import {
     LayoutGrid,
     LucideIcon,
     Settings2,
+    LayoutList,
     Users,
 } from 'lucide-react';
 
@@ -13,6 +14,7 @@ const iconMap: Record<string, LucideIcon> = {
     Users,
     IdCard,
     Settings2,
+    LayoutList,
     BookOpen,
     Folder,
 };
