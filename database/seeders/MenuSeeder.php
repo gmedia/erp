@@ -76,8 +76,9 @@ class MenuSeeder extends Seeder
     private function createMenus(array $items, ?Menu $parent = null)
     {
         foreach ($items as $item) {            
-            $newParent = Menu::firstOrCreate([
+            $newParent = Menu::updateOrCreate([
                 'name' => $item['name'],
+            ], [
                 'display_name' => $item['display_name'],
                 'icon' => $item['icon'],
                 'url' => $item['url'],

@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('menu_permission', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('menu_id')->constrained()->cascadeOnDelete();
             $table->foreignId('permission_id')->constrained()->cascadeOnDelete();
-            $table->primary(['menu_id', 'permission_id']);
             $table->timestamps();
         });
     }

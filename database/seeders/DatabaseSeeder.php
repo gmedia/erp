@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         // Seed default test user
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'test@example.com'],
             [
                 'name' => 'Test User',
@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // Seed admin user for Playwright test
-        $admin = User::firstOrCreate(
+        $admin = User::updateOrCreate(
             ['email' => 'admin@admin.com'],
             [
                 'name' => 'Admin User',
@@ -42,10 +42,11 @@ class DatabaseSeeder extends Seeder
             PositionSeeder::class,
         ]);
 
-        Employee::firstOrCreate([
-            'user_id' => $admin->id,
-            'name' => 'Admin User',
+        Employee::updateOrCreate([
             'email' => 'admin@admin.com',
+            'user_id' => $admin->id,
+        ], [
+            'name' => 'Admin User',
             'phone' => '1234567890',
             'department_id' => 1,
             'position_id' => 1,

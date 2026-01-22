@@ -15,7 +15,7 @@ class PositionSeeder extends Seeder
         ];
 
         foreach ($positions as $name) {
-            Position::firstOrCreate(['name' => $name]);
+            Position::updateOrCreate(['name' => $name]);
         }
     }
 }

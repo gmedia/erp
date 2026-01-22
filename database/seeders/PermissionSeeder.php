@@ -55,6 +55,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'branch',
+                'display_name' => 'Branch',
+                'child' => [
+                    [
+                        'name' => 'branch.create',
+                        'display_name' => 'Create Branch',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'branch.edit',
+                        'display_name' => 'Edit Branch',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'branch.delete',
+                        'display_name' => 'Delete Branch',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'employee',
                 'display_name' => 'Employee',
                 'child' => [
@@ -98,8 +119,9 @@ class PermissionSeeder extends Seeder
         $permissions = [];
 
         foreach ($items as $item) {
-            $newParent = Permission::firstOrCreate([
+            $newParent = Permission::updateOrCreate([
                 'name' => $item['name'],
+            ], [
                 'display_name' => $item['display_name'],
                 'parent_id' => $parent?->id,
             ]);

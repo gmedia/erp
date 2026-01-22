@@ -181,6 +181,13 @@ export const positionConfig = createSimpleEntityConfig({
     filterPlaceholder: 'Search positions...',
 });
 
+export const branchConfig = createSimpleEntityConfig({
+    entityName: 'Branch',
+    entityNamePlural: 'Branches',
+    apiBase: 'branches',
+    filterPlaceholder: 'Search branches...',
+});
+
 // Configuration for complex entities (employees) - using factory for consistency
 export const employeeConfig = createComplexEntityConfig({
     entityName: 'Employee',
