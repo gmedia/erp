@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Customers\ExportCustomersAction;
 use App\Actions\Customers\IndexCustomersAction;
 use App\Domain\Customers\CustomerFilterService;
+use App\DTOs\Customers\UpdateCustomerData;
+use App\Http\Requests\Customers\ExportCustomerRequest;
 use App\Http\Requests\Customers\IndexCustomerRequest;
 use App\Http\Requests\Customers\StoreCustomerRequest;
 use App\Http\Requests\Customers\UpdateCustomerRequest;
@@ -71,9 +74,22 @@ class CustomerController extends Controller
      */
     public function update(UpdateCustomerRequest $request, Customer $customer): JsonResponse
     {
-        $customer->update($request->validated());
+        $dto = UpdateCustomerData::fromArray($request->validated());
+        $customer->update($dto->toArray());
 
         return (new CustomerResource($customer))->response();
+    }
+
+    /**
+     * Export customers to Excel.
+     *
+     * @param  \App\Http\Requests\Customers\ExportCustomerRequest  $request
+     * @param  \App\Actions\Customers\ExportCustomersAction  $action
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function export(ExportCustomerRequest $request, ExportCustomersAction $action): JsonResponse
+    {
+        return $action->handle($request);
     }
 
     /**

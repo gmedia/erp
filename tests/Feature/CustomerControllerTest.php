@@ -160,6 +160,18 @@ describe('Customer API Endpoints', function () {
         expect($aIndex)->toBeLessThan($zIndex);
     });
 
+    test('export returns download url and filename', function () {
+        Customer::factory()->count(5)->create();
+
+        $response = postJson('/api/customers/export');
+
+        $response->assertOk()
+            ->assertJsonStructure(['url', 'filename']);
+        
+        $filename = $response->json('filename');
+        expect($filename)->toContain('customers_export_');
+    });
+
     test('store creates customer with valid data and returns 201 status', function () {
         $branch = Branch::factory()->create();
 
