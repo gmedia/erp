@@ -16,6 +16,7 @@ test('supplier CRUD flow', async ({ page }) => {
   
   // Verify columns with capitalized values
   await expect(row).toContainText('End2End Supplier');
+  await expect(row).toContainText('Head Office');
   await expect(row).toContainText('Electronics');
   await expect(row).toContainText('Active');
 

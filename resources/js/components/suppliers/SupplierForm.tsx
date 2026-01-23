@@ -42,7 +42,7 @@ const renderBasicInfoSection = () => (
 const renderDetailsSection = () => (
     <>
          <AsyncSelectField
-            name="branch"
+            name="branch_id"
             label="Branch"
             url="/api/branches"
             placeholder="Select a branch"
@@ -88,7 +88,7 @@ const getSupplierFormDefaults = (
             email: '',
             phone: '',
             address: '',
-            branch: '',
+            branch_id: '',
             category: 'other',
             status: 'active',
         };
@@ -99,7 +99,7 @@ const getSupplierFormDefaults = (
         email: supplier.email,
         phone: supplier.phone || '',
         address: supplier.address,
-        branch: supplier.branch ? String(supplier.branch.id) : '',
+        branch_id: supplier.branch ? String(supplier.branch.id) : '',
         category: supplier.category,
         status: supplier.status,
     };

@@ -70,7 +70,7 @@ export const supplierFormSchema = z.object({
         })
         .or(z.literal('')),
     address: z.string().min(5, { message: 'Address must be at least 5 characters.' }),
-    branch: z.string().optional(),
+    branch_id: z.string().optional(),
     category: z.enum(['electronics', 'furniture', 'stationery', 'services', 'other'], {
         message: 'Category is required.',
     }),

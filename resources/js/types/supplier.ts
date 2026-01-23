@@ -16,7 +16,7 @@ export interface SupplierFormData {
     email: string;
     phone: string;
     address: string;
-    branch: string; // AsyncSelect usually returns string ID
+    branch_id: string; // AsyncSelect usually returns string ID
     category: 'electronics' | 'furniture' | 'stationery' | 'services' | 'other';
     status: 'active' | 'inactive';
 }
