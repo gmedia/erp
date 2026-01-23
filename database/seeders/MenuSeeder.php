@@ -31,7 +31,7 @@ class MenuSeeder extends Seeder
                 'name' => 'customer',
                 'display_name' => 'Customer',
                 'permissions' => ['customer', 'customer.create', 'customer.edit', 'customer.delete'],
-                'icon' => 'UserCircle',
+                'icon' => 'Users',
                 'url' => 'customers',
                 'child' => [],
             ],
