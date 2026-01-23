@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Suppliers\ExportSuppliersAction;
 use App\Domain\Suppliers\SupplierFilterService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Suppliers\ExportSupplierRequest;
 use App\Http\Requests\Suppliers\StoreSupplierRequest;
 use App\Http\Requests\Suppliers\UpdateSupplierRequest;
 use App\Http\Resources\Suppliers\SupplierResource;
@@ -29,6 +31,18 @@ class SupplierController extends Controller
         $this->filterService->apply($query, $request->all());
 
         return SupplierResource::collection($query->paginate($request->get('per_page', 10)))->response();
+    }
+
+    /**
+     * Export suppliers to Excel.
+     *
+     * @param  \App\Http\Requests\Suppliers\ExportSupplierRequest  $request
+     * @param  \App\Actions\Suppliers\ExportSuppliersAction  $action
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function export(ExportSupplierRequest $request, ExportSuppliersAction $action): JsonResponse
+    {
+        return $action->execute($request);
     }
 
     /**

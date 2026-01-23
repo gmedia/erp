@@ -118,6 +118,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'supplier',
+                'display_name' => 'Supplier',
+                'child' => [
+                    [
+                        'name' => 'supplier.create',
+                        'display_name' => 'Create Supplier',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'supplier.edit',
+                        'display_name' => 'Edit Supplier',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'supplier.delete',
+                        'display_name' => 'Delete Supplier',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],

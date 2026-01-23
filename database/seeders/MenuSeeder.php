@@ -36,6 +36,14 @@ class MenuSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'supplier',
+                'display_name' => 'Supplier',
+                'permissions' => ['supplier', 'supplier.create', 'supplier.edit', 'supplier.delete'],
+                'icon' => 'Truck',
+                'url' => 'suppliers',
+                'child' => [],
+            ],
+            [
                 'name' => 'master.data',
                 'display_name' => 'Master Data',
                 'permissions' => ['permission'],

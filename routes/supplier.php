@@ -11,5 +11,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
-    Route::resource('suppliers', SupplierController::class)->except(['create', 'edit', 'show']);
+    Route::middleware('permission:supplier,true')->group(function () {
+        Route::get('suppliers', [SupplierController::class, 'index']);
+        Route::post('suppliers/export', [SupplierController::class, 'export']);
+        Route::get('suppliers/{supplier}', [SupplierController::class, 'show']);
+        Route::post('suppliers', [SupplierController::class, 'store'])->middleware('permission:supplier.create,true');
+        Route::put('suppliers/{supplier}', [SupplierController::class, 'update'])->middleware('permission:supplier.edit,true');
+        Route::delete('suppliers/{supplier}', [SupplierController::class, 'destroy'])->middleware('permission:supplier.delete,true');
+    });
 });
