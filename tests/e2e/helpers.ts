@@ -494,3 +494,141 @@ export async function editBranch(
   await updateBtn.click();
 }
 
+// ---------------------------------------------------
+// Customer helpers
+// ---------------------------------------------------
+
+/**
+ * Create a new customer via the UI.
+ *
+ * @param page - Playwright Page object.
+ * @param overrides - Optional fields to override the default values.
+ * @returns The unique email used for the created customer.
+ */
+export async function createCustomer(
+  page: Page,
+  overrides: Partial<{
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    branch: string;
+    customer_type: string;
+    status: string;
+    notes: string;
+  }> = {}
+): Promise<string> {
+  const timestamp = Date.now();
+  const defaultEmail = `customer${Math.random().toString(36).substring(2,7)}${timestamp}@example.com`;
+
+  // 1️⃣ Login
+  await login(page);
+
+  // 2️⃣ Navigate to customers page
+  await page.goto('/customers');
+
+  // 3️⃣ Open the "Add Customer" dialog
+  const addButton = page.getByRole('button', { name: /Add/i });
+  await expect(addButton).toBeVisible();
+  await addButton.click();
+
+  // 4️⃣ Fill the form fields
+  const email = overrides.email ?? defaultEmail;
+  
+  await page.fill('input[name="name"]', overrides.name ?? 'Test Customer');
+  await page.fill('input[name="email"]', email);
+  await page.fill('input[name="phone"]', overrides.phone ?? '+628123456789');
+  await page.fill('textarea[name="address"]', overrides.address ?? '123 Test Street, City, Country');
+  
+  // Select branch
+  await page.click('button:has-text("Select a branch")');
+  const branchSearchInput = page.getByPlaceholder('Search...');
+  if (await branchSearchInput.isVisible()) {
+    await branchSearchInput.fill(overrides.branch ?? 'Jakarta');
+  }
+  await page.getByRole('option', { name: overrides.branch ?? 'Jakarta' }).click();
+  
+  // Select customer type
+  await page.click('button:has-text("Select customer type")');
+  await page.getByRole('option', { name: overrides.customer_type ?? 'Individual' }).click();
+  
+  // Select status
+  await page.click('button:has-text("Select status")');
+  await page.getByRole('option', { name: overrides.status ?? 'Active' }).click();
+  
+  // Notes (optional)
+  if (overrides.notes) {
+    await page.fill('textarea[name="notes"]', overrides.notes);
+  }
+
+  // 5️⃣ Submit the form
+  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
+    state: 'detached',
+  });
+  const dialog = page.getByRole('dialog');
+  const submitButton = dialog.getByRole('button', { name: /Add/ });
+  await expect(submitButton).toBeVisible();
+  await submitButton.click();
+
+  return email;
+}
+
+/**
+ * Search for a customer by email.
+ *
+ * @param page - Playwright Page object.
+ * @param email - Email address to search for.
+ */
+export async function searchCustomer(page: Page, email: string): Promise<void> {
+  await page.fill('input[placeholder="Search customers..."]', email);
+  await page.press('input[placeholder="Search customers..."]', 'Enter');
+  // Wait for the row containing the email to appear
+  await page.waitForSelector(`text=${email}`);
+}
+
+/**
+ * Edit an existing customer via the UI.
+ *
+ * @param page - Playwright Page object.
+ * @param email - Current customer email to locate.
+ * @param updates - Fields to update.
+ */
+export async function editCustomer(
+  page: Page,
+  email: string,
+  updates: { name?: string; status?: string }
+): Promise<void> {
+  // Locate the customer first
+  await searchCustomer(page, email);
+
+  // Locate the row and open the Actions menu
+  const row = page.locator('tr', { hasText: email }).first();
+  await expect(row).toBeVisible();
+  await row.waitFor({ state: 'attached' });
+  const actionsBtn = row.getByRole('button', { name: /Actions/i });
+  await expect(actionsBtn).toBeVisible();
+  await actionsBtn.click({ force: true });
+
+  // Click the Edit menu item
+  const editItem = page.getByRole('menuitem', { name: /Edit/i });
+  await expect(editItem).toBeVisible();
+  await editItem.click({ force: true });
+
+  // Update fields if provided
+  if (updates.name) {
+    await page.fill('input[name="name"]', updates.name);
+  }
+  if (updates.status) {
+    await page.click('button:has-text("Active"), button:has-text("Inactive")');
+    await page.getByRole('option', { name: updates.status }).click();
+  }
+
+  // Submit the edit dialog
+  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
+    state: 'detached',
+  });
+  const dialog = page.getByRole('dialog');
+  const updateBtn = dialog.getByRole('button', { name: /Update/ });
+  await expect(updateBtn).toBeVisible();
+  await updateBtn.click();
+}

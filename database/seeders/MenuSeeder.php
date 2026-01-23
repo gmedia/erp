@@ -28,6 +28,14 @@ class MenuSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'customer',
+                'display_name' => 'Customer',
+                'permissions' => ['customer', 'customer.create', 'customer.edit', 'customer.delete'],
+                'icon' => 'UserCircle',
+                'url' => 'customers',
+                'child' => [],
+            ],
+            [
                 'name' => 'master.data',
                 'display_name' => 'Master Data',
                 'permissions' => ['permission'],

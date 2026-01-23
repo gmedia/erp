@@ -25,3 +25,4 @@ require __DIR__ . '/department.php';
 require __DIR__ . '/permission.php';
 require __DIR__ . '/user.php';
 require __DIR__ . '/branch.php';
+require __DIR__ . '/customer.php';

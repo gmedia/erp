@@ -33,3 +33,27 @@ export const employeeFormSchema = z.object({
 });
 
 export type EmployeeFormData = z.infer<typeof employeeFormSchema>;
+
+// Schema for customer form data
+export const customerFormSchema = z.object({
+    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    email: z.string().email({ message: 'Please enter a valid email address.' }),
+    phone: z
+        .string()
+        .min(10, { message: 'Phone number must be at least 10 digits.' })
+        .regex(/^[\d\s\-+().]+$/, {
+            message: 'Please enter a valid phone number.',
+        })
+        .or(z.literal('')),
+    address: z.string().min(5, { message: 'Address must be at least 5 characters.' }),
+    branch: z.string().min(1, { message: 'Branch is required.' }),
+    customer_type: z.enum(['individual', 'company'], {
+        message: 'Customer type is required.',
+    }),
+    status: z.enum(['active', 'inactive'], {
+        message: 'Status is required.',
+    }),
+    notes: z.string(),
+});
+
+export type CustomerFormData = z.infer<typeof customerFormSchema>;

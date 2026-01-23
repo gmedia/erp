@@ -57,6 +57,10 @@ import { employeeColumns } from '@/components/employees/EmployeeColumns';
 import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
 import { EmployeeForm } from '@/components/employees/EmployeeForm';
 import { EmployeeViewModal } from '@/components/employees/EmployeeViewModal';
+import { customerColumns } from '@/components/customers/CustomerColumns';
+import { createCustomerFilterFields } from '@/components/customers/CustomerFilters';
+import { CustomerForm } from '@/components/customers/CustomerForm';
+import { CustomerViewModal } from '@/components/customers/CustomerViewModal';
 import { createSimpleEntityColumns } from '@/utils/columns';
 
 // Helper function to create generic delete messages
@@ -209,4 +213,28 @@ export const employeeConfig = createComplexEntityConfig({
     viewModalComponent: EmployeeViewModal,
     getDeleteMessage: (employee: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${employee.name}'s employee record.`,
+});
+
+// Configuration for complex entities (customers) - using factory for consistency
+export const customerConfig = createComplexEntityConfig({
+    entityName: 'Customer',
+    entityNamePlural: 'Customers',
+    apiEndpoint: '/api/customers',
+    exportEndpoint: '/api/customers/export',
+    queryKey: ['customers'],
+    breadcrumbs: [{ title: 'Customers', href: '/customers' }],
+    initialFilters: {
+        search: '',
+        branch: '',
+        customer_type: '',
+        status: '',
+    },
+    columns: customerColumns,
+    filterFields: createCustomerFilterFields(),
+    formComponent: CustomerForm,
+    formType: 'complex',
+    entityNameForSearch: 'customer',
+    viewModalComponent: CustomerViewModal,
+    getDeleteMessage: (customer: { name?: string }) =>
+        `This action cannot be undone. This will permanently delete ${customer.name}'s customer record.`,
 });

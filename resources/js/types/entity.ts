@@ -25,6 +25,7 @@ export type EntityFilters<T = Record<string, unknown>> = T & {
 };
 
 // Re-export entity types for convenience
+export type { Customer, CustomerFormData } from './customer';
 export type { Department, DepartmentFormData } from './department';
 export type { Employee, EmployeeFormData } from './employee';
 export type { Position, PositionFormData } from './position';

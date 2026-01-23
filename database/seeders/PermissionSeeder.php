@@ -97,6 +97,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'customer',
+                'display_name' => 'Customer',
+                'child' => [
+                    [
+                        'name' => 'customer.create',
+                        'display_name' => 'Create Customer',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'customer.edit',
+                        'display_name' => 'Edit Customer',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'customer.delete',
+                        'display_name' => 'Delete Customer',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],
