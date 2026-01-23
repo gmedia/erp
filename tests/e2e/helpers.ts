@@ -646,3 +646,188 @@ export async function editCustomer(
   // Wait for dialog to close
   await expect(dialog).not.toBeVisible({ timeout: 10000 });
 }
+// ---------------------------------------------------
+// Supplier helpers
+// ---------------------------------------------------
+
+/**
+ * Create a new supplier via the UI.
+ *
+ * @param page - Playwright Page object.
+ * @param overrides - Optional fields to override the default values.
+ * @returns The unique email used for the created supplier.
+ */
+export async function createSupplier(
+  page: Page,
+  overrides: Partial<{
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    branch: string;
+    category: string;
+    status: string;
+  }> = {}
+): Promise<string> {
+  const timestamp = Date.now();
+  const defaultEmail = `supplier${Math.random().toString(36).substring(2,7)}${timestamp}@example.com`;
+
+  // 1️⃣ Login
+  await login(page);
+
+  // 2️⃣ Navigate to suppliers page
+  await page.goto('/suppliers');
+
+  // 3️⃣ Open the "Add Supplier" dialog
+  const addButton = page.getByRole('button', { name: /Add/i });
+  await expect(addButton).toBeVisible();
+  await addButton.click();
+  
+  // Wait for dialog to be visible
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  // 4️⃣ Fill the form fields
+  const email = overrides.email ?? defaultEmail;
+  
+  await page.fill('input[name="name"]', overrides.name ?? 'Test Supplier');
+  await page.fill('input[name="email"]', email);
+  await page.fill('input[name="phone"]', overrides.phone ?? '+628123456789');
+  await page.fill('textarea[name="address"]', overrides.address ?? '456 Supplier Ave, City, Country');
+  
+  // Select branch (AsyncSelectField)
+  const branchTrigger = dialog.locator('button').filter({ hasText: /Select a branch/i });
+  await branchTrigger.click();
+  const branchSearchInput = page.getByPlaceholder('Search...');
+  const branchName = overrides.branch ?? 'Head Office';
+  if (await branchSearchInput.isVisible()) {
+    await branchSearchInput.fill(branchName);
+  }
+  await page.getByRole('option', { name: branchName }).click();
+  
+  // Select category (SelectField)
+  const categoryTrigger = dialog.locator('button').filter({ hasText: /Select a category|Electronics|Furniture|Stationery|Services|Other/i });
+  await categoryTrigger.click();
+  const category = overrides.category ?? 'Electronics';
+  await page.getByRole('option', { name: category, exact: true }).click();
+  
+  // Select status (SelectField)
+  const statusTrigger = dialog.locator('button').filter({ hasText: /Select status|Active|Inactive/i });
+  await statusTrigger.click();
+  const status = overrides.status ?? 'Active';
+  await page.getByRole('option', { name: status, exact: true }).click();
+  
+  // 5️⃣ Submit the form - use JS click to bypass viewport issue
+  const submitButton = dialog.getByRole('button', { name: /Add/i }).last();
+  await expect(submitButton).toBeVisible();
+  await submitButton.evaluate((el: HTMLElement) => el.click());
+  
+  // Wait for dialog to close
+  await expect(dialog).not.toBeVisible({ timeout: 10000 });
+
+  return email;
+}
+
+/**
+ * Search for a supplier by email.
+ *
+ * @param page - Playwright Page object.
+ * @param email - Email address to search for.
+ */
+export async function searchSupplier(page: Page, email: string): Promise<void> {
+  await page.fill('input[placeholder="Search suppliers..."]', email);
+  await page.press('input[placeholder="Search suppliers..."]', 'Enter');
+  // Wait for the row containing the email to appear
+  await page.waitForSelector(`text=${email}`);
+}
+
+/**
+ * Edit an existing supplier via the UI.
+ *
+ * @param page - Playwright Page object.
+ * @param email - Current supplier email to locate.
+ * @param updates - Fields to update.
+ */
+export async function editSupplier(
+  page: Page,
+  email: string,
+  updates: { name?: string; status?: string }
+): Promise<void> {
+  // Locate the supplier first
+  await searchSupplier(page, email);
+
+  // Locate the row and open the Actions menu
+  const row = page.locator('tr', { hasText: email }).first();
+  await expect(row).toBeVisible();
+  await row.waitFor({ state: 'attached' });
+  const actionsBtn = row.getByRole('button', { name: /Actions/i });
+  await expect(actionsBtn).toBeVisible();
+  await actionsBtn.click({ force: true });
+
+  // Click the Edit menu item
+  const editItem = page.getByRole('menuitem', { name: /Edit/i });
+  await expect(editItem).toBeVisible();
+  await editItem.click({ force: true });
+  
+  // Wait for dialog
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  // Update fields if provided
+  if (updates.name) {
+    await page.fill('input[name="name"]', updates.name);
+  }
+  if (updates.status) {
+    // Select status (SelectField) - use more robust selector
+    const statusTrigger = dialog.locator('button').filter({ hasText: /Select status|Active|Inactive/i });
+    await statusTrigger.click();
+    await page.getByRole('option', { name: updates.status, exact: true }).click();
+  }
+
+  // Submit the edit dialog
+  const updateBtn = dialog.getByRole('button', { name: /Update/ });
+  await expect(updateBtn).toBeVisible();
+  await updateBtn.evaluate((el: HTMLElement) => el.click());
+  
+  // Wait for dialog to close
+  await expect(dialog).not.toBeVisible({ timeout: 10000 });
+}
+
+/**
+ * Delete a supplier via the UI.
+ *
+ * @param page - Playwright Page object.
+ * @param email - Email of the supplier to delete.
+ */
+export async function deleteSupplier(
+  page: Page,
+  email: string
+): Promise<void> {
+  // Locate the supplier first
+  await searchSupplier(page, email);
+
+  // Locate the row and open the Actions menu
+  const row = page.locator('tr', { hasText: email }).first();
+  await expect(row).toBeVisible();
+  await row.waitFor({ state: 'attached' });
+  const actionsBtn = row.getByRole('button', { name: /Actions/i });
+  await expect(actionsBtn).toBeVisible();
+  await actionsBtn.click({ force: true });
+
+  // Click the Delete menu item
+  const deleteItem = page.getByRole('menuitem', { name: /Delete/i });
+  await expect(deleteItem).toBeVisible();
+  await deleteItem.click({ force: true });
+
+  // Confirm delete in dialog
+  const deleteDialog = page.getByRole('alertdialog');
+  await expect(deleteDialog).toBeVisible();
+  
+  const confirmDeleteBtn = deleteDialog.getByRole('button', { name: /Delete/i });
+  await expect(confirmDeleteBtn).toBeVisible();
+  await confirmDeleteBtn.click();
+  
+  // Verify deletion
+  await expect(deleteDialog).not.toBeVisible();
+  await expect(row).not.toBeVisible();
+}

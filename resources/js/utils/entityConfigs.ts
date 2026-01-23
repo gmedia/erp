@@ -61,6 +61,9 @@ import { customerColumns } from '@/components/customers/CustomerColumns';
 import { createCustomerFilterFields } from '@/components/customers/CustomerFilters';
 import { CustomerForm } from '@/components/customers/CustomerForm';
 import { CustomerViewModal } from '@/components/customers/CustomerViewModal';
+import { supplierColumns } from '@/components/suppliers/SupplierColumns';
+import { createSupplierFilterFields } from '@/components/suppliers/SupplierFilters';
+import { SupplierForm } from '@/components/suppliers/SupplierForm';
 import { createSimpleEntityColumns } from '@/utils/columns';
 
 // Helper function to create generic delete messages
@@ -237,4 +240,27 @@ export const customerConfig = createComplexEntityConfig({
     viewModalComponent: CustomerViewModal,
     getDeleteMessage: (customer: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${customer.name}'s customer record.`,
+});
+
+// Configuration for complexes entities (suppliers) - using factory for consistency
+export const supplierConfig = createComplexEntityConfig({
+    entityName: 'Supplier',
+    entityNamePlural: 'Suppliers',
+    apiEndpoint: '/api/suppliers',
+    exportEndpoint: '/api/suppliers/export',
+    queryKey: ['suppliers'],
+    breadcrumbs: [{ title: 'Suppliers', href: '/suppliers' }],
+    initialFilters: {
+        search: '',
+        branch_id: '',
+        category: '',
+        status: '',
+    },
+    columns: supplierColumns,
+    filterFields: createSupplierFilterFields(),
+    formComponent: SupplierForm,
+    formType: 'complex',
+    entityNameForSearch: 'supplier',
+    getDeleteMessage: (supplier: { name?: string }) =>
+        `This action cannot be undone. This will permanently delete ${supplier.name}'s supplier record.`,
 });

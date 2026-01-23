@@ -29,3 +29,4 @@ export type { Customer, CustomerFormData } from './customer';
 export type { Department, DepartmentFormData } from './department';
 export type { Employee, EmployeeFormData } from './employee';
 export type { Position, PositionFormData } from './position';
+export type { Supplier, SupplierFormData, SupplierFilters } from './supplier';
