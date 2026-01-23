@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->call([
+            BranchSeeder::class,
             DepartmentSeeder::class,
             PositionSeeder::class,
         ]);
