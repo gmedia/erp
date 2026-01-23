@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ExportCustomersAction
 {
-    public function handle(ExportCustomerRequest $request): JsonResponse
+    public function execute(ExportCustomerRequest $request): JsonResponse
     {
         $validated = $request->validated();
 

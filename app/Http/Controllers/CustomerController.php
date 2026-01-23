@@ -89,7 +89,7 @@ class CustomerController extends Controller
      */
     public function export(ExportCustomerRequest $request, ExportCustomersAction $action): JsonResponse
     {
-        return $action->handle($request);
+        return $action->execute($request);
     }
 
     /**
