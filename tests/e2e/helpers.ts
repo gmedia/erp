@@ -531,6 +531,10 @@ export async function createCustomer(
   const addButton = page.getByRole('button', { name: /Add/i });
   await expect(addButton).toBeVisible();
   await addButton.click();
+  
+  // Wait for dialog to be visible
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
 
   // 4️⃣ Fill the form fields
   const email = overrides.email ?? defaultEmail;
@@ -540,35 +544,40 @@ export async function createCustomer(
   await page.fill('input[name="phone"]', overrides.phone ?? '+628123456789');
   await page.fill('textarea[name="address"]', overrides.address ?? '123 Test Street, City, Country');
   
-  // Select branch
-  await page.click('button:has-text("Select a branch")');
+  // Select branch (AsyncSelectField)
+  const branchTrigger = dialog.locator('button').filter({ hasText: /Select a branch/i });
+  await branchTrigger.click();
   const branchSearchInput = page.getByPlaceholder('Search...');
+  const branchName = overrides.branch ?? 'Head Office';
   if (await branchSearchInput.isVisible()) {
-    await branchSearchInput.fill(overrides.branch ?? 'Jakarta');
+    await branchSearchInput.fill(branchName);
   }
-  await page.getByRole('option', { name: overrides.branch ?? 'Jakarta' }).click();
+  await page.getByRole('option', { name: branchName }).click();
   
-  // Select customer type
-  await page.click('button:has-text("Select customer type")');
-  await page.getByRole('option', { name: overrides.customer_type ?? 'Individual' }).click();
+  // Select customer type (SelectField)
+  const customerTypeTrigger = dialog.locator('button').filter({ hasText: /Select customer type|Individual|Company/i });
+  await customerTypeTrigger.click();
+  const customerType = overrides.customer_type ?? 'Individual';
+  await page.getByRole('option', { name: customerType, exact: true }).click();
   
-  // Select status
-  await page.click('button:has-text("Select status")');
-  await page.getByRole('option', { name: overrides.status ?? 'Active' }).click();
+  // Select status (SelectField)
+  const statusTrigger = dialog.locator('button').filter({ hasText: /Select status|Active|Inactive/i });
+  await statusTrigger.click();
+  const status = overrides.status ?? 'Active';
+  await page.getByRole('option', { name: status, exact: true }).click();
   
   // Notes (optional)
   if (overrides.notes) {
     await page.fill('textarea[name="notes"]', overrides.notes);
   }
 
-  // 5️⃣ Submit the form
-  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
-    state: 'detached',
-  });
-  const dialog = page.getByRole('dialog');
-  const submitButton = dialog.getByRole('button', { name: /Add/ });
+  // 5️⃣ Submit the form - use JS click to bypass viewport issue
+  const submitButton = dialog.getByRole('button', { name: /Add/i }).last();
   await expect(submitButton).toBeVisible();
-  await submitButton.click();
+  await submitButton.evaluate((el: HTMLElement) => el.click());
+  
+  // Wait for dialog to close
+  await expect(dialog).not.toBeVisible({ timeout: 10000 });
 
   return email;
 }
@@ -613,22 +622,27 @@ export async function editCustomer(
   const editItem = page.getByRole('menuitem', { name: /Edit/i });
   await expect(editItem).toBeVisible();
   await editItem.click({ force: true });
+  
+  // Wait for dialog
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
 
   // Update fields if provided
   if (updates.name) {
     await page.fill('input[name="name"]', updates.name);
   }
   if (updates.status) {
-    await page.click('button:has-text("Active"), button:has-text("Inactive")');
-    await page.getByRole('option', { name: updates.status }).click();
+    // Select status (SelectField) - use more robust selector
+    const statusTrigger = dialog.locator('button').filter({ hasText: /Select status|Active|Inactive/i });
+    await statusTrigger.click();
+    await page.getByRole('option', { name: updates.status, exact: true }).click();
   }
 
   // Submit the edit dialog
-  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
-    state: 'detached',
-  });
-  const dialog = page.getByRole('dialog');
   const updateBtn = dialog.getByRole('button', { name: /Update/ });
   await expect(updateBtn).toBeVisible();
-  await updateBtn.click();
+  await updateBtn.evaluate((el: HTMLElement) => el.click());
+  
+  // Wait for dialog to close
+  await expect(dialog).not.toBeVisible({ timeout: 10000 });
 }

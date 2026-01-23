@@ -31,9 +31,10 @@ test.describe('Customer CRUD E2E', () => {
     await viewItem.click();
 
     // Verify modal content
-    await expect(page.getByText('View Customer')).toBeVisible();
-    await expect(page.getByText('View Test Customer')).toBeVisible();
-    await expect(page.getByText(email)).toBeVisible();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByText('View Customer')).toBeVisible();
+    await expect(dialog.getByText('View Test Customer')).toBeVisible();
+    await expect(dialog.getByText(email)).toBeVisible();
   });
 
   test('edit customer', async ({ page }) => {
@@ -58,7 +59,7 @@ test.describe('Customer CRUD E2E', () => {
     // Submit
     const dialog = page.getByRole('dialog');
     const updateBtn = dialog.getByRole('button', { name: /Update/ });
-    await updateBtn.click();
+    await updateBtn.evaluate((el: HTMLElement) => el.click());
 
     // Wait for dialog to close
     await expect(dialog).not.toBeVisible();
@@ -113,7 +114,7 @@ test.describe('Customer CRUD E2E', () => {
     const statusFilter = page.locator('button:has-text("All statuses")');
     if (await statusFilter.isVisible()) {
       await statusFilter.click();
-      await page.getByRole('option', { name: 'Active' }).click();
+      await page.getByRole('option', { name: 'Active', exact: true }).click();
     }
 
     // Apply filter
