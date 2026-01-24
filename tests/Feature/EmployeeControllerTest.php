@@ -84,13 +84,6 @@ describe('Employee API Endpoints', function () {
     });
 
     test('index supports search filtering by multiple fields', function () {
-        // Ensure the logged-in user's employee doesn't match our search term
-        $user = auth()->user();
-        $employee = Employee::where('user_id', $user->id)->first();
-        if ($employee) {
-            $employee->update(['name' => 'Admin User', 'email' => 'admin@admin.com', 'phone' => '111-111-1111']);
-        }
-
         Employee::factory()->create(['name' => 'John Smith', 'email' => 'john@example.com']);
         Employee::factory()->create(['name' => 'Jane Doe', 'email' => 'jane@example.com']);
         Employee::factory()->create(['name' => 'Bob Johnson', 'email' => 'bob@example.com']);
