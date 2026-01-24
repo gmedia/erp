@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('customers');
 
 test('execute exports customers and returns file info', function () {
     Storage::fake('public');

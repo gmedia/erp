@@ -4,7 +4,10 @@ use App\Http\Requests\Branches\ExportBranchRequest;
 
 describe('ExportBranchRequest', function () {
 
-    test('authorize returns true', function () {
+    
+uses()->group('branches');
+
+test('authorize returns true', function () {
         $request = new ExportBranchRequest;
 
         expect($request->authorize())->toBeTrue();

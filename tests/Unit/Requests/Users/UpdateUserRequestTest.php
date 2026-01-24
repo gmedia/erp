@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('users');
 
 /**
  * Helper function to create a form request with validation rules applied.

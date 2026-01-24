@@ -5,7 +5,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\assertDatabaseHas;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('branches');
 
 test('factory creates a valid branch', function () {
     $branch = Branch::factory()->create();

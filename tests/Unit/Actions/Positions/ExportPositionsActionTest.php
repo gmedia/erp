@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('positions');
 
 test('execute exports positions and returns file info', function () {
     Storage::fake('public');

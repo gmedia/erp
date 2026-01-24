@@ -2,6 +2,9 @@
 
 use App\Http\Requests\Customers\StoreCustomerRequest;
 
+
+uses()->group('customers');
+
 test('authorize returns true', function () {
     $request = new StoreCustomerRequest;
     expect($request->authorize())->toBeTrue();

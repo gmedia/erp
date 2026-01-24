@@ -6,7 +6,7 @@ use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('positions');
 
 test('collects property is set correctly', function () {
     $collection = new PositionCollection([]);

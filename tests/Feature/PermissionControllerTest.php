@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('permissions');
 
 /**
  * Helper function to create a user with an employee that has specific permissions.

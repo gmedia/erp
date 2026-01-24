@@ -2,6 +2,9 @@
 
 use App\Http\Requests\Positions\IndexPositionRequest;
 
+
+uses()->group('positions');
+
 describe('IndexPositionRequest', function () {
 
     test('authorize returns true', function () {

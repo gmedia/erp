@@ -5,7 +5,7 @@ use App\Models\Branch;
 use App\Models\Customer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('customers');
 
 test('applySearch adds where clause for search term', function () {
     $service = new CustomerFilterService;

@@ -4,7 +4,7 @@ use App\Domain\Branches\BranchFilterService;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('branches');
 
 test('applySearch adds where clause for search term', function () {
     $service = new BranchFilterService;

@@ -5,7 +5,7 @@ use App\Domain\Customers\CustomerFilterService;
 use App\Http\Requests\Customers\IndexCustomerRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('customers');
 
 test('execute calls filter service with correct parameters', function () {
     $filterService = Mockery::mock(CustomerFilterService::class);

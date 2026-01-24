@@ -2,6 +2,9 @@
 
 use App\Http\Requests\Customers\IndexCustomerRequest;
 
+
+uses()->group('customers');
+
 test('authorize returns true', function () {
     $request = new IndexCustomerRequest;
     expect($request->authorize())->toBeTrue();

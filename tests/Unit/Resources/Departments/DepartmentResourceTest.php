@@ -5,7 +5,7 @@ use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('departments');
 
 test('toArray transforms department correctly', function () {
     $department = Department::factory()->create([

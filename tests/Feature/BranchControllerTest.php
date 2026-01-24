@@ -14,7 +14,7 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('branches');
 
 /**
  * Helper function to create a user with an employee that has specific permissions.

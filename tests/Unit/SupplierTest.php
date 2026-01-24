@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\assertDatabaseHas;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('suppliers');
 
 test('factory creates a valid supplier', function () {
     $supplier = Supplier::factory()->create();

@@ -6,7 +6,7 @@ use App\Models\Customer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('customers');
 
 test('to array returns correct structure', function () {
     $customers = Customer::factory()->count(3)->create();

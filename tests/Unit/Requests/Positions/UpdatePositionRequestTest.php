@@ -4,7 +4,7 @@ use App\Http\Requests\Positions\UpdatePositionRequest;
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('positions');
 
 describe('UpdatePositionRequest', function () {
 

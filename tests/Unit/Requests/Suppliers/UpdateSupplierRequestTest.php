@@ -6,6 +6,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+
+uses()->group('suppliers');
+
 test('authorize returns true', function () {
     $request = new UpdateSupplierRequest;
     expect($request->authorize())->toBeTrue();

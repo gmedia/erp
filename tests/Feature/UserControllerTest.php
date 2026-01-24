@@ -11,7 +11,7 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('users');
 
 /**
  * Helper function to create a user with an employee that has specific permissions.
@@ -64,8 +64,8 @@ describe('User Page Access', function () {
 
 describe('Get User By Employee API', function () {
     beforeEach(function () {
-        $this->user = createUserWithUserPageAccess(['user']);
-        actingAs($this->user);
+        $user = createUserWithUserPageAccess(['user']);
+        actingAs($user);
     });
 
     test('returns null user when employee has no linked user', function () {
@@ -112,8 +112,8 @@ describe('Get User By Employee API', function () {
 
 describe('Update User API', function () {
     beforeEach(function () {
-        $this->user = createUserWithUserPageAccess(['user']);
-        actingAs($this->user);
+        $user = createUserWithUserPageAccess(['user']);
+        actingAs($user);
     });
 
     test('creates new user for employee without linked user', function () {

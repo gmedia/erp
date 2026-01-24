@@ -4,6 +4,9 @@ use App\Http\Requests\Customers\UpdateCustomerRequest;
 use App\Models\Customer;
 use Illuminate\Routing\Route;
 
+
+uses()->group('customers');
+
 test('authorize returns true', function () {
     $request = new UpdateCustomerRequest;
     expect($request->authorize())->toBeTrue();

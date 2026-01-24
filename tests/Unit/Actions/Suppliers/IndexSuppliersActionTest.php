@@ -5,7 +5,7 @@ use App\Domain\Suppliers\SupplierFilterService;
 use App\Http\Requests\Suppliers\IndexSupplierRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('suppliers');
 
 test('execute calls filter service with correct parameters', function () {
     $filterService = Mockery::mock(SupplierFilterService::class);

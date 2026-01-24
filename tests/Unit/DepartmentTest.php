@@ -5,7 +5,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\assertDatabaseHas;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('departments');
 
 test('factory creates a valid department', function () {
     $department = Department::factory()->create();

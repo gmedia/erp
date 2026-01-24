@@ -4,7 +4,7 @@ use App\Exports\DepartmentExport;
 use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('departments');
 
 describe('DepartmentExport', function () {
     test('query applies search filter case-insensitively', function () {

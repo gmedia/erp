@@ -2,6 +2,9 @@
 
 use App\Http\Requests\Branches\IndexBranchRequest;
 
+
+uses()->group('branches');
+
 describe('IndexBranchRequest', function () {
 
     test('authorize returns true', function () {

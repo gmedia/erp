@@ -2,7 +2,10 @@
 
 use App\Http\Resources\Suppliers\SupplierCollection;
 use App\Models\Supplier;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+
+uses(RefreshDatabase::class)->group('suppliers');
 
 test('to array returns correct structure', function () {
     $suppliers = Supplier::factory()->count(3)->create();

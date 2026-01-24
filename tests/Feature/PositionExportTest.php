@@ -4,7 +4,7 @@ use App\Exports\PositionExport;
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('positions');
 
 describe('PositionExport', function () {
     test('query applies search filter case-insensitively', function () {

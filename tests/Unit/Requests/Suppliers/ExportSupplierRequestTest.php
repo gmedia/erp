@@ -2,6 +2,9 @@
 
 use App\Http\Requests\Suppliers\ExportSupplierRequest;
 
+
+uses()->group('suppliers');
+
 test('authorize returns true', function () {
     $request = new ExportSupplierRequest;
     expect($request->authorize())->toBeTrue();

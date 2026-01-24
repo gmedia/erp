@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('suppliers');
 
 test('execute exports suppliers and returns file info', function () {
     Storage::fake('local'); // Export action uses 'local' disk explicitly

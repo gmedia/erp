@@ -5,7 +5,7 @@ use App\Models\Branch;
 use App\Models\Customer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('customers');
 
 describe('CustomerExport', function () {
 

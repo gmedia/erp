@@ -4,7 +4,7 @@ use App\Domain\Positions\PositionFilterService;
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('positions');
 
 test('applySearch adds where clause for search term', function () {
     $service = new PositionFilterService;

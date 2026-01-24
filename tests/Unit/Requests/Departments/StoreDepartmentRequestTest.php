@@ -4,7 +4,7 @@ use App\Http\Requests\Departments\StoreDepartmentRequest;
 use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('departments');
 
 describe('StoreDepartmentRequest', function () {
 

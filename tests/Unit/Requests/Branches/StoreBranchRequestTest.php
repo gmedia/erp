@@ -4,7 +4,7 @@ use App\Http\Requests\Branches\StoreBranchRequest;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('branches');
 
 describe('StoreBranchRequest', function () {
 

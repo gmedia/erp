@@ -6,7 +6,7 @@ use App\Http\Requests\Employees\IndexEmployeeRequest;
 use App\Models\Employee;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('employees');
 
 test('execute returns paginated employees without filters', function () {
     $filterService = Mockery::mock(EmployeeFilterService::class);

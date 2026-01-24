@@ -2,6 +2,9 @@
 
 use App\Http\Requests\Departments\IndexDepartmentRequest;
 
+
+uses()->group('departments');
+
 describe('IndexDepartmentRequest', function () {
 
     test('authorize returns true', function () {

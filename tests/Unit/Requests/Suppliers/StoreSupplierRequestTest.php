@@ -2,6 +2,9 @@
 
 use App\Http\Requests\Suppliers\StoreSupplierRequest;
 
+
+uses()->group('suppliers');
+
 test('authorize returns true', function () {
     $request = new StoreSupplierRequest;
     expect($request->authorize())->toBeTrue();

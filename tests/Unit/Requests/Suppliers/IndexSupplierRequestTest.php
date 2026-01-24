@@ -18,6 +18,9 @@ test('rules are correct', function () {
     ]);
 });
 
+
+uses()->group('suppliers');
+
 test('authorize returns true', function () {
     $request = new IndexSupplierRequest();
     expect($request->authorize())->toBeTrue();

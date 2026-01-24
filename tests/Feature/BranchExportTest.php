@@ -4,7 +4,7 @@ use App\Exports\BranchExport;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('branches');
 
 describe('BranchExport', function () {
     test('query applies search filter case-insensitively', function () {

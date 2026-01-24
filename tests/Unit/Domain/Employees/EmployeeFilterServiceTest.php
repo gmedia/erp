@@ -6,7 +6,7 @@ use App\Models\Employee;
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('employees');
 
 test('applySearch adds where clause for search term', function () {
     $service = new EmployeeFilterService;

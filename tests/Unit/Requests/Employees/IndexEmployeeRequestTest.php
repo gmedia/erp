@@ -2,6 +2,9 @@
 
 use App\Http\Requests\Employees\IndexEmployeeRequest;
 
+
+uses()->group('employees');
+
 describe('IndexEmployeeRequest', function () {
 
     test('authorize returns true', function () {

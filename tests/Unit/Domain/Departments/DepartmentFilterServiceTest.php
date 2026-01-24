@@ -4,7 +4,7 @@ use App\Domain\Departments\DepartmentFilterService;
 use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('departments');
 
 test('applySearch adds where clause for search term', function () {
     $service = new DepartmentFilterService;

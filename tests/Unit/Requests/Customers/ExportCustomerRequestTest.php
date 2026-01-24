@@ -2,6 +2,9 @@
 
 use App\Http\Requests\Customers\ExportCustomerRequest;
 
+
+uses()->group('customers');
+
 test('authorize returns true', function () {
     $request = new ExportCustomerRequest;
     expect($request->authorize())->toBeTrue();

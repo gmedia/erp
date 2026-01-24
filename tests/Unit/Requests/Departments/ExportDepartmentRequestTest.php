@@ -2,6 +2,9 @@
 
 use App\Http\Requests\Departments\ExportDepartmentRequest;
 
+
+uses()->group('departments');
+
 test('authorize returns true', function () {
     $request = new ExportDepartmentRequest;
 
