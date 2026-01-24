@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 uses(RefreshDatabase::class)->group('suppliers');
 
 test('to array returns correct structure', function () {
-    $suppliers = Supplier::factory()->count(3)->create();
+    Supplier::factory()->count(3)->create();
+    $suppliers = Supplier::with('branch')->paginate(2);
     
     $resource = new SupplierCollection($suppliers);
     $request = Request::create('/api/suppliers');
@@ -16,10 +17,14 @@ test('to array returns correct structure', function () {
     $result = $resource->toArray($request);
     
     expect($result)->toBeArray()
-        ->and($result)->toHaveCount(3)
-        ->and($result[0])->toHaveKeys([
-            'id',
-            'name',
+        ->and($result)->toHaveKeys(['data', 'meta'])
+        ->and($result['data'])->toHaveCount(2);
+
+    $firstItem = $result['data'][0]->resolve($request);
+    
+    expect($firstItem)->toHaveKeys([
+        'id',
+        'name',
             'email',
             'phone',
             'address',

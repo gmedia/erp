@@ -50,25 +50,14 @@ function createSupplierUserWithPermissions(array $permissionNames = []): User
 describe('Supplier API Endpoints', function () {
     beforeEach(function () {
         // Create user with all supplier permissions
-        // Permissions defined in routes/supplier.php are: 
-        // view-suppliers (implied by index/show?), create-suppliers (store), update-suppliers (update), delete-suppliers (destroy)
-        // Wait, routes/employee.php uses 'permission:employee' middleware.
-        // routes/supplier.php (that I created) uses resource controller. 
-        // I need to check if I added middleware to routes/supplier.php.
-        // Checking my memory/history... I created routes/supplier.php with:
-        // Route::resource('suppliers', SupplierController::class)->except(['create', 'edit', 'show']);
-        // And wrapped in auth/verified.
-        // I DID NOT add specific permission middleware in the route definition in my previous step, 
-        // BUT the EntityCrudPage in frontend expects permissions: view-suppliers, etc.
-        // AND the User Story/Skill says "create-suppliers", etc.
-        // I should probably double check the routes/supplier.php content again to be sure if I need to act as a user with permissions.
-        // If I haven't added middleware, then any auth user can access. 
-        // FOR NOW, I will write tests assuming it requires authentication. 
-        // If I need to implement permission middleware later, I will Update the test.
-        // Let's assume basic auth for now as per the current route file.
+        $this->user = createSupplierUserWithPermissions([
+            'supplier',
+            'supplier.create',
+            'supplier.edit',
+            'supplier.delete'
+        ]);
         
-        $user = User::factory()->create();
-        actingAs($user);
+        actingAs($this->user);
     });
 
     test('index returns paginated suppliers', function () {
@@ -177,6 +166,7 @@ describe('Supplier API Endpoints', function () {
             'category' => 'furniture',
             'status' => 'inactive'
         ];
+
 
         $response = putJson("/api/suppliers/{$supplier->id}", $data);
 

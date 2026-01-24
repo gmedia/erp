@@ -21,6 +21,7 @@ test('to array returns correct structure', function () {
     ]);
     
     $resource = new SupplierResource($supplier);
+    $resource = new SupplierResource($supplier->load('branch'));
     $request = Request::create('/api/suppliers');
     
     $result = $resource->toArray($request);
