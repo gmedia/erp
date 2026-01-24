@@ -65,6 +65,7 @@ import { supplierColumns } from '@/components/suppliers/SupplierColumns';
 import { createSupplierFilterFields } from '@/components/suppliers/SupplierFilters';
 import { SupplierForm } from '@/components/suppliers/SupplierForm';
 import { createSimpleEntityColumns } from '@/utils/columns';
+import { SupplierViewModal } from '@/components/suppliers/SupplierViewModal';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -261,6 +262,7 @@ export const supplierConfig = createComplexEntityConfig({
     formComponent: SupplierForm,
     formType: 'complex',
     entityNameForSearch: 'supplier',
+    viewModalComponent: SupplierViewModal,
     getDeleteMessage: (supplier: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${supplier.name}'s supplier record.`,
 });

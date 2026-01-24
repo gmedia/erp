@@ -30,12 +30,13 @@ class ExportSuppliersAction
         // Generate filename with timestamp
         $timestamp = now()->format('Y-m-d_His');
         $filename = "suppliers_{$timestamp}.xlsx";
+        $filePath = 'exports/' . $filename;
 
-        // Store in temporary location
-        Excel::store(new SupplierExport($filters), $filename, 'local');
+        // Store in public disk so it is accessible
+        Excel::store(new SupplierExport($filters), $filePath, 'public');
 
         // Generate temporary download URL (valid for 1 hour)
-        $url = Storage::url($filename);
+        $url = Storage::url($filePath);
 
         return response()->json([
             'message' => 'Export generated successfully',

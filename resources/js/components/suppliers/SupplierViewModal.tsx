@@ -27,9 +27,9 @@ interface Supplier {
 }
 
 interface SupplierViewModalProps {
-    supplier: Supplier | null;
-    isOpen: boolean;
+    open: boolean;
     onClose: () => void;
+    item: Supplier | null;
 }
 
 const ViewField = ({ label, value }: { label: string; value: React.ReactNode }) => (
@@ -40,11 +40,11 @@ const ViewField = ({ label, value }: { label: string; value: React.ReactNode }) 
 );
 
 export const SupplierViewModal = React.memo(
-    ({ supplier: item, isOpen, onClose }: SupplierViewModalProps) => {
+    ({ item, open, onClose }: SupplierViewModalProps) => {
         if (!item) return null;
 
         return (
-            <Dialog open={isOpen} onOpenChange={onClose}>
+            <Dialog open={open} onOpenChange={onClose}>
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
                         <DialogTitle>Supplier Details</DialogTitle>
