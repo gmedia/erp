@@ -18,8 +18,8 @@ test('execute calls filter service with correct parameters', function () {
     $request->shouldReceive('get')->with('search')->andReturn('test');
     
     // Advanced filters
-    $request->shouldReceive('get')->with('branch')->andReturn(1);
-    $request->shouldReceive('get')->with('category')->andReturn('electronics');
+    $request->shouldReceive('get')->with('branch_id')->andReturn(1);
+    $request->shouldReceive('get')->with('category_id')->andReturn(1);
     $request->shouldReceive('get')->with('status')->andReturn('active');
 
     // Sorting
@@ -35,7 +35,7 @@ test('execute calls filter service with correct parameters', function () {
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), [
             'branch_id' => 1,
-            'category' => 'electronics',
+            'category_id' => 1,
             'status' => 'active',
         ]);
 

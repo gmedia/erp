@@ -14,13 +14,13 @@ test('to array returns correct structure', function () {
     $resource = new SupplierCollection($suppliers);
     $request = Request::create('/api/suppliers');
     
-    $result = $resource->toArray($request);
+    $response = $resource->response()->getData(true);
     
-    expect($result)->toBeArray()
-        ->and($result)->toHaveKeys(['data', 'meta'])
-        ->and($result['data'])->toHaveCount(2);
+    expect($response)->toBeArray()
+        ->and($response)->toHaveKeys(['data', 'meta'])
+        ->and($response['data'])->toHaveCount(2);
 
-    $firstItem = $result['data'][0]->resolve($request);
+    $firstItem = $response['data'][0];
     
     expect($firstItem)->toHaveKeys([
         'id',
