@@ -20,7 +20,7 @@ class IndexSuppliersAction
     {
         ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 
-        $query = Supplier::query()->with(['branch']);
+        $query = Supplier::query()->with(['branch', 'category']);
 
         // Search functionality - search across name, email, phone, address
         if ($request->filled('search')) {

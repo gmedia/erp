@@ -46,7 +46,7 @@ test('execute calls filter service with correct parameters', function () {
 
     // Mock pagination
     $builder = Mockery::mock('Illuminate\Database\Eloquent\Builder');
-    $builder->shouldReceive('with')->with(['branch'])->andReturnSelf();
+    $builder->shouldReceive('with')->with(['branch', 'category'])->andReturnSelf();
     $builder->shouldReceive('paginate')->with(15, ['*'], 'page', 1)->andReturn(new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15));
 
     // We can't easily mock the static query() call on the model without alias mocking, 
