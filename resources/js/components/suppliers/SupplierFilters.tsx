@@ -17,16 +17,10 @@ export function createSupplierFilterFields(): FieldDescriptor[] {
             '/api/branches',
             'Select a branch',
         ),
-        createSelectFilterField(
-            'category',
+        createAsyncSelectFilterField(
+            'category_id',
             'Category',
-            [
-                { value: 'electronics', label: 'Electronics' },
-                { value: 'furniture', label: 'Furniture' },
-                { value: 'stationery', label: 'Stationery' },
-                { value: 'services', label: 'Services' },
-                { value: 'other', label: 'Other' },
-            ],
+            '/api/supplier-categories',
             'Select Category',
         ),
         createSelectFilterField(

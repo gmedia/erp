@@ -33,7 +33,7 @@ test('rules returns correct validation rules', function () {
         'phone' => ['nullable', 'string', 'max:20'],
         'address' => ['sometimes', 'string'],
         'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
-        'category' => ['sometimes', 'string', 'in:electronics,furniture,stationery,services,other'],
+        'category_id' => ['sometimes', 'required', 'integer', 'exists:supplier_categories,id'],
         'status' => ['sometimes', 'string', 'in:active,inactive'],
     ]);
 });

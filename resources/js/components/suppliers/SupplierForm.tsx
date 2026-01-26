@@ -47,16 +47,10 @@ const renderDetailsSection = () => (
             url="/api/branches"
             placeholder="Select a branch"
         />
-        <SelectField
-            name="category"
+        <AsyncSelectField
+            name="category_id"
             label="Category"
-            options={[
-                { value: 'electronics', label: 'Electronics' },
-                { value: 'furniture', label: 'Furniture' },
-                { value: 'stationery', label: 'Stationery' },
-                { value: 'services', label: 'Services' },
-                { value: 'other', label: 'Other' },
-            ]}
+            url="/api/supplier-categories"
             placeholder="Select a category"
         />
          <SelectField
@@ -89,7 +83,7 @@ const getSupplierFormDefaults = (
             phone: '',
             address: '',
             branch_id: '',
-            category: 'other',
+            category_id: '',
             status: 'active',
         };
     }
@@ -100,7 +94,7 @@ const getSupplierFormDefaults = (
         phone: supplier.phone || '',
         address: supplier.address,
         branch_id: supplier.branch ? String(supplier.branch.id) : '',
-        category: supplier.category,
+        category_id: supplier.category ? String(supplier.category.id) : '',
         status: supplier.status,
     };
 };

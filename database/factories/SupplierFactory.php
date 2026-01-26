@@ -23,7 +23,7 @@ class SupplierFactory extends Factory
             'phone' => $this->faker->phoneNumber(),
             'address' => $this->faker->address(),
             'branch_id' => Branch::factory(),
-            'category' => $this->faker->randomElement(['electronics', 'furniture', 'stationery', 'services', 'other']),
+            'category_id' => \App\Models\SupplierCategory::factory(),
             'status' => $this->faker->randomElement(['active', 'inactive']),
         ];
     }

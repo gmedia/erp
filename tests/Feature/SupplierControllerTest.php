@@ -101,14 +101,15 @@ describe('Supplier API Endpoints', function () {
     });
 
     test('index supports filtering by category', function () {
-        Supplier::factory()->create(['category' => 'electronics']);
-        Supplier::factory()->create(['category' => 'furniture']);
+        $category = \App\Models\SupplierCategory::factory()->create();
+        Supplier::factory()->create(['category_id' => $category->id]);
+        Supplier::factory()->create(); // different category
 
-        $response = getJson('/api/suppliers?category=electronics');
+        $response = getJson('/api/suppliers?category_id=' . $category->id);
 
         $response->assertOk();
         expect($response->json('data'))->toHaveCount(1)
-            ->and($response->json('data.0.category'))->toBe('electronics');
+            ->and($response->json('data.0.category_id'))->toBe($category->id);
     });
 
     test('index supports filtering by status', function () {
@@ -124,13 +125,14 @@ describe('Supplier API Endpoints', function () {
 
     test('store creates supplier', function () {
         $branch = Branch::factory()->create();
+        $category = \App\Models\SupplierCategory::factory()->create();
         $data = [
             'name' => 'New Supplier',
             'email' => 'new@example.com',
             'phone' => '1234567890',
             'address' => '123 St',
             'branch_id' => $branch->id,
-            'category' => 'electronics',
+            'category_id' => $category->id,
             'status' => 'active',
         ];
 
@@ -145,12 +147,13 @@ describe('Supplier API Endpoints', function () {
     test('store validates unique email', function () {
         Supplier::factory()->create(['email' => 'existing@example.com']);
         $branch = Branch::factory()->create();
+        $category = \App\Models\SupplierCategory::factory()->create();
 
         $response = postJson('/api/suppliers', [
             'name' => 'Another Supplier',
             'email' => 'existing@example.com',
             'branch_id' => $branch->id,
-            'category' => 'other',
+            'category_id' => $category->id,
             'status' => 'active'
         ]);
 
@@ -160,10 +163,11 @@ describe('Supplier API Endpoints', function () {
 
     test('update modifies supplier', function () {
         $supplier = Supplier::factory()->create();
+        $category = \App\Models\SupplierCategory::factory()->create();
         $data = [
             'name' => 'Updated Supplier',
             'email' => $supplier->email, // keep same email
-            'category' => 'furniture',
+            'category_id' => $category->id,
             'status' => 'inactive'
         ];
 

@@ -36,8 +36,8 @@ class SupplierFilterService
         }
 
         // Filter by category
-        if (! empty($filters['category'])) {
-            $query->where('category', $filters['category']);
+        if (! empty($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
         }
 
         // Filter by status

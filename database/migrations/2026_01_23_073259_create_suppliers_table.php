@@ -18,11 +18,11 @@ return new class extends Migration
             $table->string('phone', 20)->nullable();
             $table->text('address');
             $table->foreignId('branch_id')->nullable()->constrained('branches')->onDelete('set null');
-            $table->enum('category', ['electronics', 'furniture', 'stationery', 'services', 'other'])->default('other');
+            $table->foreignId('category_id')->constrained('supplier_categories')->onDelete('cascade');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
 
-            $table->index('category');
+            $table->index('category_id');
             $table->index('status');
         });
     }

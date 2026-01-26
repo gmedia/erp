@@ -10,21 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import React from 'react';
 
-interface Supplier {
-    id: number;
-    name: string;
-    email: string;
-    phone: string | null;
-    address: string;
-    branch?: {
-        id: number;
-        name: string;
-    } | null;
-    category: string;
-    status: string;
-    created_at: string;
-    updated_at: string;
-}
+import { Supplier } from '@/types/entity';
+
 
 interface SupplierViewModalProps {
     open: boolean;
@@ -64,8 +51,8 @@ export const SupplierViewModal = React.memo(
                         <ViewField 
                             label="Category" 
                             value={
-                                <Badge variant="outline" className="capitalize">
-                                    {item.category.replace('_', ' ')}
+                                <Badge variant="outline">
+                                    {item.category?.name || '-'}
                                 </Badge>
                             } 
                         />

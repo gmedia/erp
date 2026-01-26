@@ -705,11 +705,17 @@ export async function createSupplier(
   }
   await page.getByRole('option', { name: branchName }).click();
   
-  // Select category (SelectField)
-  const categoryTrigger = dialog.locator('button').filter({ hasText: /Select a category|Electronics|Furniture|Stationery|Services|Other/i });
+  // Select category (AsyncSelectField)
+  const categoryTrigger = dialog.locator('button').filter({ hasText: /Select a category/i });
   await categoryTrigger.click();
-  const category = overrides.category ?? 'Electronics';
-  await page.getByRole('option', { name: category, exact: true }).click();
+  const categorySearchInput = page.getByPlaceholder('Search...');
+  const categoryName = overrides.category ?? 'Electronics';
+  if (await categorySearchInput.isVisible()) {
+    await categorySearchInput.fill(categoryName);
+    // Wait for the option to be stable and visible before clicking
+    await expect(page.getByRole('option', { name: categoryName })).toBeVisible();
+  }
+  await page.getByRole('option', { name: categoryName }).click();
   
   // Select status (SelectField)
   const statusTrigger = dialog.locator('button').filter({ hasText: /Select status|Active|Inactive/i });

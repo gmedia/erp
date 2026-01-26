@@ -71,9 +71,7 @@ export const supplierFormSchema = z.object({
         .or(z.literal('')),
     address: z.string().min(5, { message: 'Address must be at least 5 characters.' }),
     branch_id: z.string().optional(),
-    category: z.enum(['electronics', 'furniture', 'stationery', 'services', 'other'], {
-        message: 'Category is required.',
-    }),
+    category_id: z.string().min(1, { message: 'Category is required.' }),
     status: z.enum(['active', 'inactive'], {
         message: 'Status is required.',
     }),

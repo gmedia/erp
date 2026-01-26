@@ -38,8 +38,8 @@ class SupplierExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         }
 
         // Apply category filter
-        if (!empty($this->filters['category'])) {
-            $query->where('category', $this->filters['category']);
+        if (!empty($this->filters['category_id'])) {
+            $query->where('category_id', $this->filters['category_id']);
         }
 
         // Apply status filter
@@ -52,7 +52,7 @@ class SupplierExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
 
         // Validate sort_by to prevent SQL injection
-        $allowedSortColumns = ['name', 'email', 'phone', 'branch_id', 'category', 'status', 'created_at'];
+        $allowedSortColumns = ['name', 'email', 'phone', 'branch_id', 'category_id', 'status', 'created_at'];
         if (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);
         }
@@ -84,7 +84,7 @@ class SupplierExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $supplier->phone,
             $supplier->address,
             $supplier->branch?->name,
-            $supplier->category,
+            $supplier->category?->name,
             ucfirst($supplier->status),
             $supplier->created_at->format('Y-m-d H:i:s'),
         ];

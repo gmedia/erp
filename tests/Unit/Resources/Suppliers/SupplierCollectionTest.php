@@ -9,7 +9,7 @@ uses(RefreshDatabase::class)->group('suppliers');
 
 test('to array returns correct structure', function () {
     Supplier::factory()->count(3)->create();
-    $suppliers = Supplier::with('branch')->paginate(2);
+    $suppliers = Supplier::with(['branch', 'category'])->paginate(2);
     
     $resource = new SupplierCollection($suppliers);
     $request = Request::create('/api/suppliers');
@@ -29,7 +29,9 @@ test('to array returns correct structure', function () {
             'phone',
             'address',
             'branch',
+            'branch_id',
             'category',
+            'category_id',
             'status',
             'created_at',
             'updated_at',

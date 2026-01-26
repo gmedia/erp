@@ -27,7 +27,7 @@ class StoreSupplierRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['required', 'string'],
             'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
-            'category' => ['required', 'string', 'in:electronics,furniture,stationery,services,other'],
+            'category_id' => ['required', 'integer', 'exists:supplier_categories,id'],
             'status' => ['required', 'string', 'in:active,inactive'],
         ];
     }

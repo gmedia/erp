@@ -38,15 +38,16 @@ describe('SupplierExport', function () {
     });
 
     test('query applies exact category filter', function () {
-        Supplier::factory()->create(['category' => 'electronics']);
-        Supplier::factory()->create(['category' => 'furniture']);
+        $category = \App\Models\SupplierCategory::factory()->create();
+        Supplier::factory()->create(['category_id' => $category->id]);
+        Supplier::factory()->create(); // different category
 
-        $export = new SupplierExport(['category' => 'electronics']);
+        $export = new SupplierExport(['category_id' => $category->id]);
 
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(1)
-            ->and($results->first()->category)->toBe('electronics');
+            ->and($results->first()->category_id)->toBe($category->id);
     });
 
     test('query applies exact status filter', function () {
@@ -62,17 +63,18 @@ describe('SupplierExport', function () {
     });
 
     test('map function returns correct data', function () {
+        $category = \App\Models\SupplierCategory::factory()->make(['name' => 'Electronics']);
         $supplier = Supplier::factory()->make([
             'id' => 1,
             'name' => 'Test Supplier',
-        'email' => 'test@example.com',
-        'phone' => '1234567890',
-        'address' => '123 Test St',
-        'category' => 'Electronics',
-        'status' => 'Active',
-        'created_at' => '2023-01-01 10:00:00',
-    ]);
+            'email' => 'test@example.com',
+            'phone' => '1234567890',
+            'address' => '123 Test St',
+            'status' => 'active',
+            'created_at' => '2023-01-01 10:00:00',
+        ]);
         $supplier->setRelation('branch', Branch::factory()->make(['name' => 'Test Branch']));
+        $supplier->setRelation('category', $category);
 
         $export = new SupplierExport([]);
         $mapped = $export->map($supplier);

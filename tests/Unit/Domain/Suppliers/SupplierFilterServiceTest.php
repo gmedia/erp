@@ -36,14 +36,15 @@ test('applyAdvancedFilters filters by branch', function () {
 
 test('applyAdvancedFilters filters by category', function () {
     $service = new SupplierFilterService;
-    Supplier::factory()->create(['category' => 'electronics']);
-    Supplier::factory()->create(['category' => 'services']);
+    $category = \App\Models\SupplierCategory::factory()->create();
+    Supplier::factory()->create(['category_id' => $category->id]);
+    Supplier::factory()->create(); // different category
 
     $query = Supplier::query();
-    $service->applyAdvancedFilters($query, ['category' => 'electronics']);
+    $service->applyAdvancedFilters($query, ['category_id' => $category->id]);
 
     expect($query->count())->toBe(1)
-        ->and($query->first()->category)->toBe('electronics');
+        ->and($query->first()->category_id)->toBe($category->id);
 });
 
 test('applyAdvancedFilters filters by status', function () {

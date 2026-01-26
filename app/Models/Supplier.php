@@ -14,12 +14,13 @@ class Supplier extends Model
         'phone',
         'address',
         'branch_id',
-        'category',
+        'category_id',
         'status',
     ];
 
     protected $casts = [
         'branch_id' => 'integer',
+        'category_id' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -27,5 +28,10 @@ class Supplier extends Model
     public function branch()
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(SupplierCategory::class);
     }
 }

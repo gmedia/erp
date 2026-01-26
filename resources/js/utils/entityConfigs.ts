@@ -254,7 +254,7 @@ export const supplierConfig = createComplexEntityConfig({
     initialFilters: {
         search: '',
         branch_id: '',
-        category: '',
+        category_id: '',
         status: '',
     },
     columns: supplierColumns,

@@ -27,7 +27,7 @@ const renderBranchCell = ({ row }: { row: { original: Supplier } }) => {
  */
 const renderCategoryCell = ({ row }: { row: { original: Supplier } }) => {
     const category = row.original.category;
-    return <Badge variant="outline">{category.charAt(0).toUpperCase() + category.slice(1)}</Badge>;
+    return <Badge variant="outline">{category?.name || '-'}</Badge>;
 };
 
 /**
@@ -53,7 +53,7 @@ export const supplierColumns: ColumnDef<Supplier>[] = [
         cell: renderBranchCell,
     },
     {
-        accessorKey: 'category',
+        accessorKey: 'category_id',
         ...createSortingHeader('Category'),
         cell: renderCategoryCell,
     },

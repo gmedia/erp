@@ -26,7 +26,7 @@ class SupplierController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Supplier::query()->with(['branch']);
+        $query = Supplier::query()->with(['branch', 'category']);
 
         $this->filterService->apply($query, $request->all());
 

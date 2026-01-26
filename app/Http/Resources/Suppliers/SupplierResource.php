@@ -21,7 +21,7 @@ class SupplierResource extends JsonResource
             'phone' => $this->phone,
             'address' => $this->address,
             'branch_id' => $this->branch_id,
-            'category' => $this->category,
+            'category_id' => $this->category_id,
             'status' => $this->status,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
@@ -29,6 +29,12 @@ class SupplierResource extends JsonResource
                 return [
                     'id' => $this->branch->id,
                     'name' => $this->branch->name,
+                ];
+            }),
+            'category' => $this->whenLoaded('category', function () {
+                return [
+                    'id' => $this->category->id,
+                    'name' => $this->category->name,
                 ];
             }),
         ];

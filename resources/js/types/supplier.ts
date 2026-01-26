@@ -7,7 +7,8 @@ export interface Supplier extends BaseEntity {
     address: string;
     branch_id: number | null;
     branch: SimpleEntity | null | undefined;
-    category: 'electronics' | 'furniture' | 'stationery' | 'services' | 'other';
+    category_id: number | null;
+    category: SimpleEntity | null | undefined;
     status: 'active' | 'inactive';
 }
 
@@ -16,14 +17,14 @@ export interface SupplierFormData {
     email: string;
     phone: string;
     address: string;
-    branch_id: string; // AsyncSelect usually returns string ID
-    category: 'electronics' | 'furniture' | 'stationery' | 'services' | 'other';
+    branch_id?: string; // AsyncSelect usually returns string ID
+    category_id: string;
     status: 'active' | 'inactive';
 }
 
 export interface SupplierFilters {
     search: string;
     branch_id: string;
-    category: string;
+    category_id: string;
     status: string;
 }

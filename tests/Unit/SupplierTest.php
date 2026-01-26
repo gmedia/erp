@@ -19,7 +19,7 @@ test('factory creates a valid supplier', function () {
         'phone' => $supplier->phone,
         'address' => $supplier->address,
         'branch_id' => $supplier->branch_id,
-        'category' => $supplier->category,
+        'category_id' => $supplier->category_id,
         'status' => $supplier->status,
     ]);
 });
@@ -41,7 +41,7 @@ test('fillable attributes are defined correctly', function () {
         'phone',
         'address',
         'branch_id',
-        'category',
+        'category_id',
         'status',
     ]);
 });
