@@ -74,6 +74,14 @@ class MenuSeeder extends Seeder
                         'url' => 'branches',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'supplier.category',
+                        'display_name' => 'Supplier Category',
+                        'permissions' => ['supplier.category', 'supplier.category.create', 'supplier.category.edit', 'supplier.category.delete'],
+                        'icon' => 'LayoutList',
+                        'url' => 'supplier-categories',
+                        'child' => [],
+                    ],
                 ],
             ],
             [
