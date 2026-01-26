@@ -27,6 +27,7 @@ const customerTypeOptions = [
     { value: 'company', label: 'Company' },
 ];
 
+// Status options
 const statusOptions = [
     { value: 'active', label: 'Active' },
     { value: 'inactive', label: 'Inactive' },
@@ -69,11 +70,11 @@ const renderCustomerDetailsSection = () => (
             url="/api/branches"
             placeholder="Select a branch"
         />
-        <SelectField
-            name="customer_type"
-            label="Customer Type"
-            options={customerTypeOptions}
-            placeholder="Select customer type"
+        <AsyncSelectField
+            name="category_id"
+            label="Category"
+            url="/api/customer-categories"
+            placeholder="Select a category"
         />
         <SelectField
             name="status"
@@ -106,7 +107,7 @@ const getCustomerFormDefaults = (
             phone: '',
             address: '',
             branch: '',
-            customer_type: 'individual',
+            category_id: '',
             status: 'active',
             notes: '',
         };
@@ -121,7 +122,10 @@ const getCustomerFormDefaults = (
             typeof customer.branch === 'object'
                 ? String(customer.branch.id)
                 : customer.branch,
-        customer_type: customer.customer_type,
+        category_id:
+            typeof customer.category === 'object'
+                ? String(customer.category.id)
+                : String(customer.category_id),
         status: customer.status,
         notes: customer.notes || '',
     };

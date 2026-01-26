@@ -37,16 +37,19 @@ describe('CustomerExport', function () {
             ->and($results->first()->branch->name)->toBe('Branch A');
     });
 
-    test('query applies exact customer type filter', function () {
-        Customer::factory()->create(['customer_type' => 'individual']);
-        Customer::factory()->create(['customer_type' => 'company']);
+    test('query applies exact category filter', function () {
+        $categoryA = \App\Models\CustomerCategory::factory()->create();
+        $categoryB = \App\Models\CustomerCategory::factory()->create();
 
-        $export = new CustomerExport(['customer_type' => 'company']);
+        Customer::factory()->create(['category_id' => $categoryA->id]);
+        Customer::factory()->create(['category_id' => $categoryB->id]);
+
+        $export = new CustomerExport(['category' => $categoryA->id]);
 
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(1)
-            ->and($results->first()->customer_type)->toBe('company');
+            ->and($results->first()->category_id)->toBe($categoryA->id);
     });
 
     test('query applies exact status filter', function () {
@@ -83,7 +86,7 @@ describe('CustomerExport', function () {
             'Phone',
             'Address',
             'Branch',
-            'Type',
+            'Category',
             'Status',
             'Notes',
             'Created At',
@@ -92,13 +95,14 @@ describe('CustomerExport', function () {
 
     test('map formats data correctly', function () {
         $branch = Branch::factory()->create(['name' => 'Test Branch']);
+        $category = \App\Models\CustomerCategory::factory()->create(['name' => 'Test Category']);
         $customer = Customer::factory()->create([
             'name' => 'Test Customer',
             'email' => 'test@example.com',
             'phone' => '1234567890',
             'address' => '123 Test St',
             'branch_id' => $branch->id,
-            'customer_type' => 'individual',
+            'category_id' => $category->id,
             'status' => 'active',
             'notes' => 'Test Notes',
             'created_at' => '2023-01-01 10:00:00',
@@ -114,7 +118,7 @@ describe('CustomerExport', function () {
             '1234567890',
             '123 Test St',
             'Test Branch',
-            'Individual',
+            'Test Category',
             'Active',
             'Test Notes',
             '2023-01-01 10:00:00',

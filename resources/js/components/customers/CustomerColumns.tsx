@@ -23,15 +23,11 @@ const renderBranchCell = ({ row }: { row: { original: Customer } }) => {
 };
 
 /**
- * Cell renderer for customer type column - displays as badge
+ * Cell renderer for category column - handles both object and string values
  */
-const renderCustomerTypeCell = ({ row }: { row: { original: Customer } }) => {
-    const type = row.original.customer_type;
-    return (
-        <Badge variant={type === 'company' ? 'default' : 'secondary'}>
-            {type === 'company' ? 'Company' : 'Individual'}
-        </Badge>
-    );
+const renderCategoryCell = ({ row }: { row: { original: Customer } }) => {
+    const val = row.original.category;
+    return <div>{typeof val === 'object' ? val.name : val}</div>;
 };
 
 /**
@@ -57,9 +53,9 @@ export const customerColumns: ColumnDef<Customer>[] = [
         cell: renderBranchCell,
     },
     {
-        accessorKey: 'customer_type',
-        ...createSortingHeader('Type'),
-        cell: renderCustomerTypeCell,
+        accessorKey: 'category',
+        ...createSortingHeader('Category'),
+        cell: renderCategoryCell,
     },
     {
         accessorKey: 'status',

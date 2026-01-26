@@ -18,12 +18,12 @@ return new class extends Migration
             $table->string('phone', 20)->nullable();
             $table->text('address');
             $table->foreignId('branch_id')->constrained('branches')->onDelete('cascade');
-            $table->enum('customer_type', ['individual', 'company'])->default('individual');
+            $table->foreignId('category_id')->constrained('customer_categories')->onDelete('cascade');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->text('notes')->nullable();
             $table->timestamps();
 
-            $table->index('customer_type');
+            $table->index('category_id');
             $table->index('status');
         });
     }

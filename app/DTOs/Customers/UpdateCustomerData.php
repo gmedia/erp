@@ -10,7 +10,7 @@ readonly class UpdateCustomerData
         public ?string $phone = null,
         public ?string $address = null,
         public ?int $branch_id = null,
-        public ?string $customer_type = null,
+        public ?int $category_id = null,
         public ?string $status = null,
         public ?string $notes = null,
     ) {}
@@ -18,7 +18,7 @@ readonly class UpdateCustomerData
     /**
      * Create DTO from request array.
      *
-     * @param  array{name?: string, email?: string, phone?: string, address?: string, branch_id?: int, customer_type?: string, status?: string, notes?: string|null}  $data
+     * @param  array{name?: string, email?: string, phone?: string, address?: string, branch_id?: int, category_id?: int, status?: string, notes?: string|null}  $data
      */
     public static function fromArray(array $data): self
     {
@@ -28,7 +28,7 @@ readonly class UpdateCustomerData
             phone: $data['phone'] ?? null,
             address: $data['address'] ?? null,
             branch_id: $data['branch_id'] ?? null,
-            customer_type: $data['customer_type'] ?? null,
+            category_id: $data['category_id'] ?? null,
             status: $data['status'] ?? null,
             notes: array_key_exists('notes', $data) ? $data['notes'] : null, // Handle nullable notes specifically
         );
@@ -52,7 +52,7 @@ readonly class UpdateCustomerData
         if ($this->phone !== null) $data['phone'] = $this->phone;
         if ($this->address !== null) $data['address'] = $this->address;
         if ($this->branch_id !== null) $data['branch_id'] = $this->branch_id;
-        if ($this->customer_type !== null) $data['customer_type'] = $this->customer_type;
+        if ($this->category_id !== null) $data['category_id'] = $this->category_id;
         if ($this->status !== null) $data['status'] = $this->status;
         
         // Notes is special because it can be nullable in DB.

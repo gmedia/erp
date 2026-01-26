@@ -7,11 +7,6 @@ import {
     type FieldDescriptor,
 } from '@/components/common/filters';
 
-const customerTypeOptions = [
-    { value: 'individual', label: 'Individual' },
-    { value: 'company', label: 'Company' },
-];
-
 const statusOptions = [
     { value: 'active', label: 'Active' },
     { value: 'inactive', label: 'Inactive' },
@@ -27,11 +22,11 @@ export function createCustomerFilterFields(): FieldDescriptor[] {
             '/api/branches',
             'Select a branch',
         ),
-        createSelectFilterField(
-            'customer_type',
-            'Customer Type',
-            customerTypeOptions,
-            'All types',
+        createAsyncSelectFilterField(
+            'category',
+            'Category',
+            '/api/customer-categories',
+            'All categories',
         ),
         createSelectFilterField('status', 'Status', statusOptions, 'All statuses'),
     ];

@@ -61,7 +61,7 @@ describe('Customer API Endpoints', function () {
                         'phone',
                         'address',
                         'branch' => ['id', 'name'],
-                        'customer_type',
+                        'category' => ['id', 'name'],
                         'status',
                         'notes',
                         'created_at',
@@ -115,18 +115,23 @@ describe('Customer API Endpoints', function () {
         }
     });
 
-    test('index supports filtering by customer_type', function () {
-        Customer::factory()->create(['customer_type' => 'individual']);
-        Customer::factory()->create(['customer_type' => 'company']);
-        Customer::factory()->create(['customer_type' => 'individual']);
+    test('index supports filtering by category', function () {
+        $categoryA = \App\Models\CustomerCategory::factory()->create();
+        $categoryB = \App\Models\CustomerCategory::factory()->create();
 
-        $response = getJson('/api/customers?customer_type=company');
+        Customer::factory()->create(['category_id' => $categoryA->id]);
+        Customer::factory()->create(['category_id' => $categoryB->id]);
+        Customer::factory()->create(['category_id' => $categoryA->id]);
+
+        $response = getJson('/api/customers?category=' . $categoryA->id);
 
         $response->assertOk();
 
         $data = $response->json('data');
-        expect($data)->toHaveCount(1)
-            ->and($data[0]['customer_type'])->toBe('company');
+        expect($data)->toHaveCount(2);
+        foreach ($data as $customer) {
+            expect($customer['category']['id'])->toBe($categoryA->id);
+        }
     });
 
     test('index supports filtering by status', function () {
@@ -174,6 +179,7 @@ describe('Customer API Endpoints', function () {
 
     test('store creates customer with valid data and returns 201 status', function () {
         $branch = Branch::factory()->create();
+        $category = \App\Models\CustomerCategory::factory()->create();
 
         $customerData = [
             'name' => 'John Doe',
@@ -181,7 +187,7 @@ describe('Customer API Endpoints', function () {
             'phone' => '555-1234-5678',
             'address' => '123 Main Street, City, Country',
             'branch' => $branch->id,
-            'customer_type' => 'individual',
+            'category_id' => $category->id,
             'status' => 'active',
             'notes' => 'VIP customer',
         ];
@@ -197,7 +203,7 @@ describe('Customer API Endpoints', function () {
                     'phone',
                     'address',
                     'branch',
-                    'customer_type',
+                    'category',
                     'status',
                     'notes',
                     'created_at',
@@ -207,9 +213,10 @@ describe('Customer API Endpoints', function () {
             ->assertJsonFragment([
                 'name' => 'John Doe',
                 'email' => 'john.doe@example.com',
-                'customer_type' => 'individual',
                 'status' => 'active',
             ]);
+
+        expect($response->json('data.category.id'))->toBe($category->id);
 
         assertDatabaseHas('customers', [
             'email' => 'john.doe@example.com',
@@ -226,7 +233,7 @@ describe('Customer API Endpoints', function () {
                 'email',
                 'address',
                 'branch',
-                'customer_type',
+                'category_id',
                 'status',
             ]);
     });
@@ -235,12 +242,14 @@ describe('Customer API Endpoints', function () {
         Customer::factory()->create(['email' => 'existing@example.com']);
         $branch = Branch::factory()->create();
 
+        $category = \App\Models\CustomerCategory::factory()->create();
+
         $response = postJson('/api/customers', [
             'name' => 'New Customer',
             'email' => 'existing@example.com',
             'address' => '123 Test Street',
             'branch' => $branch->id,
-            'customer_type' => 'individual',
+            'category_id' => $category->id,
             'status' => 'active',
         ]);
 
@@ -262,7 +271,7 @@ describe('Customer API Endpoints', function () {
                     'phone',
                     'address',
                     'branch',
-                    'customer_type',
+                    'category',
                     'status',
                     'notes',
                     'created_at',
@@ -290,13 +299,14 @@ describe('Customer API Endpoints', function () {
         ]);
 
         $newBranch = Branch::factory()->create();
+        $newCategory = \App\Models\CustomerCategory::factory()->create();
 
         $updateData = [
             'name' => 'Updated Name',
             'email' => $customer->email,
             'address' => $customer->address,
             'branch' => $newBranch->id,
-            'customer_type' => 'company',
+            'category_id' => $newCategory->id,
             'status' => 'active',
         ];
 
@@ -305,13 +315,14 @@ describe('Customer API Endpoints', function () {
         $response->assertOk()
             ->assertJsonFragment([
                 'name' => 'Updated Name',
-                'customer_type' => 'company',
             ]);
+
+        expect($response->json('data.category.id'))->toBe($newCategory->id);
 
         $customer->refresh();
         expect($customer->name)->toBe('Updated Name')
             ->and($customer->branch_id)->toBe($newBranch->id)
-            ->and($customer->customer_type)->toBe('company');
+            ->and($customer->category_id)->toBe($newCategory->id);
     });
 
     test('update validates fields when provided with invalid data', function () {
@@ -321,7 +332,7 @@ describe('Customer API Endpoints', function () {
             'name' => '', // Empty name
             'email' => 'invalid-email', // Invalid email format
             'branch' => 'invalid-branch', // Invalid branch
-            'customer_type' => 'invalid-type', // Invalid type
+            'category_id' => 'invalid-category', // Invalid category
             'status' => 'invalid-status', // Invalid status
         ]);
 
@@ -330,13 +341,14 @@ describe('Customer API Endpoints', function () {
                 'name',
                 'email',
                 'branch',
-                'customer_type',
+                'category_id',
                 'status',
             ]);
     });
 
     test('update ignores unique email validation for same customer', function () {
         $branch = Branch::factory()->create();
+        $category = \App\Models\CustomerCategory::factory()->create();
         $customer = Customer::factory()->create(['email' => 'john@example.com']);
 
         $response = putJson("/api/customers/{$customer->id}", [
@@ -344,7 +356,7 @@ describe('Customer API Endpoints', function () {
             'email' => 'john@example.com', // Same email should be allowed
             'address' => '123 Test Street',
             'branch' => $branch->id,
-            'customer_type' => 'individual',
+            'category_id' => $category->id,
             'status' => 'active',
         ]);
 
@@ -353,13 +365,14 @@ describe('Customer API Endpoints', function () {
 
     test('update returns 404 for non-existent customer', function () {
         $branch = Branch::factory()->create();
+        $category = \App\Models\CustomerCategory::factory()->create();
 
         $response = putJson('/api/customers/99999', [
             'name' => 'Test Customer',
             'email' => 'test@example.com',
             'address' => '123 Test Street',
             'branch' => $branch->id,
-            'customer_type' => 'individual',
+            'category_id' => $category->id,
             'status' => 'active',
         ]);
 
@@ -389,13 +402,14 @@ describe('Customer API Permission Tests', function () {
         actingAs($user);
 
         $branch = Branch::factory()->create();
+        $category = \App\Models\CustomerCategory::factory()->create();
 
         $response = postJson('/api/customers', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'address' => '123 Test Street',
             'branch' => $branch->id,
-            'customer_type' => 'individual',
+            'category_id' => $category->id,
             'status' => 'active',
         ]);
 
@@ -409,13 +423,14 @@ describe('Customer API Permission Tests', function () {
 
         $customer = Customer::factory()->create();
         $branch = Branch::factory()->create();
+        $category = \App\Models\CustomerCategory::factory()->create();
 
         $response = putJson("/api/customers/{$customer->id}", [
             'name' => 'Updated Name',
             'email' => $customer->email,
             'address' => $customer->address,
             'branch' => $branch->id,
-            'customer_type' => 'individual',
+            'category_id' => $category->id,
             'status' => 'active',
         ]);
 

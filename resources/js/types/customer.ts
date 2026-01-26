@@ -6,7 +6,8 @@ export interface Customer extends BaseEntity {
     phone: string | null;
     address: string;
     branch: { id: number; name: string } | string;
-    customer_type: 'individual' | 'company';
+    category: { id: number; name: string } | string;
+    category_id: number | string;
     status: 'active' | 'inactive';
     notes: string | null;
 }
@@ -17,7 +18,7 @@ export interface CustomerFormData {
     phone: string;
     address: string;
     branch: string;
-    customer_type: 'individual' | 'company';
+    category_id: string;
     status: 'active' | 'inactive';
     notes: string;
 }

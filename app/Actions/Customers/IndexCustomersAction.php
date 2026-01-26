@@ -20,7 +20,7 @@ class IndexCustomersAction
     {
         ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 
-        $query = Customer::query()->with(['branch']);
+        $query = Customer::query()->with(['branch', 'category']);
 
         // Search functionality - search across name, email, phone
         if ($request->filled('search')) {
@@ -30,7 +30,7 @@ class IndexCustomersAction
         // Apply advanced filters
         $this->filterService->applyAdvancedFilters($query, [
             'branch_id' => $request->get('branch'),
-            'customer_type' => $request->get('customer_type'),
+            'category_id' => $request->get('category'),
             'status' => $request->get('status'),
         ]);
 
@@ -38,7 +38,7 @@ class IndexCustomersAction
             $query,
             $request->get('sort_by', 'created_at'),
             strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'name', 'email', 'phone', 'branch_id', 'customer_type', 'status', 'created_at', 'updated_at']
+            ['id', 'name', 'email', 'phone', 'branch_id', 'category_id', 'status', 'created_at', 'updated_at']
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);

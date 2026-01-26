@@ -58,6 +58,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             MenuSeeder::class,
+            CustomerCategorySeeder::class,
             SupplierCategorySeeder::class,
         ]);
     }

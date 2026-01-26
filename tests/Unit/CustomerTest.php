@@ -19,7 +19,7 @@ test('factory creates a valid customer', function () {
         'phone' => $customer->phone,
         'address' => $customer->address,
         'branch_id' => $customer->branch_id,
-        'customer_type' => $customer->customer_type,
+        'category_id' => $customer->category_id,
         'status' => $customer->status,
         'notes' => $customer->notes,
     ]);
@@ -33,6 +33,14 @@ test('customer belongs to a branch', function () {
         ->and($customer->branch->id)->toBe($branch->id);
 });
 
+test('customer belongs to a category', function () {
+    $category = \App\Models\CustomerCategory::factory()->create();
+    $customer = Customer::factory()->create(['category_id' => $category->id]);
+
+    expect($customer->category)->toBeInstanceOf(\App\Models\CustomerCategory::class)
+        ->and($customer->category->id)->toBe($category->id);
+});
+
 test('fillable attributes are defined correctly', function () {
     $fillable = (new Customer)->getFillable();
 
@@ -42,7 +50,7 @@ test('fillable attributes are defined correctly', function () {
         'phone',
         'address',
         'branch_id',
-        'customer_type',
+        'category_id',
         'status',
         'notes',
     ]);

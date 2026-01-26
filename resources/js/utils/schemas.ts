@@ -47,9 +47,7 @@ export const customerFormSchema = z.object({
         .or(z.literal('')),
     address: z.string().min(5, { message: 'Address must be at least 5 characters.' }),
     branch: z.string().min(1, { message: 'Branch is required.' }),
-    customer_type: z.enum(['individual', 'company'], {
-        message: 'Customer type is required.',
-    }),
+    category_id: z.string().min(1, { message: 'Category is required.' }),
     status: z.enum(['active', 'inactive'], {
         message: 'Status is required.',
     }),

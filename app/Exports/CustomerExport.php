@@ -22,7 +22,7 @@ class CustomerExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
 
     public function query(): Builder
     {
-        $query = Customer::query()->with(['branch']);
+        $query = Customer::query()->with(['branch', 'category']);
 
         // Apply search filter
         if (! empty($this->filters['search'])) {
@@ -39,9 +39,9 @@ class CustomerExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             $query->where('branch_id', $this->filters['branch']);
         }
 
-        // Apply customer_type filter
-        if (! empty($this->filters['customer_type'])) {
-            $query->where('customer_type', $this->filters['customer_type']);
+        // Apply category filter
+        if (! empty($this->filters['category'])) {
+            $query->where('category_id', $this->filters['category']);
         }
 
         // Apply status filter
@@ -54,7 +54,7 @@ class CustomerExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
 
         // Validate sort_by to prevent SQL injection
-        $allowedSortColumns = ['name', 'email', 'phone', 'branch_id', 'customer_type', 'status', 'created_at'];
+        $allowedSortColumns = ['name', 'email', 'phone', 'branch_id', 'category_id', 'status', 'created_at'];
         if (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);
         }
@@ -71,7 +71,7 @@ class CustomerExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             'Phone',
             'Address',
             'Branch',
-            'Type',
+            'Category',
             'Status',
             'Notes',
             'Created At',
@@ -87,7 +87,7 @@ class CustomerExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             $customer->phone,
             $customer->address,
             $customer->branch?->name,
-            ucfirst($customer->customer_type),
+            $customer->category?->name,
             ucfirst($customer->status),
             $customer->notes,
             $customer->created_at->format('Y-m-d H:i:s'),

@@ -230,7 +230,7 @@ export const customerConfig = createComplexEntityConfig({
     initialFilters: {
         search: '',
         branch: '',
-        customer_type: '',
+        category: '',
         status: '',
     },
     columns: customerColumns,

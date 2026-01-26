@@ -18,7 +18,7 @@ class ExportCustomersAction
         $filters = [
             'search' => $validated['search'] ?? null,
             'branch' => $validated['branch'] ?? null,
-            'customer_type' => $validated['customer_type'] ?? null,
+            'category' => $validated['category'] ?? null,
             'status' => $validated['status'] ?? null,
             'sort_by' => $validated['sort_by'] ?? 'created_at',
             'sort_direction' => $validated['sort_direction'] ?? 'desc',

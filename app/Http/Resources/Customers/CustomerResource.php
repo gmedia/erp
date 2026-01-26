@@ -28,7 +28,10 @@ class CustomerResource extends JsonResource
                 'id' => $this->resource->branch_id,
                 'name' => $this->resource->branch?->name,
             ],
-            'customer_type' => $this->resource->customer_type,
+            'category' => [
+                'id' => $this->resource->category_id,
+                'name' => $this->resource->category?->name,
+            ],
             'status' => $this->resource->status,
             'notes' => $this->resource->notes,
             'created_at' => $this->resource->created_at?->toIso8601String(),

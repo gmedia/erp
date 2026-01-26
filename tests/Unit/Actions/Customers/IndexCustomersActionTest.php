@@ -19,7 +19,7 @@ test('execute calls filter service with correct parameters', function () {
     
     // Advanced filters
     $request->shouldReceive('get')->with('branch')->andReturn(1);
-    $request->shouldReceive('get')->with('customer_type')->andReturn('individual');
+    $request->shouldReceive('get')->with('category')->andReturn(1);
     $request->shouldReceive('get')->with('status')->andReturn('active');
 
     // Sorting
@@ -35,14 +35,14 @@ test('execute calls filter service with correct parameters', function () {
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), [
             'branch_id' => 1,
-            'customer_type' => 'individual',
+            'category_id' => 1,
             'status' => 'active',
         ]);
 
     $filterService->shouldReceive('applySorting')
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc', 
-            ['id', 'name', 'email', 'phone', 'branch_id', 'customer_type', 'status', 'created_at', 'updated_at']);
+            ['id', 'name', 'email', 'phone', 'branch_id', 'category_id', 'status', 'created_at', 'updated_at']);
 
     $result = $action->execute($request);
 

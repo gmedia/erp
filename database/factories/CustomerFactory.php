@@ -26,21 +26,10 @@ class CustomerFactory extends Factory
             'phone' => fake()->phoneNumber(),
             'address' => fake()->address(),
             'branch_id' => Branch::factory(),
-            'customer_type' => fake()->randomElement(['individual', 'company']),
+            'category_id' => \App\Models\CustomerCategory::factory(),
             'status' => fake()->randomElement(['active', 'inactive']),
             'notes' => fake()->optional()->sentence(),
         ];
-    }
-
-    /**
-     * Indicate that the customer is a company.
-     */
-    public function company(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'name' => fake()->company(),
-            'customer_type' => 'company',
-        ]);
     }
 
     /**

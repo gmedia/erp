@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $phone
  * @property string $address
  * @property int $branch_id
- * @property string $customer_type
+ * @property int $category_id
  * @property string $status
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -42,7 +42,7 @@ class Customer extends Model
         'phone',
         'address',
         'branch_id',
-        'customer_type',
+        'category_id',
         'status',
         'notes',
     ];
@@ -53,5 +53,13 @@ class Customer extends Model
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    /**
+     * Get the category that the customer belongs to.
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(CustomerCategory::class, 'category_id');
     }
 }

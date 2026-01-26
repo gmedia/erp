@@ -10,13 +10,14 @@ uses(RefreshDatabase::class)->group('customers');
 
 test('to array returns correct structure', function () {
     $branch = Branch::factory()->create(['name' => 'Test Branch']);
+    $category = \App\Models\CustomerCategory::factory()->create(['name' => 'Test Category']);
     $customer = Customer::factory()->create([
         'name' => 'John Doe',
         'email' => 'john@example.com',
         'phone' => '1234567890',
         'address' => '123 Test St',
         'branch_id' => $branch->id,
-        'customer_type' => 'individual',
+        'category_id' => $category->id,
         'status' => 'active',
         'notes' => 'Test Notes',
     ]);
@@ -36,7 +37,10 @@ test('to array returns correct structure', function () {
             'id' => $branch->id,
             'name' => 'Test Branch',
         ],
-        'customer_type' => 'individual',
+        'category' => [
+            'id' => $category->id,
+            'name' => 'Test Category',
+        ],
         'status' => 'active',
         'notes' => 'Test Notes',
     ]);

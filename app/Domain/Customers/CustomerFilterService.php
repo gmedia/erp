@@ -27,9 +27,9 @@ class CustomerFilterService
             $query->where('branch_id', $filters['branch_id']);
         }
 
-        // Customer type filter
-        if (! empty($filters['customer_type'])) {
-            $query->where('customer_type', $filters['customer_type']);
+        // Category filter
+        if (! empty($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
         }
 
         // Status filter

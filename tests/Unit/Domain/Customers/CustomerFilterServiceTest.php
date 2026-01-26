@@ -41,19 +41,21 @@ test('applyAdvancedFilters applies branch filter', function () {
         ->and($results->first()->branch_id)->toBe($branchA->id);
 });
 
-test('applyAdvancedFilters applies customer type filter', function () {
+test('applyAdvancedFilters applies category filter', function () {
     $service = new CustomerFilterService;
+    $categoryA = \App\Models\CustomerCategory::factory()->create();
+    $categoryB = \App\Models\CustomerCategory::factory()->create();
 
-    Customer::factory()->create(['customer_type' => 'individual']);
-    Customer::factory()->create(['customer_type' => 'company']);
+    Customer::factory()->create(['category_id' => $categoryA->id]);
+    Customer::factory()->create(['category_id' => $categoryB->id]);
 
     $query = Customer::query();
-    $service->applyAdvancedFilters($query, ['customer_type' => 'company']);
+    $service->applyAdvancedFilters($query, ['category_id' => $categoryB->id]);
 
     $results = $query->get();
 
     expect($results)->toHaveCount(1)
-        ->and($results->first()->customer_type)->toBe('company');
+        ->and($results->first()->category_id)->toBe($categoryB->id);
 });
 
 test('applyAdvancedFilters applies status filter', function () {
@@ -91,7 +93,7 @@ test('applySorting applies ascending sort when allowed', function () {
     Customer::factory()->create(['name' => 'A Customer']);
 
     $query = Customer::query();
-    $service->applySorting($query, 'name', 'asc', ['id', 'name', 'email', 'branch_id', 'customer_type', 'status', 'created_at']);
+    $service->applySorting($query, 'name', 'asc', ['id', 'name', 'email', 'branch_id', 'category_id', 'status', 'created_at']);
 
     $results = $query->get();
 
@@ -106,7 +108,7 @@ test('applySorting applies descending sort when allowed', function () {
     Customer::factory()->create(['name' => 'Z Customer']);
 
     $query = Customer::query();
-    $service->applySorting($query, 'name', 'desc', ['id', 'name', 'email', 'branch_id', 'customer_type', 'status', 'created_at']);
+    $service->applySorting($query, 'name', 'desc', ['id', 'name', 'email', 'branch_id', 'category_id', 'status', 'created_at']);
 
     $results = $query->get();
 

@@ -19,7 +19,7 @@ test('rules returns correct validation rules', function () {
         'phone' => 'nullable|string|max:20',
         'address' => 'required|string',
         'branch' => 'required|exists:branches,id',
-        'customer_type' => 'required|in:individual,company',
+        'category_id' => 'required|exists:customer_categories,id',
         'status' => 'required|in:active,inactive',
         'notes' => 'nullable|string',
     ]);

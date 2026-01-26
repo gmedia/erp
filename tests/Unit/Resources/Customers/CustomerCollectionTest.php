@@ -25,7 +25,7 @@ test('to array returns correct structure', function () {
             'phone',
             'address',
             'branch',
-            'customer_type',
+            'category',
             'status',
             'notes',
             'created_at',
