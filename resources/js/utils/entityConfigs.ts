@@ -266,3 +266,10 @@ export const supplierConfig = createComplexEntityConfig({
     getDeleteMessage: (supplier: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${supplier.name}'s supplier record.`,
 });
+
+export const supplierCategoryConfig = createSimpleEntityConfig({
+    entityName: 'Supplier Category',
+    entityNamePlural: 'Supplier Categories',
+    apiBase: 'supplier-categories',
+    filterPlaceholder: 'Search supplier categories...',
+});
