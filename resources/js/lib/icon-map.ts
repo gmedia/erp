@@ -7,6 +7,7 @@ import {
     Settings2,
     LayoutList,
     Users,
+    Truck,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -17,6 +18,7 @@ const iconMap: Record<string, LucideIcon> = {
     LayoutList,
     BookOpen,
     Folder,
+    Truck,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {
