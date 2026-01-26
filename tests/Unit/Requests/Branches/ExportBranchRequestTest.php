@@ -30,7 +30,7 @@ test('authorize returns true', function () {
 
         $validator = validator($data, (new ExportBranchRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation passes with empty data', function () {
@@ -38,7 +38,7 @@ test('authorize returns true', function () {
 
         $validator = validator($data, (new ExportBranchRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with invalid sort_by', function () {
@@ -67,7 +67,7 @@ test('authorize returns true', function () {
 
             $validator = validator($data, (new ExportBranchRequest)->rules());
 
-            expect($validator->passes())->toBeTrue();
+            expect(!$validator->fails())->toBeTrue();
         }
     });
 
@@ -79,7 +79,7 @@ test('authorize returns true', function () {
 
             $validator = validator($data, (new ExportBranchRequest)->rules());
 
-            expect($validator->passes())->toBeTrue();
+            expect(!$validator->fails())->toBeTrue();
         }
     });
 });

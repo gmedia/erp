@@ -55,7 +55,7 @@ describe('UpdateEmployeeRequest', function () {
 
         $validator = validator($data, $request->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation passes with empty data', function () {
@@ -73,7 +73,7 @@ describe('UpdateEmployeeRequest', function () {
 
         $validator = validator($data, $request->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with invalid email format', function () {
@@ -111,7 +111,7 @@ describe('UpdateEmployeeRequest', function () {
 
         $validator = validator($data, $request->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with duplicate email from another employee', function () {
@@ -209,7 +209,7 @@ describe('UpdateEmployeeRequest', function () {
 
         $validator = validator($data, $request->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation passes with phone update', function () {
@@ -227,7 +227,7 @@ describe('UpdateEmployeeRequest', function () {
 
         $validator = validator($data, $request->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation passes with null phone', function () {
@@ -245,6 +245,6 @@ describe('UpdateEmployeeRequest', function () {
 
         $validator = validator($data, $request->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 });

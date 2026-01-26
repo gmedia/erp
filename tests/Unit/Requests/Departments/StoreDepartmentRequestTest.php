@@ -29,7 +29,7 @@ describe('StoreDepartmentRequest', function () {
 
         $validator = validator($data, (new StoreDepartmentRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with missing name', function () {
@@ -74,7 +74,7 @@ describe('StoreDepartmentRequest', function () {
 
         $validator = validator($data, (new StoreDepartmentRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
 });

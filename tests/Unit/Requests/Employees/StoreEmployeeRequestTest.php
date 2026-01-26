@@ -48,7 +48,7 @@ describe('StoreEmployeeRequest', function () {
 
         $validator = validator($data, (new StoreEmployeeRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with missing required fields', function () {
@@ -176,7 +176,7 @@ describe('StoreEmployeeRequest', function () {
 
         $validator = validator($data, (new StoreEmployeeRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation passes without phone field', function () {
@@ -194,7 +194,7 @@ describe('StoreEmployeeRequest', function () {
 
         $validator = validator($data, (new StoreEmployeeRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation passes with valid department id', function () {
@@ -212,6 +212,6 @@ describe('StoreEmployeeRequest', function () {
 
         $validator = validator($data, (new StoreEmployeeRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 });

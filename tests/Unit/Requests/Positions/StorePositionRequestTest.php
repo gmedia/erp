@@ -29,7 +29,7 @@ describe('StorePositionRequest', function () {
 
         $validator = validator($data, (new StorePositionRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with missing name', function () {
@@ -74,6 +74,6 @@ describe('StorePositionRequest', function () {
 
         $validator = validator($data, (new StorePositionRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 });

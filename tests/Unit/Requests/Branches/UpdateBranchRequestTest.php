@@ -48,7 +48,7 @@ describe('UpdateBranchRequest', function () {
 
         $validator = validator($data, $request->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation passes without name field', function () {
@@ -66,7 +66,7 @@ describe('UpdateBranchRequest', function () {
 
         $validator = validator($data, $request->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with empty name', function () {
@@ -104,7 +104,7 @@ describe('UpdateBranchRequest', function () {
 
         $validator = validator($data, $request->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with duplicate name from another branch', function () {

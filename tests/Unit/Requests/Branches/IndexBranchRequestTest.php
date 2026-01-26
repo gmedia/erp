@@ -32,7 +32,7 @@ describe('IndexBranchRequest', function () {
 
         $validator = validator($data, (new IndexBranchRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation passes with empty data', function () {
@@ -40,7 +40,7 @@ describe('IndexBranchRequest', function () {
 
         $validator = validator($data, (new IndexBranchRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with invalid sort_by', function () {
@@ -96,7 +96,7 @@ describe('IndexBranchRequest', function () {
 
             $validator = validator($data, (new IndexBranchRequest)->rules());
 
-            expect($validator->passes())->toBeTrue();
+            expect(!$validator->fails())->toBeTrue();
         }
     });
 
@@ -108,7 +108,7 @@ describe('IndexBranchRequest', function () {
 
             $validator = validator($data, (new IndexBranchRequest)->rules());
 
-            expect($validator->passes())->toBeTrue();
+            expect(!$validator->fails())->toBeTrue();
         }
     });
 });

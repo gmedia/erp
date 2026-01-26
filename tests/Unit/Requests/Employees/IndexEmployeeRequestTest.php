@@ -50,7 +50,7 @@ describe('IndexEmployeeRequest', function () {
 
         $validator = validator($data, (new IndexEmployeeRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation passes with empty data', function () {
@@ -58,7 +58,7 @@ describe('IndexEmployeeRequest', function () {
 
         $validator = validator($data, (new IndexEmployeeRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with invalid sort_by', function () {
@@ -150,7 +150,7 @@ describe('IndexEmployeeRequest', function () {
 
             $validator = validator($data, (new IndexEmployeeRequest)->rules());
 
-            expect($validator->passes())->toBeTrue();
+            expect(!$validator->fails())->toBeTrue();
         }
     });
 
@@ -162,7 +162,7 @@ describe('IndexEmployeeRequest', function () {
 
             $validator = validator($data, (new IndexEmployeeRequest)->rules());
 
-            expect($validator->passes())->toBeTrue();
+            expect(!$validator->fails())->toBeTrue();
         }
     });
 
@@ -174,7 +174,7 @@ describe('IndexEmployeeRequest', function () {
 
         $validator = validator($data, (new IndexEmployeeRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 
     test('rules validation passes with valid hire_date range', function () {
@@ -185,6 +185,6 @@ describe('IndexEmployeeRequest', function () {
 
         $validator = validator($data, (new IndexEmployeeRequest)->rules());
 
-        expect($validator->passes())->toBeTrue();
+        expect(!$validator->fails())->toBeTrue();
     });
 });
