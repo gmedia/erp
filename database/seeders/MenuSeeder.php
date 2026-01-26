@@ -82,6 +82,14 @@ class MenuSeeder extends Seeder
                         'url' => 'supplier-categories',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'customer.category',
+                        'display_name' => 'Customer Category',
+                        'permissions' => ['customer.category', 'customer.category.create', 'customer.category.edit', 'customer.category.delete'],
+                        'icon' => 'LayoutList',
+                        'url' => 'customer-categories',
+                        'child' => [],
+                    ],
                 ],
             ],
             [

@@ -25,3 +25,6 @@ sleep 60
 
 # Generate ide helper
 ./vendor/bin/sail artisan ide-helper:generate
+
+# Running Vite server
+./vendor/bin/sail npm run dev

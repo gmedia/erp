@@ -160,6 +160,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'customer_category',
+                'display_name' => 'Customer Category',
+                'child' => [
+                    [
+                        'name' => 'customer_category.create',
+                        'display_name' => 'Create Customer Category',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'customer_category.edit',
+                        'display_name' => 'Edit Customer Category',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'customer_category.delete',
+                        'display_name' => 'Delete Customer Category',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],
