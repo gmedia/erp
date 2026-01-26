@@ -27,6 +27,7 @@ describe('StoreEmployeeRequest', function () {
             'phone',
             'department',
             'position',
+            'branch',
             'salary',
             'hire_date'
         ]);
@@ -42,6 +43,7 @@ describe('StoreEmployeeRequest', function () {
             'phone' => '555-1234',
             'department' => $department->id,
             'position' => $position->id,
+            'branch' => \App\Models\Branch::factory()->create()->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];
@@ -61,6 +63,7 @@ describe('StoreEmployeeRequest', function () {
             ->and($validator->errors()->has('email'))->toBeTrue()
             ->and($validator->errors()->has('department'))->toBeTrue()
             ->and($validator->errors()->has('position'))->toBeTrue()
+            ->and($validator->errors()->has('branch'))->toBeTrue()
             ->and($validator->errors()->has('salary'))->toBeTrue()
             ->and($validator->errors()->has('hire_date'))->toBeTrue();
     });
@@ -160,52 +163,17 @@ describe('StoreEmployeeRequest', function () {
             ->and($validator->errors()->has('hire_date'))->toBeTrue();
     });
 
-    test('rules validation passes with phone field', function () {
+    test('rules validation passes with valid branch id', function () {
         $department = Department::factory()->create();
         $position = Position::factory()->create();
-
-        $data = [
-            'name' => 'John Doe',
-            'email' => 'john.doe@example.com',
-            'phone' => '555-1234',
-            'department' => $department->id,
-            'position' => $position->id,
-            'salary' => '75000.00',
-            'hire_date' => '2023-01-15',
-        ];
-
-        $validator = validator($data, (new StoreEmployeeRequest)->rules());
-
-        expect(!$validator->fails())->toBeTrue();
-    });
-
-    test('rules validation passes without phone field', function () {
-        $department = Department::factory()->create();
-        $position = Position::factory()->create();
+        $branch = \App\Models\Branch::factory()->create();
 
         $data = [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'department' => $department->id,
             'position' => $position->id,
-            'salary' => '75000.00',
-            'hire_date' => '2023-01-15',
-        ];
-
-        $validator = validator($data, (new StoreEmployeeRequest)->rules());
-
-        expect(!$validator->fails())->toBeTrue();
-    });
-
-    test('rules validation passes with valid department id', function () {
-        $department = Department::factory()->create();
-        $position = Position::factory()->create();
-
-        $data = [
-            'name' => 'John Doe',
-            'email' => 'john.doe@example.com',
-            'department' => $department->id,
-            'position' => $position->id,
+            'branch' => $branch->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];

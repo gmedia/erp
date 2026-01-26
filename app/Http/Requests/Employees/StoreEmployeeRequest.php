@@ -25,6 +25,7 @@ class StoreEmployeeRequest extends FormRequest
             'phone' => 'nullable|string|max:20',
             'department' => 'required|exists:departments,id',
             'position' => 'required|exists:positions,id',
+            'branch' => 'required|exists:branches,id',
             'salary' => 'required|numeric|min:0',
             'hire_date' => 'required|date',
         ];
@@ -50,6 +51,11 @@ class StoreEmployeeRequest extends FormRequest
         if (isset($validated['position'])) {
             $validated['position_id'] = $validated['position'];
             unset($validated['position']);
+        }
+
+        if (isset($validated['branch'])) {
+            $validated['branch_id'] = $validated['branch'];
+            unset($validated['branch']);
         }
 
         return $validated;

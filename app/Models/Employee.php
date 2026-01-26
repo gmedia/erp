@@ -72,6 +72,7 @@ class Employee extends Model
         'phone',
         'department_id',
         'position_id',
+        'branch_id',
         'user_id',
         'salary',
         'hire_date',
@@ -115,6 +116,11 @@ class Employee extends Model
     public function position()
     {
         return $this->belongsTo(Position::class);
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     public function user()

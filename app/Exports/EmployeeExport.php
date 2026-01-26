@@ -22,7 +22,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
 
     public function query(): Builder
     {
-        $query = Employee::query()->with(['department', 'position']);
+        $query = Employee::query()->with(['department', 'position', 'branch']);
 
         // Apply search filter
         if (! empty($this->filters['search'])) {
@@ -42,6 +42,11 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         // Apply position filter (by position_id)
         if (! empty($this->filters['position'])) {
             $query->where('position_id', $this->filters['position']);
+        }
+
+        // Apply branch filter (by branch_id)
+        if (! empty($this->filters['branch'])) {
+            $query->where('branch_id', $this->filters['branch']);
         }
 
         // Apply salary range filters
@@ -84,6 +89,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             'Phone',
             'Department',
             'Position',
+            'Branch',
             'Salary',
             'Hire Date',
             'Created At',
@@ -99,6 +105,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             $employee->phone,
             $employee->department?->name,
             $employee->position?->name,
+            $employee->branch?->name,
             $employee->salary,
             $employee->hire_date->format('Y-m-d'),
             $employee->created_at->format('Y-m-d H:i:s'),

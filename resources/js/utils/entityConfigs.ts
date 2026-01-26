@@ -208,6 +208,7 @@ export const employeeConfig = createComplexEntityConfig({
         search: '',
         department: '',
         position: '',
+        branch: '',
     },
     columns: employeeColumns,
     filterFields: createEmployeeFilterFields(),

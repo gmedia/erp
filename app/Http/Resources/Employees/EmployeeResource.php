@@ -31,6 +31,10 @@ class EmployeeResource extends JsonResource
                 'id' => $this->resource->position_id,
                 'name' => $this->resource->position?->name,
             ],
+            'branch' => [
+                'id' => $this->resource->branch_id,
+                'name' => $this->resource->branch?->name,
+            ],
             'salary' => (string) $this->resource->salary,
             'hire_date' => $this->resource->hire_date->toIso8601String(),
             'created_at' => $this->resource->created_at ? $this->resource->created_at->toIso8601String() : null,

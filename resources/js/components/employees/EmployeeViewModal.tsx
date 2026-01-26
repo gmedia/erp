@@ -40,6 +40,11 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
                 ? item.position.name
                 : item.position;
 
+        const branchName =
+            typeof item.branch === 'object'
+                ? item.branch.name
+                : item.branch;
+
         return (
             <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
                 <DialogContent className="sm:max-w-[425px]">
@@ -56,6 +61,7 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
                         {/* Work Info Section */}
                         <ViewField label="Department" value={departmentName} />
                         <ViewField label="Position" value={positionName} />
+                        <ViewField label="Branch" value={branchName} />
                         <ViewField
                             label="Salary"
                             value={formatCurrency(item.salary)}

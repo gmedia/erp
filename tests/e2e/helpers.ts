@@ -150,6 +150,7 @@ export async function createEmployee(
     salary: string;
     department: string;
     position: string;
+    branch: string;
   }> = {}
 ): Promise<string> {
   const timestamp = Date.now();
@@ -165,6 +166,7 @@ export async function createEmployee(
       { name: 'salary', type: 'text', defaultValue: '5000' },
       { name: 'department', type: 'select', selector: 'Select a department', defaultValue: 'Engineering' },
       { name: 'position', type: 'select', selector: 'Select a position', defaultValue: 'Senior Developer' },
+      { name: 'branch', type: 'select', selector: 'Select a branch', defaultValue: 'Head Office' },
     ],
   };
 

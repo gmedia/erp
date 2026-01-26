@@ -22,5 +22,11 @@ export function createEmployeeFilterFields(): FieldDescriptor[] {
             '/api/positions',
             'Select a position',
         ),
+        createAsyncSelectFilterField(
+            'branch',
+            'Branch',
+            '/api/branches',
+            'Select a branch',
+        ),
     ];
 }

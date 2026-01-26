@@ -31,6 +31,14 @@ const renderPositionCell = ({ row }: { row: { original: Employee } }) => {
     return <div>{typeof val === 'object' ? val.name : val}</div>;
 };
 
+/**
+ * Cell renderer for branch column - handles both object and string values
+ */
+const renderBranchCell = ({ row }: { row: { original: Employee } }) => {
+    const val = row.original.branch;
+    return <div>{typeof val === 'object' ? val.name : val}</div>;
+};
+
 export const employeeColumns: ColumnDef<Employee>[] = [
     createSelectColumn<Employee>(),
     createTextColumn<Employee>({ accessorKey: 'name', label: 'Name' }),
@@ -45,6 +53,11 @@ export const employeeColumns: ColumnDef<Employee>[] = [
         accessorKey: 'position',
         ...createSortingHeader('Position'),
         cell: renderPositionCell,
+    },
+    {
+        accessorKey: 'branch',
+        ...createSortingHeader('Branch'),
+        cell: renderBranchCell,
     },
     createCurrencyColumn<Employee>({ accessorKey: 'salary', label: 'Salary' }),
     createDateColumn<Employee>({

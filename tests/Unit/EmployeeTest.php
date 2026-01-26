@@ -18,6 +18,7 @@ test('factory creates a valid employee', function () {
         'phone' => $employee->phone,
         'department_id' => $employee->department_id,
         'position_id' => $employee->position_id,
+        'branch_id' => $employee->branch_id,
         'salary' => $employee->salary,
         'hire_date' => $employee->hire_date,
     ]);
@@ -46,6 +47,7 @@ test('fillable attributes are defined correctly', function () {
         'phone',
         'department_id',
         'position_id',
+        'branch_id',
         'user_id',
         'salary',
         'hire_date',

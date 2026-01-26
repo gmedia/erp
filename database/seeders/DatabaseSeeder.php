@@ -51,6 +51,7 @@ class DatabaseSeeder extends Seeder
             'phone' => '1234567890',
             'department_id' => 1,
             'position_id' => 1,
+            'branch_id' => 1,
             'salary' => 100000,
             'hire_date' => now(),
         ]);

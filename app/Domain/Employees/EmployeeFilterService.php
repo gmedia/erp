@@ -32,6 +32,11 @@ class EmployeeFilterService
             $query->where('position_id', $filters['position_id']);
         }
 
+        // Branch filter (by foreign key)
+        if (! empty($filters['branch_id'])) {
+            $query->where('branch_id', $filters['branch_id']);
+        }
+
         // Salary range filtering
         if (! empty($filters['salary_min'])) {
             $query->where('salary', '>=', $filters['salary_min']);

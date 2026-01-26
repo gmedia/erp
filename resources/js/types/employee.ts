@@ -6,6 +6,7 @@ export interface Employee extends BaseEntity {
     phone: string;
     department: { id: number; name: string } | string;
     position: { id: number; name: string } | string;
+    branch: { id: number; name: string } | string;
     salary: string;
     hire_date: string;
 }
@@ -16,6 +17,7 @@ export interface EmployeeFormData {
     phone: string;
     department: string;
     position: string;
+    branch: string;
     salary: string;
     hire_date: Date;
 }

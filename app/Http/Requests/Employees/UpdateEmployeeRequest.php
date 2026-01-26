@@ -35,6 +35,7 @@ class UpdateEmployeeRequest extends FormRequest
             'phone' => ['sometimes', 'nullable', 'string', 'max:20'],
             'department' => ['sometimes', 'exists:departments,id'],
             'position' => ['sometimes', 'exists:positions,id'],
+            'branch' => ['sometimes', 'exists:branches,id'],
             'salary' => ['sometimes', 'numeric', 'min:0'],
             'hire_date' => ['sometimes', 'date'],
         ];
@@ -60,6 +61,11 @@ class UpdateEmployeeRequest extends FormRequest
         if (isset($validated['position'])) {
             $validated['position_id'] = $validated['position'];
             unset($validated['position']);
+        }
+
+        if (isset($validated['branch'])) {
+            $validated['branch_id'] = $validated['branch'];
+            unset($validated['branch']);
         }
 
         return $validated;

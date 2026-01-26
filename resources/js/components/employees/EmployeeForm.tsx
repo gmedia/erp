@@ -55,6 +55,12 @@ const renderEmployeeWorkInfoSection = () => (
             url="/api/positions"
             placeholder="Select a position"
         />
+        <AsyncSelectField
+            name="branch"
+            label="Branch"
+            url="/api/branches"
+            placeholder="Select a branch"
+        />
         <InputField
             name="salary"
             label="Salary"
@@ -88,6 +94,7 @@ const getEmployeeFormDefaults = (
             phone: '',
             department: '',
             position: '',
+            branch: '',
             salary: '',
             hire_date: new Date(),
         };
@@ -105,6 +112,10 @@ const getEmployeeFormDefaults = (
             typeof employee.position === 'object'
                 ? String(employee.position.id)
                 : employee.position,
+        branch:
+            typeof employee.branch === 'object'
+                ? String(employee.branch.id)
+                : employee.branch,
         salary: employee.salary,
         hire_date: new Date(employee.hire_date),
     };

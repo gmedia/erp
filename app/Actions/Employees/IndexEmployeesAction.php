@@ -20,16 +20,16 @@ class IndexEmployeesAction
     {
         ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 
-        $query = Employee::query()->with(['department', 'position']);
+        $query = Employee::query()->with(['department', 'position', 'branch']);
 
         // Search functionality - search across name, email, phone
         if ($request->filled('search')) {
             $this->filterService->applySearch($query, $request->get('search'), ['name', 'email', 'phone']);
         } else {
-            // Apply department and position filters only when no search term is provided
             $this->filterService->applyAdvancedFilters($query, [
                 'department_id' => $request->get('department'),
                 'position_id' => $request->get('position'),
+                'branch_id' => $request->get('branch'),
             ]);
         }
 
@@ -45,7 +45,7 @@ class IndexEmployeesAction
             $query,
             $request->get('sort_by', 'created_at'),
             strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'name', 'email', 'phone', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']
+            ['id', 'name', 'email', 'phone', 'department_id', 'position_id', 'branch_id', 'salary', 'hire_date', 'created_at', 'updated_at']
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);

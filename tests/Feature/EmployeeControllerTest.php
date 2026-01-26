@@ -61,6 +61,7 @@ describe('Employee API Endpoints', function () {
                         'phone',
                         'department' => ['id', 'name'],
                         'position' => ['id', 'name'],
+                        'branch' => ['id', 'name'],
                         'salary',
                         'hire_date',
                         'created_at',
@@ -133,6 +134,7 @@ describe('Employee API Endpoints', function () {
     test('store creates employee with valid data and returns 201 status', function () {
         $department = Department::factory()->create();
         $position = Position::factory()->create();
+        $branch = \App\Models\Branch::factory()->create();
 
         $employeeData = [
             'name' => 'John Doe',
@@ -140,6 +142,7 @@ describe('Employee API Endpoints', function () {
             'phone' => '555-1234',
             'department' => $department->id,
             'position' => $position->id,
+            'branch' => $branch->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];
@@ -155,6 +158,7 @@ describe('Employee API Endpoints', function () {
                     'phone',
                     'department',
                     'position',
+                    'branch',
                     'salary',
                     'hire_date',
                     'created_at',
@@ -168,11 +172,14 @@ describe('Employee API Endpoints', function () {
                     'id' => $department->id,
                     'name' => $department->name,
                 ],
-            ]);
+            ])
+            ->assertJsonPath('data.name', 'John Doe')
+            ->assertJsonPath('data.branch.id', $branch->id);
 
         assertDatabaseHas('employees', [
+            'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'name' => 'John Doe'
+            'branch_id' => $branch->id,
         ]);
     });
 
@@ -185,6 +192,7 @@ describe('Employee API Endpoints', function () {
                 'email',
                 'department',
                 'position',
+                'branch',
                 'salary',
                 'hire_date'
             ]);
@@ -194,12 +202,14 @@ describe('Employee API Endpoints', function () {
         Employee::factory()->create(['email' => 'existing@example.com']);
         $department = Department::factory()->create();
         $position = Position::factory()->create();
+        $branch = \App\Models\Branch::factory()->create();
 
         $response = postJson('/api/employees', [
             'name' => 'New Employee',
             'email' => 'existing@example.com',
             'department' => $department->id,
             'position' => $position->id,
+            'branch' => $branch->id,
             'salary' => '50000.00',
             'hire_date' => '2023-01-01',
         ]);
@@ -222,6 +232,7 @@ describe('Employee API Endpoints', function () {
                     'phone',
                     'department',
                     'position',
+                    'branch',
                     'salary',
                     'hire_date',
                     'created_at',
@@ -244,17 +255,21 @@ describe('Employee API Endpoints', function () {
     test('update modifies employee and returns updated resource', function () {
         $department = Department::factory()->create();
         $position = Position::factory()->create(['name' => 'Junior Developer']);
+        $branch = \App\Models\Branch::factory()->create();
         $employee = Employee::factory()->create([
             'name' => 'Old Name',
             'department_id' => $department->id,
             'position_id' => $position->id,
+            'branch_id' => $branch->id,
         ]);
 
         $newPosition = Position::factory()->create(['name' => 'Senior Developer']);
+        $newBranch = \App\Models\Branch::factory()->create(['name' => 'New Branch']);
 
         $updateData = [
             'name' => 'Updated Name',
-            'position' => $newPosition->id
+            'position' => $newPosition->id,
+            'branch' => $newBranch->id,
         ];
 
         $response = putJson("/api/employees/{$employee->id}", $updateData);
@@ -268,6 +283,7 @@ describe('Employee API Endpoints', function () {
                     'phone',
                     'department',
                     'position',
+                    'branch',
                     'salary',
                     'hire_date',
                     'created_at',
@@ -280,11 +296,16 @@ describe('Employee API Endpoints', function () {
                     'id' => $newPosition->id,
                     'name' => $newPosition->name,
                 ],
+                'branch' => [
+                    'id' => $newBranch->id,
+                    'name' => $newBranch->name,
+                ],
             ]);
 
         $employee->refresh();
         expect($employee->name)->toBe('Updated Name')
-            ->and($employee->position_id)->toBe($newPosition->id);
+            ->and($employee->position_id)->toBe($newPosition->id)
+            ->and($employee->branch_id)->toBe($newBranch->id);
     });
 
     test('update validates fields when provided with invalid data', function () {
@@ -294,6 +315,7 @@ describe('Employee API Endpoints', function () {
             'name' => '', // Empty name
             'email' => 'invalid-email', // Invalid email format
             'department' => 'invalid-dept', // Invalid department
+            'branch' => 'invalid-branch', // Invalid branch
             'salary' => '-100', // Negative salary
             'hire_date' => 'invalid-date', // Invalid date
         ]);
@@ -303,6 +325,7 @@ describe('Employee API Endpoints', function () {
                 'name',
                 'email',
                 'department',
+                'branch',
                 'salary',
                 'hire_date'
             ]);
@@ -312,12 +335,14 @@ describe('Employee API Endpoints', function () {
         $employee = Employee::factory()->create(['email' => 'john@example.com']);
         $department = Department::factory()->create();
         $position = Position::factory()->create();
+        $branch = \App\Models\Branch::factory()->create();
 
         $response = putJson("/api/employees/{$employee->id}", [
             'name' => 'Updated Name',
             'email' => 'john@example.com', // Same email should be allowed
             'department' => $department->id,
             'position' => $position->id,
+            'branch' => $branch->id,
             'salary' => '60000.00',
             'hire_date' => '2023-01-01',
         ]);
@@ -328,12 +353,14 @@ describe('Employee API Endpoints', function () {
     test('update returns 404 for non-existent employee', function () {
         $department = Department::factory()->create();
         $position = Position::factory()->create();
+        $branch = \App\Models\Branch::factory()->create();
 
         $response = putJson('/api/employees/99999', [
             'name' => 'Test Employee',
             'email' => 'test@example.com',
             'department' => $department->id,
             'position' => $position->id,
+            'branch' => $branch->id,
             'salary' => '50000.00',
             'hire_date' => '2023-01-01',
         ]);
@@ -380,14 +407,17 @@ describe('Employee API Endpoints', function () {
         $marketing = Department::factory()->create(['name' => 'Marketing']);
         $developer = Position::factory()->create(['name' => 'Developer']);
         $manager = Position::factory()->create(['name' => 'Manager']);
+        $branchA = \App\Models\Branch::factory()->create(['name' => 'Branch A']);
+        $branchB = \App\Models\Branch::factory()->create(['name' => 'Branch B']);
 
-        Employee::factory()->create(['department_id' => $engineering->id, 'position_id' => $developer->id]);
-        Employee::factory()->create(['department_id' => $marketing->id, 'position_id' => $manager->id]);
-        Employee::factory()->create(['position_id' => $manager->id]);
+        Employee::factory()->create(['department_id' => $engineering->id, 'position_id' => $developer->id, 'branch_id' => $branchA->id]);
+        Employee::factory()->create(['department_id' => $marketing->id, 'position_id' => $manager->id, 'branch_id' => $branchB->id]);
+        Employee::factory()->create(['position_id' => $manager->id, 'branch_id' => $branchA->id]);
 
         $response = postJson('/api/employees/export', [
             'department' => $engineering->id,
-            'position' => $developer->id
+            'position' => $developer->id,
+            'branch' => $branchA->id,
         ]);
 
         $response->assertOk();
@@ -406,12 +436,14 @@ describe('Employee API Permission Tests', function () {
 
         $department = Department::factory()->create();
         $position = Position::factory()->create();
+        $branch = \App\Models\Branch::factory()->create();
 
         $response = postJson('/api/employees', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'department' => $department->id,
             'position' => $position->id,
+            'branch' => $branch->id,
             'salary' => '50000.00',
             'hire_date' => '2023-01-01',
         ]);

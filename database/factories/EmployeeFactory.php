@@ -31,6 +31,7 @@ class EmployeeFactory extends Factory
             'phone' => $this->faker->optional()->phoneNumber(),
             'department_id' => Department::factory(),
             'position_id' => Position::factory(),
+            'branch_id' => \App\Models\Branch::factory(),
             'user_id' => User::factory(),
             // Two‑decimal salary between 30 000 and 150 000
             'salary' => $this->faker->randomFloat(2, 30000, 150000),

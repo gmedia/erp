@@ -20,6 +20,7 @@ test('execute returns paginated employees without filters', function () {
     $request->shouldReceive('get')->with('search')->andReturn(null);
     $request->shouldReceive('get')->with('department')->andReturn(null);
     $request->shouldReceive('get')->with('position')->andReturn(null);
+    $request->shouldReceive('get')->with('branch')->andReturn(null);
     $request->shouldReceive('get')->with('salary_min')->andReturn(null);
     $request->shouldReceive('get')->with('salary_max')->andReturn(null);
     $request->shouldReceive('get')->with('hire_date_from')->andReturn(null);
@@ -37,7 +38,7 @@ test('execute returns paginated employees without filters', function () {
     $filterService->shouldReceive('applySorting')
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
-            ['id', 'name', 'email', 'phone', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']);
+            ['id', 'name', 'email', 'phone', 'department_id', 'position_id', 'branch_id', 'salary', 'hire_date', 'created_at', 'updated_at']);
 
     $result = $action->execute($request);
 
@@ -83,7 +84,7 @@ test('execute applies search filter when provided', function () {
     $filterService->shouldReceive('applySorting')
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
-            ['id', 'name', 'email', 'phone', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']);
+            ['id', 'name', 'email', 'phone', 'department_id', 'position_id', 'branch_id', 'salary', 'hire_date', 'created_at', 'updated_at']);
 
     $result = $action->execute($request);
 
@@ -102,6 +103,7 @@ test('execute applies advanced filters when no search provided', function () {
     $request->shouldReceive('get')->with('search')->andReturn(null);
     $request->shouldReceive('get')->with('department')->andReturn(1);
     $request->shouldReceive('get')->with('position')->andReturn(2);
+    $request->shouldReceive('get')->with('branch')->andReturn(3);
     $request->shouldReceive('get')->with('salary_min')->andReturn(50000);
     $request->shouldReceive('get')->with('salary_max')->andReturn(80000);
     $request->shouldReceive('get')->with('hire_date_from')->andReturn('2023-01-01');
@@ -117,6 +119,7 @@ test('execute applies advanced filters when no search provided', function () {
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), [
             'department_id' => 1,
             'position_id' => 2,
+            'branch_id' => 3,
         ]);
 
     $filterService->shouldReceive('applyAdvancedFilters')
@@ -131,7 +134,7 @@ test('execute applies advanced filters when no search provided', function () {
     $filterService->shouldReceive('applySorting')
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
-            ['id', 'name', 'email', 'phone', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']);
+            ['id', 'name', 'email', 'phone', 'department_id', 'position_id', 'branch_id', 'salary', 'hire_date', 'created_at', 'updated_at']);
 
     $result = $action->execute($request);
 

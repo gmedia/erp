@@ -19,6 +19,7 @@ export const employeeFormSchema = z.object({
         }),
     department: z.string().min(1, { message: 'Department is required.' }),
     position: z.string().min(1, { message: 'Position is required.' }),
+    branch: z.string().min(1, { message: 'Branch is required.' }),
     salary: z
         .string()
         .min(1, { message: 'Salary is required.' })
