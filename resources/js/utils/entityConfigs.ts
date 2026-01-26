@@ -273,3 +273,10 @@ export const supplierCategoryConfig = createSimpleEntityConfig({
     apiBase: 'supplier-categories',
     filterPlaceholder: 'Search supplier categories...',
 });
+
+export const customerCategoryConfig = createSimpleEntityConfig({
+    entityName: 'Customer Category',
+    entityNamePlural: 'Customer Categories',
+    apiBase: 'customer-categories',
+    filterPlaceholder: 'Search customer categories...',
+});

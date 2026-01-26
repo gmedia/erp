@@ -922,3 +922,93 @@ export async function editSupplierCategory(
   await updateBtn.click();
 }
 
+// ---------------------------------------------------
+// Customer Category helpers
+// ---------------------------------------------------
+
+/**
+ * Create a new customer category via the UI.
+ *
+ * @param page - Playwright Page object.
+ * @param overrides - Optional fields to override the default values.
+ * @returns The unique name used for the created customer category.
+ */
+export async function createCustomerCategory(
+  page: Page,
+  overrides: Partial<{
+    name: string;
+  }> = {}
+): Promise<string> {
+  const timestamp = Date.now();
+  const defaultName = `${Math.random().toString(36).substring(2, 7)}${timestamp}`;
+
+  const config: EntityConfig = {
+    route: '/customer-categories',
+    returnField: 'name',
+    fields: [
+      { name: 'name', type: 'text', defaultValue: defaultName },
+    ],
+  };
+
+  return createEntity(page, config, overrides);
+}
+
+/**
+ * Search for a customer category by name.
+ *
+ * @param page - Playwright Page object.
+ * @param name - Customer Category name to search for.
+ */
+export async function searchCustomerCategory(
+  page: Page,
+  name: string
+): Promise<void> {
+  await page.fill('input[placeholder="Search customer categories..."]', name);
+  await page.press('input[placeholder="Search customer categories..."]', 'Enter');
+  // Wait for the row containing the name to appear
+  await page.waitForSelector(`text=${name}`);
+}
+
+/**
+ * Edit an existing customer category via the UI.
+ *
+ * @param page - Playwright Page object.
+ * @param name - Current customer category name to locate.
+ * @param updates - Fields to update (currently only name is supported).
+ */
+export async function editCustomerCategory(
+  page: Page,
+  name: string,
+  updates: { name?: string }
+): Promise<void> {
+  // Locate the customer category first
+  await searchCustomerCategory(page, name);
+
+  // Locate the row and open the Actions menu
+  const row = page.locator('tr', { hasText: name }).first();
+  await expect(row).toBeVisible();
+  await row.waitFor({ state: 'attached' });
+  const actionsBtn = row.getByRole('button', { name: /Actions/i });
+  await expect(actionsBtn).toBeVisible();
+  await actionsBtn.click({ force: true });
+
+  // Click the Edit menu item
+  const editItem = page.getByRole('menuitem', { name: /Edit/i });
+  await expect(editItem).toBeVisible();
+  await editItem.click({ force: true });
+
+  // Update fields if provided
+  if (updates.name) {
+    await page.fill('input[name="name"]', updates.name);
+  }
+
+  // Submit the edit dialog
+  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
+    state: 'detached',
+  });
+  const dialog = page.getByRole('dialog');
+  const updateBtn = dialog.getByRole('button', { name: /Update/ });
+  await expect(updateBtn).toBeVisible();
+  await updateBtn.click();
+}
+
