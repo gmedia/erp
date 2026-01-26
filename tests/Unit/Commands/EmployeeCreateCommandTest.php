@@ -148,3 +148,22 @@ test('generateUniqueEmail uses fallback mechanism when max attempts reached', fu
     expect($email)->not->toBe('existing@example.com');
 });
 
+test('command creates user and links to employee', function () {
+    // Generate required departments and positions strictly
+    $department = \App\Models\Department::create(['name' => 'Engineering']);
+    \App\Models\Position::create(['name' => 'Software Engineer']);
+
+    Artisan::call('employee:create', ['count' => 1]);
+
+    $employee = Employee::first();
+
+    expect($employee)->not->toBeNull();
+    expect($employee->user_id)->not->toBeNull();
+
+    $user = \App\Models\User::find($employee->user_id);
+
+    expect($user)->not->toBeNull();
+    expect($user->email)->toBe($employee->email);
+    expect($user->name)->toBe($employee->name);
+});
+

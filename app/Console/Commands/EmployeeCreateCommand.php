@@ -121,12 +121,22 @@ class EmployeeCreateCommand extends Command
                     // Generate hire date within last 5 years
                     $hireDate = $faker->dateTimeBetween('-5 years', 'now');
 
+                    $name = $faker->name;
+
+                    // Create User
+                    $user = \App\Models\User::create([
+                        'name' => $name,
+                        'email' => $email,
+                        'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                    ]);
+
                     Employee::create([
-                        'name' => $faker->name,
+                        'name' => $name,
                         'email' => $email,
                         'phone' => $faker->optional()->phoneNumber,
                         'department_id' => $department->id,
                         'position_id' => $position->id,
+                        'user_id' => $user->id,
                         'salary' => $salary,
                         'hire_date' => $hireDate->format('Y-m-d'),
                     ]);
