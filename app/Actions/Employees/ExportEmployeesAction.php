@@ -25,6 +25,7 @@ class ExportEmployeesAction
             'search' => $validated['search'] ?? null,
             'department' => $validated['department'] ?? null,
             'position' => $validated['position'] ?? null,
+            'branch' => $validated['branch'] ?? null,
             'sort_by' => $validated['sort_by'] ?? 'created_at',
             'sort_direction' => $validated['sort_direction'] ?? 'desc',
         ];

@@ -23,6 +23,7 @@ class ExportEmployeeRequest extends FormRequest
             'search' => ['nullable', 'string'],
             'department' => ['nullable', 'integer', 'exists:departments,id'],
             'position' => ['nullable', 'integer', 'exists:positions,id'],
+            'branch' => ['nullable', 'integer', 'exists:branches,id'],
             'sort_by' => ['nullable', 'string', 'in:id,name,email,department_id,position_id,salary,hire_date,created_at,updated_at'],
             'sort_direction' => ['nullable', 'in:asc,desc'],
         ];
