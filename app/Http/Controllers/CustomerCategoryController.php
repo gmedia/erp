@@ -13,7 +13,6 @@ use App\Http\Resources\CustomerCategories\CustomerCategoryCollection;
 use App\Http\Resources\CustomerCategories\CustomerCategoryResource;
 use App\Models\CustomerCategory;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
 use Inertia\Response;
 
 class CustomerCategoryController extends Controller
@@ -22,16 +21,13 @@ class CustomerCategoryController extends Controller
      * Display a listing of the customer categories.
      *
      * @param  \App\Http\Requests\CustomerCategories\IndexCustomerCategoryRequest  $request
-     * @return \Inertia\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index(IndexCustomerCategoryRequest $request): Response
+    public function index(IndexCustomerCategoryRequest $request): JsonResponse
     {
         $categories = (new IndexCustomerCategoriesAction(app(CustomerCategoryFilterService::class)))->execute($request);
 
-        return Inertia::render('customer-categories/index', [
-            'categories' => new CustomerCategoryCollection($categories),
-            'filters' => $request->only(['search', 'sort_by', 'sort_direction']),
-        ]);
+        return (new CustomerCategoryCollection($categories))->response();
     }
 
     /**
