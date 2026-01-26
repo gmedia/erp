@@ -515,7 +515,7 @@ export async function createCustomer(
     phone: string;
     address: string;
     branch: string;
-    customer_type: string;
+    category: string;
     status: string;
     notes: string;
   }> = {}
@@ -556,11 +556,17 @@ export async function createCustomer(
   }
   await page.getByRole('option', { name: branchName }).click();
   
-  // Select customer type (SelectField)
-  const customerTypeTrigger = dialog.locator('button').filter({ hasText: /Select customer type|Individual|Company/i });
-  await customerTypeTrigger.click();
-  const customerType = overrides.customer_type ?? 'Individual';
-  await page.getByRole('option', { name: customerType, exact: true }).click();
+  // Select category (AsyncSelectField)
+  const categoryTrigger = dialog.locator('button').filter({ hasText: /Select a category/i });
+  await categoryTrigger.click();
+  const categorySearchInput = page.getByPlaceholder('Search...');
+  const categoryName = overrides.category ?? 'Retail';
+  if (await categorySearchInput.isVisible()) {
+    await categorySearchInput.fill(categoryName);
+    // Wait for the option to be stable and visible before clicking
+    await expect(page.getByRole('option', { name: categoryName })).toBeVisible();
+  }
+  await page.getByRole('option', { name: categoryName }).click();
   
   // Select status (SelectField)
   const statusTrigger = dialog.locator('button').filter({ hasText: /Select status|Active|Inactive/i });
