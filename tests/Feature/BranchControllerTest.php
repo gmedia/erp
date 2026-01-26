@@ -46,7 +46,7 @@ describe('Branch API Endpoints', function () {
     });
 
     test('index returns paginated branches with proper meta structure', function () {
-        Branch::factory()->count(25)->create();
+        Branch::factory()->count(24)->create();
 
         $response = getJson('/api/branches?per_page=10');
 
