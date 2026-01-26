@@ -112,7 +112,7 @@ class EmployeeController extends Controller
      */
     public function permissions(Employee $employee): JsonResponse
     {
-        return response()->json($employee->permissions()->pluck('id'));
+        return response()->json($employee->permissions()->pluck('permissions.id'));
     }
 
     /**
