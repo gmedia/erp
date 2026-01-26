@@ -33,8 +33,8 @@ class SupplierExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         }
 
         // Apply branch filter (by branch_id)
-        if (!empty($this->filters['branch'])) {
-            $query->where('branch_id', $this->filters['branch']);
+        if (!empty($this->filters['branch_id'])) {
+            $query->where('branch_id', $this->filters['branch_id']);
         }
 
         // Apply category filter

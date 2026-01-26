@@ -29,7 +29,7 @@ describe('SupplierExport', function () {
         Supplier::factory()->create(['branch_id' => $branchA->id]);
         Supplier::factory()->create(['branch_id' => $branchB->id]);
 
-        $export = new SupplierExport(['branch' => $branchA->id]);
+        $export = new SupplierExport(['branch_id' => $branchA->id]);
 
         $results = $export->query()->get();
 
