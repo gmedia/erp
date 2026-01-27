@@ -7,13 +7,9 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 class SimpleCrudCollection extends ResourceCollection
 {
     /**
-     * Transform the resource collection into an array.
+     * The resource that this resource collects.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
+     * @var string
      */
-    public function toArray($request): array
-    {
-        return parent::toArray($request);
-    }
+    public $collects = SimpleCrudResource::class;
 }
