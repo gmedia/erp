@@ -20,8 +20,10 @@ abstract class SimpleCrudStoreRequest extends FormRequest
      */
     public function rules(): array
     {
+        $model = new ($this->getModelClass());
+        
         return [
-            'name' => ['required', 'string', 'max:255', 'unique:' . $this->getModelClass() . ',name'],
+             'name' => ['required', 'string', 'max:255', 'unique:' . $model->getTable() . ',name'],
         ];
     }
 }
