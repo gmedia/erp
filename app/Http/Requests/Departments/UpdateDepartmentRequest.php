@@ -2,37 +2,13 @@
 
 namespace App\Http\Requests\Departments;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use App\Http\Requests\SimpleCrudUpdateRequest;
+use App\Models\Department;
 
-/**
- * @property \App\Models\Department $department
- *
- * @method \Illuminate\Routing\Route route($param = null)
- */
-class UpdateDepartmentRequest extends FormRequest
+class UpdateDepartmentRequest extends SimpleCrudUpdateRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    public function getModelClass(): string
     {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     */
-    public function rules(): array
-    {
-        return [
-            'name' => [
-                'sometimes',
-                'filled',
-                'string',
-                'max:255',
-                Rule::unique('departments', 'name')->ignore($this->route('department')->id),
-            ],
-        ];
+        return Department::class;
     }
 }
