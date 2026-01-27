@@ -14,16 +14,6 @@ describe('StoreDepartmentRequest', function () {
         expect($request->authorize())->toBeTrue();
     });
 
-    test('rules returns validation rules', function () {
-        $request = new StoreDepartmentRequest;
-
-        $rules = $request->rules();
-
-        expect($rules)->toBe([
-            'name' => 'required|string|max:255|unique:departments,name',
-        ]);
-    });
-
     test('rules validation passes with valid data', function () {
         $data = ['name' => 'Engineering Department'];
 
@@ -58,13 +48,6 @@ describe('StoreDepartmentRequest', function () {
 
         expect($validator->fails())->toBeTrue()
             ->and($validator->errors()->has('name'))->toBeTrue();
-    });
-
-    test('rules validation includes unique constraint for name field', function () {
-        $rules = (new StoreDepartmentRequest)->rules();
-
-        // Check that the unique rule is present in the validation rules
-        expect($rules['name'])->toContain('unique:departments,name');
     });
 
     test('rules validation passes with unique name', function () {

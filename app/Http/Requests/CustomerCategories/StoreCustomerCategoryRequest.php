@@ -2,25 +2,13 @@
 
 namespace App\Http\Requests\CustomerCategories;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\SimpleCrudStoreRequest;
+use App\Models\CustomerCategory;
 
-class StoreCustomerCategoryRequest extends FormRequest
+class StoreCustomerCategoryRequest extends SimpleCrudStoreRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    public function getModelClass(): string
     {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     */
-    public function rules(): array
-    {
-        return [
-            'name' => 'required|string|max:255|unique:customer_categories,name',
-        ];
+        return CustomerCategory::class;
     }
 }

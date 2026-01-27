@@ -14,16 +14,6 @@ describe('StoreBranchRequest', function () {
         expect($request->authorize())->toBeTrue();
     });
 
-    test('rules returns validation rules', function () {
-        $request = new StoreBranchRequest;
-
-        $rules = $request->rules();
-
-        expect($rules)->toBe([
-            'name' => 'required|string|max:255|unique:branches,name',
-        ]);
-    });
-
     test('rules validation passes with valid data', function () {
         $data = ['name' => 'Jakarta Branch'];
 
@@ -58,13 +48,6 @@ describe('StoreBranchRequest', function () {
 
         expect($validator->fails())->toBeTrue()
             ->and($validator->errors()->has('name'))->toBeTrue();
-    });
-
-    test('rules validation includes unique constraint for name field', function () {
-        $rules = (new StoreBranchRequest)->rules();
-
-        // Check that the unique rule is present in the validation rules
-        expect($rules['name'])->toContain('unique:branches,name');
     });
 
     test('rules validation passes with unique name', function () {

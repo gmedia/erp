@@ -14,16 +14,6 @@ describe('StorePositionRequest', function () {
         expect($request->authorize())->toBeTrue();
     });
 
-    test('rules returns validation rules', function () {
-        $request = new StorePositionRequest;
-
-        $rules = $request->rules();
-
-        expect($rules)->toBe([
-            'name' => 'required|string|max:255|unique:positions,name',
-        ]);
-    });
-
     test('rules validation passes with valid data', function () {
         $data = ['name' => 'Software Engineer'];
 
@@ -59,14 +49,7 @@ describe('StorePositionRequest', function () {
         expect($validator->fails())->toBeTrue()
             ->and($validator->errors()->has('name'))->toBeTrue();
     });
-
-    test('rules validation includes unique constraint for name field', function () {
-        $rules = (new StorePositionRequest)->rules();
-
-        // Check that the unique rule is present in the validation rules
-        expect($rules['name'])->toContain('unique:positions,name');
-    });
-
+    
     test('rules validation passes with unique name', function () {
         Position::factory()->create(['name' => 'Existing Position']);
 

@@ -14,16 +14,6 @@ describe('StoreCustomerCategoryRequest', function () {
         expect($request->authorize())->toBeTrue();
     });
 
-    test('rules returns validation rules', function () {
-        $request = new StoreCustomerCategoryRequest;
-
-        $rules = $request->rules();
-
-        expect($rules)->toBe([
-            'name' => 'required|string|max:255|unique:customer_categories,name',
-        ]);
-    });
-
     test('rules validation passes with valid data', function () {
         $data = ['name' => 'Engineering Category'];
 
@@ -58,13 +48,6 @@ describe('StoreCustomerCategoryRequest', function () {
 
         expect($validator->fails())->toBeTrue()
             ->and($validator->errors()->has('name'))->toBeTrue();
-    });
-
-    test('rules validation includes unique constraint for name field', function () {
-        $rules = (new StoreCustomerCategoryRequest)->rules();
-
-        // Check that the unique rule is present in the validation rules
-        expect($rules['name'])->toContain('unique:customer_categories,name');
     });
 
     test('rules validation passes with unique name', function () {

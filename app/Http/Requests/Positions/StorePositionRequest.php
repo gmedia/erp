@@ -2,25 +2,13 @@
 
 namespace App\Http\Requests\Positions;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Position;
+use App\Http\Requests\SimpleCrudStoreRequest;
 
-class StorePositionRequest extends FormRequest
+class StorePositionRequest extends SimpleCrudStoreRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    public function getModelClass(): string
     {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     */
-    public function rules(): array
-    {
-        return [
-            'name' => 'required|string|max:255|unique:positions,name',
-        ];
+        return Position::class;
     }
 }
