@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
-class SimpleCrudStoreRequest extends FormRequest
+abstract class SimpleCrudStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,5 @@ class SimpleCrudStoreRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255', 'unique:' . $this->getModelClass() . ',name'],
         ];
-    }
-
-    public function getModelClass(): string
-    {
-        return User::class;
     }
 }
