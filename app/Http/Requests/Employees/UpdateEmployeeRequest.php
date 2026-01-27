@@ -26,18 +26,18 @@ class UpdateEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes', 'string', 'max:255'],
+            'name' => 'required|string|max:255',
             'email' => [
-                'sometimes',
+                'required',
                 'email',
                 Rule::unique('employees', 'email')->ignore($this->route('employee')->id),
             ],
-            'phone' => ['sometimes', 'nullable', 'string', 'max:20'],
-            'department' => ['sometimes', 'exists:departments,id'],
-            'position' => ['sometimes', 'exists:positions,id'],
-            'branch' => ['sometimes', 'exists:branches,id'],
-            'salary' => ['sometimes', 'numeric', 'min:0'],
-            'hire_date' => ['sometimes', 'date'],
+            'phone' => 'nullable|string|max:20',
+            'department_id' => 'required|exists:departments,id',
+            'position_id' => 'required|exists:positions,id',
+            'branch_id' => 'required|exists:branches,id',
+            'salary' => 'required|numeric|min:0',
+            'hire_date' => 'required|date',
         ];
     }
 
