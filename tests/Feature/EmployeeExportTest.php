@@ -276,7 +276,7 @@ describe('EmployeeExport', function () {
             $employee->branch->name,
             '85000.50',
             '2023-03-15',
-            '2023-01-10 14:30:00',
+            '2023-01-10T14:30:00+00:00',
         ]);
     });
 

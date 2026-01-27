@@ -88,7 +88,7 @@ describe('SupplierExport', function () {
             'Test Branch',
             'Electronics',
             'Active',
-            '2023-01-01 10:00:00',
+            '2023-01-01T10:00:00+00:00',
         ]);
     });
 

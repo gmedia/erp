@@ -97,8 +97,8 @@ class DepartmentExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
         return [
             $department->id,
             $department->name,
-            $department->created_at ? $department->created_at->format('Y-m-d H:i:s') : null,
-            $department->updated_at ? $department->updated_at->format('Y-m-d H:i:s') : null,
+            $department->created_at ? $department->created_at->toIso8601String() : null,
+            $department->updated_at ? $department->updated_at->toIso8601String() : null,
         ];
     }
 

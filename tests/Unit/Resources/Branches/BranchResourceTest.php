@@ -21,8 +21,8 @@ test('toArray transforms branch correctly', function () {
 
     expect($result)->toHaveKey('id', $branch->id)
         ->and($result)->toHaveKey('name', 'Jakarta Branch')
-        ->and($result['created_at'])->toBeInstanceOf(\Carbon\Carbon::class)
-        ->and($result['updated_at'])->toBeInstanceOf(\Carbon\Carbon::class);
+        ->and($result['created_at'])->toBeString()
+        ->and($result['updated_at'])->toBeString();
 });
 
 test('toArray includes all required fields', function () {

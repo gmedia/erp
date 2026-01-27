@@ -97,8 +97,8 @@ class CustomerCategoryExport implements FromQuery, ShouldAutoSize, WithHeadings,
         return [
             $customerCategory->id,
             $customerCategory->name,
-            $customerCategory->created_at ? $customerCategory->created_at->format('Y-m-d H:i:s') : null,
-            $customerCategory->updated_at ? $customerCategory->updated_at->format('Y-m-d H:i:s') : null,
+            $customerCategory->created_at ? $customerCategory->created_at->toIso8601String() : null,
+            $customerCategory->updated_at ? $customerCategory->updated_at->toIso8601String() : null,
         ];
     }
 

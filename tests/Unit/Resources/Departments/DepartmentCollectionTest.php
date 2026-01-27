@@ -11,7 +11,7 @@ uses(RefreshDatabase::class)->group('departments');
 test('collects property is set correctly', function () {
     $collection = new DepartmentCollection([]);
 
-    expect($collection->collects)->toBe(DepartmentResource::class);
+    expect($collection->collects)->toBe(\App\Http\Resources\SimpleCrudResource::class);
 });
 
 test('collection transforms multiple departments correctly', function () {
@@ -28,7 +28,9 @@ test('collection transforms multiple departments correctly', function () {
     foreach ($result as $index => $item) {
         expect($item)->toHaveKeys(['id', 'name', 'created_at', 'updated_at'])
             ->and($item['id'])->toBe($departments[$index]->id)
-            ->and($item['name'])->toBe($departments[$index]->name);
+            ->and($item['name'])->toBe($departments[$index]->name)
+            ->and($item['created_at'])->toBeString()
+            ->and($item['updated_at'])->toBeString();
     }
 });
 

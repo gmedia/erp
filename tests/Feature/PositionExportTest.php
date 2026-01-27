@@ -123,8 +123,8 @@ describe('PositionExport', function () {
         expect($mapped)->toBe([
             $item->id,
             'Engineering Position',
-            '2023-01-15 14:30:00',
-            '2023-01-20 09:15:00',
+            '2023-01-15T14:30:00+00:00',
+            '2023-01-20T09:15:00+00:00',
         ]);
     });
 

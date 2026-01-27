@@ -53,7 +53,7 @@ export const supplierColumns: ColumnDef<Supplier>[] = [
         cell: renderBranchCell,
     },
     {
-        accessorKey: 'category_id',
+        accessorKey: 'category',
         ...createSortingHeader('Category'),
         cell: renderCategoryCell,
     },

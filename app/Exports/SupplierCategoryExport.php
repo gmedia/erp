@@ -97,8 +97,8 @@ class SupplierCategoryExport implements FromQuery, ShouldAutoSize, WithHeadings,
         return [
             $supplierCategory->id,
             $supplierCategory->name,
-            $supplierCategory->created_at ? $supplierCategory->created_at->format('Y-m-d H:i:s') : null,
-            $supplierCategory->updated_at ? $supplierCategory->updated_at->format('Y-m-d H:i:s') : null,
+            $supplierCategory->created_at ? $supplierCategory->created_at->toIso8601String() : null,
+            $supplierCategory->updated_at ? $supplierCategory->updated_at->toIso8601String() : null,
         ];
     }
 

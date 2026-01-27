@@ -97,7 +97,7 @@ describe('Supplier API Endpoints', function () {
 
         $response->assertOk();
         expect($response->json('data'))->toHaveCount(1)
-            ->and($response->json('data.0.branch_id'))->toBe($branch1->id);
+            ->and($response->json('data.0.branch.id'))->toBe($branch1->id);
     });
 
     test('index supports filtering by category', function () {
@@ -109,7 +109,7 @@ describe('Supplier API Endpoints', function () {
 
         $response->assertOk();
         expect($response->json('data'))->toHaveCount(1)
-            ->and($response->json('data.0.category_id'))->toBe($category->id);
+            ->and($response->json('data.0.category.id'))->toBe($category->id);
     });
 
     test('index supports filtering by status', function () {

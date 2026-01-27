@@ -11,7 +11,7 @@ uses(RefreshDatabase::class)->group('positions');
 test('collects property is set correctly', function () {
     $collection = new PositionCollection([]);
 
-    expect($collection->collects)->toBe(PositionResource::class);
+    expect($collection->collects)->toBe(\App\Http\Resources\SimpleCrudResource::class);
 });
 
 test('collection transforms multiple positions correctly', function () {
@@ -28,7 +28,9 @@ test('collection transforms multiple positions correctly', function () {
     foreach ($result as $index => $item) {
         expect($item)->toHaveKeys(['id', 'name', 'created_at', 'updated_at'])
             ->and($item['id'])->toBe($positions[$index]->id)
-            ->and($item['name'])->toBe($positions[$index]->name);
+            ->and($item['name'])->toBe($positions[$index]->name)
+            ->and($item['created_at'])->toBeString()
+            ->and($item['updated_at'])->toBeString();
     }
 });
 

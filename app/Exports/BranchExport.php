@@ -97,8 +97,8 @@ class BranchExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappi
         return [
             $branch->id,
             $branch->name,
-            $branch->created_at ? $branch->created_at->format('Y-m-d H:i:s') : null,
-            $branch->updated_at ? $branch->updated_at->format('Y-m-d H:i:s') : null,
+            $branch->created_at ? $branch->created_at->toIso8601String() : null,
+            $branch->updated_at ? $branch->updated_at->toIso8601String() : null,
         ];
     }
 

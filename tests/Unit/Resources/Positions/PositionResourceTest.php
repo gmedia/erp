@@ -21,8 +21,8 @@ test('toArray transforms position correctly', function () {
 
     expect($result)->toHaveKey('id', $position->id)
         ->and($result)->toHaveKey('name', 'Software Engineer')
-        ->and($result['created_at'])->toBeInstanceOf(\Carbon\Carbon::class)
-        ->and($result['updated_at'])->toBeInstanceOf(\Carbon\Carbon::class);
+        ->and($result['created_at'])->toBeString()
+        ->and($result['updated_at'])->toBeString();
 });
 
 test('toArray includes all required fields', function () {

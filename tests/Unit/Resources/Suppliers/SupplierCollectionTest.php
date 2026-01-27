@@ -25,15 +25,13 @@ test('to array returns correct structure', function () {
     expect($firstItem)->toHaveKeys([
         'id',
         'name',
-            'email',
-            'phone',
-            'address',
-            'branch',
-            'branch_id',
-            'category',
-            'category_id',
-            'status',
-            'created_at',
-            'updated_at',
-        ]);
+        'email',
+        'phone',
+        'address',
+        'branch',
+        'category',
+        'status',
+        'created_at',
+        'updated_at',
+    ]);
 });

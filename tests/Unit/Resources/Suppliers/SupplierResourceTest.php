@@ -32,8 +32,6 @@ test('to array returns correct structure', function () {
         'email' => 'test@example.com',
         'phone' => '1234567890',
         'address' => '123 Test St',
-        'branch_id' => $branch->id,
-        'category_id' => $category->id,
         'branch' => [
             'id' => $branch->id,
             'name' => 'Test Branch',
@@ -44,4 +42,7 @@ test('to array returns correct structure', function () {
         ],
         'status' => 'active',
     ]);
+    
+    expect($result['created_at'])->toBeString()
+        ->and($result['updated_at'])->toBeString();
 });

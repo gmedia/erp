@@ -108,7 +108,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             $employee->branch?->name,
             $employee->salary,
             $employee->hire_date->format('Y-m-d'),
-            $employee->created_at->format('Y-m-d H:i:s'),
+            $employee->created_at?->toIso8601String(),
         ];
     }
 

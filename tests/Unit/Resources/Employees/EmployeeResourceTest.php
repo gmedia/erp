@@ -42,8 +42,8 @@ test('toArray transforms employee correctly', function () {
         ->and($result['position']['name'])->toBe($position->name)
         ->and($result)->toHaveKey('salary', '75000.50')
         ->and($result)->toHaveKey('hire_date')
-        ->and($result)->toHaveKey('created_at')
-        ->and($result)->toHaveKey('updated_at');
+        ->and($result['created_at'])->toBeString()
+        ->and($result['updated_at'])->toBeString();
 });
 
 test('toArray includes all required fields', function () {

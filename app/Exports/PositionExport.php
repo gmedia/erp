@@ -97,8 +97,8 @@ class PositionExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         return [
             $position->id,
             $position->name,
-            $position->created_at ? $position->created_at->format('Y-m-d H:i:s') : null,
-            $position->updated_at ? $position->updated_at->format('Y-m-d H:i:s') : null,
+            $position->created_at ? $position->created_at->toIso8601String() : null,
+            $position->updated_at ? $position->updated_at->toIso8601String() : null,
         ];
     }
 

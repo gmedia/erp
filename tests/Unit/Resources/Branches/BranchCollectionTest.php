@@ -11,7 +11,7 @@ uses(RefreshDatabase::class)->group('branches');
 test('collects property is set correctly', function () {
     $collection = new BranchCollection([]);
 
-    expect($collection->collects)->toBe(BranchResource::class);
+    expect($collection->collects)->toBe(\App\Http\Resources\SimpleCrudResource::class);
 });
 
 test('collection transforms multiple branches correctly', function () {
@@ -28,7 +28,9 @@ test('collection transforms multiple branches correctly', function () {
     foreach ($result as $index => $item) {
         expect($item)->toHaveKeys(['id', 'name', 'created_at', 'updated_at'])
             ->and($item['id'])->toBe($branches[$index]->id)
-            ->and($item['name'])->toBe($branches[$index]->name);
+            ->and($item['name'])->toBe($branches[$index]->name)
+            ->and($item['created_at'])->toBeString()
+            ->and($item['updated_at'])->toBeString();
     }
 });
 

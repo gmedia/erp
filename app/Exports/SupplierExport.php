@@ -86,7 +86,7 @@ class SupplierExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $supplier->branch?->name,
             $supplier->category?->name,
             ucfirst($supplier->status),
-            $supplier->created_at->format('Y-m-d H:i:s'),
+            $supplier->created_at?->toIso8601String(),
         ];
     }
 
