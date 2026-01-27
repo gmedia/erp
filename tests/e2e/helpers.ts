@@ -148,9 +148,9 @@ export async function createEmployee(
     email: string;
     phone: string;
     salary: string;
-    department: string;
-    position: string;
-    branch: string;
+    department_id: string;
+    position_id: string;
+    branch_id: string;
   }> = {}
 ): Promise<string> {
   const timestamp = Date.now();
@@ -160,13 +160,13 @@ export async function createEmployee(
     route: '/employees',
     returnField: 'email',
     fields: [
-      { name: 'name', type: 'text', defaultValue: 'John Doe' },
+      { name: 'name', type: 'text', defaultValue: `Employee ${timestamp}` },
       { name: 'email', type: 'email', defaultValue: defaultEmail },
-      { name: 'phone', type: 'text', defaultValue: '+628123456789' },
-      { name: 'salary', type: 'text', defaultValue: '5000' },
-      { name: 'department', type: 'select', selector: 'Select a department', defaultValue: 'Engineering' },
-      { name: 'position', type: 'select', selector: 'Select a position', defaultValue: 'Senior Developer' },
-      { name: 'branch', type: 'select', selector: 'Select a branch', defaultValue: 'Head Office' },
+      { name: 'phone', type: 'text', defaultValue: '08123456789' },
+      { name: 'department_id', type: 'select', selector: 'Select a department', defaultValue: 'Engineering' },
+      { name: 'position_id', type: 'select', selector: 'Select a position', defaultValue: 'Senior Developer' },
+      { name: 'branch_id', type: 'select', selector: 'Select a branch', defaultValue: 'Head Office' },
+      { name: 'salary', type: 'text', defaultValue: '5000000' },
     ],
   };
 
@@ -514,8 +514,8 @@ export async function createCustomer(
     email: string;
     phone: string;
     address: string;
-    branch: string;
-    category: string;
+    branch_id: string;
+    category_id: string;
     status: string;
     notes: string;
   }> = {}
@@ -550,7 +550,7 @@ export async function createCustomer(
   const branchTrigger = dialog.locator('button').filter({ hasText: /Select a branch/i });
   await branchTrigger.click();
   const branchSearchInput = page.getByPlaceholder('Search...');
-  const branchName = overrides.branch ?? 'Head Office';
+  const branchName = overrides.branch_id ?? 'Head Office';
   if (await branchSearchInput.isVisible()) {
     await branchSearchInput.fill(branchName);
   }
@@ -560,7 +560,7 @@ export async function createCustomer(
   const categoryTrigger = dialog.locator('button').filter({ hasText: /Select a category/i });
   await categoryTrigger.click();
   const categorySearchInput = page.getByPlaceholder('Search...');
-  const categoryName = overrides.category ?? 'Retail';
+  const categoryName = overrides.category_id ?? 'Retail';
   if (await categorySearchInput.isVisible()) {
     await categorySearchInput.fill(categoryName);
     // Wait for the option to be stable and visible before clicking

@@ -206,9 +206,9 @@ export const employeeConfig = createComplexEntityConfig({
     breadcrumbs: [{ title: 'Employees', href: '/employees' }],
     initialFilters: {
         search: '',
-        department: '',
-        position: '',
-        branch: '',
+        department_id: '',
+        position_id: '',
+        branch_id: '',
     },
     columns: employeeColumns,
     filterFields: createEmployeeFilterFields(),
@@ -230,8 +230,8 @@ export const customerConfig = createComplexEntityConfig({
     breadcrumbs: [{ title: 'Customers', href: '/customers' }],
     initialFilters: {
         search: '',
-        branch: '',
-        category: '',
+        branch_id: '',
+        category_id: '',
         status: '',
     },
     columns: customerColumns,

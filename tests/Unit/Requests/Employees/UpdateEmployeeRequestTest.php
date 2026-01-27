@@ -33,8 +33,9 @@ describe('UpdateEmployeeRequest', function () {
             'name',
             'email',
             'phone',
-            'department',
-            'position',
+            'department_id',
+            'position_id',
+            'branch_id',
             'salary',
             'hire_date'
         ]);
@@ -137,7 +138,7 @@ describe('UpdateEmployeeRequest', function () {
 
     test('rules validation fails with invalid department', function () {
         $employee = Employee::factory()->create();
-        $data = ['department' => 999999]; // non-existent department id
+        $data = ['department_id' => 999999]; // non-existent department id
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
@@ -151,7 +152,7 @@ describe('UpdateEmployeeRequest', function () {
         $validator = validator($data, $request->rules());
 
         expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('department'))->toBeTrue();
+            ->and($validator->errors()->has('department_id'))->toBeTrue();
     });
 
     test('rules validation fails with negative salary', function () {
@@ -196,7 +197,7 @@ describe('UpdateEmployeeRequest', function () {
         $employee = Employee::factory()->create();
         $department = Department::factory()->create();
         
-        $data = ['department' => $department->id];
+        $data = ['department_id' => $department->id];
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {

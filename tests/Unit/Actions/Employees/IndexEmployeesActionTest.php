@@ -18,9 +18,9 @@ test('execute returns paginated employees without filters', function () {
     $request = Mockery::mock(IndexEmployeeRequest::class);
     $request->shouldReceive('filled')->with('search')->andReturn(false);
     $request->shouldReceive('get')->with('search')->andReturn(null);
-    $request->shouldReceive('get')->with('department')->andReturn(null);
-    $request->shouldReceive('get')->with('position')->andReturn(null);
-    $request->shouldReceive('get')->with('branch')->andReturn(null);
+    $request->shouldReceive('get')->with('department_id')->andReturn(null);
+    $request->shouldReceive('get')->with('position_id')->andReturn(null);
+    $request->shouldReceive('get')->with('branch_id')->andReturn(null);
     $request->shouldReceive('get')->with('salary_min')->andReturn(null);
     $request->shouldReceive('get')->with('salary_max')->andReturn(null);
     $request->shouldReceive('get')->with('hire_date_from')->andReturn(null);
@@ -101,9 +101,9 @@ test('execute applies advanced filters when no search provided', function () {
     $request = Mockery::mock(IndexEmployeeRequest::class);
     $request->shouldReceive('filled')->with('search')->andReturn(false);
     $request->shouldReceive('get')->with('search')->andReturn(null);
-    $request->shouldReceive('get')->with('department')->andReturn(1);
-    $request->shouldReceive('get')->with('position')->andReturn(2);
-    $request->shouldReceive('get')->with('branch')->andReturn(3);
+    $request->shouldReceive('get')->with('department_id')->andReturn(1);
+    $request->shouldReceive('get')->with('position_id')->andReturn(2);
+    $request->shouldReceive('get')->with('branch_id')->andReturn(3);
     $request->shouldReceive('get')->with('salary_min')->andReturn(50000);
     $request->shouldReceive('get')->with('salary_max')->andReturn(80000);
     $request->shouldReceive('get')->with('hire_date_from')->andReturn('2023-01-01');

@@ -28,12 +28,17 @@ test('rules returns correct validation rules', function () {
     });
  
     expect($request->rules())->toEqual([
-        'name' => ['sometimes', 'string', 'max:255'],
-        'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:suppliers,email,' . $supplier->id],
-        'phone' => ['nullable', 'string', 'max:20'],
-        'address' => ['sometimes', 'string'],
-        'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
-        'category_id' => ['sometimes', 'required', 'integer', 'exists:supplier_categories,id'],
-        'status' => ['sometimes', 'string', 'in:active,inactive'],
+        'name' => 'sometimes|required|string|max:255',
+        'email' => [
+            'sometimes',
+            'required',
+            'email',
+            \Illuminate\Validation\Rule::unique('suppliers', 'email')->ignore($supplier->id),
+        ],
+        'phone' => 'nullable|string|max:20',
+        'address' => 'nullable|string',
+        'branch_id' => 'sometimes|required|exists:branches,id',
+        'category_id' => 'sometimes|required|exists:supplier_categories,id',
+        'status' => 'sometimes|required|in:active,inactive',
     ]);
 });

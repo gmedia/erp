@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Requests\Employees\IndexEmployeeRequest;
+use App\Models\Department;
+use App\Models\Position;
 
 
 uses()->group('employees');
@@ -20,8 +22,8 @@ describe('IndexEmployeeRequest', function () {
 
         expect($rules)->toHaveKeys([
             'search',
-            'department',
-            'position',
+            'department_id',
+            'position_id',
             'salary_min',
             'salary_max',
             'hire_date_from',
@@ -34,10 +36,13 @@ describe('IndexEmployeeRequest', function () {
     });
 
     test('rules validation passes with valid data', function () {
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
+
         $data = [
             'search' => 'john',
-            'department' => 'engineering',
-            'position' => 'developer',
+            'department_id' => $department->id,
+            'position_id' => $position->id,
             'salary_min' => 50000,
             'salary_max' => 100000,
             'hire_date_from' => '2023-01-01',
@@ -143,7 +148,7 @@ describe('IndexEmployeeRequest', function () {
     });
 
     test('rules validation passes with valid sort_by values', function () {
-        $validSortByValues = ['id', 'name', 'email', 'department', 'position', 'salary', 'hire_date', 'created_at', 'updated_at'];
+        $validSortByValues = ['id', 'name', 'email', 'department_id', 'position_id', 'branch_id', 'salary', 'hire_date', 'created_at', 'updated_at'];
 
         foreach ($validSortByValues as $value) {
             $data = ['sort_by' => $value];

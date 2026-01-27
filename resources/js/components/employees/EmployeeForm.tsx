@@ -44,19 +44,19 @@ const renderEmployeeBasicInfoSection = () => (
 const renderEmployeeWorkInfoSection = () => (
     <>
         <AsyncSelectField
-            name="department"
+            name="department_id"
             label="Department"
             url="/api/departments"
             placeholder="Select a department"
         />
         <AsyncSelectField
-            name="position"
+            name="position_id"
             label="Position"
             url="/api/positions"
             placeholder="Select a position"
         />
         <AsyncSelectField
-            name="branch"
+            name="branch_id"
             label="Branch"
             url="/api/branches"
             placeholder="Select a branch"
@@ -92,9 +92,9 @@ const getEmployeeFormDefaults = (
             name: '',
             email: '',
             phone: '',
-            department: '',
-            position: '',
-            branch: '',
+            department_id: '',
+            position_id: '',
+            branch_id: '',
             salary: '',
             hire_date: new Date(),
         };
@@ -104,19 +104,19 @@ const getEmployeeFormDefaults = (
         name: employee.name,
         email: employee.email,
         phone: employee.phone,
-        department:
+        department_id:
             typeof employee.department === 'object'
                 ? String(employee.department.id)
-                : employee.department,
-        position:
+                : String(employee.department),
+        position_id:
             typeof employee.position === 'object'
                 ? String(employee.position.id)
-                : employee.position,
-        branch:
+                : String(employee.position),
+        branch_id:
             typeof employee.branch === 'object'
                 ? String(employee.branch.id)
-                : employee.branch,
-        salary: employee.salary,
+                : String(employee.branch),
+        salary: employee.salary || '',
         hire_date: new Date(employee.hire_date),
     };
 };

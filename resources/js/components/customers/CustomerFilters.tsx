@@ -17,16 +17,16 @@ export function createCustomerFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField('search', 'Search', 'Search customers...'),
         createAsyncSelectFilterField(
-            'branch',
+            'branch_id',
             'Branch',
             '/api/branches',
             'Select a branch',
         ),
         createAsyncSelectFilterField(
-            'category',
+            'category_id',
             'Category',
             '/api/customer-categories',
-            'All categories',
+            'Select Category',
         ),
         createSelectFilterField('status', 'Status', statusOptions, 'All statuses'),
     ];

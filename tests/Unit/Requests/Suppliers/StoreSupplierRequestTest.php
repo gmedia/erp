@@ -14,12 +14,12 @@ test('rules returns correct validation rules', function () {
     $request = new StoreSupplierRequest;
 
     expect($request->rules())->toEqual([
-        'name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'string', 'email', 'max:255', 'unique:suppliers'],
-        'phone' => ['nullable', 'string', 'max:20'],
-        'address' => ['required', 'string'],
-        'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
-        'category_id' => ['required', 'integer', 'exists:supplier_categories,id'],
-        'status' => ['required', 'string', 'in:active,inactive'],
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:suppliers,email',
+        'phone' => 'nullable|string|max:20',
+        'address' => 'nullable|string',
+        'branch_id' => 'required|exists:branches,id',
+        'category_id' => 'required|exists:supplier_categories,id',
+        'status' => 'required|in:active,inactive',
     ]);
 });

@@ -11,19 +11,19 @@ export function createEmployeeFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField('search', 'Search', 'Search employees...'),
         createAsyncSelectFilterField(
-            'department',
+            'department_id',
             'Department',
             '/api/departments',
             'Select a department',
         ),
         createAsyncSelectFilterField(
-            'position',
+            'position_id',
             'Position',
             '/api/positions',
             'Select a position',
         ),
         createAsyncSelectFilterField(
-            'branch',
+            'branch_id',
             'Branch',
             '/api/branches',
             'Select a branch',

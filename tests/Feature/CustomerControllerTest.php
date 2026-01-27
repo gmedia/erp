@@ -96,15 +96,15 @@ describe('Customer API Endpoints', function () {
         expect($data)->toHaveCount(2); // John Smith and Bob Johnson (john in email)
     });
 
-    test('index supports advanced filtering by branch', function () {
+    test('index filters by branch', function () {
+        Customer::query()->delete();
         $branchA = Branch::factory()->create(['name' => 'Branch A']);
         $branchB = Branch::factory()->create(['name' => 'Branch B']);
 
-        Customer::factory()->create(['branch_id' => $branchA->id]);
+        Customer::factory()->count(2)->create(['branch_id' => $branchA->id]);
         Customer::factory()->create(['branch_id' => $branchB->id]);
-        Customer::factory()->create(['branch_id' => $branchA->id]);
 
-        $response = getJson('/api/customers?branch=' . $branchA->id);
+        $response = getJson('/api/customers?branch_id=' . $branchA->id);
 
         $response->assertOk();
 
@@ -115,15 +115,15 @@ describe('Customer API Endpoints', function () {
         }
     });
 
-    test('index supports filtering by category', function () {
-        $categoryA = \App\Models\CustomerCategory::factory()->create();
-        $categoryB = \App\Models\CustomerCategory::factory()->create();
+    test('index filters by category', function () {
+        Customer::query()->delete();
+        $categoryA = \App\Models\CustomerCategory::factory()->create(['name' => 'Category A']);
+        $categoryB = \App\Models\CustomerCategory::factory()->create(['name' => 'Category B']);
 
-        Customer::factory()->create(['category_id' => $categoryA->id]);
+        Customer::factory()->count(2)->create(['category_id' => $categoryA->id]);
         Customer::factory()->create(['category_id' => $categoryB->id]);
-        Customer::factory()->create(['category_id' => $categoryA->id]);
 
-        $response = getJson('/api/customers?category=' . $categoryA->id);
+        $response = getJson('/api/customers?category_id=' . $categoryA->id);
 
         $response->assertOk();
 
@@ -186,7 +186,7 @@ describe('Customer API Endpoints', function () {
             'email' => 'john.doe@example.com',
             'phone' => '555-1234-5678',
             'address' => '123 Main Street, City, Country',
-            'branch' => $branch->id,
+            'branch_id' => $branch->id,
             'category_id' => $category->id,
             'status' => 'active',
             'notes' => 'VIP customer',
@@ -231,8 +231,7 @@ describe('Customer API Endpoints', function () {
             ->assertJsonValidationErrors([
                 'name',
                 'email',
-                'address',
-                'branch',
+                'branch_id',
                 'category_id',
                 'status',
             ]);
@@ -248,7 +247,7 @@ describe('Customer API Endpoints', function () {
             'name' => 'New Customer',
             'email' => 'existing@example.com',
             'address' => '123 Test Street',
-            'branch' => $branch->id,
+            'branch_id' => $branch->id,
             'category_id' => $category->id,
             'status' => 'active',
         ]);
@@ -305,7 +304,7 @@ describe('Customer API Endpoints', function () {
             'name' => 'Updated Name',
             'email' => $customer->email,
             'address' => $customer->address,
-            'branch' => $newBranch->id,
+            'branch_id' => $newBranch->id,
             'category_id' => $newCategory->id,
             'status' => 'active',
         ];
@@ -331,7 +330,7 @@ describe('Customer API Endpoints', function () {
         $response = putJson("/api/customers/{$customer->id}", [
             'name' => '', // Empty name
             'email' => 'invalid-email', // Invalid email format
-            'branch' => 'invalid-branch', // Invalid branch
+            'branch_id' => 'invalid-branch', // Invalid branch
             'category_id' => 'invalid-category', // Invalid category
             'status' => 'invalid-status', // Invalid status
         ]);
@@ -340,7 +339,7 @@ describe('Customer API Endpoints', function () {
             ->assertJsonValidationErrors([
                 'name',
                 'email',
-                'branch',
+                'branch_id',
                 'category_id',
                 'status',
             ]);
@@ -355,7 +354,7 @@ describe('Customer API Endpoints', function () {
             'name' => 'Updated Name',
             'email' => 'john@example.com', // Same email should be allowed
             'address' => '123 Test Street',
-            'branch' => $branch->id,
+            'branch_id' => $branch->id,
             'category_id' => $category->id,
             'status' => 'active',
         ]);
@@ -371,7 +370,7 @@ describe('Customer API Endpoints', function () {
             'name' => 'Test Customer',
             'email' => 'test@example.com',
             'address' => '123 Test Street',
-            'branch' => $branch->id,
+            'branch_id' => $branch->id,
             'category_id' => $category->id,
             'status' => 'active',
         ]);
@@ -408,7 +407,7 @@ describe('Customer API Permission Tests', function () {
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'address' => '123 Test Street',
-            'branch' => $branch->id,
+            'branch_id' => $branch->id,
             'category_id' => $category->id,
             'status' => 'active',
         ]);

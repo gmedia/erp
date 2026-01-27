@@ -17,7 +17,7 @@ export interface CustomerFormData {
     email: string;
     phone: string;
     address: string;
-    branch: string;
+    branch_id: string;
     category_id: string;
     status: 'active' | 'inactive';
     notes: string;

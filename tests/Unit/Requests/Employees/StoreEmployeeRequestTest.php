@@ -25,9 +25,9 @@ describe('StoreEmployeeRequest', function () {
             'name',
             'email',
             'phone',
-            'department',
-            'position',
-            'branch',
+            'department_id',
+            'position_id',
+            'branch_id',
             'salary',
             'hire_date'
         ]);
@@ -41,9 +41,9 @@ describe('StoreEmployeeRequest', function () {
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'phone' => '555-1234',
-            'department' => $department->id,
-            'position' => $position->id,
-            'branch' => \App\Models\Branch::factory()->create()->id,
+            'department_id' => $department->id,
+            'position_id' => $position->id,
+            'branch_id' => \App\Models\Branch::factory()->create()->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];
@@ -61,9 +61,9 @@ describe('StoreEmployeeRequest', function () {
         expect($validator->fails())->toBeTrue()
             ->and($validator->errors()->has('name'))->toBeTrue()
             ->and($validator->errors()->has('email'))->toBeTrue()
-            ->and($validator->errors()->has('department'))->toBeTrue()
-            ->and($validator->errors()->has('position'))->toBeTrue()
-            ->and($validator->errors()->has('branch'))->toBeTrue()
+            ->and($validator->errors()->has('department_id'))->toBeTrue()
+            ->and($validator->errors()->has('position_id'))->toBeTrue()
+            ->and($validator->errors()->has('branch_id'))->toBeTrue()
             ->and($validator->errors()->has('salary'))->toBeTrue()
             ->and($validator->errors()->has('hire_date'))->toBeTrue();
     });
@@ -113,8 +113,8 @@ describe('StoreEmployeeRequest', function () {
         $data = [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'department' => 999999, // non-existent department id
-            'position' => $position->id,
+            'department_id' => 999999, // non-existent department id
+            'position_id' => $position->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];
@@ -122,7 +122,7 @@ describe('StoreEmployeeRequest', function () {
         $validator = validator($data, (new StoreEmployeeRequest)->rules());
 
         expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('department'))->toBeTrue();
+            ->and($validator->errors()->has('department_id'))->toBeTrue();
     });
 
     test('rules validation fails with negative salary', function () {
@@ -171,9 +171,9 @@ describe('StoreEmployeeRequest', function () {
         $data = [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'department' => $department->id,
-            'position' => $position->id,
-            'branch' => $branch->id,
+            'department_id' => $department->id,
+            'position_id' => $position->id,
+            'branch_id' => $branch->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];

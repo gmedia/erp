@@ -16,17 +16,17 @@ test('rules returns validation rules', function () {
 
     $rules = $request->rules();
 
-    expect($rules)->toBeArray()
-        ->and($rules)->toHaveKey('search')
-        ->and($rules)->toHaveKey('department')
-        ->and($rules)->toHaveKey('position')
+    expect($rules)->toHaveKey('department_id')
+        ->and($rules)->toHaveKey('position_id')
+        ->and($rules)->toHaveKey('branch_id')
         ->and($rules)->toHaveKey('sort_by')
         ->and($rules)->toHaveKey('sort_direction');
 
-    // Check specific validation rules - department and position expect FK IDs
+    // Check specific validation rules
     expect($rules['search'])->toBe(['nullable', 'string']);
-    expect($rules['department'])->toBe(['nullable', 'integer', 'exists:departments,id']);
-    expect($rules['position'])->toBe(['nullable', 'integer', 'exists:positions,id']);
+    expect($rules['department_id'])->toBe(['nullable', 'integer', 'exists:departments,id']);
+    expect($rules['position_id'])->toBe(['nullable', 'integer', 'exists:positions,id']);
+    expect($rules['branch_id'])->toBe(['nullable', 'integer', 'exists:branches,id']);
     expect($rules['sort_by'])->toBe(['nullable', 'string', 'in:id,name,email,department_id,position_id,salary,hire_date,created_at,updated_at']);
-    expect($rules['sort_direction'])->toBe(['nullable', 'in:asc,desc']);
+    expect($rules['sort_direction'])->toBe(['nullable', 'string', 'in:asc,desc']);
 });

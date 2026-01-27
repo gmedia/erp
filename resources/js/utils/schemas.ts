@@ -17,9 +17,9 @@ export const employeeFormSchema = z.object({
         .regex(/^[\d\s\-+().]+$/, {
             message: 'Please enter a valid phone number.',
         }),
-    department: z.string().min(1, { message: 'Department is required.' }),
-    position: z.string().min(1, { message: 'Position is required.' }),
-    branch: z.string().min(1, { message: 'Branch is required.' }),
+    department_id: z.string().min(1, { message: 'Department is required.' }),
+    position_id: z.string().min(1, { message: 'Position is required.' }),
+    branch_id: z.string().min(1, { message: 'Branch is required.' }),
     salary: z
         .string()
         .min(1, { message: 'Salary is required.' })
@@ -47,7 +47,7 @@ export const customerFormSchema = z.object({
         })
         .or(z.literal('')),
     address: z.string().min(5, { message: 'Address must be at least 5 characters.' }),
-    branch: z.string().min(1, { message: 'Branch is required.' }),
+    branch_id: z.string().min(1, { message: 'Branch is required.' }),
     category_id: z.string().min(1, { message: 'Category is required.' }),
     status: z.enum(['active', 'inactive'], {
         message: 'Status is required.',

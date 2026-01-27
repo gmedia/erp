@@ -106,7 +106,7 @@ describe('Employee API Endpoints', function () {
         Employee::factory()->create(['department_id' => $marketing->id]);
         Employee::factory()->create(['department_id' => $sales->id]);
 
-        $response = getJson('/api/employees?department=' . $engineering->id);
+        $response = getJson('/api/employees?department_id=' . $engineering->id);
 
         $response->assertOk();
 
@@ -140,9 +140,9 @@ describe('Employee API Endpoints', function () {
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'phone' => '555-1234',
-            'department' => $department->id,
-            'position' => $position->id,
-            'branch' => $branch->id,
+            'department_id' => $department->id,
+            'position_id' => $position->id,
+            'branch_id' => $branch->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
         ];
@@ -190,9 +190,9 @@ describe('Employee API Endpoints', function () {
             ->assertJsonValidationErrors([
                 'name',
                 'email',
-                'department',
-                'position',
-                'branch',
+                'department_id',
+                'position_id',
+                'branch_id',
                 'salary',
                 'hire_date'
             ]);
@@ -207,9 +207,9 @@ describe('Employee API Endpoints', function () {
         $response = postJson('/api/employees', [
             'name' => 'New Employee',
             'email' => 'existing@example.com',
-            'department' => $department->id,
-            'position' => $position->id,
-            'branch' => $branch->id,
+            'department_id' => $department->id,
+            'position_id' => $position->id,
+            'branch_id' => $branch->id,
             'salary' => '50000.00',
             'hire_date' => '2023-01-01',
         ]);
@@ -268,8 +268,8 @@ describe('Employee API Endpoints', function () {
 
         $updateData = [
             'name' => 'Updated Name',
-            'position' => $newPosition->id,
-            'branch' => $newBranch->id,
+            'position_id' => $newPosition->id,
+            'branch_id' => $newBranch->id,
         ];
 
         $response = putJson("/api/employees/{$employee->id}", $updateData);
@@ -314,8 +314,8 @@ describe('Employee API Endpoints', function () {
         $response = putJson("/api/employees/{$employee->id}", [
             'name' => '', // Empty name
             'email' => 'invalid-email', // Invalid email format
-            'department' => 'invalid-dept', // Invalid department
-            'branch' => 'invalid-branch', // Invalid branch
+            'department_id' => 'invalid-dept', // Invalid department
+            'branch_id' => 'invalid-branch', // Invalid branch
             'salary' => '-100', // Negative salary
             'hire_date' => 'invalid-date', // Invalid date
         ]);
@@ -324,8 +324,8 @@ describe('Employee API Endpoints', function () {
             ->assertJsonValidationErrors([
                 'name',
                 'email',
-                'department',
-                'branch',
+                'department_id',
+                'branch_id',
                 'salary',
                 'hire_date'
             ]);
@@ -340,9 +340,9 @@ describe('Employee API Endpoints', function () {
         $response = putJson("/api/employees/{$employee->id}", [
             'name' => 'Updated Name',
             'email' => 'john@example.com', // Same email should be allowed
-            'department' => $department->id,
-            'position' => $position->id,
-            'branch' => $branch->id,
+            'department_id' => $department->id,
+            'position_id' => $position->id,
+            'branch_id' => $branch->id,
             'salary' => '60000.00',
             'hire_date' => '2023-01-01',
         ]);
@@ -358,9 +358,9 @@ describe('Employee API Endpoints', function () {
         $response = putJson('/api/employees/99999', [
             'name' => 'Test Employee',
             'email' => 'test@example.com',
-            'department' => $department->id,
-            'position' => $position->id,
-            'branch' => $branch->id,
+            'department_id' => $department->id,
+            'position_id' => $position->id,
+            'branch_id' => $branch->id,
             'salary' => '50000.00',
             'hire_date' => '2023-01-01',
         ]);
@@ -415,9 +415,9 @@ describe('Employee API Endpoints', function () {
         Employee::factory()->create(['position_id' => $manager->id, 'branch_id' => $branchA->id]);
 
         $response = postJson('/api/employees/export', [
-            'department' => $engineering->id,
-            'position' => $developer->id,
-            'branch' => $branchA->id,
+            'department_id' => $engineering->id,
+            'position_id' => $developer->id,
+            'branch_id' => $branchA->id,
         ]);
 
         $response->assertOk();
@@ -441,9 +441,9 @@ describe('Employee API Permission Tests', function () {
         $response = postJson('/api/employees', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'department' => $department->id,
-            'position' => $position->id,
-            'branch' => $branch->id,
+            'department_id' => $department->id,
+            'position_id' => $position->id,
+            'branch_id' => $branch->id,
             'salary' => '50000.00',
             'hire_date' => '2023-01-01',
         ]);

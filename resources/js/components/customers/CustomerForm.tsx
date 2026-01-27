@@ -65,7 +65,7 @@ const renderCustomerAddressSection = () => (
 const renderCustomerDetailsSection = () => (
     <>
         <AsyncSelectField
-            name="branch"
+            name="branch_id"
             label="Branch"
             url="/api/branches"
             placeholder="Select a branch"
@@ -106,7 +106,7 @@ const getCustomerFormDefaults = (
             email: '',
             phone: '',
             address: '',
-            branch: '',
+            branch_id: '',
             category_id: '',
             status: 'active',
             notes: '',
@@ -118,10 +118,10 @@ const getCustomerFormDefaults = (
         email: customer.email,
         phone: customer.phone || '',
         address: customer.address,
-        branch:
+        branch_id:
             typeof customer.branch === 'object'
                 ? String(customer.branch.id)
-                : customer.branch,
+                : String(customer.branch),
         category_id:
             typeof customer.category === 'object'
                 ? String(customer.category.id)

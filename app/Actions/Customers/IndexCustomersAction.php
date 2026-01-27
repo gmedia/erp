@@ -29,8 +29,8 @@ class IndexCustomersAction
 
         // Apply advanced filters
         $this->filterService->applyAdvancedFilters($query, [
-            'branch_id' => $request->get('branch'),
-            'category_id' => $request->get('category'),
+            'branch_id' => $request->get('branch_id'),
+            'category_id' => $request->get('category_id'),
             'status' => $request->get('status'),
         ]);
 

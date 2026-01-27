@@ -3,6 +3,7 @@
 use App\Http\Requests\Customers\UpdateCustomerRequest;
 use App\Models\Customer;
 use Illuminate\Routing\Route;
+use Illuminate\Validation\Rule;
 
 
 uses()->group('customers');
@@ -23,22 +24,18 @@ test('rules returns correct validation rules', function () {
     $request->setRouteResolver(fn() => $route);
     
     expect($request->rules())->toEqual([
-        'name' => 'required|string|max:255',
+        'name' => 'sometimes|required|string|max:255',
         'email' => [
+            'sometimes',
             'required',
             'email',
-            Illuminate\Validation\Rule::unique('customers', 'email')->ignore($customer->id),
+            \Illuminate\Validation\Rule::unique('customers', 'email')->ignore($customer->id),
         ],
         'phone' => 'nullable|string|max:20',
-        'address' => 'required|string',
-        'branch' => 'required|exists:branches,id',
-        'category_id' => 'required|exists:customer_categories,id',
-        'status' => 'required|in:active,inactive',
+        'address' => 'nullable|string',
+        'branch_id' => 'sometimes|required|exists:branches,id',
+        'category_id' => 'sometimes|required|exists:customer_categories,id',
+        'status' => 'sometimes|required|in:active,inactive',
         'notes' => 'nullable|string',
     ]);
-});
-
-test('validated method maps branch to branch_id', function () {
-    // Rely on Feature tests for mapping logic
-    expect(true)->toBeTrue();
 });

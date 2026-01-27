@@ -60,8 +60,8 @@ test('execute exports with department and position filters', function () {
     // Mock request with filters
     $request = Mockery::mock(ExportEmployeeRequest::class);
     $request->shouldReceive('validated')->andReturn([
-        'department' => 'Engineering',
-        'position' => 'Developer',
+        'department_id' => 1,
+        'position_id' => 1,
         'sort_by' => 'name',
         'sort_direction' => 'asc',
     ]);
@@ -103,8 +103,8 @@ test('execute filters out null values from filters', function () {
     $request = Mockery::mock(ExportEmployeeRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'search' => 'test',
-        'department' => null,
-        'position' => 'Manager',
+        'department_id' => null,
+        'position_id' => 1,
         'sort_by' => null,
         'sort_direction' => null,
     ]);

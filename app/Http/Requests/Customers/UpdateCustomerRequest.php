@@ -21,38 +21,19 @@ class UpdateCustomerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            'name' => 'sometimes|required|string|max:255',
             'email' => [
+                'sometimes',
                 'required',
                 'email',
                 Rule::unique('customers', 'email')->ignore($this->route('customer')),
             ],
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
-            'branch_id' => 'required|exists:branches,id',
-            'category_id' => 'required|exists:customer_categories,id',
-            'status' => 'required|in:active,inactive',
+            'branch_id' => 'sometimes|required|exists:branches,id',
+            'category_id' => 'sometimes|required|exists:customer_categories,id',
+            'status' => 'sometimes|required|in:active,inactive',
             'notes' => 'nullable|string',
         ];
-    }
-
-    /**
-     * Get the validated data and map branch to FK column.
-     */
-    public function validated($key = null, $default = null): mixed
-    {
-        $validated = parent::validated($key, $default);
-
-        if ($key !== null) {
-            return $validated;
-        }
-
-        // Map branch to branch_id
-        if (isset($validated['branch'])) {
-            $validated['branch_id'] = $validated['branch'];
-            unset($validated['branch']);
-        }
-
-        return $validated;
     }
 }

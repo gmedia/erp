@@ -27,9 +27,9 @@ class IndexEmployeesAction
             $this->filterService->applySearch($query, $request->get('search'), ['name', 'email', 'phone']);
         } else {
             $this->filterService->applyAdvancedFilters($query, [
-                'department_id' => $request->get('department'),
-                'position_id' => $request->get('position'),
-                'branch_id' => $request->get('branch'),
+                'department_id' => $request->get('department_id'),
+                'position_id' => $request->get('position_id'),
+                'branch_id' => $request->get('branch_id'),
             ]);
         }
 

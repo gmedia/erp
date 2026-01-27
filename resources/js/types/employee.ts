@@ -15,9 +15,9 @@ export interface EmployeeFormData {
     name: string;
     email: string;
     phone: string;
-    department: string;
-    position: string;
-    branch: string;
+    department_id: string;
+    position_id: string;
+    branch_id: string;
     salary: string;
     hire_date: Date;
 }

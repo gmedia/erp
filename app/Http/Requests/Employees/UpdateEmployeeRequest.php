@@ -26,48 +26,19 @@ class UpdateEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            'name' => 'sometimes|required|string|max:255',
             'email' => [
+                'sometimes',
                 'required',
                 'email',
                 Rule::unique('employees', 'email')->ignore($this->route('employee')->id),
             ],
             'phone' => 'nullable|string|max:20',
-            'department_id' => 'required|exists:departments,id',
-            'position_id' => 'required|exists:positions,id',
-            'branch_id' => 'required|exists:branches,id',
-            'salary' => 'required|numeric|min:0',
-            'hire_date' => 'required|date',
+            'department_id' => 'sometimes|required|exists:departments,id',
+            'position_id' => 'sometimes|required|exists:positions,id',
+            'branch_id' => 'sometimes|required|exists:branches,id',
+            'salary' => 'sometimes|required|numeric|min:0',
+            'hire_date' => 'sometimes|required|date',
         ];
-    }
-
-    /**
-     * Get the validated data and map department/position to FK columns.
-     */
-    public function validated($key = null, $default = null): mixed
-    {
-        $validated = parent::validated($key, $default);
-
-        if ($key !== null) {
-            return $validated;
-        }
-
-        // Map department to department_id and position to position_id
-        if (isset($validated['department'])) {
-            $validated['department_id'] = $validated['department'];
-            unset($validated['department']);
-        }
-
-        if (isset($validated['position'])) {
-            $validated['position_id'] = $validated['position'];
-            unset($validated['position']);
-        }
-
-        if (isset($validated['branch'])) {
-            $validated['branch_id'] = $validated['branch'];
-            unset($validated['branch']);
-        }
-
-        return $validated;
     }
 }

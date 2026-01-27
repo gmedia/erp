@@ -7,16 +7,16 @@ test('filter employees end‑to‑end', async ({ page }) => {
 
   // Create employees with distinct department/position combos
   const emp1 = await createEmployee(page, {
-    department: 'Engineering',
-    position: 'Manager',
+    department_id: 'Engineering',
+    position_id: 'Manager',
   });
   const emp2 = await createEmployee(page, {
-    department: 'Marketing',
-    position: 'Senior Developer',
+    department_id: 'Marketing',
+    position_id: 'Senior Developer',
   });
   const emp3 = await createEmployee(page, {
-    department: 'Engineering',
-    position: 'Senior Developer',
+    department_id: 'Engineering',
+    position_id: 'Senior Developer',
   });
 
   // Open filter dialog

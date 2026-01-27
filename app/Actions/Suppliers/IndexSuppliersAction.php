@@ -38,7 +38,7 @@ class IndexSuppliersAction
             $query,
             $request->get('sort_by', 'created_at'),
             strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'name', 'email', 'phone', 'address', 'branch_id', 'category', 'status', 'created_at', 'updated_at']
+            ['id', 'name', 'email', 'phone', 'address', 'branch_id', 'category_id', 'status', 'created_at', 'updated_at']
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);

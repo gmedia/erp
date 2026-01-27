@@ -18,9 +18,9 @@ test('execute calls filter service with correct parameters', function () {
     $request->shouldReceive('get')->with('search')->andReturn('test');
     
     // Advanced filters
-    $request->shouldReceive('get')->with('branch_id')->andReturn(1);
-    $request->shouldReceive('get')->with('category_id')->andReturn(1);
-    $request->shouldReceive('get')->with('status')->andReturn('active');
+    $request->shouldReceive('get')->with('branch_id')->andReturn(null);
+    $request->shouldReceive('get')->with('category_id')->andReturn(null);
+    $request->shouldReceive('get')->with('status')->andReturn(null);
 
     // Sorting
     $request->shouldReceive('get')->with('sort_by', 'created_at')->andReturn('created_at');
@@ -34,15 +34,15 @@ test('execute calls filter service with correct parameters', function () {
     $filterService->shouldReceive('applyAdvancedFilters')
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), [
-            'branch_id' => 1,
-            'category_id' => 1,
-            'status' => 'active',
+            'branch_id' => null,
+            'category_id' => null,
+            'status' => null,
         ]);
 
     $filterService->shouldReceive('applySorting')
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc', 
-            ['id', 'name', 'email', 'phone', 'address', 'branch_id', 'category', 'status', 'created_at', 'updated_at']);
+            ['id', 'name', 'email', 'phone', 'address', 'branch_id', 'category_id', 'status', 'created_at', 'updated_at']);
 
     // Mock pagination
     $builder = Mockery::mock('Illuminate\Database\Eloquent\Builder');

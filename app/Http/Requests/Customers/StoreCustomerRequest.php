@@ -30,24 +30,4 @@ class StoreCustomerRequest extends FormRequest
             'notes' => 'nullable|string',
         ];
     }
-
-    /**
-     * Get the validated data and map branch to FK column.
-     */
-    public function validated($key = null, $default = null): mixed
-    {
-        $validated = parent::validated($key, $default);
-
-        if ($key !== null) {
-            return $validated;
-        }
-
-        // Map branch to branch_id
-        if (isset($validated['branch'])) {
-            $validated['branch_id'] = $validated['branch'];
-            unset($validated['branch']);
-        }
-
-        return $validated;
-    }
 }
