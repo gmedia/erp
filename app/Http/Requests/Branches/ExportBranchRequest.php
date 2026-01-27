@@ -2,27 +2,9 @@
 
 namespace App\Http\Requests\Branches;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\SimpleCrudExportRequest;
 
-class ExportBranchRequest extends FormRequest
+class ExportBranchRequest extends SimpleCrudExportRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     */
-    public function rules(): array
-    {
-        return [
-            'search' => ['nullable', 'string'],
-            'sort_by' => ['nullable', 'string', 'in:id,name,created_at,updated_at'],
-            'sort_direction' => ['nullable', 'in:asc,desc'],
-        ];
-    }
+    
 }
