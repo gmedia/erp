@@ -40,12 +40,16 @@ function createUserWithBranchPermissions(array $permissionNames = []): User
 
 describe('Branch API Endpoints', function () {
     beforeEach(function () {
+        // Clear branches to ensure isolation from other tests' side effects
+        Branch::query()->delete();
+        
         // Create user with all branch permissions for existing tests
         $user = createUserWithBranchPermissions(['branch', 'branch.create', 'branch.edit', 'branch.delete']);
         actingAs($user);
     });
 
     test('index returns paginated branches with proper meta structure', function () {
+        $baseline = Branch::count();
         Branch::factory()->count(24)->create();
 
         $response = getJson('/api/branches?per_page=10');
@@ -71,7 +75,7 @@ describe('Branch API Endpoints', function () {
             ]);
 
         expect($response->json('data'))->toHaveCount(10);
-        expect($response->json('meta.total'))->toBe(25);
+        expect($response->json('meta.total'))->toBe($baseline + 24);
     });
 
     test('index supports search filtering', function () {

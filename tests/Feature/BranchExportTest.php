@@ -7,6 +7,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('branches');
 
 describe('BranchExport', function () {
+    beforeEach(function () {
+        Branch::query()->delete();
+    });
+
     test('query applies search filter case-insensitively', function () {
         Branch::factory()->create(['name' => 'Jakarta Branch']);
         Branch::factory()->create(['name' => 'Surabaya Branch']);

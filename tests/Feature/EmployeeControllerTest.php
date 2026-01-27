@@ -85,6 +85,14 @@ describe('Employee API Endpoints', function () {
     });
 
     test('index supports search filtering by multiple fields', function () {
+        Employee::query()->delete();
+        $user = createUserWithPermissions(['employee', 'employee.create', 'employee.edit', 'employee.delete']);
+        $user->employee->update([
+            'name' => 'Zebra Tester',
+            'email' => 'zebra@example.com'
+        ]);
+        actingAs($user);
+
         Employee::factory()->create(['name' => 'John Smith', 'email' => 'john@example.com']);
         Employee::factory()->create(['name' => 'Jane Doe', 'email' => 'jane@example.com']);
         Employee::factory()->create(['name' => 'Bob Johnson', 'email' => 'bob@example.com']);
@@ -94,7 +102,7 @@ describe('Employee API Endpoints', function () {
         $response->assertOk();
 
         $data = $response->json('data');
-        expect($data)->toHaveCount(2); // John Smith and Bob Johnson (john in email)
+        expect($data)->toHaveCount(2); // John Smith and Bob Johnson (john in name/email)
     });
 
     test('index supports advanced filtering by department', function () {

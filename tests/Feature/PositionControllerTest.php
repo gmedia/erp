@@ -40,12 +40,16 @@ function createUserWithPositionPermissions(array $permissionNames = []): User
 
 describe('Position API Endpoints', function () {
     beforeEach(function () {
+        // Clear positions to ensure isolation from other tests' side effects
+        Position::query()->delete();
+
         // Create user with all position permissions for existing tests
         $user = createUserWithPositionPermissions(['position', 'position.create', 'position.edit', 'position.delete']);
         actingAs($user);
     });
 
     test('index returns paginated positions with proper meta structure', function () {
+        $baseline = Position::count();
         Position::factory()->count(25)->create();
 
         $response = getJson('/api/positions?per_page=10');
@@ -70,8 +74,8 @@ describe('Position API Endpoints', function () {
                 ],
             ]);
 
-        // Note: +1 because beforeEach creates a position for the employee's user
-        expect($response->json('meta.total'))->toBe(26)
+        // Total should be baseline + 25
+        expect($response->json('meta.total'))->toBe($baseline + 25)
             ->and($response->json('meta.per_page'))->toBe(10)
             ->and($response->json('data'))->toHaveCount(10);
     });

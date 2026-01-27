@@ -7,6 +7,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('positions');
 
 describe('PositionExport', function () {
+    beforeEach(function () {
+        Position::query()->delete();
+    });
+
     test('query applies search filter case-insensitively', function () {
         Position::factory()->create(['name' => 'Engineering Position']);
         Position::factory()->create(['name' => 'Marketing Position']);

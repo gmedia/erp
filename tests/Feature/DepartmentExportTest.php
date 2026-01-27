@@ -7,6 +7,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('departments');
 
 describe('DepartmentExport', function () {
+    beforeEach(function () {
+        Department::query()->delete();
+    });
+
     test('query applies search filter case-insensitively', function () {
         Department::factory()->create(['name' => 'Engineering Department']);
         Department::factory()->create(['name' => 'Marketing Department']);

@@ -40,12 +40,16 @@ function createUserWithDepartmentPermissions(array $permissionNames = []): User
 
 describe('Department API Endpoints', function () {
     beforeEach(function () {
+        // Clear departments to ensure isolation from other tests' side effects
+        Department::query()->delete();
+
         // Create user with all department permissions for existing tests
         $user = createUserWithDepartmentPermissions(['department', 'department.create', 'department.edit', 'department.delete']);
         actingAs($user);
     });
 
     test('index returns paginated departments with proper meta structure', function () {
+        $baseline = Department::count();
         Department::factory()->count(25)->create();
 
         $response = getJson('/api/departments?per_page=10');
@@ -70,8 +74,8 @@ describe('Department API Endpoints', function () {
                 ],
             ]);
 
-        // Note: +1 because beforeEach creates a department for the employee's user
-        expect($response->json('meta.total'))->toBe(26)
+        // Total should be baseline + 25
+        expect($response->json('meta.total'))->toBe($baseline + 25)
             ->and($response->json('meta.per_page'))->toBe(10)
             ->and($response->json('data'))->toHaveCount(10);
     });
