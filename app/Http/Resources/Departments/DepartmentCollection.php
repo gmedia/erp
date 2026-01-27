@@ -2,14 +2,8 @@
 
 namespace App\Http\Resources\Departments;
 
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use App\Http\Resources\SimpleCrudCollection;
 
-class DepartmentCollection extends ResourceCollection
+class DepartmentCollection extends SimpleCrudCollection
 {
-    /**
-     * The resource that this collection transforms.
-     *
-     * @var string
-     */
-    public $collects = DepartmentResource::class;
 }

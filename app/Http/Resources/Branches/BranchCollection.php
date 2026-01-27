@@ -2,14 +2,8 @@
 
 namespace App\Http\Resources\Branches;
 
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use App\Http\Resources\SimpleCrudCollection;
 
-class BranchCollection extends ResourceCollection
+class BranchCollection extends SimpleCrudCollection
 {
-    /**
-     * The resource that this collection transforms.
-     *
-     * @var string
-     */
-    public $collects = BranchResource::class;
 }

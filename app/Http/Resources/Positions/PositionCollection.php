@@ -2,14 +2,8 @@
 
 namespace App\Http\Resources\Positions;
 
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use App\Http\Resources\SimpleCrudCollection;
 
-class PositionCollection extends ResourceCollection
+class PositionCollection extends SimpleCrudCollection
 {
-    /**
-     * The resource that this collection transforms.
-     *
-     * @var string
-     */
-    public $collects = PositionResource::class;
 }
