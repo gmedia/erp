@@ -67,7 +67,7 @@ Apakah modul ini:
 | `tests/Unit/Requests/{Features}/Update{Feature}RequestTest.php` | `SimpleCrudUpdateRequestTestTrait` |
 | `tests/Unit/Resources/{Features}/{Feature}ResourceTest.php` | `SimpleCrudResourceTestTrait` |
 | `tests/Unit/Resources/{Features}/{Feature}CollectionTest.php` | `SimpleCrudCollectionTestTrait` |
-| `tests/e2e/{features}/` | - |
+| `tests/e2e/{features}/{feature}.spec.ts` | Uses `runSimpleCrudE2ETests()` |
 
 ---
 
@@ -233,6 +233,23 @@ class FeatureCollectionTest extends TestCase
     protected function getCollectionClass() { return FeatureCollection::class; }
     protected function getModelClass() { return Feature::class; }
 }
+```
+
+### E2E Tests
+```typescript
+// tests/e2e/{features}/{feature}.spec.ts
+import { runSimpleCrudE2ETests } from '../simple-crud-tests';
+import { createFeature, searchFeature, editFeature } from '../helpers';
+
+runSimpleCrudE2ETests({
+  entityName: 'feature',
+  entityNamePlural: 'features',
+  route: '/features',
+  searchPlaceholder: 'Search features...',
+  createEntity: createFeature,
+  searchEntity: searchFeature,
+  editEntity: editFeature,
+});
 ```
 
 ---
