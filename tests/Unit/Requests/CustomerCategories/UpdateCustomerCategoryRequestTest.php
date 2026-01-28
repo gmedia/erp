@@ -1,30 +1,30 @@
 <?php
 
-namespace Tests\Unit\Requests\Departments;
+namespace Tests\Unit\Requests\CustomerCategories;
 
-use App\Http\Requests\Departments\UpdateDepartmentRequest;
-use App\Models\Department;
+use App\Http\Requests\CustomerCategories\UpdateCustomerCategoryRequest;
+use App\Models\CustomerCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\SimpleCrudUpdateRequestTestTrait;
 
-class UpdateDepartmentRequestTest extends TestCase
+class UpdateCustomerCategoryRequestTest extends TestCase
 {
     use RefreshDatabase;
     use SimpleCrudUpdateRequestTestTrait;
 
     protected function getRequestClass(): string
     {
-        return UpdateDepartmentRequest::class;
+        return UpdateCustomerCategoryRequest::class;
     }
 
     protected function getModelClass(): string
     {
-        return Department::class;
+        return CustomerCategory::class;
     }
 
     protected function getRouteParameterName(): string
     {
-        return 'department';
+        return 'customer_category';
     }
 }

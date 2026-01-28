@@ -1,25 +1,25 @@
 <?php
 
-namespace Tests\Unit\Resources\Positions;
+namespace Tests\Unit\Resources\CustomerCategories;
 
-use App\Http\Resources\Positions\PositionCollection;
-use App\Models\Position;
+use App\Http\Resources\CustomerCategories\CustomerCategoryCollection;
+use App\Models\CustomerCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\SimpleCrudCollectionTestTrait;
 
-class PositionCollectionTest extends TestCase
+class CustomerCategoryCollectionTest extends TestCase
 {
     use RefreshDatabase;
     use SimpleCrudCollectionTestTrait;
 
     protected function getCollectionClass(): string
     {
-        return PositionCollection::class;
+        return CustomerCategoryCollection::class;
     }
 
     protected function getModelClass(): string
     {
-        return Position::class;
+        return CustomerCategory::class;
     }
 }
