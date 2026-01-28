@@ -2,62 +2,29 @@
 
 namespace App\Actions\Departments;
 
-use App\Domain\Departments\DepartmentFilterService;
+use App\Actions\Concerns\SimpleCrudExportAction;
 use App\Exports\DepartmentExport;
-use App\Http\Requests\Departments\ExportDepartmentRequest;
 use App\Models\Department;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\FromQuery;
 
 /**
- * Action to export departments to Excel based on filters
+ * Action to export departments to Excel based on filters.
  */
-class ExportDepartmentsAction
+class ExportDepartmentsAction extends SimpleCrudExportAction
 {
-    public function __construct(
-        private DepartmentFilterService $filterService
-    ) {}
-
-    /**
-     * Execute the department export action.
-     *
-     * @param  \App\Http\Requests\Departments\ExportDepartmentRequest  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function execute(ExportDepartmentRequest $request): JsonResponse
+    protected function getModelClass(): string
     {
-        $validated = $request->validated();
+        return Department::class;
+    }
 
-        $query = Department::query();
+    protected function getExportInstance(array $filters, ?Builder $query): FromQuery
+    {
+        return new DepartmentExport($filters, $query);
+    }
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $validated['search'], ['name']);
-        }
-
-        $this->filterService->applySorting(
-            $query,
-            $validated['sort_by'] ?? 'created_at',
-            $validated['sort_direction'] ?? 'desc',
-            ['id', 'name', 'created_at', 'updated_at']
-        );
-
-        // Generate filename with timestamp
-        $filename = 'departments_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-
-        // Store the file in storage/app/public/exports/
-        $filePath = 'exports/' . $filename;
-
-        // Generate the Excel file using public disk
-        $export = new DepartmentExport([], $query);
-        Excel::store($export, $filePath, 'public');
-
-        // Generate the public URL for download
-        $url = Storage::url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+    protected function getFilenamePrefix(): string
+    {
+        return 'departments';
     }
 }

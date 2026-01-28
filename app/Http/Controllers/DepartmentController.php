@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Actions\Departments\ExportDepartmentsAction;
 use App\Actions\Departments\IndexDepartmentsAction;
-use App\Domain\Departments\DepartmentFilterService;
 use App\Http\Requests\Departments\ExportDepartmentRequest;
 use App\Http\Requests\Departments\IndexDepartmentRequest;
 use App\Http\Requests\Departments\StoreDepartmentRequest;
@@ -25,22 +24,16 @@ class DepartmentController extends Controller
      * Display a listing of the departments.
      *
      * Supports pagination, search filtering, and sorting.
-     *
-     * @param  \App\Http\Requests\Departments\IndexDepartmentRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function index(IndexDepartmentRequest $request): JsonResponse
     {
-        $departments = (new IndexDepartmentsAction(app(DepartmentFilterService::class)))->execute($request);
+        $departments = (new IndexDepartmentsAction())->execute($request);
 
         return (new DepartmentCollection($departments))->response();
     }
 
     /**
      * Store a newly created department in storage.
-     *
-     * @param  \App\Http\Requests\Departments\StoreDepartmentRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreDepartmentRequest $request): JsonResponse
     {
@@ -53,9 +46,6 @@ class DepartmentController extends Controller
 
     /**
      * Display the specified department.
-     *
-     * @param  \App\Models\Department  $department
-     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Department $department): JsonResponse
     {
@@ -64,10 +54,6 @@ class DepartmentController extends Controller
 
     /**
      * Update the specified department in storage.
-     *
-     * @param  \App\Http\Requests\Departments\UpdateDepartmentRequest  $request
-     * @param  \App\Models\Department  $department
-     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateDepartmentRequest $request, Department $department): JsonResponse
     {
@@ -78,9 +64,6 @@ class DepartmentController extends Controller
 
     /**
      * Remove the specified department from storage.
-     *
-     * @param  \App\Models\Department  $department
-     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Department $department): JsonResponse
     {
@@ -91,12 +74,9 @@ class DepartmentController extends Controller
 
     /**
      * Export departments to Excel based on filters.
-     *
-     * @param  \App\Http\Requests\Departments\ExportDepartmentRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function export(ExportDepartmentRequest $request): JsonResponse
     {
-        return (new ExportDepartmentsAction(app(DepartmentFilterService::class)))->execute($request);
+        return (new ExportDepartmentsAction())->execute($request);
     }
 }

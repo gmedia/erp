@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Actions\CustomerCategories\ExportCustomerCategoriesAction;
 use App\Actions\CustomerCategories\IndexCustomerCategoriesAction;
-use App\Domain\CustomerCategories\CustomerCategoryFilterService;
 use App\Http\Requests\CustomerCategories\ExportCustomerCategoryRequest;
 use App\Http\Requests\CustomerCategories\IndexCustomerCategoryRequest;
 use App\Http\Requests\CustomerCategories\StoreCustomerCategoryRequest;
@@ -13,41 +12,40 @@ use App\Http\Resources\CustomerCategories\CustomerCategoryCollection;
 use App\Http\Resources\CustomerCategories\CustomerCategoryResource;
 use App\Models\CustomerCategory;
 use Illuminate\Http\JsonResponse;
-use Inertia\Response;
 
+/**
+ * Controller for customer category management operations.
+ *
+ * Handles CRUD operations and export functionality for customer categories.
+ */
 class CustomerCategoryController extends Controller
 {
     /**
      * Display a listing of the customer categories.
      *
-     * @param  \App\Http\Requests\CustomerCategories\IndexCustomerCategoryRequest  $request
-     * @return \Illuminate\Http\JsonResponse
+     * Supports pagination, search filtering, and sorting.
      */
     public function index(IndexCustomerCategoryRequest $request): JsonResponse
     {
-        $categories = (new IndexCustomerCategoriesAction(app(CustomerCategoryFilterService::class)))->execute($request);
+        $customerCategories = (new IndexCustomerCategoriesAction())->execute($request);
 
-        return (new CustomerCategoryCollection($categories))->response();
+        return (new CustomerCategoryCollection($customerCategories))->response();
     }
 
     /**
      * Store a newly created customer category in storage.
-     *
-     * @param  \App\Http\Requests\CustomerCategories\StoreCustomerCategoryRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreCustomerCategoryRequest $request): JsonResponse
     {
-        $category = CustomerCategory::create($request->validated());
+        $customerCategory = CustomerCategory::create($request->validated());
 
-        return (new CustomerCategoryResource($category))->response()->setStatusCode(201);
+        return (new CustomerCategoryResource($customerCategory))
+            ->response()
+            ->setStatusCode(201);
     }
 
     /**
      * Display the specified customer category.
-     *
-     * @param  \App\Models\CustomerCategory  $customerCategory
-     * @return \Illuminate\Http\JsonResponse
      */
     public function show(CustomerCategory $customerCategory): JsonResponse
     {
@@ -56,10 +54,6 @@ class CustomerCategoryController extends Controller
 
     /**
      * Update the specified customer category in storage.
-     *
-     * @param  \App\Http\Requests\CustomerCategories\UpdateCustomerCategoryRequest  $request
-     * @param  \App\Models\CustomerCategory  $customerCategory
-     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateCustomerCategoryRequest $request, CustomerCategory $customerCategory): JsonResponse
     {
@@ -70,9 +64,6 @@ class CustomerCategoryController extends Controller
 
     /**
      * Remove the specified customer category from storage.
-     *
-     * @param  \App\Models\CustomerCategory  $customerCategory
-     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(CustomerCategory $customerCategory): JsonResponse
     {
@@ -83,12 +74,9 @@ class CustomerCategoryController extends Controller
 
     /**
      * Export customer categories to Excel based on filters.
-     *
-     * @param  \App\Http\Requests\CustomerCategories\ExportCustomerCategoryRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function export(ExportCustomerCategoryRequest $request): JsonResponse
     {
-        return (new ExportCustomerCategoriesAction(app(CustomerCategoryFilterService::class)))->execute($request);
+        return (new ExportCustomerCategoriesAction())->execute($request);
     }
 }

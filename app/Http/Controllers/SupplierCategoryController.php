@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Actions\SupplierCategories\ExportSupplierCategoriesAction;
 use App\Actions\SupplierCategories\IndexSupplierCategoriesAction;
-use App\Domain\SupplierCategories\SupplierCategoryFilterService;
 use App\Http\Requests\SupplierCategories\ExportSupplierCategoryRequest;
 use App\Http\Requests\SupplierCategories\IndexSupplierCategoryRequest;
 use App\Http\Requests\SupplierCategories\StoreSupplierCategoryRequest;
@@ -25,22 +24,16 @@ class SupplierCategoryController extends Controller
      * Display a listing of the supplier categories.
      *
      * Supports pagination, search filtering, and sorting.
-     *
-     * @param  \App\Http\Requests\SupplierCategories\IndexSupplierCategoryRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function index(IndexSupplierCategoryRequest $request): JsonResponse
     {
-        $supplierCategories = (new IndexSupplierCategoriesAction(app(SupplierCategoryFilterService::class)))->execute($request);
+        $supplierCategories = (new IndexSupplierCategoriesAction())->execute($request);
 
         return (new SupplierCategoryCollection($supplierCategories))->response();
     }
 
     /**
      * Store a newly created supplier category in storage.
-     *
-     * @param  \App\Http\Requests\SupplierCategories\StoreSupplierCategoryRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreSupplierCategoryRequest $request): JsonResponse
     {
@@ -53,9 +46,6 @@ class SupplierCategoryController extends Controller
 
     /**
      * Display the specified supplier category.
-     *
-     * @param  \App\Models\SupplierCategory  $supplierCategory
-     * @return \Illuminate\Http\JsonResponse
      */
     public function show(SupplierCategory $supplierCategory): JsonResponse
     {
@@ -64,10 +54,6 @@ class SupplierCategoryController extends Controller
 
     /**
      * Update the specified supplier category in storage.
-     *
-     * @param  \App\Http\Requests\SupplierCategories\UpdateSupplierCategoryRequest  $request
-     * @param  \App\Models\SupplierCategory  $supplierCategory
-     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateSupplierCategoryRequest $request, SupplierCategory $supplierCategory): JsonResponse
     {
@@ -78,9 +64,6 @@ class SupplierCategoryController extends Controller
 
     /**
      * Remove the specified supplier category from storage.
-     *
-     * @param  \App\Models\SupplierCategory  $supplierCategory
-     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(SupplierCategory $supplierCategory): JsonResponse
     {
@@ -91,12 +74,9 @@ class SupplierCategoryController extends Controller
 
     /**
      * Export supplier categories to Excel based on filters.
-     *
-     * @param  \App\Http\Requests\SupplierCategories\ExportSupplierCategoryRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function export(ExportSupplierCategoryRequest $request): JsonResponse
     {
-        return (new ExportSupplierCategoriesAction(app(SupplierCategoryFilterService::class)))->execute($request);
+        return (new ExportSupplierCategoriesAction())->execute($request);
     }
 }
