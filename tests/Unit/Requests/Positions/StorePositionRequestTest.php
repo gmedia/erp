@@ -1,62 +1,25 @@
 <?php
 
+namespace Tests\Unit\Requests\Positions;
+
 use App\Http\Requests\Positions\StorePositionRequest;
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use Tests\Traits\SimpleCrudStoreRequestTestTrait;
 
-uses(RefreshDatabase::class)->group('positions');
+class StorePositionRequestTest extends TestCase
+{
+    use RefreshDatabase;
+    use SimpleCrudStoreRequestTestTrait;
 
-describe('StorePositionRequest', function () {
+    protected function getRequestClass(): string
+    {
+        return StorePositionRequest::class;
+    }
 
-    test('authorize returns true', function () {
-        $request = new StorePositionRequest;
-
-        expect($request->authorize())->toBeTrue();
-    });
-
-    test('rules validation passes with valid data', function () {
-        $data = ['name' => 'Software Engineer'];
-
-        $validator = validator($data, (new StorePositionRequest)->rules());
-
-        expect(!$validator->fails())->toBeTrue();
-    });
-
-    test('rules validation fails with missing name', function () {
-        $data = [];
-
-        $validator = validator($data, (new StorePositionRequest)->rules());
-
-        expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('name'))->toBeTrue()
-            ->and($validator->errors()->first('name'))->toContain('required');
-    });
-
-    test('rules validation fails with empty name', function () {
-        $data = ['name' => ''];
-
-        $validator = validator($data, (new StorePositionRequest)->rules());
-
-        expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('name'))->toBeTrue();
-    });
-
-    test('rules validation fails with name too long', function () {
-        $data = ['name' => str_repeat('a', 256)];
-
-        $validator = validator($data, (new StorePositionRequest)->rules());
-
-        expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('name'))->toBeTrue();
-    });
-    
-    test('rules validation passes with unique name', function () {
-        Position::factory()->create(['name' => 'Existing Position']);
-
-        $data = ['name' => 'New Position'];
-
-        $validator = validator($data, (new StorePositionRequest)->rules());
-
-        expect(!$validator->fails())->toBeTrue();
-    });
-});
+    protected function getModelClass(): string
+    {
+        return Position::class;
+    }
+}

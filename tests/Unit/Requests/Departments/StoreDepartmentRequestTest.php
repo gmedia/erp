@@ -1,63 +1,25 @@
 <?php
 
+namespace Tests\Unit\Requests\Departments;
+
 use App\Http\Requests\Departments\StoreDepartmentRequest;
 use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use Tests\Traits\SimpleCrudStoreRequestTestTrait;
 
-uses(RefreshDatabase::class)->group('departments');
+class StoreDepartmentRequestTest extends TestCase
+{
+    use RefreshDatabase;
+    use SimpleCrudStoreRequestTestTrait;
 
-describe('StoreDepartmentRequest', function () {
+    protected function getRequestClass(): string
+    {
+        return StoreDepartmentRequest::class;
+    }
 
-    test('authorize returns true', function () {
-        $request = new StoreDepartmentRequest;
-
-        expect($request->authorize())->toBeTrue();
-    });
-
-    test('rules validation passes with valid data', function () {
-        $data = ['name' => 'Engineering Department'];
-
-        $validator = validator($data, (new StoreDepartmentRequest)->rules());
-
-        expect(!$validator->fails())->toBeTrue();
-    });
-
-    test('rules validation fails with missing name', function () {
-        $data = [];
-
-        $validator = validator($data, (new StoreDepartmentRequest)->rules());
-
-        expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('name'))->toBeTrue()
-            ->and($validator->errors()->first('name'))->toContain('required');
-    });
-
-    test('rules validation fails with empty name', function () {
-        $data = ['name' => ''];
-
-        $validator = validator($data, (new StoreDepartmentRequest)->rules());
-
-        expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('name'))->toBeTrue();
-    });
-
-    test('rules validation fails with name too long', function () {
-        $data = ['name' => str_repeat('a', 256)];
-
-        $validator = validator($data, (new StoreDepartmentRequest)->rules());
-
-        expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('name'))->toBeTrue();
-    });
-
-    test('rules validation passes with unique name', function () {
-        Department::factory()->create(['name' => 'Existing Department']);
-
-        $data = ['name' => 'New Department'];
-
-        $validator = validator($data, (new StoreDepartmentRequest)->rules());
-
-        expect(!$validator->fails())->toBeTrue();
-    });
-
-});
+    protected function getModelClass(): string
+    {
+        return Department::class;
+    }
+}

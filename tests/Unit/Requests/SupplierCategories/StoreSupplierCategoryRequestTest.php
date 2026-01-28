@@ -1,63 +1,25 @@
 <?php
 
+namespace Tests\Unit\Requests\SupplierCategories;
+
 use App\Http\Requests\SupplierCategories\StoreSupplierCategoryRequest;
 use App\Models\SupplierCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use Tests\Traits\SimpleCrudStoreRequestTestTrait;
 
-uses(RefreshDatabase::class)->group('supplier_categories');
+class StoreSupplierCategoryRequestTest extends TestCase
+{
+    use RefreshDatabase;
+    use SimpleCrudStoreRequestTestTrait;
 
-describe('StoreSupplierCategoryRequest', function () {
+    protected function getRequestClass(): string
+    {
+        return StoreSupplierCategoryRequest::class;
+    }
 
-    test('authorize returns true', function () {
-        $request = new StoreSupplierCategoryRequest;
-
-        expect($request->authorize())->toBeTrue();
-    });
-
-    test('rules validation passes with valid data', function () {
-        $data = ['name' => 'Engineering Category'];
-
-        $validator = validator($data, (new StoreSupplierCategoryRequest)->rules());
-
-        expect(!$validator->fails())->toBeTrue();
-    });
-
-    test('rules validation fails with missing name', function () {
-        $data = [];
-
-        $validator = validator($data, (new StoreSupplierCategoryRequest)->rules());
-
-        expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('name'))->toBeTrue()
-            ->and($validator->errors()->first('name'))->toContain('required');
-    });
-
-    test('rules validation fails with empty name', function () {
-        $data = ['name' => ''];
-
-        $validator = validator($data, (new StoreSupplierCategoryRequest)->rules());
-
-        expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('name'))->toBeTrue();
-    });
-
-    test('rules validation fails with name too long', function () {
-        $data = ['name' => str_repeat('a', 256)];
-
-        $validator = validator($data, (new StoreSupplierCategoryRequest)->rules());
-
-        expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('name'))->toBeTrue();
-    });
-
-    test('rules validation passes with unique name', function () {
-        SupplierCategory::factory()->create(['name' => 'Existing Category']);
-
-        $data = ['name' => 'New Category'];
-
-        $validator = validator($data, (new StoreSupplierCategoryRequest)->rules());
-
-        expect(!$validator->fails())->toBeTrue();
-    });
-
-});
+    protected function getModelClass(): string
+    {
+        return SupplierCategory::class;
+    }
+}

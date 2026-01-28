@@ -1,53 +1,25 @@
 <?php
 
+namespace Tests\Unit\Resources\Departments;
+
 use App\Http\Resources\Departments\DepartmentResource;
 use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Request;
+use Tests\TestCase;
+use Tests\Traits\SimpleCrudResourceTestTrait;
 
-uses(RefreshDatabase::class)->group('departments');
+class DepartmentResourceTest extends TestCase
+{
+    use RefreshDatabase;
+    use SimpleCrudResourceTestTrait;
 
-test('toArray transforms department correctly', function () {
-    $department = Department::factory()->create([
-        'name' => 'Engineering',
-        'created_at' => '2023-01-01 10:00:00',
-        'updated_at' => '2023-01-02 11:00:00',
-    ]);
+    protected function getResourceClass(): string
+    {
+        return DepartmentResource::class;
+    }
 
-    $resource = new DepartmentResource($department);
-    $request = new Request;
-
-    $result = $resource->toArray($request);
-
-    expect($result)->toHaveKey('id', $department->id)
-        ->and($result)->toHaveKey('name', 'Engineering')
-        ->and($result['created_at'])->toBeString()
-        ->and($result['updated_at'])->toBeString();
-});
-
-test('toArray includes all required fields', function () {
-    $department = Department::factory()->create();
-
-    $resource = new DepartmentResource($department);
-    $request = new Request;
-
-    $result = $resource->toArray($request);
-
-    expect($result)->toHaveKeys(['id', 'name', 'created_at', 'updated_at'])
-        ->and($result['id'])->toBe($department->id)
-        ->and($result['name'])->toBe($department->name);
-});
-
-test('toArray handles null timestamps', function () {
-    $department = Department::factory()->create();
-    $department->created_at = null;
-    $department->updated_at = null;
-
-    $resource = new DepartmentResource($department);
-    $request = new Request;
-
-    $result = $resource->toArray($request);
-
-    expect($result['created_at'])->toBeNull()
-        ->and($result['updated_at'])->toBeNull();
-});
+    protected function getModelClass(): string
+    {
+        return Department::class;
+    }
+}

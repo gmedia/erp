@@ -1,71 +1,31 @@
 <?php
 
+namespace Tests\Unit\Actions\Positions;
+
 use App\Actions\Positions\IndexPositionsAction;
-use App\Domain\Positions\PositionFilterService;
 use App\Http\Requests\Positions\IndexPositionRequest;
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Tests\TestCase;
+use Tests\Traits\SimpleCrudIndexActionTestTrait;
 
-uses(RefreshDatabase::class)->group('positions');
+class IndexPositionsActionTest extends TestCase
+{
+    use RefreshDatabase;
+    use SimpleCrudIndexActionTestTrait;
 
-test('execute returns paginated positions', function () {
-    $filterService = new PositionFilterService;
-    $action = new IndexPositionsAction($filterService);
+    protected function getActionClass(): string
+    {
+        return IndexPositionsAction::class;
+    }
 
-    Position::factory()->count(3)->create();
+    protected function getModelClass(): string
+    {
+        return Position::class;
+    }
 
-    // Mock request
-    $request = Mockery::mock(IndexPositionRequest::class);
-    $request->shouldReceive('filled')->with('search')->andReturn(false);
-    $request->shouldReceive('get')->with('sort_by', 'created_at')->andReturn('created_at');
-    $request->shouldReceive('get')->with('sort_direction', 'desc')->andReturn('desc');
-    $request->shouldReceive('get')->with('per_page', 15)->andReturn(15);
-
-    $result = $action->execute($request);
-
-    expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
-        ->and($result->count())->toBe(3);
-});
-
-test('execute filters by search term', function () {
-    $filterService = new PositionFilterService;
-    $action = new IndexPositionsAction($filterService);
-
-    Position::factory()->create(['name' => 'Manager']);
-    Position::factory()->create(['name' => 'Staff']);
-
-    // Mock request with search
-    $request = Mockery::mock(IndexPositionRequest::class);
-    $request->shouldReceive('filled')->with('search')->andReturn(true);
-    $request->shouldReceive('get')->with('search')->andReturn('manager');
-    $request->shouldReceive('get')->with('sort_by', 'created_at')->andReturn('created_at');
-    $request->shouldReceive('get')->with('sort_direction', 'desc')->andReturn('desc');
-    $request->shouldReceive('get')->with('per_page', 15)->andReturn(15);
-
-    $result = $action->execute($request);
-
-    expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
-        ->and($result->count())->toBe(1)
-        ->and($result->first()->name)->toBe('Manager');
-});
-
-test('execute sorts results', function () {
-    $filterService = new PositionFilterService;
-    $action = new IndexPositionsAction($filterService);
-
-    Position::factory()->create(['name' => 'A Position']);
-    Position::factory()->create(['name' => 'B Position']);
-
-    // Mock request with sort
-    $request = Mockery::mock(IndexPositionRequest::class);
-    $request->shouldReceive('filled')->with('search')->andReturn(false);
-    $request->shouldReceive('get')->with('sort_by', 'created_at')->andReturn('name');
-    $request->shouldReceive('get')->with('sort_direction', 'desc')->andReturn('desc');
-    $request->shouldReceive('get')->with('per_page', 15)->andReturn(15);
-
-    $result = $action->execute($request);
-
-    expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
-        ->and($result->first()->name)->toBe('B Position');
-});
+    protected function getRequestClass(): string
+    {
+        return IndexPositionRequest::class;
+    }
+}
