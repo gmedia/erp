@@ -54,11 +54,20 @@ Apakah modul ini:
 | `resources/js/utils/entityConfigs.ts` (tambah config baru) |
 
 ### Tests
-| Path |
-|------|
-| `tests/Feature/{Feature}ControllerTest.php` (use `SimpleCrudTestTrait`) |
-| `tests/Feature/{Feature}ExportTest.php` |
-| `tests/e2e/{features}/` |
+| Path | Base Trait |
+|------|------------|
+| `tests/Feature/{Feature}ControllerTest.php` | `SimpleCrudTestTrait` |
+| `tests/Feature/{Feature}ExportTest.php` | `SimpleCrudExportTestTrait` |
+| `tests/Unit/Actions/{Features}/Index{Features}ActionTest.php` | `SimpleCrudIndexActionTestTrait` |
+| `tests/Unit/Actions/{Features}/Export{Features}ActionTest.php` | `SimpleCrudExportActionTestTrait` |
+| `tests/Unit/Domain/{Features}/{Feature}FilterServiceTest.php` | `SimpleCrudFilterServiceTestTrait` |
+| `tests/Unit/Requests/{Features}/Index{Feature}RequestTest.php` | `SimpleCrudIndexRequestTestTrait` |
+| `tests/Unit/Requests/{Features}/Export{Feature}RequestTest.php` | `SimpleCrudExportRequestTestTrait` |
+| `tests/Unit/Requests/{Features}/Store{Feature}RequestTest.php` | `SimpleCrudStoreRequestTestTrait` |
+| `tests/Unit/Requests/{Features}/Update{Feature}RequestTest.php` | `SimpleCrudUpdateRequestTestTrait` |
+| `tests/Unit/Resources/{Features}/{Feature}ResourceTest.php` | `SimpleCrudResourceTestTrait` |
+| `tests/Unit/Resources/{Features}/{Feature}CollectionTest.php` | `SimpleCrudCollectionTestTrait` |
+| `tests/e2e/{features}/` | - |
 
 ---
 
@@ -133,6 +142,7 @@ class FeatureCollection extends SimpleCrudCollection {}
 
 ### Tests
 ```php
+// Feature Controller Test - tests/Feature/{Feature}ControllerTest.php
 class FeatureControllerTest extends TestCase
 {
     use RefreshDatabase, SimpleCrudTestTrait;
@@ -141,6 +151,87 @@ class FeatureControllerTest extends TestCase
     protected $endpoint = '/api/features';
     protected $permissionPrefix = 'feature';
     protected $structure = ['id', 'name', 'created_at', 'updated_at'];
+}
+
+// Feature Export Test - tests/Feature/{Feature}ExportTest.php
+class FeatureExportTest extends TestCase
+{
+    use RefreshDatabase, SimpleCrudExportTestTrait;
+    
+    protected function getExportClass() { return FeatureExport::class; }
+    protected function getModelClass() { return Feature::class; }
+    protected function getSampleData() { 
+        return ['match' => 'Engineering', 'others' => ['Marketing', 'Sales']]; 
+    }
+}
+
+// Unit Action Tests - tests/Unit/Actions/{Features}/
+class IndexFeaturesActionTest extends TestCase
+{
+    use RefreshDatabase, SimpleCrudIndexActionTestTrait;
+    protected function getActionClass() { return IndexFeaturesAction::class; }
+    protected function getModelClass() { return Feature::class; }
+    protected function getRequestClass() { return IndexFeatureRequest::class; }
+}
+
+class ExportFeaturesActionTest extends TestCase
+{
+    use RefreshDatabase, SimpleCrudExportActionTestTrait;
+    protected function getActionClass() { return ExportFeaturesAction::class; }
+    protected function getModelClass() { return Feature::class; }
+    protected function getRequestClass() { return ExportFeatureRequest::class; }
+    protected function getExpectedFilenamePrefix() { return 'features'; }
+}
+
+// Unit FilterService Test - tests/Unit/Domain/{Features}/
+class FeatureFilterServiceTest extends TestCase
+{
+    use RefreshDatabase, SimpleCrudFilterServiceTestTrait;
+    protected function getFilterServiceClass() { return FeatureFilterService::class; }
+    protected function getModelClass() { return Feature::class; }
+}
+
+// Unit Request Tests - tests/Unit/Requests/{Features}/
+class IndexFeatureRequestTest extends TestCase
+{
+    use SimpleCrudIndexRequestTestTrait;
+    protected function getRequestClass() { return IndexFeatureRequest::class; }
+}
+
+class ExportFeatureRequestTest extends TestCase
+{
+    use SimpleCrudExportRequestTestTrait;
+    protected function getRequestClass() { return ExportFeatureRequest::class; }
+}
+
+class StoreFeatureRequestTest extends TestCase
+{
+    use RefreshDatabase, SimpleCrudStoreRequestTestTrait;
+    protected function getRequestClass() { return StoreFeatureRequest::class; }
+    protected function getModelClass() { return Feature::class; }
+}
+
+class UpdateFeatureRequestTest extends TestCase
+{
+    use RefreshDatabase, SimpleCrudUpdateRequestTestTrait;
+    protected function getRequestClass() { return UpdateFeatureRequest::class; }
+    protected function getModelClass() { return Feature::class; }
+    protected function getRouteParameterName() { return 'feature'; }
+}
+
+// Unit Resource Tests - tests/Unit/Resources/{Features}/
+class FeatureResourceTest extends TestCase
+{
+    use RefreshDatabase, SimpleCrudResourceTestTrait;
+    protected function getResourceClass() { return FeatureResource::class; }
+    protected function getModelClass() { return Feature::class; }
+}
+
+class FeatureCollectionTest extends TestCase
+{
+    use RefreshDatabase, SimpleCrudCollectionTestTrait;
+    protected function getCollectionClass() { return FeatureCollection::class; }
+    protected function getModelClass() { return Feature::class; }
 }
 ```
 
@@ -215,5 +306,11 @@ Gunakan `mcp_laravel-boost_list-routes` untuk verify routes terdaftar.
 - [ ] Controller tanpa dependency injection FilterService
 - [ ] Config ditambahkan di `entityConfigs.ts`
 - [ ] Frontend page menggunakan `createEntityCrudPage`
-- [ ] Tests menggunakan `SimpleCrudTestTrait`
+- [ ] **Tests menggunakan traits:**
+  - [ ] Feature Controller → `SimpleCrudTestTrait`
+  - [ ] Feature Export → `SimpleCrudExportTestTrait`
+  - [ ] Unit Actions → `SimpleCrudIndexActionTestTrait`, `SimpleCrudExportActionTestTrait`
+  - [ ] Unit FilterService → `SimpleCrudFilterServiceTestTrait`
+  - [ ] Unit Requests → `SimpleCrud*RequestTestTrait`
+  - [ ] Unit Resources → `SimpleCrudResourceTestTrait`, `SimpleCrudCollectionTestTrait`
 - [ ] Semua tests pass
