@@ -5,6 +5,7 @@ use App\Models\Permission;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Traits\CreatesTestUserWithPermissions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -14,49 +15,18 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
 
-uses(RefreshDatabase::class)->group('suppliers');
-
-/**
- * Helper function to create a user with specific permissions.
- */
-function createSupplierUserWithPermissions(array $permissionNames = []): User
-{
-    $user = User::factory()->create();
-    
-    // Create required permissions
-    foreach ($permissionNames as $name) {
-        Permission::firstOrCreate(
-            ['name' => $name],
-            ['display_name' => ucwords(str_replace(['.', '-'], ' ', $name))]
-        );
-    }
-    
-    // Assign permissions to user directly or via role (assuming direct assignment for simplicity in tests or via a helper if exists)
-    // In this codebase, permissions seem to be assigned to employees usually, but let's see how the Employee test did it.
-    // The Employee test helper `createUserWithPermissions` creates an employee for the user and syncs permissions to the employee.
-    // I should probably follow that pattern if the authorization middleware checks employee permissions.
-    // Let's assume standard Laravel permission checking for now, but looking at EmployeeControllerTest, it does:
-    // $employee->permissions()->sync($permissions);
-    
-    // So I need to create an employee for this user.
-    $employee = \App\Models\Employee::factory()->create(['user_id' => $user->id]);
-    
-    $permissionIds = Permission::whereIn('name', $permissionNames)->pluck('id');
-    $employee->permissions()->sync($permissionIds);
-
-    return $user;
-}
+uses(RefreshDatabase::class, CreatesTestUserWithPermissions::class)->group('suppliers');
 
 describe('Supplier API Endpoints', function () {
     beforeEach(function () {
         // Create user with all supplier permissions
-        $this->user = createSupplierUserWithPermissions([
+        $this->user = $this->createTestUserWithPermissions([
             'supplier',
             'supplier.create',
             'supplier.edit',
             'supplier.delete'
         ]);
-        
+
         actingAs($this->user);
     });
 

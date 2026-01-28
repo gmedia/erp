@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Suppliers;
 
-use Illuminate\Http\Request;
+use App\Models\Supplier;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -16,17 +16,14 @@ class SupplierResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
+    public function toArray($request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->phone,
-            'address' => $this->address,
-            'status' => $this->status,
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            'id' => $this->resource->id,
+            'name' => $this->resource->name,
+            'email' => $this->resource->email,
+            'phone' => $this->resource->phone,
+            'address' => $this->resource->address,
             'branch' => [
                 'id' => $this->resource->branch_id,
                 'name' => $this->resource->branch?->name,
@@ -35,6 +32,9 @@ class SupplierResource extends JsonResource
                 'id' => $this->resource->category_id,
                 'name' => $this->resource->category?->name,
             ],
+            'status' => $this->resource->status,
+            'created_at' => $this->resource->created_at?->toIso8601String(),
+            'updated_at' => $this->resource->updated_at?->toIso8601String(),
         ];
     }
 }
