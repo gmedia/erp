@@ -41,6 +41,8 @@ class DatabaseSeeder extends Seeder
             BranchSeeder::class,
             DepartmentSeeder::class,
             PositionSeeder::class,
+            ProductCategorySeeder::class,
+            UnitSeeder::class,
         ]);
 
         Employee::updateOrCreate([
