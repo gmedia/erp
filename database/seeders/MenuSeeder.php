@@ -106,6 +106,14 @@ class MenuSeeder extends Seeder
                         'url' => 'units',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'product',
+                        'display_name' => 'Product',
+                        'permissions' => ['product', 'product.create', 'product.edit', 'product.delete'],
+                        'icon' => 'LayoutList',
+                        'url' => 'products',
+                        'child' => [],
+                    ],
                 ],
             ],
             [

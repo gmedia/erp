@@ -223,6 +223,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'product',
+                'display_name' => 'Product',
+                'child' => [
+                    [
+                        'name' => 'product.create',
+                        'display_name' => 'Create Product',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'product.edit',
+                        'display_name' => 'Edit Product',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'product.delete',
+                        'display_name' => 'Delete Product',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],
