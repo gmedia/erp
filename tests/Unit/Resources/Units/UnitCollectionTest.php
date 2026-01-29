@@ -21,4 +21,9 @@ class UnitCollectionTest extends TestCase
     {
         return Unit::class;
     }
+
+    protected function getResourceClass(): string
+    {
+        return \App\Http\Resources\Units\UnitResource::class;
+    }
 }

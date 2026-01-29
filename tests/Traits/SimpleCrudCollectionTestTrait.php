@@ -27,12 +27,22 @@ trait SimpleCrudCollectionTestTrait
      */
     abstract protected function getModelClass(): string;
 
+    /**
+     * Get the resource class that the collection should collect.
+     * 
+     * @return class-string
+     */
+    protected function getResourceClass(): string
+    {
+        return \App\Http\Resources\SimpleCrudResource::class;
+    }
+
     public function test_collects_property_is_set_correctly(): void
     {
         $collectionClass = $this->getCollectionClass();
         $collection = new $collectionClass([]);
 
-        $this->assertEquals(\App\Http\Resources\SimpleCrudResource::class, $collection->collects);
+        $this->assertEquals($this->getResourceClass(), $collection->collects);
     }
 
     public function test_collection_transforms_multiple_items_correctly(): void

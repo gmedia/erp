@@ -21,4 +21,9 @@ class ProductCategoryCollectionTest extends TestCase
     {
         return ProductCategory::class;
     }
+
+    protected function getResourceClass(): string
+    {
+        return \App\Http\Resources\ProductCategories\ProductCategoryResource::class;
+    }
 }
