@@ -48,22 +48,14 @@ export const CustomerViewModal = memo<CustomerViewModalProps>(
 
                         {/* Details Section */}
                         <ViewField label="Branch" value={branchName} />
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-muted-foreground">
-                                Customer Type
-                            </span>
-                            <Badge
-                                variant={
-                                    item.customer_type === 'company'
-                                        ? 'default'
-                                        : 'secondary'
-                                }
-                            >
-                                {item.customer_type === 'company'
-                                    ? 'Company'
-                                    : 'Individual'}
-                            </Badge>
-                        </div>
+                        <ViewField
+                            label="Category"
+                            value={
+                                typeof item.category === 'object'
+                                    ? item.category.name
+                                    : item.category
+                            }
+                        />
                         <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-muted-foreground">
                                 Status
