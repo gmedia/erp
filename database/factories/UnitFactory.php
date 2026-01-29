@@ -19,19 +19,9 @@ class UnitFactory extends Factory
      */
     public function definition(): array
     {
-        $units = [
-            ['name' => 'Piece', 'symbol' => 'pcs'],
-            ['name' => 'Box', 'symbol' => 'box'],
-            ['name' => 'Kilogram', 'symbol' => 'kg'],
-            ['name' => 'Meter', 'symbol' => 'm'],
-            ['name' => 'Liter', 'symbol' => 'L'],
-        ];
-
-        $unit = fake()->randomElement($units);
-
         return [
-            'name' => $unit['name'],
-            'symbol' => $unit['symbol'],
+            'name' => fake()->unique()->words(2, true),
+            'symbol' => fake()->unique()->lexify('???'),
         ];
     }
 }

@@ -24,6 +24,6 @@ class UpdateProductCategoryRequestTest extends TestCase
 
     protected function getRouteParameterName(): string
     {
-        return 'productCategory';
+        return 'product_category';
     }
 }
