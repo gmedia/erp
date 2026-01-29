@@ -66,6 +66,10 @@ import { createSupplierFilterFields } from '@/components/suppliers/SupplierFilte
 import { SupplierForm } from '@/components/suppliers/SupplierForm';
 import { createSimpleEntityColumns } from '@/utils/columns';
 import { SupplierViewModal } from '@/components/suppliers/SupplierViewModal';
+import { productColumns } from '@/components/products/ProductColumns';
+import { createProductFilterFields } from '@/components/products/ProductFilters';
+import { ProductForm } from '@/components/products/ProductForm';
+import { ProductViewModal } from '@/components/products/ProductViewModal';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -294,6 +298,31 @@ export const unitConfig = createSimpleEntityConfig({
     entityNamePlural: 'Units',
     apiBase: 'units',
     filterPlaceholder: 'Search units...',
+});
+
+export const productConfig = createComplexEntityConfig({
+    entityName: 'Product',
+    entityNamePlural: 'Products',
+    apiEndpoint: '/api/products',
+    exportEndpoint: '/api/products/export',
+    queryKey: ['products'],
+    breadcrumbs: [{ title: 'Products', href: '/products' }],
+    initialFilters: {
+        search: '',
+        category_id: '',
+        unit_id: '',
+        branch_id: '',
+        type: '',
+        status: '',
+    },
+    columns: productColumns,
+    filterFields: createProductFilterFields(),
+    formComponent: ProductForm,
+    formType: 'complex',
+    entityNameForSearch: 'product',
+    viewModalComponent: ProductViewModal,
+    getDeleteMessage: (product: { name?: string }) =>
+        `This action cannot be undone. This will permanently delete ${product.name}'s product record.`,
 });
 
 

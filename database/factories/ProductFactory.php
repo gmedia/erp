@@ -34,7 +34,7 @@ class ProductFactory extends Factory
             'type' => $type,
             'category_id' => ProductCategory::factory(),
             'unit_id' => Unit::factory(),
-            'branch_id' => fake()->optional()->randomElement([null, 1, 2, 3]),
+            'branch_id' => fake()->boolean(70) ? Branch::factory() : null,
             'cost' => $cost,
             'selling_price' => round($sellingPrice, 2),
             'markup_percentage' => $markup,

@@ -77,3 +77,35 @@ export const supplierFormSchema = z.object({
 });
 
 export type SupplierFormData = z.infer<typeof supplierFormSchema>;
+
+// Schema for product form data
+export const productFormSchema = z.object({
+    code: z.string().min(2, { message: 'Code must be at least 2 characters.' }),
+    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    description: z.string().optional(),
+    type: z.enum(['raw_material', 'work_in_progress', 'finished_good', 'purchased_good', 'service'], {
+        message: 'Product type is required.',
+    }),
+    category_id: z.string().min(1, { message: 'Category is required.' }),
+    unit_id: z.string().min(1, { message: 'Unit is required.' }),
+    branch_id: z.string().optional(),
+    cost: z.string().min(1, { message: 'Cost is required.' }),
+    selling_price: z.string().min(1, { message: 'Selling price is required.' }),
+    markup_percentage: z.string().optional(),
+    billing_model: z.enum(['one_time', 'subscription', 'both'], {
+        message: 'Billing model is required.',
+    }),
+    is_recurring: z.boolean().default(false),
+    trial_period_days: z.string().optional(),
+    allow_one_time_purchase: z.boolean().default(true),
+    is_manufactured: z.boolean().default(false),
+    is_purchasable: z.boolean().default(true),
+    is_sellable: z.boolean().default(true),
+    is_taxable: z.boolean().default(true),
+    status: z.enum(['active', 'inactive', 'discontinued'], {
+        message: 'Status is required.',
+    }),
+    notes: z.string().optional(),
+});
+
+export type ProductFormData = z.infer<typeof productFormSchema>;
