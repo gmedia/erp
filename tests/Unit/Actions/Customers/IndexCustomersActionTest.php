@@ -59,7 +59,6 @@ test('getPaginationParams returns default values', function () {
 
     $reflection = new ReflectionClass($action);
     $method = $reflection->getMethod('getPaginationParams');
-    $method->setAccessible(true);
 
     $result = $method->invoke($action, $request);
 

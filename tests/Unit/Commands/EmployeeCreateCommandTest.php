@@ -14,7 +14,6 @@ test('generateUniqueEmail creates unique emails', function () {
     // Use reflection to access private method
     $reflection = new ReflectionClass($command);
     $method = $reflection->getMethod('generateUniqueEmail');
-    $method->setAccessible(true);
 
     $faker = \Faker\Factory::create();
 
@@ -39,7 +38,6 @@ test('generateUniqueEmail handles existing emails by generating new ones', funct
     // Use reflection to access private method
     $reflection = new ReflectionClass($command);
     $method = $reflection->getMethod('generateUniqueEmail');
-    $method->setAccessible(true);
 
     // Create a simple faker instance - the method will handle the uniqueness internally
     $faker = \Faker\Factory::create();
@@ -60,7 +58,6 @@ test('generateSalaryForPosition returns appropriate salary ranges', function () 
     // Use reflection to access private method
     $reflection = new ReflectionClass($command);
     $method = $reflection->getMethod('generateSalaryForPosition');
-    $method->setAccessible(true);
 
     $faker = \Faker\Factory::create();
 
@@ -86,7 +83,6 @@ test('generateSalaryForPosition handles unknown positions with default range', f
     // Use reflection to access private method
     $reflection = new ReflectionClass($command);
     $method = $reflection->getMethod('generateSalaryForPosition');
-    $method->setAccessible(true);
 
     $faker = \Faker\Factory::create();
 
@@ -105,7 +101,6 @@ test('generateSalaryForPosition formats salary correctly', function () {
     // Use reflection to access private method
     $reflection = new ReflectionClass($command);
     $method = $reflection->getMethod('generateSalaryForPosition');
-    $method->setAccessible(true);
 
     $faker = \Faker\Factory::create();
 
@@ -130,7 +125,6 @@ test('generateUniqueEmail uses fallback mechanism when max attempts reached', fu
     // Use reflection to access private method
     $reflection = new ReflectionClass($command);
     $method = $reflection->getMethod('generateUniqueEmail');
-    $method->setAccessible(true);
 
     // Use our custom test faker that always returns existing emails
     $testFaker = new TestFaker();
