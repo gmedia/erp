@@ -29,3 +29,7 @@ require __DIR__ . '/customer.php';
 require __DIR__ . '/supplier.php';
 require __DIR__ . '/supplier_category.php';
 require __DIR__ . '/customer_category.php';
+require __DIR__ . '/product_category.php';
+require __DIR__ . '/unit.php';
+
+
