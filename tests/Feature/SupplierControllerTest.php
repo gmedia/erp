@@ -20,14 +20,14 @@ uses(RefreshDatabase::class, CreatesTestUserWithPermissions::class)->group('supp
 describe('Supplier API Endpoints', function () {
     beforeEach(function () {
         // Create user with all supplier permissions
-        $this->user = $this->createTestUserWithPermissions([
+        $user = $this->createTestUserWithPermissions([
             'supplier',
             'supplier.create',
             'supplier.edit',
             'supplier.delete'
         ]);
 
-        actingAs($this->user);
+        actingAs($user);
     });
 
     test('index returns paginated suppliers', function () {
