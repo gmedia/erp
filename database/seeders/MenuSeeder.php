@@ -90,6 +90,22 @@ class MenuSeeder extends Seeder
                         'url' => 'customer-categories',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'product_category',
+                        'display_name' => 'Product Category',
+                        'permissions' => ['product_category', 'product_category.create', 'product_category.edit', 'product_category.delete'],
+                        'icon' => 'LayoutList',
+                        'url' => 'product-categories',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'unit',
+                        'display_name' => 'Unit',
+                        'permissions' => ['unit', 'unit.create', 'unit.edit', 'unit.delete'],
+                        'icon' => 'LayoutList',
+                        'url' => 'units',
+                        'child' => [],
+                    ],
                 ],
             ],
             [

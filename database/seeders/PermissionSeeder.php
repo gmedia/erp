@@ -181,6 +181,48 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'product_category',
+                'display_name' => 'Product Category',
+                'child' => [
+                    [
+                        'name' => 'product_category.create',
+                        'display_name' => 'Create Product Category',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'product_category.edit',
+                        'display_name' => 'Edit Product Category',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'product_category.delete',
+                        'display_name' => 'Delete Product Category',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'unit',
+                'display_name' => 'Unit',
+                'child' => [
+                    [
+                        'name' => 'unit.create',
+                        'display_name' => 'Create Unit',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'unit.edit',
+                        'display_name' => 'Edit Unit',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'unit.delete',
+                        'display_name' => 'Delete Unit',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],
