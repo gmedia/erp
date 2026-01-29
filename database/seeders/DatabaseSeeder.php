@@ -63,6 +63,7 @@ class DatabaseSeeder extends Seeder
             MenuSeeder::class,
             CustomerCategorySeeder::class,
             SupplierCategorySeeder::class,
+            ProductSampleDataSeeder::class,
         ]);
     }
 }
