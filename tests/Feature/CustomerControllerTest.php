@@ -6,7 +6,6 @@ use App\Models\Employee;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTestUserWithPermissions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -16,12 +15,12 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
 
-uses(RefreshDatabase::class, CreatesTestUserWithPermissions::class)->group('customers');
+uses(RefreshDatabase::class)->group('customers');
 
 describe('Customer API Endpoints', function () {
     beforeEach(function () {
         // Create user with all customer permissions for existing tests
-        $user = $this->createTestUserWithPermissions(['customer', 'customer.create', 'customer.edit', 'customer.delete']);
+        $user = createTestUserWithPermissions(['customer', 'customer.create', 'customer.edit', 'customer.delete']);
         actingAs($user);
     });
 
@@ -376,7 +375,7 @@ describe('Customer API Endpoints', function () {
 
 describe('Customer API Permission Tests', function () {
     test('store returns 403 when user lacks customer.create permission', function () {
-        $user = $this->createTestUserWithPermissions(['customer']);
+        $user = createTestUserWithPermissions(['customer']);
         actingAs($user);
 
         $branch = Branch::factory()->create();
@@ -396,7 +395,7 @@ describe('Customer API Permission Tests', function () {
     });
 
     test('update returns 403 when user lacks customer.edit permission', function () {
-        $user = $this->createTestUserWithPermissions(['customer']);
+        $user = createTestUserWithPermissions(['customer']);
         actingAs($user);
 
         $customer = Customer::factory()->create();
@@ -417,7 +416,7 @@ describe('Customer API Permission Tests', function () {
     });
 
     test('destroy returns 403 when user lacks customer.delete permission', function () {
-        $user = $this->createTestUserWithPermissions(['customer']);
+        $user = createTestUserWithPermissions(['customer']);
         actingAs($user);
 
         $customer = Customer::factory()->create();

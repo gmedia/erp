@@ -6,7 +6,6 @@ use App\Models\Permission;
 use App\Models\Position;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTestUserWithPermissions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -16,12 +15,12 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
 
-uses(RefreshDatabase::class, CreatesTestUserWithPermissions::class)->group('employees');
+uses(RefreshDatabase::class)->group('employees');
 
 describe('Employee API Endpoints', function () {
     beforeEach(function () {
         // Create user with all employee permissions for existing tests
-        $user = $this->createTestUserWithPermissions(['employee', 'employee.create', 'employee.edit', 'employee.delete']);
+        $user = createTestUserWithPermissions(['employee', 'employee.create', 'employee.edit', 'employee.delete']);
         actingAs($user);
     });
 
@@ -65,7 +64,7 @@ describe('Employee API Endpoints', function () {
 
     test('index supports search filtering by multiple fields', function () {
         Employee::query()->delete();
-        $user = $this->createTestUserWithPermissions(['employee', 'employee.create', 'employee.edit', 'employee.delete']);
+        $user = createTestUserWithPermissions(['employee', 'employee.create', 'employee.edit', 'employee.delete']);
         $user->employee->update([
             'name' => 'Zebra Tester',
             'email' => 'zebra@example.com'
@@ -418,7 +417,7 @@ describe('Employee API Endpoints', function () {
 
 describe('Employee API Permission Tests', function () {
     test('store returns 403 when user lacks employee.create permission', function () {
-        $user = $this->createTestUserWithPermissions(['employee']);
+        $user = createTestUserWithPermissions(['employee']);
         actingAs($user);
 
         $department = Department::factory()->create();
@@ -440,7 +439,7 @@ describe('Employee API Permission Tests', function () {
     });
 
     test('update returns 403 when user lacks employee.edit permission', function () {
-        $user = $this->createTestUserWithPermissions(['employee']);
+        $user = createTestUserWithPermissions(['employee']);
         actingAs($user);
 
         $employee = Employee::factory()->create();
@@ -454,7 +453,7 @@ describe('Employee API Permission Tests', function () {
     });
 
     test('destroy returns 403 when user lacks employee.delete permission', function () {
-        $user = $this->createTestUserWithPermissions(['employee']);
+        $user = createTestUserWithPermissions(['employee']);
         actingAs($user);
 
         $employee = Employee::factory()->create();

@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\Employee;
+use App\Models\Permission;
+use App\Models\User;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -39,7 +43,28 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Create a test user with specific permissions.
+ *
+ * @param array<string> $permissionNames
+ * @return User
+ */
+function createTestUserWithPermissions(array $permissionNames = []): User
 {
-    // ..
+    $user = User::factory()->create();
+    $employee = Employee::factory()->create(['user_id' => $user->id]);
+
+    if (!empty($permissionNames)) {
+        $permissions = [];
+        foreach ($permissionNames as $name) {
+            $permissions[] = Permission::firstOrCreate(
+                ['name' => $name],
+                ['display_name' => ucwords(str_replace(['.', '-'], ' ', $name))]
+            )->id;
+        }
+        $employee->permissions()->sync($permissions);
+    }
+
+    return $user;
 }
+

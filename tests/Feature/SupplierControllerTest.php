@@ -5,7 +5,6 @@ use App\Models\Permission;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Traits\CreatesTestUserWithPermissions;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -15,12 +14,12 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
 
-uses(RefreshDatabase::class, CreatesTestUserWithPermissions::class)->group('suppliers');
+uses(RefreshDatabase::class)->group('suppliers');
 
 describe('Supplier API Endpoints', function () {
     beforeEach(function () {
         // Create user with all supplier permissions
-        $user = $this->createTestUserWithPermissions([
+        $user = createTestUserWithPermissions([
             'supplier',
             'supplier.create',
             'supplier.edit',
