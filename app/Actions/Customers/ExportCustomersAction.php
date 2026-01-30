@@ -17,8 +17,8 @@ class ExportCustomersAction
         // Map request parameters to match CustomerExport expectations
         $filters = [
             'search' => $validated['search'] ?? null,
-            'branch' => $validated['branch'] ?? null,
-            'category' => $validated['category'] ?? null,
+            'branch_id' => $validated['branch_id'] ?? null,
+            'category_id' => $validated['category_id'] ?? null,
             'status' => $validated['status'] ?? null,
             'sort_by' => $validated['sort_by'] ?? 'created_at',
             'sort_direction' => $validated['sort_direction'] ?? 'desc',

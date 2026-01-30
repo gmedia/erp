@@ -35,13 +35,13 @@ class CustomerExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         }
 
         // Apply branch filter (by branch_id)
-        if (! empty($this->filters['branch'])) {
-            $query->where('branch_id', $this->filters['branch']);
+        if (! empty($this->filters['branch_id'])) {
+            $query->where('branch_id', $this->filters['branch_id']);
         }
 
         // Apply category filter
-        if (! empty($this->filters['category'])) {
-            $query->where('category_id', $this->filters['category']);
+        if (! empty($this->filters['category_id'])) {
+            $query->where('category_id', $this->filters['category_id']);
         }
 
         // Apply status filter

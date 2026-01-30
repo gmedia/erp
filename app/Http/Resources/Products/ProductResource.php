@@ -27,10 +27,10 @@ class ProductResource extends JsonResource
                 'name' => $this->resource->unit?->name,
                 'symbol' => $this->resource->unit?->symbol,
             ],
-            'branch' => [
+            'branch' => $this->resource->branch_id ? [
                 'id' => $this->resource->branch_id,
                 'name' => $this->resource->branch?->name,
-            ],
+            ] : null,
 
             'cost' => (string) $this->resource->cost,
             'selling_price' => (string) $this->resource->selling_price,

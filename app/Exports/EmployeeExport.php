@@ -35,18 +35,18 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         }
 
         // Apply department filter (by department_id)
-        if (! empty($this->filters['department'])) {
-            $query->where('department_id', $this->filters['department']);
+        if (! empty($this->filters['department_id'])) {
+            $query->where('department_id', $this->filters['department_id']);
         }
 
         // Apply position filter (by position_id)
-        if (! empty($this->filters['position'])) {
-            $query->where('position_id', $this->filters['position']);
+        if (! empty($this->filters['position_id'])) {
+            $query->where('position_id', $this->filters['position_id']);
         }
 
         // Apply branch filter (by branch_id)
-        if (! empty($this->filters['branch'])) {
-            $query->where('branch_id', $this->filters['branch']);
+        if (! empty($this->filters['branch_id'])) {
+            $query->where('branch_id', $this->filters['branch_id']);
         }
 
         // Apply salary range filters

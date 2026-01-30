@@ -66,7 +66,7 @@ export function AsyncSelect({
     // Initial fetch to get label if value is provided
     React.useEffect(() => {
         const fetchInitialLabel = async () => {
-            if (value && !selectedLabel && !initialLoadDone) {
+            if (value && value !== 'null' && value !== 'undefined' && !selectedLabel && !initialLoadDone) {
                 try {
                     // Try to fetch specific item by ID
                     const response = await axios.get(`${url}/${value}`);
@@ -103,9 +103,9 @@ export function AsyncSelect({
         }
     }, [value, items, valueFn, labelFn]);
 
-    // Clear label if value is cleared
+    // Clear label if value is cleared or invalid
     React.useEffect(() => {
-        if (!value) setSelectedLabel('');
+        if (!value || value === 'null' || value === 'undefined') setSelectedLabel('');
     }, [value]);
 
     return (

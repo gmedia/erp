@@ -38,7 +38,7 @@ export default function AsyncSelectField({
                     {label && <FormLabel>{label}</FormLabel>}
                     <FormControl>
                         <AsyncSelect
-                            value={field.value?.toString()}
+                            value={field.value ? String(field.value) : undefined}
                             onValueChange={field.onChange}
                             url={url}
                             placeholder={placeholder}

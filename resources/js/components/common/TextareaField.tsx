@@ -5,6 +5,7 @@ import {
     FormField,
     FormItem,
     FormLabel,
+    FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
@@ -47,6 +48,7 @@ export function TextareaField({
                             {...props}
                         />
                     </FormControl>
+                    <FormMessage />
                     {children}
                 </FormItem>
             )}

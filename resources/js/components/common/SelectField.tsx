@@ -3,6 +3,7 @@ import {
     FormField,
     FormItem,
     FormLabel,
+    FormMessage,
 } from '@/components/ui/form';
 import {
     Select,
@@ -70,6 +71,7 @@ export default function SelectField({
                             </SelectContent>
                         </Select>
                     </FormControl>
+                    <FormMessage />
                     {children}
                 </FormItem>
             )}

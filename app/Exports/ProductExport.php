@@ -35,18 +35,18 @@ class ProductExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
         }
 
         // Apply category filter
-        if (! empty($this->filters['category'])) {
-            $query->where('category_id', $this->filters['category']);
+        if (! empty($this->filters['category_id'])) {
+            $query->where('category_id', $this->filters['category_id']);
         }
 
         // Apply unit filter
-        if (! empty($this->filters['unit'])) {
-            $query->where('unit_id', $this->filters['unit']);
+        if (! empty($this->filters['unit_id'])) {
+            $query->where('unit_id', $this->filters['unit_id']);
         }
 
         // Apply branch filter
-        if (! empty($this->filters['branch'])) {
-            $query->where('branch_id', $this->filters['branch']);
+        if (! empty($this->filters['branch_id'])) {
+            $query->where('branch_id', $this->filters['branch_id']);
         }
 
         // Apply type filter
@@ -57,6 +57,11 @@ class ProductExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
         // Apply status filter
         if (! empty($this->filters['status'])) {
             $query->where('status', $this->filters['status']);
+        }
+ 
+        // Apply billing model filter
+        if (! empty($this->filters['billing_model'])) {
+            $query->where('billing_model', $this->filters['billing_model']);
         }
 
         // Apply sorting

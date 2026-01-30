@@ -23,9 +23,9 @@ class ExportEmployeesAction
         // Map request parameters to match EmployeeExport expectations
         $filters = [
             'search' => $validated['search'] ?? null,
-            'department' => $validated['department'] ?? null,
-            'position' => $validated['position'] ?? null,
-            'branch' => $validated['branch'] ?? null,
+            'department_id' => $validated['department_id'] ?? null,
+            'position_id' => $validated['position_id'] ?? null,
+            'branch_id' => $validated['branch_id'] ?? null,
             'sort_by' => $validated['sort_by'] ?? 'created_at',
             'sort_direction' => $validated['sort_direction'] ?? 'desc',
         ];

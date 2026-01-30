@@ -17,11 +17,12 @@ class ExportProductsAction
         // Map keys (request uses 'category', not 'category_id' for simplicity in filters)
         $filters = [
             'search' => $validated['search'] ?? null,
-            'category' => $validated['category'] ?? null,
-            'unit' => $validated['unit'] ?? null,
-            'branch' => $validated['branch'] ?? null,
+            'category_id' => $validated['category_id'] ?? null,
+            'unit_id' => $validated['unit_id'] ?? null,
+            'branch_id' => $validated['branch_id'] ?? null,
             'type' => $validated['type'] ?? null,
             'status' => $validated['status'] ?? null,
+            'billing_model' => $validated['billing_model'] ?? null,
             'sort_by' => $validated['sort_by'] ?? 'created_at',
             'sort_direction' => $validated['sort_direction'] ?? 'desc',
         ];

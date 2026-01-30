@@ -75,17 +75,17 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(handleSubmit)}
-                        className="space-y-4"
+                        className="space-y-4 px-1"
                     >
                         {children}
-                        <DialogFooter>
+                        <DialogFooter className="pt-4 border-t mt-4">
                             <Button
                                 type="button"
                                 variant="outline"

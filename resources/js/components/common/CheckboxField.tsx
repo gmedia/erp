@@ -5,6 +5,7 @@ import {
     FormField,
     FormItem,
     FormLabel,
+    FormMessage,
 } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
@@ -34,6 +35,7 @@ export default function CheckboxField({
                 >
                     <FormControl>
                         <Checkbox
+                            id={name}
                             checked={field.value}
                             onCheckedChange={field.onChange}
                         />
@@ -46,6 +48,7 @@ export default function CheckboxField({
                             </p>
                         )}
                     </div>
+                    <FormMessage />
                 </FormItem>
             )}
         />
