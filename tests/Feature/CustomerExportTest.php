@@ -29,7 +29,7 @@ describe('CustomerExport', function () {
         Customer::factory()->create(['branch_id' => $branchA->id]);
         Customer::factory()->create(['branch_id' => $branchB->id]);
 
-        $export = new CustomerExport(['branch' => $branchA->id]);
+        $export = new CustomerExport(['branch_id' => $branchA->id]);
 
         $results = $export->query()->get();
 
@@ -44,7 +44,7 @@ describe('CustomerExport', function () {
         Customer::factory()->create(['category_id' => $categoryA->id]);
         Customer::factory()->create(['category_id' => $categoryB->id]);
 
-        $export = new CustomerExport(['category' => $categoryA->id]);
+        $export = new CustomerExport(['category_id' => $categoryA->id]);
 
         $results = $export->query()->get();
 

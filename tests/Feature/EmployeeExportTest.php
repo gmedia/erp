@@ -32,7 +32,7 @@ describe('EmployeeExport', function () {
         Employee::factory()->create(['department_id' => $marketing->id]);
         Employee::factory()->create(['department_id' => $sales->id]);
 
-        $export = new EmployeeExport(['department' => $engineering->id]);
+        $export = new EmployeeExport(['department_id' => $engineering->id]);
 
         $results = $export->query()->get();
 
@@ -49,7 +49,7 @@ describe('EmployeeExport', function () {
         Employee::factory()->create(['position_id' => $productManager->id]);
         Employee::factory()->create(['position_id' => $designer->id]);
 
-        $export = new EmployeeExport(['position' => $seniorDev->id]);
+        $export = new EmployeeExport(['position_id' => $seniorDev->id]);
 
         $results = $export->query()->get();
 
@@ -217,7 +217,7 @@ describe('EmployeeExport', function () {
         ]);
 
         $export = new EmployeeExport([
-            'department' => $engineering->id,
+            'department_id' => $engineering->id,
             'min_salary' => 60000,
             'sort_by' => 'name',
             'sort_direction' => 'asc'
