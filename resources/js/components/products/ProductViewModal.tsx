@@ -7,12 +7,14 @@ import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
 import { formatCurrency } from '@/utils/formatters';
 import { Product } from '@/types/entity';
+import { useTranslation } from '@/contexts/i18n-context';
 
 interface ProductViewModalProps {
     open: boolean;
@@ -28,6 +30,7 @@ const BooleanBadge = ({ value }: { value: boolean }) => (
 
 export const ProductViewModal = memo<ProductViewModalProps>(
     function ProductViewModal({ open, onClose, item }) {
+        const { t } = useTranslation();
         if (!item) return null;
 
         return (
@@ -35,6 +38,9 @@ export const ProductViewModal = memo<ProductViewModalProps>(
                 <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>View Product/Service</DialogTitle>
+                        <DialogDescription>
+                            {t('common.view_details')}
+                        </DialogDescription>
                     </DialogHeader>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 py-4">

@@ -34,6 +34,8 @@ export interface Translations {
         success: string;
         error: string;
         warning: string;
+        fill_details: string;
+        view_details: string;
     };
     nav: {
         platform: string;
@@ -182,6 +184,8 @@ const defaultTranslations: Translations = {
         success: 'Success',
         error: 'Error',
         warning: 'Warning',
+        fill_details: 'Please fill in the details below.',
+        view_details: 'Here are the details for this item.',
     },
     nav: {
         platform: 'Platform',

@@ -21,7 +21,9 @@
         "confirm": "Konfirmasi",
         "success": "Berhasil",
         "error": "Kesalahan",
-        "warning": "Peringatan"
+        "warning": "Peringatan",
+        "fill_details": "Silakan isi detail di bawah ini.",
+        "view_details": "Berikut adalah detail untuk item ini."
     },
     "nav": {
         "platform": "Platform",

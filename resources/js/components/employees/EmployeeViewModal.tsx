@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -15,6 +16,7 @@ import { formatDate } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatters';
 
 import { Employee } from '@/types/entity';
+import { useTranslation } from '@/contexts/i18n-context';
 
 interface EmployeeViewModalProps {
     open: boolean;
@@ -28,6 +30,7 @@ interface EmployeeViewModalProps {
  */
 export const EmployeeViewModal = memo<EmployeeViewModalProps>(
     function EmployeeViewModal({ open, onClose, item }) {
+        const { t } = useTranslation();
         if (!item) return null;
 
         const departmentName =
@@ -50,6 +53,9 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle>View Employee</DialogTitle>
+                        <DialogDescription>
+                            {t('common.view_details')}
+                        </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4 py-4">

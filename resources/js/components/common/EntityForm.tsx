@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -78,6 +79,9 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
+                    <DialogDescription>
+                        {t('common.fill_details')}
+                    </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                     <form

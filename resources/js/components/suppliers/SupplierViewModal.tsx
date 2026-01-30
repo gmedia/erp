@@ -3,6 +3,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
     DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { format } from 'date-fns';
 import React from 'react';
 
 import { Supplier } from '@/types/entity';
+import { useTranslation } from '@/contexts/i18n-context';
 
 
 interface SupplierViewModalProps {
@@ -28,6 +30,7 @@ const ViewField = ({ label, value }: { label: string; value: React.ReactNode }) 
 
 export const SupplierViewModal = React.memo(
     ({ item, open, onClose }: SupplierViewModalProps) => {
+        const { t } = useTranslation();
         if (!item) return null;
 
         return (
@@ -35,6 +38,9 @@ export const SupplierViewModal = React.memo(
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
                         <DialogTitle>Supplier Details</DialogTitle>
+                        <DialogDescription>
+                            {t('common.view_details')}
+                        </DialogDescription>
                     </DialogHeader>
 
                     <div className="grid grid-cols-2 gap-6 py-4">

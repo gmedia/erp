@@ -8,10 +8,12 @@ import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { useTranslation } from '@/contexts/i18n-context';
 
 import { Customer } from '@/types/entity';
 
@@ -27,6 +29,7 @@ interface CustomerViewModalProps {
  */
 export const CustomerViewModal = memo<CustomerViewModalProps>(
     function CustomerViewModal({ open, onClose, item }) {
+        const { t } = useTranslation();
         if (!item) return null;
 
         const branchName =
@@ -37,6 +40,9 @@ export const CustomerViewModal = memo<CustomerViewModalProps>(
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle>View Customer</DialogTitle>
+                        <DialogDescription>
+                            {t('common.view_details')}
+                        </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4 py-4">

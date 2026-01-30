@@ -7,11 +7,13 @@ import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
 import { formatDate } from '@/lib/utils';
+import { useTranslation } from '@/contexts/i18n-context';
 
 interface SimpleEntity {
     id: number;
@@ -33,6 +35,7 @@ interface SimpleEntityViewModalProps {
  */
 export const SimpleEntityViewModal = memo<SimpleEntityViewModalProps>(
     function SimpleEntityViewModal({ open, onClose, item, entityName }) {
+        const { t } = useTranslation();
         if (!item) return null;
 
         return (
@@ -40,6 +43,9 @@ export const SimpleEntityViewModal = memo<SimpleEntityViewModalProps>(
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle>View {entityName}</DialogTitle>
+                        <DialogDescription>
+                            {t('common.view_details')}
+                        </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4 py-4">

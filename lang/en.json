@@ -21,7 +21,9 @@
         "confirm": "Confirm",
         "success": "Success",
         "error": "Error",
-        "warning": "Warning"
+        "warning": "Warning",
+        "fill_details": "Please fill in the details below.",
+        "view_details": "Here are the details for this item."
     },
     "nav": {
         "platform": "Platform",
