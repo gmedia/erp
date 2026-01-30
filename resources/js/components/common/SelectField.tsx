@@ -1,3 +1,5 @@
+'use client';
+
 import {
     FormControl,
     FormField,
@@ -43,7 +45,7 @@ export default function SelectField({
         <FormField
             name={name}
             render={({ field }) => (
-                <FormItem className={cn('space-y-2', className)}>
+                <FormItem className={className}>
                     {label && <FormLabel>{label}</FormLabel>}
                     <FormControl>
                         <Select

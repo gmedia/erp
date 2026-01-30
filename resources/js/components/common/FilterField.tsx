@@ -30,7 +30,7 @@ export default function FilterField({
         <FormField
             name={name}
             render={({ field }) => (
-                <FormItem className={cn('flex flex-col space-y-1', className)}>
+                <FormItem className={className}>
                     {label && <FormLabel>{label}</FormLabel>}
                     <FormControl>
                         <Input

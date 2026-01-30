@@ -1,3 +1,5 @@
+'use client';
+
 import {
     FormControl,
     FormField,
@@ -34,7 +36,7 @@ export default function AsyncSelectField({
         <FormField
             name={name}
             render={({ field }) => (
-                <FormItem className={cn('space-y-2', className)}>
+                <FormItem className={className}>
                     {label && <FormLabel>{label}</FormLabel>}
                     <FormControl>
                         <AsyncSelect

@@ -23,6 +23,7 @@ interface DatePickerFieldProps {
     label: string;
     placeholder?: string;
     disabled?: (date: Date) => boolean;
+    className?: string;
 }
 
 export function DatePickerField({
@@ -30,12 +31,13 @@ export function DatePickerField({
     label,
     placeholder = 'Pick a date',
     disabled,
+    className,
 }: DatePickerFieldProps) {
     return (
         <FormField
             name={name}
             render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem className={className}>
                     <FormLabel>{label}</FormLabel>
                     <Popover>
                         <PopoverTrigger asChild>

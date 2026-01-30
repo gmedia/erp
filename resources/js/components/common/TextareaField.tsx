@@ -34,7 +34,7 @@ export function TextareaField({
         <FormField
             name={name}
             render={({ field }) => (
-                <FormItem className={cn('space-y-2', className)}>
+                <FormItem className={className}>
                     <FormLabel>{label}</FormLabel>
                     <FormControl>
                         <Textarea

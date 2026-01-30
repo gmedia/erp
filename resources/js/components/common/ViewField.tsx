@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Label } from '@/components/ui/label';
 
 interface ViewFieldProps {
     label: string;
@@ -13,10 +14,10 @@ interface ViewFieldProps {
  */
 export function ViewField({ label, value }: ViewFieldProps) {
     return (
-        <div className="space-y-1">
-            <label className="text-sm font-medium text-muted-foreground">
+        <div className="grid gap-1">
+            <Label className="text-muted-foreground">
                 {label}
-            </label>
+            </Label>
             <p className="text-sm font-medium">{value || '-'}</p>
         </div>
     );

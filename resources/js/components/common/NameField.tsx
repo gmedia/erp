@@ -30,7 +30,7 @@ export default function NameField({
         <FormField
             name={name}
             render={({ field }) => (
-                <FormItem className={cn('space-y-2', className)}>
+                <FormItem className={className}>
                     {label && <FormLabel>{label}</FormLabel>}
                     <FormControl>
                         <Input placeholder={placeholder} {...field} />
