@@ -53,7 +53,7 @@ async function createEntity(
       await page.click(`button:has-text("${field.selector}")`);
       
       // Type in the search box to filter results (handles pagination)
-      const searchInput = page.getByPlaceholder('Search...');
+      const searchInput = page.getByPlaceholder('Search...').filter({ visible: true }).last();
       if (await searchInput.isVisible()) {
         await searchInput.fill(value);
       }
@@ -549,7 +549,7 @@ export async function createCustomer(
   // Select branch (AsyncSelectField)
   const branchTrigger = dialog.locator('button').filter({ hasText: /Select a branch/i });
   await branchTrigger.click();
-  const branchSearchInput = page.getByPlaceholder('Search...');
+  const branchSearchInput = page.getByPlaceholder('Search...').filter({ visible: true }).last();
   const branchName = overrides.branch_id ?? 'Head Office';
   if (await branchSearchInput.isVisible()) {
     await branchSearchInput.fill(branchName);
@@ -559,7 +559,7 @@ export async function createCustomer(
   // Select category (AsyncSelectField)
   const categoryTrigger = dialog.locator('button').filter({ hasText: /Select a category/i });
   await categoryTrigger.click();
-  const categorySearchInput = page.getByPlaceholder('Search...');
+  const categorySearchInput = page.getByPlaceholder('Search...').filter({ visible: true }).last();
   const categoryName = overrides.category_id ?? 'Retail';
   if (await categorySearchInput.isVisible()) {
     await categorySearchInput.fill(categoryName);
@@ -706,7 +706,7 @@ export async function createSupplier(
   // Select branch (AsyncSelectField)
   const branchTrigger = dialog.locator('button').filter({ hasText: /Select a branch/i });
   await branchTrigger.click();
-  const branchSearchInput = page.getByPlaceholder('Search...');
+  const branchSearchInput = page.getByPlaceholder('Search...').filter({ visible: true }).last();
   const branchName = overrides.branch ?? 'Head Office';
   if (await branchSearchInput.isVisible()) {
     await branchSearchInput.fill(branchName);
@@ -716,7 +716,7 @@ export async function createSupplier(
   // Select category (AsyncSelectField)
   const categoryTrigger = dialog.locator('button').filter({ hasText: /Select a category/i });
   await categoryTrigger.click();
-  const categorySearchInput = page.getByPlaceholder('Search...');
+  const categorySearchInput = page.getByPlaceholder('Search...').filter({ visible: true }).last();
   const categoryName = overrides.category ?? 'Electronics';
   if (await categorySearchInput.isVisible()) {
     await categorySearchInput.fill(categoryName);
