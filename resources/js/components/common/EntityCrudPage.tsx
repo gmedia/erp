@@ -47,6 +47,8 @@ function createFormPropsMapper(
             return {
                 ...baseProps,
                 [entityKey]: crudProps.item,
+                entity: crudProps.item,
+                item: crudProps.item,
             };
         }
     };
