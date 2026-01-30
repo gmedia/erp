@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { formatCurrency } from '@/utils/formatters';
 import { Product } from '@/types/entity';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTranslation } from '@/contexts/i18n-context';
 
 interface ProductViewModalProps {
@@ -35,7 +36,7 @@ export const ProductViewModal = memo<ProductViewModalProps>(
 
         return (
             <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                <DialogContent className="sm:max-w-[600px]">
                     <DialogHeader>
                         <DialogTitle>View Product/Service</DialogTitle>
                         <DialogDescription>
@@ -43,7 +44,8 @@ export const ProductViewModal = memo<ProductViewModalProps>(
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 py-4">
+                    <ScrollArea className="max-h-[60vh] pr-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 py-4">
                         {/* General Info */}
                         <div className="md:col-span-2 space-y-4 border-b pb-4">
                             <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">General Information</h3>
@@ -98,6 +100,7 @@ export const ProductViewModal = memo<ProductViewModalProps>(
                             <ViewField label="Notes" value={item.notes} />
                         </div>
                     </div>
+                </ScrollArea>
 
                     <DialogFooter>
                         <Button type="button" onClick={onClose}>
