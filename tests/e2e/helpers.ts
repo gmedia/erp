@@ -3,7 +3,7 @@ import { Page, expect } from '@playwright/test';
 // Generic entity creation helper
 interface EntityField {
   name: string;
-  type: 'text' | 'email' | 'select';
+  type: 'text' | 'email' | 'select' | 'textarea';
   selector?: string;
   defaultValue: string;
   optionSelector?: string;
@@ -59,6 +59,8 @@ async function createEntity(
       }
       
       await page.getByRole('option', { name: value }).click();
+    } else if (field.type === 'textarea') {
+      await page.fill(`textarea[name="${field.name}"]`, value);
     } else {
       await page.fill(`input[name="${field.name}"]`, value);
     }
@@ -1051,6 +1053,7 @@ export async function createProductCategory(
     returnField: 'name',
     fields: [
       { name: 'name', type: 'text', defaultValue: defaultName },
+      { name: 'description', type: 'textarea', defaultValue: 'Test Description' },
     ],
   };
 
@@ -1083,7 +1086,7 @@ export async function searchProductCategory(
 export async function editProductCategory(
   page: Page,
   name: string,
-  updates: { name?: string }
+  updates: { name?: string; description?: string }
 ): Promise<void> {
   // Locate the product category first
   await searchProductCategory(page, name);
@@ -1105,13 +1108,16 @@ export async function editProductCategory(
   if (updates.name) {
     await page.fill('input[name="name"]', updates.name);
   }
+  if (updates.description) {
+    await page.fill('textarea[name="description"]', updates.description);
+  }
 
   // Submit the edit dialog
   await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
     state: 'detached',
   });
   const dialog = page.getByRole('dialog');
-  const updateBtn = dialog.getByRole('button', { name: /Update/ });
+  const updateBtn = dialog.locator('button[type="submit"]');
   await expect(updateBtn).toBeVisible();
   await updateBtn.click();
 }

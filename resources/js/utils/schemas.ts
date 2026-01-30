@@ -7,6 +7,16 @@ export const simpleEntitySchema = z.object({
 
 export type SimpleEntityFormData = z.infer<typeof simpleEntitySchema>;
 
+/**
+ * Product category form schema with name and description.
+ */
+export const productCategoryFormSchema = z.object({
+    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    description: z.string().optional(),
+});
+
+export type ProductCategoryFormData = z.infer<typeof productCategoryFormSchema>;
+
 // Schema for employee form data
 export const employeeFormSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),

@@ -7,6 +7,13 @@ use App\Models\ProductCategory;
 
 class UpdateProductCategoryRequest extends SimpleCrudUpdateRequest
 {
+    public function rules(): array
+    {
+        return array_merge(parent::rules(), [
+            'description' => ['nullable', 'string'],
+        ]);
+    }
+
     public function getModelClass(): string
     {
         return ProductCategory::class;
