@@ -14,6 +14,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form, FormMessage } from '@/components/ui/form';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTranslation } from '@/contexts/i18n-context';
 import { simpleEntitySchema } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -76,32 +77,40 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle>{title}</DialogTitle>
-                    <DialogDescription>
-                        {t('common.fill_details')}
-                    </DialogDescription>
-                </DialogHeader>
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] p-0 overflow-hidden flex flex-col">
+                <div className="shrink-0 p-6 pb-2">
+                    <DialogHeader>
+                        <DialogTitle>{title}</DialogTitle>
+                        <DialogDescription>
+                            {t('common.fill_details')}
+                        </DialogDescription>
+                    </DialogHeader>
+                </div>
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(handleSubmit)}
-                        className="space-y-4 px-1"
+                        className="flex-1 flex flex-col min-h-0"
                     >
-                        {children}
-                        <DialogFooter className="pt-4 border-t mt-4">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => onOpenChange(false)}
-                                disabled={isLoading}
-                            >
-                                {t('common.cancel')}
-                            </Button>
-                            <Button type="submit" disabled={isLoading}>
-                                {submitButtonText}
-                            </Button>
-                        </DialogFooter>
+                        <div className="flex-1 overflow-y-auto px-6">
+                            <div className="space-y-4 py-1 pr-6">
+                                {children}
+                            </div>
+                        </div>
+                        <div className="shrink-0 p-6 pt-2">
+                            <DialogFooter className="pt-4 border-t">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => onOpenChange(false)}
+                                    disabled={isLoading}
+                                >
+                                    {t('common.cancel')}
+                                </Button>
+                                <Button type="submit" disabled={isLoading}>
+                                    {submitButtonText}
+                                </Button>
+                            </DialogFooter>
+                        </div>
                     </form>
                 </Form>
             </DialogContent>

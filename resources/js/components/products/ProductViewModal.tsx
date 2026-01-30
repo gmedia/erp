@@ -36,16 +36,20 @@ export const ProductViewModal = memo<ProductViewModalProps>(
 
         return (
             <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-                <DialogContent className="sm:max-w-[600px]">
-                    <DialogHeader>
-                        <DialogTitle>View Product/Service</DialogTitle>
-                        <DialogDescription>
-                            {t('common.view_details')}
-                        </DialogDescription>
-                    </DialogHeader>
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] p-0 overflow-hidden flex flex-col">
+                    <div className="shrink-0 p-6 pb-2">
+                        <DialogHeader>
+                            <DialogTitle>View Product/Service</DialogTitle>
+                            <DialogDescription>
+                                {t('common.view_details')}
+                            </DialogDescription>
+                        </DialogHeader>
+                    </div>
 
-                    <ScrollArea className="max-h-[60vh] pr-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 py-4">
+                    <div className="flex-1 overflow-y-auto px-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 py-4 pr-6">
+                        {/* Content... */}
+                        {/* Note: I'm keeping the internal structure but ensuring max-h is on ScrollArea */}
                         {/* General Info */}
                         <div className="md:col-span-2 space-y-4 border-b pb-4">
                             <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">General Information</h3>
@@ -100,13 +104,14 @@ export const ProductViewModal = memo<ProductViewModalProps>(
                             <ViewField label="Notes" value={item.notes} />
                         </div>
                     </div>
-                </ScrollArea>
-
-                    <DialogFooter>
-                        <Button type="button" onClick={onClose}>
-                            Close
-                        </Button>
-                    </DialogFooter>
+                    </div>
+                    <div className="shrink-0 p-6 pt-2">
+                        <DialogFooter>
+                            <Button type="button" onClick={onClose}>
+                                Close
+                            </Button>
+                        </DialogFooter>
+                    </div>
                 </DialogContent>
             </Dialog>
         );

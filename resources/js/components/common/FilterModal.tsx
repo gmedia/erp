@@ -10,6 +10,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Select } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import * as React from 'react';
 import type { FieldDescriptor } from './filters';
 
@@ -41,14 +42,17 @@ export function FilterModal({
 }: FilterModalProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="border-border bg-background text-foreground sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Filters</DialogTitle>
-                    <DialogDescription className="text-muted-foreground">
-                        Apply filters to refine the results
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
+            <DialogContent className="border-border bg-background text-foreground sm:max-w-[425px] max-h-[90vh] p-0 overflow-hidden flex flex-col">
+                <div className="shrink-0 p-6 pb-2">
+                    <DialogHeader>
+                        <DialogTitle>Filters</DialogTitle>
+                        <DialogDescription className="text-muted-foreground">
+                            Apply filters to refine the results
+                        </DialogDescription>
+                    </DialogHeader>
+                </div>
+                <div className="flex-1 overflow-y-auto px-6">
+                    <div className="grid gap-4 py-4 pr-6">
                     {filterFields.map((field) => {
                         const element = React.isValidElement(field.component)
                             ? field.component
@@ -103,15 +107,18 @@ export function FilterModal({
                         );
                     })}
                 </div>
-                <DialogFooter>
-                    <Button variant="outline" onClick={onReset}>
-                        Reset
-                    </Button>
-                    <Button variant="outline" onClick={onClearAll}>
-                        Clear All
-                    </Button>
-                    <Button onClick={onApply}>Apply Filters</Button>
-                </DialogFooter>
+            </div>
+                <div className="shrink-0 p-6 pt-2">
+                    <DialogFooter>
+                        <Button variant="outline" onClick={onReset}>
+                            Reset
+                        </Button>
+                        <Button variant="outline" onClick={onClearAll}>
+                            Clear All
+                        </Button>
+                        <Button onClick={onApply}>Apply Filters</Button>
+                    </DialogFooter>
+                </div>
             </DialogContent>
         </Dialog>
     );
