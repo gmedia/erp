@@ -17,6 +17,16 @@ export const productCategoryFormSchema = z.object({
 
 export type ProductCategoryFormData = z.infer<typeof productCategoryFormSchema>;
 
+/**
+ * Unit form schema with name and symbol.
+ */
+export const unitFormSchema = z.object({
+    name: z.string().min(1, { message: 'Name is required' }),
+    symbol: z.string().max(10, { message: 'Symbol cannot exceed 10 characters' }).optional().nullable(),
+});
+
+export type UnitFormData = z.infer<typeof unitFormSchema>;
+
 // Schema for employee form data
 export const employeeFormSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),

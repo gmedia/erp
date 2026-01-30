@@ -11,4 +11,11 @@ class UpdateUnitRequest extends SimpleCrudUpdateRequest
     {
         return Unit::class;
     }
+
+    public function rules(): array
+    {
+        return array_merge(parent::rules(), [
+            'symbol' => 'nullable|string|max:10',
+        ]);
+    }
 }

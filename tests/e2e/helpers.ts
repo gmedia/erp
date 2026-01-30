@@ -1147,6 +1147,7 @@ export async function createUnit(
     returnField: 'name',
     fields: [
       { name: 'name', type: 'text', defaultValue: defaultName },
+      { name: 'symbol', type: 'text', defaultValue: 'kg' },
     ],
   };
 
@@ -1176,7 +1177,7 @@ export async function searchUnit(page: Page, name: string): Promise<void> {
 export async function editUnit(
   page: Page,
   name: string,
-  updates: { name?: string }
+  updates: { name?: string; symbol?: string }
 ): Promise<void> {
   // Locate the unit first
   await searchUnit(page, name);
@@ -1198,13 +1199,16 @@ export async function editUnit(
   if (updates.name) {
     await page.fill('input[name="name"]', updates.name);
   }
+  if (updates.symbol) {
+    await page.fill('input[name="symbol"]', updates.symbol);
+  }
 
   // Submit the edit dialog
   await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
     state: 'detached',
   });
   const dialog = page.getByRole('dialog');
-  const updateBtn = dialog.getByRole('button', { name: /Update/ });
+  const updateBtn = dialog.locator('button[type="submit"]');
   await expect(updateBtn).toBeVisible();
   await updateBtn.click();
 }

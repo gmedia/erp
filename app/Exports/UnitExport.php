@@ -11,4 +11,20 @@ class UnitExport extends SimpleCrudExport
     {
         return Unit::class;
     }
+
+    public function headings(): array
+    {
+        return ['ID', 'Name', 'Symbol', 'Created At', 'Updated At'];
+    }
+
+    public function map($item): array
+    {
+        return [
+            $item->id,
+            $item->name,
+            $item->symbol,
+            $item->created_at?->toIso8601String(),
+            $item->updated_at?->toIso8601String(),
+        ];
+    }
 }

@@ -73,6 +73,9 @@ import { ProductViewModal } from '@/components/products/ProductViewModal';
 import { productCategoryColumns, type ProductCategory } from '@/components/product-categories/ProductCategoryColumns';
 import { ProductCategoryForm } from '@/components/product-categories/ProductCategoryForm';
 import { ProductCategoryViewModal } from '@/components/product-categories/ProductCategoryViewModal';
+import { unitColumns, type Unit } from '@/components/units/UnitColumns';
+import { UnitForm } from '@/components/units/UnitForm';
+import { UnitViewModal } from '@/components/units/UnitViewModal';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -306,11 +309,21 @@ export const productCategoryConfig = createComplexEntityConfig<ProductCategory>(
     getDeleteMessage: createGenericDeleteMessage('Product Category'),
 });
 
-export const unitConfig = createSimpleEntityConfig({
+export const unitConfig = createComplexEntityConfig<Unit>({
     entityName: 'Unit',
     entityNamePlural: 'Units',
-    apiBase: 'units',
-    filterPlaceholder: 'Search units...',
+    apiEndpoint: '/api/units',
+    exportEndpoint: '/api/units/export',
+    queryKey: ['units'],
+    breadcrumbs: [{ title: 'Units', href: '/units' }],
+    initialFilters: { search: '' },
+    columns: unitColumns,
+    filterFields: createSimpleEntityFilterFields('Search units...'),
+    formComponent: UnitForm,
+    formType: 'complex',
+    entityNameForSearch: 'unit',
+    viewModalComponent: UnitViewModal,
+    getDeleteMessage: createGenericDeleteMessage('Unit'),
 });
 
 export const productConfig = createComplexEntityConfig({
