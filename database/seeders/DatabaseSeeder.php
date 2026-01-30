@@ -43,6 +43,7 @@ class DatabaseSeeder extends Seeder
             PositionSeeder::class,
             ProductCategorySeeder::class,
             UnitSeeder::class,
+            CoaSeeder::class,
         ]);
 
         Employee::updateOrCreate([
