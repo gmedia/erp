@@ -1,61 +1,42 @@
 <?php
 
-namespace Tests\Feature\CoaVersions;
-
 use App\Models\CoaVersion;
-use App\Models\Employee;
 use App\Models\FiscalYear;
-use App\Models\Permission;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-/**
- * @group coa_versions
- */
-class CoaVersionControllerTest extends TestCase
-{
-    use RefreshDatabase;
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
+use function Pest\Laravel\deleteJson;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 
-    protected Employee $admin;
-    protected FiscalYear $fiscalYear;
+uses(RefreshDatabase::class)->group('coa-versions');
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->admin = Employee::factory()->create([
-            'email' => 'admin@example.com',
-        ]);
-
-        $this->fiscalYear = FiscalYear::factory()->create([
-            'name' => 'FY 2026',
-            'status' => 'open',
-        ]);
-
-        // Give admin all coa_version permissions
-        $permissions = [
+describe('COA Version API Endpoints', function () {
+    beforeEach(function () {
+        $user = createTestUserWithPermissions([
             'coa_version',
             'coa_version.create',
             'coa_version.edit',
             'coa_version.delete',
             'coa_version.export',
-        ];
+        ]);
+        actingAs($user);
+        
+        $this->fiscalYear = FiscalYear::factory()->create([
+            'name' => 'FY 2026',
+            'status' => 'open',
+        ]);
+    });
 
-        foreach ($permissions as $p) {
-            $permission = Permission::updateOrCreate(['name' => $p], ['display_name' => $p]);
-            $this->admin->permissions()->attach($permission);
-        }
-
-        $this->actingAs($this->admin->user);
-    }
-
-    public function test_index_returns_paginated_coa_versions()
-    {
+    test('index returns paginated coa versions', function () {
         CoaVersion::factory()->count(15)->create([
             'fiscal_year_id' => $this->fiscalYear->id,
         ]);
 
-        $response = $this->getJson('/api/coa-versions');
+        $response = getJson('/api/coa-versions');
 
         $response->assertStatus(200)
             ->assertJsonCount(15, 'data')
@@ -74,67 +55,62 @@ class CoaVersionControllerTest extends TestCase
                 'links',
                 'meta',
             ]);
-    }
+    });
 
-    public function test_index_filters_by_search_name()
-    {
+    test('index filters by search name', function () {
         CoaVersion::factory()->create(['name' => 'Version Alpha', 'fiscal_year_id' => $this->fiscalYear->id]);
         CoaVersion::factory()->create(['name' => 'Version Beta', 'fiscal_year_id' => $this->fiscalYear->id]);
 
-        $response = $this->getJson('/api/coa-versions?search=Alpha');
+        $response = getJson('/api/coa-versions?search=Alpha');
 
         $response->assertStatus(200)
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.name', 'Version Alpha');
-    }
+    });
 
-    public function test_index_filters_by_fiscal_year()
-    {
+    test('index filters by fiscal year', function () {
         $otherFY = FiscalYear::factory()->create(['name' => 'FY 2027']);
         
         CoaVersion::factory()->create(['name' => 'V1 2026', 'fiscal_year_id' => $this->fiscalYear->id]);
         CoaVersion::factory()->create(['name' => 'V1 2027', 'fiscal_year_id' => $otherFY->id]);
 
-        $response = $this->getJson("/api/coa-versions?fiscal_year_id={$this->fiscalYear->id}");
+        $response = getJson("/api/coa-versions?fiscal_year_id={$this->fiscalYear->id}");
 
         $response->assertStatus(200)
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.name', 'V1 2026');
-    }
+    });
 
-    public function test_store_creates_new_coa_version()
-    {
+    test('store creates new coa version', function () {
         $payload = [
             'name' => 'New Version',
             'fiscal_year_id' => $this->fiscalYear->id,
             'status' => 'draft',
         ];
 
-        $response = $this->postJson('/api/coa-versions', $payload);
+        $response = postJson('/api/coa-versions', $payload);
 
         $response->assertStatus(201);
-        $this->assertDatabaseHas('coa_versions', [
+        assertDatabaseHas('coa_versions', [
             'name' => 'New Version',
             'fiscal_year_id' => $this->fiscalYear->id,
             'status' => 'draft',
         ]);
-    }
+    });
 
-    public function test_show_returns_coa_version_details()
-    {
+    test('show returns coa version details', function () {
         $version = CoaVersion::factory()->create([
             'fiscal_year_id' => $this->fiscalYear->id,
         ]);
 
-        $response = $this->getJson("/api/coa-versions/{$version->id}");
+        $response = getJson("/api/coa-versions/{$version->id}");
 
         $response->assertStatus(200)
             ->assertJsonPath('data.id', $version->id)
             ->assertJsonPath('data.name', $version->name);
-    }
+    });
 
-    public function test_update_modifies_existing_coa_version()
-    {
+    test('update modifies existing coa version', function () {
         $version = CoaVersion::factory()->create([
             'fiscal_year_id' => $this->fiscalYear->id,
             'status' => 'draft',
@@ -146,48 +122,44 @@ class CoaVersionControllerTest extends TestCase
             'status' => 'active',
         ];
 
-        $response = $this->putJson("/api/coa-versions/{$version->id}", $payload);
+        $response = putJson("/api/coa-versions/{$version->id}", $payload);
 
         $response->assertStatus(200);
-        $this->assertDatabaseHas('coa_versions', [
+        assertDatabaseHas('coa_versions', [
             'id' => $version->id,
             'name' => 'Updated Version',
             'status' => 'active',
         ]);
-    }
+    });
 
-    public function test_destroy_deletes_coa_version()
-    {
+    test('destroy deletes coa version', function () {
         $version = CoaVersion::factory()->create([
             'fiscal_year_id' => $this->fiscalYear->id,
         ]);
 
-        $response = $this->deleteJson("/api/coa-versions/{$version->id}");
+        $response = deleteJson("/api/coa-versions/{$version->id}");
 
         $response->assertStatus(204);
-        $this->assertDatabaseMissing('coa_versions', ['id' => $version->id]);
-    }
+        assertDatabaseMissing('coa_versions', ['id' => $version->id]);
+    });
 
-    public function test_export_returns_xlsx_file()
-    {
+    test('export returns download url', function () {
         CoaVersion::factory()->count(5)->create([
             'fiscal_year_id' => $this->fiscalYear->id,
         ]);
 
-        $response = $this->postJson('/api/coa-versions/export');
+        $response = postJson('/api/coa-versions/export');
 
         $response->assertStatus(200)
             ->assertJsonStructure(['url', 'filename']);
 
-        $this->assertStringContainsString('coa_versions_export', $response->json('filename'));
-    }
+        expect($response->json('filename'))->toContain('coa_versions_export');
+    });
 
-    public function test_unauthorized_access_is_forbidden()
-    {
-        $user = Employee::factory()->create()->user;
-        $this->actingAs($user);
+    test('unauthorized access is forbidden', function () {
+        $user = createTestUserWithPermissions([]); // No permissions
+        actingAs($user);
 
-        $response = $this->getJson('/api/coa-versions');
-        $response->assertStatus(403);
-    }
-}
+        getJson('/api/coa-versions')->assertForbidden();
+    });
+});

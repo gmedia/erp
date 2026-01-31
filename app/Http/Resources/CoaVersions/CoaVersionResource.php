@@ -2,23 +2,19 @@
 
 namespace App\Http\Resources\CoaVersions;
 
-use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\SimpleCrudResource;
 
-class CoaVersionResource extends JsonResource
+class CoaVersionResource extends SimpleCrudResource
 {
     public function toArray($request): array
     {
-        return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'fiscal_year_id' => $this->fiscal_year_id,
+        return array_merge(parent::toArray($request), [
+            'fiscal_year_id' => $this->resource->fiscal_year_id,
             'fiscal_year' => [
-                'id' => $this->fiscalYear?->id,
-                'name' => $this->fiscalYear?->name,
+                'id' => $this->resource->fiscalYear?->id,
+                'name' => $this->resource->fiscalYear?->name,
             ],
-            'status' => $this->status,
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
-        ];
+            'status' => $this->resource->status,
+        ]);
     }
 }
