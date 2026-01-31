@@ -1,63 +1,50 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudTestTrait;
 
-class FiscalYearControllerTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudTestTrait;
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
+use function Pest\Laravel\deleteJson;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 
-    protected $modelClass = FiscalYear::class;
-    protected $endpoint = '/api/fiscal-years';
-    protected $permissionPrefix = 'fiscal-year';
-    protected $structure = ['id', 'name', 'start_date', 'end_date', 'status', 'created_at', 'updated_at'];
+uses(RefreshDatabase::class)->group('fiscal-years');
 
-    protected function getBasePermissions(): array
-    {
-        return [
-            $this->permissionPrefix,
-            "{$this->permissionPrefix}.create",
-            "{$this->permissionPrefix}.edit",
-            "{$this->permissionPrefix}.delete",
-            "{$this->permissionPrefix}.export",
-        ];
-    }
+describe('Fiscal Year API Endpoints', function () {
+    beforeEach(function () {
+        $user = createTestUserWithPermissions([
+            'fiscal-year',
+            'fiscal-year.create',
+            'fiscal-year.edit',
+            'fiscal-year.delete',
+            'fiscal-year.export',
+        ]);
+        actingAs($user);
+    });
 
-    public function test_it_returns_paginated_list_with_proper_meta_structure()
-    {
-        $this->modelClass::query()->delete();
-        $user = $this->setUpUserWithPermissions($this->getBasePermissions());
-        $this->actingAs($user);
+    test('index returns paginated fiscal years with proper meta structure', function () {
+        FiscalYear::query()->delete();
+        FiscalYear::factory()->count(25)->create(['status' => 'open']);
 
-        $baseline = $this->modelClass::count();
-
-        $this->modelClass::factory()->count(25)->create(['status' => 'open']);
-
-        $response = $this->getJson("{$this->endpoint}?per_page=10");
+        $response = getJson('/api/fiscal-years?per_page=10');
 
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => $this->structure
+                    '*' => ['id', 'name', 'start_date', 'end_date', 'status', 'created_at', 'updated_at']
                 ],
                 'links',
                 'meta'
             ])
             ->assertJsonCount(10, 'data')
-            ->assertJsonPath('meta.total', $baseline + 25);
-    }
+            ->assertJsonPath('meta.total', 25);
+    });
 
-    public function test_it_creates_resource_successfully()
-    {
-        $this->modelClass::query()->delete();
-        $user = $this->setUpUserWithPermissions($this->getBasePermissions());
-        $this->actingAs($user);
-
+    test('store creates fiscal year successfully', function () {
+        FiscalYear::query()->delete();
         $data = [
             'name' => 'FY 2026',
             'start_date' => '2026-01-01',
@@ -65,122 +52,108 @@ class FiscalYearControllerTest extends TestCase
             'status' => 'open',
         ];
         
-        $response = $this->postJson($this->endpoint, $data);
+        $response = postJson('/api/fiscal-years', $data);
 
         $response->assertCreated()
             ->assertJsonPath('data.name', 'FY 2026')
             ->assertJsonPath('data.status', 'open');
 
-        $this->assertDatabaseHas('fiscal_years', $data);
-    }
+        assertDatabaseHas('fiscal_years', $data);
+    });
 
-    public function test_it_updates_resource_successfully()
-    {
-        $this->modelClass::query()->delete();
-        $user = $this->setUpUserWithPermissions($this->getBasePermissions());
-        $this->actingAs($user);
+    test('store validates required fields', function () {
+        $response = postJson('/api/fiscal-years', []);
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['name', 'start_date', 'end_date', 'status']);
+    });
 
-        $resource = $this->modelClass::factory()->create([
-            'name' => 'FY 2025',
+    test('store validates date logic', function () {
+        $response = postJson('/api/fiscal-years', [
+            'name' => 'Invalid Dates',
+            'start_date' => '2026-12-31',
+            'end_date' => '2026-01-01',
             'status' => 'open'
         ]);
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['end_date']);
+    });
+
+    test('show returns fiscal year successfully', function () {
+        $resource = FiscalYear::factory()->create();
+
+        $response = getJson("/api/fiscal-years/{$resource->id}");
+
+        $response->assertOk()
+            ->assertJsonPath('data.id', $resource->id)
+            ->assertJsonPath('data.name', $resource->name);
+    });
+
+    test('update modifies fiscal year successfully', function () {
+        $resource = FiscalYear::factory()->create(['name' => 'Old Name', 'status' => 'open']);
 
         $updateData = [
-            'name' => 'FY 2025 Updated',
+            'name' => 'Updated Name',
             'start_date' => $resource->start_date->format('Y-m-d'),
             'end_date' => $resource->end_date->format('Y-m-d'),
             'status' => 'closed',
         ];
 
-        $response = $this->putJson("{$this->endpoint}/{$resource->id}", $updateData);
+        $response = putJson("/api/fiscal-years/{$resource->id}", $updateData);
 
         $response->assertOk()
-            ->assertJsonPath('data.name', 'FY 2025 Updated')
+            ->assertJsonPath('data.name', 'Updated Name')
             ->assertJsonPath('data.status', 'closed');
 
-        $this->assertDatabaseHas('fiscal_years', array_merge(['id' => $resource->id], $updateData));
-    }
+        assertDatabaseHas('fiscal_years', array_merge(['id' => $resource->id], $updateData));
+    });
 
-    public function test_it_validates_update_request()
-    {
-        $this->modelClass::query()->delete();
-        $user = $this->setUpUserWithPermissions($this->getBasePermissions());
-        $this->actingAs($user);
+    test('update validates input', function () {
+        $resource = FiscalYear::factory()->create();
 
-        $resource = $this->modelClass::factory()->create(['name' => 'Original FY', 'status' => 'open']);
-
-        // Test empty name
-        $response = $this->putJson("{$this->endpoint}/{$resource->id}", ['name' => '']);
+        $response = putJson("/api/fiscal-years/{$resource->id}", ['name' => '']);
         $response->assertUnprocessable()->assertJsonValidationErrors(['name']);
 
-        // Test invalid status
-        $response = $this->putJson("{$this->endpoint}/{$resource->id}", ['status' => 'invalid']);
+        $response = putJson("/api/fiscal-years/{$resource->id}", ['status' => 'invalid']);
         $response->assertUnprocessable()->assertJsonValidationErrors(['status']);
+    });
 
-        // Test valid partial update (SimpleCrudUpdateRequest usually allows partials, but let's check our implementation)
-        // Our UpdateFiscalYearRequest requires status if present, etc.
-        $response = $this->putJson("{$this->endpoint}/{$resource->id}", [
-            'name' => 'Updated Name',
-            'start_date' => $resource->start_date->format('Y-m-d'),
-            'end_date' => $resource->end_date->format('Y-m-d'),
-            'status' => $resource->status,
-        ]);
-        $response->assertOk();
-    }
+    test('destroy removes fiscal year successfully', function () {
+        $resource = FiscalYear::factory()->create();
 
-    public function test_it_validates_store_request()
-    {
-        $this->modelClass::query()->delete();
-        $user = $this->setUpUserWithPermissions($this->getBasePermissions());
-        $this->actingAs($user);
+        $response = deleteJson("/api/fiscal-years/{$resource->id}");
 
-        // Test required fields
-        $response = $this->postJson($this->endpoint, []);
-        $response->assertUnprocessable()
-            ->assertJsonValidationErrors(['name', 'start_date', 'end_date', 'status']);
+        $response->assertNoContent();
+        assertDatabaseMissing('fiscal_years', ['id' => $resource->id]);
+    });
 
-        // Test date logical validation
-        $response = $this->postJson($this->endpoint, [
-            'name' => 'Invalid Dates',
-            'start_date' => '2026-12-31',
-            'end_date' => '2026-01-01', // Before start_date
-            'status' => 'open'
-        ]);
-        $response->assertUnprocessable()
-            ->assertJsonValidationErrors(['end_date']);
-    }
-
-    public function test_it_filters_by_status()
-    {
-        $this->modelClass::query()->delete();
-        $user = $this->setUpUserWithPermissions($this->getBasePermissions());
-        $this->actingAs($user);
-
+    test('index filters by status', function () {
+        FiscalYear::query()->delete();
         FiscalYear::factory()->create(['status' => 'open']);
         FiscalYear::factory()->create(['status' => 'closed']);
-        FiscalYear::factory()->create(['status' => 'locked']);
 
-        $response = $this->getJson("{$this->endpoint}?status=open");
+        $response = getJson('/api/fiscal-years?status=open');
         $response->assertOk()->assertJsonCount(1, 'data');
+    });
 
-        $response = $this->getJson("{$this->endpoint}?status=closed");
-        $response->assertOk()->assertJsonCount(1, 'data');
-    }
+    test('export returns download url', function () {
+        FiscalYear::factory()->count(5)->create();
 
-    public function test_it_exports_with_status_filter()
-    {
-        $this->modelClass::query()->delete();
-        $user = $this->setUpUserWithPermissions($this->getBasePermissions());
-        $this->actingAs($user);
-
-        FiscalYear::factory()->create(['name' => 'FY Open', 'status' => 'open']);
-        FiscalYear::factory()->create(['name' => 'FY Closed', 'status' => 'closed']);
-
-        $response = $this->postJson("{$this->endpoint}/export", ['status' => 'open']);
+        $response = postJson('/api/fiscal-years/export');
 
         $response->assertOk()
             ->assertJsonStructure(['url', 'filename']);
         
-        $this->assertStringContainsString('fiscal_years_export', $response->json('filename'));
-    }
-}
+        expect($response->json('filename'))->toContain('fiscal_years_export');
+    });
+
+    test('enforces permissions', function () {
+        $user = createTestUserWithPermissions(['fiscal-year']); // View only
+        actingAs($user);
+
+        postJson('/api/fiscal-years', ['name' => 'Fail'])->assertForbidden();
+
+        $resource = FiscalYear::factory()->create();
+        putJson("/api/fiscal-years/{$resource->id}", ['name' => 'Fail'])->assertForbidden();
+        deleteJson("/api/fiscal-years/{$resource->id}")->assertForbidden();
+    });
+});

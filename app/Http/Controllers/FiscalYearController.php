@@ -21,9 +21,9 @@ class FiscalYearController extends Controller
     /**
      * Display a listing of the fiscal years.
      */
-    public function index(IndexFiscalYearRequest $request): JsonResponse
+    public function index(IndexFiscalYearRequest $request, IndexFiscalYearsAction $action): JsonResponse
     {
-        $fiscalYears = (new IndexFiscalYearsAction())->execute($request);
+        $fiscalYears = $action->execute($request);
 
         return (new FiscalYearCollection($fiscalYears))->response();
     }
@@ -71,8 +71,8 @@ class FiscalYearController extends Controller
     /**
      * Export fiscal years to Excel based on filters.
      */
-    public function export(ExportFiscalYearRequest $request): JsonResponse
+    public function export(ExportFiscalYearRequest $request, ExportFiscalYearsAction $action): JsonResponse
     {
-        return (new ExportFiscalYearsAction())->execute($request);
+        return $action->execute($request);
     }
 }
