@@ -16,11 +16,11 @@ uses(RefreshDatabase::class)->group('fiscal-years');
 describe('Fiscal Year API Endpoints', function () {
     beforeEach(function () {
         $user = createTestUserWithPermissions([
-            'fiscal-year',
-            'fiscal-year.create',
-            'fiscal-year.edit',
-            'fiscal-year.delete',
-            'fiscal-year.export',
+            'fiscal_year',
+            'fiscal_year.create',
+            'fiscal_year.edit',
+            'fiscal_year.delete',
+            'fiscal_year.export',
         ]);
         actingAs($user);
     });
