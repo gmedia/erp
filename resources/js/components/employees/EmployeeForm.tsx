@@ -4,6 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { format } from 'date-fns';
+
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
@@ -143,13 +145,20 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
         form.reset(defaultValues);
     }, [form, defaultValues]);
 
+    const handleFormSubmit = (data: EmployeeFormData) => {
+        onSubmit({
+            ...data,
+            hire_date: format(data.hire_date, 'yyyy-MM-dd') as any,
+        });
+    };
+
     return (
         <EntityForm<EmployeeFormData>
             form={form}
             open={open}
             onOpenChange={onOpenChange}
             title={employee ? 'Edit Employee' : 'Add New Employee'}
-            onSubmit={onSubmit}
+            onSubmit={handleFormSubmit}
             isLoading={isLoading}
         >
             {renderEmployeeBasicInfoSection()}

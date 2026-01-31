@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import EntityForm from '@/components/common/EntityForm';
 import NameField from '@/components/common/NameField';
+import { format } from 'date-fns';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import SelectField from '@/components/common/SelectField';
 import { fiscalYearFormSchema, type FiscalYearFormData } from '@/utils/schemas';
@@ -52,13 +53,21 @@ export function FiscalYearForm({
         }
     }, [form, activeEntity, open]);
 
+    const handleFormSubmit = (data: FiscalYearFormData) => {
+        onSubmit({
+            ...data,
+            start_date: format(data.start_date, 'yyyy-MM-dd') as any,
+            end_date: format(data.end_date, 'yyyy-MM-dd') as any,
+        });
+    };
+
     return (
         <EntityForm
             form={form}
             open={open}
             onOpenChange={onOpenChange}
             title={activeEntity ? 'Edit Fiscal Year' : 'Add New Fiscal Year'}
-            onSubmit={onSubmit}
+            onSubmit={handleFormSubmit}
             isLoading={isLoading}
         >
             <NameField
