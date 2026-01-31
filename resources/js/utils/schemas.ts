@@ -143,3 +143,10 @@ export const fiscalYearFormSchema = z.object({
 });
 
 export type FiscalYearFormData = z.infer<typeof fiscalYearFormSchema>;
+export const coaVersionFormSchema = z.object({
+    name: z.string().min(1, 'Name is required').max(255),
+    fiscal_year_id: z.union([z.number(), z.string()]).transform((val) => Number(val)).pipe(z.number().min(1, 'Fiscal Year is required')),
+    status: z.enum(['draft', 'active', 'archived']),
+});
+
+export type CoaVersionFormData = z.infer<typeof coaVersionFormSchema>;

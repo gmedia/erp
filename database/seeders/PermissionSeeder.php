@@ -265,6 +265,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'coa_version',
+                'display_name' => 'COA Version',
+                'child' => [
+                    [
+                        'name' => 'coa_version.create',
+                        'display_name' => 'Create COA Version',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'coa_version.edit',
+                        'display_name' => 'Edit COA Version',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'coa_version.delete',
+                        'display_name' => 'Delete COA Version',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],

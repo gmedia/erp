@@ -373,3 +373,26 @@ export const fiscalYearConfig = createComplexEntityConfig<FiscalYear>({
     viewModalComponent: FiscalYearViewModal,
     getDeleteMessage: createGenericDeleteMessage('Fiscal Year'),
 });
+
+import { coaVersionColumns } from '@/components/coa-versions/CoaVersionColumns';
+import { createCoaVersionFilterFields } from '@/components/coa-versions/CoaVersionFilters';
+import { CoaVersionForm } from '@/components/coa-versions/CoaVersionForm';
+import { CoaVersionViewModal } from '@/components/coa-versions/CoaVersionViewModal';
+import { type CoaVersion } from '@/types/coa-version';
+
+export const coaVersionConfig = createComplexEntityConfig<CoaVersion>({
+    entityName: 'COA Version',
+    entityNamePlural: 'COA Versions',
+    apiEndpoint: '/api/coa-versions',
+    exportEndpoint: '/api/coa-versions/export',
+    queryKey: ['coa-versions'],
+    breadcrumbs: [{ title: 'COA Versions', href: '/coa-versions' }],
+    initialFilters: { search: '', status: '', fiscal_year_id: '' },
+    columns: coaVersionColumns,
+    filterFields: createCoaVersionFilterFields(),
+    formComponent: CoaVersionForm,
+    formType: 'complex',
+    entityNameForSearch: 'coa version',
+    viewModalComponent: CoaVersionViewModal,
+    getDeleteMessage: createGenericDeleteMessage('COA Version'),
+});

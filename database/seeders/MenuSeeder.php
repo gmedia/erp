@@ -122,6 +122,14 @@ class MenuSeeder extends Seeder
                         'url' => 'fiscal-years',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'coa_version',
+                        'display_name' => 'COA Version',
+                        'permissions' => ['coa_version', 'coa_version.create', 'coa_version.edit', 'coa_version.delete'],
+                        'icon' => 'LayoutList',
+                        'url' => 'coa-versions',
+                        'child' => [],
+                    ],
                 ],
             ],
             [
