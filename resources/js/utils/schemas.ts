@@ -135,8 +135,8 @@ export type ProductFormData = z.infer<typeof productFormSchema>;
  */
 export const fiscalYearFormSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    start_date: z.string().min(1, { message: 'Start date is required.' }),
-    end_date: z.string().min(1, { message: 'End date is required.' }),
+    start_date: z.date({ message: 'Start date is required.' }),
+    end_date: z.date({ message: 'End date is required.' }),
     status: z.enum(['open', 'closed', 'locked'], {
         message: 'Status is required.',
     }),

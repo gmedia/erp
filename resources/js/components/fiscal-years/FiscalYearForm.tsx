@@ -35,8 +35,8 @@ export function FiscalYearForm({
         resolver: zodResolver(fiscalYearFormSchema),
         defaultValues: {
             name: activeEntity?.name || '',
-            start_date: activeEntity?.start_date || '',
-            end_date: activeEntity?.end_date || '',
+            start_date: activeEntity?.start_date ? new Date(activeEntity.start_date) : undefined as any,
+            end_date: activeEntity?.end_date ? new Date(activeEntity.end_date) : undefined as any,
             status: activeEntity?.status || 'open',
         },
     });
@@ -45,8 +45,8 @@ export function FiscalYearForm({
         if (open) {
             form.reset({
                 name: activeEntity?.name || '',
-                start_date: activeEntity?.start_date || '',
-                end_date: activeEntity?.end_date || '',
+                start_date: activeEntity?.start_date ? new Date(activeEntity.start_date) : undefined as any,
+                end_date: activeEntity?.end_date ? new Date(activeEntity.end_date) : undefined as any,
                 status: activeEntity?.status || 'open',
             });
         }
