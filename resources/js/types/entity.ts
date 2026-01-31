@@ -31,3 +31,4 @@ export type { Employee, EmployeeFormData } from './employee';
 export type { Position, PositionFormData } from './position';
 export type { Supplier, SupplierFormData, SupplierFilters } from './supplier';
 export type { Product, ProductFormData } from './product';
+export type { FiscalYear, FiscalYearFormData, FiscalYearFilters } from './fiscal-year';

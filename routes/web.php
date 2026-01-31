@@ -32,5 +32,6 @@ require __DIR__ . '/customer_category.php';
 require __DIR__ . '/product_category.php';
 require __DIR__ . '/unit.php';
 require __DIR__ . '/product.php';
+require __DIR__ . '/fiscal_year.php';
 
 

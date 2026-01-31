@@ -244,6 +244,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'fiscal_year',
+                'display_name' => 'Fiscal Year',
+                'child' => [
+                    [
+                        'name' => 'fiscal_year.create',
+                        'display_name' => 'Create Fiscal Year',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'fiscal_year.edit',
+                        'display_name' => 'Edit Fiscal Year',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'fiscal_year.delete',
+                        'display_name' => 'Delete Fiscal Year',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],

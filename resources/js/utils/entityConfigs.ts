@@ -351,4 +351,25 @@ export const productConfig = createComplexEntityConfig({
         `This action cannot be undone. This will permanently delete ${product.name}'s product record.`,
 });
 
+import { fiscalYearColumns } from '@/components/fiscal-years/FiscalYearColumns';
+import { createFiscalYearFilterFields } from '@/components/fiscal-years/FiscalYearFilters';
+import { FiscalYearForm } from '@/components/fiscal-years/FiscalYearForm';
+import { FiscalYearViewModal } from '@/components/fiscal-years/FiscalYearViewModal';
+import { type FiscalYear } from '@/types/entity';
 
+export const fiscalYearConfig = createComplexEntityConfig<FiscalYear>({
+    entityName: 'Fiscal Year',
+    entityNamePlural: 'Fiscal Years',
+    apiEndpoint: '/api/fiscal-years',
+    exportEndpoint: '/api/fiscal-years/export',
+    queryKey: ['fiscal-years'],
+    breadcrumbs: [{ title: 'Fiscal Years', href: '/fiscal-years' }],
+    initialFilters: { search: '', status: '' },
+    columns: fiscalYearColumns,
+    filterFields: createFiscalYearFilterFields(),
+    formComponent: FiscalYearForm,
+    formType: 'complex',
+    entityNameForSearch: 'fiscal year',
+    viewModalComponent: FiscalYearViewModal,
+    getDeleteMessage: createGenericDeleteMessage('Fiscal Year'),
+});

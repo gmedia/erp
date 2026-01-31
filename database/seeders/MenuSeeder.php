@@ -114,6 +114,14 @@ class MenuSeeder extends Seeder
                         'url' => 'products',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'fiscal_year',
+                        'display_name' => 'Fiscal Year',
+                        'permissions' => ['fiscal_year', 'fiscal_year.create', 'fiscal_year.edit', 'fiscal_year.delete'],
+                        'icon' => 'LayoutList',
+                        'url' => 'fiscal-years',
+                        'child' => [],
+                    ],
                 ],
             ],
             [
