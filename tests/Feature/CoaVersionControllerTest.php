@@ -68,6 +68,28 @@ describe('COA Version API Endpoints', function () {
             ->assertJsonPath('data.0.name', 'Version Alpha');
     });
 
+    test('index filters by status', function () {
+        CoaVersion::factory()->create(['status' => 'active', 'fiscal_year_id' => $this->fiscalYear->id]);
+        CoaVersion::factory()->create(['status' => 'draft', 'fiscal_year_id' => $this->fiscalYear->id]);
+
+        $response = getJson('/api/coa-versions?status=active');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.status', 'active');
+    });
+
+    test('index sorts by name', function () {
+        CoaVersion::factory()->create(['name' => 'B Version', 'fiscal_year_id' => $this->fiscalYear->id]);
+        CoaVersion::factory()->create(['name' => 'A Version', 'fiscal_year_id' => $this->fiscalYear->id]);
+
+        $response = getJson('/api/coa-versions?sort_by=name&sort_direction=asc');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.0.name', 'A Version')
+            ->assertJsonPath('data.1.name', 'B Version');
+    });
+
     test('index filters by fiscal year', function () {
         $otherFY = FiscalYear::factory()->create(['name' => 'FY 2027']);
         
@@ -96,6 +118,19 @@ describe('COA Version API Endpoints', function () {
             'fiscal_year_id' => $this->fiscalYear->id,
             'status' => 'draft',
         ]);
+    });
+
+    test('store fails with invalid status', function () {
+        $payload = [
+            'name' => 'New Version',
+            'fiscal_year_id' => $this->fiscalYear->id,
+            'status' => 'invalid-status',
+        ];
+
+        $response = postJson('/api/coa-versions', $payload);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['status']);
     });
 
     test('show returns coa version details', function () {
@@ -130,6 +165,22 @@ describe('COA Version API Endpoints', function () {
             'name' => 'Updated Version',
             'status' => 'active',
         ]);
+    });
+
+    test('update fails with duplicate name in same fiscal year', function () {
+        CoaVersion::factory()->create(['name' => 'Existing Version', 'fiscal_year_id' => $this->fiscalYear->id]);
+        $version = CoaVersion::factory()->create(['name' => 'My Version', 'fiscal_year_id' => $this->fiscalYear->id]);
+
+        $payload = [
+            'name' => 'Existing Version',
+            'fiscal_year_id' => $this->fiscalYear->id,
+            'status' => 'active',
+        ];
+
+        $response = putJson("/api/coa-versions/{$version->id}", $payload);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['name']);
     });
 
     test('destroy deletes coa version', function () {

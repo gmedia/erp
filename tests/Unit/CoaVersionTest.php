@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Account;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -31,4 +32,12 @@ test('belongs to a fiscal year', function () {
 
     expect($coaVersion->fiscalYear)->toBeInstanceOf(FiscalYear::class)
         ->and($coaVersion->fiscalYear->id)->toBe($fiscalYear->id);
+});
+
+test('has many accounts', function () {
+    $coaVersion = CoaVersion::factory()->create();
+    Account::factory()->count(3)->create(['coa_version_id' => $coaVersion->id]);
+
+    expect($coaVersion->accounts)->toHaveCount(3)
+        ->and($coaVersion->accounts->first())->toBeInstanceOf(Account::class);
 });
