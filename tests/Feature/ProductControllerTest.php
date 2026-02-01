@@ -53,6 +53,51 @@ describe('Product API Endpoints', function () {
             ->and($response->json('data.0.category.id'))->toBe($cat->id);
     });
 
+    test('index supports filtering by branch', function () {
+        $branch = Branch::factory()->create();
+        Product::factory()->create(['branch_id' => $branch->id]);
+        Product::factory()->create();
+
+        $response = getJson("/api/products?branch_id={$branch->id}");
+
+        $response->assertOk();
+        expect($response->json('data'))->toHaveCount(1)
+            ->and($response->json('data.0.branch.id'))->toBe($branch->id);
+    });
+
+    test('index supports filtering by type', function () {
+        Product::factory()->create(['type' => 'finished_good']);
+        Product::factory()->create(['type' => 'raw_material']);
+
+        $response = getJson("/api/products?type=finished_good");
+
+        $response->assertOk();
+        expect($response->json('data'))->toHaveCount(1)
+            ->and($response->json('data.0.type'))->toBe('finished_good');
+    });
+
+    test('index supports filtering by status', function () {
+        Product::factory()->create(['status' => 'active']);
+        Product::factory()->create(['status' => 'inactive']);
+
+        $response = getJson("/api/products?status=active");
+
+        $response->assertOk();
+        expect($response->json('data'))->toHaveCount(1)
+            ->and($response->json('data.0.status'))->toBe('active');
+    });
+
+    test('index supports search', function () {
+        Product::factory()->create(['name' => 'Searchable Product']);
+        Product::factory()->create(['name' => 'Other Product']);
+
+        $response = getJson("/api/products?search=Searchable");
+
+        $response->assertOk();
+        expect($response->json('data'))->toHaveCount(1)
+            ->and($response->json('data.0.name'))->toBe('Searchable Product');
+    });
+
     test('store creates product with valid data', function () {
         $cat = ProductCategory::factory()->create();
         $unit = Unit::factory()->create();
@@ -82,6 +127,15 @@ describe('Product API Endpoints', function () {
             'code' => 'TEST-001',
             'name' => 'Test Product',
         ]);
+    });
+
+    test('store fails with invalid data', function () {
+        $response = postJson('/api/products', [
+            'name' => '', // required
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['name', 'code', 'type', 'category_id', 'unit_id']);
     });
 
     test('show returns single product', function () {

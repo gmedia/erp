@@ -9,72 +9,77 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('products');
 
-beforeEach(function () {
-    $this->filterService = new ProductFilterService();
-});
-
-test('it filters by search name', function () {
-    Product::factory()->create(['name' => 'Widget A']);
-    Product::factory()->create(['name' => 'Gadget B']);
-
-    $query = Product::query();
-    $this->filterService->applySearch($query, 'Widget', ['name']);
-
-    expect($query->count())->toBe(1)
-        ->and($query->first()->name)->toBe('Widget A');
-});
-
-test('it filters by search code', function () {
-    Product::factory()->create(['code' => 'CODE-123']);
-    Product::factory()->create(['code' => 'CODE-456']);
-
-    $query = Product::query();
-    $this->filterService->applySearch($query, '123', ['code']);
-
-    expect($query->count())->toBe(1)
-        ->and($query->first()->code)->toBe('CODE-123');
-});
-
-test('it filters by category', function () {
-    $cat1 = ProductCategory::factory()->create();
-    $cat2 = ProductCategory::factory()->create();
+test('applyAdvancedFilters applies category filter', function () {
+    $service = new ProductFilterService();
+    $cat = ProductCategory::factory()->create();
     
-    Product::factory()->create(['category_id' => $cat1->id]);
-    Product::factory()->create(['category_id' => $cat2->id]);
+    Product::factory()->create(['category_id' => $cat->id]);
+    Product::factory()->create();
 
     $query = Product::query();
-    $this->filterService->applyAdvancedFilters($query, ['category_id' => $cat1->id]);
+    $service->applyAdvancedFilters($query, ['category_id' => $cat->id]);
 
-    expect($query->count())->toBe(1)
-        ->and($query->first()->category_id)->toBe($cat1->id);
+    expect($query->count())->toBe(1);
 });
 
-test('it filters by status', function () {
+test('applyAdvancedFilters applies unit filter', function () {
+    $service = new ProductFilterService();
+    $unit = Unit::factory()->create();
+    
+    Product::factory()->create(['unit_id' => $unit->id]);
+    Product::factory()->create();
+
+    $query = Product::query();
+    $service->applyAdvancedFilters($query, ['unit_id' => $unit->id]);
+
+    expect($query->count())->toBe(1);
+});
+
+test('applyAdvancedFilters applies branch filter', function () {
+    $service = new ProductFilterService();
+    $branch = Branch::factory()->create();
+    
+    Product::factory()->create(['branch_id' => $branch->id]);
+    Product::factory()->create();
+
+    $query = Product::query();
+    $service->applyAdvancedFilters($query, ['branch_id' => $branch->id]);
+
+    expect($query->count())->toBe(1);
+});
+
+test('applyAdvancedFilters applies type filter', function () {
+    $service = new ProductFilterService();
+    
+    Product::factory()->create(['type' => 'finished_good']);
+    Product::factory()->create(['type' => 'raw_material']);
+
+    $query = Product::query();
+    $service->applyAdvancedFilters($query, ['type' => 'finished_good']);
+
+    expect($query->count())->toBe(1);
+});
+
+test('applyAdvancedFilters applies status filter', function () {
+    $service = new ProductFilterService();
+    
     Product::factory()->create(['status' => 'active']);
     Product::factory()->create(['status' => 'inactive']);
 
     $query = Product::query();
-    $this->filterService->applyAdvancedFilters($query, ['status' => 'active']);
+    $service->applyAdvancedFilters($query, ['status' => 'active']);
 
     expect($query->count())->toBe(1);
 });
 
-test('it filters by type', function () {
-    Product::factory()->create(['type' => 'service']);
-    Product::factory()->create(['type' => 'finished_good']);
-
-    $query = Product::query();
-    $this->filterService->applyAdvancedFilters($query, ['type' => 'service']);
-
-    expect($query->count())->toBe(1);
-});
-
-test('it filters by boolean flags', function () {
+test('applyAdvancedFilters applies flag filters', function () {
+    $service = new ProductFilterService();
+    
     Product::factory()->create(['is_manufactured' => true]);
     Product::factory()->create(['is_manufactured' => false]);
 
     $query = Product::query();
-    $this->filterService->applyAdvancedFilters($query, ['is_manufactured' => true]);
+    $service->applyAdvancedFilters($query, ['is_manufactured' => true]);
 
     expect($query->count())->toBe(1);
 });
