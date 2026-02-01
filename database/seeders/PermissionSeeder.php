@@ -286,6 +286,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'account',
+                'display_name' => 'Chart of Accounts',
+                'child' => [
+                    [
+                        'name' => 'account.create',
+                        'display_name' => 'Create Chart of Accounts',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'account.edit',
+                        'display_name' => 'Edit Chart of Accounts',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'account.delete',
+                        'display_name' => 'Delete Chart of Accounts',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],

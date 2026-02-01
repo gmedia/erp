@@ -133,7 +133,7 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'chart_of_accounts',
                         'display_name' => 'Chart of Accounts',
-                        'permissions' => ['coa_version'], // Using coa_version permission for now or create new one
+                        'permissions' => ['accounts', 'accounts.create', 'accounts.edit', 'accounts.delete'],
                         'icon' => 'FolderTree',
                         'url' => 'accounts',
                         'child' => [],
