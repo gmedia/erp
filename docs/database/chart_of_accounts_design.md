@@ -298,6 +298,41 @@ Menyimpan detail debit/kredit untuk setiap jurnal.
 | `created_at` | Timestamp | |
 | `updated_at` | Timestamp | |
 
+#### Detail Penjelasan Jurnal
+
+Tabel `journal_entries` dan `journal_entry_lines` bekerja berpasangan (Header-Detail) untuk mencatat setiap transaksi keuangan.
+
+##### 1. `journal_entries` (Header)
+Berfungsi sebagai amplop atau wadah transaksi.
+*   **`entry_number`**: Nomor referensi unik (contoh: JV-2026-01-001).
+*   **`entry_date`**: Tanggal terjadinya transaksi (bukan tanggal input).
+*   **`status`**:
+    *   `draft`: Masih bisa diedit/dihapus, belum masuk laporan.
+    *   `posted`: Sudah final, masuk buku besar & laporan, tidak bisa diedit.
+    *   `void`: Dibatalkan (audit trail tetap ada).
+
+##### 2. `journal_entry_lines` (Detail)
+Berisi rincian akun yang didebit dan dikredit.
+*   **`debit` & `credit`**: Nilai mutasi. Salah satu harus 0.
+*   **`account_id`**: Mengacu ke akun di COA versi tahun tersebut.
+
+#### Contoh Kasus (Jurnal Umum)
+
+**Skenario:** Pembayaran Biaya Listrik sebesar Rp 1.500.000 dengan transfer bank BCA tanggal 15 Januari 2026.
+
+**A. Tabel `journal_entries`**
+| id | fiscal_year_id | entry_number | entry_date | description | status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 101 | 2 (2026) | `JV-2026-005` | `2026-01-15` | Bayar Tagihan PLN Jan 2026 | `posted` |
+
+**B. Tabel `journal_entry_lines`**
+| id | journal_entry_id | account_id | debit | credit | memo |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 501 | 101 | `6100` (Beban Listrik) | 1.500.000 | 0 | Tagihan ID: 54321 |
+| 502 | 101 | `11100` (Bank BCA) | 0 | 1.500.000 | Transfer via KlikBCA |
+
+*Catatan: Total Debit (1.500.000) = Total Kredit (1.500.000).*
+
 ---
 
 ## Skema Perhitungan Debit & Kredit
@@ -355,9 +390,63 @@ $accounts = Account::where('coa_version_id', $activeVersionId)
 
 ---
 
+## Logika Laporan Keuangan (Financial Statements)
+
+Berikut adalah algoritma dasar untuk menyusun laporan keuangan utama.
+
+### 1. Laporan Laba Rugi (Income Statement / Profit & Loss)
+
+Laporan ini menghitung kinerja operasional dalam periode rentang waktu tertentu (misal: 1 Jan - 31 Des).
+
+**Filter Akun:**
+*   `type`: `revenue` dan `expense`
+
+**Rumus Saldo per Akun:**
+```php
+// Revenue (Normal Balance: Credit)
+$revenueBalance = $totalCredit - $totalDebit;
+
+// Expense (Normal Balance: Debit)
+$expenseBalance = $totalDebit - $totalCredit;
+```
+
+**Perhitungan Laba Bersih (Net Income):**
+```
+Net Income = Total Revenue - Total Expense
+```
+
+---
+
+### 2. Neraca (Balance Sheet)
+
+Laporan ini menampilkan posisi keuangan pada satu titik waktu tertentu (misal: per 31 Des).
+
+**Filter Akun:**
+*   `type`: `asset`, `liability`, `equity`
+
+**Rumus Saldo per Akun (Year-to-Date):**
+Saldo diambil secara akumulatif sejak awal sistem berjalan hingga tanggal laporan.
+
+```php
+// Asset (Normal Balance: Debit)
+$assetBalance = $totalDebit - $totalCredit;
+
+// Liability & Equity (Normal Balance: Credit)
+$liabilityEquityBalance = $totalCredit - $totalDebit;
+```
+
+**Handling Laba Periode Berjalan (Current Year Earnings):**
+Neraca harus menyertakan laba/rugi tahun berjalan yang belum ditutup ke akun Laba Ditahan (Retained Earnings).
+1.  Hitung `Net Income` (Laba/Rugi) menggunakan logika Laba Rugi.
+2.  Tambahkan nilai `Net Income` ini ke dalam bagian **Equity** (biasanya sebagai baris terpisah "Current Year Earnings" sebelum Closing Entry tahunan).
+3.  Pastikan persamaannya valid: `Assets = Liabilities + Equity + Net Income`.
+
+---
+
 ## Contoh Data Seed
 
 Seeder menyediakan data contoh:
+
 
 ### Tahun Fiskal
 - **2025** (closed) - COA 2025 Standard (archived)
