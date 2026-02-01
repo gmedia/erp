@@ -261,7 +261,7 @@ export default function AccountIndex() {
                                 e.preventDefault();
                                 confirmDelete();
                             }}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            className="bg-destructive text-white hover:bg-destructive/80"
                             disabled={isActionLoading}
                         >
                             {isActionLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
