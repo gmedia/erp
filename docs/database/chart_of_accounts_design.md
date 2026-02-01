@@ -230,6 +230,31 @@ Tabel untuk menangani perubahan kode akun yang drastis antar versi. Digunakan ji
 - `split`: Satu akun lama dipecah menjadi beberapa akun baru
 - `rename`: Akun berganti kode atau nama
 
+#### Detail Penjelasan Mapping
+
+Tabel ini berfungsi sebagai "kamus penerjemah" antar versi COA, krusial untuk laporan komparatif saat struktur akun berubah.
+
+##### 1. `rename` (Perubahan 1-to-1)
+*   **Logika:** Satu akun lama digantikan satu akun baru, tapi kode berbeda drastis.
+*   **Contoh:**
+    *   **2025:** `1100-00` (Kas Umum)
+    *   **2026:** `11100` (Kas Besar) -> Format baru 5 digit.
+    *   **Efek:** Saldo `1100-00` tahun lalu ditampilkan sebagai pembanding `11100`.
+
+##### 2. `merge` (Penggabungan / Many-to-1)
+*   **Logika:** Beberapa akun lama disederhanakan menjadi satu akun baru.
+*   **Contoh:**
+    *   **2025:** `6101` (Beban Listrik) & `6102` (Beban Air).
+    *   **2026:** Digabung ke `6100` (Beban Utilitas).
+    *   **Efek:** Saldo pembanding `6100` adalah total (`6101` + `6102`) tahun lalu.
+
+##### 3. `split` (Pemecahan / 1-to-Many)
+*   **Logika:** Satu akun lama dipecah menjadi akun-akun lebih detail.
+*   **Contoh:**
+    *   **2025:** `5200` (Beban Perjalanan Dinas).
+    *   **2026:** Dipecah ke `5210` (Tiket Pesawat) & `5220` (Akomodasi Hotel).
+    *   **Efek:** Biasanya total saldo lama ditampilkan di level Group Header, atau dialokasikan jika ada aturan khusus.
+
 ---
 
 ### 5. `journal_entries` (Jurnal Umum - Header)
