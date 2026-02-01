@@ -9,14 +9,14 @@ uses(RefreshDatabase::class)->group('departments');
 describe('DepartmentExport', function () {
 
     test('query applies search filter', function () {
-        Department::factory()->create(['name' => 'Engineering']);
-        Department::factory()->create(['name' => 'Sales']);
+        Department::factory()->create(['name' => 'UniqueDeptEngineering']);
+        Department::factory()->create(['name' => 'OtherDeptSales']);
 
-        $export = new DepartmentExport(['search' => 'Engine']);
+        $export = new DepartmentExport(['search' => 'UniqueDept']);
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(1)
-            ->and($results->first()->name)->toBe('Engineering');
+            ->and($results->first()->name)->toBe('UniqueDeptEngineering');
     });
 
     test('map function returns correct data', function () {
