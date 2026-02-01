@@ -50,13 +50,13 @@ export default function SelectField({
                     <FormControl>
                         <Select
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            value={field.value !== undefined && field.value !== null ? String(field.value) : undefined}
                         >
                             <SelectTrigger className="w-full">
                                 <span>
-                                    {field.value
+                                    {(field.value !== undefined && field.value !== null && field.value !== '')
                                         ? options.find(
-                                              (o) => o.value === field.value,
+                                              (o) => String(o.value) === String(field.value),
                                           )?.label
                                         : placeholder}
                                 </span>
