@@ -1,24 +1,20 @@
 <?php
 
-namespace Tests\Unit\Domain\Units;
-
 use App\Domain\Units\UnitFilterService;
 use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudFilterServiceTestTrait;
 
-class UnitFilterServiceTest extends TestCase
-{
-    use RefreshDatabase, SimpleCrudFilterServiceTestTrait;
+uses(RefreshDatabase::class)->group('units', 'domain');
 
-    protected function getFilterServiceClass(): string
-    {
-        return UnitFilterService::class;
-    }
+test('apply search filters by name', function () {
+    Unit::factory()->create(['name' => 'Kilogram']);
+    Unit::factory()->create(['name' => 'Meter']);
 
-    protected function getModelClass(): string
-    {
-        return Unit::class;
-    }
-}
+    $service = new UnitFilterService();
+    $query = Unit::query();
+    
+    $service->applySearch($query, 'Kilo', ['name']);
+    
+    expect($query->count())->toBe(1)
+        ->and($query->first()->name)->toBe('Kilogram');
+});

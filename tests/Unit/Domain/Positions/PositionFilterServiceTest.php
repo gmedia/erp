@@ -1,25 +1,20 @@
 <?php
 
-namespace Tests\Unit\Domain\Positions;
-
 use App\Domain\Positions\PositionFilterService;
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudFilterServiceTestTrait;
 
-class PositionFilterServiceTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudFilterServiceTestTrait;
+uses(RefreshDatabase::class)->group('positions', 'domain');
 
-    protected function getFilterServiceClass(): string
-    {
-        return PositionFilterService::class;
-    }
+test('apply search filters by name', function () {
+    Position::factory()->create(['name' => 'Manager']);
+    Position::factory()->create(['name' => 'Staff']);
 
-    protected function getModelClass(): string
-    {
-        return Position::class;
-    }
-}
+    $service = new PositionFilterService();
+    $query = Position::query();
+    
+    $service->applySearch($query, 'Man', ['name']);
+    
+    expect($query->count())->toBe(1)
+        ->and($query->first()->name)->toBe('Manager');
+});

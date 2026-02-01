@@ -7,7 +7,7 @@ use App\Models\Unit;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('products');
 
 beforeEach(function () {
     $this->filterService = new ProductFilterService();

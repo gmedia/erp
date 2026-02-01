@@ -1,25 +1,18 @@
 <?php
 
-namespace Tests\Unit\Requests\SupplierCategories;
-
 use App\Http\Requests\SupplierCategories\StoreSupplierCategoryRequest;
-use App\Models\SupplierCategory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudStoreRequestTestTrait;
 
-class StoreSupplierCategoryRequestTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudStoreRequestTestTrait;
+uses()->group('supplier-categories', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return StoreSupplierCategoryRequest::class;
-    }
+test('authorize returns true', function () {
+    $request = new StoreSupplierCategoryRequest();
+    expect($request->authorize())->toBeTrue();
+});
 
-    protected function getModelClass(): string
-    {
-        return SupplierCategory::class;
-    }
-}
+test('rules returns correct validation rules', function () {
+    $request = new StoreSupplierCategoryRequest();
+    
+    expect($request->rules())->toEqual([
+        'name' => ['required', 'string', 'max:255', 'unique:supplier_categories,name'],
+    ]);
+});

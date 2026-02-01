@@ -1,31 +1,49 @@
 <?php
 
-namespace Tests\Unit\Actions\Departments;
-
 use App\Actions\Departments\IndexDepartmentsAction;
 use App\Http\Requests\Departments\IndexDepartmentRequest;
 use App\Models\Department;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudIndexActionTestTrait;
 
-class IndexDepartmentsActionTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudIndexActionTestTrait;
+uses(RefreshDatabase::class)->group('departments', 'actions');
 
-    protected function getActionClass(): string
-    {
-        return IndexDepartmentsAction::class;
-    }
+test('execute returns paginated results', function () {
+    Department::factory()->count(3)->create();
 
-    protected function getModelClass(): string
-    {
-        return Department::class;
-    }
+    $action = new IndexDepartmentsAction();
+    $request = new IndexDepartmentRequest();
+    
+    $result = $action->execute($request);
 
-    protected function getRequestClass(): string
-    {
-        return IndexDepartmentRequest::class;
-    }
-}
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
+        ->and($result->count())->toBe(3);
+});
+
+test('execute filters by search term', function () {
+    Department::factory()->create(['name' => 'IT Department']);
+    Department::factory()->create(['name' => 'HR Department']);
+
+    $action = new IndexDepartmentsAction();
+    $request = new IndexDepartmentRequest(['search' => 'IT']);
+    
+    $result = $action->execute($request);
+
+    expect($result->count())->toBe(1)
+        ->and($result->first()->name)->toBe('IT Department');
+});
+
+test('execute sorts results', function () {
+    Department::factory()->create(['name' => 'A Dept']);
+    Department::factory()->create(['name' => 'B Dept']);
+
+    $action = new IndexDepartmentsAction();
+    $request = new IndexDepartmentRequest([
+        'sort_by' => 'name',
+        'sort_direction' => 'desc'
+    ]);
+    
+    $result = $action->execute($request);
+
+    expect($result->first()->name)->toBe('B Dept');
+});

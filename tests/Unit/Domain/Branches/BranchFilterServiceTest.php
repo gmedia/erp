@@ -1,25 +1,20 @@
 <?php
 
-namespace Tests\Unit\Domain\Branches;
-
 use App\Domain\Branches\BranchFilterService;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudFilterServiceTestTrait;
 
-class BranchFilterServiceTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudFilterServiceTestTrait;
+uses(RefreshDatabase::class)->group('branches', 'domain');
 
-    protected function getFilterServiceClass(): string
-    {
-        return BranchFilterService::class;
-    }
+test('apply search filters by name', function () {
+    Branch::factory()->create(['name' => 'HQ']);
+    Branch::factory()->create(['name' => 'Branch 2']);
 
-    protected function getModelClass(): string
-    {
-        return Branch::class;
-    }
-}
+    $service = new BranchFilterService();
+    $query = Branch::query();
+    
+    $service->applySearch($query, 'HQ', ['name']);
+    
+    expect($query->count())->toBe(1)
+        ->and($query->first()->name)->toBe('HQ');
+});

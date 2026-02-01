@@ -1,29 +1,31 @@
 <?php
 
-namespace Tests\Unit\Requests\Units;
-
 use App\Http\Requests\Units\UpdateUnitRequest;
 use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudUpdateRequestTestTrait;
 
-class UpdateUnitRequestTest extends TestCase
-{
-    use RefreshDatabase, SimpleCrudUpdateRequestTestTrait;
+uses(RefreshDatabase::class)->group('units', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return UpdateUnitRequest::class;
-    }
+test('authorize returns true', function () {
+    $request = new UpdateUnitRequest();
+    expect($request->authorize())->toBeTrue();
+});
 
-    protected function getModelClass(): string
-    {
-        return Unit::class;
-    }
+test('rules returns correct validation rules', function () {
+    $unit = Unit::factory()->create();
 
-    protected function getRouteParameterName(): string
-    {
-        return 'unit';
-    }
-}
+    $request = Mockery::mock(UpdateUnitRequest::class)->makePartial();
+    
+    $request->shouldReceive('route')
+        ->with('unit')
+        ->andReturn($unit);
+        
+    $request->shouldReceive('route')
+        ->with('id')
+        ->andReturn(null);
+
+    expect($request->rules())->toEqual([
+        'name' => ['sometimes', 'required', 'string', 'max:255', 'unique:units,name,' . $unit->id],
+        'symbol' => 'nullable|string|max:10',
+    ]);
+});

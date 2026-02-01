@@ -1,24 +1,19 @@
 <?php
 
-namespace Tests\Unit\Requests\Units;
-
 use App\Http\Requests\Units\StoreUnitRequest;
-use App\Models\Unit;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudStoreRequestTestTrait;
 
-class StoreUnitRequestTest extends TestCase
-{
-    use RefreshDatabase, SimpleCrudStoreRequestTestTrait;
+uses()->group('units', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return StoreUnitRequest::class;
-    }
+test('authorize returns true', function () {
+    $request = new StoreUnitRequest();
+    expect($request->authorize())->toBeTrue();
+});
 
-    protected function getModelClass(): string
-    {
-        return Unit::class;
-    }
-}
+test('rules returns correct validation rules', function () {
+    $request = new StoreUnitRequest();
+    
+    expect($request->rules())->toEqual([
+        'name' => ['required', 'string', 'max:255', 'unique:units,name'],
+        'symbol' => 'nullable|string|max:10',
+    ]);
+});

@@ -1,17 +1,22 @@
 <?php
 
-namespace Tests\Unit\Requests\Departments;
-
 use App\Http\Requests\Departments\IndexDepartmentRequest;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudIndexRequestTestTrait;
 
-class IndexDepartmentRequestTest extends TestCase
-{
-    use SimpleCrudIndexRequestTestTrait;
+uses()->group('departments', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return IndexDepartmentRequest::class;
-    }
-}
+test('authorize returns true', function () {
+    $request = new IndexDepartmentRequest();
+    expect($request->authorize())->toBeTrue();
+});
+
+test('rules returns correct validation rules', function () {
+    $request = new IndexDepartmentRequest();
+
+    expect($request->rules())->toEqual([
+        'search' => ['nullable', 'string'],
+        'sort_by' => ['nullable', 'string', 'in:id,name,created_at,updated_at'],
+        'sort_direction' => ['nullable', 'in:asc,desc'],
+        'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+        'page' => ['nullable', 'integer', 'min:1'],
+    ]);
+});

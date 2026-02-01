@@ -1,24 +1,25 @@
 <?php
 
-namespace Tests\Unit\Resources\ProductCategories;
-
 use App\Http\Resources\ProductCategories\ProductCategoryResource;
 use App\Models\ProductCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudResourceTestTrait;
+use Illuminate\Http\Request;
 
-class ProductCategoryResourceTest extends TestCase
-{
-    use RefreshDatabase, SimpleCrudResourceTestTrait;
+uses(RefreshDatabase::class)->group('product-categories', 'resources');
 
-    protected function getResourceClass(): string
-    {
-        return ProductCategoryResource::class;
-    }
-
-    protected function getModelClass(): string
-    {
-        return ProductCategory::class;
-    }
-}
+test('to array returns correct structure', function () {
+    $category = ProductCategory::factory()->create(['name' => 'Electronics']);
+    
+    $resource = new ProductCategoryResource($category);
+    $request = Request::create('/');
+    
+    $result = $resource->toArray($request);
+    
+    expect($result)->toMatchArray([
+        'id' => $category->id,
+        'name' => 'Electronics',
+    ]);
+    
+    expect($result['created_at'])->toBeString()
+        ->and($result['updated_at'])->toBeString();
+});

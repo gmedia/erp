@@ -4,7 +4,7 @@ use App\Http\Requests\Products\StoreProductRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('products');
 
 test('store product request validation rules', function () {
     $request = new StoreProductRequest();

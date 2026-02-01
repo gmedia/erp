@@ -1,25 +1,20 @@
 <?php
 
-namespace Tests\Unit\Domain\Departments;
-
 use App\Domain\Departments\DepartmentFilterService;
 use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudFilterServiceTestTrait;
 
-class DepartmentFilterServiceTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudFilterServiceTestTrait;
+uses(RefreshDatabase::class)->group('departments', 'domain');
 
-    protected function getFilterServiceClass(): string
-    {
-        return DepartmentFilterService::class;
-    }
+test('apply search filters by name', function () {
+    Department::factory()->create(['name' => 'IT Dept']);
+    Department::factory()->create(['name' => 'HR Dept']);
 
-    protected function getModelClass(): string
-    {
-        return Department::class;
-    }
-}
+    $service = new DepartmentFilterService();
+    $query = Department::query();
+    
+    $service->applySearch($query, 'IT', ['name']);
+    
+    expect($query->count())->toBe(1)
+        ->and($query->first()->name)->toBe('IT Dept');
+});

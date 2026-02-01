@@ -1,25 +1,18 @@
 <?php
 
-namespace Tests\Unit\Requests\Branches;
-
 use App\Http\Requests\Branches\StoreBranchRequest;
-use App\Models\Branch;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudStoreRequestTestTrait;
 
-class StoreBranchRequestTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudStoreRequestTestTrait;
+uses()->group('branches', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return StoreBranchRequest::class;
-    }
+test('authorize returns true', function () {
+    $request = new StoreBranchRequest();
+    expect($request->authorize())->toBeTrue();
+});
 
-    protected function getModelClass(): string
-    {
-        return Branch::class;
-    }
-}
+test('rules returns correct validation rules', function () {
+    $request = new StoreBranchRequest();
+    
+    expect($request->rules())->toEqual([
+        'name' => ['required', 'string', 'max:255', 'unique:branches,name'],
+    ]);
+});

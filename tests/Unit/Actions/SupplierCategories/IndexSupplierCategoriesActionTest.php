@@ -1,31 +1,34 @@
 <?php
 
-namespace Tests\Unit\Actions\SupplierCategories;
-
 use App\Actions\SupplierCategories\IndexSupplierCategoriesAction;
 use App\Http\Requests\SupplierCategories\IndexSupplierCategoryRequest;
 use App\Models\SupplierCategory;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudIndexActionTestTrait;
 
-class IndexSupplierCategoriesActionTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudIndexActionTestTrait;
+uses(RefreshDatabase::class)->group('supplier-categories', 'actions');
 
-    protected function getActionClass(): string
-    {
-        return IndexSupplierCategoriesAction::class;
-    }
+test('execute returns paginated results', function () {
+    SupplierCategory::factory()->count(3)->create();
 
-    protected function getModelClass(): string
-    {
-        return SupplierCategory::class;
-    }
+    $action = new IndexSupplierCategoriesAction();
+    $request = new IndexSupplierCategoryRequest();
+    
+    $result = $action->execute($request);
 
-    protected function getRequestClass(): string
-    {
-        return IndexSupplierCategoryRequest::class;
-    }
-}
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
+        ->and($result->count())->toBe(3);
+});
+
+test('execute filters by search term', function () {
+    SupplierCategory::factory()->create(['name' => 'Raw Material']);
+    SupplierCategory::factory()->create(['name' => 'Service']);
+
+    $action = new IndexSupplierCategoriesAction();
+    $request = new IndexSupplierCategoryRequest(['search' => 'Raw']);
+    
+    $result = $action->execute($request);
+
+    expect($result->count())->toBe(1)
+        ->and($result->first()->name)->toBe('Raw Material');
+});

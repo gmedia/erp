@@ -1,30 +1,30 @@
 <?php
 
-namespace Tests\Unit\Requests\Positions;
-
 use App\Http\Requests\Positions\UpdatePositionRequest;
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudUpdateRequestTestTrait;
 
-class UpdatePositionRequestTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudUpdateRequestTestTrait;
+uses(RefreshDatabase::class)->group('positions', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return UpdatePositionRequest::class;
-    }
+test('authorize returns true', function () {
+    $request = new UpdatePositionRequest();
+    expect($request->authorize())->toBeTrue();
+});
 
-    protected function getModelClass(): string
-    {
-        return Position::class;
-    }
+test('rules returns correct validation rules', function () {
+    $position = Position::factory()->create();
 
-    protected function getRouteParameterName(): string
-    {
-        return 'position';
-    }
-}
+    $request = Mockery::mock(UpdatePositionRequest::class)->makePartial();
+    
+    $request->shouldReceive('route')
+        ->with('position')
+        ->andReturn($position);
+        
+    $request->shouldReceive('route')
+        ->with('id')
+        ->andReturn(null);
+
+    expect($request->rules())->toEqual([
+        'name' => ['sometimes', 'required', 'string', 'max:255', 'unique:positions,name,' . $position->id],
+    ]);
+});

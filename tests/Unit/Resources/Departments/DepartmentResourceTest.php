@@ -1,25 +1,27 @@
 <?php
 
-namespace Tests\Unit\Resources\Departments;
-
 use App\Http\Resources\Departments\DepartmentResource;
 use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudResourceTestTrait;
+use Illuminate\Http\Request;
 
-class DepartmentResourceTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudResourceTestTrait;
+uses(RefreshDatabase::class)->group('departments', 'resources');
 
-    protected function getResourceClass(): string
-    {
-        return DepartmentResource::class;
-    }
-
-    protected function getModelClass(): string
-    {
-        return Department::class;
-    }
-}
+test('to array returns correct structure', function () {
+    $department = Department::factory()->create([
+        'name' => 'IT Department',
+    ]);
+    
+    $resource = new DepartmentResource($department);
+    $request = Request::create('/');
+    
+    $result = $resource->toArray($request);
+    
+    expect($result)->toMatchArray([
+        'id' => $department->id,
+        'name' => 'IT Department',
+    ]);
+    
+    expect($result['created_at'])->toBeString()
+        ->and($result['updated_at'])->toBeString();
+});

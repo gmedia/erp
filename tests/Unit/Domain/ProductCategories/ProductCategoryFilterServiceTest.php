@@ -1,24 +1,20 @@
 <?php
 
-namespace Tests\Unit\Domain\ProductCategories;
-
 use App\Domain\ProductCategories\ProductCategoryFilterService;
 use App\Models\ProductCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudFilterServiceTestTrait;
 
-class ProductCategoryFilterServiceTest extends TestCase
-{
-    use RefreshDatabase, SimpleCrudFilterServiceTestTrait;
+uses(RefreshDatabase::class)->group('product-categories', 'domain');
 
-    protected function getFilterServiceClass(): string
-    {
-        return ProductCategoryFilterService::class;
-    }
+test('apply search filters by name', function () {
+    ProductCategory::factory()->create(['name' => 'Electronics']);
+    ProductCategory::factory()->create(['name' => 'Furniture']);
 
-    protected function getModelClass(): string
-    {
-        return ProductCategory::class;
-    }
-}
+    $service = new ProductCategoryFilterService();
+    $query = ProductCategory::query();
+    
+    $service->applySearch($query, 'Electro', ['name']);
+    
+    expect($query->count())->toBe(1)
+        ->and($query->first()->name)->toBe('Electronics');
+});

@@ -1,25 +1,20 @@
 <?php
 
-namespace Tests\Unit\Domain\CustomerCategories;
-
 use App\Domain\CustomerCategories\CustomerCategoryFilterService;
 use App\Models\CustomerCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudFilterServiceTestTrait;
 
-class CustomerCategoryFilterServiceTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudFilterServiceTestTrait;
+uses(RefreshDatabase::class)->group('customer-categories', 'domain');
 
-    protected function getFilterServiceClass(): string
-    {
-        return CustomerCategoryFilterService::class;
-    }
+test('apply search filters by name', function () {
+    CustomerCategory::factory()->create(['name' => 'VIP']);
+    CustomerCategory::factory()->create(['name' => 'Regular']);
 
-    protected function getModelClass(): string
-    {
-        return CustomerCategory::class;
-    }
-}
+    $service = new CustomerCategoryFilterService();
+    $query = CustomerCategory::query();
+    
+    $service->applySearch($query, 'VIP', ['name']);
+    
+    expect($query->count())->toBe(1)
+        ->and($query->first()->name)->toBe('VIP');
+});

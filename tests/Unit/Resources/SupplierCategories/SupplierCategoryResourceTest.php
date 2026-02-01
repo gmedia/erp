@@ -1,25 +1,25 @@
 <?php
 
-namespace Tests\Unit\Resources\SupplierCategories;
-
 use App\Http\Resources\SupplierCategories\SupplierCategoryResource;
 use App\Models\SupplierCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudResourceTestTrait;
+use Illuminate\Http\Request;
 
-class SupplierCategoryResourceTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudResourceTestTrait;
+uses(RefreshDatabase::class)->group('supplier-categories', 'resources');
 
-    protected function getResourceClass(): string
-    {
-        return SupplierCategoryResource::class;
-    }
-
-    protected function getModelClass(): string
-    {
-        return SupplierCategory::class;
-    }
-}
+test('to array returns correct structure', function () {
+    $category = SupplierCategory::factory()->create(['name' => 'Raw Materials']);
+    
+    $resource = new SupplierCategoryResource($category);
+    $request = Request::create('/');
+    
+    $result = $resource->toArray($request);
+    
+    expect($result)->toMatchArray([
+        'id' => $category->id,
+        'name' => 'Raw Materials',
+    ]);
+    
+    expect($result['created_at'])->toBeString()
+        ->and($result['updated_at'])->toBeString();
+});

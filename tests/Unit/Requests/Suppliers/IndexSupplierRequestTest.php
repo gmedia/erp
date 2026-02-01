@@ -3,6 +3,8 @@
 use App\Http\Requests\Suppliers\IndexSupplierRequest;
 use Illuminate\Support\Facades\Validator;
 
+uses()->group('suppliers');
+
 test('rules are correct', function () {
     $request = new IndexSupplierRequest();
 
@@ -19,7 +21,6 @@ test('rules are correct', function () {
 });
 
 
-uses()->group('suppliers');
 
 test('authorize returns true', function () {
     $request = new IndexSupplierRequest();

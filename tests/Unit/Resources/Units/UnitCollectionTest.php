@@ -1,29 +1,20 @@
 <?php
 
-namespace Tests\Unit\Resources\Units;
-
 use App\Http\Resources\Units\UnitCollection;
 use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudCollectionTestTrait;
+use Illuminate\Http\Request;
 
-class UnitCollectionTest extends TestCase
-{
-    use RefreshDatabase, SimpleCrudCollectionTestTrait;
+uses(RefreshDatabase::class)->group('units', 'resources');
 
-    protected function getCollectionClass(): string
-    {
-        return UnitCollection::class;
-    }
-
-    protected function getModelClass(): string
-    {
-        return Unit::class;
-    }
-
-    protected function getResourceClass(): string
-    {
-        return \App\Http\Resources\Units\UnitResource::class;
-    }
-}
+test('to array transforms collection', function () {
+    $units = Unit::factory()->count(3)->create();
+    
+    $collection = new UnitCollection($units);
+    $request = Request::create('/');
+    
+    $result = $collection->toArray($request);
+    
+    expect($result)->toHaveCount(3);
+    expect($result[0]['name'])->toBe($units[0]->name);
+});

@@ -1,17 +1,20 @@
 <?php
 
-namespace Tests\Unit\Requests\Departments;
-
 use App\Http\Requests\Departments\ExportDepartmentRequest;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudExportRequestTestTrait;
 
-class ExportDepartmentRequestTest extends TestCase
-{
-    use SimpleCrudExportRequestTestTrait;
+uses()->group('departments', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return ExportDepartmentRequest::class;
-    }
-}
+test('authorize returns true', function () {
+    $request = new ExportDepartmentRequest();
+    expect($request->authorize())->toBeTrue();
+});
+
+test('rules returns correct validation rules', function () {
+    $request = new ExportDepartmentRequest();
+
+    expect($request->rules())->toEqual([
+        'search' => ['nullable', 'string'],
+        'sort_by' => ['nullable', 'string', 'in:id,name,created_at,updated_at'],
+        'sort_direction' => ['nullable', 'in:asc,desc'],
+    ]);
+});

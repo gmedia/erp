@@ -1,31 +1,49 @@
 <?php
 
-namespace Tests\Unit\Actions\Positions;
-
 use App\Actions\Positions\IndexPositionsAction;
 use App\Http\Requests\Positions\IndexPositionRequest;
 use App\Models\Position;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudIndexActionTestTrait;
 
-class IndexPositionsActionTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudIndexActionTestTrait;
+uses(RefreshDatabase::class)->group('positions', 'actions');
 
-    protected function getActionClass(): string
-    {
-        return IndexPositionsAction::class;
-    }
+test('execute returns paginated results', function () {
+    Position::factory()->count(3)->create();
 
-    protected function getModelClass(): string
-    {
-        return Position::class;
-    }
+    $action = new IndexPositionsAction();
+    $request = new IndexPositionRequest();
+    
+    $result = $action->execute($request);
 
-    protected function getRequestClass(): string
-    {
-        return IndexPositionRequest::class;
-    }
-}
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
+        ->and($result->count())->toBe(3);
+});
+
+test('execute filters by search term', function () {
+    Position::factory()->create(['name' => 'Manager']);
+    Position::factory()->create(['name' => 'Staff']);
+
+    $action = new IndexPositionsAction();
+    $request = new IndexPositionRequest(['search' => 'Manage']);
+    
+    $result = $action->execute($request);
+
+    expect($result->count())->toBe(1)
+        ->and($result->first()->name)->toBe('Manager');
+});
+
+test('execute sorts results', function () {
+    Position::factory()->create(['name' => 'A Pos']);
+    Position::factory()->create(['name' => 'B Pos']);
+
+    $action = new IndexPositionsAction();
+    $request = new IndexPositionRequest([
+        'sort_by' => 'name',
+        'sort_direction' => 'desc'
+    ]);
+    
+    $result = $action->execute($request);
+
+    expect($result->first()->name)->toBe('B Pos');
+});

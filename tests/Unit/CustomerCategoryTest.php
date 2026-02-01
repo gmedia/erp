@@ -5,7 +5,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\assertDatabaseHas;
 
-uses(RefreshDatabase::class)->group('customer_categories');
+uses(RefreshDatabase::class)->group('customer-categories');
 
 test('factory creates a valid customer category', function () {
     $category = CustomerCategory::factory()->create();

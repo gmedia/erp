@@ -1,17 +1,20 @@
 <?php
 
-namespace Tests\Unit\Requests\Positions;
-
 use App\Http\Requests\Positions\ExportPositionRequest;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudExportRequestTestTrait;
 
-class ExportPositionRequestTest extends TestCase
-{
-    use SimpleCrudExportRequestTestTrait;
+uses()->group('positions', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return ExportPositionRequest::class;
-    }
-}
+test('authorize returns true', function () {
+    $request = new ExportPositionRequest();
+    expect($request->authorize())->toBeTrue();
+});
+
+test('rules returns correct validation rules', function () {
+    $request = new ExportPositionRequest();
+
+    expect($request->rules())->toEqual([
+        'search' => ['nullable', 'string'],
+        'sort_by' => ['nullable', 'string', 'in:id,name,created_at,updated_at'],
+        'sort_direction' => ['nullable', 'in:asc,desc'],
+    ]);
+});

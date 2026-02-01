@@ -1,25 +1,20 @@
 <?php
 
-namespace Tests\Unit\Resources\SupplierCategories;
-
 use App\Http\Resources\SupplierCategories\SupplierCategoryCollection;
 use App\Models\SupplierCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudCollectionTestTrait;
+use Illuminate\Http\Request;
 
-class SupplierCategoryCollectionTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudCollectionTestTrait;
+uses(RefreshDatabase::class)->group('supplier-categories', 'resources');
 
-    protected function getCollectionClass(): string
-    {
-        return SupplierCategoryCollection::class;
-    }
-
-    protected function getModelClass(): string
-    {
-        return SupplierCategory::class;
-    }
-}
+test('to array transforms collection', function () {
+    $categories = SupplierCategory::factory()->count(3)->create();
+    
+    $collection = new SupplierCategoryCollection($categories);
+    $request = Request::create('/');
+    
+    $result = $collection->toArray($request);
+    
+    expect($result)->toHaveCount(3);
+    expect($result[0]['name'])->toBe($categories[0]->name);
+});

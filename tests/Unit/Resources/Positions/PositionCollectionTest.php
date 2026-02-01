@@ -1,25 +1,22 @@
 <?php
 
-namespace Tests\Unit\Resources\Positions;
-
 use App\Http\Resources\Positions\PositionCollection;
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudCollectionTestTrait;
+use Illuminate\Http\Request;
 
-class PositionCollectionTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudCollectionTestTrait;
+uses(RefreshDatabase::class)->group('positions', 'resources');
 
-    protected function getCollectionClass(): string
-    {
-        return PositionCollection::class;
-    }
-
-    protected function getModelClass(): string
-    {
-        return Position::class;
-    }
-}
+test('to array transforms collection of positions', function () {
+    $positions = Position::factory()->count(3)->create();
+    
+    $collection = new PositionCollection($positions);
+    $request = Request::create('/');
+    
+    $result = $collection->toArray($request);
+    
+    expect($result)->toHaveCount(3);
+    
+    expect($result[0])->toHaveKeys(['id', 'name', 'created_at', 'updated_at']);
+    expect($result[0]['name'])->toBe($positions[0]->name);
+});

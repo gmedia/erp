@@ -1,29 +1,31 @@
 <?php
 
-namespace Tests\Unit\Requests\ProductCategories;
-
 use App\Http\Requests\ProductCategories\UpdateProductCategoryRequest;
 use App\Models\ProductCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudUpdateRequestTestTrait;
 
-class UpdateProductCategoryRequestTest extends TestCase
-{
-    use RefreshDatabase, SimpleCrudUpdateRequestTestTrait;
+uses(RefreshDatabase::class)->group('product-categories', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return UpdateProductCategoryRequest::class;
-    }
+test('authorize returns true', function () {
+    $request = new UpdateProductCategoryRequest();
+    expect($request->authorize())->toBeTrue();
+});
 
-    protected function getModelClass(): string
-    {
-        return ProductCategory::class;
-    }
+test('rules returns correct validation rules', function () {
+    $category = ProductCategory::factory()->create();
 
-    protected function getRouteParameterName(): string
-    {
-        return 'product_category';
-    }
-}
+    $request = Mockery::mock(UpdateProductCategoryRequest::class)->makePartial();
+    
+    $request->shouldReceive('route')
+        ->with('product_category')
+        ->andReturn($category);
+        
+    $request->shouldReceive('route')
+        ->with('id')
+        ->andReturn(null);
+
+    expect($request->rules())->toEqual([
+        'name' => ['sometimes', 'required', 'string', 'max:255', 'unique:product_categories,name,' . $category->id],
+        'description' => ['nullable', 'string'],
+    ]);
+});

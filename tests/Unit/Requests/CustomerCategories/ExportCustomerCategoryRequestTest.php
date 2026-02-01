@@ -1,17 +1,20 @@
 <?php
 
-namespace Tests\Unit\Requests\CustomerCategories;
-
 use App\Http\Requests\CustomerCategories\ExportCustomerCategoryRequest;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudExportRequestTestTrait;
 
-class ExportCustomerCategoryRequestTest extends TestCase
-{
-    use SimpleCrudExportRequestTestTrait;
+uses()->group('customer-categories', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return ExportCustomerCategoryRequest::class;
-    }
-}
+test('authorize returns true', function () {
+    $request = new ExportCustomerCategoryRequest();
+    expect($request->authorize())->toBeTrue();
+});
+
+test('rules returns correct validation rules', function () {
+    $request = new ExportCustomerCategoryRequest();
+
+    expect($request->rules())->toEqual([
+        'search' => ['nullable', 'string'],
+        'sort_by' => ['nullable', 'string', 'in:id,name,created_at,updated_at'],
+        'sort_direction' => ['nullable', 'in:asc,desc'],
+    ]);
+});

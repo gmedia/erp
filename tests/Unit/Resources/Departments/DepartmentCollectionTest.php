@@ -1,25 +1,22 @@
 <?php
 
-namespace Tests\Unit\Resources\Departments;
-
 use App\Http\Resources\Departments\DepartmentCollection;
 use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudCollectionTestTrait;
+use Illuminate\Http\Request;
 
-class DepartmentCollectionTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudCollectionTestTrait;
+uses(RefreshDatabase::class)->group('departments', 'resources');
 
-    protected function getCollectionClass(): string
-    {
-        return DepartmentCollection::class;
-    }
-
-    protected function getModelClass(): string
-    {
-        return Department::class;
-    }
-}
+test('to array transforms collection of departments', function () {
+    $departments = Department::factory()->count(3)->create();
+    
+    $collection = new DepartmentCollection($departments);
+    $request = Request::create('/');
+    
+    $result = $collection->toArray($request);
+    
+    expect($result)->toHaveCount(3);
+    
+    expect($result[0])->toHaveKeys(['id', 'name', 'created_at', 'updated_at']);
+    expect($result[0]['name'])->toBe($departments[0]->name);
+});

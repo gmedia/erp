@@ -1,17 +1,20 @@
 <?php
 
-namespace Tests\Unit\Requests\SupplierCategories;
-
 use App\Http\Requests\SupplierCategories\ExportSupplierCategoryRequest;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudExportRequestTestTrait;
 
-class ExportSupplierCategoryRequestTest extends TestCase
-{
-    use SimpleCrudExportRequestTestTrait;
+uses()->group('supplier-categories', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return ExportSupplierCategoryRequest::class;
-    }
-}
+test('authorize returns true', function () {
+    $request = new ExportSupplierCategoryRequest();
+    expect($request->authorize())->toBeTrue();
+});
+
+test('rules returns correct validation rules', function () {
+    $request = new ExportSupplierCategoryRequest();
+
+    expect($request->rules())->toEqual([
+        'search' => ['nullable', 'string'],
+        'sort_by' => ['nullable', 'string', 'in:id,name,created_at,updated_at'],
+        'sort_direction' => ['nullable', 'in:asc,desc'],
+    ]);
+});

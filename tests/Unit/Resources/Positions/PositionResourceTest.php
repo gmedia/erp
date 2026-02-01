@@ -1,25 +1,27 @@
 <?php
 
-namespace Tests\Unit\Resources\Positions;
-
 use App\Http\Resources\Positions\PositionResource;
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudResourceTestTrait;
+use Illuminate\Http\Request;
 
-class PositionResourceTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudResourceTestTrait;
+uses(RefreshDatabase::class)->group('positions', 'resources');
 
-    protected function getResourceClass(): string
-    {
-        return PositionResource::class;
-    }
-
-    protected function getModelClass(): string
-    {
-        return Position::class;
-    }
-}
+test('to array returns correct structure', function () {
+    $position = Position::factory()->create([
+        'name' => 'Manager',
+    ]);
+    
+    $resource = new PositionResource($position);
+    $request = Request::create('/');
+    
+    $result = $resource->toArray($request);
+    
+    expect($result)->toMatchArray([
+        'id' => $position->id,
+        'name' => 'Manager',
+    ]);
+    
+    expect($result['created_at'])->toBeString()
+        ->and($result['updated_at'])->toBeString();
+});

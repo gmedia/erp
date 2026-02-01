@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Mockery;
 use ReflectionClass;
  
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('products');
  
 beforeEach(function () {
     $this->action = new ExportProductsAction();

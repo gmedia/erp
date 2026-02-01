@@ -1,25 +1,18 @@
 <?php
 
-namespace Tests\Unit\Requests\Departments;
-
 use App\Http\Requests\Departments\StoreDepartmentRequest;
-use App\Models\Department;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudStoreRequestTestTrait;
 
-class StoreDepartmentRequestTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudStoreRequestTestTrait;
+uses()->group('departments', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return StoreDepartmentRequest::class;
-    }
+test('authorize returns true', function () {
+    $request = new StoreDepartmentRequest();
+    expect($request->authorize())->toBeTrue();
+});
 
-    protected function getModelClass(): string
-    {
-        return Department::class;
-    }
-}
+test('rules returns correct validation rules', function () {
+    $request = new StoreDepartmentRequest();
+    
+    expect($request->rules())->toEqual([
+        'name' => ['required', 'string', 'max:255', 'unique:departments,name'],
+    ]);
+});

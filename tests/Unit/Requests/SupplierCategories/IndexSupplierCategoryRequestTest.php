@@ -1,17 +1,22 @@
 <?php
 
-namespace Tests\Unit\Requests\SupplierCategories;
-
 use App\Http\Requests\SupplierCategories\IndexSupplierCategoryRequest;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudIndexRequestTestTrait;
 
-class IndexSupplierCategoryRequestTest extends TestCase
-{
-    use SimpleCrudIndexRequestTestTrait;
+uses()->group('supplier-categories', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return IndexSupplierCategoryRequest::class;
-    }
-}
+test('authorize returns true', function () {
+    $request = new IndexSupplierCategoryRequest();
+    expect($request->authorize())->toBeTrue();
+});
+
+test('rules returns correct validation rules', function () {
+    $request = new IndexSupplierCategoryRequest();
+
+    expect($request->rules())->toEqual([
+        'search' => ['nullable', 'string'],
+        'sort_by' => ['nullable', 'string', 'in:id,name,created_at,updated_at'],
+        'sort_direction' => ['nullable', 'in:asc,desc'],
+        'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+        'page' => ['nullable', 'integer', 'min:1'],
+    ]);
+});

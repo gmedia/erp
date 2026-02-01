@@ -1,25 +1,20 @@
 <?php
 
-namespace Tests\Unit\Resources\Branches;
-
 use App\Http\Resources\Branches\BranchCollection;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudCollectionTestTrait;
+use Illuminate\Http\Request;
 
-class BranchCollectionTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudCollectionTestTrait;
+uses(RefreshDatabase::class)->group('branches', 'resources');
 
-    protected function getCollectionClass(): string
-    {
-        return BranchCollection::class;
-    }
-
-    protected function getModelClass(): string
-    {
-        return Branch::class;
-    }
-}
+test('to array transforms collection', function () {
+    $branches = Branch::factory()->count(3)->create();
+    
+    $collection = new BranchCollection($branches);
+    $request = Request::create('/');
+    
+    $result = $collection->toArray($request);
+    
+    expect($result)->toHaveCount(3);
+    expect($result[0]['name'])->toBe($branches[0]->name);
+});

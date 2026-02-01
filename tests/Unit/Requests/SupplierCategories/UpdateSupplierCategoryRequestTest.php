@@ -1,30 +1,30 @@
 <?php
 
-namespace Tests\Unit\Requests\SupplierCategories;
-
 use App\Http\Requests\SupplierCategories\UpdateSupplierCategoryRequest;
 use App\Models\SupplierCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudUpdateRequestTestTrait;
 
-class UpdateSupplierCategoryRequestTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudUpdateRequestTestTrait;
+uses(RefreshDatabase::class)->group('supplier-categories', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return UpdateSupplierCategoryRequest::class;
-    }
+test('authorize returns true', function () {
+    $request = new UpdateSupplierCategoryRequest();
+    expect($request->authorize())->toBeTrue();
+});
 
-    protected function getModelClass(): string
-    {
-        return SupplierCategory::class;
-    }
+test('rules returns correct validation rules', function () {
+    $category = SupplierCategory::factory()->create();
 
-    protected function getRouteParameterName(): string
-    {
-        return 'supplier_category';
-    }
-}
+    $request = Mockery::mock(UpdateSupplierCategoryRequest::class)->makePartial();
+    
+    $request->shouldReceive('route')
+        ->with('supplier_category')
+        ->andReturn($category);
+        
+    $request->shouldReceive('route')
+        ->with('id')
+        ->andReturn(null);
+
+    expect($request->rules())->toEqual([
+        'name' => ['sometimes', 'required', 'string', 'max:255', 'unique:supplier_categories,name,' . $category->id],
+    ]);
+});

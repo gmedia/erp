@@ -1,25 +1,20 @@
 <?php
 
-namespace Tests\Unit\Domain\SupplierCategories;
-
 use App\Domain\SupplierCategories\SupplierCategoryFilterService;
 use App\Models\SupplierCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudFilterServiceTestTrait;
 
-class SupplierCategoryFilterServiceTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudFilterServiceTestTrait;
+uses(RefreshDatabase::class)->group('supplier-categories', 'domain');
 
-    protected function getFilterServiceClass(): string
-    {
-        return SupplierCategoryFilterService::class;
-    }
+test('apply search filters by name', function () {
+    SupplierCategory::factory()->create(['name' => 'Material']);
+    SupplierCategory::factory()->create(['name' => 'Service']);
 
-    protected function getModelClass(): string
-    {
-        return SupplierCategory::class;
-    }
-}
+    $service = new SupplierCategoryFilterService();
+    $query = SupplierCategory::query();
+    
+    $service->applySearch($query, 'Material', ['name']);
+    
+    expect($query->count())->toBe(1)
+        ->and($query->first()->name)->toBe('Material');
+});

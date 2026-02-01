@@ -1,29 +1,20 @@
 <?php
 
-namespace Tests\Unit\Resources\ProductCategories;
-
 use App\Http\Resources\ProductCategories\ProductCategoryCollection;
 use App\Models\ProductCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudCollectionTestTrait;
+use Illuminate\Http\Request;
 
-class ProductCategoryCollectionTest extends TestCase
-{
-    use RefreshDatabase, SimpleCrudCollectionTestTrait;
+uses(RefreshDatabase::class)->group('product-categories', 'resources');
 
-    protected function getCollectionClass(): string
-    {
-        return ProductCategoryCollection::class;
-    }
-
-    protected function getModelClass(): string
-    {
-        return ProductCategory::class;
-    }
-
-    protected function getResourceClass(): string
-    {
-        return \App\Http\Resources\ProductCategories\ProductCategoryResource::class;
-    }
-}
+test('to array transforms collection', function () {
+    $categories = ProductCategory::factory()->count(3)->create();
+    
+    $collection = new ProductCategoryCollection($categories);
+    $request = Request::create('/');
+    
+    $result = $collection->toArray($request);
+    
+    expect($result)->toHaveCount(3);
+    expect($result[0]['name'])->toBe($categories[0]->name);
+});

@@ -1,36 +1,39 @@
 <?php
 
-namespace Tests\Unit\Actions\CustomerCategories;
-
 use App\Actions\CustomerCategories\ExportCustomerCategoriesAction;
 use App\Http\Requests\CustomerCategories\ExportCustomerCategoryRequest;
 use App\Models\CustomerCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudExportActionTestTrait;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
-class ExportCustomerCategoriesActionTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudExportActionTestTrait;
+uses(RefreshDatabase::class)->group('customer-categories', 'actions');
 
-    protected function getActionClass(): string
-    {
-        return ExportCustomerCategoriesAction::class;
-    }
+test('execute generates excel file and returns url', function () {
+    Carbon::setTestNow(now());
+    Excel::fake();
+    Storage::fake('public');
+    
+    CustomerCategory::factory()->count(3)->create();
 
-    protected function getModelClass(): string
-    {
-        return CustomerCategory::class;
-    }
+    $action = new ExportCustomerCategoriesAction();
+    
+    $request = Mockery::mock(ExportCustomerCategoryRequest::class);
+    $request->shouldReceive('validated')->andReturn([
+        'search' => null,
+        'sort_by' => 'created_at',
+        'sort_direction' => 'desc',
+    ]);
+    $request->shouldReceive('filled')->with('search')->andReturn(false);
+    
+    $result = $action->execute($request);
 
-    protected function getRequestClass(): string
-    {
-        return ExportCustomerCategoryRequest::class;
-    }
+    $filename = 'customer_categories_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
 
-    protected function getExpectedFilenamePrefix(): string
-    {
-        return 'customer_categories';
-    }
-}
+    expect($result->getStatusCode())->toBe(200)
+        ->and($result->getData(true))->toHaveKeys(['url', 'filename'])
+        ->and($result->getData(true)['filename'])->toBe($filename);
+        
+    Excel::assertStored('exports/' . $filename, 'public');
+});

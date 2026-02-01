@@ -4,10 +4,7 @@ use App\Http\Requests\Suppliers\UpdateSupplierRequest;
 use App\Models\Supplier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
-
-
-uses()->group('suppliers');
+uses(RefreshDatabase::class)->group('suppliers');
 
 test('authorize returns true', function () {
     $request = new UpdateSupplierRequest;

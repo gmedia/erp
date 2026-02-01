@@ -1,17 +1,20 @@
 <?php
 
-namespace Tests\Unit\Requests\ProductCategories;
-
 use App\Http\Requests\ProductCategories\ExportProductCategoryRequest;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudExportRequestTestTrait;
 
-class ExportProductCategoryRequestTest extends TestCase
-{
-    use SimpleCrudExportRequestTestTrait;
+uses()->group('product-categories', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return ExportProductCategoryRequest::class;
-    }
-}
+test('authorize returns true', function () {
+    $request = new ExportProductCategoryRequest();
+    expect($request->authorize())->toBeTrue();
+});
+
+test('rules returns correct validation rules', function () {
+    $request = new ExportProductCategoryRequest();
+
+    expect($request->rules())->toEqual([
+        'search' => ['nullable', 'string'],
+        'sort_by' => ['nullable', 'string', 'in:id,name,created_at,updated_at'],
+        'sort_direction' => ['nullable', 'in:asc,desc'],
+    ]);
+});

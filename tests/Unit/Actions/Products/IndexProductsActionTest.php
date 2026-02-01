@@ -5,7 +5,7 @@ use App\Http\Requests\Products\IndexProductRequest;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('products');
 
 beforeEach(function () {
     $this->filterService = new \App\Domain\Products\ProductFilterService();

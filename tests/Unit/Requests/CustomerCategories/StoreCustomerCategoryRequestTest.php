@@ -1,25 +1,18 @@
 <?php
 
-namespace Tests\Unit\Requests\CustomerCategories;
-
 use App\Http\Requests\CustomerCategories\StoreCustomerCategoryRequest;
-use App\Models\CustomerCategory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudStoreRequestTestTrait;
 
-class StoreCustomerCategoryRequestTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudStoreRequestTestTrait;
+uses()->group('customer-categories', 'requests');
 
-    protected function getRequestClass(): string
-    {
-        return StoreCustomerCategoryRequest::class;
-    }
+test('authorize returns true', function () {
+    $request = new StoreCustomerCategoryRequest();
+    expect($request->authorize())->toBeTrue();
+});
 
-    protected function getModelClass(): string
-    {
-        return CustomerCategory::class;
-    }
-}
+test('rules returns correct validation rules', function () {
+    $request = new StoreCustomerCategoryRequest();
+    
+    expect($request->rules())->toEqual([
+        'name' => ['required', 'string', 'max:255', 'unique:customer_categories,name'],
+    ]);
+});

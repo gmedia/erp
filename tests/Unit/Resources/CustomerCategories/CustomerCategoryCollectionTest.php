@@ -1,25 +1,20 @@
 <?php
 
-namespace Tests\Unit\Resources\CustomerCategories;
-
 use App\Http\Resources\CustomerCategories\CustomerCategoryCollection;
 use App\Models\CustomerCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudCollectionTestTrait;
+use Illuminate\Http\Request;
 
-class CustomerCategoryCollectionTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudCollectionTestTrait;
+uses(RefreshDatabase::class)->group('customer-categories', 'resources');
 
-    protected function getCollectionClass(): string
-    {
-        return CustomerCategoryCollection::class;
-    }
-
-    protected function getModelClass(): string
-    {
-        return CustomerCategory::class;
-    }
-}
+test('to array transforms collection', function () {
+    $categories = CustomerCategory::factory()->count(3)->create();
+    
+    $collection = new CustomerCategoryCollection($categories);
+    $request = Request::create('/');
+    
+    $result = $collection->toArray($request);
+    
+    expect($result)->toHaveCount(3);
+    expect($result[0]['name'])->toBe($categories[0]->name);
+});

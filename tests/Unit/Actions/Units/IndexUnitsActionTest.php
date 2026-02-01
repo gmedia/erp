@@ -1,30 +1,34 @@
 <?php
 
-namespace Tests\Unit\Actions\Units;
-
 use App\Actions\Units\IndexUnitsAction;
 use App\Http\Requests\Units\IndexUnitRequest;
 use App\Models\Unit;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudIndexActionTestTrait;
 
-class IndexUnitsActionTest extends TestCase
-{
-    use RefreshDatabase, SimpleCrudIndexActionTestTrait;
+uses(RefreshDatabase::class)->group('units', 'actions');
 
-    protected function getActionClass(): string
-    {
-        return IndexUnitsAction::class;
-    }
+test('execute returns paginated results', function () {
+    Unit::factory()->count(3)->create();
 
-    protected function getModelClass(): string
-    {
-        return Unit::class;
-    }
+    $action = new IndexUnitsAction();
+    $request = new IndexUnitRequest();
+    
+    $result = $action->execute($request);
 
-    protected function getRequestClass(): string
-    {
-        return IndexUnitRequest::class;
-    }
-}
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
+        ->and($result->count())->toBe(3);
+});
+
+test('execute filters by search term', function () {
+    Unit::factory()->create(['name' => 'Kilogram']);
+    Unit::factory()->create(['name' => 'Meter']);
+
+    $action = new IndexUnitsAction();
+    $request = new IndexUnitRequest(['search' => 'Kilo']);
+    
+    $result = $action->execute($request);
+
+    expect($result->count())->toBe(1)
+        ->and($result->first()->name)->toBe('Kilogram');
+});

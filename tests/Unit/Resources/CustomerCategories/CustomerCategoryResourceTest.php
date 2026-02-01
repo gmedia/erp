@@ -1,25 +1,25 @@
 <?php
 
-namespace Tests\Unit\Resources\CustomerCategories;
-
 use App\Http\Resources\CustomerCategories\CustomerCategoryResource;
 use App\Models\CustomerCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudResourceTestTrait;
+use Illuminate\Http\Request;
 
-class CustomerCategoryResourceTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudResourceTestTrait;
+uses(RefreshDatabase::class)->group('customer-categories', 'resources');
 
-    protected function getResourceClass(): string
-    {
-        return CustomerCategoryResource::class;
-    }
-
-    protected function getModelClass(): string
-    {
-        return CustomerCategory::class;
-    }
-}
+test('to array returns correct structure', function () {
+    $category = CustomerCategory::factory()->create(['name' => 'VIP']);
+    
+    $resource = new CustomerCategoryResource($category);
+    $request = Request::create('/');
+    
+    $result = $resource->toArray($request);
+    
+    expect($result)->toMatchArray([
+        'id' => $category->id,
+        'name' => 'VIP',
+    ]);
+    
+    expect($result['created_at'])->toBeString()
+        ->and($result['updated_at'])->toBeString();
+});
