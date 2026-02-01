@@ -1,31 +1,25 @@
 <?php
 
-namespace Tests\Unit\Requests\Accounts;
-
 use App\Http\Requests\Accounts\ExportAccountRequest;
 use Illuminate\Support\Facades\Validator;
-use Tests\TestCase;
 
-class ExportAccountRequestTest extends TestCase
-{
-    public function test_it_validates_required_coa_version_id()
-    {
-        $request = new ExportAccountRequest();
-        $validator = Validator::make([], $request->rules());
+uses()->group('accounts', 'requests');
 
-        $this->assertFalse($validator->passes());
-        $this->assertArrayHasKey('coa_version_id', $validator->errors()->toArray());
-    }
+test('it validates required coa_version_id', function () {
+    $request = new ExportAccountRequest();
+    $validator = Validator::make([], $request->rules());
 
-    public function test_it_validates_type_if_provided()
-    {
-        $request = new ExportAccountRequest();
-        $validator = Validator::make([
-            'coa_version_id' => 1,
-            'type' => 'invalid'
-        ], $request->rules());
+    expect($validator->passes())->toBeFalse()
+        ->and($validator->errors()->toArray())->toHaveKey('coa_version_id');
+});
 
-        $this->assertFalse($validator->passes());
-        $this->assertArrayHasKey('type', $validator->errors()->toArray());
-    }
-}
+test('it validates type if provided', function () {
+    $request = new ExportAccountRequest();
+    $validator = Validator::make([
+        'coa_version_id' => 1,
+        'type' => 'invalid'
+    ], $request->rules());
+
+    expect($validator->passes())->toBeFalse()
+        ->and($validator->errors()->toArray())->toHaveKey('type');
+});
