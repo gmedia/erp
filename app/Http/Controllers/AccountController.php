@@ -45,7 +45,6 @@ class AccountController extends Controller
 
     public function destroy(Account $account): JsonResponse
     {
-        // Optimization: check if has children or journal entries before delete
         if ($account->children()->count() > 0) {
             return response()->json([
                 'message' => 'Cannot delete account with child accounts.',

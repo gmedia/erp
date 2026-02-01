@@ -2,43 +2,65 @@
 
 namespace App\Actions\Accounts;
 
+use App\Actions\Concerns\SimpleCrudIndexAction;
+use App\Domain\Accounts\AccountFilterService;
 use App\Http\Requests\Accounts\IndexAccountRequest;
 use App\Models\Account;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Http\FormRequest;
 
-class IndexAccountsAction
+class IndexAccountsAction extends SimpleCrudIndexAction
 {
+    protected function getModelClass(): string
+    {
+        return Account::class;
+    }
+
+    protected function getSearchFields(): array
+    {
+        return ['name', 'code'];
+    }
+
+    protected function getSortableFields(): array
+    {
+        return ['id', 'code', 'name', 'type', 'level', 'created_at', 'updated_at'];
+    }
+
+    public function __construct(
+        private AccountFilterService $filterService
+    ) {}
+
     /**
      * Execute the action to fetch accounts.
-     * Note: For Tree View, we usually want to fetch all accounts for a specific COA version 
-     * and build the tree on the frontend, rather than pagination.
-     * But we support both.
+     * 
+     * @param  \Illuminate\Foundation\Http\FormRequest  $request
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Database\Eloquent\Collection
      */
-    public function execute(IndexAccountRequest $request): Collection|LengthAwarePaginator
+    public function execute(FormRequest $request): Collection|LengthAwarePaginator
     {
-        $query = Account::query()
-            ->where('coa_version_id', $request->coa_version_id);
+        $query = Account::query()->with('parent');
+
+        if ($request->filled('coa_version_id')) {
+            $query->where('coa_version_id', $request->coa_version_id);
+        }
 
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%");
-            });
+            $this->filterService->applySearch($query, $request->get('search'), $this->getSearchFields());
+        } else {
+            $this->filterService->applyAdvancedFilters($query, [
+                'type' => $request->get('type'),
+                'is_active' => $request->get('is_active'),
+                'coa_version_id' => $request->get('coa_version_id'),
+            ]);
         }
 
-        if ($request->filled('type')) {
-            $query->where('type', $request->type);
-        }
-
-        if ($request->has('is_active')) {
-            $query->where('is_active', $request->boolean('is_active'));
-        }
-
-        $sortBy = $request->input('sort_by', 'code');
-        $sortOrder = $request->input('sort_order', 'asc');
-        $query->orderBy($sortBy, $sortOrder);
+        $this->filterService->applySorting(
+            $query,
+            $request->get('sort_by', $this->getDefaultSortBy()),
+            strtolower($request->get('sort_direction', $this->getDefaultSortDirection())) === 'asc' ? 'asc' : 'desc',
+            $this->getSortableFields()
+        );
 
         // If per_page is provided, paginate. Otherwise return all (useful for tree)
         if ($request->filled('per_page')) {

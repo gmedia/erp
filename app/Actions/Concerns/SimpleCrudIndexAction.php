@@ -72,9 +72,9 @@ abstract class SimpleCrudIndexAction
      * Execute the action to retrieve paginated entities with filters.
      *
      * @param  \Illuminate\Foundation\Http\FormRequest  $request
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Database\Eloquent\Collection
      */
-    public function execute(FormRequest $request): LengthAwarePaginator
+    public function execute(FormRequest $request): \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Database\Eloquent\Collection
     {
         $modelClass = $this->getModelClass();
         $query = $modelClass::query();
