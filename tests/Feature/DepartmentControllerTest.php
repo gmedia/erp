@@ -26,9 +26,14 @@ describe('Department API Endpoints', function () {
     });
 
     test('index returns paginated departments', function () {
-        // User creation creates 1 department via EmployeeFactory
-        // We create 14 more to reach 15 total
-        Department::factory()->count(14)->create();
+        // User creation creates 1 (or more) departments via EmployeeFactory side effects
+        // We dynamically calculate how many more we need to reach 15 total
+        $existingCount = Department::count();
+        $needed = 15 - $existingCount;
+        
+        if ($needed > 0) {
+            Department::factory()->count($needed)->create();
+        }
 
         $response = getJson('/api/departments?per_page=10');
 

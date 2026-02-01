@@ -26,9 +26,14 @@ describe('Position API Endpoints', function () {
     });
 
     test('index returns paginated positions', function () {
-        // User creation creates 1 position via EmployeeFactory
-        // We create 14 more to reach 15 total
-        Position::factory()->count(14)->create();
+        // User creation creates 1 (or more) positions via EmployeeFactory side effects
+        // We dynamically calculate how many more we need to reach 15 total
+        $existingCount = Position::count();
+        $needed = 15 - $existingCount;
+        
+        if ($needed > 0) {
+            Position::factory()->count($needed)->create();
+        }
 
         $response = getJson('/api/positions?per_page=10');
 
