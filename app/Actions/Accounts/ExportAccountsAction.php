@@ -2,23 +2,29 @@
 
 namespace App\Actions\Accounts;
 
-use App\Domain\Accounts\AccountFilterService;
+use App\Exports\AccountExport;
 use App\Http\Requests\Accounts\ExportAccountRequest;
-use App\Models\Account;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ExportAccountsAction
 {
-    public function __construct(
-        private AccountFilterService $filterService
-    ) {}
-
     public function execute(ExportAccountRequest $request): JsonResponse
     {
-        // For now, returning a JSON placeholder as requested by the pattern.
+        $filters = $request->validated();
+        
+        $filename = 'accounts_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+        $filePath = 'exports/' . $filename;
+
+        $export = new AccountExport($filters);
+        Excel::store($export, $filePath, 'public');
+
+        $url = Storage::url($filePath);
+
         return response()->json([
-            'message' => 'Export functionality would be implemented here.',
-            'filters' => $request->all(),
+            'url' => $url,
+            'filename' => $filename,
         ]);
     }
 }

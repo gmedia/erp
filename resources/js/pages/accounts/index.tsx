@@ -163,7 +163,12 @@ export default function AccountIndex() {
                 coa_version_id: selectedVersionId,
                 search: search,
             });
-            toast.success(response.data.message);
+            
+            if (response.data.url) {
+                window.location.href = response.data.url;
+            }
+            
+            toast.success(response.data.message || 'Export started');
         } catch (error) {
             toast.error('Failed to export accounts');
         }

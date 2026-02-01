@@ -92,48 +92,30 @@ export async function login(
   email = 'admin@admin.com',
   password = 'password'
 ): Promise<void> {
-  // If already on the dashboard, no need to log in again
-  if (page.url().includes('/dashboard')) {
-    await page.waitForLoadState('networkidle');
-    return;
+  // 1. Check if already logged in by looking at URL
+  if (page.url().includes('/dashboard')) return;
+
+  // 2. Go to login page (wait for commit instead of networkidle which can be slow)
+  await page.goto('/login', { waitUntil: 'commit', timeout: 60000 });
+
+  // 3. Wait a bit for potential automatic redirect or email field
+  await page.waitForTimeout(2000);
+
+  if (page.url().includes('/dashboard')) return;
+
+  // 4. Fill login form if email is visible
+  const emailInput = page.locator('input[name="email"]');
+  if (await emailInput.isVisible({ timeout: 10000 }).catch(() => false)) {
+    await emailInput.fill(email);
+    await page.fill('input[name="password"]', password);
+    await page.click('button[type="submit"], button[data-testid="login-button"]');
+    await page.waitForURL('**/dashboard', { timeout: 60000 });
+  } else {
+    // Maybe we are already on dashboard but URL hasn't fully updated or it's a different page
+    if (!page.url().includes('/dashboard')) {
+       await page.waitForURL('**/dashboard', { timeout: 30000 }).catch(() => {});
+    }
   }
-
-  // Navigate to the login page
-  await page.goto('/login', { timeout: 100000 });
-
-  // Wait for either a redirect to the dashboard or the email input to become visible
-  const dashboardWait = page.waitForURL('**/dashboard', { timeout: 100000 }).catch(() => null);
-  const emailWait = page.waitForSelector('input[name="email"]', { state: 'visible', timeout: 100000 }).catch(() => null);
-  await Promise.race([dashboardWait, emailWait]);
-
-  // If we have been redirected to the dashboard, finish early
-  if (page.url().includes('/dashboard')) {
-    await page.waitForLoadState('networkidle');
-    return;
-  }
-
-  // If the email input is not present, wait for a possible later redirect to the dashboard
-  const emailElement = await page.$('input[name="email"]');
-  if (!emailElement) {
-    await page.waitForURL('**/dashboard', { timeout: 100000 }).catch(() => {});
-    return;
-  }
-
-  // Perform login steps
-  await page.fill('input[name="email"]', email);
-  await page.fill('input[name="password"]', password);
-  await Promise.all([
-    page.waitForURL('**/dashboard', { timeout: 1000000 }),
-    (async () => {
-      const testIdButton = page.locator('button[data-testid="login-button"]');
-      if (await testIdButton.count() > 0) {
-        await testIdButton.first().click();
-      } else {
-        await page.click('button[type="submit"]');
-      }
-    })()
-  ]);
-  await page.waitForLoadState('domcontentloaded');
 }
 
 /**
@@ -656,6 +638,173 @@ export async function editCustomer(
   // Wait for dialog to close
   await expect(dialog).not.toBeVisible({ timeout: 10000 });
 }
+
+/**
+ * Generic function to create an account via the UI.
+ */
+export async function createAccount(
+  page: Page,
+  overrides: Partial<{
+    coa_version: string;
+    code: string;
+    name: string;
+    type: string;
+    normal_balance: string;
+    is_active: boolean;
+    is_cash_flow: boolean;
+    description: string;
+  }> = {}
+): Promise<string> {
+  const timestamp = Date.now();
+  const defaultName = `Account ${timestamp}`;
+  const defaultCode = `CODE${timestamp.toString().slice(-5)}`;
+
+  // 1️⃣ Login
+  await login(page);
+
+  // 2️⃣ Navigate to Accounts page
+  await page.goto('/accounts');
+  await page.waitForLoadState('networkidle');
+
+  // 3️⃣ Select COA Version if provided
+  if (overrides.coa_version) {
+    // Try to find the selector trigger by role or text
+    const versionTrigger = page.getByRole('combobox').or(page.locator('button')).filter({ hasText: /Select COA Version|COA \d{4}/i }).first();
+    await expect(versionTrigger).toBeVisible({ timeout: 30000 });
+    await versionTrigger.click();
+    
+    const option = page.getByRole('option', { name: overrides.coa_version });
+    await expect(option).toBeVisible({ timeout: 15000 });
+    await option.first().click();
+    await page.waitForLoadState('networkidle');
+  }
+
+  // 4️⃣ Open the "Add Account" dialog
+  const addButton = page.getByRole('button', { name: /New Root Account/i });
+  await expect(addButton).toBeVisible({ timeout: 15000 });
+  await addButton.click();
+
+  // Wait for dialog to be visible
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  // 5️⃣ Fill the form fields
+  const name = overrides.name ?? defaultName;
+  const code = overrides.code ?? defaultCode;
+  
+  await dialog.locator('input[name="code"]').fill(code);
+  await dialog.locator('input[name="name"]').fill(name);
+
+  // Select type
+  if (overrides.type) {
+    const typeTrigger = dialog.locator('button').filter({ hasText: /Asset|Liability|Equity|Revenue|Expense/i });
+    await typeTrigger.click();
+    await page.getByRole('option', { name: overrides.type, exact: true }).click();
+  }
+
+  // Select normal balance
+  if (overrides.normal_balance) {
+    const balanceTrigger = dialog.locator('button').filter({ hasText: /Debit|Credit/i }).last();
+    await balanceTrigger.click();
+    await page.getByRole('option', { name: overrides.normal_balance, exact: true }).click();
+  }
+
+  // Checkboxes
+  if (overrides.is_active === false) {
+    await dialog.locator('button[id="is_active"]').click();
+  }
+  if (overrides.is_cash_flow === true) {
+    await dialog.locator('button[id="is_cash_flow"]').click();
+  }
+
+  if (overrides.description) {
+    await dialog.locator('textarea[id="description"]').fill(overrides.description);
+  }
+
+  // 6️⃣ Submit the form
+  const submitButton = dialog.getByRole('button', { name: /Create/i }).first();
+  await submitButton.click();
+
+  // Wait for dialog to be hidden
+  await expect(dialog).not.toBeVisible({ timeout: 15000 });
+
+  return code;
+}
+
+/**
+ * Search for an account by code or name.
+ */
+export async function searchAccount(page: Page, query: string): Promise<void> {
+  const searchInput = page.getByPlaceholder(/Search code or name/i);
+  await searchInput.waitFor({ state: 'visible' });
+  await searchInput.fill(query);
+  await searchInput.press('Enter');
+  await page.waitForLoadState('networkidle');
+}
+
+/**
+ * Edit an existing account.
+ */
+export async function editAccount(
+  page: Page,
+  code: string,
+  updates: { name?: string; type?: string }
+): Promise<void> {
+  await searchAccount(page, code);
+
+  const item = page.locator('div', { hasText: code }).first();
+  await expect(item).toBeVisible();
+  
+  // Hover to reveal buttons
+  await item.hover();
+
+  // The Edit button has .text-blue-500 class
+  const editBtn = item.locator('button.text-blue-500');
+  await editBtn.click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  if (updates.name) {
+    await dialog.locator('input[name="name"]').fill(updates.name);
+  }
+
+  if (updates.type) {
+    const typeTrigger = dialog.locator('button').filter({ hasText: /Asset|Liability|Equity|Revenue|Expense/i });
+    await typeTrigger.click();
+    await page.getByRole('option', { name: updates.type, exact: true }).click();
+  }
+
+  const updateBtn = dialog.getByRole('button', { name: /Update|Save|Submit/i }).first();
+  await updateBtn.click();
+
+  await expect(dialog).not.toBeVisible({ timeout: 15000 });
+}
+
+/**
+ * Delete an account.
+ */
+export async function deleteAccount(page: Page, code: string): Promise<void> {
+  await searchAccount(page, code);
+
+  // Find the row or tree item containing the code
+  const item = page.locator('div', { hasText: code }).first();
+  await expect(item).toBeVisible();
+  
+  // Hover to reveal buttons
+  await item.hover();
+
+  // The Delete button has .text-destructive class
+  const deleteBtn = item.locator('button.text-destructive');
+  await deleteBtn.click();
+
+  // Confirm deletion in AlertDialog
+  const confirmBtn = page.getByRole('button', { name: /Delete/i }).last();
+  await confirmBtn.click();
+
+  await page.waitForLoadState('networkidle');
+}
+
 // ---------------------------------------------------
 // Supplier helpers
 // ---------------------------------------------------
