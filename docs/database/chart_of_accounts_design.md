@@ -148,6 +148,67 @@ Menyimpan detail akun untuk setiap versi.
 
 **Unique Constraint:** `(coa_version_id, code)` - Kode akun unik per versi
 
+#### Detail Penjelasan Kolom
+
+Berikut adalah penjelasan detail mengenai fungsi dan penggunaan kolom-kolom penting pada tabel `accounts`:
+
+##### 1. `type`
+**Kegunaan:** Mengelompokkan akun ke dalam kategori utama laporan keuangan (Neraca atau Laba Rugi).
+**Nilai (Enum):** `asset`, `liability`, `equity`, `revenue`, `expense`.
+**Contoh:**
+*   **Kas Besar**: Type = `asset` (Harta).
+*   **Hutang Dagang**: Type = `liability` (Kewajiban).
+*   **Penjualan Barang**: Type = `revenue` (Pendapatan).
+
+##### 2. `sub_type`
+**Kegunaan:** Klasifikasi spesifik dari `type` untuk penyajian laporan yang lebih terstruktur.
+**Contoh:**
+*   **Kas & Bank**: Type `asset`, Sub Type `current_asset` (Aset Lancar).
+*   **Gedung Kantor**: Type `asset`, Sub Type `fixed_asset` (Aset Tetap).
+*   **Gaji Karyawan**: Type `expense`, Sub Type `operating_expense` (Beban Operasional).
+
+##### 3. `normal_balance`
+**Kegunaan:** Menentukan posisi normal saldo akun (Debit atau Kredit) agar bernilai positif.
+*   **Debit**: Saldo bertambah di Debit (Aset, Beban).
+*   **Kredit**: Saldo bertambah di Kredit (Hutang, Modal, Pendapatan).
+**Contoh:**
+*   **Kas (Asset)**: Normal Balance `debit`. Uang masuk (Debit) menambah saldo.
+*   **Penjualan (Revenue)**: Normal Balance `credit`. Penjualan (Kredit) menambah saldo.
+
+##### 4. `level`
+**Kegunaan:** Menunjukkan kedalaman hierarki akun dalam struktur pohon (tree) untuk indentasi laporan.
+**Contoh:**
+*   **Level 0**: Aset (Header Utama)
+    *   **Level 1**: Aset Lancar (Header Kategori)
+        *   **Level 2**: Kas & Bank (Header Group)
+            *   **Level 3**: **Bank BCA** (Akun Transaksi)
+
+##### 5. `is_active`
+**Kegunaan:** Menandai akun yang boleh digunakan untuk transaksi baru. Akun lama dengan saldo tidak boleh dihapus, hanya dinonaktifkan.
+**Contoh:**
+*   Bank Mandiri (lama) diganti Bank Jago (baru).
+*   Set `is_active = false` pada Bank Mandiri agar tidak muncul di pilihan jurnal baru, namun histori tetap terjaga.
+
+##### 6. `is_cash_flow`
+**Kegunaan:** Menandai akun yang menjadi komponen Laporan Arus Kas (Operating, Investing, Financing).
+**Contoh:**
+*   **Penjualan Tunai**: `is_cash_flow = true`. Masuk aktivitas operasional.
+*   **Pembelian Mesin**: `is_cash_flow = true`. Masuk aktivitas investasi.
+*   **Beban Penyusutan**: `is_cash_flow = false`. Beban non-tunai, diabaikan di metode langsung.
+
+#### Contoh Data Baris (Row Example)
+
+| Column | Akun: Kas Bank BCA | Akun: Hutang Usaha | Akun: Penjualan Jasa |
+| :--- | :--- | :--- | :--- |
+| **code** | `1110-001` | `2100-001` | `4100-001` |
+| **name** | Bank BCA IDR | Hutang Supplier Lokal | Jasa Konsultasi IT |
+| **type** | `asset` | `liability` | `revenue` |
+| **sub_type** | `current_asset` | `current_liability` | `operating_revenue` |
+| **normal_balance** | `debit` | `credit` | `credit` |
+| **level** | `3` | `3` | `3` |
+| **is_active** | `true` | `true` | `true` |
+| **is_cash_flow** | `true` | `false` | `true` |
+
 ---
 
 ### 4. `account_mappings` (Pemetaan Akun)
