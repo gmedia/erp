@@ -187,7 +187,7 @@ export default function AccountIndex() {
 
                     <div className="flex items-center gap-2">
                         <Select value={selectedVersionId || ''} onValueChange={setSelectedVersionId}>
-                            <SelectTrigger className="w-[200px]">
+                            <SelectTrigger className="w-[320px]">
                                 <SelectValue placeholder="Select COA Version" />
                             </SelectTrigger>
                             <SelectContent>
