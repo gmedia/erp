@@ -130,6 +130,14 @@ class MenuSeeder extends Seeder
                         'url' => 'coa-versions',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'chart_of_accounts',
+                        'display_name' => 'Chart of Accounts',
+                        'permissions' => ['coa_version'], // Using coa_version permission for now or create new one
+                        'icon' => 'FolderTree',
+                        'url' => 'accounts',
+                        'child' => [],
+                    ],
                 ],
             ],
             [
