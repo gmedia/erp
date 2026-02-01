@@ -1,33 +1,42 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Exports\DepartmentExport;
 use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Tests\Traits\SimpleCrudExportTestTrait;
 
-class DepartmentExportTest extends TestCase
-{
-    use RefreshDatabase;
-    use SimpleCrudExportTestTrait;
+uses(RefreshDatabase::class)->group('departments');
 
-    protected function getExportClass(): string
-    {
-        return DepartmentExport::class;
-    }
+describe('DepartmentExport', function () {
 
-    protected function getModelClass(): string
-    {
-        return Department::class;
-    }
+    test('query applies search filter', function () {
+        Department::factory()->create(['name' => 'Engineering']);
+        Department::factory()->create(['name' => 'Sales']);
 
-    protected function getSampleData(): array
-    {
-        return [
-            'match' => 'Engineering Department',
-            'others' => ['Marketing Department', 'Sales Department'],
-        ];
-    }
-}
+        $export = new DepartmentExport(['search' => 'Engine']);
+        $results = $export->query()->get();
+
+        expect($results)->toHaveCount(1)
+            ->and($results->first()->name)->toBe('Engineering');
+    });
+
+    test('map function returns correct data', function () {
+        $department = Department::factory()->make([
+            'id' => 1,
+            'name' => 'Test Dept',
+            'created_at' => '2023-01-01 12:00:00',
+        ]);
+
+        $export = new DepartmentExport([]);
+        $mapped = $export->map($department);
+
+        expect($mapped)->toBeArray();
+        expect($mapped[0])->toBe(1);
+        expect($mapped[1])->toBe('Test Dept');
+    });
+
+    test('headings returns correct columns', function () {
+        $export = new DepartmentExport([]);
+        
+        expect($export->headings())->toContain('ID', 'Name', 'Created At');
+    });
+});
