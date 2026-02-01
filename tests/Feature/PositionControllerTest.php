@@ -50,14 +50,15 @@ describe('Position API Endpoints', function () {
     });
 
     test('index supports search filtering', function () {
-        Position::factory()->create(['name' => 'Manager']);
+        // Use unique name to avoid collision with seeded data
+        Position::factory()->create(['name' => 'UniqueManagerPos']);
         Position::factory()->create(['name' => 'Staff']);
 
-        $response = getJson('/api/positions?search=Man');
+        $response = getJson('/api/positions?search=UniqueMan');
 
         $response->assertOk();
         expect($response->json('data'))->toHaveCount(1)
-            ->and($response->json('data.0.name'))->toBe('Manager');
+            ->and($response->json('data.0.name'))->toBe('UniqueManagerPos');
     });
 
     test('index sorts results', function () {
