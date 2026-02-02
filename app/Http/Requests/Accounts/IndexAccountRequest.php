@@ -14,7 +14,7 @@ class IndexAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'coa_version_id' => ['required', 'exists:coa_versions,id'],
+            'coa_version_id' => ['nullable', 'exists:coa_versions,id'],
             'search' => ['nullable', 'string'],
             'type' => ['nullable', 'in:asset,liability,equity,revenue,expense'],
             'is_active' => ['nullable', 'boolean'],

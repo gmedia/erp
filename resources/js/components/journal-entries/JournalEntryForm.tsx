@@ -35,6 +35,8 @@ interface JournalEntryFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     journalEntry?: JournalEntry | null;
+    item?: JournalEntry | null;
+    entity?: JournalEntry | null;
     onSubmit: (data: JournalEntryFormData) => void;
     isLoading?: boolean;
 }
@@ -42,6 +44,9 @@ interface JournalEntryFormProps {
 const getJournalEntryFormDefaults = (
     journalEntry?: JournalEntry | null,
 ): JournalEntryFormData => {
+    if (journalEntry) {
+         // console.log('getJournalEntryFormDefaults input:', JSON.stringify(journalEntry));
+    }
     if (!journalEntry) {
         return {
             entry_date: new Date(),
@@ -71,23 +76,32 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(function JournalEntr
     open,
     onOpenChange,
     journalEntry,
+    // @ts-ignore
+    item,
+    // @ts-ignore
+    entity,
     onSubmit,
-    isLoading = false,
+    isLoading,
 }) {
-    const defaultValues = useMemo(
-        () => getJournalEntryFormDefaults(journalEntry),
-        [journalEntry],
-    );
+    const data = journalEntry || item || entity;
 
     const form = useForm<JournalEntryFormData>({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolver: zodResolver(journalEntryFormSchema) as any,
-        defaultValues,
+        defaultValues: getJournalEntryFormDefaults(data),
     });
 
     const { fields, append, remove } = useFieldArray({
         control: form.control,
         name: 'lines',
     });
+
+    // Reset form when dialog opens/closes or data changes
+    useEffect(() => {
+        if (open) {
+            form.reset(getJournalEntryFormDefaults(data));
+        }
+    }, [open, data, form]);
 
     const lines = useWatch({
         control: form.control,
@@ -98,11 +112,6 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(function JournalEntr
     const totalCredit = lines?.reduce((acc, line) => acc + (Number(line.credit) || 0), 0) || 0;
     const difference = totalDebit - totalCredit;
 
-    useEffect(() => {
-        if (open) {
-             form.reset(defaultValues);
-        }
-    }, [open, defaultValues, form]);
 
     const handleFormSubmit = (data: JournalEntryFormData) => {
         onSubmit({
@@ -233,7 +242,9 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(function JournalEntr
                                 <p className="text-red-500 text-sm p-4">{form.formState.errors.root.message}</p>
                             )}
                              {form.formState.errors.lines && (
-                                <p className="text-red-500 text-sm p-4">{String(form.formState.errors.lines.message)}</p>
+                                <p className="text-red-500 text-sm p-4">
+                                     {JSON.stringify(form.formState.errors.lines)}
+                                </p>
                             )}
                         </div>
 

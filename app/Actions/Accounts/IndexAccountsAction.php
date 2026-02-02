@@ -41,19 +41,27 @@ class IndexAccountsAction extends SimpleCrudIndexAction
     {
         $query = Account::query()->with('parent');
 
+        // Default to active COA version if not provided
         if ($request->filled('coa_version_id')) {
             $query->where('coa_version_id', $request->coa_version_id);
+        } else {
+            // Find active coa version
+            $activeVersion = \App\Models\CoaVersion::where('status', 'active')->first();
+            if ($activeVersion) {
+                $query->where('coa_version_id', $activeVersion->id);
+            }
         }
 
+        // Apply filters AND search
         if ($request->filled('search')) {
             $this->filterService->applySearch($query, $request->get('search'), $this->getSearchFields());
-        } else {
-            $this->filterService->applyAdvancedFilters($query, [
-                'type' => $request->get('type'),
-                'is_active' => $request->get('is_active'),
-                'coa_version_id' => $request->get('coa_version_id'),
-            ]);
         }
+        
+        $this->filterService->applyAdvancedFilters($query, [
+            'type' => $request->get('type'),
+            'is_active' => $request->get('is_active'),
+            'coa_version_id' => $request->get('coa_version_id'),
+        ]);
 
         $this->filterService->applySorting(
             $query,
