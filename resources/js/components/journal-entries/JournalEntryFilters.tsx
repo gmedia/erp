@@ -1,4 +1,4 @@
-import { DatePickerField } from '@/components/common/DatePickerField';
+import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     createSelectFilterField,
     createTextFilterField,
@@ -19,12 +19,12 @@ export function createJournalEntryFilterFields(): FieldDescriptor[] {
         {
             name: 'start_date',
             label: 'Start Date',
-            component: <DatePickerField name="start_date" label="Start Date" placeholder="Start Date" />,
+            component: <FilterDatePicker placeholder="Start Date" />,
         },
         {
             name: 'end_date',
             label: 'End Date',
-            component: <DatePickerField name="end_date" label="End Date" placeholder="End Date" />,
+            component: <FilterDatePicker placeholder="End Date" />,
         },
     ];
 }
