@@ -149,4 +149,23 @@ export const coaVersionFormSchema = z.object({
     status: z.enum(['draft', 'active', 'archived']),
 });
 
-export type CoaVersionFormData = z.infer<typeof coaVersionFormSchema>;
+
+// Schema for Journal Entry
+export const journalEntryFormSchema = z.object({
+    entry_date: z.date({ message: 'Date is required.' }),
+    reference: z.string().optional(),
+    description: z.string().min(1, { message: 'Description is required.' }),
+    lines: z.array(z.object({
+        account_id: z.string().min(1, { message: 'Account is required.' }),
+        debit: z.coerce.number().min(0),
+        credit: z.coerce.number().min(0),
+        memo: z.string().optional(),
+    })).min(2, { message: 'At least 2 lines are required.' })
+    .refine((lines) => {
+        const totalDebit = lines.reduce((sum, line) => sum + (line.debit || 0), 0);
+        const totalCredit = lines.reduce((sum, line) => sum + (line.credit || 0), 0);
+        return Math.abs(totalDebit - totalCredit) < 0.01;
+    }, { message: 'Total Debit and Total Credit must be equal.', path: ['root'] }),
+});
+
+export type JournalEntryFormData = z.infer<typeof journalEntryFormSchema>;

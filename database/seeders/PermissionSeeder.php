@@ -139,6 +139,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'journal_entry',
+                'display_name' => 'Journal Entry',
+                'child' => [
+                    [
+                        'name' => 'journal_entry.create',
+                        'display_name' => 'Create Journal Entry',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'journal_entry.edit',
+                        'display_name' => 'Edit Journal Entry',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'journal_entry.delete',
+                        'display_name' => 'Delete Journal Entry',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'supplier_category',
                 'display_name' => 'Supplier Category',
                 'child' => [

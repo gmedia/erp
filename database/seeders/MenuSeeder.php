@@ -44,6 +44,23 @@ class MenuSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'accounting',
+                'display_name' => 'Accounting',
+                'permissions' => ['journal_entry', 'journal_entry.create', 'journal_entry.edit', 'journal_entry.delete'],
+                'icon' => 'BookOpen',
+                'url' => null,
+                'child' => [
+                    [
+                        'name' => 'journal_entry',
+                        'display_name' => 'Journal Entry',
+                        'permissions' => ['journal_entry', 'journal_entry.create', 'journal_entry.edit', 'journal_entry.delete'],
+                        'icon' => 'Book',
+                        'url' => 'journal-entries',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'master.data',
                 'display_name' => 'Master Data',
                 'permissions' => ['permission'],

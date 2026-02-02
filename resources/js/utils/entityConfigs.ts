@@ -396,3 +396,28 @@ export const coaVersionConfig = createComplexEntityConfig<CoaVersion>({
     viewModalComponent: CoaVersionViewModal,
     getDeleteMessage: createGenericDeleteMessage('COA Version'),
 });
+
+import { journalEntryColumns } from '@/components/journal-entries/JournalEntryColumns';
+import { createJournalEntryFilterFields } from '@/components/journal-entries/JournalEntryFilters';
+import { JournalEntryForm } from '@/components/journal-entries/JournalEntryForm';
+import { JournalEntryViewModal } from '@/components/journal-entries/JournalEntryViewModal';
+import { type JournalEntry } from '@/types/journal-entry';
+import { JournalEntryFormData } from '@/utils/schemas';
+
+export const journalEntryConfig = createComplexEntityConfig<JournalEntry>({
+    entityName: 'Journal Entry',
+    entityNamePlural: 'Journal Entries',
+    apiEndpoint: '/api/journal-entries',
+    exportEndpoint: '/api/journal-entries/export',
+    queryKey: ['journal-entries'],
+    breadcrumbs: [{ title: 'Journal Entries', href: '/journal-entries' }],
+    initialFilters: { search: '', status: '', start_date: '', end_date: '' },
+    columns: journalEntryColumns,
+    filterFields: createJournalEntryFilterFields(),
+    formComponent: JournalEntryForm,
+    formType: 'complex',
+    entityNameForSearch: 'journal entry',
+    viewModalComponent: JournalEntryViewModal,
+    getDeleteMessage: (item: any) =>
+        `This action cannot be undone. This will permanently delete Journal Entry ${item.entry_number}.`,
+});
