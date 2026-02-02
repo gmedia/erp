@@ -8,6 +8,7 @@ import {
     LayoutList,
     Users,
     Truck,
+    Book,
     FolderTree,
 } from 'lucide-react';
 
@@ -20,6 +21,7 @@ const iconMap: Record<string, LucideIcon> = {
     BookOpen,
     Folder,
     Truck,
+    Book,
     FolderTree,
 };
 
