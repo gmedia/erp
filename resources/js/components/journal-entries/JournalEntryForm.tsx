@@ -25,6 +25,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogFooter,
+    DialogDescription,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
 
@@ -127,6 +128,9 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(function JournalEntr
                     <DialogTitle>
                         {journalEntry ? 'Edit Journal Entry' : 'Add New Journal Entry'}
                     </DialogTitle>
+                    <DialogDescription>
+                        Fill in the form below to create or update a journal entry.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <Form {...form}>

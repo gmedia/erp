@@ -1,6 +1,8 @@
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
@@ -15,6 +17,7 @@ import {
 } from '@/components/ui/table';
 import { JournalEntry } from '@/types/journal-entry';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 
 interface JournalEntryViewModalProps {
@@ -35,6 +38,9 @@ export function JournalEntryViewModal({
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Journal Entry Details</DialogTitle>
+                    <DialogDescription>
+                        View complete details of this journal entry
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
@@ -111,6 +117,11 @@ export function JournalEntryViewModal({
                         </TableFooter>
                     </Table>
                 </div>
+                <DialogFooter>
+                    <Button type="button" onClick={onClose}>
+                        Close
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
