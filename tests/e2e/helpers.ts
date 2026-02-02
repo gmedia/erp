@@ -2031,7 +2031,7 @@ export async function createJournalEntry(
   }
 
   // 6️⃣ Submit
-  const saveBtn = dialog.getByRole('button', { name: /Save/i });
+  const saveBtn = dialog.locator('button[type="submit"]');
   await expect(saveBtn).toBeEnabled(); 
   await saveBtn.click();
 
@@ -2081,7 +2081,7 @@ export async function editJournalEntry(
         await dialog.locator('input[name="description"]').fill(updates.description);
     }
 
-    const saveBtn = dialog.getByRole('button', { name: /Save/i });
+    const saveBtn = dialog.locator('button[type="submit"]');
     await expect(saveBtn).toBeVisible();
     
     // Check if disabled - if so, we can't save

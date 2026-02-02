@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Form, FormMessage } from '@/components/ui/form';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
 import { simpleEntitySchema } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,6 +35,10 @@ interface EntityFormProps<T extends FieldValues = FieldValues> {
     isLoading?: boolean;
     /** The form object returned by react‑hook‑form's useForm */
     form: UseFormReturn<T>;
+    /** Optional – disable the submit button manually (e.g. for custom validation) */
+    submitDisabled?: boolean;
+    /** Optional – custom class name for the DialogContent (e.g. for wider forms) */
+    className?: string;
 }
 
 /**
@@ -51,6 +56,8 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
     children,
     isLoading = false,
     form,
+    submitDisabled = false,
+    className,
 }: EntityFormProps<T>) {
     const { t } = useTranslation();
 
@@ -77,7 +84,7 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] p-0 overflow-hidden flex flex-col">
+            <DialogContent className={cn("sm:max-w-[600px] max-h-[90vh] p-0 overflow-hidden flex flex-col", className)}>
                 <div className="shrink-0 p-6 pb-2">
                     <DialogHeader>
                         <DialogTitle>{title}</DialogTitle>
@@ -106,7 +113,7 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
                                 >
                                     {t('common.cancel')}
                                 </Button>
-                                <Button type="submit" disabled={isLoading}>
+                                <Button type="submit" disabled={isLoading || submitDisabled}>
                                     {submitButtonText}
                                 </Button>
                             </DialogFooter>
