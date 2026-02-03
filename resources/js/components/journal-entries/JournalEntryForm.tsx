@@ -169,6 +169,9 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(function JournalEntr
                                             label=""
                                             url="/api/accounts?is_active=1&has_children=0"
                                             placeholder="Select Account"
+                                            labelFn={(item) =>
+                                                `${item.code} - ${item.name} (${item.normal_balance})`
+                                            }
                                         />
                                     </TableCell>
                                     <TableCell>
