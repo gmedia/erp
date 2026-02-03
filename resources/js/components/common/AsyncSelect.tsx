@@ -69,7 +69,8 @@ export function AsyncSelect({
             if (value && value !== 'null' && value !== 'undefined' && !selectedLabel && !initialLoadDone) {
                 try {
                     // Try to fetch specific item by ID
-                    const response = await axios.get(`${url}/${value}`);
+                    const [baseUrl] = url.split('?');
+                    const response = await axios.get(`${baseUrl}/${value}`);
                     const data = response.data.data || response.data;
                     if (data) {
                         setSelectedLabel(labelFn(data));
