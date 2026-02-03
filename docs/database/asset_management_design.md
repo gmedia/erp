@@ -294,3 +294,185 @@ Saat `asset_depreciation_runs` diposting:
 
 > [!NOTE]
 > Jika akun depresiasi berbeda per kategori, simpan default account mapping pada `asset_categories` (opsional) dan override per aset di `assets`.
+
+---
+
+## 5. Rekomendasi Menu & Tabel Terlibat
+
+Bagian ini merangkum menu yang umumnya dibutuhkan untuk menjalankan modul manajemen aset end-to-end, beserta tabel yang terlibat pada tiap menu.
+
+### A. Master Data (Setup)
+
+#### 1) Asset Categories
+Tujuan: mengelola kategori aset dan default masa manfaat.
+
+Tabel terlibat:
+* `asset_categories`
+
+#### 2) Asset Models
+Tujuan: mengelola template/model aset (spesifikasi standar).
+
+Tabel terlibat:
+* `asset_models`
+* `asset_categories`
+
+#### 3) Asset Locations
+Tujuan: mengelola lokasi fisik aset per cabang dengan hierarki.
+
+Tabel terlibat:
+* `asset_locations`
+* `branches`
+
+---
+
+### B. Operasional Aset
+
+#### 4) Assets (List & Form)
+Tujuan: registrasi aset baru, edit data aset, dan mengelola “current state” (lokasi, PIC, status).
+
+Tabel terlibat:
+* `assets`
+* `asset_categories`
+* `asset_models`
+* `asset_locations`
+* `branches`
+* `departments`
+* `employees`
+* `suppliers`
+* `accounts` (untuk `depreciation_expense_account_id` dan `accumulated_depr_account_id`)
+
+Catatan proses:
+* Saat aset dibuat/diakuisisi, sistem idealnya menambah histori awal di `asset_movements` dengan `movement_type = acquired`.
+* Saat lokasi/PIC berubah, update kolom di `assets` dan simpan histori di `asset_movements`.
+
+#### 5) Asset Detail (Profile)
+Tujuan: melihat ringkasan aset + tab histori (movement, maintenance, stocktake, depresiasi).
+
+Tabel terlibat:
+* `assets`
+* `asset_movements`
+* `asset_maintenances`
+* `asset_stocktake_items` (dan header `asset_stocktakes`)
+* `asset_depreciation_lines` (dan header `asset_depreciation_runs`)
+* `branches`, `asset_locations`, `departments`, `employees`, `suppliers`, `accounts`
+
+#### 6) Asset Movements (Transfer / Assignment)
+Tujuan: membuat dokumen perpindahan aset (mutasi antar cabang/ruang/PIC) dan audit trail.
+
+Tabel terlibat:
+* `asset_movements`
+* `assets`
+* `branches`
+* `asset_locations`
+* `departments`
+* `employees`
+* `users` (kolom `created_by`)
+
+Contoh kasus:
+* Transfer laptop dari Head Office ke Branch 1 dan ganti PIC dari Employee A ke Employee B.
+
+#### 7) Asset Maintenance
+Tujuan: mencatat jadwal/riwayat perawatan dan biaya.
+
+Tabel terlibat:
+* `asset_maintenances`
+* `assets`
+* `suppliers`
+* `users` (kolom `created_by`)
+
+Contoh kasus:
+* Perawatan berkala kendaraan tiap 3 bulan (preventive) dan servis perbaikan (corrective).
+
+---
+
+### C. Kontrol & Audit
+
+#### 8) Asset Stocktake (Header)
+Tujuan: membuat event stocktake per cabang/per periode (jadwal & status).
+
+Tabel terlibat:
+* `asset_stocktakes`
+* `branches`
+* `users` (kolom `created_by`)
+
+#### 9) Asset Stocktake (Items)
+Tujuan: mengisi hasil cek per aset dan mencatat selisih (expected vs found).
+
+Tabel terlibat:
+* `asset_stocktake_items`
+* `asset_stocktakes`
+* `assets`
+* `branches`
+* `asset_locations`
+* `users` (kolom `checked_by`)
+
+Contoh kasus:
+* Aset seharusnya berada di “IT Room”, tetapi ditemukan di “Warehouse” → `result = moved`.
+
+---
+
+### D. Akuntansi (Depresiasi)
+
+#### 10) Depreciation Run (Calculate)
+Tujuan: memilih periode, menghitung depresiasi untuk aset yang eligible.
+
+Tabel terlibat:
+* `asset_depreciation_runs`
+* `asset_depreciation_lines`
+* `assets`
+* `fiscal_years`
+
+#### 11) Depreciation Run (Post to Journal)
+Tujuan: posting hasil depresiasi menjadi jurnal akuntansi (debit beban, kredit akumulasi).
+
+Tabel terlibat:
+* `asset_depreciation_runs` (kolom `journal_entry_id`, `posted_by`, `posted_at`)
+* `asset_depreciation_lines`
+* `assets` (referensi akun depresiasi per aset)
+* `accounts`
+* `journal_entries`
+* `journal_entry_lines`
+* `users`
+
+Contoh kasus:
+* Periode Jan 2026: total depresiasi seluruh aset Rp 25.000.000, dibuat 1 jurnal header dan line agregat per akun.
+
+---
+
+### E. Laporan (Opsional tapi umum)
+
+#### 12) Asset Register / Asset Listing Report
+Tujuan: daftar aset lengkap + filter (kategori, status, cabang, lokasi, PIC).
+
+Tabel terlibat:
+* `assets`
+* `asset_categories`, `asset_models`
+* `branches`, `asset_locations`
+* `departments`, `employees`
+* `suppliers`
+
+#### 13) Book Value & Depreciation Report
+Tujuan: laporan nilai buku dan depresiasi per periode/per aset.
+
+Tabel terlibat:
+* `assets`
+* `asset_depreciation_runs`, `asset_depreciation_lines`
+* `fiscal_years`
+* `accounts` (jika butuh grouping akun)
+
+#### 14) Maintenance Cost Report
+Tujuan: biaya maintenance per aset/per periode/per vendor.
+
+Tabel terlibat:
+* `asset_maintenances`
+* `assets`
+* `suppliers`
+
+#### 15) Stocktake Variance Report
+Tujuan: daftar aset missing/damaged/moved pada suatu stocktake.
+
+Tabel terlibat:
+* `asset_stocktakes`
+* `asset_stocktake_items`
+* `assets`
+* `branches`, `asset_locations`
