@@ -157,6 +157,11 @@ class PermissionSeeder extends Seeder
                         'display_name' => 'Delete Journal Entry',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'journal_entry.post',
+                        'display_name' => 'Post Journal Entry',
+                        'child' => [],
+                    ],
                 ],
             ],
             [

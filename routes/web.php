@@ -36,5 +36,7 @@ require __DIR__ . '/fiscal_year.php';
 require __DIR__ . '/coa_version.php';
 require __DIR__ . '/account.php';
 require __DIR__ . '/journal_entry.php';
+require __DIR__ . '/posting_journal.php';
+
 
 
