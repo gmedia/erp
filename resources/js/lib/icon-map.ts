@@ -10,6 +10,7 @@ import {
     Truck,
     Book,
     FolderTree,
+    BarChart,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -23,6 +24,7 @@ const iconMap: Record<string, LucideIcon> = {
     Truck,
     Book,
     FolderTree,
+    BarChart,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

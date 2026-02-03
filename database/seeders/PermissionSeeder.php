@@ -170,6 +170,16 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'trial_balance_report',
+                'display_name' => 'Trial Balance Report',
+                'child' => [],
+            ],
+            [
+                'name' => 'balance_sheet_report',
+                'display_name' => 'Balance Sheet Report',
+                'child' => [],
+            ],
+            [
                 'name' => 'supplier_category',
                 'display_name' => 'Supplier Category',
                 'child' => [

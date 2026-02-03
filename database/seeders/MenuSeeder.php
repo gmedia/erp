@@ -69,6 +69,31 @@ class MenuSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'report',
+                'display_name' => 'Report',
+                'permissions' => ['trial_balance_report', 'balance_sheet_report'],
+                'icon' => 'BarChart',
+                'url' => null,
+                'child' => [
+                    [
+                        'name' => 'trial_balance_report',
+                        'display_name' => 'Trial Balance Report',
+                        'permissions' => ['trial_balance_report'],
+                        'icon' => 'BarChart',
+                        'url' => 'reports/trial-balance',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'balance_sheet_report',
+                        'display_name' => 'Balance Sheet Report',
+                        'permissions' => ['balance_sheet_report'],
+                        'icon' => 'BarChart',
+                        'url' => 'reports/balance-sheet',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'master.data',
                 'display_name' => 'Master Data',
                 'permissions' => ['permission'],
