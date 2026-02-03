@@ -16,7 +16,8 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Loader2, CheckCircle2, AlertCircle, Search } from 'lucide-react';
 import { format } from 'date-fns';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -39,6 +40,7 @@ export default function Index() {
         selectAll,
         postSelected,
         isPosting,
+        handleSearch,
     } = usePostingJournal();
 
     return (
@@ -54,18 +56,28 @@ export default function Index() {
                                 Review and post draft journal entries to the general ledger.
                             </CardDescription>
                         </div>
-                        <Button
-                            onClick={postSelected}
-                            disabled={selectedIds.length === 0 || isPosting}
-                            className="bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50"
-                        >
-                            {isPosting ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            ) : (
-                                <CheckCircle2 className="mr-2 h-4 w-4" />
-                            )}
-                            {isPosting ? 'Posting...' : `Post Selected (${selectedIds.length})`}
-                        </Button>
+                        <div className="flex items-center gap-4">
+                            <div className="relative w-72">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <Input
+                                    placeholder="Search journals..."
+                                    className="pl-9 bg-white/50 backdrop-blur-sm border-gray-100 focus:bg-white transition-all"
+                                    onChange={(e) => handleSearch(e.target.value)}
+                                />
+                            </div>
+                            <Button
+                                onClick={postSelected}
+                                disabled={selectedIds.length === 0 || isPosting}
+                                className="bg-blue-600 hover:bg-blue-700 text-white transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50"
+                            >
+                                {isPosting ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                                )}
+                                {isPosting ? 'Posting...' : `Post Selected (${selectedIds.length})`}
+                            </Button>
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">

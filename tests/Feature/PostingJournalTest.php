@@ -14,7 +14,7 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class)->group('posting-journals');
 
 beforeEach(function () {
-    $this->user = createTestUserWithPermissions(['journal_entry.post']);
+    $this->user = createTestUserWithPermissions(['posting_journal']);
     actingAs($this->user);
     
     $this->fiscalYear = FiscalYear::factory()->create([

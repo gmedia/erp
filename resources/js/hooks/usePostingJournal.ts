@@ -57,6 +57,11 @@ export function usePostingJournal() {
         }
     };
 
+    const handleSearch = (query: string) => {
+        setFilters((prev) => ({ ...prev, search: query }));
+        setPagination((prev) => ({ ...prev, page: 1 }));
+    };
+
     return {
         data,
         meta,
@@ -65,10 +70,12 @@ export function usePostingJournal() {
         setPagination,
         filters,
         setFilters,
+        handleSearch,
         selectedIds,
         toggleSelection,
         selectAll,
         postSelected,
         isPosting,
+        refetch,
     };
 }
