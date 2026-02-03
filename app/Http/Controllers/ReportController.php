@@ -40,15 +40,17 @@ class ReportController extends Controller
         $currentFiscalYear = $fiscalYears->firstWhere('status', 'open') ?? $fiscalYears->first();
         
         $selectedYearId = $request->input('fiscal_year_id', $currentFiscalYear?->id);
+        $comparisonYearId = $request->input('comparison_year_id');
 
         $report = [];
         if ($selectedYearId) {
-            $report = $this->reportService->getBalanceSheet((int) $selectedYearId);
+            $report = $this->reportService->getBalanceSheet((int) $selectedYearId, $comparisonYearId ? (int) $comparisonYearId : null);
         }
 
         return Inertia::render('reports/balance-sheet/index', [
             'fiscalYears' => $fiscalYears,
             'selectedYearId' => (int) $selectedYearId,
+            'comparisonYearId' => $comparisonYearId ? (int) $comparisonYearId : null,
             'report' => $report,
         ]);
     }

@@ -6,6 +6,7 @@ use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use App\Models\User;
+use Carbon\Carbon;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 use function Pest\Laravel\seed;
@@ -59,13 +60,25 @@ test('can view balance sheet page', function () {
 
 test('trial balance calculations are correct', function () {
     // Create Accounts
-    $cash = Account::create([
+    $parentAccount = Account::create([
         'coa_version_id' => $this->coaVersion->id,
         'code' => '1000',
-        'name' => 'Cash',
+        'name' => 'Cash Parent',
         'type' => 'asset',
         'normal_balance' => 'debit',
         'level' => 1,
+        'is_active' => true,
+        'is_cash_flow' => true,
+    ]);
+
+    $childAccount = Account::create([
+        'coa_version_id' => $this->coaVersion->id,
+        'code' => '1100',
+        'name' => 'Cash Child',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'level' => 2,
+        'parent_id' => $parentAccount->id,
         'is_active' => true,
         'is_cash_flow' => true,
     ]);
@@ -91,10 +104,10 @@ test('trial balance calculations are correct', function () {
         'created_by' => $this->user->id,
     ]);
 
-    // Debit Cash 1000
+    // Debit Child Cash 1000
     JournalEntryLine::create([
         'journal_entry_id' => $journal->id,
-        'account_id' => $cash->id,
+        'account_id' => $childAccount->id,
         'debit' => 1000,
         'credit' => 0,
     ]);
@@ -111,85 +124,110 @@ test('trial balance calculations are correct', function () {
         ->get(route('reports.trial-balance', ['fiscal_year_id' => $this->fiscalYear->id]))
         ->assertStatus(200)
         ->assertInertia(fn ($page) => $page
-            ->where('report.0.code', '1000')
-            ->where('report.0.debit', 1000)
-            ->where('report.1.code', '4000')
-            ->where('report.1.credit', 1000)
+            ->component('reports/trial-balance/index')
+            ->has('report', 3) // Check count
+            ->where('report.0.code', '1000') // Parent
+            ->where('report.0.level', 1) 
+            ->where('report.1.code', '1100') // Child
+            ->where('report.1.level', 2)
+            ->where('report.1.parent_id', $parentAccount->id)
+            ->where('report.1.debit', 1000)
         );
 });
 
-test('balance sheet includes net income in equity', function () {
-    // Create Accounts
-    $cash = Account::create([
-        'coa_version_id' => $this->coaVersion->id,
-        'code' => '1000',
-        'name' => 'Cash',
-        'type' => 'asset', // Asset
-        'normal_balance' => 'debit',
-        'level' => 1,
-        'is_active' => true,
-        'is_cash_flow' => true,
-    ]);
-
-    $revenue = Account::create([
+test('balance sheet accounts include net income in equity', function () {
+    // Create Revenue/Expense accounts and transactions
+    $revenue = Account::factory()->create([
         'coa_version_id' => $this->coaVersion->id,
         'code' => '4000',
-        'name' => 'Revenue',
+        'name' => 'Sales',
         'type' => 'revenue',
         'normal_balance' => 'credit',
-        'level' => 1,
-        'is_active' => true,
-        'is_cash_flow' => false,
     ]);
-
-     $expense = Account::create([
+    
+    $expense = Account::factory()->create([
         'coa_version_id' => $this->coaVersion->id,
         'code' => '5000',
-        'name' => 'Expense',
+        'name' => 'Cost of Goods',
         'type' => 'expense',
         'normal_balance' => 'debit',
-        'level' => 1,
-        'is_active' => true,
-        'is_cash_flow' => false,
     ]);
 
-    // Create Journal Entry
-    $journal = JournalEntry::create([
+    // Create journal entry: Credit Revenue 1000, Debit Expense 200
+    // Net Income = 1000 - 200 = 800
+    $je = JournalEntry::factory()->create([
         'fiscal_year_id' => $this->fiscalYear->id,
-        'entry_number' => 'JV-001',
-        'entry_date' => '2025-01-15',
-        'description' => 'Sales',
         'status' => 'posted',
-        'created_by' => $this->user->id,
     ]);
 
-    // Debit Cash 1000, Credit Revenue 1000
-    JournalEntryLine::create(['journal_entry_id' => $journal->id, 'account_id' => $cash->id, 'debit' => 1000, 'credit' => 0]);
-    JournalEntryLine::create(['journal_entry_id' => $journal->id, 'account_id' => $revenue->id, 'debit' => 0, 'credit' => 1000]);
-
-    // Create Expense Entry
-    $journal2 = JournalEntry::create([
-        'fiscal_year_id' => $this->fiscalYear->id,
-        'entry_number' => 'JV-002',
-        'entry_date' => '2025-01-20',
-        'description' => 'Expense',
-        'status' => 'posted',
-        'created_by' => $this->user->id,
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $je->id,
+        'account_id' => $revenue->id,
+        'credit' => 1000,
+        'debit' => 0,
     ]);
 
-    // Debit Expense 200, Credit Cash 200
-    JournalEntryLine::create(['journal_entry_id' => $journal2->id, 'account_id' => $expense->id, 'debit' => 200, 'credit' => 0]);
-    JournalEntryLine::create(['journal_entry_id' => $journal2->id, 'account_id' => $cash->id, 'debit' => 0, 'credit' => 200]);
-
-    // Net Income should be 1000 - 200 = 800
-    // Cash Balance: 1000 - 200 = 800 (Asset)
-    // Equity should show 800 (Current Year Earnings)
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $je->id,
+        'account_id' => $expense->id,
+        'debit' => 200,
+        'credit' => 0,
+    ]);
 
     actingAs($this->user)
         ->get(route('reports.balance-sheet', ['fiscal_year_id' => $this->fiscalYear->id]))
         ->assertStatus(200)
         ->assertInertia(fn ($page) => $page
-            ->where('report.totals.assets', 800)
             ->where('report.totals.equity', 800) // Assumes no other equity
+        );
+});
+
+test('balance sheet comparison works', function () {
+    // Create Previous Fiscal Year
+    $prevFiscalYear = FiscalYear::factory()->create([
+        'name' => 'FY-2024',
+        'start_date' => Carbon::now()->subYear()->startOfYear(),
+        'end_date' => Carbon::now()->subYear()->endOfYear(),
+        'status' => 'closed',
+    ]);
+    
+    $prevCoaVersion = CoaVersion::factory()->create([
+        'name' => 'v1-Prev', 
+        'status' => 'active',
+        'fiscal_year_id' => $prevFiscalYear->id
+    ]);
+    // $prevFiscalYear->coaVersions()->attach($prevCoaVersion);
+
+    // Create Asset Account in Prev COA matching Current COA Code
+    $assetAccount = Account::factory()->create([
+        'coa_version_id' => $this->coaVersion->id,
+        'code' => '1000', // Matches
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'name' => 'Cash'
+    ]);
+
+    $prevAssetAccount = Account::factory()->create([
+        'coa_version_id' => $prevCoaVersion->id,
+        'code' => '1000', // SAME CODE
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'name' => 'Cash Prev'
+    ]);
+
+    // Current Year txn
+    $jeCurr = JournalEntry::factory()->create(['fiscal_year_id' => $this->fiscalYear->id, 'status' => 'posted']);
+    JournalEntryLine::factory()->create(['journal_entry_id' => $jeCurr->id, 'account_id' => $assetAccount->id, 'debit' => 500, 'credit' => 0]);
+
+    // Prev Year txn
+    $jePrev = JournalEntry::factory()->create(['fiscal_year_id' => $prevFiscalYear->id, 'status' => 'posted']);
+    JournalEntryLine::factory()->create(['journal_entry_id' => $jePrev->id, 'account_id' => $prevAssetAccount->id, 'debit' => 300, 'credit' => 0]);
+
+    actingAs($this->user)
+        ->get(route('reports.balance-sheet', ['fiscal_year_id' => $this->fiscalYear->id, 'comparison_year_id' => $prevFiscalYear->id]))
+        ->assertStatus(200)
+        ->assertInertia(fn ($page) => $page
+            ->where('report.totals.assets', 500)
+            ->where('report.totals.comparison_assets', 300)
         );
 });

@@ -19,6 +19,8 @@ interface AccountItem {
     code: string;
     name: string;
     type: string;
+    level: number;
+    parent_id: number | null;
     normal_balance: 'debit' | 'credit';
     debit: number;
     credit: number;
@@ -36,14 +38,14 @@ export default function TrialBalance({ fiscalYears, selectedYearId, report }: Pr
     const isBalanced = Math.abs(totalDebit - totalCredit) < 0.01;
 
     const handleYearChange = (value: string) => {
-        router.get(route('reports.trial-balance'), { fiscal_year_id: value }, {
+        router.get('/reports/trial-balance', { fiscal_year_id: value }, {
             preserveState: true,
             preserveScroll: true,
         });
     };
 
     return (
-        <AppLayout breadcrumbs={[{ label: 'Reports' }, { label: 'Trial Balance' }]}>
+        <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Trial Balance', href: '/reports/trial-balance' }]}>
             <Head title="Trial Balance" />
 
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
@@ -95,7 +97,11 @@ export default function TrialBalance({ fiscalYears, selectedYearId, report }: Pr
                                         report.map((item) => (
                                             <TableRow key={item.id}>
                                                 <TableCell className="font-mono">{item.code}</TableCell>
-                                                <TableCell>{item.name}</TableCell>
+                                                <TableCell>
+                                                    <div style={{ paddingLeft: `${(item.level - 1) * 1.5}rem` }}>
+                                                        {item.name}
+                                                    </div>
+                                                </TableCell>
                                                 <TableCell className="capitalize">{item.type}</TableCell>
                                                 <TableCell className="text-right">
                                                     {item.debit !== 0 ? formatCurrency(item.debit) : '-'}

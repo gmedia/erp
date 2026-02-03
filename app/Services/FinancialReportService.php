@@ -78,16 +78,14 @@ class FinancialReportService
                 'name' => $account->name,
                 'type' => $account->type,
                 'normal_balance' => $account->normal_balance,
+                'level' => $account->level,
+                'parent_id' => $account->parent_id,
                 'debit' => $netDebit, // Net Movement
                 'credit' => $netCredit, // Net Movement
                 'raw_debit' => $debit, // Total Debits in period
                 'raw_credit' => $credit, // Total Credits in period
             ];
-        })->filter(function($item) {
-            // Optional: Filter out zero balance accounts? 
-            // Usually we keep them to show the COA structure, but let's filter if both are 0
-            return $item['debit'] != 0 || $item['credit'] != 0 || $item['raw_debit'] != 0 || $item['raw_credit'] != 0;
-        })->values();
+        })->values(); // Remove filter to show all accounts
 
         return $report->toArray();
     }
@@ -95,51 +93,110 @@ class FinancialReportService
     /**
      * Get Balance Sheet Report
      */
-    public function getBalanceSheet(int $fiscalYearId): array
+    public function getBalanceSheet(int $fiscalYearId, ?int $comparisonFiscalYearId = null): array
     {
         $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
         $coaVersion = $fiscalYear->coaVersions()->where('status', 'active')->first();
         
         if (!$coaVersion) return [];
 
-        // 1. Calculate Net Income (Revenue - Expenses) for Current Year Earnings
+        // 1. Calculate Net Income for Current Year
         $netIncome = $this->calculateNetIncome($fiscalYearId, $coaVersion->id);
+        
+        // 2. Calculate Net Income for Comparison Year (if exists)
+        $comparisonNetIncome = 0;
+        $comparisonCoaVersion = null;
+        if ($comparisonFiscalYearId) {
+             $comparisonFiscalYear = FiscalYear::find($comparisonFiscalYearId);
+             // Ideally we should find the COA version used in that year. 
+             // Simplification: Assume logic allows finding it.
+             $comparisonCoaVersion = $comparisonFiscalYear?->coaVersions()->where('status', 'active')->first();
+             if ($comparisonCoaVersion) {
+                 $comparisonNetIncome = $this->calculateNetIncome($comparisonFiscalYearId, $comparisonCoaVersion->id);
+             }
+        }
 
-        // 2. Get Asset, Liability, Equity Accounts
+        // 3. Get Asset, Liability, Equity Accounts
+        // We need to fetch balances for BOTH years.
+        // Complex part: COA might be different. 
+        // For this task, we assume we display the CURRENT COA structure, 
+        // and map previous years data to it IF possible (via mapping or just same code).
+        // Design doc says: "Sistem akan mencoba mencocokkan akun berdasarkan kolom code."
+        
         $accounts = Account::where('coa_version_id', $coaVersion->id)
             ->whereIn('type', ['asset', 'liability', 'equity'])
             ->withSum(['journalLines as total_debit' => function ($query) use ($fiscalYearId) {
                  $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)
-                      ->where('status', 'posted');
+                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
                 });
             }], 'debit')
              ->withSum(['journalLines as total_credit' => function ($query) use ($fiscalYearId) {
                  $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)
-                      ->where('status', 'posted');
+                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
                 });
             }], 'credit')
             ->orderBy('code')
             ->get();
 
+        // If comparison needed, we might need a separate query to get comparison balances 
+        // because we can't easily sum relations with different filters in one go (unless we use different aliases).
+        // Let's use separate aliases if possible, OR just separate query.
+        // Eloquent `withSum` uses subqueries, so we can add more `withSum` for comparison.
+        
+        $comparisonBalances = [];
+        if ($comparisonFiscalYearId && $comparisonCoaVersion) {
+            // We need to get balances of accounts in the COMPARISON COA, 
+            // then map them to CURRENT COA codes.
+            $comparisonAccounts = Account::where('coa_version_id', $comparisonCoaVersion->id)
+                ->whereIn('type', ['asset', 'liability', 'equity'])
+                ->withSum(['journalLines as total_debit' => function ($query) use ($comparisonFiscalYearId) {
+                     $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
+                        $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
+                    });
+                }], 'debit')
+                 ->withSum(['journalLines as total_credit' => function ($query) use ($comparisonFiscalYearId) {
+                     $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
+                        $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
+                    });
+                }], 'credit')
+                ->get()
+                ->keyBy('code'); // Map by code for easy lookup
+                
+             $comparisonBalances = $comparisonAccounts;
+        }
+
         $assets = [];
         $liabilities = [];
         $equity = [];
+        
+        // Track totals
+        $totals = [
+            'assets' => 0,
+            'liabilities' => 0,
+            'equity' => 0,
+            'comparison_assets' => 0,
+            'comparison_liabilities' => 0,
+            'comparison_equity' => 0,
+        ];
 
         foreach ($accounts as $account) {
             $debit = $account->total_debit ?? 0;
             $credit = $account->total_credit ?? 0;
             
-            $balance = 0;
-            if ($account->normal_balance === 'debit') {
-                $balance = $debit - $credit;
-            } else {
-                $balance = $credit - $debit;
+            $balance = ($account->normal_balance === 'debit') ? ($debit - $credit) : ($credit - $debit);
+            
+            // Get Comparison Balance
+            $compBalance = 0;
+            if ($comparisonFiscalYearId) {
+                // Find account with same code in comparison year
+                if (isset($comparisonBalances[$account->code])) {
+                    $compAcc = $comparisonBalances[$account->code];
+                    $compDebit = $compAcc->total_debit ?? 0;
+                    $compCredit = $compAcc->total_credit ?? 0;
+                    // Assume normal balance is same as current account (safe assumption for same code)
+                    $compBalance = ($account->normal_balance === 'debit') ? ($compDebit - $compCredit) : ($compCredit - $compDebit);
+                }
             }
-
-            // Exclude zero balance accounts if desired, or keep them. keeping them for now.
-            // if ($balance == 0) continue;
 
             $item = [
                  'id' => $account->id,
@@ -148,40 +205,44 @@ class FinancialReportService
                  'level' => $account->level,
                  'parent_id' => $account->parent_id,
                  'balance' => $balance,
+                 'comparison_balance' => $compBalance,
                  'sub_type' => $account->sub_type
             ];
 
             if ($account->type === 'asset') {
                 $assets[] = $item;
+                $totals['assets'] += $balance;
+                $totals['comparison_assets'] += $compBalance;
             } elseif ($account->type === 'liability') {
                 $liabilities[] = $item;
+                $totals['liabilities'] += $balance;
+                $totals['comparison_liabilities'] += $compBalance;
             } elseif ($account->type === 'equity') {
                 $equity[] = $item;
+                $totals['equity'] += $balance;
+                $totals['comparison_equity'] += $compBalance;
             }
         }
 
         // Add Current Year Earnings to Equity
-        if ($netIncome != 0) {
-            $equity[] = [
-                'id' => 'current_year_earnings',
-                'code' => '9999-CYE', // Temporary code
-                'name' => 'Current Year Earnings',
-                'level' => 1,
-                'parent_id' => null, // Top level
-                'balance' => $netIncome,
-                'sub_type' => 'equity'
-            ];
-        }
+        $equity[] = [
+            'id' => 'current_year_earnings',
+            'code' => '9999-CYE',
+            'name' => 'Current Year Earnings',
+            'level' => 1,
+            'parent_id' => null,
+            'balance' => $netIncome,
+            'comparison_balance' => $comparisonNetIncome,
+            'sub_type' => 'equity'
+        ];
+        $totals['equity'] += $netIncome;
+        $totals['comparison_equity'] += $comparisonNetIncome;
 
         return [
             'assets' => $this->buildTree($assets),
             'liabilities' => $this->buildTree($liabilities),
             'equity' => $this->buildTree($equity),
-            'totals' => [
-                'assets' => collect($assets)->sum('balance'),
-                'liabilities' => collect($liabilities)->sum('balance'),
-                'equity' => collect($equity)->sum('balance'),
-            ]
+            'totals' => $totals
         ];
     }
 
@@ -220,32 +281,37 @@ class FinancialReportService
         return $revenue - $expense;
     }
 
+
+
+
     private function buildTree(array $elements, $parentId = null): array
     {
         $branch = [];
 
         foreach ($elements as $element) {
             if ($element['parent_id'] == $parentId) {
+                // We MUST pass $elements (the full flat list) to find children.
                 $children = $this->buildTree($elements, $element['id']);
+                
+                // Initialize default if not set (for safety, though we set it in main loop)
+                $element['balance'] = $element['balance'] ?? 0;
+                $element['comparison_balance'] = $element['comparison_balance'] ?? 0;
+
                 if ($children) {
                     $element['children'] = $children;
-                    // Aggregate balance from children if this is a header account
-                    // But assume 'balance' already has posted values. 
-                    // If header accounts don't have direct entries, we might need to sum children.
-                    // For typical COA, direct posting to headers is disabled, they just aggregate.
-                    // BUT, current query gets balance from JournalEntryLines directly linked to this account.
-                    // If this is a header account, it likely has 0 balance in lines. 
-                    // So we should sum children balance to this node.
+                    
+                    // Aggregate balances from children
+                    // NOTE: This assumes PARENT ACCOUNTS *DO NOT* HAVE DIRECT POSTINGS.
+                    // If they do, we should ADD children sum to existing balance.
+                    // Our service logic above fetched direct postings.
+                    // So we ADD children sum.
+                    
                     $element['balance'] += collect($children)->sum('balance');
+                    $element['comparison_balance'] += collect($children)->sum('comparison_balance');
                 }
                 $branch[] = $element;
             }
         }
-
-        // What if there are elements with parent_ids that are not in the list?
-        // (e.g. parent is not asset/liability/equity? Unlikely)
-        // Or if filter excluded the parent?
-        // For now, assume tree is clean.
 
         return $branch;
     }
