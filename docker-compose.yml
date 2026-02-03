@@ -11,10 +11,10 @@ services:
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
-            - '${APP_PORT:-80}:80'
-            - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
-            - '${COVERAGE_PORT:-9000}:9000'
-            - '${COVERAGE_NEW_PORT:-9001}:9001'
+            - '${HOST_IP}:${APP_PORT:-80}:80'
+            - '${HOST_IP}:${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+            - '${HOST_IP}:${COVERAGE_PORT:-9000}:9000'
+            - '${HOST_IP}:${COVERAGE_NEW_PORT:-9001}:9001'
         environment:
             WWWUSER: '${WWWUSER}'
             WWWGROUP: '${WWWGROUP}'
@@ -32,7 +32,7 @@ services:
     mariadb:
         image: 'mariadb:11'
         # ports:
-        #     - '${FORWARD_DB_PORT:-3306}:3306'
+        #     - '${HOST_IP}:${FORWARD_DB_PORT:-3306}:3306'
         environment:
             MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
             MYSQL_ROOT_HOST: '%'
@@ -56,7 +56,7 @@ services:
     valkey:
         image: 'valkey/valkey:alpine'
         # ports:
-        #     - '${FORWARD_VALKEY_PORT:-6379}:6379'
+        #     - '${HOST_IP}:${FORWARD_VALKEY_PORT:-6379}:6379'
         volumes:
             - 'sail-valkey:/data'
         networks:
