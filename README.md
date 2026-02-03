@@ -8,13 +8,9 @@
     ```
     bash project_setup.sh
     ```
-- Run App
+- Open App
     ```
-    sail up -d
-    ```
-- Run Vite
-    ```
-    sail npm run dev
+    http://localhost:81
     ```
 - Generate autocompletion for Facades
     ```
@@ -51,7 +47,7 @@
     ```
 - Run Playwright e2e test
     ```
-    npm run test:e2e
+    sail npm run test:e2e
     ```
 - Start analyzing using the SonarQube scanner
     ```
