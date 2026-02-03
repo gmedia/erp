@@ -6,8 +6,32 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Modul: Manajemen Aset (Fixed Assets & Asset Tracking)
+     *
+     * Tujuan desain:
+     * - Menyimpan master data aset (nilai perolehan, lokasi, PIC, status).
+     * - Menyimpan audit trail pergerakan aset (transfer/assign/return/dispose).
+     * - Mendukung maintenance dan stocktake (inventarisasi berkala).
+     * - Mendukung proses depresiasi periodik dan link ke jurnal akuntansi.
+     *
+     * Contoh kasus yang didukung:
+     * 1) Pembelian aset: buat record di `assets` + log awal di `asset_movements` (movement_type = acquired).
+     * 2) Mutasi aset: pindah cabang/ruang/PIC, update kolom “current state” di `assets`,
+     *    lalu simpan histori di `asset_movements` (movement_type = transfer/assign/return).
+     * 3) Stocktake: buat `asset_stocktakes`, lalu `asset_stocktake_items` untuk hasil cek per aset
+     *    (found/missing/damaged/moved) termasuk lokasi expected vs found.
+     * 4) Depresiasi bulanan: buat `asset_depreciation_runs` (periode), generate `asset_depreciation_lines`
+     *    per aset, lalu (opsional) posting ke `journal_entries` dan simpan `journal_entry_id`.
+     *
+     * Catatan teknis:
+     * - Beberapa unique constraint diberi nama manual agar aman di MariaDB (limit panjang nama index).
+     */
     public function up(): void
     {
+        // ==============================
+        // Master: Kategori & Model Aset
+        // ==============================
         Schema::create('asset_categories', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
@@ -27,6 +51,10 @@ return new class extends Migration
             $table->index('asset_category_id');
         });
 
+        // ==============================
+        // Master: Lokasi Aset (hierarki)
+        // ==============================
+        // Lokasi ini melengkapi `branches` (Cabang). Contoh hierarki: Cabang -> Gedung -> Lantai -> Ruang.
         Schema::create('asset_locations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('branch_id')->constrained('branches')->restrictOnDelete();
@@ -35,11 +63,17 @@ return new class extends Migration
             $table->string('name');
             $table->timestamps();
 
+            // Kode lokasi unik dalam satu cabang.
             $table->unique(['branch_id', 'code'], 'asset_locations_branch_code_unique');
             $table->index('parent_id');
             $table->index('branch_id');
         });
 
+        // ==============================
+        // Master: Aset (current state)
+        // ==============================
+        // Kolom lokasi/department/employee di sini merepresentasikan kondisi terkini.
+        // Riwayat perubahan disimpan di `asset_movements`.
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
             $table->string('asset_code')->unique();
@@ -64,6 +98,9 @@ return new class extends Migration
             $table->enum('condition', ['good', 'needs_repair', 'damaged'])->nullable();
             $table->text('notes')->nullable();
 
+            // Depresiasi:
+            // - Jika akun depresiasi diset per aset, isi account_id di bawah.
+            // - Nilai accumulated/book_value disimpan sebagai cache (bisa dihitung ulang dari depreciation lines).
             $table->enum('depreciation_method', ['straight_line', 'declining_balance'])->default('straight_line');
             $table->date('depreciation_start_date')->nullable();
             $table->integer('useful_life_months')->nullable();
@@ -86,6 +123,10 @@ return new class extends Migration
             $table->index('serial_number');
         });
 
+        // ==============================
+        // Audit Trail: Pergerakan Aset
+        // ==============================
+        // Semua transfer/assign/return/dispose dicatat di sini untuk kebutuhan audit.
         Schema::create('asset_movements', function (Blueprint $table) {
             $table->id();
             $table->foreignId('asset_id')->constrained('assets')->cascadeOnDelete();
@@ -112,6 +153,10 @@ return new class extends Migration
             $table->index('to_employee_id');
         });
 
+        // ==============================
+        // Maintenance / Servis Aset
+        // ==============================
+        // Catatan biaya maintenance bisa dipakai untuk analisis (TCO) dan histori kerusakan.
         Schema::create('asset_maintenances', function (Blueprint $table) {
             $table->id();
             $table->foreignId('asset_id')->constrained('assets')->cascadeOnDelete();
@@ -130,6 +175,10 @@ return new class extends Migration
             $table->index('maintenance_type');
         });
 
+        // ==============================
+        // Stocktake (Inventarisasi)
+        // ==============================
+        // 1 record stocktake bisa memiliki banyak item hasil cek aset.
         Schema::create('asset_stocktakes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('branch_id')->constrained('branches')->restrictOnDelete();
@@ -145,6 +194,8 @@ return new class extends Migration
             $table->index('status');
         });
 
+        // Item hasil cek stocktake.
+        // expected_* adalah lokasi/cabang yang seharusnya, found_* adalah yang ditemukan di lapangan.
         Schema::create('asset_stocktake_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('asset_stocktake_id')->constrained('asset_stocktakes')->cascadeOnDelete();
@@ -166,6 +217,11 @@ return new class extends Migration
             $table->index('result');
         });
 
+        // ==============================
+        // Depresiasi: Header Periode
+        // ==============================
+        // Satu periode depresiasi (mis. 1 bulan) disimpan sebagai satu "run".
+        // Jika sudah diposting, `journal_entry_id` akan menunjuk jurnal yang dibuat.
         Schema::create('asset_depreciation_runs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('fiscal_year_id')->constrained('fiscal_years')->cascadeOnDelete();
@@ -183,6 +239,8 @@ return new class extends Migration
             $table->index('fiscal_year_id');
         });
 
+        // Depresiasi: detail per aset untuk satu periode/run.
+        // Constraint unik memastikan satu aset hanya punya 1 baris depresiasi per run.
         Schema::create('asset_depreciation_lines', function (Blueprint $table) {
             $table->id();
             $table->foreignId('asset_depreciation_run_id')->constrained('asset_depreciation_runs')->cascadeOnDelete();
