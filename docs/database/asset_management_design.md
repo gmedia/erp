@@ -306,11 +306,17 @@ Bagian ini merangkum menu yang umumnya dibutuhkan untuk menjalankan modul manaje
 #### 1) Asset Categories
 Tujuan: mengelola kategori aset dan default masa manfaat.
 
+Jenis menu: Simple CRUD  
+Agent skill: `feature-crud-simple`
+
 Tabel terlibat:
 * `asset_categories`
 
 #### 2) Asset Models
 Tujuan: mengelola template/model aset (spesifikasi standar).
+
+Jenis menu: Complex CRUD  
+Agent skill: `feature-crud-complex`
 
 Tabel terlibat:
 * `asset_models`
@@ -318,6 +324,9 @@ Tabel terlibat:
 
 #### 3) Asset Locations
 Tujuan: mengelola lokasi fisik aset per cabang dengan hierarki.
+
+Jenis menu: Complex CRUD  
+Agent skill: `feature-crud-complex`
 
 Tabel terlibat:
 * `asset_locations`
@@ -329,6 +338,9 @@ Tabel terlibat:
 
 #### 4) Assets (List & Form)
 Tujuan: registrasi aset baru, edit data aset, dan mengelola “current state” (lokasi, PIC, status).
+
+Jenis menu: Complex CRUD  
+Agent skill: `feature-crud-complex`
 
 Tabel terlibat:
 * `assets`
@@ -348,6 +360,9 @@ Catatan proses:
 #### 5) Asset Detail (Profile)
 Tujuan: melihat ringkasan aset + tab histori (movement, maintenance, stocktake, depresiasi).
 
+Jenis menu: Non-CRUD  
+Agent skill: `feature-non-crud`
+
 Tabel terlibat:
 * `assets`
 * `asset_movements`
@@ -358,6 +373,9 @@ Tabel terlibat:
 
 #### 6) Asset Movements (Transfer / Assignment)
 Tujuan: membuat dokumen perpindahan aset (mutasi antar cabang/ruang/PIC) dan audit trail.
+
+Jenis menu: Non-CRUD  
+Agent skill: `feature-non-crud`
 
 Tabel terlibat:
 * `asset_movements`
@@ -373,6 +391,9 @@ Contoh kasus:
 
 #### 7) Asset Maintenance
 Tujuan: mencatat jadwal/riwayat perawatan dan biaya.
+
+Jenis menu: Complex CRUD  
+Agent skill: `feature-crud-complex`
 
 Tabel terlibat:
 * `asset_maintenances`
@@ -390,6 +411,9 @@ Contoh kasus:
 #### 8) Asset Stocktake (Header)
 Tujuan: membuat event stocktake per cabang/per periode (jadwal & status).
 
+Jenis menu: Complex CRUD  
+Agent skill: `feature-crud-complex`
+
 Tabel terlibat:
 * `asset_stocktakes`
 * `branches`
@@ -397,6 +421,9 @@ Tabel terlibat:
 
 #### 9) Asset Stocktake (Items)
 Tujuan: mengisi hasil cek per aset dan mencatat selisih (expected vs found).
+
+Jenis menu: Non-CRUD  
+Agent skill: `feature-non-crud`
 
 Tabel terlibat:
 * `asset_stocktake_items`
@@ -416,6 +443,9 @@ Contoh kasus:
 #### 10) Depreciation Run (Calculate)
 Tujuan: memilih periode, menghitung depresiasi untuk aset yang eligible.
 
+Jenis menu: Non-CRUD  
+Agent skill: `feature-non-crud`
+
 Tabel terlibat:
 * `asset_depreciation_runs`
 * `asset_depreciation_lines`
@@ -424,6 +454,9 @@ Tabel terlibat:
 
 #### 11) Depreciation Run (Post to Journal)
 Tujuan: posting hasil depresiasi menjadi jurnal akuntansi (debit beban, kredit akumulasi).
+
+Jenis menu: Non-CRUD  
+Agent skill: `feature-non-crud`
 
 Tabel terlibat:
 * `asset_depreciation_runs` (kolom `journal_entry_id`, `posted_by`, `posted_at`)
@@ -444,6 +477,9 @@ Contoh kasus:
 #### 12) Asset Register / Asset Listing Report
 Tujuan: daftar aset lengkap + filter (kategori, status, cabang, lokasi, PIC).
 
+Jenis menu: Non-CRUD  
+Agent skill: `feature-non-crud`
+
 Tabel terlibat:
 * `assets`
 * `asset_categories`, `asset_models`
@@ -454,6 +490,9 @@ Tabel terlibat:
 #### 13) Book Value & Depreciation Report
 Tujuan: laporan nilai buku dan depresiasi per periode/per aset.
 
+Jenis menu: Non-CRUD  
+Agent skill: `feature-non-crud`
+
 Tabel terlibat:
 * `assets`
 * `asset_depreciation_runs`, `asset_depreciation_lines`
@@ -463,6 +502,9 @@ Tabel terlibat:
 #### 14) Maintenance Cost Report
 Tujuan: biaya maintenance per aset/per periode/per vendor.
 
+Jenis menu: Non-CRUD  
+Agent skill: `feature-non-crud`
+
 Tabel terlibat:
 * `asset_maintenances`
 * `assets`
@@ -470,6 +512,9 @@ Tabel terlibat:
 
 #### 15) Stocktake Variance Report
 Tujuan: daftar aset missing/damaged/moved pada suatu stocktake.
+
+Jenis menu: Non-CRUD  
+Agent skill: `feature-non-crud`
 
 Tabel terlibat:
 * `asset_stocktakes`
