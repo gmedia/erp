@@ -19,3 +19,7 @@ export function formatCurrency(
         currency,
     }).format(numValue);
 }
+
+export function formatRupiah(value: string | number): string {
+    return formatCurrency(value, 'IDR', 'id-ID');
+}

@@ -12,7 +12,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { formatCurrency } from '@/utils/formatters';
+import { formatRupiah } from '@/utils/formatters';
 import { Product } from '@/types/entity';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTranslation } from '@/contexts/i18n-context';
@@ -70,8 +70,8 @@ export const ProductViewModal = memo<ProductViewModalProps>(
                         <div className="md:col-span-2 space-y-4 border-b pb-4">
                             <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Pricing</h3>
                             <div className="grid grid-cols-3 gap-4">
-                                <ViewField label="Cost" value={formatCurrency(item.cost)} />
-                                <ViewField label="Selling Price" value={formatCurrency(item.selling_price)} />
+                                <ViewField label="Cost" value={formatRupiah(item.cost)} />
+                                <ViewField label="Selling Price" value={formatRupiah(item.selling_price)} />
                                 <ViewField label="Markup" value={`${item.markup_percentage || '0'}%`} />
                             </div>
                         </div>
