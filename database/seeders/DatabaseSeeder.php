@@ -65,6 +65,7 @@ class DatabaseSeeder extends Seeder
             CustomerCategorySeeder::class,
             SupplierCategorySeeder::class,
             ProductSampleDataSeeder::class,
+            AssetSampleDataSeeder::class,
         ]);
     }
 }
