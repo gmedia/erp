@@ -6,7 +6,7 @@ use Inertia\Inertia;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('posting-journals', function () {
-        return Inertia::render('PostingJournal/Index');
+        return Inertia::render('posting-journals/index');
     })->name('posting-journals')->middleware('permission:posting_journal');
 });
 
