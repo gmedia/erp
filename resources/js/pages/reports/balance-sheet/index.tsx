@@ -20,6 +20,8 @@ interface AccountNode {
     name: string;
     balance: number;
     comparison_balance?: number;
+    change?: number;
+    change_percentage?: number;
     children?: AccountNode[];
     level: number;
 }
@@ -39,6 +41,12 @@ interface Props {
             comparison_assets?: number;
             comparison_liabilities?: number;
             comparison_equity?: number;
+            change_assets?: number;
+            change_percentage_assets?: number;
+            change_liabilities?: number;
+            change_percentage_liabilities?: number;
+            change_equity?: number;
+            change_percentage_equity?: number;
         };
     };
 }
@@ -71,9 +79,17 @@ const AccountRow = ({ node, isExpanded = true, showComparison = false }: { node:
                         {formatCurrency(node.balance)}
                     </div>
                     {showComparison && (
-                        <div className="font-mono w-32 text-muted-foreground">
-                            {formatCurrency(node.comparison_balance || 0)}
-                        </div>
+                        <>
+                            <div className="font-mono w-32 text-muted-foreground">
+                                {formatCurrency(node.comparison_balance || 0)}
+                            </div>
+                            <div className={cn("font-mono w-28", (node.change || 0) < 0 ? "text-red-500" : "text-green-500")}>
+                                {formatCurrency(node.change || 0)}
+                            </div>
+                             <div className={cn("font-mono w-16", (node.change || 0) < 0 ? "text-red-500" : "text-green-500")}>
+                                {(node.change_percentage || 0).toFixed(1)}%
+                            </div>
+                        </>
                     )}
                 </div>
             </div>
@@ -88,7 +104,7 @@ const AccountRow = ({ node, isExpanded = true, showComparison = false }: { node:
     );
 };
 
-const Section = ({ title, nodes, total, comparisonTotal, showComparison }: { title: string, nodes: AccountNode[], total: number, comparisonTotal?: number, showComparison?: boolean }) => (
+const Section = ({ title, nodes, total, comparisonTotal, change, changePercentage, showComparison }: { title: string, nodes: AccountNode[], total: number, comparisonTotal?: number, change?: number, changePercentage?: number, showComparison?: boolean }) => (
     <Card className="mb-6">
         <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
@@ -96,7 +112,15 @@ const Section = ({ title, nodes, total, comparisonTotal, showComparison }: { tit
                 <div className="flex gap-4 text-right">
                     <span className="text-lg font-bold w-32">{formatCurrency(total)}</span>
                     {showComparison && (
-                         <span className="text-lg font-bold w-32 text-muted-foreground">{formatCurrency(comparisonTotal || 0)}</span>
+                        <>
+                             <span className="text-lg font-bold w-32 text-muted-foreground">{formatCurrency(comparisonTotal || 0)}</span>
+                             <span className={cn("text-lg font-bold w-28", (change || 0) < 0 ? "text-red-500" : "text-green-500")}>
+                                {formatCurrency(change || 0)}
+                            </span>
+                            <span className={cn("text-lg font-bold w-16", (change || 0) < 0 ? "text-red-500" : "text-green-500")}>
+                                {(changePercentage || 0).toFixed(1)}%
+                            </span>
+                        </>
                     )}
                 </div>
             </div>
@@ -111,7 +135,13 @@ const Section = ({ title, nodes, total, comparisonTotal, showComparison }: { tit
                         <div className="flex-1">Account</div>
                          <div className="flex gap-4 text-right">
                             <div className="w-32">Current</div>
-                            {showComparison && <div className="w-32">Comparison</div>}
+                            {showComparison && (
+                                <>
+                                    <div className="w-32">Comparison</div>
+                                    <div className="w-28">Change</div>
+                                    <div className="w-16">%</div>
+                                </>
+                            )}
                         </div>
                     </div>
                     {nodes.map(node => (
@@ -195,6 +225,8 @@ export default function BalanceSheet({ fiscalYears, selectedYearId, comparisonYe
                         nodes={report.assets || []} 
                         total={report.totals?.assets || 0}
                         comparisonTotal={report.totals?.comparison_assets}
+                        change={report.totals?.change_assets}
+                        changePercentage={report.totals?.change_percentage_assets}
                         showComparison={!!comparisonYearId} 
                     />
 
@@ -204,6 +236,8 @@ export default function BalanceSheet({ fiscalYears, selectedYearId, comparisonYe
                             nodes={report.liabilities || []} 
                             total={report.totals?.liabilities || 0} 
                             comparisonTotal={report.totals?.comparison_liabilities}
+                            change={report.totals?.change_liabilities}
+                            changePercentage={report.totals?.change_percentage_liabilities}
                             showComparison={!!comparisonYearId} 
                         />
                         
@@ -212,6 +246,8 @@ export default function BalanceSheet({ fiscalYears, selectedYearId, comparisonYe
                             nodes={report.equity || []} 
                             total={report.totals?.equity || 0} 
                             comparisonTotal={report.totals?.comparison_equity}
+                            change={report.totals?.change_equity}
+                            changePercentage={report.totals?.change_percentage_equity}
                             showComparison={!!comparisonYearId} 
                         />
                     </div>

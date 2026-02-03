@@ -229,5 +229,7 @@ test('balance sheet comparison works', function () {
         ->assertInertia(fn ($page) => $page
             ->where('report.totals.assets', 500)
             ->where('report.totals.comparison_assets', 300)
+            ->where('report.totals.change_assets', 200) // 500 - 300
+            ->where('report.totals.change_percentage_assets', 66.66666666666666) // (200/300)*100
         );
 });

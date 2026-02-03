@@ -238,6 +238,15 @@ class FinancialReportService
         $totals['equity'] += $netIncome;
         $totals['comparison_equity'] += $comparisonNetIncome;
 
+        $totals['change_assets'] = $totals['assets'] - $totals['comparison_assets'];
+        $totals['change_percentage_assets'] = $totals['comparison_assets'] != 0 ? ($totals['change_assets'] / abs($totals['comparison_assets'])) * 100 : 0;
+
+        $totals['change_liabilities'] = $totals['liabilities'] - $totals['comparison_liabilities'];
+        $totals['change_percentage_liabilities'] = $totals['comparison_liabilities'] != 0 ? ($totals['change_liabilities'] / abs($totals['comparison_liabilities'])) * 100 : 0;
+
+        $totals['change_equity'] = $totals['equity'] - $totals['comparison_equity'];
+        $totals['change_percentage_equity'] = $totals['comparison_equity'] != 0 ? ($totals['change_equity'] / abs($totals['comparison_equity'])) * 100 : 0;
+
         return [
             'assets' => $this->buildTree($assets),
             'liabilities' => $this->buildTree($liabilities),
@@ -301,14 +310,21 @@ class FinancialReportService
                     $element['children'] = $children;
                     
                     // Aggregate balances from children
-                    // NOTE: This assumes PARENT ACCOUNTS *DO NOT* HAVE DIRECT POSTINGS.
-                    // If they do, we should ADD children sum to existing balance.
-                    // Our service logic above fetched direct postings.
-                    // So we ADD children sum.
-                    
                     $element['balance'] += collect($children)->sum('balance');
                     $element['comparison_balance'] += collect($children)->sum('comparison_balance');
                 }
+
+                // Calculate Variance (Change & Change %)
+                // Change = Current - Comparison
+                $element['change'] = $element['balance'] - $element['comparison_balance'];
+                
+                // Change % = (Change / Comparison) * 100
+                if ($element['comparison_balance'] != 0) {
+                    $element['change_percentage'] = ($element['change'] / abs($element['comparison_balance'])) * 100;
+                } else {
+                    $element['change_percentage'] = 0; // Or null to indicate N/A? Let's use 0 or handle in UI
+                }
+
                 $branch[] = $element;
             }
         }
