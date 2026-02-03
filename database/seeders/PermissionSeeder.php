@@ -165,6 +165,11 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'posting_journal',
+                'display_name' => 'Posting Journal',
+                'child' => [],
+            ],
+            [
                 'name' => 'supplier_category',
                 'display_name' => 'Supplier Category',
                 'child' => [

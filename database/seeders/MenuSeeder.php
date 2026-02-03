@@ -58,6 +58,14 @@ class MenuSeeder extends Seeder
                         'url' => 'journal-entries',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'posting_journal',
+                        'display_name' => 'Posting Journal',
+                        'permissions' => ['posting_journal'],
+                        'icon' => 'BookOpen',
+                        'url' => 'posting-journals',
+                        'child' => [],
+                    ],
                 ],
             ],
             [
