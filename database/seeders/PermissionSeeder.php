@@ -190,6 +190,11 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'comparative_report',
+                'display_name' => 'Comparative Report',
+                'child' => [],
+            ],
+            [
                 'name' => 'supplier_category',
                 'display_name' => 'Supplier Category',
                 'child' => [

@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Account;
+use App\Models\AccountMapping;
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntryLine;
 use Illuminate\Support\Collection;
@@ -21,7 +23,7 @@ class FinancialReportService
         // Based on design doc, accounts are linked to coa_version, which is linked to fiscal_year via coa_versions table.
         // However, a simpler approach for now is to find the active COA version for this fiscal year.
         
-        $coaVersion = $fiscalYear->coaVersions()->where('status', 'active')->first();
+        $coaVersion = $this->resolveCoaVersionForFiscalYear($fiscalYear);
         
         if (!$coaVersion) {
              // Fallback: try to find any version or handle error
@@ -93,7 +95,7 @@ class FinancialReportService
     public function getCashFlow(int $fiscalYearId): array
     {
         $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
-        $coaVersion = $fiscalYear->coaVersions()->where('status', 'active')->first();
+        $coaVersion = $this->resolveCoaVersionForFiscalYear($fiscalYear);
 
         if (!$coaVersion) {
             return [];
@@ -161,7 +163,7 @@ class FinancialReportService
     public function getBalanceSheet(int $fiscalYearId, ?int $comparisonFiscalYearId = null): array
     {
         $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
-        $coaVersion = $fiscalYear->coaVersions()->where('status', 'active')->first();
+        $coaVersion = $this->resolveCoaVersionForFiscalYear($fiscalYear);
         
         if (!$coaVersion) return [];
 
@@ -175,7 +177,7 @@ class FinancialReportService
              $comparisonFiscalYear = FiscalYear::find($comparisonFiscalYearId);
              // Ideally we should find the COA version used in that year. 
              // Simplification: Assume logic allows finding it.
-             $comparisonCoaVersion = $comparisonFiscalYear?->coaVersions()->where('status', 'active')->first();
+             $comparisonCoaVersion = $comparisonFiscalYear ? $this->resolveCoaVersionForFiscalYear($comparisonFiscalYear) : null;
              if ($comparisonCoaVersion) {
                  $comparisonNetIncome = $this->calculateNetIncome($comparisonFiscalYearId, $comparisonCoaVersion->id);
              }
@@ -208,26 +210,9 @@ class FinancialReportService
         // Let's use separate aliases if possible, OR just separate query.
         // Eloquent `withSum` uses subqueries, so we can add more `withSum` for comparison.
         
-        $comparisonBalances = [];
+        $comparisonBalanceByCurrentAccountId = [];
         if ($comparisonFiscalYearId && $comparisonCoaVersion) {
-            // We need to get balances of accounts in the COMPARISON COA, 
-            // then map them to CURRENT COA codes.
-            $comparisonAccounts = Account::where('coa_version_id', $comparisonCoaVersion->id)
-                ->whereIn('type', ['asset', 'liability', 'equity'])
-                ->withSum(['journalLines as total_debit' => function ($query) use ($comparisonFiscalYearId) {
-                     $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
-                        $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
-                    });
-                }], 'debit')
-                 ->withSum(['journalLines as total_credit' => function ($query) use ($comparisonFiscalYearId) {
-                     $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
-                        $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
-                    });
-                }], 'credit')
-                ->get()
-                ->keyBy('code'); // Map by code for easy lookup
-                
-             $comparisonBalances = $comparisonAccounts;
+            $comparisonBalanceByCurrentAccountId = $this->buildComparisonBalanceMap($accounts, $comparisonFiscalYearId, $comparisonCoaVersion);
         }
 
         $assets = [];
@@ -253,14 +238,7 @@ class FinancialReportService
             // Get Comparison Balance
             $compBalance = 0;
             if ($comparisonFiscalYearId) {
-                // Find account with same code in comparison year
-                if (isset($comparisonBalances[$account->code])) {
-                    $compAcc = $comparisonBalances[$account->code];
-                    $compDebit = $compAcc->total_debit ?? 0;
-                    $compCredit = $compAcc->total_credit ?? 0;
-                    // Assume normal balance is same as current account (safe assumption for same code)
-                    $compBalance = ($account->normal_balance === 'debit') ? ($compDebit - $compCredit) : ($compCredit - $compDebit);
-                }
+                $compBalance = $comparisonBalanceByCurrentAccountId[$account->id] ?? 0;
             }
 
             $item = [
@@ -323,14 +301,14 @@ class FinancialReportService
     public function getIncomeStatement(int $fiscalYearId, ?int $comparisonFiscalYearId = null): array
     {
         $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
-        $coaVersion = $fiscalYear->coaVersions()->where('status', 'active')->first();
+        $coaVersion = $this->resolveCoaVersionForFiscalYear($fiscalYear);
 
         if (!$coaVersion) return [];
 
         $comparisonCoaVersion = null;
         if ($comparisonFiscalYearId) {
             $comparisonFiscalYear = FiscalYear::find($comparisonFiscalYearId);
-            $comparisonCoaVersion = $comparisonFiscalYear?->coaVersions()->where('status', 'active')->first();
+            $comparisonCoaVersion = $comparisonFiscalYear ? $this->resolveCoaVersionForFiscalYear($comparisonFiscalYear) : null;
         }
 
         $accounts = Account::where('coa_version_id', $coaVersion->id)
@@ -348,24 +326,9 @@ class FinancialReportService
             ->orderBy('code')
             ->get();
 
-        $comparisonBalances = [];
+        $comparisonBalanceByCurrentAccountId = [];
         if ($comparisonFiscalYearId && $comparisonCoaVersion) {
-            $comparisonAccounts = Account::where('coa_version_id', $comparisonCoaVersion->id)
-                ->whereIn('type', ['revenue', 'expense'])
-                ->withSum(['journalLines as total_debit' => function ($query) use ($comparisonFiscalYearId) {
-                    $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
-                        $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
-                    });
-                }], 'debit')
-                ->withSum(['journalLines as total_credit' => function ($query) use ($comparisonFiscalYearId) {
-                    $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
-                        $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
-                    });
-                }], 'credit')
-                ->get()
-                ->keyBy('code');
-
-            $comparisonBalances = $comparisonAccounts;
+            $comparisonBalanceByCurrentAccountId = $this->buildComparisonBalanceMap($accounts, $comparisonFiscalYearId, $comparisonCoaVersion);
         }
 
         $revenues = [];
@@ -388,12 +351,7 @@ class FinancialReportService
 
             $compBalance = 0;
             if ($comparisonFiscalYearId) {
-                if (isset($comparisonBalances[$account->code])) {
-                    $compAcc = $comparisonBalances[$account->code];
-                    $compDebit = $compAcc->total_debit ?? 0;
-                    $compCredit = $compAcc->total_credit ?? 0;
-                    $compBalance = ($account->normal_balance === 'debit') ? ($compDebit - $compCredit) : ($compCredit - $compDebit);
-                }
+                $compBalance = $comparisonBalanceByCurrentAccountId[$account->id] ?? 0;
             }
 
             $item = [
@@ -437,6 +395,128 @@ class FinancialReportService
         ];
     }
 
+    public function getComparativeReport(int $fiscalYearId, ?int $comparisonFiscalYearId = null): array
+    {
+        $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
+        $coaVersion = $this->resolveCoaVersionForFiscalYear($fiscalYear);
+
+        if (!$coaVersion) {
+            return [
+                'assets' => [],
+                'liabilities' => [],
+                'equity' => [],
+                'revenues' => [],
+                'expenses' => [],
+                'totals' => [],
+            ];
+        }
+
+        $accounts = Account::where('coa_version_id', $coaVersion->id)
+            ->withSum(['journalLines as total_debit' => function ($query) use ($fiscalYearId) {
+                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
+                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
+                });
+            }], 'debit')
+            ->withSum(['journalLines as total_credit' => function ($query) use ($fiscalYearId) {
+                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
+                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
+                });
+            }], 'credit')
+            ->orderBy('code')
+            ->get();
+
+        $comparisonCoaVersion = null;
+        if ($comparisonFiscalYearId) {
+            $comparisonFiscalYear = FiscalYear::find($comparisonFiscalYearId);
+            $comparisonCoaVersion = $comparisonFiscalYear ? $this->resolveCoaVersionForFiscalYear($comparisonFiscalYear) : null;
+        }
+
+        $comparisonBalanceByCurrentAccountId = [];
+        if ($comparisonFiscalYearId && $comparisonCoaVersion) {
+            $comparisonBalanceByCurrentAccountId = $this->buildComparisonBalanceMap($accounts, $comparisonFiscalYearId, $comparisonCoaVersion);
+        }
+
+        $assets = [];
+        $liabilities = [];
+        $equity = [];
+        $revenues = [];
+        $expenses = [];
+
+        $totals = [
+            'assets' => 0,
+            'liabilities' => 0,
+            'equity' => 0,
+            'revenues' => 0,
+            'expenses' => 0,
+            'comparison_assets' => 0,
+            'comparison_liabilities' => 0,
+            'comparison_equity' => 0,
+            'comparison_revenues' => 0,
+            'comparison_expenses' => 0,
+        ];
+
+        foreach ($accounts as $account) {
+            $debit = $account->total_debit ?? 0;
+            $credit = $account->total_credit ?? 0;
+            $balance = $this->computeAccountBalance($account->normal_balance, $debit, $credit);
+
+            $compBalance = 0;
+            if ($comparisonFiscalYearId) {
+                $compBalance = $comparisonBalanceByCurrentAccountId[$account->id] ?? 0;
+            }
+
+            $item = [
+                'id' => $account->id,
+                'code' => $account->code,
+                'name' => $account->name,
+                'level' => $account->level,
+                'parent_id' => $account->parent_id,
+                'balance' => $balance,
+                'comparison_balance' => $compBalance,
+                'sub_type' => $account->sub_type,
+            ];
+
+            if ($account->type === 'asset') {
+                $assets[] = $item;
+                $totals['assets'] += $balance;
+                $totals['comparison_assets'] += $compBalance;
+            } elseif ($account->type === 'liability') {
+                $liabilities[] = $item;
+                $totals['liabilities'] += $balance;
+                $totals['comparison_liabilities'] += $compBalance;
+            } elseif ($account->type === 'equity') {
+                $equity[] = $item;
+                $totals['equity'] += $balance;
+                $totals['comparison_equity'] += $compBalance;
+            } elseif ($account->type === 'revenue') {
+                $revenues[] = $item;
+                $totals['revenues'] += $balance;
+                $totals['comparison_revenues'] += $compBalance;
+            } elseif ($account->type === 'expense') {
+                $expenses[] = $item;
+                $totals['expenses'] += $balance;
+                $totals['comparison_expenses'] += $compBalance;
+            }
+        }
+
+        foreach (['assets', 'liabilities', 'equity', 'revenues', 'expenses'] as $key) {
+            $comparisonKey = "comparison_{$key}";
+            $totals["change_{$key}"] = $totals[$key] - ($totals[$comparisonKey] ?? 0);
+            $totals["change_percentage_{$key}"] = ($totals[$comparisonKey] ?? 0) != 0
+                ? ($totals["change_{$key}"] / abs($totals[$comparisonKey])) * 100
+                : 0;
+        }
+
+        return [
+            'assets' => $this->buildTree($assets),
+            'liabilities' => $this->buildTree($liabilities),
+            'equity' => $this->buildTree($equity),
+            'revenues' => $this->buildTree($revenues),
+            'expenses' => $this->buildTree($expenses),
+            'totals' => $totals,
+        ];
+    }
+
     private function calculateNetIncome(int $fiscalYearId, int $coaVersionId): float
     {
         $accounts = Account::where('coa_version_id', $coaVersionId)
@@ -470,6 +550,159 @@ class FinancialReportService
         }
 
         return $revenue - $expense;
+    }
+
+    private function resolveCoaVersionForFiscalYear(FiscalYear $fiscalYear): ?CoaVersion
+    {
+        return $fiscalYear->coaVersions()
+            ->orderByRaw("CASE status WHEN 'active' THEN 0 WHEN 'archived' THEN 1 WHEN 'draft' THEN 2 ELSE 3 END")
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    private function computeAccountBalance(string $normalBalance, float|int $debit, float|int $credit): float
+    {
+        $debit = (float) $debit;
+        $credit = (float) $credit;
+
+        return $normalBalance === 'debit' ? ($debit - $credit) : ($credit - $debit);
+    }
+
+    private function buildComparisonBalanceMap(Collection $currentAccounts, int $comparisonFiscalYearId, CoaVersion $comparisonCoaVersion): array
+    {
+        $currentAccounts = $currentAccounts->values();
+        $currentIds = $currentAccounts->pluck('id')->all();
+        $codes = $currentAccounts->pluck('code')->unique()->values()->all();
+
+        $comparisonByCode = Account::where('coa_version_id', $comparisonCoaVersion->id)
+            ->whereIn('code', $codes)
+            ->withSum(['journalLines as total_debit' => function ($query) use ($comparisonFiscalYearId) {
+                $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
+                    $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
+                });
+            }], 'debit')
+            ->withSum(['journalLines as total_credit' => function ($query) use ($comparisonFiscalYearId) {
+                $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
+                    $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
+                });
+            }], 'credit')
+            ->get()
+            ->keyBy('code');
+
+        $comparisonBalanceByCurrentId = [];
+        foreach ($currentAccounts as $account) {
+            $comparisonBalanceByCurrentId[$account->id] = 0;
+            if (isset($comparisonByCode[$account->code])) {
+                $compAcc = $comparisonByCode[$account->code];
+                $comparisonBalanceByCurrentId[$account->id] = $this->computeAccountBalance(
+                    $compAcc->normal_balance,
+                    $compAcc->total_debit ?? 0,
+                    $compAcc->total_credit ?? 0
+                );
+            }
+        }
+
+        $mappings = AccountMapping::query()
+            ->whereIn('target_account_id', $currentIds)
+            ->get(['source_account_id', 'target_account_id', 'type']);
+
+        if ($mappings->isEmpty()) {
+            return $comparisonBalanceByCurrentId;
+        }
+
+        $sourceIds = $mappings->pluck('source_account_id')->unique()->values()->all();
+        $sourceAccounts = Account::where('coa_version_id', $comparisonCoaVersion->id)
+            ->whereIn('id', $sourceIds)
+            ->withSum(['journalLines as total_debit' => function ($query) use ($comparisonFiscalYearId) {
+                $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
+                    $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
+                });
+            }], 'debit')
+            ->withSum(['journalLines as total_credit' => function ($query) use ($comparisonFiscalYearId) {
+                $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
+                    $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
+                });
+            }], 'credit')
+            ->get();
+
+        $sourceBalanceById = [];
+        foreach ($sourceAccounts as $sourceAccount) {
+            $sourceBalanceById[$sourceAccount->id] = $this->computeAccountBalance(
+                $sourceAccount->normal_balance,
+                $sourceAccount->total_debit ?? 0,
+                $sourceAccount->total_credit ?? 0
+            );
+        }
+
+        $mappingSumByTargetId = [];
+        foreach ($mappings as $mapping) {
+            if ($mapping->type === 'split') {
+                continue;
+            }
+
+            $mappingSumByTargetId[$mapping->target_account_id] = ($mappingSumByTargetId[$mapping->target_account_id] ?? 0)
+                + ($sourceBalanceById[$mapping->source_account_id] ?? 0);
+        }
+
+        foreach ($mappingSumByTargetId as $targetId => $sum) {
+            $comparisonBalanceByCurrentId[$targetId] = $sum;
+        }
+
+        $parentMap = $currentAccounts->pluck('parent_id', 'id')->toArray();
+        $splitGroups = $mappings->where('type', 'split')->groupBy('source_account_id');
+
+        foreach ($splitGroups as $sourceId => $group) {
+            $sourceBalance = $sourceBalanceById[$sourceId] ?? 0;
+            if ($sourceBalance == 0) {
+                continue;
+            }
+
+            $targetIds = $group->pluck('target_account_id')->unique()->values()->all();
+            if (count($targetIds) === 0) {
+                continue;
+            }
+
+            $lcaTargetId = $this->lowestCommonAncestor($targetIds, $parentMap);
+            if (!$lcaTargetId) {
+                $lcaTargetId = $targetIds[0];
+            }
+
+            $comparisonBalanceByCurrentId[$lcaTargetId] = ($comparisonBalanceByCurrentId[$lcaTargetId] ?? 0) + $sourceBalance;
+        }
+
+        return $comparisonBalanceByCurrentId;
+    }
+
+    private function lowestCommonAncestor(array $nodeIds, array $parentMap): ?int
+    {
+        if (count($nodeIds) === 0) {
+            return null;
+        }
+
+        $common = $this->ancestorChain((int) $nodeIds[0], $parentMap);
+        for ($i = 1; $i < count($nodeIds); $i++) {
+            $ancestors = array_flip($this->ancestorChain((int) $nodeIds[$i], $parentMap));
+            $common = array_values(array_filter($common, fn ($id) => isset($ancestors[$id])));
+            if (count($common) === 0) {
+                return null;
+            }
+        }
+
+        return (int) $common[0];
+    }
+
+    private function ancestorChain(int $nodeId, array $parentMap): array
+    {
+        $chain = [];
+        $visited = [];
+
+        while ($nodeId && !isset($visited[$nodeId])) {
+            $visited[$nodeId] = true;
+            $chain[] = $nodeId;
+            $nodeId = (int) ($parentMap[$nodeId] ?? 0);
+        }
+
+        return $chain;
     }
 
 

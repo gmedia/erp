@@ -94,4 +94,32 @@ class ReportController extends Controller
             'report' => $report,
         ]);
     }
+
+    public function comparative(Request $request): Response
+    {
+        $fiscalYears = FiscalYear::orderBy('start_date', 'desc')->get();
+        $currentFiscalYear = $fiscalYears->firstWhere('status', 'open') ?? $fiscalYears->first();
+
+        $selectedYearId = (int) $request->input('fiscal_year_id', $currentFiscalYear?->id);
+        $defaultComparisonYearId = null;
+
+        $selectedIndex = $fiscalYears->search(fn (FiscalYear $fy) => $fy->id === $selectedYearId);
+        if (is_int($selectedIndex) && ($selectedIndex + 1) < $fiscalYears->count()) {
+            $defaultComparisonYearId = $fiscalYears[$selectedIndex + 1]->id;
+        }
+
+        $comparisonYearId = $request->input('comparison_year_id', $defaultComparisonYearId);
+
+        $report = [];
+        if ($selectedYearId) {
+            $report = $this->reportService->getComparativeReport($selectedYearId, $comparisonYearId ? (int) $comparisonYearId : null);
+        }
+
+        return Inertia::render('reports/comparative/index', [
+            'fiscalYears' => $fiscalYears,
+            'selectedYearId' => $selectedYearId,
+            'comparisonYearId' => $comparisonYearId ? (int) $comparisonYearId : null,
+            'report' => $report,
+        ]);
+    }
 }

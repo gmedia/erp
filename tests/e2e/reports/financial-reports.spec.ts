@@ -89,4 +89,17 @@ test.describe('Financial Reports', () => {
         await expect(page.getByRole('columnheader', { name: 'Inflow' })).toBeVisible();
         await expect(page.getByRole('columnheader', { name: 'Outflow' })).toBeVisible();
     });
+
+    test('can view comparative report', async ({ page }) => {
+        await page.goto('/reports/comparative');
+        await expect(page).toHaveTitle(/Comparative Report/);
+
+        await expect(page.getByRole('heading', { name: 'Comparative Report', level: 1 })).toBeVisible();
+
+        await expect(page.locator('[data-slot="card-title"]', { hasText: 'Assets' })).toBeVisible();
+        await expect(page.locator('[data-slot="card-title"]', { hasText: 'Liabilities' })).toBeVisible();
+        await expect(page.locator('[data-slot="card-title"]', { hasText: 'Equity' })).toBeVisible();
+        await expect(page.locator('[data-slot="card-title"]', { hasText: 'Revenue' })).toBeVisible();
+        await expect(page.locator('[data-slot="card-title"]', { hasText: 'Expense' })).toBeVisible();
+    });
 });
