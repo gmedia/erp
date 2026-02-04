@@ -16,10 +16,10 @@ uses(RefreshDatabase::class)->group('asset-categories');
 describe('Asset Category API Endpoints', function () {
     beforeEach(function () {
         $user = createTestUserWithPermissions([
-            'asset-category',
-            'asset-category.create',
-            'asset-category.edit',
-            'asset-category.delete'
+            'asset_category',
+            'asset_category.create',
+            'asset_category.edit',
+            'asset_category.delete'
         ]);
 
         actingAs($user);

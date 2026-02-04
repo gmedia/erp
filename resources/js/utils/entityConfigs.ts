@@ -76,6 +76,10 @@ import { ProductCategoryViewModal } from '@/components/product-categories/Produc
 import { unitColumns, type Unit } from '@/components/units/UnitColumns';
 import { UnitForm } from '@/components/units/UnitForm';
 import { UnitViewModal } from '@/components/units/UnitViewModal';
+import { assetCategoryColumns } from '@/components/asset-categories/AssetCategoryColumns';
+import { AssetCategoryForm } from '@/components/asset-categories/AssetCategoryForm';
+import { AssetCategoryViewModal } from '@/components/asset-categories/AssetCategoryViewModal';
+import { type AssetCategory } from '@/types/asset-category';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -292,11 +296,21 @@ export const customerCategoryConfig = createSimpleEntityConfig({
     filterPlaceholder: 'Search customer categories...',
 });
 
-export const assetCategoryConfig = createSimpleEntityConfig({
+export const assetCategoryConfig = createComplexEntityConfig<AssetCategory>({
     entityName: 'Asset Category',
     entityNamePlural: 'Asset Categories',
-    apiBase: 'asset-categories',
-    filterPlaceholder: 'Search asset categories...',
+    apiEndpoint: '/api/asset-categories',
+    exportEndpoint: '/api/asset-categories/export',
+    queryKey: ['asset-categories'],
+    breadcrumbs: [{ title: 'Asset Categories', href: '/asset-categories' }],
+    initialFilters: { search: '' },
+    columns: assetCategoryColumns,
+    filterFields: createSimpleEntityFilterFields('Search asset categories...'),
+    formComponent: AssetCategoryForm,
+    formType: 'complex',
+    entityNameForSearch: 'asset category',
+    viewModalComponent: AssetCategoryViewModal,
+    getDeleteMessage: createGenericDeleteMessage('Asset Category'),
 });
 
 export const productCategoryConfig = createComplexEntityConfig<ProductCategory>({
