@@ -21,6 +21,16 @@ test('edit existing product end-to-end', async ({ page }) => {
   await searchProduct(page, productCode);
   const row = page.locator('tr', { hasText: productCode });
   await expect(row).toContainText(newName);
-  await expect(row).toContainText('1,200.00');
+  const formattedPrice = new Intl.NumberFormat('id-ID', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(Number(newPrice));
+  const escapedFormattedPrice = formattedPrice.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    '\\$&'
+  );
+  await expect(row).toContainText(
+    new RegExp(`Rp[\\s\\u00A0]*${escapedFormattedPrice}`)
+  );
   await expect(row).toContainText('Inactive');
 });
