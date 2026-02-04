@@ -71,7 +71,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'report',
                 'display_name' => 'Report',
-                'permissions' => ['trial_balance_report', 'balance_sheet_report'],
+                'permissions' => ['trial_balance_report', 'balance_sheet_report', 'income_statement_report'],
                 'icon' => 'BarChart',
                 'url' => null,
                 'child' => [
@@ -89,6 +89,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['balance_sheet_report'],
                         'icon' => 'BarChart',
                         'url' => 'reports/balance-sheet',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'income_statement_report',
+                        'display_name' => 'Income Statement Report',
+                        'permissions' => ['income_statement_report'],
+                        'icon' => 'BarChart',
+                        'url' => 'reports/income-statement',
                         'child' => [],
                     ],
                 ],

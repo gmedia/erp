@@ -54,4 +54,25 @@ class ReportController extends Controller
             'report' => $report,
         ]);
     }
+
+    public function incomeStatement(Request $request): Response
+    {
+        $fiscalYears = FiscalYear::orderBy('start_date', 'desc')->get();
+        $currentFiscalYear = $fiscalYears->firstWhere('status', 'open') ?? $fiscalYears->first();
+
+        $selectedYearId = $request->input('fiscal_year_id', $currentFiscalYear?->id);
+        $comparisonYearId = $request->input('comparison_year_id');
+
+        $report = [];
+        if ($selectedYearId) {
+            $report = $this->reportService->getIncomeStatement((int) $selectedYearId, $comparisonYearId ? (int) $comparisonYearId : null);
+        }
+
+        return Inertia::render('reports/income-statement/index', [
+            'fiscalYears' => $fiscalYears,
+            'selectedYearId' => (int) $selectedYearId,
+            'comparisonYearId' => $comparisonYearId ? (int) $comparisonYearId : null,
+            'report' => $report,
+        ]);
+    }
 }

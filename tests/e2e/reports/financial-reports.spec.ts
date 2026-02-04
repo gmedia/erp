@@ -62,4 +62,18 @@ test.describe('Financial Reports', () => {
              await expect(page.getByRole('option')).not.toHaveCount(0); // Should have at least 'None' or years
         }
     });
+
+    test('can view income statement', async ({ page }) => {
+        await page.goto('/reports/income-statement');
+        await expect(page).toHaveTitle(/Income Statement/);
+
+        await expect(page.getByRole('heading', { name: 'Income Statement', level: 1 })).toBeVisible();
+
+        await expect(page.locator('[data-slot="card-title"]', { hasText: 'Revenue' })).toBeVisible();
+        await expect(page.locator('[data-slot="card-title"]', { hasText: 'Expense' })).toBeVisible();
+
+        await expect(page.getByText('Total Revenue', { exact: true })).toBeVisible();
+        await expect(page.getByText('Total Expense', { exact: true })).toBeVisible();
+        await expect(page.getByText('Net Income', { exact: true })).toBeVisible();
+    });
 });
