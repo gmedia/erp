@@ -2294,8 +2294,8 @@ export async function createAssetModel(
  * Search for an asset model by name.
  */
 export async function searchAssetModel(page: Page, query: string): Promise<void> {
-  await page.fill('input[placeholder="Search asset models..."]', query);
-  await page.press('input[placeholder="Search asset models..."]', 'Enter');
+  await page.fill('input[placeholder="Search by model name or manufacturer..."]', query);
+  await page.press('input[placeholder="Search by model name or manufacturer..."]', 'Enter');
   await page.waitForLoadState('networkidle');
 
   // Wait for the row containing the query to appear

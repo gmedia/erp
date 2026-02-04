@@ -11,16 +11,16 @@ test('filter asset models by search', async ({ page }) => {
   await page.goto('/asset-models');
 
   // Search by model name
-  await page.fill('input[placeholder="Search asset models..."]', targetName);
-  await page.press('input[placeholder="Search asset models..."]', 'Enter');
+  await page.fill('input[placeholder="Search by model name or manufacturer..."]', targetName);
+  await page.press('input[placeholder="Search by model name or manufacturer..."]', 'Enter');
   await page.waitForLoadState('networkidle');
 
   await expect(page.locator('tr', { hasText: targetName })).toBeVisible();
   await expect(page.locator('tr', { hasText: 'Alpha Model' })).not.toBeVisible();
 
   // Search by different term
-  await page.fill('input[placeholder="Search asset models..."]', 'Alpha');
-  await page.press('input[placeholder="Search asset models..."]', 'Enter');
+  await page.fill('input[placeholder="Search by model name or manufacturer..."]', 'Alpha');
+  await page.press('input[placeholder="Search by model name or manufacturer..."]', 'Enter');
   await page.waitForLoadState('networkidle');
 
   await expect(page.locator('tr', { hasText: 'Alpha Model' })).toBeVisible();

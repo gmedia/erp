@@ -1,7 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { type AssetModel } from '@/types/entity';
 
 interface AssetModelViewModalProps {
@@ -18,6 +18,7 @@ export function AssetModelViewModal({ open, onClose, item }: AssetModelViewModal
             <DialogContent className="max-w-md">
                 <DialogHeader>
                     <DialogTitle>{item.model_name}</DialogTitle>
+                    <DialogDescription>View asset model details</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div>
