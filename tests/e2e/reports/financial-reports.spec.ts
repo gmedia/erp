@@ -13,7 +13,7 @@ test.describe('Financial Reports', () => {
         // Check for main elements
         // Check for main elements
         await expect(page.getByRole('heading', { name: 'Trial Balance', level: 1 })).toBeVisible();
-        await expect(page.getByText('Trial Balance Report')).toBeVisible();
+        await expect(page.locator('[data-slot="card-title"]', { hasText: 'Trial Balance Report' })).toBeVisible();
         
         // Check for table headers
         await expect(page.getByRole('columnheader', { name: 'Code' })).toBeVisible();
