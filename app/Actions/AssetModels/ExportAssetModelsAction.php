@@ -16,7 +16,7 @@ class ExportAssetModelsAction
 
         $filters = [
             'search' => $validated['search'] ?? null,
-            'category' => $validated['category'] ?? null,
+            'asset_category_id' => $validated['asset_category_id'] ?? null,
             'sort_by' => $validated['sort_by'] ?? 'created_at',
             'sort_direction' => $validated['sort_direction'] ?? 'desc',
         ];

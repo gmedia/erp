@@ -32,8 +32,8 @@ class AssetModelExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
             });
         }
 
-        if (!empty($this->filters['category'])) {
-            $query->where('asset_category_id', $this->filters['category']);
+        if (!empty($this->filters['asset_category_id'])) {
+            $query->where('asset_category_id', $this->filters['asset_category_id']);
         }
 
         $sortBy = $this->filters['sort_by'] ?? 'created_at';

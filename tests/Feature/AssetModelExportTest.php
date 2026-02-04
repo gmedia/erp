@@ -46,7 +46,7 @@ describe('Asset Model Export', function () {
         AssetModel::factory()->create(['asset_category_id' => $category->id]);
 
         $response = $this->postJson('/api/asset-models/export', [
-            'category' => $category->id,
+            'asset_category_id' => $category->id,
         ]);
 
         $response->assertOk()
