@@ -75,4 +75,23 @@ class ReportController extends Controller
             'report' => $report,
         ]);
     }
+
+    public function cashFlow(Request $request): Response
+    {
+        $fiscalYears = FiscalYear::orderBy('start_date', 'desc')->get();
+        $currentFiscalYear = $fiscalYears->firstWhere('status', 'open') ?? $fiscalYears->first();
+
+        $selectedYearId = $request->input('fiscal_year_id', $currentFiscalYear?->id);
+
+        $report = [];
+        if ($selectedYearId) {
+            $report = $this->reportService->getCashFlow((int) $selectedYearId);
+        }
+
+        return Inertia::render('reports/cash-flow/index', [
+            'fiscalYears' => $fiscalYears,
+            'selectedYearId' => (int) $selectedYearId,
+            'report' => $report,
+        ]);
+    }
 }

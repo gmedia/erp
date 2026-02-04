@@ -2,7 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Branch;
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Position;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -46,15 +49,19 @@ class DatabaseSeeder extends Seeder
             CoaSeeder::class,
         ]);
 
+        $departmentId = Department::query()->value('id');
+        $positionId = Position::query()->value('id');
+        $branchId = Branch::query()->value('id');
+
         Employee::updateOrCreate([
             'email' => 'admin@admin.com',
             'user_id' => $admin->id,
         ], [
             'name' => 'Admin User',
             'phone' => '1234567890',
-            'department_id' => 1,
-            'position_id' => 1,
-            'branch_id' => 1,
+            'department_id' => $departmentId,
+            'position_id' => $positionId,
+            'branch_id' => $branchId,
             'salary' => 100000,
             'hire_date' => now(),
         ]);

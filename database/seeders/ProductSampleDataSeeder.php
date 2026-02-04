@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\BillOfMaterial;
+use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\CustomerSubscription;
 use App\Models\Product;
@@ -123,11 +124,13 @@ class ProductSampleDataSeeder extends Seeder
             'notes' => 'Assembly screws',
         ]);
 
+        $branchId = Branch::query()->value('id') ?? Branch::create(['name' => 'Head Office'])->id;
+
         // Production Orders
         $productionOrder = ProductionOrder::create([
             'order_number' => 'PO-20260129-0001',
             'product_id' => $officeDesk->id,
-            'branch_id' => 1,
+            'branch_id' => $branchId,
             'quantity_to_produce' => 10,
             'production_date' => now()->subDays(5),
             'completion_date' => now()->subDays(1),
@@ -275,7 +278,7 @@ class ProductSampleDataSeeder extends Seeder
         // Stock for raw materials
         ProductStock::create([
             'product_id' => $woodPanel->id,
-            'branch_id' => 1,
+            'branch_id' => $branchId,
             'quantity_on_hand' => 50,
             'quantity_reserved' => 10,
             'minimum_quantity' => 20,
@@ -284,7 +287,7 @@ class ProductSampleDataSeeder extends Seeder
 
         ProductStock::create([
             'product_id' => $tableLegs->id,
-            'branch_id' => 1,
+            'branch_id' => $branchId,
             'quantity_on_hand' => 30,
             'quantity_reserved' => 5,
             'minimum_quantity' => 15,
@@ -294,7 +297,7 @@ class ProductSampleDataSeeder extends Seeder
         // Stock for finished goods
         ProductStock::create([
             'product_id' => $officeDesk->id,
-            'branch_id' => 1,
+            'branch_id' => $branchId,
             'quantity_on_hand' => 8,
             'quantity_reserved' => 2,
             'minimum_quantity' => 5,

@@ -76,4 +76,17 @@ test.describe('Financial Reports', () => {
         await expect(page.getByText('Total Expense', { exact: true })).toBeVisible();
         await expect(page.getByText('Net Income', { exact: true })).toBeVisible();
     });
+
+    test('can view cash flow', async ({ page }) => {
+        await page.goto('/reports/cash-flow');
+        await expect(page).toHaveTitle(/Cash Flow/);
+
+        await expect(page.getByRole('heading', { name: 'Cash Flow', level: 1 })).toBeVisible();
+        await expect(page.locator('[data-slot="card-title"]', { hasText: 'Cash Flow Report' })).toBeVisible();
+
+        await expect(page.getByRole('columnheader', { name: 'Code' })).toBeVisible();
+        await expect(page.getByRole('columnheader', { name: 'Account Name' })).toBeVisible();
+        await expect(page.getByRole('columnheader', { name: 'Inflow' })).toBeVisible();
+        await expect(page.getByRole('columnheader', { name: 'Outflow' })).toBeVisible();
+    });
 });

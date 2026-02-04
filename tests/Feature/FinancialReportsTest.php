@@ -18,7 +18,7 @@ beforeEach(function () {
     // seed(); // Avoid full seed to prevent conflicts/slowness
     
     // Create necessary data for testing
-    $this->user = createTestUserWithPermissions(['trial_balance_report', 'balance_sheet_report']);
+    $this->user = createTestUserWithPermissions(['trial_balance_report', 'balance_sheet_report', 'cash_flow_report']);
     
     // Create Fiscal Year
     $this->fiscalYear = FiscalYear::create([
@@ -51,6 +51,15 @@ test('can view balance sheet page', function () {
         ->assertStatus(200)
         ->assertInertia(fn ($page) => $page
             ->component('reports/balance-sheet/index')
+        );
+});
+
+test('can view cash flow page', function () {
+    actingAs($this->user)
+        ->get(route('reports.cash-flow'))
+        ->assertStatus(200)
+        ->assertInertia(fn ($page) => $page
+            ->component('reports/cash-flow/index')
         );
 });
 
@@ -128,6 +137,99 @@ test('trial balance calculations are correct', function () {
             ->where('report.1.level', 2)
             ->where('report.1.parent_id', $parentAccount->id)
             ->where('report.1.debit', 1000)
+        );
+});
+
+test('cash flow calculations are correct', function () {
+    $cash = Account::create([
+        'coa_version_id' => $this->coaVersion->id,
+        'code' => '1100',
+        'name' => 'Cash',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'level' => 1,
+        'is_active' => true,
+        'is_cash_flow' => false,
+    ]);
+
+    $revenueCash = Account::create([
+        'coa_version_id' => $this->coaVersion->id,
+        'code' => '4100',
+        'name' => 'Cash Revenue',
+        'type' => 'revenue',
+        'normal_balance' => 'credit',
+        'level' => 1,
+        'is_active' => true,
+        'is_cash_flow' => true,
+    ]);
+
+    $expenseCash = Account::create([
+        'coa_version_id' => $this->coaVersion->id,
+        'code' => '5200',
+        'name' => 'Cash Expense',
+        'type' => 'expense',
+        'normal_balance' => 'debit',
+        'level' => 1,
+        'is_active' => true,
+        'is_cash_flow' => true,
+    ]);
+
+    $journal1 = JournalEntry::create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'entry_number' => 'JV-100',
+        'entry_date' => '2025-02-01',
+        'description' => 'Cash sale',
+        'status' => 'posted',
+        'created_by' => $this->user->id,
+    ]);
+
+    JournalEntryLine::create([
+        'journal_entry_id' => $journal1->id,
+        'account_id' => $cash->id,
+        'debit' => 1000,
+        'credit' => 0,
+    ]);
+
+    JournalEntryLine::create([
+        'journal_entry_id' => $journal1->id,
+        'account_id' => $revenueCash->id,
+        'debit' => 0,
+        'credit' => 1000,
+    ]);
+
+    $journal2 = JournalEntry::create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'entry_number' => 'JV-101',
+        'entry_date' => '2025-02-02',
+        'description' => 'Cash expense',
+        'status' => 'posted',
+        'created_by' => $this->user->id,
+    ]);
+
+    JournalEntryLine::create([
+        'journal_entry_id' => $journal2->id,
+        'account_id' => $expenseCash->id,
+        'debit' => 200,
+        'credit' => 0,
+    ]);
+
+    JournalEntryLine::create([
+        'journal_entry_id' => $journal2->id,
+        'account_id' => $cash->id,
+        'debit' => 0,
+        'credit' => 200,
+    ]);
+
+    actingAs($this->user)
+        ->get(route('reports.cash-flow', ['fiscal_year_id' => $this->fiscalYear->id]))
+        ->assertStatus(200)
+        ->assertInertia(fn ($page) => $page
+            ->component('reports/cash-flow/index')
+            ->has('report', 2)
+            ->where('report.0.code', '4100')
+            ->where('report.0.inflow', 1000)
+            ->where('report.1.code', '5200')
+            ->where('report.1.outflow', 200)
         );
 });
 

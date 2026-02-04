@@ -71,7 +71,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'report',
                 'display_name' => 'Report',
-                'permissions' => ['trial_balance_report', 'balance_sheet_report', 'income_statement_report'],
+                'permissions' => ['trial_balance_report', 'balance_sheet_report', 'income_statement_report', 'cash_flow_report'],
                 'icon' => 'BarChart',
                 'url' => null,
                 'child' => [
@@ -97,6 +97,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['income_statement_report'],
                         'icon' => 'BarChart',
                         'url' => 'reports/income-statement',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'cash_flow_report',
+                        'display_name' => 'Cash Flow Report',
+                        'permissions' => ['cash_flow_report'],
+                        'icon' => 'BarChart',
+                        'url' => 'reports/cash-flow',
                         'child' => [],
                     ],
                 ],

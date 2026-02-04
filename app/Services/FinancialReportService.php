@@ -90,6 +90,71 @@ class FinancialReportService
         return $report->toArray();
     }
 
+    public function getCashFlow(int $fiscalYearId): array
+    {
+        $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
+        $coaVersion = $fiscalYear->coaVersions()->where('status', 'active')->first();
+
+        if (!$coaVersion) {
+            return [];
+        }
+
+        $accounts = Account::where('coa_version_id', $coaVersion->id)
+            ->where('is_cash_flow', true)
+            ->withSum(['journalLines as total_debit' => function ($query) use ($fiscalYearId) {
+                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
+                    $q->where('fiscal_year_id', $fiscalYearId)
+                        ->where('status', 'posted');
+                });
+            }], 'debit')
+            ->withSum(['journalLines as total_credit' => function ($query) use ($fiscalYearId) {
+                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
+                    $q->where('fiscal_year_id', $fiscalYearId)
+                        ->where('status', 'posted');
+                });
+            }], 'credit')
+            ->orderBy('code')
+            ->get();
+
+        $report = $accounts->map(function ($account) {
+            $debit = $account->total_debit ?? 0;
+            $credit = $account->total_credit ?? 0;
+
+            $netDebit = 0;
+            $netCredit = 0;
+
+            if ($account->normal_balance === 'debit') {
+                $balance = $debit - $credit;
+                if ($balance >= 0) {
+                    $netDebit = $balance;
+                } else {
+                    $netCredit = abs($balance);
+                }
+            } else {
+                $balance = $credit - $debit;
+                if ($balance >= 0) {
+                    $netCredit = $balance;
+                } else {
+                    $netDebit = abs($balance);
+                }
+            }
+
+            return [
+                'id' => $account->id,
+                'code' => $account->code,
+                'name' => $account->name,
+                'type' => $account->type,
+                'normal_balance' => $account->normal_balance,
+                'level' => $account->level,
+                'parent_id' => $account->parent_id,
+                'inflow' => $netCredit,
+                'outflow' => $netDebit,
+            ];
+        })->values();
+
+        return $report->toArray();
+    }
+
     /**
      * Get Balance Sheet Report
      */
