@@ -173,3 +173,34 @@ export const journalEntryFormSchema = z.object({
 });
 
 export type JournalEntryFormData = z.infer<typeof journalEntryFormSchema>;
+
+/**
+ * Asset category form schema with code, name, and useful life.
+ */
+export const assetCategoryFormSchema = z.object({
+    code: z.string().min(2, { message: 'Code must be at least 2 characters.' }),
+    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    useful_life_months_default: z.coerce.number().min(1, { message: 'Useful life must be at least 1 month.' }),
+});
+
+export type AssetCategoryFormData = z.infer<typeof assetCategoryFormSchema>;
+
+/**
+ * Asset model form schema.
+ */
+export const assetModelFormSchema = z.object({
+    model_name: z.string().min(2, { message: 'Model name must be at least 2 characters.' }),
+    manufacturer: z.string().optional(),
+    asset_category_id: z.string().min(1, { message: 'Category is required.' }),
+    specs: z.string().optional().refine((val) => {
+        if (!val || val.trim() === '') return true;
+        try {
+            JSON.parse(val);
+            return true;
+        } catch {
+            return false;
+        }
+    }, { message: 'Specs must be valid JSON.' }),
+});
+
+export type AssetModelFormData = z.infer<typeof assetModelFormSchema>;

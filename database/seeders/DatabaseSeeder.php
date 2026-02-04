@@ -47,6 +47,7 @@ class DatabaseSeeder extends Seeder
             ProductCategorySeeder::class,
             UnitSeeder::class,
             CoaSeeder::class,
+            AssetCategorySeeder::class,
         ]);
 
         $departmentId = Department::query()->value('id');

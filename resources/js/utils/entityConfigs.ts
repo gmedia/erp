@@ -76,6 +76,10 @@ import { ProductCategoryViewModal } from '@/components/product-categories/Produc
 import { unitColumns, type Unit } from '@/components/units/UnitColumns';
 import { UnitForm } from '@/components/units/UnitForm';
 import { UnitViewModal } from '@/components/units/UnitViewModal';
+import { assetCategoryColumns } from '@/components/asset-categories/AssetCategoryColumns';
+import { AssetCategoryForm } from '@/components/asset-categories/AssetCategoryForm';
+import { AssetCategoryViewModal } from '@/components/asset-categories/AssetCategoryViewModal';
+import { type AssetCategory } from '@/types/asset-category';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -292,6 +296,23 @@ export const customerCategoryConfig = createSimpleEntityConfig({
     filterPlaceholder: 'Search customer categories...',
 });
 
+export const assetCategoryConfig = createComplexEntityConfig<AssetCategory>({
+    entityName: 'Asset Category',
+    entityNamePlural: 'Asset Categories',
+    apiEndpoint: '/api/asset-categories',
+    exportEndpoint: '/api/asset-categories/export',
+    queryKey: ['asset-categories'],
+    breadcrumbs: [{ title: 'Asset Categories', href: '/asset-categories' }],
+    initialFilters: { search: '' },
+    columns: assetCategoryColumns,
+    filterFields: createSimpleEntityFilterFields('Search asset categories...'),
+    formComponent: AssetCategoryForm,
+    formType: 'complex',
+    entityNameForSearch: 'asset category',
+    viewModalComponent: AssetCategoryViewModal,
+    getDeleteMessage: createGenericDeleteMessage('Asset Category'),
+});
+
 export const productCategoryConfig = createComplexEntityConfig<ProductCategory>({
     entityName: 'Product Category',
     entityNamePlural: 'Product Categories',
@@ -420,4 +441,28 @@ export const journalEntryConfig = createComplexEntityConfig<JournalEntry>({
     viewModalComponent: JournalEntryViewModal,
     getDeleteMessage: (item: any) =>
         `This action cannot be undone. This will permanently delete Journal Entry ${item.entry_number}.`,
+});
+
+import { assetModelColumns } from '@/components/asset-models/AssetModelColumns';
+import { createAssetModelFilterFields } from '@/components/asset-models/AssetModelFilters';
+import { AssetModelForm } from '@/components/asset-models/AssetModelForm';
+import { AssetModelViewModal } from '@/components/asset-models/AssetModelViewModal';
+import { type AssetModel } from '@/types/asset-model';
+
+export const assetModelConfig = createComplexEntityConfig<AssetModel>({
+    entityName: 'Asset Model',
+    entityNamePlural: 'Asset Models',
+    apiEndpoint: '/api/asset-models',
+    exportEndpoint: '/api/asset-models/export',
+    queryKey: ['asset-models'],
+    breadcrumbs: [{ title: 'Asset Models', href: '/asset-models' }],
+    initialFilters: { search: '', asset_category_id: '' },
+    columns: assetModelColumns,
+    filterFields: createAssetModelFilterFields(),
+    formComponent: AssetModelForm,
+    formType: 'complex',
+    entityNameForSearch: 'asset model',
+    viewModalComponent: AssetModelViewModal,
+    getDeleteMessage: (item: { model_name?: string }) =>
+        `This action cannot be undone. This will permanently delete ${item.model_name || 'this asset model'}.`,
 });
