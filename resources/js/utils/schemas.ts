@@ -184,3 +184,23 @@ export const assetCategoryFormSchema = z.object({
 });
 
 export type AssetCategoryFormData = z.infer<typeof assetCategoryFormSchema>;
+
+/**
+ * Asset model form schema.
+ */
+export const assetModelFormSchema = z.object({
+    model_name: z.string().min(2, { message: 'Model name must be at least 2 characters.' }),
+    manufacturer: z.string().optional(),
+    asset_category_id: z.string().min(1, { message: 'Category is required.' }),
+    specs: z.string().optional().refine((val) => {
+        if (!val || val.trim() === '') return true;
+        try {
+            JSON.parse(val);
+            return true;
+        } catch {
+            return false;
+        }
+    }, { message: 'Specs must be valid JSON.' }),
+});
+
+export type AssetModelFormData = z.infer<typeof assetModelFormSchema>;

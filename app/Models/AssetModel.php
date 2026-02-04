@@ -21,6 +21,8 @@ class AssetModel extends Model
     protected $casts = [
         'asset_category_id' => 'integer',
         'specs' => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function category(): BelongsTo
