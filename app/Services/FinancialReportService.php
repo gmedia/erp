@@ -255,6 +255,123 @@ class FinancialReportService
         ];
     }
 
+    public function getIncomeStatement(int $fiscalYearId, ?int $comparisonFiscalYearId = null): array
+    {
+        $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
+        $coaVersion = $fiscalYear->coaVersions()->where('status', 'active')->first();
+
+        if (!$coaVersion) return [];
+
+        $comparisonCoaVersion = null;
+        if ($comparisonFiscalYearId) {
+            $comparisonFiscalYear = FiscalYear::find($comparisonFiscalYearId);
+            $comparisonCoaVersion = $comparisonFiscalYear?->coaVersions()->where('status', 'active')->first();
+        }
+
+        $accounts = Account::where('coa_version_id', $coaVersion->id)
+            ->whereIn('type', ['revenue', 'expense'])
+            ->withSum(['journalLines as total_debit' => function ($query) use ($fiscalYearId) {
+                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
+                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
+                });
+            }], 'debit')
+            ->withSum(['journalLines as total_credit' => function ($query) use ($fiscalYearId) {
+                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
+                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
+                });
+            }], 'credit')
+            ->orderBy('code')
+            ->get();
+
+        $comparisonBalances = [];
+        if ($comparisonFiscalYearId && $comparisonCoaVersion) {
+            $comparisonAccounts = Account::where('coa_version_id', $comparisonCoaVersion->id)
+                ->whereIn('type', ['revenue', 'expense'])
+                ->withSum(['journalLines as total_debit' => function ($query) use ($comparisonFiscalYearId) {
+                    $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
+                        $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
+                    });
+                }], 'debit')
+                ->withSum(['journalLines as total_credit' => function ($query) use ($comparisonFiscalYearId) {
+                    $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
+                        $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
+                    });
+                }], 'credit')
+                ->get()
+                ->keyBy('code');
+
+            $comparisonBalances = $comparisonAccounts;
+        }
+
+        $revenues = [];
+        $expenses = [];
+
+        $totals = [
+            'revenue' => 0,
+            'expense' => 0,
+            'net_income' => 0,
+            'comparison_revenue' => 0,
+            'comparison_expense' => 0,
+            'comparison_net_income' => 0,
+        ];
+
+        foreach ($accounts as $account) {
+            $debit = $account->total_debit ?? 0;
+            $credit = $account->total_credit ?? 0;
+
+            $balance = ($account->normal_balance === 'debit') ? ($debit - $credit) : ($credit - $debit);
+
+            $compBalance = 0;
+            if ($comparisonFiscalYearId) {
+                if (isset($comparisonBalances[$account->code])) {
+                    $compAcc = $comparisonBalances[$account->code];
+                    $compDebit = $compAcc->total_debit ?? 0;
+                    $compCredit = $compAcc->total_credit ?? 0;
+                    $compBalance = ($account->normal_balance === 'debit') ? ($compDebit - $compCredit) : ($compCredit - $compDebit);
+                }
+            }
+
+            $item = [
+                'id' => $account->id,
+                'code' => $account->code,
+                'name' => $account->name,
+                'level' => $account->level,
+                'parent_id' => $account->parent_id,
+                'balance' => $balance,
+                'comparison_balance' => $compBalance,
+                'sub_type' => $account->sub_type,
+            ];
+
+            if ($account->type === 'revenue') {
+                $revenues[] = $item;
+                $totals['revenue'] += $balance;
+                $totals['comparison_revenue'] += $compBalance;
+            } else {
+                $expenses[] = $item;
+                $totals['expense'] += $balance;
+                $totals['comparison_expense'] += $compBalance;
+            }
+        }
+
+        $totals['net_income'] = $totals['revenue'] - $totals['expense'];
+        $totals['comparison_net_income'] = $totals['comparison_revenue'] - $totals['comparison_expense'];
+
+        $totals['change_revenue'] = $totals['revenue'] - $totals['comparison_revenue'];
+        $totals['change_percentage_revenue'] = $totals['comparison_revenue'] != 0 ? ($totals['change_revenue'] / abs($totals['comparison_revenue'])) * 100 : 0;
+
+        $totals['change_expense'] = $totals['expense'] - $totals['comparison_expense'];
+        $totals['change_percentage_expense'] = $totals['comparison_expense'] != 0 ? ($totals['change_expense'] / abs($totals['comparison_expense'])) * 100 : 0;
+
+        $totals['change_net_income'] = $totals['net_income'] - $totals['comparison_net_income'];
+        $totals['change_percentage_net_income'] = $totals['comparison_net_income'] != 0 ? ($totals['change_net_income'] / abs($totals['comparison_net_income'])) * 100 : 0;
+
+        return [
+            'revenues' => $this->buildTree($revenues),
+            'expenses' => $this->buildTree($expenses),
+            'totals' => $totals,
+        ];
+    }
+
     private function calculateNetIncome(int $fiscalYearId, int $coaVersionId): float
     {
         $accounts = Account::where('coa_version_id', $coaVersionId)

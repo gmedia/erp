@@ -2,12 +2,11 @@ import { Head, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { formatCurrency, cn } from '@/lib/utils';
-import { AlertTriangle, ChevronRight, ChevronDown } from 'lucide-react';
+import { cn, formatCurrency } from '@/lib/utils';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
 interface FiscalYear {
@@ -35,44 +34,57 @@ interface Props {
     selectedYearId: number;
     comparisonYearId?: number;
     report: {
-        assets: AccountNode[];
-        liabilities: AccountNode[];
-        equity: AccountNode[];
+        revenues: AccountNode[];
+        expenses: AccountNode[];
         totals: {
-            assets: number;
-            liabilities: number;
-            equity: number;
-            comparison_assets?: number;
-            comparison_liabilities?: number;
-            comparison_equity?: number;
-            change_assets?: number;
-            change_percentage_assets?: number;
-            change_liabilities?: number;
-            change_percentage_liabilities?: number;
-            change_equity?: number;
-            change_percentage_equity?: number;
+            revenue: number;
+            expense: number;
+            net_income: number;
+            comparison_revenue?: number;
+            comparison_expense?: number;
+            comparison_net_income?: number;
+            change_revenue?: number;
+            change_percentage_revenue?: number;
+            change_expense?: number;
+            change_percentage_expense?: number;
+            change_net_income?: number;
+            change_percentage_net_income?: number;
         };
     };
 }
 
-const AccountRow = ({ node, isExpanded = true, showComparison = false }: { node: AccountNode; isExpanded?: boolean, showComparison?: boolean }) => {
+const AccountRow = ({
+    node,
+    isExpanded = true,
+    showComparison = false,
+}: {
+    node: AccountNode;
+    isExpanded?: boolean;
+    showComparison?: boolean;
+}) => {
     const [expanded, setExpanded] = useState(isExpanded);
     const hasChildren = node.children && node.children.length > 0;
     const changeValue = node.change || 0;
 
     return (
         <div className="flex flex-col">
-            <div className={cn(
-                "flex items-center gap-2 py-2 px-2 text-sm border-b border-border/40 hover:bg-muted/40",
-                hasChildren && "bg-muted/20 font-semibold"
-            )}>
-                <div 
+            <div
+                className={cn(
+                    'flex items-center gap-2 py-2 px-2 text-sm border-b border-border/40 hover:bg-muted/40',
+                    hasChildren && 'bg-muted/20 font-semibold',
+                )}
+            >
+                <div
                     className="flex items-center flex-1 gap-2 cursor-pointer"
                     onClick={() => hasChildren && setExpanded(!expanded)}
                     style={{ paddingLeft: `${(node.level - 1) * 1.5}rem` }}
                 >
                     {hasChildren ? (
-                        expanded ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        expanded ? (
+                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        )
                     ) : (
                         <div className="w-4" />
                     )}
@@ -80,18 +92,34 @@ const AccountRow = ({ node, isExpanded = true, showComparison = false }: { node:
                     <span className="truncate">{node.name}</span>
                 </div>
                 <div className="flex gap-4 text-right tabular-nums">
-                    <div className="w-32 font-mono">
-                        {formatCurrency(node.balance)}
-                    </div>
+                    <div className="w-32 font-mono">{formatCurrency(node.balance)}</div>
                     {showComparison && (
                         <>
                             <div className="w-32 font-mono text-muted-foreground">
                                 {formatCurrency(node.comparison_balance || 0)}
                             </div>
-                            <div className={cn("w-28 font-mono", changeValue < 0 ? "text-red-500" : changeValue > 0 ? "text-green-600" : "text-muted-foreground")}>
+                            <div
+                                className={cn(
+                                    'w-28 font-mono',
+                                    changeValue < 0
+                                        ? 'text-red-500'
+                                        : changeValue > 0
+                                          ? 'text-green-600'
+                                          : 'text-muted-foreground',
+                                )}
+                            >
                                 {formatCurrency(changeValue)}
                             </div>
-                             <div className={cn("w-16 font-mono", changeValue < 0 ? "text-red-500" : changeValue > 0 ? "text-green-600" : "text-muted-foreground")}>
+                            <div
+                                className={cn(
+                                    'w-16 font-mono',
+                                    changeValue < 0
+                                        ? 'text-red-500'
+                                        : changeValue > 0
+                                          ? 'text-green-600'
+                                          : 'text-muted-foreground',
+                                )}
+                            >
                                 {(node.change_percentage || 0).toFixed(1)}%
                             </div>
                         </>
@@ -154,19 +182,21 @@ function Section({
                         <span className="w-32 text-lg font-bold">{formatCurrency(total)}</span>
                         {showComparison && (
                             <>
-                                <span className="w-32 text-lg font-bold text-muted-foreground">{formatCurrency(comparisonTotal || 0)}</span>
+                                <span className="w-32 text-lg font-bold text-muted-foreground">
+                                    {formatCurrency(comparisonTotal || 0)}
+                                </span>
                                 <span
                                     className={cn(
-                                        "w-28 text-lg font-bold",
-                                        changeValue < 0 ? "text-red-500" : changeValue > 0 ? "text-green-600" : "text-muted-foreground"
+                                        'w-28 text-lg font-bold',
+                                        changeValue < 0 ? 'text-red-500' : changeValue > 0 ? 'text-green-600' : 'text-muted-foreground',
                                     )}
                                 >
                                     {formatCurrency(changeValue)}
                                 </span>
                                 <span
                                     className={cn(
-                                        "w-16 text-lg font-bold",
-                                        changeValue < 0 ? "text-red-500" : changeValue > 0 ? "text-green-600" : "text-muted-foreground"
+                                        'w-16 text-lg font-bold',
+                                        changeValue < 0 ? 'text-red-500' : changeValue > 0 ? 'text-green-600' : 'text-muted-foreground',
                                     )}
                                 >
                                     {(changePercentage || 0).toFixed(1)}%
@@ -206,40 +236,42 @@ function Section({
     );
 }
 
-export default function BalanceSheet({ fiscalYears, selectedYearId, comparisonYearId, report }: Props) {
+export default function IncomeStatement({ fiscalYears, selectedYearId, comparisonYearId, report }: Props) {
     const selectedFiscalYear = fiscalYears.find((fy) => fy.id === selectedYearId);
-    const selectedComparisonFiscalYear = comparisonYearId
-        ? fiscalYears.find((fy) => fy.id === comparisonYearId)
-        : undefined;
+    const selectedComparisonFiscalYear = comparisonYearId ? fiscalYears.find((fy) => fy.id === comparisonYearId) : undefined;
 
     const handleYearChange = (value: string) => {
-        router.get('/reports/balance-sheet', { fiscal_year_id: value, comparison_year_id: comparisonYearId }, {
-             preserveState: true,
-             preserveScroll: true,
-        });
+        router.get(
+            '/reports/income-statement',
+            { fiscal_year_id: value, comparison_year_id: comparisonYearId },
+            { preserveState: true, preserveScroll: true },
+        );
     };
 
     const handleComparisonChange = (value: string) => {
-         router.get('/reports/balance-sheet', { fiscal_year_id: selectedYearId, comparison_year_id: value === 'none' ? undefined : value }, {
-             preserveState: true,
-             preserveScroll: true,
-        });
+        router.get(
+            '/reports/income-statement',
+            { fiscal_year_id: selectedYearId, comparison_year_id: value === 'none' ? undefined : value },
+            { preserveState: true, preserveScroll: true },
+        );
     };
 
-    // Calculate generic check
-    const totalAssets = report.totals?.assets || 0;
-    const totalLiabilitiesAndEquity = (report.totals?.liabilities || 0) + (report.totals?.equity || 0);
-    const isBalanced = Math.abs(totalAssets - totalLiabilitiesAndEquity) < 1.0;
-    const difference = Math.abs(totalAssets - totalLiabilitiesAndEquity);
+    const totalRevenue = report.totals?.revenue || 0;
+    const totalExpense = report.totals?.expense || 0;
+    const netIncome = report.totals?.net_income || 0;
+    const netIncomeComparison = report.totals?.comparison_net_income || 0;
+    const netIncomeChange = report.totals?.change_net_income || 0;
+    const netIncomeChangePct = report.totals?.change_percentage_net_income || 0;
+    const isProfit = netIncome >= 0;
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Balance Sheet', href: '/reports/balance-sheet' }]}>
-            <Head title="Balance Sheet" />
+        <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Income Statement', href: '/reports/income-statement' }]}>
+            <Head title="Income Statement" />
 
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-bold tracking-tight">Balance Sheet</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">Income Statement</h1>
                         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                             {selectedFiscalYear && (
                                 <span>
@@ -250,21 +282,16 @@ export default function BalanceSheet({ fiscalYears, selectedYearId, comparisonYe
                                 {selectedComparisonFiscalYear ? `Compare: ${selectedComparisonFiscalYear.name}` : 'Compare: None'}
                             </Badge>
                             <Badge
-                                variant={isBalanced ? "secondary" : "destructive"}
-                                className={cn(
-                                    isBalanced && "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-                                )}
+                                variant={isProfit ? 'secondary' : 'destructive'}
+                                className={cn(isProfit && 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300')}
                             >
-                                {isBalanced ? 'Balanced' : `Unbalanced • ${formatCurrency(difference)}`}
+                                {isProfit ? 'Profit' : 'Loss'}
                             </Badge>
                         </div>
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
                         <div className="w-full sm:w-[220px]">
-                            <Select
-                                value={String(selectedYearId)}
-                                onValueChange={handleYearChange}
-                            >
+                            <Select value={String(selectedYearId)} onValueChange={handleYearChange}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Fiscal Year" />
                                 </SelectTrigger>
@@ -278,20 +305,19 @@ export default function BalanceSheet({ fiscalYears, selectedYearId, comparisonYe
                             </Select>
                         </div>
                         <div className="w-full sm:w-[220px]">
-                            <Select
-                                value={comparisonYearId ? String(comparisonYearId) : 'none'}
-                                onValueChange={handleComparisonChange}
-                            >
+                            <Select value={comparisonYearId ? String(comparisonYearId) : 'none'} onValueChange={handleComparisonChange}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Compare With..." />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">None</SelectItem>
-                                    {fiscalYears.filter(fy => fy.id !== selectedYearId).map((fy) => (
-                                        <SelectItem key={fy.id} value={String(fy.id)}>
-                                            {fy.name}
-                                        </SelectItem>
-                                    ))}
+                                    {fiscalYears
+                                        .filter((fy) => fy.id !== selectedYearId)
+                                        .map((fy) => (
+                                            <SelectItem key={fy.id} value={String(fy.id)}>
+                                                {fy.name}
+                                            </SelectItem>
+                                        ))}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -299,97 +325,87 @@ export default function BalanceSheet({ fiscalYears, selectedYearId, comparisonYe
                 </div>
 
                 <div className="grid gap-6">
-                    <Section 
-                        title="Assets" 
-                        nodes={report.assets || []} 
-                        total={report.totals?.assets || 0}
-                        comparisonTotal={report.totals?.comparison_assets}
-                        change={report.totals?.change_assets}
-                        changePercentage={report.totals?.change_percentage_assets}
-                        showComparison={!!comparisonYearId} 
+                    <Section
+                        title="Revenue"
+                        nodes={report.revenues || []}
+                        total={report.totals?.revenue || 0}
+                        comparisonTotal={report.totals?.comparison_revenue}
+                        change={report.totals?.change_revenue}
+                        changePercentage={report.totals?.change_percentage_revenue}
+                        showComparison={!!comparisonYearId}
                     />
 
-                    <div className="space-y-6">
-                        <Section 
-                            title="Liabilities" 
-                            nodes={report.liabilities || []} 
-                            total={report.totals?.liabilities || 0} 
-                            comparisonTotal={report.totals?.comparison_liabilities}
-                            change={report.totals?.change_liabilities}
-                            changePercentage={report.totals?.change_percentage_liabilities}
-                            showComparison={!!comparisonYearId} 
-                        />
-                        
-                        <Section 
-                            title="Equity" 
-                            nodes={report.equity || []} 
-                            total={report.totals?.equity || 0} 
-                            comparisonTotal={report.totals?.comparison_equity}
-                            change={report.totals?.change_equity}
-                            changePercentage={report.totals?.change_percentage_equity}
-                            showComparison={!!comparisonYearId} 
-                        />
-                    </div>
+                    <Section
+                        title="Expense"
+                        nodes={report.expenses || []}
+                        total={report.totals?.expense || 0}
+                        comparisonTotal={report.totals?.comparison_expense}
+                        change={report.totals?.change_expense}
+                        changePercentage={report.totals?.change_percentage_expense}
+                        showComparison={!!comparisonYearId}
+                    />
 
-                    <Card
-                        className={cn(
-                            'overflow-hidden border-t-4',
-                            isBalanced ? 'border-emerald-500' : 'border-destructive'
-                        )}
-                    >
+                    <Card className={cn('overflow-hidden border-t-4', isProfit ? 'border-emerald-500' : 'border-destructive')}>
                         <CardHeader className="bg-muted/15">
                             <div className="flex items-start justify-between gap-3">
                                 <div className="space-y-1">
                                     <CardTitle className="text-base">Summary</CardTitle>
-                                    <CardDescription className="text-xs">
-                                        Assets should equal liabilities plus equity.
-                                    </CardDescription>
+                                    <CardDescription className="text-xs">Net Income = Total Revenue - Total Expense.</CardDescription>
                                 </div>
                                 <Badge
-                                    variant={isBalanced ? 'secondary' : 'destructive'}
-                                    className={cn(
-                                        isBalanced &&
-                                            'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
-                                    )}
+                                    variant={isProfit ? 'secondary' : 'destructive'}
+                                    className={cn(isProfit && 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300')}
                                 >
-                                    {isBalanced ? 'Balanced' : `Unbalanced • ${formatCurrency(difference)}`}
+                                    {isProfit ? 'Profit' : 'Loss'}
                                 </Badge>
                             </div>
                         </CardHeader>
                         <CardContent className="grid gap-4">
                             <div className="grid gap-3 rounded-lg border bg-background p-4">
                                 <div className="flex items-center justify-between gap-4">
-                                    <span className="text-sm text-muted-foreground">Total Assets</span>
-                                    <span className="text-sm font-semibold tabular-nums">
-                                        {formatCurrency(totalAssets)}
-                                    </span>
+                                    <span className="text-sm text-muted-foreground">Total Revenue</span>
+                                    <span className="text-sm font-semibold tabular-nums">{formatCurrency(totalRevenue)}</span>
                                 </div>
                                 <Separator />
                                 <div className="flex items-center justify-between gap-4">
-                                    <span className="text-sm text-muted-foreground">
-                                        Total Liabilities &amp; Equity
-                                    </span>
-                                    <span className="text-sm font-semibold tabular-nums">
-                                        {formatCurrency(totalLiabilitiesAndEquity)}
+                                    <span className="text-sm text-muted-foreground">Total Expense</span>
+                                    <span className="text-sm font-semibold tabular-nums">{formatCurrency(totalExpense)}</span>
+                                </div>
+                                <Separator />
+                                <div className="flex items-center justify-between gap-4">
+                                    <span className="text-sm text-muted-foreground">Net Income</span>
+                                    <span className={cn('text-sm font-semibold tabular-nums', isProfit ? 'text-emerald-700 dark:text-emerald-300' : 'text-destructive')}>
+                                        {formatCurrency(netIncome)}
                                     </span>
                                 </div>
+                                {!!comparisonYearId && (
+                                    <>
+                                        <Separator />
+                                        <div className="flex items-center justify-between gap-4">
+                                            <span className="text-sm text-muted-foreground">Net Income (Comparison)</span>
+                                            <span className="text-sm font-semibold tabular-nums text-muted-foreground">
+                                                {formatCurrency(netIncomeComparison)}
+                                            </span>
+                                        </div>
+                                        <Separator />
+                                        <div className="flex items-center justify-between gap-4">
+                                            <span className="text-sm text-muted-foreground">Net Income Change</span>
+                                            <span
+                                                className={cn(
+                                                    'text-sm font-semibold tabular-nums',
+                                                    netIncomeChange < 0
+                                                        ? 'text-red-500'
+                                                        : netIncomeChange > 0
+                                                          ? 'text-green-600'
+                                                          : 'text-muted-foreground',
+                                                )}
+                                            >
+                                                {formatCurrency(netIncomeChange)} ({netIncomeChangePct.toFixed(1)}%)
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
-
-                            {!isBalanced && (
-                                <Alert
-                                    variant="destructive"
-                                    className="border-destructive/40 bg-destructive/10 text-destructive"
-                                >
-                                    <AlertTriangle className="h-4 w-4" />
-                                    <AlertTitle>Unbalanced</AlertTitle>
-                                    <AlertDescription>
-                                        Difference:{' '}
-                                        <span className="font-medium tabular-nums">
-                                            {formatCurrency(difference)}
-                                        </span>
-                                    </AlertDescription>
-                                </Alert>
-                            )}
                         </CardContent>
                     </Card>
                 </div>
@@ -397,3 +413,4 @@ export default function BalanceSheet({ fiscalYears, selectedYearId, comparisonYe
         </AppLayout>
     );
 }
+

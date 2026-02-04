@@ -12,17 +12,13 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\seed;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('reports', 'reports-legacy');
 
 beforeEach(function () {
     // seed(); // Avoid full seed to prevent conflicts/slowness
     
     // Create necessary data for testing
-    // Ensure permission exists if we were using it, but currently no permission middleware on reports
-    // Permission::firstOrCreate(['name' => 'view_reports']); 
-
-    $this->user = User::factory()->create();
-    // $this->user->givePermissionTo('view_reports'); 
+    $this->user = createTestUserWithPermissions(['trial_balance_report', 'balance_sheet_report']);
     
     // Create Fiscal Year
     $this->fiscalYear = FiscalYear::create([
