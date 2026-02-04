@@ -383,6 +383,27 @@ class PermissionSeeder extends Seeder
                     ],
                 ],
             ],
+            [
+                'name' => 'asset_model',
+                'display_name' => 'Asset Model',
+                'child' => [
+                    [
+                        'name' => 'asset_model.create',
+                        'display_name' => 'Create Asset Model',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset_model.edit',
+                        'display_name' => 'Edit Asset Model',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset_model.delete',
+                        'display_name' => 'Delete Asset Model',
+                        'child' => [],
+                    ],
+                ],
+            ],
         ];
 
         $permissions = $this->createPermissions($permissions);

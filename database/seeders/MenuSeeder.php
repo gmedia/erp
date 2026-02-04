@@ -197,6 +197,14 @@ class MenuSeeder extends Seeder
                         'child' => [],
                     ],
                     [
+                        'name' => 'asset_model',
+                        'display_name' => 'Asset Model',
+                        'permissions' => ['asset_model', 'asset_model.create', 'asset_model.edit', 'asset_model.delete'],
+                        'icon' => 'LayoutList',
+                        'url' => 'asset-models',
+                        'child' => [],
+                    ],
+                    [
                         'name' => 'chart_of_accounts',
                         'display_name' => 'Chart of Accounts',
                         'permissions' => ['accounts', 'accounts.create', 'accounts.edit', 'accounts.delete'],
