@@ -13,9 +13,9 @@ export interface AssetModel extends BaseEntity {
 
 export interface AssetModelFormData {
     model_name: string;
-    manufacturer: string;
+    manufacturer?: string;
     asset_category_id: string;
-    specs: string;
+    specs?: string;
 }
 
 export interface AssetModelFilters {

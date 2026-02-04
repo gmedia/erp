@@ -15,7 +15,7 @@ import { assetModelFormSchema } from '@/utils/schemas';
 interface AssetModelFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    assetModel?: AssetModel | null;
+    entity?: AssetModel | null;
     onSubmit: (data: AssetModelFormData) => void;
     isLoading?: boolean;
 }
@@ -53,8 +53,8 @@ const renderSpecsSection = () => (
     />
 );
 
-const getAssetModelFormDefaults = (assetModel?: AssetModel | null): AssetModelFormData => {
-    if (!assetModel) {
+const getAssetModelFormDefaults = (entity?: AssetModel | null): AssetModelFormData => {
+    if (!entity) {
         return {
             model_name: '',
             manufacturer: '',
@@ -64,25 +64,25 @@ const getAssetModelFormDefaults = (assetModel?: AssetModel | null): AssetModelFo
     }
 
     return {
-        model_name: assetModel.model_name,
-        manufacturer: assetModel.manufacturer || '',
-        asset_category_id: typeof assetModel.category === 'object'
-            ? String(assetModel.category.id)
-            : String(assetModel.asset_category_id || ''),
-        specs: assetModel.specs ? JSON.stringify(assetModel.specs) : '',
+        model_name: entity.model_name,
+        manufacturer: entity.manufacturer || '',
+        asset_category_id: typeof entity.category === 'object'
+            ? String(entity.category.id)
+            : String(entity.asset_category_id || ''),
+        specs: entity.specs ? JSON.stringify(entity.specs) : '',
     };
 };
 
 export const AssetModelForm = memo<AssetModelFormProps>(function AssetModelForm({
     open,
     onOpenChange,
-    assetModel,
+    entity,
     onSubmit,
     isLoading = false,
 }) {
     const defaultValues = useMemo(
-        () => getAssetModelFormDefaults(assetModel),
-        [assetModel],
+        () => getAssetModelFormDefaults(entity),
+        [entity],
     );
 
     const form = useForm<AssetModelFormData>({
@@ -107,7 +107,7 @@ export const AssetModelForm = memo<AssetModelFormProps>(function AssetModelForm(
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={assetModel ? 'Edit Asset Model' : 'Add New Asset Model'}
+            title={entity ? 'Edit' : 'Add New Asset Model'}
             onSubmit={handleSubmit}
             isLoading={isLoading}
         >
