@@ -181,6 +181,14 @@ class MenuSeeder extends Seeder
                         'child' => [],
                     ],
                     [
+                        'name' => 'asset_category',
+                        'display_name' => 'Asset Category',
+                        'permissions' => ['asset_category', 'asset_category.create', 'asset_category.edit', 'asset_category.delete'],
+                        'icon' => 'LayoutList',
+                        'url' => 'asset-categories',
+                        'child' => [],
+                    ],
+                    [
                         'name' => 'chart_of_accounts',
                         'display_name' => 'Chart of Accounts',
                         'permissions' => ['accounts', 'accounts.create', 'accounts.edit', 'accounts.delete'],

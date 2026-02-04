@@ -357,6 +357,27 @@ class PermissionSeeder extends Seeder
                 'display_name' => 'User',
                 'child' => [],
             ],
+            [
+                'name' => 'asset_category',
+                'display_name' => 'Asset Category',
+                'child' => [
+                    [
+                        'name' => 'asset_category.create',
+                        'display_name' => 'Create Asset Category',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset_category.edit',
+                        'display_name' => 'Edit Asset Category',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset_category.delete',
+                        'display_name' => 'Delete Asset Category',
+                        'child' => [],
+                    ],
+                ],
+            ],
         ];
 
         $permissions = $this->createPermissions($permissions);

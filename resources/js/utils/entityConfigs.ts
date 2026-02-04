@@ -292,6 +292,13 @@ export const customerCategoryConfig = createSimpleEntityConfig({
     filterPlaceholder: 'Search customer categories...',
 });
 
+export const assetCategoryConfig = createSimpleEntityConfig({
+    entityName: 'Asset Category',
+    entityNamePlural: 'Asset Categories',
+    apiBase: 'asset-categories',
+    filterPlaceholder: 'Search asset categories...',
+});
+
 export const productCategoryConfig = createComplexEntityConfig<ProductCategory>({
     entityName: 'Product Category',
     entityNamePlural: 'Product Categories',

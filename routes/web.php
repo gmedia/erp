@@ -38,6 +38,7 @@ require __DIR__ . '/account.php';
 require __DIR__ . '/journal_entry.php';
 require __DIR__ . '/posting_journal.php';
 require __DIR__ . '/reports.php';
+require __DIR__ . '/asset_category.php';
 
 
 
