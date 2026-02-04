@@ -2,10 +2,12 @@ import { Head, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { formatCurrency, cn } from '@/lib/utils';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { AlertTriangle, ChevronRight, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
 interface FiscalYear {
@@ -329,33 +331,64 @@ export default function BalanceSheet({ fiscalYears, selectedYearId, comparisonYe
                         />
                     </div>
 
-                    <Card className={cn("border-t-4", isBalanced ? "border-green-500" : "border-destructive")}>
-                        <CardHeader>
-                            <div className="flex items-center justify-between gap-2">
-                                <CardTitle>Summary</CardTitle>
+                    <Card
+                        className={cn(
+                            'overflow-hidden border-t-4',
+                            isBalanced ? 'border-emerald-500' : 'border-destructive'
+                        )}
+                    >
+                        <CardHeader className="bg-muted/15">
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="space-y-1">
+                                    <CardTitle className="text-base">Summary</CardTitle>
+                                    <CardDescription className="text-xs">
+                                        Assets should equal liabilities plus equity.
+                                    </CardDescription>
+                                </div>
                                 <Badge
-                                    variant={isBalanced ? "secondary" : "destructive"}
+                                    variant={isBalanced ? 'secondary' : 'destructive'}
                                     className={cn(
-                                        isBalanced && "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                                        isBalanced &&
+                                            'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
                                     )}
                                 >
                                     {isBalanced ? 'Balanced' : `Unbalanced • ${formatCurrency(difference)}`}
                                 </Badge>
                             </div>
                         </CardHeader>
-                        <CardContent>
-                            <div className="flex justify-between items-center text-lg">
-                                <span>Total Assets</span>
-                                <span className="font-bold">{formatCurrency(totalAssets)}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-lg mt-2">
-                                <span>Total Liabilities & Equity</span>
-                                <span className="font-bold">{formatCurrency(totalLiabilitiesAndEquity)}</span>
-                            </div>
-                             {!isBalanced && (
-                                <div className="mt-4 p-2 bg-destructive/10 text-destructive rounded-md text-center">
-                                    <strong>Unbalanced!</strong> Difference: {formatCurrency(Math.abs(totalAssets - totalLiabilitiesAndEquity))}
+                        <CardContent className="grid gap-4">
+                            <div className="grid gap-3 rounded-lg border bg-background p-4">
+                                <div className="flex items-center justify-between gap-4">
+                                    <span className="text-sm text-muted-foreground">Total Assets</span>
+                                    <span className="text-sm font-semibold tabular-nums">
+                                        {formatCurrency(totalAssets)}
+                                    </span>
                                 </div>
+                                <Separator />
+                                <div className="flex items-center justify-between gap-4">
+                                    <span className="text-sm text-muted-foreground">
+                                        Total Liabilities &amp; Equity
+                                    </span>
+                                    <span className="text-sm font-semibold tabular-nums">
+                                        {formatCurrency(totalLiabilitiesAndEquity)}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {!isBalanced && (
+                                <Alert
+                                    variant="destructive"
+                                    className="border-destructive/40 bg-destructive/10 text-destructive"
+                                >
+                                    <AlertTriangle className="h-4 w-4" />
+                                    <AlertTitle>Unbalanced</AlertTitle>
+                                    <AlertDescription>
+                                        Difference:{' '}
+                                        <span className="font-medium tabular-nums">
+                                            {formatCurrency(difference)}
+                                        </span>
+                                    </AlertDescription>
+                                </Alert>
                             )}
                         </CardContent>
                     </Card>
