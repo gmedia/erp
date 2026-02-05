@@ -204,3 +204,15 @@ export const assetModelFormSchema = z.object({
 });
 
 export type AssetModelFormData = z.infer<typeof assetModelFormSchema>;
+
+/**
+ * Asset location form schema.
+ */
+export const assetLocationFormSchema = z.object({
+    code: z.string().min(1, { message: 'Code is required.' }),
+    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    branch_id: z.string().min(1, { message: 'Branch is required.' }),
+    parent_id: z.string().optional(),
+});
+
+export type AssetLocationFormData = z.infer<typeof assetLocationFormSchema>;

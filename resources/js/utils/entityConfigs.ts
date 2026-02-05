@@ -466,3 +466,27 @@ export const assetModelConfig = createComplexEntityConfig<AssetModel>({
     getDeleteMessage: (item: { model_name?: string }) =>
         `This action cannot be undone. This will permanently delete ${item.model_name || 'this asset model'}.`,
 });
+
+import { assetLocationColumns } from '@/components/asset-locations/AssetLocationColumns';
+import { createAssetLocationFilterFields } from '@/components/asset-locations/AssetLocationFilters';
+import { AssetLocationForm } from '@/components/asset-locations/AssetLocationForm';
+import { AssetLocationViewModal } from '@/components/asset-locations/AssetLocationViewModal';
+import { type AssetLocation } from '@/types/asset-location';
+
+export const assetLocationConfig = createComplexEntityConfig<AssetLocation>({
+    entityName: 'Asset Location',
+    entityNamePlural: 'Asset Locations',
+    apiEndpoint: '/api/asset-locations',
+    exportEndpoint: '/api/asset-locations/export',
+    queryKey: ['asset-locations'],
+    breadcrumbs: [{ title: 'Asset Locations', href: '/asset-locations' }],
+    initialFilters: { search: '', branch_id: '', parent_id: '' },
+    columns: assetLocationColumns,
+    filterFields: createAssetLocationFilterFields(),
+    formComponent: AssetLocationForm,
+    formType: 'complex',
+    entityNameForSearch: 'asset location',
+    viewModalComponent: AssetLocationViewModal,
+    getDeleteMessage: (item: { name?: string }) =>
+        `This action cannot be undone. This will permanently delete ${item.name || 'this asset location'}.`,
+});

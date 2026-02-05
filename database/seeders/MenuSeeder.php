@@ -221,6 +221,14 @@ class MenuSeeder extends Seeder
                         'child' => [],
                     ],
                     [
+                        'name' => 'asset_location',
+                        'display_name' => 'Asset Location',
+                        'permissions' => ['asset_location', 'asset_location.create', 'asset_location.edit', 'asset_location.delete'],
+                        'icon' => 'LayoutList',
+                        'url' => 'asset-locations',
+                        'child' => [],
+                    ],
+                    [
                         'name' => 'chart_of_accounts',
                         'display_name' => 'Chart of Accounts',
                         'permissions' => ['accounts', 'accounts.create', 'accounts.edit', 'accounts.delete'],
