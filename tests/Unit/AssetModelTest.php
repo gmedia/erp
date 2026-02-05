@@ -2,48 +2,44 @@
 
 use App\Models\AssetCategory;
 use App\Models\AssetModel;
+use App\Models\Asset;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use function Pest\Laravel\assertDatabaseHas;
+uses(Tests\TestCase::class, RefreshDatabase::class)->in('Unit');
 
-uses(RefreshDatabase::class)->group('asset-models');
-
-test('factory creates a valid asset model', function () {
-    $assetModel = AssetModel::factory()->create();
-
-    assertDatabaseHas('asset_models', ['id' => $assetModel->id]);
-
-    expect($assetModel->getAttributes())->toMatchArray([
-        'model_name' => $assetModel->model_name,
-        'manufacturer' => $assetModel->manufacturer,
-        'asset_category_id' => $assetModel->asset_category_id,
-    ]);
-});
-
-test('asset model belongs to a category', function () {
-    $category = AssetCategory::factory()->create();
-    $assetModel = AssetModel::factory()->create(['asset_category_id' => $category->id]);
-
-    expect($assetModel->category)->toBeInstanceOf(AssetCategory::class)
-        ->and($assetModel->category->id)->toBe($category->id);
-});
-
-test('fillable attributes are defined correctly', function () {
-    $fillable = (new AssetModel)->getFillable();
-
-    expect($fillable)->toBe([
+test('asset model has correct fillable fields', function () {
+    $model = new AssetModel();
+    
+    expect($model->getFillable())->toBe([
         'asset_category_id',
         'manufacturer',
         'model_name',
         'specs',
     ]);
-});
+})->group('asset-models');
 
-test('specs is cast to array', function () {
-    $assetModel = AssetModel::factory()->create([
-        'specs' => ['cpu' => 'i7', 'ram_gb' => 16],
+test('asset model belongs to an asset category', function () {
+    $category = AssetCategory::factory()->create();
+    $model = AssetModel::factory()->create(['asset_category_id' => $category->id]);
+    
+    expect($model->category)->toBeInstanceOf(AssetCategory::class)
+        ->and($model->category->id)->toBe($category->id);
+})->group('asset-models');
+
+test('asset model has many assets', function () {
+    $model = AssetModel::factory()->create();
+    $asset = Asset::factory()->create(['asset_model_id' => $model->id]);
+    
+    expect($model->assets)->toHaveCount(1)
+        ->and($model->assets->first())->toBeInstanceOf(Asset::class)
+        ->and($model->assets->first()->id)->toBe($asset->id);
+})->group('asset-models');
+
+test('asset model casts specs to array', function () {
+    $model = AssetModel::factory()->create([
+        'specs' => ['color' => 'red', 'weight' => '1kg']
     ]);
-
-    expect($assetModel->specs)->toBeArray()
-        ->and($assetModel->specs['cpu'])->toBe('i7');
-});
+    
+    expect($model->specs)->toBeArray()
+        ->and($model->specs)->toBe(['color' => 'red', 'weight' => '1kg']);
+})->group('asset-models');

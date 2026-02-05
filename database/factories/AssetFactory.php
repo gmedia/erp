@@ -30,7 +30,7 @@ class AssetFactory extends Factory
             'asset_model_id' => $this->faker->boolean(60) ? AssetModel::factory() : null,
             'asset_category_id' => AssetCategory::factory(),
             'serial_number' => $this->faker->optional()->bothify('SN-########'),
-            'barcode' => $this->faker->optional()->unique()->bothify('BC-########'),
+            'barcode' => $this->faker->unique()->bothify('BC-########'),
             'branch_id' => Branch::factory(),
             'asset_location_id' => $this->faker->boolean(70) ? AssetLocation::factory() : null,
             'department_id' => $this->faker->boolean(40) ? Department::factory() : null,

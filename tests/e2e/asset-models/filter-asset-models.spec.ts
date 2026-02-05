@@ -4,9 +4,14 @@ import { login, createAssetModel } from '../helpers';
 test('filter asset models by search', async ({ page }) => {
   await login(page);
 
-  await createAssetModel(page, { model_name: 'Alpha Model' });
-  await createAssetModel(page, { model_name: 'Beta Model' });
-  const targetName = await createAssetModel(page, { model_name: 'Gamma Model' });
+  const timestamp = Date.now();
+  const alpha = `Alpha Model ${timestamp}`;
+  const beta = `Beta Model ${timestamp}`;
+  const targetName = `Gamma Model ${timestamp}`;
+
+  await createAssetModel(page, { model_name: alpha });
+  await createAssetModel(page, { model_name: beta });
+  await createAssetModel(page, { model_name: targetName });
 
   await page.goto('/asset-models');
 
@@ -15,14 +20,14 @@ test('filter asset models by search', async ({ page }) => {
   await page.press('input[placeholder="Search by model name or manufacturer..."]', 'Enter');
   await page.waitForLoadState('networkidle');
 
-  await expect(page.locator('tr', { hasText: targetName })).toBeVisible();
-  await expect(page.locator('tr', { hasText: 'Alpha Model' })).not.toBeVisible();
+  await expect(page.locator('tr').filter({ hasText: targetName }).first()).toBeVisible();
+  await expect(page.locator('tr').filter({ hasText: alpha })).not.toBeVisible();
 
   // Search by different term
   await page.fill('input[placeholder="Search by model name or manufacturer..."]', 'Alpha');
   await page.press('input[placeholder="Search by model name or manufacturer..."]', 'Enter');
   await page.waitForLoadState('networkidle');
 
-  await expect(page.locator('tr', { hasText: 'Alpha Model' })).toBeVisible();
-  await expect(page.locator('tr', { hasText: targetName })).not.toBeVisible();
+  await expect(page.locator('tr').filter({ hasText: alpha }).first()).toBeVisible();
+  await expect(page.locator('tr').filter({ hasText: targetName })).not.toBeVisible();
 });

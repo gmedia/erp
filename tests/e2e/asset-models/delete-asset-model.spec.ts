@@ -4,8 +4,9 @@ import { createAssetModel, searchAssetModel, deleteAssetModel, login } from '../
 test('delete asset model end-to-end', async ({ page }) => {
   await login(page);
 
+  const timestamp = Date.now();
   const modelName = await createAssetModel(page, {
-    model_name: 'Model To Delete',
+    model_name: `Model To Delete ${timestamp}`,
   });
 
   await page.goto('/asset-models');
@@ -14,8 +15,8 @@ test('delete asset model end-to-end', async ({ page }) => {
   await deleteAssetModel(page, modelName);
 
   // Verify the model is deleted
-  await page.fill('input[placeholder="Search asset models..."]', modelName);
-  await page.press('input[placeholder="Search asset models..."]', 'Enter');
+  await page.fill('input[placeholder="Search by model name or manufacturer..."]', modelName);
+  await page.press('input[placeholder="Search by model name or manufacturer..."]', 'Enter');
   await page.waitForLoadState('networkidle');
 
   const row = page.locator('tr', { hasText: modelName });

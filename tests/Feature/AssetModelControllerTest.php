@@ -28,6 +28,7 @@ describe('Asset Model API Endpoints', function () {
     });
 
     test('index returns paginated asset models', function () {
+        AssetModel::query()->delete();
         AssetModel::factory()->count(15)->create();
 
         $response = getJson('/api/asset-models?per_page=10');

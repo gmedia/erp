@@ -4,7 +4,8 @@ import { login, createAssetModel } from '../helpers';
 test('export asset models', async ({ page }) => {
   await login(page);
 
-  await createAssetModel(page, { model_name: 'Export Test Model' });
+  const timestamp = Date.now();
+  const modelName = await createAssetModel(page, { model_name: `Export Test Model ${timestamp}` });
 
   await page.goto('/asset-models');
   await page.waitForLoadState('networkidle');
