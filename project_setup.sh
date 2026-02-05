@@ -6,9 +6,6 @@ composer install
 # Installing npm packages
 npm install
 
-# Copying .env.example to .env
-cp .env.example .env
-
 # Starting Laravel Sail
 ./vendor/bin/sail down -v
 ./vendor/bin/sail up -d --build

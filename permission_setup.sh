@@ -116,3 +116,6 @@ chmod +x \
     .agent/skills/feature-crud-complex/scripts/generate.sh \
     .agent/skills/refactor-backend/scripts/check-architecture.sh \
     .agent/skills/refactor-backend/scripts/generate.sh
+
+# Copying .env.example to .env
+cp .env.example .env
