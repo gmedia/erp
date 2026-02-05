@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  ssr:
+    image: ghcr.io/gmedia/erp/app:latest
+    env_file:
+      - .env.production
+    command: bun /var/www/html/bootstrap/ssr/ssr.js
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+    networks:
+      - erp-network
+
+  app:
+    image: ghcr.io/gmedia/erp/app:latest
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: ingress
+    env_file:
+      - .env.production
+    environment:
+      - RUN_MIGRATIONS=true
+    command: php artisan octane:swoole --host=0.0.0.0 --port=80 --workers=2 --max-requests=500
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: any
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1/ping"]
+      interval: 40s
+      timeout: 15s
+      retries: 3
+      start_period: 90s
+    networks:
+      - erp-network
+
+networks:
+  erp-network:
+    driver: overlay
+    attachable: true

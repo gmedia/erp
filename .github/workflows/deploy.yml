@@ -1,0 +1,20 @@
+name: Deploy Application
+
+on:
+  workflow_run:
+    workflows: ["Release Application"]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Placeholder
+        run: |
+          echo "Starting deployment to production..."
+          echo "Connecting to production server..."
+          # ssh user@host "cd /app && ./docker/production/scripts/deploy.sh"
+          echo "Deployment successful!"
