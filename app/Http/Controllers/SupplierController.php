@@ -55,6 +55,14 @@ class SupplierController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(Supplier $supplier): JsonResponse
+    {
+        return (new SupplierResource($supplier))->response();
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(UpdateSupplierRequest $request, Supplier $supplier): JsonResponse

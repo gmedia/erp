@@ -43,7 +43,16 @@ test('add new asset end-to-end', async ({ page }) => {
   await expect(dialog).not.toBeVisible({ timeout: 10000 });
 
   // Verify it appears in the table
-  await page.fill('input[placeholder="Search assets..."]', assetCode);
-  await page.press('input[placeholder="Search assets..."]', 'Enter');
+  const searchInput = page.getByPlaceholder(/Search assets.../i);
+  await searchInput.clear();
+  await searchInput.fill(assetCode);
+  await Promise.all([
+    page.waitForResponse(response => 
+      response.url().includes('/api/assets') && 
+      response.url().includes(encodeURIComponent(assetCode)) &&
+      response.status() === 200
+    ),
+    searchInput.press('Enter')
+  ]);
   await expect(page.locator(`text=${assetCode}`)).toBeVisible();
 });
