@@ -1,0 +1,51 @@
+services:
+  app:
+    image: ghcr.io/gmedia/erp/app:latest
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: ingress
+    env_file:
+      - .env.production
+    environment:
+      - RUN_MIGRATIONS=true
+    command: php artisan octane:swoole --host=0.0.0.0 --port=80 --workers=2 --max-requests=500
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: any
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1/ping"]
+      interval: 40s
+      timeout: 15s
+      retries: 3
+      start_period: 90s
+    networks:
+      - erp-network
+
+  # mariadb:
+  #   image: mariadb:10.11
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+  #     MYSQL_ROOT_HOST: '%'
+  #     MYSQL_DATABASE: '${DB_DATABASE}'
+  #     MYSQL_USER: '${DB_USERNAME}'
+  #     MYSQL_PASSWORD: '${DB_PASSWORD}'
+  #     MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+  #   networks:
+  #     - erp-network
+  
+  # valkey:
+  #   image: valkey/valkey:latest
+  #   networks:
+  #     - erp-network
+
+networks:
+  erp-network:
+    driver: overlay
+    attachable: true

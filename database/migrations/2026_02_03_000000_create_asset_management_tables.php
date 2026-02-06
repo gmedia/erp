@@ -104,12 +104,13 @@ return new class extends Migration
             $table->enum('depreciation_method', ['straight_line', 'declining_balance'])->default('straight_line');
             $table->date('depreciation_start_date')->nullable();
             $table->integer('useful_life_months')->nullable();
-            $table->decimal('salvage_value', 15, 2)->default(0);
-            $table->decimal('accumulated_depreciation', 15, 2)->default(0);
-            $table->decimal('book_value', 15, 2)->default(0);
+            $table->decimal('salvage_value', 15, 2)->nullable()->default(0);
+            $table->decimal('accumulated_depreciation', 15, 2)->nullable()->default(0);
+            $table->decimal('book_value', 15, 2)->nullable()->default(0);
             $table->foreignId('depreciation_expense_account_id')->nullable()->constrained('accounts')->nullOnDelete();
             $table->foreignId('accumulated_depr_account_id')->nullable()->constrained('accounts')->nullOnDelete();
 
+            $table->softDeletes();
             $table->timestamps();
 
             $table->index('asset_category_id');

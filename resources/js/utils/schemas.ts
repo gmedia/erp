@@ -232,3 +232,37 @@ export const assetLocationFormSchema = z.object({
 });
 
 export type AssetLocationFormData = z.infer<typeof assetLocationFormSchema>;
+
+/**
+ * Asset form schema.
+ */
+export const assetFormSchema = z.object({
+    asset_code: z.string().min(2, { message: 'Asset code must be at least 2 characters.' }),
+    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    asset_category_id: z.string().min(1, { message: 'Category is required.' }),
+    asset_model_id: z.string().default(''),
+    serial_number: z.string().default(''),
+    barcode: z.string().default(''),
+    branch_id: z.string().min(1, { message: 'Branch is required.' }),
+    asset_location_id: z.string().default(''),
+    department_id: z.string().default(''),
+    employee_id: z.string().default(''),
+    supplier_id: z.string().default(''),
+    purchase_date: z.date({ message: 'Purchase date is required.' }),
+    purchase_cost: z.string().min(1, { message: 'Purchase cost is required.' }),
+    currency: z.string().min(3).max(3).default('IDR'),
+    warranty_end_date: z.date().optional().nullable(),
+    status: z.enum(['draft', 'active', 'maintenance', 'disposed', 'lost'], {
+        message: 'Status is required.',
+    }),
+    condition: z.enum(['good', 'needs_repair', 'damaged']).optional().nullable(),
+    notes: z.string().default(''),
+    depreciation_method: z.enum(['straight_line', 'declining_balance']).default('straight_line'),
+    depreciation_start_date: z.date().optional().nullable(),
+    useful_life_months: z.string().default(''),
+    salvage_value: z.string().default(''),
+    depreciation_expense_account_id: z.string().default(''),
+    accumulated_depr_account_id: z.string().default(''),
+});
+
+export type AssetFormData = z.infer<typeof assetFormSchema>;
