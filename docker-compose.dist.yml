@@ -1,16 +1,4 @@
 services:
-  ssr:
-    image: ghcr.io/gmedia/erp/app:latest
-    env_file:
-      - .env.production
-    command: bun /var/www/html/bootstrap/ssr/ssr.js
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-    networks:
-      - erp-network
-
   app:
     image: ghcr.io/gmedia/erp/app:latest
     ports:

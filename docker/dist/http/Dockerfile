@@ -1,33 +1,39 @@
-# Stage 1: Build assets
-FROM node:22-alpine AS asset-builder
+ARG BASE_IMAGE=ghcr.io/gmedia/erp/base:8.4
+
+# Stage 0: Composer dependencies
+FROM ${BASE_IMAGE} AS composer
 WORKDIR /app
 COPY . .
-RUN npm install -g bun \
-    && bun install \
-    && bun run build:ssr
-
-# Stage 2: Production image
-# Note: You should build the base image first and push it to ghcr.io, then use it here.
-# For now, we reference it as a generic name that can be overridden via build args or CI.
-ARG BASE_IMAGE=ghcr.io/gmedia/erp/base:8.4
-FROM ${BASE_IMAGE}
-
-WORKDIR /var/www/html
-
-# Copy application code
-COPY . .
-
-# Copy built assets from builder stage
-COPY --from=asset-builder /app/public/build ./public/build
-COPY --from=asset-builder /app/bootstrap/ssr ./bootstrap/ssr
-
-# Install production dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
+# Stage 1: Build assets
+FROM ${BASE_IMAGE} AS asset-builder
+# Install Node.js and NPM
+RUN apk add --no-cache nodejs npm
+WORKDIR /app
+COPY . .
+# We need vendor for Wayfinder to run php artisan
+COPY --from=composer /app/vendor /app/vendor
+RUN npm ci
+RUN npm run build
+
+# Stage 2: Production image
+FROM ${BASE_IMAGE}
+ENV APPDIR=/var/www/html
+WORKDIR ${APPDIR}
+
+# Copy application code and vendor from composer stage
+COPY . .
+COPY --from=composer /app/vendor ${APPDIR}/vendor
+
+# Copy built assets from asset-builder stage
+COPY --from=asset-builder /app/public/build ${APPDIR}/public/build
+COPY --from=asset-builder /app/node_modules ${APPDIR}/node_modules
+
 # Setup scripts and permissions
-COPY docker/production/scripts/start-container.sh /usr/local/bin/start-container
+COPY docker/dist/scripts/start-container.sh /usr/local/bin/start-container
 RUN chmod +x /usr/local/bin/start-container \
-    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+    && chown -R www-data:www-data ${APPDIR}/storage ${APPDIR}/bootstrap/cache
 
 # Expose port (Octane default)
 EXPOSE 80

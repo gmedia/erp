@@ -18,6 +18,7 @@ RUN apk add --no-cache \
     icu-dev \
     postgresql-dev \
     openldap-dev \
+    brotli-dev \
     $PHPIZE_DEPS
 
 # Install PHP extensions
