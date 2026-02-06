@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Http\Requests\{{Features}};
+
+use Illuminate\Foundation\Http\FormRequest;
+
+/**
+ * Form request for storing a new {{feature}}.
+ *
+ * REFACTOR GUIDELINES:
+ * - Validasi HARUS spesifik per operasi (Store vs Update)
+ * - Gunakan authorize() untuk permission check jika perlu
+ * - Manfaatkan custom messages untuk UX yang lebih baik
+ * - JANGAN duplikasi rules - extend base jika perlu
+ */
+class Store{{Feature}}Request extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true; // Or check permission: $this->user()->can('create', {{Feature}}::class)
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255', 'unique:{{features}},name'],
+            // Add other fields here
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'The {{feature}} name is required.',
+            'name.unique' => 'A {{feature}} with this name already exists.',
+        ];
+    }
+}

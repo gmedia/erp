@@ -1,0 +1,84 @@
+import { ColumnDef } from '@tanstack/react-table';
+import { {{Feature}} } from '@/types';
+import { Button } from '@/components/ui/button';
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+/**
+ * {{Feature}} Table Columns
+ * 
+ * REFACTOR GUIDELINES:
+ * - Jangan ubah accessorKey yang sudah ada (API contract)
+ * - Jangan hapus column yang digunakan
+ * - Maintain order kolom yang sudah ada
+ */
+
+interface {{Feature}}ColumnsProps {
+    onEdit: (item: {{Feature}}) => void;
+    onDelete: (item: {{Feature}}) => void;
+    onView?: (item: {{Feature}}) => void;
+}
+
+export function get{{Feature}}Columns({ onEdit, onDelete, onView }: {{Feature}}ColumnsProps): ColumnDef<{{Feature}}>[] {
+    return [
+        {
+            accessorKey: 'id',
+            header: 'ID',
+        },
+        {
+            accessorKey: 'name',
+            header: 'Name',
+        },
+        // Add more columns as needed
+        // {
+        //     accessorKey: 'department.name',
+        //     header: 'Department',
+        //     cell: ({ row }) => row.original.department?.name ?? '-',
+        // },
+        {
+            accessorKey: 'created_at',
+            header: 'Created At',
+            cell: ({ row }) => new Date(row.original.created_at).toLocaleDateString(),
+        },
+        {
+            id: 'actions',
+            header: 'Actions',
+            cell: ({ row }) => {
+                const item = row.original;
+                return (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0" data-testid={`{{feature}}-actions-${item.id}`}>
+                                <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {onView && (
+                                <DropdownMenuItem onClick={() => onView(item)} data-testid={`{{feature}}-view-${item.id}`}>
+                                    View
+                                </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem onClick={() => onEdit(item)} data-testid={`{{feature}}-edit-${item.id}`}>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                                onClick={() => onDelete(item)} 
+                                className="text-red-600"
+                                data-testid={`{{feature}}-delete-${item.id}`}
+                            >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                );
+            },
+        },
+    ];
+}

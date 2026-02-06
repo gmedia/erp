@@ -7,6 +7,8 @@ export default defineConfig({
     browserName: 'chromium',
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:80',
   },
+  fullyParallel: false,
+  workers: 1,
   reporter: [
     ['html', { outputFolder: 'e2e/playwright-report', open: 'never' }],
   ],

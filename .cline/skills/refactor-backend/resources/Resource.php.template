@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Http\Resources\{{Features}};
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+/**
+ * API Resource for {{Feature}} model.
+ *
+ * REFACTOR GUIDELINES:
+ * - JANGAN ubah structure response yang sudah dipakai frontend
+ * - Gunakan whenLoaded() untuk relasi optional
+ * - Pastikan semua field yang dibutuhkan frontend ada
+ * - Tambahkan computed fields jika diperlukan
+ */
+class {{Feature}}Resource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            // Add other fields here
+            
+            // Relasi (gunakan whenLoaded untuk optional)
+            // 'department' => new DepartmentResource($this->whenLoaded('department')),
+            // 'position' => new PositionResource($this->whenLoaded('position')),
+            
+            // Timestamps
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
+        ];
+    }
+}
