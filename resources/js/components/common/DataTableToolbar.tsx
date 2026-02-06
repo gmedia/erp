@@ -80,7 +80,7 @@ export function DataTableToolbar<T>({
     const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            onSearchSubmit(searchValue);
+            onSearchSubmit(e.currentTarget.value);
         }
     };
 

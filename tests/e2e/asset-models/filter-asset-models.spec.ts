@@ -13,19 +13,22 @@ test('filter asset models by search', async ({ page }) => {
   await createAssetModel(page, { model_name: beta });
   await createAssetModel(page, { model_name: targetName });
 
-  await page.goto('/asset-models');
+  await page.waitForURL('**/asset-models', { timeout: 60000 });
+  const searchInput = page.locator('input[placeholder="Search by model name or manufacturer..."]');
+  await searchInput.waitFor({ state: 'visible', timeout: 15000 });
+  await expect(searchInput).toBeEditable({ timeout: 15000 });
 
   // Search by model name
-  await page.fill('input[placeholder="Search by model name or manufacturer..."]', targetName);
-  await page.press('input[placeholder="Search by model name or manufacturer..."]', 'Enter');
+  await searchInput.fill(targetName);
+  await searchInput.press('Enter');
   await page.waitForLoadState('networkidle');
 
   await expect(page.locator('tr').filter({ hasText: targetName }).first()).toBeVisible();
   await expect(page.locator('tr').filter({ hasText: alpha })).not.toBeVisible();
 
   // Search by different term
-  await page.fill('input[placeholder="Search by model name or manufacturer..."]', 'Alpha');
-  await page.press('input[placeholder="Search by model name or manufacturer..."]', 'Enter');
+  await searchInput.fill('Alpha');
+  await searchInput.press('Enter');
   await page.waitForLoadState('networkidle');
 
   await expect(page.locator('tr').filter({ hasText: alpha }).first()).toBeVisible();

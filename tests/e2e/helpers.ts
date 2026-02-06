@@ -75,6 +75,8 @@ async function createEntity(
   await expect(submitButton).toBeVisible();
   await submitButton.click();
 
+  await expect(dialog).not.toBeVisible({ timeout: 15000 });
+
   return returnValue;
 }
 
@@ -92,30 +94,46 @@ export async function login(
   email = 'admin@admin.com',
   password = 'password'
 ): Promise<void> {
-  // 1. Check if already logged in by looking at URL
   if (page.url().includes('/dashboard')) return;
 
-  // 2. Go to login page (wait for commit instead of networkidle which can be slow)
-  await page.goto('/login', { waitUntil: 'commit', timeout: 60000 });
+  const gotoWithRetry = async (url: string): Promise<void> => {
+    let lastError: unknown;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+        return;
+      } catch (err) {
+        lastError = err;
+        const message = err instanceof Error ? err.message : String(err);
+        const retriable =
+          message.includes('net::ERR_ABORTED') ||
+          message.toLowerCase().includes('frame was detached') ||
+          message.toLowerCase().includes('navigation');
+        if (!retriable) throw err;
+        await page.waitForTimeout(750);
+      }
+    }
+    throw lastError instanceof Error ? lastError : new Error(String(lastError));
+  };
 
-  // 3. Wait a bit for potential automatic redirect or email field
-  await page.waitForTimeout(2000);
+  await gotoWithRetry('/dashboard');
 
   if (page.url().includes('/dashboard')) return;
 
-  // 4. Fill login form if email is visible
   const emailInput = page.locator('input[name="email"]');
-  if (await emailInput.isVisible({ timeout: 10000 }).catch(() => false)) {
+  if (page.url().includes('/login') || (await emailInput.isVisible({ timeout: 5000 }).catch(() => false))) {
+    if (!page.url().includes('/login')) {
+      await gotoWithRetry('/login');
+    }
+    await expect(emailInput).toBeVisible({ timeout: 15000 });
     await emailInput.fill(email);
     await page.fill('input[name="password"]', password);
     await page.click('button[type="submit"], button[data-testid="login-button"]');
     await page.waitForURL('**/dashboard', { timeout: 60000 });
-  } else {
-    // Maybe we are already on dashboard but URL hasn't fully updated or it's a different page
-    if (!page.url().includes('/dashboard')) {
-       await page.waitForURL('**/dashboard', { timeout: 30000 }).catch(() => {});
-    }
+    return;
   }
+
+  await page.waitForURL('**/dashboard', { timeout: 60000 });
 }
 
 /**
@@ -2245,14 +2263,13 @@ export async function createAssetModel(
   // First create an asset category if not provided
   let categoryName = overrides.asset_category_id;
   if (!categoryName) {
-    await login(page);
     await createAssetCategory(page, {});
     // The category was created, we'll select it by searching
     categoryName = 'Category';
   }
 
   await login(page);
-  await page.goto('/asset-models');
+  await page.goto('/asset-models', { waitUntil: 'domcontentloaded', timeout: 60000 });
 
   const addButton = page.getByRole('button', { name: /Add/i });
   await expect(addButton).toBeVisible();
