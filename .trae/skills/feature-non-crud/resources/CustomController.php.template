@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Actions\{{Feature}}\Custom{{Feature}}Action;
+use App\Http\Requests\{{Feature}}\Custom{{Feature}}Request;
+use App\Http\Resources\{{Feature}}\{{Feature}}Resource;
+use Illuminate\Http\JsonResponse;
+use Inertia\Inertia;
+use Inertia\Response;
+
+/**
+ * Controller for {{feature}} management operations.
+ *
+ * Handles custom operations for {{feature}} (non-standard CRUD).
+ */
+class {{Feature}}Controller extends Controller
+{
+    /**
+     * Display the {{feature}} management page.
+     */
+    public function index(): Response
+    {
+        return Inertia::render('{{features}}/index');
+    }
+
+    /**
+     * Custom action example.
+     *
+     * @param  Custom{{Feature}}Request  $request
+     * @return JsonResponse
+     */
+    public function customAction(Custom{{Feature}}Request $request): JsonResponse
+    {
+        $result = (new Custom{{Feature}}Action())->execute($request->validated());
+
+        return response()->json([
+            'message' => 'Action completed successfully.',
+            'data' => $result,
+        ]);
+    }
+}

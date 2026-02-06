@@ -1,0 +1,46 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Migration: Add columns to {{features}} table
+ *
+ * GUIDELINES:
+ * - Kolom baru di tabel existing HARUS nullable atau punya default value
+ * - Gunakan ->after('column_name') untuk positioning
+ */
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('{{features}}', function (Blueprint $table) {
+            // Tambah kolom string
+            $table->string('new_column')->after('name')->nullable();
+            
+            // Tambah foreign key
+            // $table->foreignId('category_id')->after('id')->nullable()->constrained();
+            
+            // Tambah kolom dengan default
+            // $table->boolean('is_featured')->after('is_active')->default(false);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('{{features}}', function (Blueprint $table) {
+            $table->dropColumn('new_column');
+            
+            // Untuk FK, drop constraint dulu
+            // $table->dropForeign(['category_id']);
+            // $table->dropColumn('category_id');
+        });
+    }
+};

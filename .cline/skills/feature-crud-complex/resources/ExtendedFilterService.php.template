@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Domain\{{Features}};
+
+use App\Domain\Concerns\BaseFilterService;
+use Illuminate\Database\Eloquent\Builder;
+
+/**
+ * Filter service for {{feature}} queries.
+ *
+ * Provides search, advanced filtering, and sorting functionality for {{feature}} listings.
+ */
+class {{Feature}}FilterService
+{
+    use BaseFilterService;
+
+    /**
+     * Apply advanced filters for {{features}} (foreign keys, ranges, dates).
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\{{Feature}}>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    public function applyAdvancedFilters(Builder $query, array $filters): void
+    {
+        // Foreign key filter example
+        // if (!empty($filters['department_id'])) {
+        //     $query->where('department_id', $filters['department_id']);
+        // }
+
+        // Range filter example (salary)
+        // if (!empty($filters['salary_min'])) {
+        //     $query->where('salary', '>=', $filters['salary_min']);
+        // }
+        // if (!empty($filters['salary_max'])) {
+        //     $query->where('salary', '<=', $filters['salary_max']);
+        // }
+
+        // Date range filter example
+        // if (!empty($filters['date_from'])) {
+        //     $query->whereDate('created_at', '>=', $filters['date_from']);
+        // }
+        // if (!empty($filters['date_to'])) {
+        //     $query->whereDate('created_at', '<=', $filters['date_to']);
+        // }
+    }
+}
