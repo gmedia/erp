@@ -34,6 +34,16 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+      - name: Build and push base Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/dist/base/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/base:8.4
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/base:8.4
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/base:8.4,mode=max
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
