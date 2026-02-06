@@ -21,6 +21,7 @@ export interface AsyncSelectProps {
     className?: string;
     labelFn?: (item: any) => string; // To extract label from item
     valueFn?: (item: any) => string; // To extract value from item
+    initialLabel?: string; // Optional initial label to avoid extra fetch
 }
 
 export function AsyncSelect({
@@ -31,12 +32,13 @@ export function AsyncSelect({
     className,
     labelFn = (item) => item.name,
     valueFn = (item) => item.id.toString(),
+    initialLabel,
 }: AsyncSelectProps) {
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState('');
     const [items, setItems] = React.useState<any[]>([]);
     const [loading, setLoading] = React.useState(false);
-    const [selectedLabel, setSelectedLabel] = React.useState<string>('');
+    const [selectedLabel, setSelectedLabel] = React.useState<string>(initialLabel || '');
     const [initialLoadDone, setInitialLoadDone] = React.useState(false);
 
     const debouncedSearch = useDebounce(search, 300);
@@ -63,10 +65,10 @@ export function AsyncSelect({
         [url],
     );
 
-    // Initial fetch to get label if value is provided
+    // Initial fetch to get label if value is provided and initialLabel is not present
     React.useEffect(() => {
         const fetchInitialLabel = async () => {
-            if (value && value !== 'null' && value !== 'undefined' && !selectedLabel && !initialLoadDone) {
+            if (value && value !== 'null' && value !== 'undefined' && !selectedLabel && !initialLoadDone && !initialLabel) {
                 try {
                     // Try to fetch specific item by ID
                     const [baseUrl] = url.split('?');
@@ -81,11 +83,14 @@ export function AsyncSelect({
                 } finally {
                     setInitialLoadDone(true);
                 }
+            } else if (initialLabel && value && !initialLoadDone) {
+                setSelectedLabel(initialLabel);
+                setInitialLoadDone(true);
             }
         };
 
         fetchInitialLabel();
-    }, [value, url, selectedLabel, initialLoadDone, labelFn]);
+    }, [value, url, selectedLabel, initialLoadDone, labelFn, initialLabel]);
 
     // Fetch items on open or search
     React.useEffect(() => {

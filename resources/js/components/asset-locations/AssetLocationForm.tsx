@@ -34,21 +34,23 @@ const renderBasicInfoSection = () => (
     </>
 );
 
-const renderBranchSection = () => (
+const renderBranchSection = (entity?: AssetLocation | null) => (
     <AsyncSelectField
         name="branch_id"
         label="Branch"
         url="/api/branches"
         placeholder="Select a branch"
+        initialLabel={entity?.branch?.name}
     />
 );
 
-const renderParentSection = () => (
+const renderParentSection = (entity?: AssetLocation | null) => (
     <AsyncSelectField
         name="parent_id"
         label="Parent Location (optional)"
         url="/api/asset-locations"
         placeholder="Select a parent location"
+        initialLabel={entity?.parent?.name}
     />
 );
 
@@ -65,12 +67,12 @@ const getAssetLocationFormDefaults = (entity?: AssetLocation | null): AssetLocat
     return {
         code: entity.code,
         name: entity.name,
-        branch_id: typeof entity.branch === 'object'
+        branch_id: typeof entity.branch === 'object' && entity.branch
             ? String(entity.branch.id)
             : String(entity.branch_id || ''),
-        parent_id: entity.parent_id && entity.parent
+        parent_id: typeof entity.parent === 'object' && entity.parent
             ? String(entity.parent.id)
-            : '',
+            : String(entity.parent_id || ''),
     };
 };
 
@@ -113,8 +115,8 @@ export const AssetLocationForm = memo<AssetLocationFormProps>(function AssetLoca
             isLoading={isLoading}
         >
             {renderBasicInfoSection()}
-            {renderBranchSection()}
-            {renderParentSection()}
+            {renderBranchSection(entity)}
+            {renderParentSection(entity)}
         </EntityForm>
     );
 });

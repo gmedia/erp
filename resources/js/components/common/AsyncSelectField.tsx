@@ -20,6 +20,7 @@ interface AsyncSelectFieldProps {
     children?: ReactNode;
     labelFn?: (item: any) => string;
     valueFn?: (item: any) => string;
+    initialLabel?: string;
 }
 
 export default function AsyncSelectField({
@@ -31,6 +32,7 @@ export default function AsyncSelectField({
     children,
     labelFn,
     valueFn,
+    initialLabel,
 }: AsyncSelectFieldProps) {
     return (
         <FormField
@@ -46,6 +48,7 @@ export default function AsyncSelectField({
                             placeholder={placeholder}
                             labelFn={labelFn}
                             valueFn={valueFn}
+                            initialLabel={initialLabel}
                         />
                     </FormControl>
                     <FormMessage />
