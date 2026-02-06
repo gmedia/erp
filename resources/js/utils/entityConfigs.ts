@@ -80,6 +80,10 @@ import { assetCategoryColumns } from '@/components/asset-categories/AssetCategor
 import { AssetCategoryForm } from '@/components/asset-categories/AssetCategoryForm';
 import { AssetCategoryViewModal } from '@/components/asset-categories/AssetCategoryViewModal';
 import { type AssetCategory } from '@/types/asset-category';
+import { assetColumns } from '@/components/assets/AssetColumns';
+import { createAssetFilterFields } from '@/components/assets/AssetFilters';
+import { AssetForm } from '@/components/assets/AssetForm';
+import { type Asset } from '@/types/asset';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -518,4 +522,27 @@ export const assetLocationConfig = createComplexEntityConfig<AssetLocation>({
     viewModalComponent: AssetLocationViewModal,
     getDeleteMessage: (item: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${item.name || 'this asset location'}.`,
+});
+
+export const assetConfig = createComplexEntityConfig<Asset>({
+    entityName: 'Asset',
+    entityNamePlural: 'Assets',
+    apiEndpoint: '/api/assets',
+    exportEndpoint: '/api/assets/export',
+    queryKey: ['assets'],
+    breadcrumbs: [{ title: 'Assets', href: '/assets' }],
+    initialFilters: {
+        search: '',
+        asset_category_id: '',
+        branch_id: '',
+        status: '',
+        condition: '',
+    },
+    columns: assetColumns,
+    filterFields: createAssetFilterFields(),
+    formComponent: AssetForm,
+    formType: 'complex',
+    entityNameForSearch: 'asset',
+    getDeleteMessage: (item: { name?: string; asset_code?: string }) =>
+        `This action cannot be undone. This will permanently delete asset ${item.asset_code} (${item.name}).`,
 });
