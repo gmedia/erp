@@ -67,7 +67,7 @@
 - [ ] SonarQube. ([Link](https://docs.sonarsource.com/sonarqube-community-build/server-installation/from-docker-image/installation-overview))
 - [x] Laravel Actions. ([Link](https://github.com/lorisleiva/laravel-actions))
 - [x] Scramble. ([Link](https://github.com/dedoc/scramble))
-- [ ] Octane. ([Link](https://laravel.com/docs/12.x/octane))
+- [x] Octane. ([Link](https://laravel.com/docs/12.x/octane))
 - [ ] Buggregator (XHProf, VarDumper, Ray, Sentry, SMTP Server, Monolog, Inspector). ([Link](https://docs.buggregator.dev))
 - [ ] Sentry. ([Link](https://docs.sentry.io/platforms/php/guides/laravel))
 - [ ] Paratest. ([Link](https://github.com/paratestphp/paratest))
