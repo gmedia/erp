@@ -52,7 +52,12 @@ expect()->extend('toBeOne', function () {
 function createTestUserWithPermissions(array $permissionNames = []): User
 {
     $user = User::factory()->create();
-    $employee = Employee::factory()->create(['user_id' => $user->id]);
+    $employee = Employee::factory()->create([
+        'user_id' => $user->id,
+        'department_id' => null,
+        'position_id' => null,
+        'branch_id' => null,
+    ]);
 
     if (!empty($permissionNames)) {
         $permissions = [];
@@ -67,4 +72,3 @@ function createTestUserWithPermissions(array $permissionNames = []): User
 
     return $user;
 }
-

@@ -27,6 +27,7 @@ describe('Asset Location API Endpoints', function () {
     });
 
     test('index returns paginated asset locations', function () {
+        $baseline = AssetLocation::count();
         AssetLocation::factory()->count(15)->create();
 
         $response = getJson('/api/asset-locations?per_page=10');
@@ -37,19 +38,20 @@ describe('Asset Location API Endpoints', function () {
                 'meta' => ['total', 'per_page', 'current_page']
             ]);
 
-        expect($response->json('meta.total'))->toBe(15)
+        expect($response->json('meta.total'))->toBe($baseline + 15)
             ->and($response->json('data'))->toHaveCount(10);
     });
 
     test('index supports search filtering', function () {
-        AssetLocation::factory()->create(['name' => 'Warehouse A']);
+        $token = 'ALOC-' . uniqid();
+        AssetLocation::factory()->create(['name' => "{$token} A"]);
         AssetLocation::factory()->create(['name' => 'Office B']);
 
-        $response = getJson('/api/asset-locations?search=Warehouse');
+        $response = getJson("/api/asset-locations?search={$token}");
 
         $response->assertOk();
         expect($response->json('data'))->toHaveCount(1)
-            ->and($response->json('data.0.name'))->toBe('Warehouse A');
+            ->and($response->json('data.0.name'))->toBe("{$token} A");
     });
 
     test('index supports filtering by branch', function () {

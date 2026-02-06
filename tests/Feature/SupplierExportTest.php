@@ -51,15 +51,18 @@ describe('SupplierExport', function () {
     });
 
     test('query applies exact status filter', function () {
-        Supplier::factory()->create(['status' => 'active']);
-        Supplier::factory()->create(['status' => 'inactive']);
+        $baselineInactive = Supplier::query()->where('status', 'inactive')->count();
 
-        $export = new SupplierExport(['status' => 'active']);
+        Supplier::factory()->create(['status' => 'active']);
+        $inactiveSupplier = Supplier::factory()->create(['status' => 'inactive']);
+
+        $export = new SupplierExport(['status' => 'inactive']);
 
         $results = $export->query()->get();
 
-        expect($results)->toHaveCount(1)
-            ->and($results->first()->status)->toBe('active');
+        expect($results)->toHaveCount($baselineInactive + 1)
+            ->and($results->every(fn ($supplier) => $supplier->status === 'inactive'))->toBeTrue()
+            ->and($results->contains('id', $inactiveSupplier->id))->toBeTrue();
     });
 
     test('map function returns correct data', function () {
@@ -93,13 +96,14 @@ describe('SupplierExport', function () {
     });
 
     test('handles empty filters gracefully', function () {
+        $baseline = Supplier::count();
         Supplier::factory()->count(5)->create();
 
         $export = new SupplierExport([]);
 
         $results = $export->query()->get();
 
-        expect($results)->toHaveCount(5);
+        expect($results)->toHaveCount($baseline + 5);
     });
 
 });

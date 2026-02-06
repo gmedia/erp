@@ -8,6 +8,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('employees');
 
+beforeEach(function () {
+    Employee::query()->delete();
+});
+
 test('applySearch adds where clause for search term', function () {
     $service = new EmployeeFilterService;
 

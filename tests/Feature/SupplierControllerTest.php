@@ -30,6 +30,7 @@ describe('Supplier API Endpoints', function () {
     });
 
     test('index returns paginated suppliers', function () {
+        $baseline = Supplier::count();
         Supplier::factory()->count(15)->create();
 
         $response = getJson('/api/suppliers?per_page=10');
@@ -40,7 +41,7 @@ describe('Supplier API Endpoints', function () {
                 'meta' => ['total', 'per_page', 'current_page']
             ]);
 
-        expect($response->json('meta.total'))->toBe(15)
+        expect($response->json('meta.total'))->toBe($baseline + 15)
             ->and($response->json('data'))->toHaveCount(10);
     });
 

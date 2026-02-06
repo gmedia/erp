@@ -25,6 +25,7 @@ describe('Employee API Endpoints', function () {
     });
 
     test('index returns paginated employees with proper meta structure', function () {
+        $baseline = Employee::count();
         Employee::factory()->count(25)->create();
 
         $response = getJson('/api/employees?per_page=10');
@@ -56,8 +57,7 @@ describe('Employee API Endpoints', function () {
                 ],
             ]);
 
-        // Note: +1 because beforeEach creates an employee for the logged-in user
-        expect($response->json('meta.total'))->toBe(26)
+        expect($response->json('meta.total'))->toBe($baseline + 25)
             ->and($response->json('meta.per_page'))->toBe(10)
             ->and($response->json('data'))->toHaveCount(10);
     });

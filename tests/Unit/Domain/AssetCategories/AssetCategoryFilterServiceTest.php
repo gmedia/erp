@@ -7,27 +7,29 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('asset-categories', 'unit', 'domain');
 
 test('asset category filter service applies name search', function () {
-    AssetCategory::factory()->create(['name' => 'IT Equipment']);
+    $needle = 'ACAT-' . uniqid();
+    AssetCategory::factory()->create(['name' => "{$needle} Equipment"]);
     AssetCategory::factory()->create(['name' => 'Office Chair']);
 
     $service = new AssetCategoryFilterService();
     $query = AssetCategory::query();
     
-    $service->applySearch($query, 'IT', ['name']);
+    $service->applySearch($query, $needle, ['name']);
     
     expect($query->count())->toBe(1)
-        ->and($query->first()->name)->toBe('IT Equipment');
+        ->and($query->first()->name)->toBe("{$needle} Equipment");
 });
 
 test('asset category filter service applies code search', function () {
-    AssetCategory::factory()->create(['code' => 'AC-001']);
-    AssetCategory::factory()->create(['code' => 'FE-001']);
+    $needle = 'CODE-' . uniqid();
+    AssetCategory::factory()->create(['code' => "AC-{$needle}"]);
+    AssetCategory::factory()->create(['code' => "FE-{$needle}"]);
 
     $service = new AssetCategoryFilterService();
     $query = AssetCategory::query();
     
-    $service->applySearch($query, 'AC', ['code']);
+    $service->applySearch($query, "AC-{$needle}", ['code']);
     
     expect($query->count())->toBe(1)
-        ->and($query->first()->code)->toBe('AC-001');
+        ->and($query->first()->code)->toBe("AC-{$needle}");
 });

@@ -26,9 +26,8 @@ describe('Branch API Endpoints', function () {
     });
 
     test('index returns paginated branches', function () {
-        // User creation creates 1 branch automatically via EmployeeFactory
-        // We create 14 more to reach 15 total
-        Branch::factory()->count(14)->create();
+        $baseline = Branch::count();
+        Branch::factory()->count(15)->create();
 
         $response = getJson('/api/branches?per_page=10');
 
@@ -40,7 +39,7 @@ describe('Branch API Endpoints', function () {
                 'meta' => ['total', 'per_page', 'current_page']
             ]);
 
-        expect($response->json('meta.total'))->toBe(15)
+        expect($response->json('meta.total'))->toBe($baseline + 15)
             ->and($response->json('data'))->toHaveCount(10);
     });
 

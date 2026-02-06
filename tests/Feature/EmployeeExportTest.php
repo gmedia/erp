@@ -9,6 +9,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('employees');
 
 describe('EmployeeExport', function () {
+    beforeEach(function () {
+        Employee::query()->delete();
+    });
 
     test('query applies search filter across name and email fields', function () {
         Employee::factory()->create(['name' => 'John Doe', 'email' => 'john@example.com']);
