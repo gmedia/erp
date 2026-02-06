@@ -204,3 +204,19 @@ export const assetModelFormSchema = z.object({
 });
 
 export type AssetModelFormData = z.infer<typeof assetModelFormSchema>;
+
+export const accountMappingFormSchema = z
+    .object({
+        source_coa_version_id: z.string().min(1, { message: 'Source COA Version is required.' }),
+        target_coa_version_id: z.string().min(1, { message: 'Target COA Version is required.' }),
+        source_account_id: z.string().min(1, { message: 'Source account is required.' }),
+        target_account_id: z.string().min(1, { message: 'Target account is required.' }),
+        type: z.enum(['merge', 'split', 'rename'], { message: 'Type is required.' }),
+        notes: z.string().optional(),
+    })
+    .refine(
+        (data) => data.source_coa_version_id !== data.target_coa_version_id,
+        { message: 'Source and target COA versions must be different.', path: ['target_coa_version_id'] },
+    );
+
+export type AccountMappingFormData = z.infer<typeof accountMappingFormSchema>;
