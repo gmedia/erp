@@ -418,6 +418,35 @@ export const coaVersionConfig = createComplexEntityConfig<CoaVersion>({
     getDeleteMessage: createGenericDeleteMessage('COA Version'),
 });
 
+import { accountMappingColumns } from '@/components/account-mappings/AccountMappingColumns';
+import { createAccountMappingFilterFields } from '@/components/account-mappings/AccountMappingFilters';
+import { AccountMappingForm } from '@/components/account-mappings/AccountMappingForm';
+import { AccountMappingViewModal } from '@/components/account-mappings/AccountMappingViewModal';
+import { type AccountMapping } from '@/types/account-mapping';
+
+export const accountMappingConfig = createComplexEntityConfig<AccountMapping>({
+    entityName: 'Account Mapping',
+    entityNamePlural: 'Account Mappings',
+    apiEndpoint: '/api/account-mappings',
+    exportEndpoint: '/api/account-mappings/export',
+    queryKey: ['account-mappings'],
+    breadcrumbs: [{ title: 'Account Mappings', href: '/account-mappings' }],
+    initialFilters: {
+        search: '',
+        type: '',
+        source_coa_version_id: '',
+        target_coa_version_id: '',
+    },
+    columns: accountMappingColumns,
+    filterFields: createAccountMappingFilterFields(),
+    formComponent: AccountMappingForm,
+    formType: 'complex',
+    entityNameForSearch: 'account mapping',
+    viewModalComponent: AccountMappingViewModal,
+    getDeleteMessage: () =>
+        'This action cannot be undone. This will permanently delete this account mapping.',
+});
+
 import { journalEntryColumns } from '@/components/journal-entries/JournalEntryColumns';
 import { createJournalEntryFilterFields } from '@/components/journal-entries/JournalEntryFilters';
 import { JournalEntryForm } from '@/components/journal-entries/JournalEntryForm';

@@ -363,14 +363,25 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'permission',
-                'display_name' => 'Permission',
-                'child' => [],
-            ],
-            [
-                'name' => 'user',
-                'display_name' => 'User',
-                'child' => [],
+                'name' => 'account_mapping',
+                'display_name' => 'Account Mappings',
+                'child' => [
+                    [
+                        'name' => 'account_mapping.create',
+                        'display_name' => 'Create Account Mapping',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'account_mapping.edit',
+                        'display_name' => 'Edit Account Mapping',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'account_mapping.delete',
+                        'display_name' => 'Delete Account Mapping',
+                        'child' => [],
+                    ],
+                ],
             ],
             [
                 'name' => 'asset_category',
@@ -434,6 +445,16 @@ class PermissionSeeder extends Seeder
                         'child' => [],
                     ],
                 ],
+            ],
+            [
+                'name' => 'permission',
+                'display_name' => 'Permission',
+                'child' => [],
+            ],
+            [
+                'name' => 'user',
+                'display_name' => 'User',
+                'child' => [],
             ],
         ];
 
