@@ -16,5 +16,5 @@ jobs:
         run: |
           echo "Starting deployment to production..."
           echo "Connecting to production server..."
-          # ssh user@host "cd /app && ./docker/production/scripts/deploy.sh"
+          # ssh user@host "cd /app && ./docker/dist/scripts/deploy.sh"
           echo "Deployment successful!"
