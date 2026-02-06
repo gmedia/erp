@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   ssr:
     image: ghcr.io/gmedia/erp/app:latest
