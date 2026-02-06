@@ -1,17 +1,29 @@
 import { Page, expect } from '@playwright/test';
 import { login } from '../helpers';
 
+async function fillVisibleSearch(page: Page, value: string): Promise<void> {
+  const input = page.locator('input[placeholder="Search..."]:visible');
+  await expect(input).toHaveCount(1, { timeout: 15000 });
+  await input.fill(value);
+}
+
 async function clickFirstMatchingOption(page: Page, name: RegExp): Promise<void> {
   for (let attempt = 0; attempt < 5; attempt++) {
-    const option = page.getByRole('option', { name }).first();
+    const option = page
+      .locator('[role="option"]:visible')
+      .filter({ hasText: name })
+      .first();
     await option.waitFor({ state: 'visible', timeout: 15000 });
     try {
+      await option.scrollIntoViewIfNeeded();
       await option.click();
       return;
     } catch (error) {
       if (attempt === 4) throw error;
     }
   }
+
+  throw new Error(`Option not found: ${name}`);
 }
 
 export async function createAccountMapping(page: Page): Promise<{
@@ -38,27 +50,23 @@ export async function createAccountMapping(page: Page): Promise<{
   await expect(combos.first()).toBeVisible({ timeout: 15000 });
 
   await combos.nth(0).click();
-  const search1 = page.getByPlaceholder('Search...').filter({ visible: true }).last();
-  await search1.fill('COA 2025 Standard');
+  await fillVisibleSearch(page, 'COA 2025 Standard');
   await clickFirstMatchingOption(page, /COA 2025 Standard/i);
 
   await combos.nth(1).click();
-  const search2 = page.getByPlaceholder('Search...').filter({ visible: true }).last();
-  await search2.fill(sourceCode);
+  await fillVisibleSearch(page, sourceCode);
   await clickFirstMatchingOption(page, new RegExp(sourceCode));
 
   await combos.nth(2).click();
-  const search3 = page.getByPlaceholder('Search...').filter({ visible: true }).last();
-  await search3.fill('COA 2026 Enhanced');
+  await fillVisibleSearch(page, 'COA 2026 Enhanced');
   await clickFirstMatchingOption(page, /COA 2026 Enhanced/i);
 
   await combos.nth(3).click();
-  const search4 = page.getByPlaceholder('Search...').filter({ visible: true }).last();
-  await search4.fill(targetCode);
+  await fillVisibleSearch(page, targetCode);
   await clickFirstMatchingOption(page, new RegExp(targetCode));
 
   await combos.nth(4).click();
-  await page.getByRole('option', { name: 'Rename', exact: true }).click();
+  await clickFirstMatchingOption(page, /^Rename$/);
 
   const notes = `notes-${timestamp}`;
   await dialog.locator('textarea[name="notes"]').fill(notes);

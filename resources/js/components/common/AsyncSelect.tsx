@@ -148,6 +148,7 @@ export function AsyncSelect({
                     <div
                         className="max-h-[200px] overflow-y-auto p-1"
                         role="listbox"
+                        aria-busy={loading}
                     >
                         {loading && (
                             <div className="flex items-center justify-center p-4">
