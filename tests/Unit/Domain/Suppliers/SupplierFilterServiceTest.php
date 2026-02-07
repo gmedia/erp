@@ -49,12 +49,16 @@ test('applyAdvancedFilters filters by category', function () {
 
 test('applyAdvancedFilters filters by status', function () {
     $service = new SupplierFilterService;
+    // Get existing suppliers count before creating new ones
+    $baselineActive = Supplier::where('status', 'active')->count();
+    $baselineInactive = Supplier::where('status', 'inactive')->count();
+    
     Supplier::factory()->create(['status' => 'active']);
     Supplier::factory()->create(['status' => 'inactive']);
 
     $query = Supplier::query();
     $service->applyAdvancedFilters($query, ['status' => 'active']);
 
-    expect($query->count())->toBe(1)
+    expect($query->count())->toBe($baselineActive + 1)
         ->and($query->first()->status)->toBe('active');
 });

@@ -83,13 +83,16 @@ describe('Supplier API Endpoints', function () {
     });
 
     test('index supports filtering by status', function () {
+        // Get existing suppliers count before creating new ones
+        $baselineActive = Supplier::where('status', 'active')->count();
+        
         Supplier::factory()->create(['status' => 'active']);
         Supplier::factory()->create(['status' => 'inactive']);
 
         $response = getJson('/api/suppliers?status=active');
 
         $response->assertOk();
-        expect($response->json('data'))->toHaveCount(1)
+        expect($response->json('data'))->toHaveCount($baselineActive + 1)
             ->and($response->json('data.0.status'))->toBe('active');
     });
 

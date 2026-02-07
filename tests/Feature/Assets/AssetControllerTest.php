@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\{Asset, User};
+use App\Models\{Asset, Employee, Permission, User};
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -8,6 +8,18 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->user = User::factory()->create();
     $this->actingAs($this->user);
+    
+    $this->employee = Employee::factory()->create([
+        'user_id' => $this->user->id,
+        'email' => $this->user->email,
+    ]);
+
+    $pAsset = Permission::firstOrCreate(['name' => 'asset', 'display_name' => 'Asset']);
+    $pCreate = Permission::firstOrCreate(['name' => 'asset.create', 'display_name' => 'Create Asset']);
+    $pEdit = Permission::firstOrCreate(['name' => 'asset.edit', 'display_name' => 'Edit Asset']);
+    $pDelete = Permission::firstOrCreate(['name' => 'asset.delete', 'display_name' => 'Delete Asset']);
+    
+    $this->employee->permissions()->attach([$pAsset->id, $pCreate->id, $pEdit->id, $pDelete->id]);
 });
 
 test('can list assets', function () {
@@ -58,5 +70,5 @@ test('can delete asset', function () {
     $response = $this->deleteJson(route('assets.destroy', $asset));
 
     $response->assertStatus(200);
-    $this->assertDatabaseMissing('assets', ['id' => $asset->id]);
+    $this->assertSoftDeleted('assets', ['id' => $asset->id]);
 });
