@@ -23,12 +23,13 @@ beforeEach(function () {
 });
 
 test('can list assets', function () {
+    $baseline = Asset::count();
     Asset::factory()->count(3)->create();
 
     $response = $this->getJson(route('assets.index'));
 
     $response->assertStatus(200)
-        ->assertJsonCount(3, 'data');
+        ->assertJsonCount($baseline + 3, 'data');
 });
 
 test('can create asset', function () {
