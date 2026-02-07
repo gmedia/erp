@@ -46,7 +46,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'accounting',
                 'display_name' => 'Accounting',
-                'permissions' => ['journal_entry', 'journal_entry.create', 'journal_entry.edit', 'journal_entry.delete'],
+                'permissions' => ['journal_entry', 'posting_journal'],
                 'icon' => 'BookOpen',
                 'url' => null,
                 'child' => [
@@ -64,6 +64,23 @@ class MenuSeeder extends Seeder
                         'permissions' => ['posting_journal'],
                         'icon' => 'BookOpen',
                         'url' => 'posting-journals',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'asset',
+                'display_name' => 'Asset',
+                'permissions' => ['asset'],
+                'icon' => 'BookOpen',
+                'url' => null,
+                'child' => [
+                    [
+                        'name' => 'asset',
+                        'display_name' => 'Asset Data',
+                        'permissions' => ['asset', 'asset.create', 'asset.edit', 'asset.delete'],
+                        'icon' => 'Book',
+                        'url' => 'assets',
                         'child' => [],
                     ],
                 ],
@@ -120,7 +137,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'master.data',
                 'display_name' => 'Master Data',
-                'permissions' => ['permission'],
+                'permissions' => ['department', 'position', 'branch', 'customer_category', 'supplier_category', 'product_category', 'unit', 'product', 'fiscal_year', 'coa_version', 'account', 'account_mapping', 'asset_category', 'asset_model', 'asset_location', 'accounts'],
                 'icon' => 'LayoutList',
                 'url' => null,
                 'child' => [
@@ -257,7 +274,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'admin',
                 'display_name' => 'Admin',
-                'permissions' => ['permission'],
+                'permissions' => ['permission', 'user'],
                 'icon' => 'Settings2',
                 'url' => null,
                 'child' => [

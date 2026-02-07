@@ -170,6 +170,32 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'asset',
+                'display_name' => 'Asset',
+                'child' => [
+                    [
+                        'name' => 'asset.create',
+                        'display_name' => 'Create Asset',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset.edit',
+                        'display_name' => 'Edit Asset',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset.delete',
+                        'display_name' => 'Delete Asset',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset.post',
+                        'display_name' => 'Post Asset',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'trial_balance_report',
                 'display_name' => 'Trial Balance Report',
                 'child' => [],
