@@ -27,9 +27,11 @@ yarn-error.log
 /.vscode
 /.zed
 task.*
-.kilocode*
+.cline*
 .roo*
-.agent/example_skills
+.kilocode*
+.agent*
+.trae*
 
 # IDE helper
 _ide_helper.php
