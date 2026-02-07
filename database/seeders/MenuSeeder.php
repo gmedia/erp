@@ -76,7 +76,7 @@ class MenuSeeder extends Seeder
                 'url' => null,
                 'child' => [
                     [
-                        'name' => 'asset',
+                        'name' => 'asset_data',
                         'display_name' => 'Asset Data',
                         'permissions' => ['asset', 'asset.create', 'asset.edit', 'asset.delete'],
                         'icon' => 'Book',
