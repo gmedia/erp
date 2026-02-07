@@ -44,6 +44,8 @@ class DatabaseSeeder extends Seeder
             BranchSeeder::class,
             DepartmentSeeder::class,
             PositionSeeder::class,
+            CustomerCategorySeeder::class,
+            SupplierCategorySeeder::class,
             ProductCategorySeeder::class,
             UnitSeeder::class,
             CoaSeeder::class,
@@ -70,8 +72,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             MenuSeeder::class,
-            CustomerCategorySeeder::class,
-            SupplierCategorySeeder::class,
             ProductSampleDataSeeder::class,
             AssetSampleDataSeeder::class,
         ]);

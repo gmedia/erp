@@ -261,14 +261,6 @@ class MenuSeeder extends Seeder
                         'url' => 'asset-locations',
                         'child' => [],
                     ],
-                    [
-                        'name' => 'chart_of_accounts',
-                        'display_name' => 'Chart of Accounts',
-                        'permissions' => ['accounts', 'accounts.create', 'accounts.edit', 'accounts.delete'],
-                        'icon' => 'FolderTree',
-                        'url' => 'accounts',
-                        'child' => [],
-                    ],
                 ],
             ],
             [
