@@ -1,6 +1,7 @@
 import { BaseEntity } from './entity';
 
 export interface AssetModel extends BaseEntity {
+    name?: string; // Added for compatibility with AsyncSelect
     model_name: string;
     manufacturer: string | null;
     asset_category_id: number;

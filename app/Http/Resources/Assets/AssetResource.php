@@ -14,6 +14,13 @@ class AssetResource extends JsonResource
             'id' => $this->resource->id,
             'asset_code' => $this->resource->asset_code,
             'name' => $this->resource->name,
+            'asset_category_id' => $this->resource->asset_category_id,
+            'asset_model_id' => $this->resource->asset_model_id,
+            'branch_id' => $this->resource->branch_id,
+            'asset_location_id' => $this->resource->asset_location_id,
+            'department_id' => $this->resource->department_id,
+            'employee_id' => $this->resource->employee_id,
+            'supplier_id' => $this->resource->supplier_id,
             'serial_number' => $this->resource->serial_number,
             'barcode' => $this->resource->barcode,
             
@@ -24,6 +31,7 @@ class AssetResource extends JsonResource
             'model' => [
                 'id' => $this->resource->asset_model_id,
                 'name' => $this->resource->model?->model_name,
+                'model_name' => $this->resource->model?->model_name,
             ],
             'branch' => [
                 'id' => $this->resource->branch_id,
