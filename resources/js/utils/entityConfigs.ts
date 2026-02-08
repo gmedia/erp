@@ -83,6 +83,7 @@ import { type AssetCategory } from '@/types/asset-category';
 import { assetColumns } from '@/components/assets/AssetColumns';
 import { createAssetFilterFields } from '@/components/assets/AssetFilters';
 import { AssetForm } from '@/components/assets/AssetForm';
+import { AssetViewModal } from '@/components/assets/AssetViewModal';
 import { type Asset } from '@/types/asset';
 
 // Helper function to create generic delete messages
@@ -543,6 +544,7 @@ export const assetConfig = createComplexEntityConfig<Asset>({
     formComponent: AssetForm,
     formType: 'complex',
     entityNameForSearch: 'asset',
+    viewModalComponent: AssetViewModal,
     getDeleteMessage: (item: { name?: string; asset_code?: string }) =>
         `This action cannot be undone. This will permanently delete asset ${item.asset_code} (${item.name}).`,
 });
