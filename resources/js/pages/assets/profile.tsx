@@ -22,6 +22,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type Asset } from '@/types/asset';
 import { Head } from '@inertiajs/react';
 import { format } from 'date-fns';
+import { QRCodeSVG } from 'qrcode.react';
 import {
     Activity,
     AlertCircle,
@@ -49,6 +50,7 @@ interface Props {
     asset: {
         data: Asset & {
             ulid: string;
+            qrcode_url?: string;
             movements?: any[];
             maintenances?: any[];
             stocktake_items?: any[];
@@ -160,19 +162,32 @@ export default function AssetProfile({ asset }: Props) {
                             </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-2">
-                            <Badge
-                                variant={getStatusVariant(item.status)}
-                                className={`px-4 py-1.5 text-sm font-medium capitalize ${item.status === 'active' ? 'animate-pulse' : ''}`}
-                            >
-                                {item.status}
-                            </Badge>
-                            <Badge
-                                variant={getConditionVariant(item.condition || '')}
-                                className="px-4 py-1.5 text-sm font-medium capitalize"
-                            >
-                                {item.condition?.replace('_', ' ') || 'Unknown'}
-                            </Badge>
+                        <div className="flex flex-wrap items-center gap-4">
+                            {item.qrcode_url && (
+                                <div className="rounded-lg bg-white p-2 shadow-sm border border-primary/10">
+                                    <QRCodeSVG
+                                        value={item.qrcode_url}
+                                        size={80}
+                                        level="H"
+                                        includeMargin={false}
+                                        className="h-20 w-20"
+                                    />
+                                </div>
+                            )}
+                            <div className="flex flex-col gap-2">
+                                <Badge
+                                    variant={getStatusVariant(item.status)}
+                                    className={`px-4 py-1.5 text-sm font-medium capitalize ${item.status === 'active' ? 'animate-pulse' : ''}`}
+                                >
+                                    {item.status}
+                                </Badge>
+                                <Badge
+                                    variant={getConditionVariant(item.condition || '')}
+                                    className="px-4 py-1.5 text-sm font-medium capitalize"
+                                >
+                                    {item.condition?.replace('_', ' ') || 'Unknown'}
+                                </Badge>
+                            </div>
                         </div>
                     </div>
                 </div>
