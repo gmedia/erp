@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import {
     Table,
@@ -23,11 +24,24 @@ import { Head } from '@inertiajs/react';
 import { format } from 'date-fns';
 import {
     Activity,
+    AlertCircle,
+    Barcode,
+    Building2,
     Calendar,
+    CalendarDays,
+    CircleDollarSign,
     ClipboardCheck,
+    Clock,
+    Hash,
     History,
     Info,
+    Layers,
+    MapPin,
+    Package,
+    Settings,
+    ShieldCheck,
     TrendingDown,
+    User,
     Wrench,
 } from 'lucide-react';
 
@@ -91,6 +105,13 @@ export default function AssetProfile({ asset }: Props) {
         }
     };
 
+    const getDepreciationProgress = () => {
+        const purchaseCost = Number(item.purchase_cost) || 0;
+        const accumulatedDep = Number(item.accumulated_depreciation) || 0;
+        if (purchaseCost === 0) return 0;
+        return Math.min((accumulatedDep / purchaseCost) * 100, 100);
+    };
+
     const breadcrumbs = [
         { title: 'Assets', href: '/assets' },
         { title: item.asset_code, href: '#' },
@@ -101,50 +122,80 @@ export default function AssetProfile({ asset }: Props) {
             <Head title={`Asset Profile - ${item.asset_code}`} />
 
             <div className="flex flex-col gap-6 p-6">
-                {/* Header Section */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                            <h1 className="text-3xl font-bold tracking-tight">{item.name}</h1>
-                            <Badge variant="outline" className="text-lg py-1 px-3">
-                                {item.asset_code}
+                {/* Header Section - Enhanced */}
+                <div className="relative overflow-hidden rounded-xl border bg-gradient-to-r from-primary/5 via-primary/10 to-transparent p-6">
+                    <div className="absolute right-0 top-0 -z-10 h-64 w-64 opacity-20">
+                        <Package className="h-full w-full text-primary/30" />
+                    </div>
+                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                        <div className="flex items-start gap-4">
+                            {/* Icon Box */}
+                            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-sm">
+                                <Layers className="h-8 w-8" />
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{item.name}</h1>
+                                    <Badge variant="outline" className="font-mono text-sm px-3 py-1">
+                                        {item.asset_code}
+                                    </Badge>
+                                </div>
+                                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                                    <span className="flex items-center gap-1">
+                                        <Package className="h-4 w-4" />
+                                        {item.category?.name || 'Uncategorized'}
+                                    </span>
+                                    <span className="hidden sm:inline">•</span>
+                                    <span className="flex items-center gap-1">
+                                        <Settings className="h-4 w-4" />
+                                        {item.model?.model_name || 'Generic Model'}
+                                    </span>
+                                    {item.model?.manufacturer && (
+                                        <>
+                                            <span className="hidden sm:inline">•</span>
+                                            <span>{item.model.manufacturer}</span>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Badge
+                                variant={getStatusVariant(item.status)}
+                                className={`px-4 py-1.5 text-sm font-medium capitalize ${item.status === 'active' ? 'animate-pulse' : ''}`}
+                            >
+                                {item.status}
+                            </Badge>
+                            <Badge
+                                variant={getConditionVariant(item.condition || '')}
+                                className="px-4 py-1.5 text-sm font-medium capitalize"
+                            >
+                                {item.condition?.replace('_', ' ') || 'Unknown'}
                             </Badge>
                         </div>
-                        <p className="text-muted-foreground">
-                            {item.category?.name} &bull; {item.model?.model_name || 'Generic Model'}
-                        </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <Badge variant={getStatusVariant(item.status)} className="text-sm px-4 py-1 capitalize">
-                            {item.status}
-                        </Badge>
-                        <Badge variant={getConditionVariant(item.condition || '')} className="text-sm px-4 py-1 capitalize">
-                            {item.condition?.replace('_', ' ') || 'Unknown'}
-                        </Badge>
                     </div>
                 </div>
 
-                <Separator />
-
                 <Tabs defaultValue="summary" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto">
-                        <TabsTrigger value="summary" className="py-2">
+                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto bg-muted/50">
+                        <TabsTrigger value="summary" className="py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <Info className="mr-2 h-4 w-4" />
                             Summary
                         </TabsTrigger>
-                        <TabsTrigger value="movements" className="py-2">
+                        <TabsTrigger value="movements" className="py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <History className="mr-2 h-4 w-4" />
                             Movements
                         </TabsTrigger>
-                        <TabsTrigger value="maintenance" className="py-2">
+                        <TabsTrigger value="maintenance" className="py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <Wrench className="mr-2 h-4 w-4" />
                             Maintenance
                         </TabsTrigger>
-                        <TabsTrigger value="stocktake" className="py-2">
+                        <TabsTrigger value="stocktake" className="py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <ClipboardCheck className="mr-2 h-4 w-4" />
                             Stocktake
                         </TabsTrigger>
-                        <TabsTrigger value="depreciation" className="py-2">
+                        <TabsTrigger value="depreciation" className="py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <TrendingDown className="mr-2 h-4 w-4" />
                             Depreciation
                         </TabsTrigger>
@@ -154,97 +205,152 @@ export default function AssetProfile({ asset }: Props) {
                     <TabsContent value="summary" className="space-y-6 mt-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {/* General Information */}
-                            <Card>
+                            <Card className="group hover:shadow-md transition-all duration-200 hover:border-primary/30">
                                 <CardHeader className="pb-3">
-                                    <CardTitle className="text-sm font-medium flex items-center">
-                                        <Info className="mr-2 h-4 w-4 text-primary" />
-                                        General Information
+                                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                                            <Info className="h-4 w-4" />
+                                        </div>
+                                        <span>General Information</span>
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-3">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Serial Number</span>
-                                        <span className="font-medium">{item.serial_number || '-'}</span>
+                                <CardContent className="space-y-4">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="flex items-center gap-2 text-muted-foreground">
+                                            <Hash className="h-3.5 w-3.5" />
+                                            Serial Number
+                                        </span>
+                                        <span className="font-mono font-medium">{item.serial_number || '-'}</span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Barcode</span>
-                                        <span className="font-medium">{item.barcode || '-'}</span>
+                                    <Separator />
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="flex items-center gap-2 text-muted-foreground">
+                                            <Barcode className="h-3.5 w-3.5" />
+                                            Barcode
+                                        </span>
+                                        <span className="font-mono font-medium">{item.barcode || '-'}</span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Purchase Date</span>
+                                    <Separator />
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="flex items-center gap-2 text-muted-foreground">
+                                            <CalendarDays className="h-3.5 w-3.5" />
+                                            Purchase Date
+                                        </span>
                                         <span className="font-medium">{formatDate(item.purchase_date)}</span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Warranty Until</span>
+                                    <Separator />
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="flex items-center gap-2 text-muted-foreground">
+                                            <ShieldCheck className="h-3.5 w-3.5" />
+                                            Warranty Until
+                                        </span>
                                         <span className="font-medium">{formatDate(item.warranty_end_date)}</span>
                                     </div>
                                 </CardContent>
                             </Card>
 
                             {/* Location & Assignment */}
-                            <Card>
+                            <Card className="group hover:shadow-md transition-all duration-200 hover:border-primary/30">
                                 <CardHeader className="pb-3">
-                                    <CardTitle className="text-sm font-medium flex items-center">
-                                        <Activity className="mr-2 h-4 w-4 text-primary" />
-                                        Current Location & PIC
+                                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
+                                            <MapPin className="h-4 w-4" />
+                                        </div>
+                                        <span>Current Location & PIC</span>
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-3">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Branch</span>
+                                <CardContent className="space-y-4">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="flex items-center gap-2 text-muted-foreground">
+                                            <Building2 className="h-3.5 w-3.5" />
+                                            Branch
+                                        </span>
                                         <span className="font-medium">{item.branch?.name || '-'}</span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Location</span>
+                                    <Separator />
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="flex items-center gap-2 text-muted-foreground">
+                                            <MapPin className="h-3.5 w-3.5" />
+                                            Location
+                                        </span>
                                         <span className="font-medium">{item.location?.name || '-'}</span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Department</span>
+                                    <Separator />
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="flex items-center gap-2 text-muted-foreground">
+                                            <Activity className="h-3.5 w-3.5" />
+                                            Department
+                                        </span>
                                         <span className="font-medium">{item.department?.name || '-'}</span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Person in Charge</span>
-                                        <span className="font-medium text-primary">{item.employee?.name || 'Unassigned'}</span>
+                                    <Separator />
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="flex items-center gap-2 text-muted-foreground">
+                                            <User className="h-3.5 w-3.5" />
+                                            Person in Charge
+                                        </span>
+                                        <Badge variant="outline" className="font-medium">
+                                            {item.employee?.name || 'Unassigned'}
+                                        </Badge>
                                     </div>
                                 </CardContent>
                             </Card>
 
-                            {/* Financial Summary */}
-                            <Card>
+                            {/* Financial Summary - Enhanced */}
+                            <Card className="group hover:shadow-md transition-all duration-200 hover:border-primary/30">
                                 <CardHeader className="pb-3">
-                                    <CardTitle className="text-sm font-medium flex items-center">
-                                        <TrendingDown className="mr-2 h-4 w-4 text-primary" />
-                                        Financial Summary
+                                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
+                                            <CircleDollarSign className="h-4 w-4" />
+                                        </div>
+                                        <span>Financial Summary</span>
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-3">
-                                    <div className="flex justify-between text-sm">
+                                <CardContent className="space-y-4">
+                                    <div className="flex items-center justify-between text-sm">
                                         <span className="text-muted-foreground">Purchase Cost</span>
-                                        <span className="font-medium">{formatCurrency(item.purchase_cost)}</span>
+                                        <span className="font-semibold">{formatCurrency(item.purchase_cost)}</span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
+                                    <div className="flex items-center justify-between text-sm">
                                         <span className="text-muted-foreground">Useful Life</span>
                                         <span className="font-medium">{item.useful_life_months} Months</span>
                                     </div>
-                                    <div className="flex justify-between text-sm text-primary font-bold pt-2 border-t border-dashed">
-                                        <span>Current Book Value</span>
-                                        <span>{formatCurrency(item.book_value)}</span>
+                                    <Separator />
+                                    {/* Depreciation Progress */}
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between text-xs">
+                                            <span className="text-muted-foreground">Depreciation Progress</span>
+                                            <span className="font-medium">{getDepreciationProgress().toFixed(1)}%</span>
+                                        </div>
+                                        <Progress value={getDepreciationProgress()} className="h-2" />
+                                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                            <span>Accumulated: {formatCurrency(item.accumulated_depreciation)}</span>
+                                        </div>
                                     </div>
-                                    <div className="flex justify-between text-xs text-muted-foreground pt-1">
-                                        <span>Accumulated Depr.</span>
-                                        <span>{formatCurrency(item.accumulated_depreciation)}</span>
+                                    <Separator />
+                                    {/* Book Value Highlight */}
+                                    <div className="rounded-lg bg-primary/5 p-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm font-medium text-muted-foreground">Current Book Value</span>
+                                            <span className="text-lg font-bold text-primary">{formatCurrency(item.book_value)}</span>
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>
                         </div>
 
                         {item.notes && (
-                            <Card>
+                            <Card className="hover:shadow-md transition-all duration-200">
                                 <CardHeader className="pb-3">
-                                    <CardTitle className="text-sm font-medium">Notes</CardTitle>
+                                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                                            <Info className="h-4 w-4" />
+                                        </div>
+                                        <span>Notes</span>
+                                    </CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">{item.notes}</p>
+                                    <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{item.notes}</p>
                                 </CardContent>
                             </Card>
                         )}
@@ -252,129 +358,159 @@ export default function AssetProfile({ asset }: Props) {
 
                     {/* Movements Tab */}
                     <TabsContent value="movements" className="mt-6">
-                        <Card>
+                        <Card className="overflow-hidden">
                             <CardContent className="p-0">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Type</TableHead>
-                                            <TableHead>Date</TableHead>
-                                            <TableHead>Origin</TableHead>
-                                            <TableHead>Destination</TableHead>
-                                            <TableHead>Ref/Notes</TableHead>
-                                            <TableHead>PIC</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {item.movements?.length ? (
-                                            item.movements.map((m) => (
-                                                <TableRow key={m.id}>
-                                                    <TableCell className="capitalize font-medium">{m.movement_type}</TableCell>
-                                                    <TableCell className="whitespace-nowrap">{formatDate(m.moved_at)}</TableCell>
+                                {item.movements?.length ? (
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow className="bg-muted/50">
+                                                <TableHead>Type</TableHead>
+                                                <TableHead>Date</TableHead>
+                                                <TableHead>Origin</TableHead>
+                                                <TableHead>Destination</TableHead>
+                                                <TableHead>Ref/Notes</TableHead>
+                                                <TableHead>PIC</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {item.movements.map((m) => (
+                                                <TableRow key={m.id} className="hover:bg-muted/30">
+                                                    <TableCell>
+                                                        <Badge variant="outline" className="capitalize font-medium">
+                                                            {m.movement_type}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="whitespace-nowrap text-sm">{formatDate(m.moved_at)}</TableCell>
                                                     <TableCell className="text-xs">
-                                                        {m.from_branch && <div>{m.from_branch}</div>}
+                                                        {m.from_branch && <div className="font-medium">{m.from_branch}</div>}
                                                         {m.from_location && <div className="text-muted-foreground">{m.from_location}</div>}
                                                         {m.from_employee && <div className="text-primary">{m.from_employee}</div>}
                                                     </TableCell>
                                                     <TableCell className="text-xs">
-                                                        {m.to_branch && <div>{m.to_branch}</div>}
+                                                        {m.to_branch && <div className="font-medium">{m.to_branch}</div>}
                                                         {m.to_location && <div className="text-muted-foreground">{m.to_location}</div>}
                                                         {m.to_employee && <div className="text-primary">{m.to_employee}</div>}
                                                     </TableCell>
                                                     <TableCell className="max-w-[200px]">
-                                                        <div className="text-xs font-semibold">{m.reference}</div>
-                                                        <div className="text-xs text-muted-foreground truncate">{m.notes}</div>
+                                                        {m.reference && <div className="text-xs font-semibold">{m.reference}</div>}
+                                                        {m.notes && <div className="text-xs text-muted-foreground truncate">{m.notes}</div>}
                                                     </TableCell>
                                                     <TableCell className="text-xs whitespace-nowrap">{m.created_by}</TableCell>
                                                 </TableRow>
-                                            ))
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
-                                                    No movement history found.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                                        <div className="rounded-full bg-muted p-4 mb-4">
+                                            <History className="h-8 w-8 text-muted-foreground" />
+                                        </div>
+                                        <h3 className="text-lg font-medium mb-1">No Movement History</h3>
+                                        <p className="text-sm text-muted-foreground max-w-sm">
+                                            This asset has not been transferred or reassigned yet.
+                                        </p>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </TabsContent>
 
                     {/* Maintenance Tab */}
                     <TabsContent value="maintenance" className="mt-6">
-                        <Card>
+                        <Card className="overflow-hidden">
                             <CardContent className="p-0">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Type</TableHead>
-                                            <TableHead>Status</TableHead>
-                                            <TableHead>Date</TableHead>
-                                            <TableHead>Supplier</TableHead>
-                                            <TableHead className="text-right">Cost</TableHead>
-                                            <TableHead>Notes</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {item.maintenances?.length ? (
-                                            item.maintenances.map((m) => (
-                                                <TableRow key={m.id}>
-                                                    <TableCell className="capitalize font-medium">{m.maintenance_type}</TableCell>
+                                {item.maintenances?.length ? (
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow className="bg-muted/50">
+                                                <TableHead>Type</TableHead>
+                                                <TableHead>Status</TableHead>
+                                                <TableHead>Date</TableHead>
+                                                <TableHead>Supplier</TableHead>
+                                                <TableHead className="text-right">Cost</TableHead>
+                                                <TableHead>Notes</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {item.maintenances.map((m) => (
+                                                <TableRow key={m.id} className="hover:bg-muted/30">
                                                     <TableCell>
-                                                        <Badge variant={m.status === 'completed' ? 'default' : 'outline'} className="capitalize">
+                                                        <Badge variant="outline" className="capitalize font-medium">
+                                                            {m.maintenance_type}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge variant={m.status === 'completed' ? 'default' : 'secondary'} className="capitalize">
                                                             {m.status}
                                                         </Badge>
                                                     </TableCell>
                                                     <TableCell className="text-xs whitespace-nowrap">
-                                                        <div>S: {formatDate(m.scheduled_at)}</div>
-                                                        <div className="text-muted-foreground">P: {formatDate(m.performed_at)}</div>
+                                                        <div className="flex items-center gap-1">
+                                                            <Calendar className="h-3 w-3 text-muted-foreground" />
+                                                            {formatDate(m.scheduled_at)}
+                                                        </div>
+                                                        {m.performed_at && (
+                                                            <div className="flex items-center gap-1 text-muted-foreground mt-1">
+                                                                <Clock className="h-3 w-3" />
+                                                                {formatDate(m.performed_at)}
+                                                            </div>
+                                                        )}
                                                     </TableCell>
-                                                    <TableCell className="text-xs">{m.supplier || '-'}</TableCell>
-                                                    <TableCell className="text-right">{formatCurrency(m.cost)}</TableCell>
+                                                    <TableCell className="text-sm">{m.supplier || '-'}</TableCell>
+                                                    <TableCell className="text-right font-medium">{formatCurrency(m.cost)}</TableCell>
                                                     <TableCell className="max-w-[200px] text-xs text-muted-foreground truncate">
                                                         {m.notes}
                                                     </TableCell>
                                                 </TableRow>
-                                            ))
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
-                                                    No maintenance history found.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                                        <div className="rounded-full bg-muted p-4 mb-4">
+                                            <Wrench className="h-8 w-8 text-muted-foreground" />
+                                        </div>
+                                        <h3 className="text-lg font-medium mb-1">No Maintenance Records</h3>
+                                        <p className="text-sm text-muted-foreground max-w-sm">
+                                            This asset has no scheduled or completed maintenance tasks.
+                                        </p>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </TabsContent>
 
                     {/* Stocktake Tab */}
                     <TabsContent value="stocktake" className="mt-6">
-                        <Card>
+                        <Card className="overflow-hidden">
                             <CardContent className="p-0">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Reference</TableHead>
-                                            <TableHead>Date</TableHead>
-                                            <TableHead>Branch</TableHead>
-                                            <TableHead>Expect/Found</TableHead>
-                                            <TableHead>Result</TableHead>
-                                            <TableHead>Notes</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {item.stocktake_items?.length ? (
-                                            item.stocktake_items.map((s) => (
-                                                <TableRow key={s.id}>
-                                                    <TableCell className="font-medium">{s.stocktake_reference}</TableCell>
-                                                    <TableCell className="whitespace-nowrap">{s.stocktake_date}</TableCell>
+                                {item.stocktake_items?.length ? (
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow className="bg-muted/50">
+                                                <TableHead>Reference</TableHead>
+                                                <TableHead>Date</TableHead>
+                                                <TableHead>Branch</TableHead>
+                                                <TableHead>Expect/Found</TableHead>
+                                                <TableHead>Result</TableHead>
+                                                <TableHead>Notes</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {item.stocktake_items.map((s) => (
+                                                <TableRow key={s.id} className="hover:bg-muted/30">
+                                                    <TableCell className="font-mono font-medium">{s.stocktake_reference}</TableCell>
+                                                    <TableCell className="whitespace-nowrap text-sm">{s.stocktake_date}</TableCell>
                                                     <TableCell>{s.branch}</TableCell>
                                                     <TableCell className="text-xs">
-                                                        <div className="text-muted-foreground">E: {s.expected_location}</div>
-                                                        <div className="font-medium text-primary">F: {s.found_location}</div>
+                                                        <div className="flex items-center gap-1 text-muted-foreground">
+                                                            <AlertCircle className="h-3 w-3" />
+                                                            {s.expected_location}
+                                                        </div>
+                                                        <div className="flex items-center gap-1 font-medium text-primary mt-1">
+                                                            <MapPin className="h-3 w-3" />
+                                                            {s.found_location}
+                                                        </div>
                                                     </TableCell>
                                                     <TableCell>
                                                         <Badge variant={s.result === 'found' ? 'default' : 'destructive'} className="capitalize">
@@ -385,60 +521,75 @@ export default function AssetProfile({ asset }: Props) {
                                                         {s.notes}
                                                     </TableCell>
                                                 </TableRow>
-                                            ))
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
-                                                    No stocktake history found.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                                        <div className="rounded-full bg-muted p-4 mb-4">
+                                            <ClipboardCheck className="h-8 w-8 text-muted-foreground" />
+                                        </div>
+                                        <h3 className="text-lg font-medium mb-1">No Stocktake Records</h3>
+                                        <p className="text-sm text-muted-foreground max-w-sm">
+                                            This asset has not been included in any stocktake yet.
+                                        </p>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </TabsContent>
 
                     {/* Depreciation Tab */}
                     <TabsContent value="depreciation" className="mt-6">
-                        <Card>
+                        <Card className="overflow-hidden">
                             <CardContent className="p-0">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Period</TableHead>
-                                            <TableHead>FY</TableHead>
-                                            <TableHead className="text-right">Amount</TableHead>
-                                            <TableHead className="text-right">Accum. (After)</TableHead>
-                                            <TableHead className="text-right">Book Value</TableHead>
-                                            <TableHead>Status</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {item.depreciation_lines?.length ? (
-                                            item.depreciation_lines.map((d) => (
-                                                <TableRow key={d.id}>
-                                                    <TableCell className="font-medium text-xs">{d.period}</TableCell>
-                                                    <TableCell>{d.fiscal_year}</TableCell>
-                                                    <TableCell className="text-right">{formatCurrency(d.amount)}</TableCell>
-                                                    <TableCell className="text-right text-xs text-muted-foreground">{formatCurrency(d.accumulated_after)}</TableCell>
-                                                    <TableCell className="text-right font-semibold text-primary">{formatCurrency(d.book_value_after)}</TableCell>
+                                {item.depreciation_lines?.length ? (
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow className="bg-muted/50">
+                                                <TableHead>Period</TableHead>
+                                                <TableHead>FY</TableHead>
+                                                <TableHead className="text-right">Amount</TableHead>
+                                                <TableHead className="text-right">Accum. (After)</TableHead>
+                                                <TableHead className="text-right">Book Value</TableHead>
+                                                <TableHead>Status</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {item.depreciation_lines.map((d) => (
+                                                <TableRow key={d.id} className="hover:bg-muted/30">
+                                                    <TableCell className="font-mono text-sm">{d.period}</TableCell>
+                                                    <TableCell className="text-sm">{d.fiscal_year}</TableCell>
+                                                    <TableCell className="text-right font-medium">{formatCurrency(d.amount)}</TableCell>
+                                                    <TableCell className="text-right text-sm text-muted-foreground">
+                                                        {formatCurrency(d.accumulated_after)}
+                                                    </TableCell>
+                                                    <TableCell className="text-right font-semibold text-primary">
+                                                        {formatCurrency(d.book_value_after)}
+                                                    </TableCell>
                                                     <TableCell>
-                                                        <Badge variant={d.status === 'posted' ? 'default' : 'outline'} className="capitalize text-[10px]">
+                                                        <Badge
+                                                            variant={d.status === 'posted' ? 'default' : 'outline'}
+                                                            className="capitalize text-xs"
+                                                        >
                                                             {d.status}
                                                         </Badge>
                                                     </TableCell>
                                                 </TableRow>
-                                            ))
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
-                                                    No depreciation history found.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                                        <div className="rounded-full bg-muted p-4 mb-4">
+                                            <TrendingDown className="h-8 w-8 text-muted-foreground" />
+                                        </div>
+                                        <h3 className="text-lg font-medium mb-1">No Depreciation History</h3>
+                                        <p className="text-sm text-muted-foreground max-w-sm">
+                                            No depreciation has been calculated for this asset yet.
+                                        </p>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </TabsContent>
