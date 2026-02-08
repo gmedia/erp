@@ -29,8 +29,12 @@ test('view asset profile end-to-end', async ({ page }) => {
   await expect(page.locator('body')).toContainText(assetCode);
 
   // Verify basic info is visible in the Summary tab
-  await expect(page.locator('text=Asset Information')).toBeVisible();
-  await expect(page.locator('text=Purchase Information')).toBeVisible();
+  await expect(page.getByTestId('summary-general-info')).toBeVisible();
+  await expect(page.getByTestId('summary-location-info')).toBeVisible();
+  await expect(page.getByTestId('summary-financial-info')).toBeVisible();
+  
+  await expect(page.getByText(/General Information/i)).toBeVisible();
+  await expect(page.getByText(/Current Location & PIC/i)).toBeVisible();
 
   // Click through all tabs
   const tabs = ['Movements', 'Maintenance', 'Stocktake', 'Depreciation'];

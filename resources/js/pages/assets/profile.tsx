@@ -343,7 +343,7 @@ export default function AssetProfile({ asset }: Props) {
                     <TabsContent value="summary" className="space-y-6 mt-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {/* General Information */}
-                            <Card className="group hover:shadow-md transition-all duration-200 hover:border-primary/30">
+                            <Card className="group hover:shadow-md transition-all duration-200 hover:border-primary/30" data-testid="summary-general-info">
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-sm font-medium flex items-center gap-2">
                                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
@@ -388,7 +388,7 @@ export default function AssetProfile({ asset }: Props) {
                             </Card>
 
                             {/* Location & Assignment */}
-                            <Card className="group hover:shadow-md transition-all duration-200 hover:border-primary/30">
+                            <Card className="group hover:shadow-md transition-all duration-200 hover:border-primary/30" data-testid="summary-location-info">
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-sm font-medium flex items-center gap-2">
                                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
@@ -435,7 +435,7 @@ export default function AssetProfile({ asset }: Props) {
                             </Card>
 
                             {/* Financial Summary - Enhanced */}
-                            <Card className="group hover:shadow-md transition-all duration-200 hover:border-primary/30">
+                            <Card className="group hover:shadow-md transition-all duration-200 hover:border-primary/30" data-testid="summary-financial-info">
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-sm font-medium flex items-center gap-2">
                                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">

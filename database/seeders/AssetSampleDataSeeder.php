@@ -105,17 +105,17 @@ class AssetSampleDataSeeder extends Seeder
         foreach ($branches as $branch) {
             $office = AssetLocation::updateOrCreate(
                 ['branch_id' => $branch->id, 'code' => 'OFFICE'],
-                ['name' => 'Office', 'parent_id' => null]
+                ['name' => 'Office ('.$branch->name.')', 'parent_id' => null]
             );
 
             AssetLocation::updateOrCreate(
                 ['branch_id' => $branch->id, 'code' => 'IT-ROOM'],
-                ['name' => 'IT Room', 'parent_id' => $office->id]
+                ['name' => 'IT Room ('.$branch->name.')', 'parent_id' => $office->id]
             );
 
             AssetLocation::updateOrCreate(
                 ['branch_id' => $branch->id, 'code' => 'WAREHOUSE'],
-                ['name' => 'Warehouse', 'parent_id' => null]
+                ['name' => 'Warehouse ('.$branch->name.')', 'parent_id' => null]
             );
         }
 
