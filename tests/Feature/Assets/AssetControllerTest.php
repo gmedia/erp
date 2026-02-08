@@ -3,11 +3,7 @@
 use App\Models\{Asset, Employee, Permission, User};
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-/**
- * @group assets
- */
-
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('assets');
 
 beforeEach(function () {
     $this->user = User::factory()->create();

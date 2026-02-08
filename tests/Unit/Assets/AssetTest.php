@@ -3,11 +3,7 @@
 use App\Models\{Asset, AssetCategory, AssetModel, Branch, AssetLocation, Department, Employee, Supplier, Account};
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-/**
- * @group assets
- */
-
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('assets');
 
 test('asset model has correct fillable attributes', function () {
     $asset = new Asset();
