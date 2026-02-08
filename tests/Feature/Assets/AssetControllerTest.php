@@ -3,6 +3,10 @@
 use App\Models\{Asset, Employee, Permission, User};
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
+/**
+ * @group assets
+ */
+
 uses(RefreshDatabase::class);
 
 beforeEach(function () {

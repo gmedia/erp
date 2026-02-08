@@ -266,3 +266,22 @@ export const assetFormSchema = z.object({
 });
 
 export type AssetFormData = z.infer<typeof assetFormSchema>;
+
+/**
+ * Asset movement form schema.
+ */
+export const assetMovementFormSchema = z.object({
+    asset_id: z.string().min(1, { message: 'Asset is required.' }),
+    movement_type: z.enum(['transfer', 'assign', 'return', 'dispose', 'adjustment'], {
+        message: 'Movement type is required.',
+    }),
+    moved_at: z.date({ message: 'Movement date is required.' }),
+    to_branch_id: z.string().optional(),
+    to_location_id: z.string().optional(),
+    to_department_id: z.string().optional(),
+    to_employee_id: z.string().optional(),
+    reference: z.string().optional(),
+    notes: z.string().optional(),
+});
+
+export type AssetMovementFormData = z.infer<typeof assetMovementFormSchema>;

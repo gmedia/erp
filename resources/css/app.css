@@ -5,7 +5,7 @@
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
-@custom-variant dark (&:is(.dark *));
+/* @custom-variant dark (&:is(.dark *)); */
 
 @theme {
     --font-sans:
@@ -141,11 +141,11 @@
         @apply bg-background text-foreground;
     }
 
-    @utility no-scrollbar {
+/* @utility no-scrollbar {
         -ms-overflow-style: none;
         scrollbar-width: none;
         &::-webkit-scrollbar {
             display: none;
         }
-    }
+    } */
 }

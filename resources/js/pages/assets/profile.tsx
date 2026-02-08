@@ -20,9 +20,14 @@ import {
 } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type Asset } from '@/types/asset';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { QRCodeSVG } from 'qrcode.react';
+import { useState, useCallback } from 'react';
+import { toast } from 'sonner';
+import axios from 'axios';
+import { AssetMovementForm } from '@/components/assets/AssetMovementForm';
+import { AssetMovementFormData } from '@/utils/schemas';
 import {
     Activity,
     AlertCircle,
@@ -63,6 +68,8 @@ interface Props {
 
 export default function AssetProfile({ asset }: Props) {
     const item = asset.data;
+    const [isMovementFormOpen, setIsMovementFormOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'N/A';
@@ -186,6 +193,20 @@ export default function AssetProfile({ asset }: Props) {
         printWindow.document.close();
     };
 
+    const handleMovementSubmit = useCallback(async (data: AssetMovementFormData) => {
+        setIsSubmitting(true);
+        try {
+            await axios.post('/api/asset-movements', data);
+            toast.success('Movement recorded successfully');
+            setIsMovementFormOpen(false);
+            router.reload({ only: ['asset'] });
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Failed to record movement');
+        } finally {
+            setIsSubmitting(false);
+        }
+    }, []);
+
     const breadcrumbs = [
         { title: 'Assets', href: '/assets' },
         { title: item.asset_code, href: '#' },
@@ -270,10 +291,27 @@ export default function AssetProfile({ asset }: Props) {
                                 >
                                     {item.condition?.replace('_', ' ') || 'Unknown'}
                                 </Badge>
+                                <Button 
+                                    size="sm" 
+                                    variant="outline" 
+                                    className="gap-2 mt-2"
+                                    onClick={() => setIsMovementFormOpen(true)}
+                                >
+                                    <History className="h-4 w-4" />
+                                    Move/Assign
+                                </Button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <AssetMovementForm
+                    open={isMovementFormOpen}
+                    onOpenChange={setIsMovementFormOpen}
+                    asset={item as any}
+                    onSubmit={handleMovementSubmit}
+                    isLoading={isSubmitting}
+                />
 
                 <Tabs defaultValue="summary" className="w-full">
                     <div className="overflow-x-auto no-scrollbar">
@@ -365,7 +403,7 @@ export default function AssetProfile({ asset }: Props) {
                                             <Building2 className="h-3.5 w-3.5" />
                                             Branch
                                         </span>
-                                        <span className="font-medium">{item.branch?.name || '-'}</span>
+                                        <span className="font-medium" data-testid="asset-branch">{item.branch?.name || '-'}</span>
                                     </div>
                                     <Separator />
                                     <div className="flex items-center justify-between text-sm">
@@ -373,7 +411,7 @@ export default function AssetProfile({ asset }: Props) {
                                             <MapPin className="h-3.5 w-3.5" />
                                             Location
                                         </span>
-                                        <span className="font-medium">{item.location?.name || '-'}</span>
+                                        <span className="font-medium" data-testid="asset-location">{item.location?.name || '-'}</span>
                                     </div>
                                     <Separator />
                                     <div className="flex items-center justify-between text-sm">
@@ -381,7 +419,7 @@ export default function AssetProfile({ asset }: Props) {
                                             <Activity className="h-3.5 w-3.5" />
                                             Department
                                         </span>
-                                        <span className="font-medium">{item.department?.name || '-'}</span>
+                                        <span className="font-medium" data-testid="asset-department">{item.department?.name || '-'}</span>
                                     </div>
                                     <Separator />
                                     <div className="flex items-center justify-between text-sm">
@@ -389,7 +427,7 @@ export default function AssetProfile({ asset }: Props) {
                                             <User className="h-3.5 w-3.5" />
                                             Person in Charge
                                         </span>
-                                        <Badge variant="outline" className="font-medium">
+                                        <Badge variant="outline" className="font-medium" data-testid="asset-employee">
                                             {item.employee?.name || 'Unassigned'}
                                         </Badge>
                                     </div>

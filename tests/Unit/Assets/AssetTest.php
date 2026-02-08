@@ -3,6 +3,10 @@
 use App\Models\{Asset, AssetCategory, AssetModel, Branch, AssetLocation, Department, Employee, Supplier, Account};
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
+/**
+ * @group assets
+ */
+
 uses(RefreshDatabase::class);
 
 test('asset model has correct fillable attributes', function () {

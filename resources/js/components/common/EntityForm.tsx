@@ -39,6 +39,8 @@ interface EntityFormProps<T extends FieldValues = FieldValues> {
     submitDisabled?: boolean;
     /** Optional – custom class name for the DialogContent (e.g. for wider forms) */
     className?: string;
+    /** Optional – custom label for the submit button */
+    submitLabel?: string;
 }
 
 /**
@@ -58,6 +60,7 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
     form,
     submitDisabled = false,
     className,
+    submitLabel,
 }: EntityFormProps<T>) {
     const { t } = useTranslation();
 
@@ -71,6 +74,7 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
     // Determine submit button text based on title
     const submitButtonText = React.useMemo(() => {
         if (isLoading) return t('common.saving');
+        if (submitLabel) return submitLabel;
 
         const lowerTitle = title.toLowerCase();
         if (lowerTitle.includes('add') || lowerTitle.includes('tambah'))

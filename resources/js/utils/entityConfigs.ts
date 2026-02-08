@@ -86,6 +86,10 @@ import { createAssetFilterFields } from '@/components/assets/AssetFilters';
 import { AssetForm } from '@/components/assets/AssetForm';
 import { AssetViewModal } from '@/components/assets/AssetViewModal';
 import { type Asset } from '@/types/asset';
+import { assetMovementColumns } from '@/components/asset-movements/AssetMovementColumns';
+import { createAssetMovementFilterFields } from '@/components/asset-movements/AssetMovementFilters';
+import { AssetMovementForm } from '@/components/assets/AssetMovementForm';
+import { AssetMovementViewModal } from '@/components/asset-movements/AssetMovementViewModal';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -551,4 +555,25 @@ export const assetConfig = createComplexEntityConfig<Asset>({
     viewModalComponent: AssetViewModal,
     getDeleteMessage: (item: { name?: string; asset_code?: string }) =>
         `This action cannot be undone. This will permanently delete asset ${item.asset_code} (${item.name}).`,
+});
+
+export const assetMovementConfig = createComplexEntityConfig({
+    entityName: 'Asset Movement',
+    entityNamePlural: 'Asset Movements',
+    apiEndpoint: '/api/asset-movements',
+    exportEndpoint: '/api/asset-movements/export',
+    queryKey: ['asset-movements'],
+    breadcrumbs: [{ title: 'Asset Movements', href: '/asset-movements' }],
+    initialFilters: {
+        search: '',
+        asset_id: '',
+        movement_type: '',
+    },
+    columns: assetMovementColumns as any,
+    filterFields: createAssetMovementFilterFields(),
+    formComponent: AssetMovementForm,
+    formType: 'complex',
+    entityNameForSearch: 'movement',
+    viewModalComponent: AssetMovementViewModal as any,
+    getDeleteMessage: () => 'This action cannot be undone. This will permanently delete this movement record.',
 });

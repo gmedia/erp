@@ -2,10 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Asset;
-use App\Models\User;
-use App\Models\Employee;
-use App\Models\Permission;
+use App\Models\{Asset, AssetMovement, User, Employee, Permission};
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -26,6 +23,9 @@ beforeEach(function () {
 
 test('asset profile page is accessible and contains data', function () {
     $asset = Asset::factory()->create();
+    
+    // Create related data to ensure relationships are loaded
+    AssetMovement::factory()->create(['asset_id' => $asset->id]);
 
     $response = $this->get(route('assets.profile', ['asset' => $asset->ulid]));
 
@@ -36,11 +36,17 @@ test('asset profile page is accessible and contains data', function () {
             ->where('id', $asset->id)
             ->where('ulid', $asset->ulid)
             ->where('asset_code', $asset->asset_code)
-            ->has('movements')
+            ->has('movements', 1) // Verify that one movement is loaded
             ->has('maintenances')
             ->has('stocktake_items')
             ->has('depreciation_lines')
             ->etc()
         )
     );
+});
+
+test('asset profile returns 404 for non-existent asset', function () {
+    $response = $this->get(route('assets.profile', ['asset' => 'non-existent-ulid']));
+
+    $response->assertStatus(404);
 });

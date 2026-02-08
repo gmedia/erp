@@ -40,4 +40,5 @@ export interface Asset extends EntityWithId {
     department?: { id: number; name: string };
     employee?: { id: number; name: string };
     supplier?: { id: number; name: string };
+    movements?: any[];
 }

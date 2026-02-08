@@ -9,6 +9,8 @@ import { initializeTheme } from './hooks/use-appearance';
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 const queryClient = new QueryClient();
 
+import { Toaster } from 'sonner';
+
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) =>
@@ -22,6 +24,7 @@ createInertiaApp({
         root.render(
             <QueryClientProvider client={queryClient}>
                 <App {...props} />
+                <Toaster />
             </QueryClientProvider>,
         );
     },
