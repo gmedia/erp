@@ -9,6 +9,7 @@ export interface UseCrudMutationsOptions {
     endpoint: string;
     queryKey: string[];
     entityName: string;
+    identifierKey?: string;
     onSuccess?: () => void;
     onError?: (error: ApiError) => void;
 }
@@ -16,15 +17,16 @@ export interface UseCrudMutationsOptions {
 export interface UseCrudMutationsResult<Entity, FormData> {
     createMutation: ReturnType<typeof useMutation<Entity, Error, FormData>>;
     updateMutation: ReturnType<
-        typeof useMutation<Entity, Error, { id: number; data: FormData }>
+        typeof useMutation<Entity, Error, { id: string | number; data: FormData }>
     >;
-    deleteMutation: ReturnType<typeof useMutation<void, Error, number>>;
+    deleteMutation: ReturnType<typeof useMutation<void, Error, string | number>>;
 }
 
 export function useCrudMutations<Entity, FormData>({
     endpoint,
     queryKey,
     entityName,
+    identifierKey = 'id',
     onSuccess,
     onError,
 }: UseCrudMutationsOptions): UseCrudMutationsResult<Entity, FormData> {
@@ -52,9 +54,9 @@ export function useCrudMutations<Entity, FormData>({
     const updateMutation = useMutation<
         Entity,
         Error,
-        { id: number; data: FormData }
+        { id: string | number; data: FormData }
     >({
-        mutationFn: async ({ id, data }: { id: number; data: FormData }) => {
+        mutationFn: async ({ id, data }) => {
             const response = await axios.put(`${endpoint}/${id}`, data);
             return response.data;
         },
@@ -72,8 +74,8 @@ export function useCrudMutations<Entity, FormData>({
         },
     });
 
-    const deleteMutation = useMutation<void, Error, number>({
-        mutationFn: async (id: number) => {
+    const deleteMutation = useMutation<void, Error, string | number>({
+        mutationFn: async (id) => {
             await axios.delete(`${endpoint}/${id}`);
         },
         onSuccess: () => {

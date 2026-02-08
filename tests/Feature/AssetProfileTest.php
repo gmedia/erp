@@ -27,13 +27,14 @@ beforeEach(function () {
 test('asset profile page is accessible and contains data', function () {
     $asset = Asset::factory()->create();
 
-    $response = $this->get(route('assets.profile', $asset));
+    $response = $this->get(route('assets.profile', ['asset' => $asset->ulid]));
 
     $response->assertStatus(200);
     $response->assertInertia(fn (Assert $page) => $page
         ->component('assets/profile')
         ->has('asset.data', fn (Assert $data) => $data
             ->where('id', $asset->id)
+            ->where('ulid', $asset->ulid)
             ->where('asset_code', $asset->asset_code)
             ->has('movements')
             ->has('maintenances')

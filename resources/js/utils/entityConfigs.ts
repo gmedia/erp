@@ -15,6 +15,7 @@ export interface BaseEntityConfig<
     readonly apiEndpoint: string;
     readonly exportEndpoint: string;
     readonly queryKey: readonly string[];
+    readonly identifierKey?: string;
     readonly breadcrumbs: readonly BreadcrumbItem[];
     readonly getDeleteMessage: (item: Record<string, unknown>) => string;
     readonly initialFilters?: FilterType;
@@ -107,6 +108,7 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     apiEndpoint: string;
     exportEndpoint: string;
     queryKey: string[];
+    identifierKey?: string;
     breadcrumbs: BreadcrumbItem[];
     initialFilters: Record<string, string | number | undefined>;
     columns: ColumnDef<T>[];
@@ -181,6 +183,7 @@ function createComplexEntityConfig<T = Record<string, unknown>>(
         apiEndpoint: options.apiEndpoint,
         exportEndpoint: options.exportEndpoint,
         queryKey: options.queryKey,
+        identifierKey: options.identifierKey,
         breadcrumbs: options.breadcrumbs,
         initialFilters: options.initialFilters,
         columns: options.columns,
@@ -531,6 +534,7 @@ export const assetConfig = createComplexEntityConfig<Asset>({
     apiEndpoint: '/api/assets',
     exportEndpoint: '/api/assets/export',
     queryKey: ['assets'],
+    identifierKey: 'ulid',
     breadcrumbs: [{ title: 'Assets', href: '/assets' }],
     initialFilters: {
         search: '',

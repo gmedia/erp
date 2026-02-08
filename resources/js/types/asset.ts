@@ -4,6 +4,7 @@ import { AssetModel } from './asset-model';
 import { AssetLocation } from './asset-location';
 
 export interface Asset extends EntityWithId {
+    ulid: string;
     asset_code: string;
     name: string;
     asset_model_id: number | null;

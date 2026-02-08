@@ -66,7 +66,7 @@ test('can store asset', function () {
 test('can show asset', function () {
     $asset = Asset::factory()->create();
 
-    $response = $this->getJson("/api/assets/{$asset->id}");
+    $response = $this->getJson("/api/assets/{$asset->ulid}");
 
     $response->assertStatus(200)
         ->assertJsonPath('data.id', $asset->id);
@@ -75,7 +75,7 @@ test('can show asset', function () {
 test('can update asset', function () {
     $asset = Asset::factory()->create(['name' => 'Old Name']);
     
-    $response = $this->putJson("/api/assets/{$asset->id}", [
+    $response = $this->putJson("/api/assets/{$asset->ulid}", [
         'name' => 'Updated Name'
     ]);
 
@@ -89,7 +89,7 @@ test('can update asset', function () {
 test('can delete asset', function () {
     $asset = Asset::factory()->create();
 
-    $response = $this->deleteJson("/api/assets/{$asset->id}");
+    $response = $this->deleteJson("/api/assets/{$asset->ulid}");
 
     $response->assertStatus(200);
     $this->assertSoftDeleted('assets', ['id' => $asset->id]);

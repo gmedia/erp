@@ -14,6 +14,7 @@ export interface CrudPageConfig<
     entityName: string;
     apiEndpoint: string;
     queryKey: string[];
+    identifierKey?: string;
 
     // Optional callbacks for customization
     onCreateSuccess?: () => void;
@@ -132,6 +133,7 @@ export function useCrudPage<
         endpoint: config.apiEndpoint,
         queryKey: config.queryKey,
         entityName: config.entityName,
+        identifierKey: config.identifierKey,
         onSuccess: () => {
             // Reset pagination to first page after create/update/delete
             setPagination({ page: 1, per_page: pagination.per_page });
@@ -165,9 +167,10 @@ export function useCrudPage<
 
     const handleFormSubmit = useCallback(
         (data: FormData) => {
+            const identifierKey = config.identifierKey || 'id';
             if (selectedItem) {
                 updateMutation.mutate(
-                    { id: selectedItem.id as number, data },
+                    { id: selectedItem[identifierKey] as string | number, data },
                     {
                         onSuccess: () => {
                             setIsFormOpen(false);
@@ -190,8 +193,9 @@ export function useCrudPage<
     );
 
     const handleDeleteConfirm = useCallback(() => {
+        const identifierKey = config.identifierKey || 'id';
         if (itemToDelete) {
-            deleteMutation.mutate(itemToDelete.id as number, {
+            deleteMutation.mutate(itemToDelete[identifierKey] as string | number, {
                 onSuccess: () => {
                     setItemToDelete(null);
                     config.onDeleteSuccess?.();

@@ -20,13 +20,21 @@ test('add new asset end-to-end', async ({ page }) => {
 
   // Select Category (AsyncSelect)
   await dialog.locator('button').filter({ hasText: /Select a category/i }).click();
-  await page.getByPlaceholder('Search...').last().fill('IT Equipment');
-  await page.getByRole('option', { name: 'IT Equipment' }).first().click();
+  const categorySearchInput = page.getByPlaceholder('Search...').last();
+  await expect(categorySearchInput).toBeVisible();
+  await categorySearchInput.fill('IT Equipment');
+  const categoryOption = page.getByRole('option', { name: /^IT Equipment$/i }).first();
+  await expect(categoryOption).toBeVisible();
+  await categoryOption.click();
 
   // Select Branch (AsyncSelect)
   await dialog.locator('button').filter({ hasText: /Select a branch/i }).click();
-  await page.getByPlaceholder('Search...').last().fill('Head Office');
-  await page.getByRole('option', { name: 'Head Office' }).first().click();
+  const branchSearchInput = page.getByPlaceholder('Search...').last();
+  await expect(branchSearchInput).toBeVisible();
+  await branchSearchInput.fill('Head Office');
+  const branchOption = page.getByRole('option', { name: /^Head Office$/i }).first();
+  await expect(branchOption).toBeVisible();
+  await branchOption.click();
 
   // Purchase Information (using default purchase_date: today)
   await dialog.locator('input[name="purchase_cost"]').fill('1500000');

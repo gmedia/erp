@@ -1,6 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
+import { Link } from '@inertiajs/react';
 import { Badge } from '@/components/ui/badge';
 import {
     createActionsColumn,
@@ -32,7 +33,18 @@ const renderStatusCell = ({ row }: { row: { original: Asset } }) => {
 export const assetColumns: ColumnDef<Asset>[] = [
     createSelectColumn<Asset>(),
     createTextColumn<Asset>({ accessorKey: 'asset_code', label: 'Code' }),
-    createTextColumn<Asset>({ accessorKey: 'name', label: 'Name' }),
+    {
+        accessorKey: 'name',
+        ...createSortingHeader('Name'),
+        cell: ({ row }) => (
+            <Link
+                href={`/assets/${row.original.ulid}`}
+                className="font-medium text-primary hover:underline"
+            >
+                {row.original.name}
+            </Link>
+        ),
+    },
     {
         accessorKey: 'category',
         ...createSortingHeader('Category'),

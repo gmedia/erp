@@ -101,6 +101,7 @@ export function createEntityCrudPage<T = Record<string, unknown>>(
                         entityNamePlural: config.entityNamePlural,
                         apiEndpoint: config.apiEndpoint,
                         queryKey: [...config.queryKey],
+                        identifierKey: config.identifierKey,
                         breadcrumbs: [...config.breadcrumbs],
                         initialFilters: config.initialFilters,
 

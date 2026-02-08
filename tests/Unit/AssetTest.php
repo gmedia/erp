@@ -17,6 +17,7 @@ uses(RefreshDatabase::class)->group('assets', 'asset-unit');
 
 test('asset model has correct fillable attributes', function () {
     $fillable = [
+        'ulid',
         'asset_code',
         'name',
         'asset_model_id',

@@ -1,17 +1,19 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { login, createAsset } from '../helpers';
 
 test('edit existing asset end-to-end', async ({ page }) => {  
-  await login(page);
+  // Create a fresh asset to edit
+  const freshAssetCode = await createAsset(page);
+
   await page.goto('/assets');
 
   // Wait for the table to load
   await page.waitForSelector('table');
 
-  // Search for a specific asset to ensure isolation
+  // Search for the fresh asset
   let searchInput = page.getByPlaceholder(/Search assets.../i);
   await searchInput.clear();
-  await searchInput.fill('FA-000001');
+  await searchInput.fill(freshAssetCode);
   await Promise.all([
     page.waitForResponse(response => 
       response.url().includes('/api/assets') && 
@@ -20,7 +22,7 @@ test('edit existing asset end-to-end', async ({ page }) => {
     searchInput.press('Enter')
   ]);
 
-  const firstRow = page.locator('tbody tr').filter({ hasText: 'FA-000001' }).first();
+  const firstRow = page.locator('tbody tr').filter({ hasText: freshAssetCode }).first();
   await expect(firstRow).toBeVisible();
   const assetCode = await firstRow.locator('td').nth(1).textContent();
   const assetName = await firstRow.locator('td').nth(2).textContent();

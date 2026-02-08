@@ -34,6 +34,7 @@ import {
 interface Props {
     asset: {
         data: Asset & {
+            ulid: string;
             movements?: any[];
             maintenances?: any[];
             stocktake_items?: any[];

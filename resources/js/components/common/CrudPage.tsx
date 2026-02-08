@@ -39,6 +39,7 @@ export interface CrudPageConfig<
     // UI configuration
     entityNamePlural: string;
     breadcrumbs: BreadcrumbItem[];
+    identifierKey?: string;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     DataTableComponent: React.ComponentType<any>;
@@ -109,6 +110,7 @@ export function CrudPage<
         onDeleteSuccess: config.onDeleteSuccess,
         onError: config.onError,
         initialFilters: config.initialFilters,
+        identifierKey: config.identifierKey,
         initialPagination: config.initialPagination,
         getDeleteMessage: config.getDeleteMessage,
     });

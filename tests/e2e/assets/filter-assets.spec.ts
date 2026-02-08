@@ -43,8 +43,9 @@ test('filter assets by search and status end-to-end', async ({ page }) => {
 
   // select status "Active"
   await filterDialog.locator('button').filter({ hasText: /Select a status/i }).click();
-  // Options are usually in a portal, so we search globally but specifically for roles
-  await page.getByRole('option', { name: 'Active' }).click();
+  const statusOption = page.getByRole('option', { name: /^Active$/i }).first();
+  await expect(statusOption).toBeVisible();
+  await statusOption.click();
   
   // Click Apply Filters
   await Promise.all([
