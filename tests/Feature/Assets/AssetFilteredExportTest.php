@@ -98,3 +98,25 @@ test('can export assets with branch filter', function () {
                $results->every(fn($asset) => $asset->branch_id === $branch1->id);
     });
 });
+
+test('can export assets with condition filter', function () {
+    Excel::fake();
+    
+    Asset::factory()->count(3)->create(['condition' => 'good']);
+    Asset::factory()->count(2)->create(['condition' => 'damaged']);
+
+    $response = $this->postJson('/api/assets/export', [
+        'condition' => 'good'
+    ]);
+
+    $response->assertStatus(200);
+    $filename = $response->json('filename');
+    
+    Excel::assertStored('exports/' . $filename, 'public', function (AssetExport $export) {
+        $query = $export->query();
+        $results = $query->get();
+        
+        return $results->count() === 3 && 
+               $results->every(fn($asset) => $asset->condition === 'good');
+    });
+});
