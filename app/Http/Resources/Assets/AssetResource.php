@@ -2,6 +2,10 @@
 
 namespace App\Http\Resources\Assets;
 
+use App\Http\Resources\AssetMovements\AssetMovementResource;
+use App\Http\Resources\AssetMaintenances\AssetMaintenanceResource;
+use App\Http\Resources\AssetStocktakeItems\AssetStocktakeItemResource;
+use App\Http\Resources\AssetDepreciationLines\AssetDepreciationLineResource;
 use App\Models\Asset;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -75,6 +79,11 @@ class AssetResource extends JsonResource
             
             'created_at' => $this->resource->created_at?->toIso8601String(),
             'updated_at' => $this->resource->updated_at?->toIso8601String(),
+            
+            'movements' => AssetMovementResource::collection($this->whenLoaded('movements')),
+            'maintenances' => AssetMaintenanceResource::collection($this->whenLoaded('maintenances')),
+            'stocktake_items' => AssetStocktakeItemResource::collection($this->whenLoaded('stocktakeItems')),
+            'depreciation_lines' => AssetDepreciationLineResource::collection($this->whenLoaded('depreciationLines')),
         ];
     }
 }

@@ -8,6 +8,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('assets', function () {
         return Inertia::render('assets/index');
     })->name('assets')->middleware('permission:asset');
+
+    Route::get('assets/{asset}', [AssetController::class, 'profile'])
+        ->name('assets.profile')
+        ->middleware('permission:asset');
 });
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {

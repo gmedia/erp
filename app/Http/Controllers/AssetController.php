@@ -42,6 +42,35 @@ class AssetController extends Controller
         return new AssetResource($asset->load(['category', 'model', 'branch', 'location', 'department', 'employee', 'supplier']));
     }
 
+    public function profile(Asset $asset): Response
+    {
+        $asset->load([
+            'category',
+            'model',
+            'branch',
+            'location',
+            'department',
+            'employee',
+            'supplier',
+            'movements.fromBranch',
+            'movements.toBranch',
+            'movements.fromLocation',
+            'movements.toLocation',
+            'movements.fromEmployee',
+            'movements.toEmployee',
+            'movements.createdBy',
+            'maintenances.supplier',
+            'maintenances.createdBy',
+            'stocktakeItems.stocktake.branch',
+            'stocktakeItems.checkedBy',
+            'depreciationLines.run.fiscalYear',
+        ]);
+
+        return Inertia::render('assets/profile', [
+            'asset' => new AssetResource($asset),
+        ]);
+    }
+
     public function update(UpdateAssetRequest $request, Asset $asset): JsonResponse
     {
         $data = UpdateAssetData::fromArray($request->validated());
