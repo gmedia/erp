@@ -15,10 +15,15 @@ class ExportAssetRequest extends FormRequest
     {
         return [
             'search' => ['nullable', 'string'],
-            'branch' => ['nullable', 'exists:branches,id'],
-            'category' => ['nullable', 'exists:asset_categories,id'],
+            'asset_category_id' => ['nullable', 'exists:asset_categories,id'],
+            'asset_model_id' => ['nullable', 'exists:asset_models,id'],
+            'branch_id' => ['nullable', 'exists:branches,id'],
+            'asset_location_id' => ['nullable', 'exists:asset_locations,id'],
+            'department_id' => ['nullable', 'exists:departments,id'],
+            'employee_id' => ['nullable', 'exists:employees,id'],
             'status' => ['nullable', 'string', 'in:draft,active,maintenance,disposed,lost'],
-            'sort_by' => ['nullable', 'string', 'in:asset_code,name,purchase_date,status'],
+            'condition' => ['nullable', 'string', 'in:new,good,damaged,broken'],
+            'sort_by' => ['nullable', 'string', 'in:asset_code,name,purchase_date,status,created_at'],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
         ];
     }

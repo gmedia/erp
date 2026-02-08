@@ -20,32 +20,29 @@ class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
     {
         $query = Asset::query()->with(['category', 'model', 'branch', 'location', 'department', 'employee', 'supplier']);
 
+        $filterService = app(\App\Domain\Assets\AssetFilterService::class);
+
         if (!empty($this->filters['search'])) {
-            $search = $this->filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('asset_code', 'like', "%{$search}%")
-                  ->orWhere('serial_number', 'like', "%{$search}%");
-            });
+            $filterService->applySearch($query, $this->filters['search'], ['name', 'asset_code', 'serial_number', 'barcode']);
+        } else {
+            $filterService->applyAdvancedFilters($query, [
+                'asset_category_id' => $this->filters['asset_category_id'] ?? null,
+                'asset_model_id' => $this->filters['asset_model_id'] ?? null,
+                'branch_id' => $this->filters['branch_id'] ?? null,
+                'asset_location_id' => $this->filters['asset_location_id'] ?? null,
+                'department_id' => $this->filters['department_id'] ?? null,
+                'employee_id' => $this->filters['employee_id'] ?? null,
+                'status' => $this->filters['status'] ?? null,
+                'condition' => $this->filters['condition'] ?? null,
+            ]);
         }
 
-        if (!empty($this->filters['branch'])) {
-            $query->where('branch_id', $this->filters['branch']);
-        }
-        if (!empty($this->filters['category'])) {
-            $query->where('asset_category_id', $this->filters['category']);
-        }
-        if (!empty($this->filters['status'])) {
-            $query->where('status', $this->filters['status']);
-        }
-
-        $sortBy = $this->filters['sort_by'] ?? 'created_at';
-        $sortDirection = $this->filters['sort_direction'] ?? 'desc';
-        $allowedSortColumns = ['asset_code', 'name', 'purchase_date', 'status', 'created_at'];
-        
-        if (in_array($sortBy, $allowedSortColumns)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
+        $filterService->applySorting(
+            $query,
+            $this->filters['sort_by'] ?? 'created_at',
+            $this->filters['sort_direction'] ?? 'desc',
+            ['id', 'asset_code', 'name', 'purchase_date', 'purchase_cost', 'status', 'created_at']
+        );
 
         return $query;
     }

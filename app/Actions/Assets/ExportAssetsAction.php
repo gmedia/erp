@@ -12,18 +12,7 @@ class ExportAssetsAction
 {
     public function execute(ExportAssetRequest $request): JsonResponse
     {
-        $validated = $request->validated();
-
-        $filters = [
-            'search' => $validated['search'] ?? null,
-            'branch' => $validated['branch'] ?? null,
-            'category' => $validated['category'] ?? null,
-            'status' => $validated['status'] ?? null,
-            'sort_by' => $validated['sort_by'] ?? 'created_at',
-            'sort_direction' => $validated['sort_direction'] ?? 'desc',
-        ];
-
-        $filters = array_filter($filters);
+        $filters = array_filter($request->validated());
 
         $filename = 'assets_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
         $filePath = 'exports/' . $filename;
