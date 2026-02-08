@@ -8,6 +8,7 @@ uses(RefreshDatabase::class);
 test('asset model has correct fillable attributes', function () {
     $asset = new Asset();
     $fillable = [
+        'ulid',
         'asset_code',
         'name',
         'asset_model_id',
