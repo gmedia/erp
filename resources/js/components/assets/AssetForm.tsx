@@ -83,7 +83,7 @@ const renderFinancialSection = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <DatePickerField name="purchase_date" label="Purchase Date" placeholder="Pick a date" />
         <InputField name="purchase_cost" label="Purchase Cost" type="number" placeholder="0" />
-        <InputField name="currency" label="Currency" placeholder="IDR" defaultValue="IDR" />
+        <InputField name="currency" label="Currency" placeholder="IDR" />
         <DatePickerField name="warranty_end_date" label="Warranty End Date" placeholder="Pick a date" />
     </div>
 );
