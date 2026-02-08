@@ -96,6 +96,7 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
     });
 
     const categoryId = form.watch('asset_category_id');
+    const branchId = form.watch('branch_id');
 
     useEffect(() => {
         form.reset(defaultValues);
@@ -120,6 +121,26 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
         }
         prevCategoryIdRef.current = categoryId;
     }, [categoryId, asset, form]);
+
+    // Reset location when branch changes, but NOT on initial load
+    const prevBranchIdRef = useRef(branchId);
+    useEffect(() => {
+        if (prevBranchIdRef.current !== branchId) {
+            // Only reset if it's not the initial load from props
+            const isInitialPropMatch = asset && (
+                String(asset.branch_id) === String(branchId) || 
+                String(asset.branch?.id) === String(branchId)
+            );
+            
+            if (!isInitialPropMatch) {
+                const currentLocationId = form.getValues('asset_location_id');
+                if (currentLocationId) {
+                    form.setValue('asset_location_id', '');
+                }
+            }
+        }
+        prevBranchIdRef.current = branchId;
+    }, [branchId, asset, form]);
 
     const handleFormSubmit = (data: AssetFormData) => {
         onSubmit({
@@ -180,8 +201,9 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
                         <AsyncSelectField
                             name="asset_location_id"
                             label="Location"
-                            url="/api/asset-locations"
+                            url={branchId ? `/api/asset-locations?branch_id=${branchId}` : '/api/asset-locations'}
                             placeholder="Select a location"
+                            key={`location-select-${branchId}`}
                             initialLabel={asset?.location?.name}
                         />
                         <AsyncSelectField
