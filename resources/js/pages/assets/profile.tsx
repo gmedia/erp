@@ -276,7 +276,8 @@ export default function AssetProfile({ asset }: Props) {
                 </div>
 
                 <Tabs defaultValue="summary" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-muted/50 p-1">
+                    <div className="overflow-x-auto no-scrollbar">
+                        <TabsList className="inline-flex h-auto w-full min-w-max md:grid md:grid-cols-5 bg-muted/50 p-1">
                         <TabsTrigger value="summary" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <Info className="mr-2 h-4 w-4" />
                             Summary
@@ -298,6 +299,7 @@ export default function AssetProfile({ asset }: Props) {
                             Depreciation
                         </TabsTrigger>
                     </TabsList>
+                </div>
 
                     {/* Summary Tab */}
                     <TabsContent value="summary" className="space-y-6 mt-6">
