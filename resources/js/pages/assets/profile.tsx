@@ -39,12 +39,14 @@ import {
     Layers,
     MapPin,
     Package,
+    Printer,
     Settings,
     ShieldCheck,
     TrendingDown,
     User,
     Wrench,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Props {
     asset: {
@@ -114,6 +116,76 @@ export default function AssetProfile({ asset }: Props) {
         return Math.min((accumulatedDep / purchaseCost) * 100, 100);
     };
 
+    const handlePrint = () => {
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return;
+
+        const qrSvg = document.querySelector('.qr-code-svg');
+        const qrSvgHtml = qrSvg ? qrSvg.outerHTML : '';
+
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Print QR Code - ${item.asset_code}</title>
+                    <style>
+                        body {
+                            font-family: system-ui, -apple-system, sans-serif;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            height: 100vh;
+                            margin: 0;
+                            text-align: center;
+                        }
+                        .container {
+                            border: 2px solid #eee;
+                            padding: 40px;
+                            border-radius: 20px;
+                        }
+                        .qr-wrapper svg {
+                            width: 250px;
+                            height: 250px;
+                        }
+                        .info {
+                            margin-top: 20px;
+                        }
+                        .code {
+                            font-size: 24px;
+                            font-weight: bold;
+                            font-family: monospace;
+                            margin: 10px 0;
+                        }
+                        .name {
+                            font-size: 18px;
+                            color: #666;
+                        }
+                        @media print {
+                            body { height: auto; }
+                            .container { border: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="qr-wrapper">${qrSvgHtml}</div>
+                        <div class="info">
+                            <div class="code">${item.asset_code}</div>
+                            <div class="name">${item.name}</div>
+                        </div>
+                    </div>
+                    <script>
+                        setTimeout(() => {
+                            window.print();
+                            window.close();
+                        }, 500);
+                    </script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+    };
+
     const breadcrumbs = [
         { title: 'Assets', href: '/assets' },
         { title: item.asset_code, href: '#' },
@@ -164,14 +236,25 @@ export default function AssetProfile({ asset }: Props) {
 
                         <div className="flex flex-wrap items-center gap-4">
                             {item.qrcode_url && (
-                                <div className="rounded-lg bg-white p-2 shadow-sm border border-primary/10">
-                                    <QRCodeSVG
-                                        value={item.qrcode_url}
-                                        size={80}
-                                        level="H"
-                                        includeMargin={false}
-                                        className="h-20 w-20"
-                                    />
+                                <div className="flex flex-col items-center gap-2">
+                                    <div className="rounded-lg bg-white p-2 shadow-sm border border-primary/10">
+                                        <QRCodeSVG
+                                            value={item.qrcode_url}
+                                            size={80}
+                                            level="H"
+                                            includeMargin={false}
+                                            className="h-20 w-20 qr-code-svg"
+                                        />
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-8 gap-2 text-xs text-primary hover:text-primary hover:bg-primary/5"
+                                        onClick={handlePrint}
+                                    >
+                                        <Printer className="h-3.5 w-3.5" />
+                                        Print QR
+                                    </Button>
                                 </div>
                             )}
                             <div className="flex flex-col gap-2">
