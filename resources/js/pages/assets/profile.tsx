@@ -178,24 +178,24 @@ export default function AssetProfile({ asset }: Props) {
                 </div>
 
                 <Tabs defaultValue="summary" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto bg-muted/50">
-                        <TabsTrigger value="summary" className="py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-muted/50 p-1">
+                        <TabsTrigger value="summary" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <Info className="mr-2 h-4 w-4" />
                             Summary
                         </TabsTrigger>
-                        <TabsTrigger value="movements" className="py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                        <TabsTrigger value="movements" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <History className="mr-2 h-4 w-4" />
                             Movements
                         </TabsTrigger>
-                        <TabsTrigger value="maintenance" className="py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                        <TabsTrigger value="maintenance" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <Wrench className="mr-2 h-4 w-4" />
                             Maintenance
                         </TabsTrigger>
-                        <TabsTrigger value="stocktake" className="py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                        <TabsTrigger value="stocktake" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <ClipboardCheck className="mr-2 h-4 w-4" />
                             Stocktake
                         </TabsTrigger>
-                        <TabsTrigger value="depreciation" className="py-3 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                        <TabsTrigger value="depreciation" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <TrendingDown className="mr-2 h-4 w-4" />
                             Depreciation
                         </TabsTrigger>
