@@ -190,9 +190,19 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
         defaultValues,
     });
 
+    const categoryId = form.watch('asset_category_id');
+
     useEffect(() => {
         form.reset(defaultValues);
     }, [form, defaultValues]);
+
+    // Reset model when category changes
+    useEffect(() => {
+        const currentModelId = form.getValues('asset_model_id');
+        if (currentModelId && (!asset || String(asset.asset_category_id) !== String(categoryId))) {
+            form.setValue('asset_model_id', '');
+        }
+    }, [categoryId, form, asset]);
 
     const handleFormSubmit = (data: AssetFormData) => {
         onSubmit({
@@ -216,7 +226,25 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
             <div className="space-y-6">
                 <div>
                     <h3 className="text-lg font-medium mb-4">Basic Information</h3>
-                    {renderBasicInfoSection()}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <InputField name="asset_code" label="Asset Code" placeholder="FA-000001" />
+                        <InputField name="name" label="Asset Name" placeholder="Laptop Dell Latitude" />
+                        <AsyncSelectField
+                            name="asset_category_id"
+                            label="Category"
+                            url="/api/asset-categories"
+                            placeholder="Select a category"
+                        />
+                        <AsyncSelectField
+                            name="asset_model_id"
+                            label="Model"
+                            url={categoryId ? `/api/asset-models?asset_category_id=${categoryId}` : '/api/asset-models'}
+                            placeholder="Select a model"
+                            key={categoryId} // Force remount to refresh data
+                        />
+                        <InputField name="serial_number" label="Serial Number" placeholder="SN-123456" />
+                        <InputField name="barcode" label="Barcode" placeholder="BC-123456" />
+                    </div>
                 </div>
                 <hr />
                 <div>

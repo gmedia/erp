@@ -12,6 +12,7 @@ class AssetModelResource extends JsonResource
     {
         return [
             'id' => $this->resource->id,
+            'name' => $this->resource->model_name,
             'model_name' => $this->resource->model_name,
             'manufacturer' => $this->resource->manufacturer,
             'specs' => $this->resource->specs,
