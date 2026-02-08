@@ -48,7 +48,13 @@ export const assetColumns: ColumnDef<Asset>[] = [
         ...createSortingHeader('Status'),
         cell: renderStatusCell,
     },
-    createCurrencyColumn<Asset>({ accessorKey: 'purchase_cost', label: 'Cost' }),
+    createCurrencyColumn<Asset>({
+        accessorKey: 'purchase_cost',
+        label: 'Cost',
+        currency: 'IDR',
+        locale: 'id-ID',
+        minimumFractionDigits: 0,
+    }),
     createDateColumn<Asset>({
         accessorKey: 'purchase_date',
         label: 'Purchase Date',
