@@ -1,5 +1,11 @@
 # ERP
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=gmedia_erp&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=gmedia_erp)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=gmedia_erp&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=gmedia_erp)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=gmedia_erp&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=gmedia_erp)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=gmedia_erp&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=gmedia_erp)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=gmedia_erp&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=gmedia_erp)
+
 ## Project Overview
 
 This Enterprise Resource Planning (ERP) system is a comprehensive business management platform designed to streamline and integrate core business operations across multiple departments. Built with modern web technologies, the system provides a unified solution for managing financial records, assets, customers, suppliers, products, employees, and organizational branches.
