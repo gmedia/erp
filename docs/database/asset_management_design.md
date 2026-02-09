@@ -184,6 +184,7 @@ Setiap pergerakan aset dicatat untuk menjaga *audit trail* yang akurat. Berikut 
 | **`return`** | Pengembalian aset. Penyerahan kembali aset dari penanggung jawab sebelumnya ke gudang atau pool aset. | Karyawan (Budi) mengembalikan laptop ke bagian IT karena sudah tidak bekerja lagi (resign) atau akan mutasi jabatan. |
 | **`dispose`** | Pelepasan atau penghapusan. Penghentian penggunaan aset secara permanen dari operasional perusahaan. | Menjual mobil operasional yang sudah melewati masa manfaat, atau menghapus printer rusak yang sudah tidak bisa diperbaiki lagi. |
 | **`adjustment`** | Penyesuaian data. Koreksi administratif data lokasi atau PIC, biasanya dilakukan setelah proses *stocktake*. | Mengoreksi data lokasi printer yang di sistem tercatat di "Lantai 1", namun ditemukan secara fisik di "Lantai 2" saat audit. |
+| **`test_coverage`** | Semua tipe pergerakan di atas telah dilingkupi oleh *Functional Test* (Pest) dan *E2E Test* (Playwright) untuk memastikan integritas data. | |
 
 ---
 

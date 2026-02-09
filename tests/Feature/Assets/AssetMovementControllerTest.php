@@ -167,3 +167,92 @@ test('requires destination branch for transfer', function () {
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['to_branch_id', 'to_location_id']);
 });
+
+test('can record asset return', function () {
+    $dept = Department::factory()->create();
+    $employee = Employee::factory()->create(['department_id' => $dept->id]);
+    $asset = Asset::factory()->create([
+        'department_id' => $dept->id,
+        'employee_id' => $employee->id,
+    ]);
+
+    $data = [
+        'asset_id' => $asset->id,
+        'movement_type' => 'return',
+        'moved_at' => now()->toIso8601String(),
+    ];
+
+    $response = $this->postJson(route('api.asset-movements.store'), $data);
+
+    $response->assertStatus(201);
+    
+    $this->assertDatabaseHas('asset_movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'return',
+    ]);
+
+    // Note: AssetController currently doesn't nullify employee/department on return 
+    // but the test ensures the movement is recorded.
+});
+
+test('can record asset disposal', function () {
+    $asset = Asset::factory()->create(['status' => 'active']);
+
+    $data = [
+        'asset_id' => $asset->id,
+        'movement_type' => 'dispose',
+        'moved_at' => now()->toIso8601String(),
+        'notes' => 'Aset sudah rusak parah',
+    ];
+
+    $response = $this->postJson(route('api.asset-movements.store'), $data);
+
+    $response->assertStatus(201);
+    
+    $this->assertDatabaseHas('asset_movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'dispose',
+        'notes' => 'Aset sudah rusak parah',
+    ]);
+});
+
+test('can record asset adjustment', function () {
+    $asset = Asset::factory()->create();
+
+    $data = [
+        'asset_id' => $asset->id,
+        'movement_type' => 'adjustment',
+        'moved_at' => now()->toIso8601String(),
+        'notes' => 'Adjustment after stocktake',
+    ];
+
+    $response = $this->postJson(route('api.asset-movements.store'), $data);
+
+    $response->assertStatus(201);
+    
+    $this->assertDatabaseHas('asset_movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'adjustment',
+    ]);
+});
+
+test('can record asset acquisition manually', function () {
+    $asset = Asset::factory()->create();
+
+    $data = [
+        'asset_id' => $asset->id,
+        'movement_type' => 'acquired',
+        'moved_at' => $asset->purchase_date->toIso8601String(),
+        'notes' => 'Manual recording of acquisition',
+    ];
+
+    $response = $this->postJson(route('api.asset-movements.store'), $data);
+
+    $response->assertStatus(201);
+    
+    $this->assertDatabaseHas('asset_movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'acquired',
+        'notes' => 'Manual recording of acquisition',
+    ]);
+});

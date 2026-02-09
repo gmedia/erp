@@ -63,4 +63,10 @@ test('add new asset end-to-end', async ({ page }) => {
     searchInput.press('Enter')
   ]);
   await expect(page.locator(`text=${assetCode}`)).toBeVisible();
+
+  // Go to profile and verify movement
+  await page.locator('tbody tr').filter({ hasText: assetCode }).first().locator('td').nth(2).click();
+  await page.waitForURL(/\/assets\/\w+/);
+  await page.getByRole('tab', { name: 'Movements' }).click();
+  await expect(page.locator('table')).toContainText('acquired');
 });

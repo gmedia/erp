@@ -84,3 +84,95 @@ test('record asset movement end-to-end', async ({ page }) => {
   await expect(page.locator('table')).toContainText('transfer');
   await expect(page.locator('table')).toContainText('E2E-TRANS-001');
 });
+
+test('record asset assignment end-to-end', async ({ page }) => {
+  const assetCode = await createAsset(page);
+  await page.goto('/assets');
+  await page.waitForLoadState('networkidle');
+
+  // Go to profile
+  const firstRow = page.locator('tbody tr').filter({ hasText: assetCode }).first();
+  await firstRow.locator('td').nth(2).click();
+  await page.waitForURL(/\/assets\/\w+/);
+
+  // Open Move/Assign dialog
+  await page.getByRole('button', { name: /Move\/Assign/i }).click();
+  const dialog = page.getByRole('dialog');
+  
+  // Select "Assign" movement type
+  await dialog.locator('button').filter({ hasText: /Transfer \(Location Change\)/i }).click();
+  await page.getByRole('option', { name: /Assign \(PIC Change\)/i }).click();
+
+  // Select Department
+  await dialog.locator('button').filter({ hasText: /Select department/i }).click();
+  const deptOption = page.getByRole('option').first();
+  await expect(deptOption).toBeVisible();
+  await deptOption.click();
+
+  // Select Employee
+  await dialog.locator('button').filter({ hasText: /Select employee/i }).click();
+  const empOption = page.getByRole('option').first();
+  await expect(empOption).toBeVisible();
+  await empOption.click();
+
+  await dialog.getByRole('button', { name: /Record Movement/i }).click();
+  await expect(page.getByText(/Movement recorded successfully/i)).toBeVisible();
+
+  // Verify entry in Movements tab
+  await page.getByRole('tab', { name: 'Movements' }).click();
+  await expect(page.locator('table')).toContainText('assign');
+});
+
+test('record asset return end-to-end', async ({ page }) => {
+  const assetCode = await createAsset(page);
+  await page.goto('/assets');
+  const firstRow = page.locator('tbody tr').filter({ hasText: assetCode }).first();
+  await firstRow.locator('td').nth(2).click();
+
+  await page.getByRole('button', { name: /Move\/Assign/i }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.locator('button').filter({ hasText: /Transfer \(Location Change\)/i }).click();
+  await page.getByRole('option', { name: /Return/i }).click();
+
+  await dialog.getByRole('button', { name: /Record Movement/i }).click();
+  await expect(page.getByText(/Movement recorded successfully/i)).toBeVisible();
+
+  await page.getByRole('tab', { name: 'Movements' }).click();
+  await expect(page.locator('table')).toContainText('return');
+});
+
+test('record asset disposal end-to-end', async ({ page }) => {
+  const assetCode = await createAsset(page);
+  await page.goto('/assets');
+  const firstRow = page.locator('tbody tr').filter({ hasText: assetCode }).first();
+  await firstRow.locator('td').nth(2).click();
+
+  await page.getByRole('button', { name: /Move\/Assign/i }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.locator('button').filter({ hasText: /Transfer \(Location Change\)/i }).click();
+  await page.getByRole('option', { name: /Dispose/i }).click();
+
+  await dialog.getByRole('button', { name: /Record Movement/i }).click();
+  await expect(page.getByText(/Movement recorded successfully/i)).toBeVisible();
+
+  await page.getByRole('tab', { name: 'Movements' }).click();
+  await expect(page.locator('table')).toContainText('dispose');
+});
+
+test('record asset adjustment end-to-end', async ({ page }) => {
+  const assetCode = await createAsset(page);
+  await page.goto('/assets');
+  const firstRow = page.locator('tbody tr').filter({ hasText: assetCode }).first();
+  await firstRow.locator('td').nth(2).click();
+
+  await page.getByRole('button', { name: /Move\/Assign/i }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.locator('button').filter({ hasText: /Transfer \(Location Change\)/i }).click();
+  await page.getByRole('option', { name: /Adjustment/i }).click();
+
+  await dialog.getByRole('button', { name: /Record Movement/i }).click();
+  await expect(page.getByText(/Movement recorded successfully/i)).toBeVisible();
+
+  await page.getByRole('tab', { name: 'Movements' }).click();
+  await expect(page.locator('table')).toContainText('adjustment');
+});

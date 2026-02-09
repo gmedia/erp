@@ -16,7 +16,7 @@ class StoreAssetMovementRequest extends FormRequest
     {
         return [
             'asset_id' => ['required', 'exists:assets,id'],
-            'movement_type' => ['required', 'string', Rule::in(['transfer', 'assign', 'return', 'dispose', 'adjustment'])],
+            'movement_type' => ['required', 'string', Rule::in(['acquired', 'transfer', 'assign', 'return', 'dispose', 'adjustment'])],
             'moved_at' => ['required', 'date'],
             'to_branch_id' => ['nullable', 'exists:branches,id', Rule::requiredIf(fn() => in_array($this->movement_type, ['transfer']))],
             'to_location_id' => ['nullable', 'exists:asset_locations,id', Rule::requiredIf(fn() => in_array($this->movement_type, ['transfer']))],
