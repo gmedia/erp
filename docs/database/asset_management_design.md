@@ -172,6 +172,19 @@ Audit trail untuk mutasi lokasi & penanggung jawab. Satu record merepresentasika
 
 **Index (disarankan):** `(asset_id, moved_at)`, `movement_type`, `to_branch_id`, `to_employee_id`
 
+##### Penjelasan Tipe Pergerakan (`movement_type`)
+
+Setiap pergerakan aset dicatat untuk menjaga *audit trail* yang akurat. Berikut adalah penjelasan dan contoh kasus untuk masing-masing tipe:
+
+| Tipe | Penjelasan | Contoh Kasus |
+| :--- | :--- | :--- |
+| **`acquired`** | Perolehan aset baru. Digunakan saat aset pertama kali didaftarkan ke sistem. | Pembelian Laptop Dell baru melalui vendor PT. Maju Jaya, diregistrasi dengan lokasi awal di "Gudang IT". |
+| **`transfer`** | Mutasi lokasi fisik. Perpindahan aset antar cabang atau antar ruangan/lantai dalam satu cabang. | Memindahkan printer dari "Kantor Pusat" ke "Cabang Surabaya", atau memindahkan meja dari "Ruang Meeting" ke "Ruang Staff". |
+| **`assign`** | Penugasan atau serah terima. Perubahan tanggung jawab penggunaan aset kepada karyawan atau departemen tertentu. | Memberikan Laptop (aset perusahaan) kepada karyawan baru (Budi) untuk digunakan selama masa kerjanya di Departemen IT. |
+| **`return`** | Pengembalian aset. Penyerahan kembali aset dari penanggung jawab sebelumnya ke gudang atau pool aset. | Karyawan (Budi) mengembalikan laptop ke bagian IT karena sudah tidak bekerja lagi (resign) atau akan mutasi jabatan. |
+| **`dispose`** | Pelepasan atau penghapusan. Penghentian penggunaan aset secara permanen dari operasional perusahaan. | Menjual mobil operasional yang sudah melewati masa manfaat, atau menghapus printer rusak yang sudah tidak bisa diperbaiki lagi. |
+| **`adjustment`** | Penyesuaian data. Koreksi administratif data lokasi atau PIC, biasanya dilakukan setelah proses *stocktake*. | Mengoreksi data lokasi printer yang di sistem tercatat di "Lantai 1", namun ditemukan secara fisik di "Lantai 2" saat audit. |
+
 ---
 
 ### C. Pemeliharaan (Maintenance)
