@@ -5,7 +5,7 @@ test('sort employees by various columns', async ({ page }) => {
   await login(page);
   await page.goto('/employees');
   
-  const columns = ['Name', 'Email', 'Salary', 'Hire Date'];
+  const columns = ['Name', 'Email', 'Department', 'Position', 'Branch', 'Salary', 'Hire Date'];
   
   for (const col of columns) {
     const header = page.getByRole('columnheader', { name: col });

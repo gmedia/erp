@@ -45,16 +45,19 @@ export const employeeColumns: ColumnDef<Employee>[] = [
     createEmailColumn<Employee>({ accessorKey: 'email', label: 'Email' }),
     createPhoneColumn<Employee>({ accessorKey: 'phone', label: 'Phone' }),
     {
+        id: 'department_id',
         accessorKey: 'department',
         ...createSortingHeader('Department'),
         cell: renderDepartmentCell,
     },
     {
+        id: 'position_id',
         accessorKey: 'position',
         ...createSortingHeader('Position'),
         cell: renderPositionCell,
     },
     {
+        id: 'branch_id',
         accessorKey: 'branch',
         ...createSortingHeader('Branch'),
         cell: renderBranchCell,
