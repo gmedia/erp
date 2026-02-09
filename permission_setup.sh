@@ -123,3 +123,5 @@ done
 
 # Copying .env.example to .env
 cp .env.example .env
+chmod ugo+rw .env
+chown 1000:1000 .env
