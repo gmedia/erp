@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Actions\AssetMovements\ExportAssetMovementsAction;
 use App\Domain\AssetMovements\AssetMovementFilterService;
-use App\Http\Requests\Assets\ExportAssetMovementRequest;
-use App\Http\Requests\Assets\StoreAssetMovementRequest;
-use App\Http\Requests\Assets\UpdateAssetMovementRequest;
+use App\Http\Requests\AssetMovements\ExportAssetMovementRequest;
+use App\Http\Requests\AssetMovements\StoreAssetMovementRequest;
+use App\Http\Requests\AssetMovements\UpdateAssetMovementRequest;
 use App\Http\Resources\AssetMovements\AssetMovementResource;
 use App\Models\Asset;
 use App\Models\AssetMovement;

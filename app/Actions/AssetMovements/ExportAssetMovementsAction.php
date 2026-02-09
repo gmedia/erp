@@ -3,7 +3,7 @@
 namespace App\Actions\AssetMovements;
 
 use App\Exports\AssetMovementExport;
-use App\Http\Requests\Assets\ExportAssetMovementRequest;
+use App\Http\Requests\AssetMovements\ExportAssetMovementRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;

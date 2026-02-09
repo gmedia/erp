@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Assets;
+namespace App\Http\Requests\AssetMovements;
 
 use Illuminate\Foundation\Http\FormRequest;
 
