@@ -26,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->append(AddCspHeaders::class);
-
+        
         $middleware->alias([
             'permission' => \App\Http\Middleware\CheckPermission::class,
         ]);
