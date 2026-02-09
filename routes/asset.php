@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AssetController;
-use App\Http\Controllers\AssetMovementController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,10 +12,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('assets/{asset}', [AssetController::class, 'profile'])
         ->name('assets.profile')
         ->middleware('permission:asset_profile');
-
-    Route::get('asset-movements', [AssetMovementController::class, 'index'])
-        ->name('asset-movements.index')
-        ->middleware('permission:asset_movement');
 });
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
@@ -27,10 +22,5 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
         Route::put('assets/{asset}', [AssetController::class, 'update'])->name('assets.update')->middleware('permission:asset.edit,true');
         Route::delete('assets/{asset}', [AssetController::class, 'destroy'])->name('assets.destroy')->middleware('permission:asset.delete,true');
         Route::post('assets/export', [AssetController::class, 'export'])->name('assets.export');
-    });
-
-    Route::middleware('permission:asset_movement,true')->group(function () {
-        Route::get('asset-movements', [AssetMovementController::class, 'index'])->name('api.asset-movements.index');
-        Route::post('asset-movements', [AssetMovementController::class, 'store'])->name('api.asset-movements.store');
     });
 });

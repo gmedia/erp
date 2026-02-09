@@ -88,7 +88,7 @@ import { AssetViewModal } from '@/components/assets/AssetViewModal';
 import { type Asset } from '@/types/asset';
 import { assetMovementColumns } from '@/components/asset-movements/AssetMovementColumns';
 import { createAssetMovementFilterFields } from '@/components/asset-movements/AssetMovementFilters';
-import { AssetMovementForm } from '@/components/assets/AssetMovementForm';
+import { AssetMovementForm } from '@/components/asset-movements/AssetMovementForm';
 import { AssetMovementViewModal } from '@/components/asset-movements/AssetMovementViewModal';
 
 // Helper function to create generic delete messages

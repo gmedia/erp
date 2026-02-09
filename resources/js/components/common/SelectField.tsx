@@ -28,6 +28,7 @@ interface SelectFieldProps {
     placeholder?: string;
     className?: string;
     children?: ReactNode;
+    disabled?: boolean;
 }
 
 /**
@@ -40,6 +41,7 @@ export default function SelectField({
     placeholder = '',
     className,
     children,
+    disabled,
 }: SelectFieldProps) {
     return (
         <FormField
@@ -51,6 +53,7 @@ export default function SelectField({
                         <Select
                             onValueChange={field.onChange}
                             value={field.value !== undefined && field.value !== null ? String(field.value) : undefined}
+                            disabled={disabled}
                         >
                             <SelectTrigger className="w-full">
                                 <span>

@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AssetMovements\ExportAssetMovementsAction;
+use App\Domain\AssetMovements\AssetMovementFilterService;
+use App\Http\Requests\Assets\ExportAssetMovementRequest;
 use App\Http\Requests\Assets\StoreAssetMovementRequest;
+use App\Http\Requests\Assets\UpdateAssetMovementRequest;
 use App\Http\Resources\AssetMovements\AssetMovementResource;
 use App\Models\Asset;
 use App\Models\AssetMovement;
@@ -16,7 +20,7 @@ use Inertia\Response;
 
 class AssetMovementController extends Controller
 {
-    public function index(Request $request): Response|AnonymousResourceCollection
+    public function index(Request $request, AssetMovementFilterService $filterService): Response|AnonymousResourceCollection
     {
         $query = AssetMovement::with([
             'asset',
@@ -29,11 +33,20 @@ class AssetMovementController extends Controller
             'fromEmployee',
             'toEmployee',
             'createdBy'
-        ])->latest('moved_at');
+        ]);
 
-        if ($request->has('asset_id')) {
-            $query->where('asset_id', $request->asset_id);
+        if ($request->filled('search')) {
+            $filterService->applySearch($query, $request->search, ['reference', 'notes']);
+        } else {
+            $filterService->applyAdvancedFilters($query, $request->all());
         }
+
+        $filterService->applySorting(
+            $query,
+            $request->sort_by ?? 'moved_at',
+            $request->sort_direction ?? 'desc',
+            ['id', 'movement_type', 'moved_at', 'created_at']
+        );
 
         $movements = $query->paginate($request->integer('per_page', 15));
 
@@ -41,9 +54,19 @@ class AssetMovementController extends Controller
             return AssetMovementResource::collection($movements);
         }
 
-        return Inertia::render('assets/movements/index', [
+        return Inertia::render('asset-movements/index', [
             'movements' => AssetMovementResource::collection($movements),
-            'filters' => $request->only(['asset_id']),
+            'filters' => $request->all(),
+        ]);
+    }
+
+    public function show(AssetMovement $asset_movement): JsonResponse
+    {
+        return response()->json([
+            'data' => new AssetMovementResource($asset_movement->load([
+                'asset', 'fromBranch', 'toBranch', 'fromLocation', 'toLocation',
+                'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy'
+            ])),
         ]);
     }
 
@@ -77,5 +100,71 @@ class AssetMovementController extends Controller
                 ])),
             ], 201);
         });
+    }
+
+    public function update(UpdateAssetMovementRequest $request, AssetMovement $asset_movement): JsonResponse
+    {
+        $asset_movement->update($request->validated());
+
+        return response()->json([
+            'message' => 'Movement updated successfully',
+            'data' => new AssetMovementResource($asset_movement->load([
+                'asset', 'fromBranch', 'toBranch', 'fromLocation', 'toLocation',
+                'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy'
+            ])),
+        ]);
+    }
+
+    public function destroy(AssetMovement $asset_movement): JsonResponse
+    {
+        return DB::transaction(function () use ($asset_movement) {
+            $asset = $asset_movement->asset;
+
+            // Find the latest movement for this asset
+            $latestMovement = AssetMovement::where('asset_id', $asset->id)
+                ->latest('moved_at')
+                ->latest('id')
+                ->first();
+
+            // If we are deleting the latest movement, we should revert the asset state
+            if ($latestMovement && $latestMovement->id === $asset_movement->id) {
+                // Find the previous movement
+                $previousMovement = AssetMovement::where('asset_id', $asset->id)
+                    ->where('id', '!=', $asset_movement->id)
+                    ->latest('moved_at')
+                    ->latest('id')
+                    ->first();
+
+                if ($previousMovement) {
+                    $asset->update([
+                        'branch_id' => $previousMovement->to_branch_id,
+                        'asset_location_id' => $previousMovement->to_location_id,
+                        'department_id' => $previousMovement->to_department_id,
+                        'employee_id' => $previousMovement->to_employee_id,
+                    ]);
+                } else {
+                    // If no previous movement, revert to "initial" state if possible
+                    // However, we don't have a record of the state before the first movement in the movements table
+                    // unless we assume the 'from' fields of the first movement represent it.
+                    $asset->update([
+                        'branch_id' => $asset_movement->from_branch_id,
+                        'asset_location_id' => $asset_movement->from_location_id,
+                        'department_id' => $asset_movement->from_department_id,
+                        'employee_id' => $asset_movement->from_employee_id,
+                    ]);
+                }
+            }
+
+            $asset_movement->delete();
+
+            return response()->json([
+                'message' => 'Movement deleted successfully',
+            ]);
+        });
+    }
+
+    public function export(ExportAssetMovementRequest $request, ExportAssetMovementsAction $action): JsonResponse
+    {
+        return $action->execute($request);
     }
 }

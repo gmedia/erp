@@ -389,7 +389,7 @@ Tabel terlibat:
 #### 6) Asset Movements (Transfer / Assignment)
 Tujuan: membuat dokumen perpindahan aset (mutasi antar cabang/ruang/PIC) dan audit trail.
 
-Jenis menu: Non-CRUD  
+Jenis menu: Complex CRUD  
 Agent skill: `feature-non-crud`
 
 Tabel terlibat:
