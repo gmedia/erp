@@ -108,14 +108,16 @@ chmod -R ugo+rw "database"
 chown -R 1000:1000 "database"
 
 # Fix agent skill script permissions
-chmod +x \
-    .agent/skills/wizard.sh \
-    .agent/skills/feature-crud-simple/scripts/scaffold.sh \
-    .agent/skills/feature-crud-simple/scripts/generate.sh \
-    .agent/skills/feature-crud-complex/scripts/scaffold.sh \
-    .agent/skills/feature-crud-complex/scripts/generate.sh \
-    .agent/skills/refactor-backend/scripts/check-architecture.sh \
-    .agent/skills/refactor-backend/scripts/generate.sh
+if [ -d ".agent" ]; then
+    chmod +x \
+        .agent/skills/wizard.sh \
+        .agent/skills/feature-crud-simple/scripts/scaffold.sh \
+        .agent/skills/feature-crud-simple/scripts/generate.sh \
+        .agent/skills/feature-crud-complex/scripts/scaffold.sh \
+        .agent/skills/feature-crud-complex/scripts/generate.sh \
+        .agent/skills/refactor-backend/scripts/check-architecture.sh \
+        .agent/skills/refactor-backend/scripts/generate.sh
+fi
 
 # Copying .env.example to .env
 cp .env.example .env
