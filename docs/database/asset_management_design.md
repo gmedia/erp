@@ -367,7 +367,8 @@ Tabel terlibat:
 * `accounts` (untuk `depreciation_expense_account_id` dan `accumulated_depr_account_id`)
 
 Catatan proses:
-* Saat aset dibuat/diakuisisi, sistem idealnya menambah histori awal di `asset_movements` dengan `movement_type = acquired`.
+* Saat aset dibuat/diakuisisi, sistem akan menambah histori awal di `asset_movements` dengan `movement_type = acquired`.
+* Saat data utama aset (tanggal perolehan, lokasi, atau PIC) diupdate, sistem akan menyelaraskan data pada record `acquired` terkait, atau membuatnya jika belum ada.
 * Saat lokasi/PIC berubah, update kolom di `assets` dan simpan histori di `asset_movements`.
 
 #### 5) Asset Detail (Profile)

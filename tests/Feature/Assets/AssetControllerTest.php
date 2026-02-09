@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\{Asset, Employee, Permission, User};
+use App\Models\{Asset, AssetMovement, Employee, Permission, User};
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('assets');
@@ -47,7 +47,15 @@ test('can create asset', function () {
     $response->assertStatus(201)
         ->assertJsonPath('data.name', $data['name']);
     
+    $assetId = $response->json('data.id');
+    
     $this->assertDatabaseHas('assets', ['asset_code' => $data['asset_code']]);
+    $this->assertDatabaseHas('asset_movements', [
+        'asset_id' => $assetId,
+        'movement_type' => 'acquired',
+        'to_branch_id' => $data['branch_id'],
+        'to_location_id' => $data['asset_location_id'] ?? null,
+    ]);
 });
 
 test('can update asset', function () {
@@ -62,6 +70,61 @@ test('can update asset', function () {
     $this->assertDatabaseHas('assets', [
         'id' => $asset->id,
         'name' => 'Updated Asset Name'
+    ]);
+});
+
+test('updating asset syncs existing acquired movement', function () {
+    $asset = Asset::factory()->create(['name' => 'Original Name']);
+    
+    // Manually create the initial 'acquired' movement
+    AssetMovement::create([
+        'asset_id' => $asset->id,
+        'movement_type' => 'acquired',
+        'moved_at' => $asset->purchase_date,
+        'to_branch_id' => $asset->branch_id,
+        'to_location_id' => $asset->asset_location_id,
+        'created_by' => $this->user->id,
+    ]);
+
+    $this->assertDatabaseHas('asset_movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'acquired',
+    ]);
+
+    $newData = [
+        'name' => 'Updated Name',
+        'purchase_date' => now()->subDays(10)->format('Y-m-d'),
+    ];
+
+    $response = $this->putJson(route('assets.update', $asset), $newData);
+
+    $response->assertStatus(200);
+    
+    $this->assertDatabaseHas('asset_movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'acquired',
+        'moved_at' => $newData['purchase_date'] . ' 00:00:00',
+    ]);
+});
+
+test('updating asset creates acquired movement if missing', function () {
+    // Manually create asset without movement (simulating old data)
+    $asset = Asset::factory()->create();
+    AssetMovement::where('asset_id', $asset->id)->delete();
+    
+    $this->assertDatabaseMissing('asset_movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'acquired',
+    ]);
+
+    $newData = ['name' => 'Updated Name'];
+    $response = $this->putJson(route('assets.update', $asset), $newData);
+
+    $response->assertStatus(200);
+    
+    $this->assertDatabaseHas('asset_movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'acquired',
     ]);
 });
 

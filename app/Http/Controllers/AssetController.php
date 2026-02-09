@@ -6,7 +6,7 @@ use App\Actions\Assets\{IndexAssetsAction, ExportAssetsAction};
 use App\Http\Requests\Assets\{IndexAssetRequest, StoreAssetRequest, UpdateAssetRequest, ExportAssetRequest};
 use App\Http\Resources\Assets\{AssetResource, AssetCollection};
 use App\DTOs\Assets\UpdateAssetData;
-use App\Models\Asset;
+use App\Models\{Asset, AssetMovement};
 use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -30,6 +30,18 @@ class AssetController extends Controller
     public function store(StoreAssetRequest $request): JsonResponse
     {
         $asset = Asset::create($request->validated());
+
+        AssetMovement::create([
+            'asset_id' => $asset->id,
+            'movement_type' => 'acquired',
+            'moved_at' => $asset->purchase_date,
+            'to_branch_id' => $asset->branch_id,
+            'to_location_id' => $asset->asset_location_id,
+            'to_department_id' => $asset->department_id,
+            'to_employee_id' => $asset->employee_id,
+            'notes' => 'Initial acquisition',
+            'created_by' => auth()->id(),
+        ]);
 
         return response()->json([
             'message' => 'Asset created successfully',
@@ -76,9 +88,27 @@ class AssetController extends Controller
         $data = UpdateAssetData::fromArray($request->validated());
         $asset->update($data->toArray());
 
+        $asset->refresh();
+
+        AssetMovement::updateOrCreate(
+            [
+                'asset_id' => $asset->id,
+                'movement_type' => 'acquired',
+            ],
+            [
+                'moved_at' => $asset->purchase_date,
+                'to_branch_id' => $asset->branch_id,
+                'to_location_id' => $asset->asset_location_id,
+                'to_department_id' => $asset->department_id,
+                'to_employee_id' => $asset->employee_id,
+                'notes' => 'Initial acquisition (synced)',
+                'created_by' => auth()->id(),
+            ]
+        );
+
         return response()->json([
             'message' => 'Asset updated successfully',
-            'data' => new AssetResource($asset->fresh()),
+            'data' => new AssetResource($asset),
         ]);
     }
 
