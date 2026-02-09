@@ -186,6 +186,16 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'asset_profile',
+                'display_name' => 'Asset Profile',
+                'child' => [],
+            ],
+            [
+                'name' => 'asset_movement',
+                'display_name' => 'Asset Movement',
+                'child' => [],
+            ],
+            [
                 'name' => 'trial_balance_report',
                 'display_name' => 'Trial Balance Report',
                 'child' => [],

@@ -16,8 +16,9 @@ beforeEach(function () {
 
     $pAsset = Permission::firstOrCreate(['name' => 'asset', 'display_name' => 'Asset']);
     $pEdit = Permission::firstOrCreate(['name' => 'asset.edit', 'display_name' => 'Edit Asset']);
+    $pMovement = Permission::firstOrCreate(['name' => 'asset_movement', 'display_name' => 'Asset Movement']);
     
-    $this->employee->permissions()->attach([$pAsset->id, $pEdit->id]);
+    $this->employee->permissions()->attach([$pAsset->id, $pEdit->id, $pMovement->id]);
 });
 
 test('can list asset movements', function () {
