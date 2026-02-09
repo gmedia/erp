@@ -41,21 +41,15 @@ class AssetSampleDataSeeder extends Seeder
             ]);
         }
 
-        $categories = [
-            ['code' => 'FA-IT', 'name' => 'IT Equipment', 'useful_life_months_default' => 36],
-            ['code' => 'FA-VEH', 'name' => 'Vehicles', 'useful_life_months_default' => 60],
-            ['code' => 'FA-OFF', 'name' => 'Office Equipment', 'useful_life_months_default' => 48],
-            ['code' => 'FA-MCH', 'name' => 'Machinery', 'useful_life_months_default' => 120],
-        ];
+        // Check for existing categories from AssetCategorySeeder first
+        $itCategory = AssetCategory::where('code', 'IT')->first();
+        $vehCategory = AssetCategory::where('code', 'KND')->first();
+        $offCategory = AssetCategory::where('code', 'PRB')->first();
+        $mchCategory = AssetCategory::where('code', 'MSN')->first();
 
-        foreach ($categories as $data) {
-            AssetCategory::updateOrCreate(['code' => $data['code']], $data);
-        }
-
-        $itCategory = AssetCategory::where('code', 'FA-IT')->first();
-        $vehCategory = AssetCategory::where('code', 'FA-VEH')->first();
-        $offCategory = AssetCategory::where('code', 'FA-OFF')->first();
-        $mchCategory = AssetCategory::where('code', 'FA-MCH')->first();
+        // Fallback or verify they exist. 
+        // Since AssetCategorySeeder runs first, they should exist.
+        // If they don't we could create them, but better to rely on AssetCategorySeeder.
 
         $models = [
             [
