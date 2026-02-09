@@ -18,20 +18,20 @@ import { AssetMovementFormData, assetMovementFormSchema } from '@/utils/schemas'
 interface AssetMovementFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    asset: Asset;
+    asset?: Asset;
     onSubmit: (data: AssetMovementFormData) => void;
     isLoading?: boolean;
 }
 
-const getAssetMovementFormDefaults = (asset: Asset): AssetMovementFormData => {
+const getAssetMovementFormDefaults = (asset?: Asset): AssetMovementFormData => {
     return {
-        asset_id: String(asset.id),
+        asset_id: asset ? String(asset.id) : '',
         movement_type: 'transfer',
         moved_at: new Date(),
-        to_branch_id: String(asset.branch_id || ''),
-        to_location_id: String(asset.asset_location_id || ''),
-        to_department_id: String(asset.department_id || ''),
-        to_employee_id: String(asset.employee_id || ''),
+        to_branch_id: asset ? String(asset.branch_id || '') : '',
+        to_location_id: asset ? String(asset.asset_location_id || '') : '',
+        to_department_id: asset ? String(asset.department_id || '') : '',
+        to_employee_id: asset ? String(asset.employee_id || '') : '',
         reference: '',
         notes: '',
     };
@@ -72,13 +72,24 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(function AssetMove
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={`Record Movement for ${asset.asset_code}`}
+            title={asset ? `Record Movement for ${asset.asset_code}` : 'Record Asset Movement'}
             submitLabel="Record Movement"
             onSubmit={handleFormSubmit}
             isLoading={isLoading}
             className="sm:max-w-[600px]"
         >
             <div className="space-y-6">
+                {!asset && (
+                    <div className="grid grid-cols-1 gap-4">
+                        <AsyncSelectField
+                            name="asset_id"
+                            label="Asset"
+                            url="/api/assets"
+                            placeholder="Select asset"
+                        />
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <SelectField
                         name="movement_type"
@@ -105,7 +116,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(function AssetMove
                                 label="To Branch"
                                 url="/api/branches"
                                 placeholder="Select destination branch"
-                                initialLabel={asset.branch?.name}
+                                initialLabel={asset?.branch?.name}
                             />
                             <AsyncSelectField
                                 name="to_location_id"
@@ -113,7 +124,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(function AssetMove
                                 url={toBranchId ? `/api/asset-locations?branch_id=${toBranchId}` : '/api/asset-locations'}
                                 placeholder="Select destination location"
                                 key={`location-select-${toBranchId}`}
-                                initialLabel={asset.location?.name}
+                                initialLabel={asset?.location?.name}
                             />
                         </div>
                     </div>
@@ -128,14 +139,14 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(function AssetMove
                                 label="To Department"
                                 url="/api/departments"
                                 placeholder="Select department"
-                                initialLabel={asset.department?.name}
+                                initialLabel={asset?.department?.name}
                             />
                             <AsyncSelectField
                                 name="to_employee_id"
                                 label="To Employee"
                                 url="/api/employees"
                                 placeholder="Select employee"
-                                initialLabel={asset.employee?.name}
+                                initialLabel={asset?.employee?.name}
                             />
                         </div>
                     </div>
