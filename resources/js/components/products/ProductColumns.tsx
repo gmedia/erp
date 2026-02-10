@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import {
     createActionsColumn,
     createCurrencyColumn,
+    createSelectColumn,
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
@@ -54,6 +55,7 @@ const renderStatusCell = ({ row }: { row: { original: Product } }) => {
 };
 
 export const productColumns: ColumnDef<Product>[] = [
+    createSelectColumn(),
     createTextColumn<Product>({ accessorKey: 'code', label: 'Code' }),
     createTextColumn<Product>({ accessorKey: 'name', label: 'Name' }),
     {
