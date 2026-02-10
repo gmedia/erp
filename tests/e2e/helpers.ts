@@ -2592,3 +2592,4 @@ export async function createAsset(
 
   return assetCode;
 }
+
