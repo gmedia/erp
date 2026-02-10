@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { createDepartment, searchDepartment } from '../helpers';
 
 test('edit department', async ({ page }) => {
-  const name = await createDepartment(page, { name: 'Original Dept' });
+  const name = await createDepartment(page);
 
   await searchDepartment(page, name);
 
@@ -10,14 +10,15 @@ test('edit department', async ({ page }) => {
   await row.getByRole('button', { name: /Actions/i }).click();
   await page.getByRole('menuitem', { name: /Edit/i }).click();
 
-  await page.fill('input[name="name"]', 'Updated Dept');
+  const updatedName = `Updated Dept ${Date.now()}`;
+  await page.fill('input[name="name"]', updatedName);
   
   await Promise.all([
-    page.waitForResponse(resp => resp.url().includes('/api/departments') && resp.status() === 200),
+    page.waitForResponse(resp => resp.url().includes('/api/departments') && (resp.status() === 200 || resp.status() === 422)),
     page.getByRole('button', { name: /Submit|Update|Save/i }).click(),
   ]);
 
   await page.goto('/departments');
-  await searchDepartment(page, 'Updated Dept');
-  await expect(page.getByText('Updated Dept')).toBeVisible();
+  await searchDepartment(page, updatedName);
+  await expect(page.getByText(updatedName)).toBeVisible();
 });

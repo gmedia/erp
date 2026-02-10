@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { createDepartment, deleteDepartment } from '../helpers';
 
 test('delete department', async ({ page }) => {
-  const name = await createDepartment(page, { name: 'To Delete Department' });
+  const name = await createDepartment(page);
 
   await deleteDepartment(page, name);
 
