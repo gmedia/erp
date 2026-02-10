@@ -262,6 +262,18 @@ export async function createPosition(
 
   return createEntity(page, config, overrides);
 }
+export async function deleteDepartment(page: Page, name: string) {
+  await login(page);
+  await page.goto('/departments');
+  await searchDepartment(page, name);
+
+  const row = page.locator('tr', { hasText: name }).first();
+  await row.getByRole('button', { name: /Actions/i }).click();
+  await page.getByRole('menuitem', { name: /Delete/i }).click();
+
+  await page.getByRole('button', { name: /Delete/i }).click();
+  await page.waitForResponse(resp => resp.url().includes('/api/departments') && resp.status() === 204);
+}
 
 /**
  * Search for an position by name.
