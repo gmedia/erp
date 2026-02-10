@@ -24,7 +24,7 @@ class ExportSupplierRequest extends FormRequest
             'branch_id' => ['nullable', 'exists:branches,id'],
             'category_id' => ['nullable', 'exists:supplier_categories,id'],
             'status' => ['nullable', 'string', 'in:active,inactive'],
-            'sort_by' => ['nullable', 'string', 'in:id,name,email,phone,branch_id,category_id,status,created_at,updated_at'],
+            'sort_by' => ['nullable', 'string', 'in:id,name,email,phone,branch,branch_id,category,category_id,status,created_at,updated_at'],
             'sort_direction' => ['nullable', 'in:asc,desc'],
         ];
     }
