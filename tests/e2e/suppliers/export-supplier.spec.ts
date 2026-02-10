@@ -3,7 +3,7 @@ import { createSupplier } from '../helpers';
 import * as fs from 'fs';
 import * as path from 'path';
 
-test('export suppliers to Excel works correctly', async ({ page }) => {
+test('export suppliers to Excel works correctly with all columns', async ({ page }) => {
   // Create a supplier to ensure data exists
   await createSupplier(page);
   
@@ -26,8 +26,8 @@ test('export suppliers to Excel works correctly', async ({ page }) => {
   expect(jsonResponse.url).toBeTruthy();
   expect(jsonResponse.filename).toMatch(/suppliers_.*\.xlsx$/i);
 
-  // Setup download path
-  const downloadsDir = path.resolve('e2e/test-results', 'downloads');
+  // Setup download path in a temporary or project-relative directory
+  const downloadsDir = path.resolve('tests/e2e/test-results', 'downloads');
   if (!fs.existsSync(downloadsDir)) {
     fs.mkdirSync(downloadsDir, { recursive: true });
   }
@@ -40,10 +40,12 @@ test('export suppliers to Excel works correctly', async ({ page }) => {
   
   fs.writeFileSync(destPath, fileBuffer);
 
-  // Validate file existence
+  // Validate file existence and basic integrity
   expect(fs.existsSync(destPath)).toBeTruthy();
 
   // Basic check of file content (zip header for xlsx)
   const header = fs.readFileSync(destPath).slice(0, 2).toString('utf8');
   expect(header).toBe('PK');
+  
+  // Clean up if needed, though usually kept for CI artifacts
 });
