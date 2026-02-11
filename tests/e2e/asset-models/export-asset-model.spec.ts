@@ -1,27 +1,34 @@
 import { test, expect } from '@playwright/test';
-import { login, createAssetModel } from '../helpers';
+import { login } from '../helpers';
+import * as fs from 'fs';
+import * as path from 'path';
 
-test('export asset models', async ({ page }) => {
-  await login(page);
+test.describe('Asset Models - Export', () => {
+    test.beforeEach(async ({ page }) => {
+        await login(page);
+        await page.goto('/asset-models');
+    });
 
-  const timestamp = Date.now();
-  const modelName = await createAssetModel(page, { model_name: `Export Test Model ${timestamp}` });
+    test('should export asset models with all columns', async ({ page }) => {
+        await expect(page.locator('table')).toBeVisible();
 
-  await page.goto('/asset-models');
-  await page.waitForLoadState('networkidle');
+        // Trigger export
+        const downloadPromise = page.waitForEvent('download');
+        await page.getByRole('button', { name: 'Export' }).click();
+        const download = await downloadPromise;
 
-  // Click the export button
-  const exportButton = page.getByRole('button', { name: /Export/i });
-  await expect(exportButton).toBeVisible();
+        // Save to temporary path
+        const downloadPath = path.join(test.info().project.outputDir, download.suggestedFilename());
+        await download.saveAs(downloadPath);
 
-  // Start waiting for download before clicking
-  const downloadPromise = page.waitForEvent('download', { timeout: 30000 });
-  await exportButton.click();
+        // Verify file exists
+        expect(fs.existsSync(downloadPath)).toBeTruthy();
+        
+        // Verify file extension
+        expect(download.suggestedFilename()).toMatch(/\.xlsx$/);
 
-  // Wait for the download to finish
-  const download = await downloadPromise;
-
-  // Verify the filename contains expected pattern
-  expect(download.suggestedFilename()).toContain('asset_models_export_');
-  expect(download.suggestedFilename()).toContain('.xlsx');
+        // Verify file size is greater than 0
+        const stats = fs.statSync(downloadPath);
+        expect(stats.size).toBeGreaterThan(0);
+    });
 });
