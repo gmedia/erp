@@ -1,26 +1,40 @@
 import { test, expect } from '@playwright/test';
-import { createAssetModel, searchAssetModel, editAssetModel, login } from '../helpers';
+import { login } from '../helpers';
 
-test('edit asset model end-to-end', async ({ page }) => {
-  await login(page);
+test.describe('Asset Models - Edit', () => {
+    test.beforeEach(async ({ page }) => {
+        await login(page);
+        await page.goto('/asset-models');
+    });
 
-  const timestamp = Date.now();
-  const modelName = await createAssetModel(page, {
-    model_name: `Model To Edit ${timestamp}`,
-    manufacturer: 'Original Manufacturer',
-  });
+    test('should edit an existing asset model', async ({ page }) => {
+        await expect(page.locator('table')).toBeVisible();
 
-  await page.goto('/asset-models');
-  await searchAssetModel(page, modelName);
+        // Click on the first row or an action button to edit
+        const firstRow = page.locator('tbody tr').first();
+        const actionsButton = firstRow.getByRole('button', { name: 'Actions' });
+        await actionsButton.click();
 
-  const updatedName = `Updated Model Name ${timestamp}`;
-  await editAssetModel(page, modelName, {
-    model_name: updatedName,
-  });
+        const editButton = page.getByRole('menuitem', { name: 'Edit' });
+        await editButton.click();
 
-  await page.waitForTimeout(1000);
-  await searchAssetModel(page, updatedName);
-  
-  const row = page.locator('tr', { hasText: updatedName }).first();
-  await expect(row).toBeVisible();
+        await expect(page.getByRole('dialog')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Edit Asset Model' })).toBeVisible();
+
+        // Update form
+        const newModelName = `Updated Model ${Date.now()}`;
+        await page.getByLabel('Model Name').fill(newModelName);
+        
+        // Update Specs
+        await page.getByLabel('Specifications (JSON)').fill('{"updated": "true"}');
+
+        // Submit
+        await page.getByRole('button', { name: 'Update', exact: true }).click();
+
+        // Verify success
+        await expect(page.getByRole('dialog')).not.toBeVisible();
+
+        // Verify in table
+        await expect(page.locator('table')).toContainText(newModelName);
+    });
 });

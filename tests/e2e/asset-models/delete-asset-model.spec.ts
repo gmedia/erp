@@ -1,24 +1,43 @@
 import { test, expect } from '@playwright/test';
-import { createAssetModel, searchAssetModel, deleteAssetModel, login } from '../helpers';
+import { login } from '../helpers';
 
-test('delete asset model end-to-end', async ({ page }) => {
-  await login(page);
+test.describe('Asset Models - Delete', () => {
+    test.beforeEach(async ({ page }) => {
+        await login(page);
+        await page.goto('/asset-models');
+    });
 
-  const timestamp = Date.now();
-  const modelName = await createAssetModel(page, {
-    model_name: `Model To Delete ${timestamp}`,
-  });
+    test('should delete an asset model', async ({ page }) => {
+        await expect(page.locator('table')).toBeVisible();
 
-  await page.goto('/asset-models');
-  await searchAssetModel(page, modelName);
+        // Create a temporary model to delete or use existing
+        // Ideally we should create one to ensure test isolation
+        await page.getByRole('button', { name: 'Add', exact: true }).click();
+        const modelName = `Model To Delete ${Date.now()}`;
+        await page.getByLabel('Model Name').fill(modelName);
+        
+        // We need to fill category too
+        await page.getByRole('combobox').click();
+        await page.getByRole('option').first().click();
+        
+        await page.getByRole('button', { name: 'Add', exact: true }).click();
+        await expect(page.getByRole('dialog')).not.toBeVisible();
+        await expect(page.locator('table')).toContainText(modelName);
 
-  await deleteAssetModel(page, modelName);
+        // Find the row with the specific model name
+        const row = page.locator('tbody tr', { hasText: modelName });
+        const actionsButton = row.getByRole('button', { name: 'Actions' });
+        await actionsButton.click();
 
-  // Verify the model is deleted
-  await page.fill('input[placeholder="Search by model name or manufacturer..."]', modelName);
-  await page.press('input[placeholder="Search by model name or manufacturer..."]', 'Enter');
-  await page.waitForLoadState('networkidle');
+        const deleteButton = page.getByRole('menuitem', { name: 'Delete' });
+        await deleteButton.click();
 
-  const row = page.locator('tr', { hasText: modelName });
-  await expect(row).not.toBeVisible();
+        // Confirm deletion
+        const confirmDialog = page.getByRole('alertdialog');
+        await expect(confirmDialog).toBeVisible();
+        await confirmDialog.getByRole('button', { name: 'Delete' }).click();
+
+        // Verify success
+        await expect(page.locator('table')).not.toContainText(modelName);
+    });
 });

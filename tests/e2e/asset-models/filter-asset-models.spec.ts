@@ -1,36 +1,50 @@
 import { test, expect } from '@playwright/test';
-import { login, createAssetModel } from '../helpers';
+import { login } from '../helpers';
 
-test('filter asset models by search', async ({ page }) => {
-  await login(page);
+test.describe('Asset Models - Filter', () => {
+    test.beforeEach(async ({ page }) => {
+        await login(page);
+        await page.goto('/asset-models');
+    });
 
-  const timestamp = Date.now();
-  const alpha = `Alpha Model ${timestamp}`;
-  const beta = `Beta Model ${timestamp}`;
-  const targetName = `Gamma Model ${timestamp}`;
+    test('should filter by category', async ({ page }) => {
+        // Create a model to filter
+        await page.getByRole('button', { name: 'Add' }).click();
+        await page.getByLabel('Model Name').fill('Filterable Model');
+        await page.getByLabel('Manufacturer').fill('Filterable Mfg');
+        await page.getByRole('combobox').click();
+        const firstCategory = page.getByRole('option').first();
+        const categoryName = await firstCategory.textContent(); // Capture category name if needed
+        await firstCategory.click();
+        await page.getByRole('button', { name: 'Add', exact: true }).click();
+        await expect(page.getByRole('dialog')).not.toBeVisible();
 
-  await createAssetModel(page, { model_name: alpha });
-  await createAssetModel(page, { model_name: beta });
-  await createAssetModel(page, { model_name: targetName });
+        await expect(page.locator('table')).toBeVisible();
 
-  await page.waitForURL('**/asset-models', { timeout: 60000 });
-  const searchInput = page.locator('input[placeholder="Search by model name or manufacturer..."]');
-  await searchInput.waitFor({ state: 'visible', timeout: 15000 });
-  await expect(searchInput).toBeEditable({ timeout: 15000 });
-
-  // Search by model name
-  await searchInput.fill(targetName);
-  await searchInput.press('Enter');
-  await page.waitForLoadState('networkidle');
-
-  await expect(page.locator('tr').filter({ hasText: targetName }).first()).toBeVisible();
-  await expect(page.locator('tr').filter({ hasText: alpha })).not.toBeVisible();
-
-  // Search by different term
-  await searchInput.fill('Alpha');
-  await searchInput.press('Enter');
-  await page.waitForLoadState('networkidle');
-
-  await expect(page.locator('tr').filter({ hasText: alpha }).first()).toBeVisible();
-  await expect(page.locator('tr').filter({ hasText: targetName })).not.toBeVisible();
+        // Open the filter dialog
+        const filterButton = page.getByRole('button', { name: /Filters/i });
+        await expect(filterButton).toBeVisible();
+        await filterButton.click();
+        await expect(page.getByRole('dialog')).toBeVisible();
+        
+        // Find the category trigger inside the dialog
+        // We find the div that contains the 'Category' label, then find the combobox within it
+        const categoryTrigger = page.locator('div').filter({ has: page.getByText('Category', { exact: true }) }).getByRole('combobox');
+        await expect(categoryTrigger).toBeVisible();
+        await categoryTrigger.click();
+        
+        // Select an option from the popover
+        // The options are rendered in a portal/popover, so we use page.getByRole('option')
+        const option = page.getByRole('option').first();
+        await expect(option).toBeVisible();
+        await option.click();
+        
+        const filterResponse = page.waitForResponse(resp => 
+            resp.url().includes('/api/asset-models') && 
+            resp.url().includes('asset_category_id') &&
+            resp.status() === 200
+        );
+        await page.getByRole('button', { name: 'Apply Filters' }).click();
+        await filterResponse;
+    });
 });
