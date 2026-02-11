@@ -1,2 +1,6 @@
+default:
+  tags:
+    - "dokfin"
+
 include:
   - local: '.gitlab/ci/deploy.yml'
