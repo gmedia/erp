@@ -1,5 +1,6 @@
 deploy prod:
   stage: deploy
+  image: curlimages/curl:latest
   environment:
     name: prod
   script:
@@ -12,3 +13,5 @@ deploy prod:
   interruptible: true
   dependencies: []
   retry: 2
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'prod'
