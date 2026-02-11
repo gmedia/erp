@@ -1,6 +1,9 @@
 default:
   tags:
     - "dokfin"
+  image:
+    name: registry.gitlab.com/varx.id/dokfin/backend:8.3-dev
+    entrypoint: ['']
 
 include:
   - local: '.gitlab/ci/deploy.yml'
