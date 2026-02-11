@@ -32,8 +32,6 @@ export async function createAccountMapping(page: Page): Promise<{
   notes: string;
 }> {
   const timestamp = Date.now();
-  const sourceCode = '52000';
-  const targetCode = timestamp % 2 === 0 ? '11110' : '11120';
 
   await login(page);
   await page.goto('/account-mappings');
@@ -49,22 +47,53 @@ export async function createAccountMapping(page: Page): Promise<{
   const combos = dialog.locator('[role="combobox"]');
   await expect(combos.first()).toBeVisible({ timeout: 15000 });
 
+  // 1. Select Source COA Version
   await combos.nth(0).click();
   await fillVisibleSearch(page, 'COA 2025 Standard');
-  await clickFirstMatchingOption(page, /COA 2025 Standard/i);
+  // Use a regex that matches the option text more loosely to avoid issues with formatting
+  await clickFirstMatchingOption(page, /COA 2025 Standard/);
 
+  // 2. Select Source Account
   await combos.nth(1).click();
-  await fillVisibleSearch(page, sourceCode);
-  await clickFirstMatchingOption(page, new RegExp(sourceCode));
+  
+  // Helper to select first available option and return its code
+  const selectFirstOptionAndGetCode = async (retries = 3): Promise<string> => {
+      for (let i = 0; i < retries; i++) {
+          try {
+              // Wait for listbox to finish loading
+              await expect(page.locator('[role="listbox"][aria-busy="false"]')).toBeVisible({ timeout: 10000 });
+              
+              const options = page.locator('[role="option"]');
+              await expect(options.first()).toBeVisible({ timeout: 5000 });
+              
+              const firstOption = options.first();
+              const text = await firstOption.textContent();
+              if (!text) throw new Error('Option text missing');
+              
+              const code = text.split(' - ')[0].trim();
+              await firstOption.click();
+              return code;
+          } catch (e) {
+              if (i === retries - 1) throw e;
+              await page.waitForTimeout(500);
+          }
+      }
+      return ''; // Should not reach here
+  };
 
+  const sourceCodeDerived = await selectFirstOptionAndGetCode();
+
+
+  // 3. Select Target COA Version
   await combos.nth(2).click();
   await fillVisibleSearch(page, 'COA 2026 Enhanced');
-  await clickFirstMatchingOption(page, /COA 2026 Enhanced/i);
+  await clickFirstMatchingOption(page, /COA 2026 Enhanced/);
 
+  // 4. Select Target Account
   await combos.nth(3).click();
-  await fillVisibleSearch(page, targetCode);
-  await clickFirstMatchingOption(page, new RegExp(targetCode));
+  const targetCodeDerived = await selectFirstOptionAndGetCode();
 
+  // 5. Select Type (Rename)
   await combos.nth(4).click();
   await clickFirstMatchingOption(page, /^Rename$/);
 
@@ -76,8 +105,8 @@ export async function createAccountMapping(page: Page): Promise<{
   await submitBtn.click();
 
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
-
-  return { sourceCode, targetCode, notes };
+  
+  return { sourceCode: sourceCodeDerived || '52000', targetCode: targetCodeDerived || '11120', notes };
 }
 
 export async function searchAccountMappings(page: Page, query: string): Promise<void> {

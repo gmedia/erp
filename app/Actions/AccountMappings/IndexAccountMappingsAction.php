@@ -32,11 +32,9 @@ class IndexAccountMappingsAction
         ]);
 
         $sortBy = (string) $request->get('sort_by', 'created_at');
-        $sortDirection = strtolower((string) $request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+        $sortDirection = (string) $request->get('sort_direction', 'desc');
 
-        if (in_array($sortBy, ['id', 'type', 'created_at', 'updated_at'], true)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
+        $this->filterService->applySorting($query, $sortBy, $sortDirection);
 
         return $query->paginate($request->integer('per_page', 15));
     }

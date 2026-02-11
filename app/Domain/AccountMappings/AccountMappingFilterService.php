@@ -42,4 +42,23 @@ class AccountMappingFilterService
                 });
         });
     }
+
+    public function applySorting(Builder $query, string $sortBy, string $sortDirection): void
+    {
+        $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'source') {
+            $query->join('accounts as source_acc', 'account_mappings.source_account_id', '=', 'source_acc.id')
+                ->orderBy('source_acc.code', $sortDirection)
+                ->select('account_mappings.*');
+        } elseif ($sortBy === 'target') {
+            $query->join('accounts as target_acc', 'account_mappings.target_account_id', '=', 'target_acc.id')
+                ->orderBy('target_acc.code', $sortDirection)
+                ->select('account_mappings.*');
+        } elseif (in_array($sortBy, ['id', 'type', 'created_at', 'updated_at'], true)) {
+            $query->orderBy($sortBy, $sortDirection);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+    }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { createActionsColumn, createBadgeColumn, createDateColumn } from '@/utils/columns';
+import { createActionsColumn, createBadgeColumn, createDateColumn, createSelectColumn, createSortingHeader } from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
 import { type AccountMapping } from '@/types/account-mapping';
 
@@ -16,14 +16,19 @@ function formatAccountLabel(account?: {
 }
 
 export const accountMappingColumns: ColumnDef<AccountMapping>[] = [
+    createSelectColumn<AccountMapping>(),
     {
         id: 'source',
-        header: 'Source Account',
+        accessorKey: 'source_account_id', // Add accessorKey to satisfy sorting requirements if needed
+        enableSorting: true,
+        ...createSortingHeader('Source Account'),
         cell: ({ row }) => formatAccountLabel(row.original.source_account),
     },
     {
         id: 'target',
-        header: 'Target Account',
+        accessorKey: 'target_account_id', // Add accessorKey to satisfy sorting requirements if needed
+        enableSorting: true,
+        ...createSortingHeader('Target Account'),
         cell: ({ row }) => formatAccountLabel(row.original.target_account),
     },
     createBadgeColumn<AccountMapping>({

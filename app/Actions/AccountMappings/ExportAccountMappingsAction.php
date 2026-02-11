@@ -37,11 +37,8 @@ class ExportAccountMappingsAction
 
         $sortBy = $validated['sort_by'] ?? 'created_at';
         $sortDirection = $validated['sort_direction'] ?? 'desc';
-        $sortDirection = strtolower((string) $sortDirection) === 'asc' ? 'asc' : 'desc';
 
-        if (in_array($sortBy, ['id', 'type', 'created_at', 'updated_at'], true)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
+        $this->filterService->applySorting($query, $sortBy, $sortDirection);
 
         $filename = 'account_mappings_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
         $filePath = 'exports/' . $filename;
