@@ -223,6 +223,11 @@ export function DataTable<T>({
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         manualPagination: true,
+        meta: {
+            onView,
+            onEdit,
+            onDelete,
+        },
     });
 
     React.useEffect(() => {

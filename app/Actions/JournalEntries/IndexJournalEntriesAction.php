@@ -19,7 +19,8 @@ class IndexJournalEntriesAction
         $page = $request->get('page', 1);
 
         $query = JournalEntry::query()
-            ->with(['lines.account', 'fiscalYear', 'createdBy', 'postedBy']);
+            ->with(['lines.account', 'fiscalYear', 'createdBy', 'postedBy'])
+            ->withSum('lines as total_debit', 'debit');
 
         if ($request->filled('search')) {
             $this->filterService->applySearch($query, $request->get('search'), [
@@ -37,7 +38,7 @@ class IndexJournalEntriesAction
             $query,
             $request->get('sort_by', 'entry_date'),
             $request->get('sort_direction', 'desc'),
-            ['entry_date', 'entry_number', 'created_at']
+            ['entry_date', 'entry_number', 'description', 'reference', 'total_debit', 'status', 'created_at']
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);

@@ -9,11 +9,9 @@ test('delete journal entry end-to-end', async ({ page }) => {
   const row = page.locator('tr', { hasText: reference }).first();
   await expect(row).toBeVisible();
 
-  const actionsBtn = row.getByRole('button', { name: /Actions/i });
-  await actionsBtn.click();
-
-  const deleteItem = page.getByRole('menuitem', { name: /Delete/i });
-  await deleteItem.click();
+  const actionsCell = row.locator('td').last();
+  // Delete is the third button (index 2)
+  await actionsCell.locator('button').nth(2).click();
 
   const confirmBtn = page.getByRole('button', { name: /Delete|Confirm/i });
   await confirmBtn.click();

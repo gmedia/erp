@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { type JournalEntry } from '@/types/journal-entry';
 import {
     createActionsColumn,
+    createSelectColumn,
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
@@ -12,39 +13,50 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
 
 export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
-    createTextColumn<JournalEntry>({ accessorKey: 'entry_number', label: 'Entry Number', enableSorting: true }),
+    createSelectColumn<JournalEntry>(),
+    createTextColumn<JournalEntry>({
+        accessorKey: 'entry_number',
+        label: 'Entry Number',
+        enableSorting: true,
+    }),
     {
         accessorKey: 'entry_date',
-         ...createSortingHeader('Date'),
+        ...createSortingHeader('Date'),
         cell: ({ row }) => {
             const date = new Date(row.getValue('entry_date'));
-             return new Intl.DateTimeFormat('id-ID', {
+            return new Intl.DateTimeFormat('id-ID', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
             }).format(date);
-        }
+        },
     },
-    createTextColumn<JournalEntry>({ accessorKey: 'description', label: 'Description' }),
-    createTextColumn<JournalEntry>({ accessorKey: 'reference', label: 'Reference' }),
+    createTextColumn<JournalEntry>({
+        accessorKey: 'description',
+        label: 'Description',
+    }),
+    createTextColumn<JournalEntry>({
+        accessorKey: 'reference',
+        label: 'Reference',
+    }),
     {
-        accessorKey: 'total_debit', // Using total_debit as Amount
-        header: ({ column }) => (
-            <div className="text-right">Total Amount</div>
-        ),
+        accessorKey: 'total_debit',
+        ...createSortingHeader('Total Amount'),
         cell: ({ row }) => {
             const amount = parseFloat(row.getValue('total_debit'));
-            return <div className="text-right font-medium">
-                {new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                }).format(amount)}
-            </div>;
+            return (
+                <div className="text-right font-medium">
+                    {new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                    }).format(amount)}
+                </div>
+            );
         },
     },
     {
         accessorKey: 'status',
-        header: 'Status',
+        ...createSortingHeader('Status'),
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
             return (
@@ -61,10 +73,9 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
                 </Badge>
             );
         },
-        enableSorting: true,
     },
     {
-        id: 'actions',
+        id: 'row-actions',
         cell: ({ row, table }) => {
             const meta = table.options.meta as any;
             return (

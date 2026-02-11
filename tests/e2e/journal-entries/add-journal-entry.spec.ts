@@ -16,7 +16,9 @@ test('add new journal entry end-to-end', async ({ page }) => {
   await searchJournalEntry(page, reference);
 
   // Verify the entry appears in the table
-  const row = page.locator(`text=${reference}`);
+  const row = page.locator('tr', { hasText: reference }).first();
   await expect(row).toBeVisible();
-  await expect(page.locator(`text=E2E Test Entry`)).toBeVisible();
+  await expect(row).toContainText('E2E Test Entry');
+  // Check total amount formatting (Rp 5.000,00)
+  await expect(row).toContainText(/Rp\s*5\.000,00/);
 });

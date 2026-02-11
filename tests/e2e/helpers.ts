@@ -2117,11 +2117,9 @@ export async function editJournalEntry(
     const row = page.locator('tr', { hasText: query }).first();
     await expect(row).toBeVisible();
 
-    const actionsBtn = row.getByRole('button', { name: /Actions/i });
-    await actionsBtn.click();
-
-    const editItem = page.getByRole('menuitem', { name: /Edit/i });
-    await editItem.click();
+    const actionsCell = row.locator('td').last();
+    // Edit is the second button (index 1)
+    await actionsCell.locator('button').nth(1).click();
 
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
