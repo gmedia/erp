@@ -262,6 +262,18 @@ export async function createPosition(
 
   return createEntity(page, config, overrides);
 }
+export async function deleteDepartment(page: Page, name: string) {
+  await login(page);
+  await page.goto('/departments');
+  await searchDepartment(page, name);
+
+  const row = page.locator('tr', { hasText: name }).first();
+  await row.getByRole('button', { name: /Actions/i }).click();
+  await page.getByRole('menuitem', { name: /Delete/i }).click();
+
+  await page.getByRole('button', { name: /Delete/i }).click();
+  await page.waitForResponse(resp => resp.url().includes('/api/departments') && resp.status() === 204);
+}
 
 /**
  * Search for an position by name.
@@ -1810,6 +1822,25 @@ export async function editFiscalYear(
 }
 
 /**
+ * Delete a fiscal year.
+ */
+export async function deleteFiscalYear(page: Page, name: string): Promise<void> {
+  await searchFiscalYear(page, name);
+
+  const row = page.locator('tr', { hasText: name }).first();
+  const actionsBtn = row.getByRole('button', { name: /Actions/i });
+  await actionsBtn.click();
+
+  const deleteBtn = page.getByRole('menuitem', { name: /Delete/i });
+  await deleteBtn.click();
+
+  const confirmBtn = page.getByRole('alertdialog').getByRole('button', { name: /Delete/i });
+  await confirmBtn.click();
+
+  await expect(page.locator('tr', { hasText: name })).not.toBeVisible();
+}
+
+/**
  * Create a new COA version via the UI.
  *
  * @param page - Playwright Page object.
@@ -2580,3 +2611,4 @@ export async function createAsset(
 
   return assetCode;
 }
+

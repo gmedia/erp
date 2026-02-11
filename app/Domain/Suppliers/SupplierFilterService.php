@@ -18,7 +18,16 @@ class SupplierFilterService
     public function apply(Builder $query, array $filters): void
     {
         $this->applySearch($query, $filters['search'] ?? '', ['name', 'email', 'phone', 'address']);
-        $this->applySorting($query, $filters['sort_by'] ?? 'created_at', $filters['sort_direction'] ?? 'desc', ['name', 'email', 'created_at']);
+
+        $sortBy = $filters['sort_by'] ?? 'created_at';
+        // Map frontend sort keys to backend columns
+        $sortBy = match($sortBy) {
+            'branch' => 'branch_id',
+            'category' => 'category_id',
+            default => $sortBy
+        };
+
+        $this->applySorting($query, $sortBy, $filters['sort_direction'] ?? 'desc', ['name', 'email', 'phone', 'status', 'branch_id', 'category_id', 'created_at']);
         $this->applyAdvancedFilters($query, $filters);
     }
 

@@ -26,7 +26,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import axios from 'axios';
-import { AssetMovementForm } from '@/components/assets/AssetMovementForm';
+import { AssetMovementForm } from '@/components/asset-movements/AssetMovementForm';
 import { AssetMovementFormData } from '@/utils/schemas';
 import {
     Activity,

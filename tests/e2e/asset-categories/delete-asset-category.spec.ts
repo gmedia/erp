@@ -11,5 +11,6 @@ test('delete existing asset category end-to-end', async ({ page }) => {
   await page.fill('input[placeholder="Search asset categories..."]', code);
   await page.press('input[placeholder="Search asset categories..."]', 'Enter');
   
-  await expect(page.locator('text=No results.')).toBeVisible();
+  // Use more consistent "No results." text based on DataTable implementation
+  await expect(page.getByText('No results.')).toBeVisible();
 });

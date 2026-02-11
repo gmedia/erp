@@ -38,6 +38,7 @@ import {
     Shield,
     Lock,
     User,
+    ArrowLeftRight,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -79,6 +80,7 @@ const iconMap: Record<string, LucideIcon> = {
     Shield,
     Lock,
     User,
+    ArrowLeftRight,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

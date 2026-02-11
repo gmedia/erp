@@ -3,6 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
+import { createActionsColumn } from '@/utils/columns';
 
 export interface AssetMovement {
     id: number;
@@ -31,6 +32,7 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
         header: 'Asset',
         cell: ({ row }) => {
             const asset = row.original.asset;
+            if (!asset) return '-';
             return (
                 <div className="flex flex-col">
                     <span className="font-medium">{asset.name}</span>
@@ -98,4 +100,5 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
         accessorKey: 'created_by',
         header: 'PIC',
     },
+    createActionsColumn<AssetMovement>(),
 ];

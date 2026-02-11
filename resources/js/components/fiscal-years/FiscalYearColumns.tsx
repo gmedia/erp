@@ -1,10 +1,11 @@
 'use client';
 
-import { createActionsColumn, createDateColumn, createTextColumn, createBadgeColumn } from '@/utils/columns';
+import { createActionsColumn, createDateColumn, createTextColumn, createBadgeColumn, createSelectColumn } from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
 import { type FiscalYear } from '@/types/entity';
 
 export const fiscalYearColumns: ColumnDef<FiscalYear>[] = [
+    createSelectColumn<FiscalYear>(),
     createTextColumn<FiscalYear>({ accessorKey: 'name', label: 'Name' }),
     createDateColumn<FiscalYear>({ accessorKey: 'start_date', label: 'Start Date' }),
     createDateColumn<FiscalYear>({ accessorKey: 'end_date', label: 'End Date' }),

@@ -83,6 +83,15 @@ class MenuSeeder extends Seeder
                         'url' => 'assets',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'asset_movement',
+                        'display_name' => 'Asset Movement',
+                        'permissions' => ['asset_movement'],
+                        'icon' => 'ArrowLeftRight',
+                        'url' => 'asset-movements',
+                        'child' => [],
+                    ],
+
                 ],
             ],
             [

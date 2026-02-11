@@ -26,6 +26,9 @@ test('export employees to Excel works correctly', async ({ page }) => {
   expect(download.suggestedFilename()).toMatch(/\.xlsx$/i);
   expect(fs.existsSync(destPath)).toBeTruthy();
 
-  const header = fs.readFileSync(destPath).slice(0, 2).toString('utf8');
-  expect(header).toBe('PK');
+  // Basic check for Excel file signature
+  const buffer = fs.readFileSync(destPath);
+  // Zip-based formats (like .xlsx) start with PK (0x50 0x4B)
+  expect(buffer[0]).toBe(0x50);
+  expect(buffer[1]).toBe(0x4B);
 });

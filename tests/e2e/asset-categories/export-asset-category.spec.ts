@@ -2,10 +2,12 @@ import { test, expect } from '@playwright/test';
 import { login, createAssetCategory } from '../helpers';
 import * as fs from 'fs';
 import * as path from 'path';
+import ExcelJS from 'exceljs';
 
 test('export asset categories to Excel', async ({ page }) => {
   await login(page);
-  await createAssetCategory(page);
+  // Ensure at least one category exists
+  await createAssetCategory(page, { name: 'Export Test Category' });
   await page.goto('/asset-categories');
 
   const exportBtn = page.getByRole('button', { name: /Export/i });
@@ -26,6 +28,22 @@ test('export asset categories to Excel', async ({ page }) => {
   expect(download.suggestedFilename()).toMatch(/\.xlsx$/i);
   expect(fs.existsSync(destPath)).toBeTruthy();
 
-  const fileBuffer = fs.readFileSync(destPath);
-  expect(fileBuffer.length).toBeGreaterThan(0);
+  // Verify Excel columns
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.readFile(destPath);
+  const worksheet = workbook.worksheets[0];
+  const headers = worksheet.getRow(1).values as string[];
+
+  const expectedHeaders = [
+    'ID',
+    'Code',
+    'Name',
+    'Default Useful Life (Months)',
+    'Created At',
+    'Updated At',
+  ];
+
+  for (const header of expectedHeaders) {
+    expect(headers).toContain(header);
+  }
 });

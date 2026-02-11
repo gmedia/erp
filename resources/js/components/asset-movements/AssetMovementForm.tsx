@@ -12,26 +12,40 @@ import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 
-import { Asset } from '@/types/asset';
 import { AssetMovementFormData, assetMovementFormSchema } from '@/utils/schemas';
 
 interface AssetMovementFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    asset: Asset;
+    item?: any | null; // For editing
+    asset?: any | null; // For creating from profile
     onSubmit: (data: AssetMovementFormData) => void;
     isLoading?: boolean;
 }
 
-const getAssetMovementFormDefaults = (asset: Asset): AssetMovementFormData => {
+const getAssetMovementFormDefaults = (item?: any | null, asset?: any | null): AssetMovementFormData => {
+    if (item) {
+        return {
+            asset_id: item.asset_id ? String(item.asset_id) : '',
+            movement_type: item.movement_type || 'transfer',
+            moved_at: item.moved_at ? new Date(item.moved_at) : new Date(),
+            to_branch_id: item.to_branch_id ? String(item.to_branch_id) : '',
+            to_location_id: item.to_location_id ? String(item.to_location_id) : '',
+            to_department_id: item.to_department_id ? String(item.to_department_id) : '',
+            to_employee_id: item.to_employee_id ? String(item.to_employee_id) : '',
+            reference: item.reference || '',
+            notes: item.notes || '',
+        };
+    }
+    
     return {
-        asset_id: String(asset.id),
+        asset_id: asset ? String(asset.id) : '',
         movement_type: 'transfer',
         moved_at: new Date(),
-        to_branch_id: String(asset.branch_id || ''),
-        to_location_id: String(asset.asset_location_id || ''),
-        to_department_id: String(asset.department_id || ''),
-        to_employee_id: String(asset.employee_id || ''),
+        to_branch_id: asset ? String(asset.branch_id || '') : '',
+        to_location_id: asset ? String(asset.asset_location_id || '') : '',
+        to_department_id: asset ? String(asset.department_id || '') : '',
+        to_employee_id: asset ? String(asset.employee_id || '') : '',
         reference: '',
         notes: '',
     };
@@ -40,11 +54,12 @@ const getAssetMovementFormDefaults = (asset: Asset): AssetMovementFormData => {
 export const AssetMovementForm = memo<AssetMovementFormProps>(function AssetMovementForm({
     open,
     onOpenChange,
+    item,
     asset,
     onSubmit,
     isLoading = false,
 }) {
-    const defaultValues = useMemo(() => getAssetMovementFormDefaults(asset), [asset]);
+    const defaultValues = useMemo(() => getAssetMovementFormDefaults(item, asset), [item, asset]);
 
     const form = useForm<AssetMovementFormData>({
         resolver: zodResolver(assetMovementFormSchema),
@@ -67,22 +82,36 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(function AssetMove
         });
     };
 
+    const isEdit = !!item;
+
     return (
         <EntityForm<AssetMovementFormData>
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={`Record Movement for ${asset.asset_code}`}
-            submitLabel="Record Movement"
+            title={isEdit ? 'Edit Movement' : (asset ? `Record Movement for ${asset.asset_code}` : 'Record Asset Movement')}
+            submitLabel={isEdit ? 'Update Movement' : 'Record Movement'}
             onSubmit={handleFormSubmit}
             isLoading={isLoading}
             className="sm:max-w-[600px]"
         >
             <div className="space-y-6">
+                {!asset && !isEdit && (
+                    <div className="grid grid-cols-1 gap-4">
+                        <AsyncSelectField
+                            name="asset_id"
+                            label="Asset"
+                            url="/api/assets"
+                            placeholder="Select asset"
+                        />
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <SelectField
                         name="movement_type"
                         label="Movement Type"
+                        disabled={isEdit}
                         options={[
                             { value: 'transfer', label: 'Transfer (Location Change)' },
                             { value: 'assign', label: 'Assign (PIC Change)' },
@@ -94,9 +123,9 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(function AssetMove
                     <DatePickerField name="moved_at" label="Movement Date" />
                 </div>
 
-                <hr />
+                {!isEdit && <hr />}
 
-                {movementType === 'transfer' && (
+                {movementType === 'transfer' && !isEdit && (
                     <div className="space-y-4">
                         <h4 className="text-sm font-medium">Destination Details</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -105,7 +134,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(function AssetMove
                                 label="To Branch"
                                 url="/api/branches"
                                 placeholder="Select destination branch"
-                                initialLabel={asset.branch?.name}
+                                initialLabel={asset?.branch?.name}
                             />
                             <AsyncSelectField
                                 name="to_location_id"
@@ -113,13 +142,13 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(function AssetMove
                                 url={toBranchId ? `/api/asset-locations?branch_id=${toBranchId}` : '/api/asset-locations'}
                                 placeholder="Select destination location"
                                 key={`location-select-${toBranchId}`}
-                                initialLabel={asset.location?.name}
+                                initialLabel={asset?.location?.name}
                             />
                         </div>
                     </div>
                 )}
 
-                {movementType === 'assign' && (
+                {movementType === 'assign' && !isEdit && (
                     <div className="space-y-4">
                         <h4 className="text-sm font-medium">Assignment Details</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -128,14 +157,14 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(function AssetMove
                                 label="To Department"
                                 url="/api/departments"
                                 placeholder="Select department"
-                                initialLabel={asset.department?.name}
+                                initialLabel={asset?.department?.name}
                             />
                             <AsyncSelectField
                                 name="to_employee_id"
                                 label="To Employee"
                                 url="/api/employees"
                                 placeholder="Select employee"
-                                initialLabel={asset.employee?.name}
+                                initialLabel={asset?.employee?.name}
                             />
                         </div>
                     </div>

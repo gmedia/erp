@@ -18,7 +18,8 @@ beforeEach(function () {
     ]);
 
     $pAsset = Permission::firstOrCreate(['name' => 'asset', 'display_name' => 'Asset']);
-    $this->employee->permissions()->attach([$pAsset->id]);
+    $pProfile = Permission::firstOrCreate(['name' => 'asset_profile', 'display_name' => 'Asset Profile']);
+    $this->employee->permissions()->attach([$pAsset->id, $pProfile->id]);
 });
 
 test('asset profile page is accessible and contains data', function () {

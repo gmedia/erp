@@ -19,7 +19,7 @@ import { Badge } from '@/components/ui/badge';
  */
 const renderBranchCell = ({ row }: { row: { original: Customer } }) => {
     const val = row.original.branch;
-    return <div>{typeof val === 'object' ? val.name : val}</div>;
+    return <div>{typeof val === 'object' ? val?.name : val}</div>;
 };
 
 /**
@@ -27,7 +27,7 @@ const renderBranchCell = ({ row }: { row: { original: Customer } }) => {
  */
 const renderCategoryCell = ({ row }: { row: { original: Customer } }) => {
     const val = row.original.category;
-    return <div>{typeof val === 'object' ? val.name : val}</div>;
+    return <div>{typeof val === 'object' ? val?.name : val}</div>;
 };
 
 /**
@@ -48,12 +48,12 @@ export const customerColumns: ColumnDef<Customer>[] = [
     createEmailColumn<Customer>({ accessorKey: 'email', label: 'Email' }),
     createPhoneColumn<Customer>({ accessorKey: 'phone', label: 'Phone' }),
     {
-        accessorKey: 'branch',
+        accessorKey: 'branch_id',
         ...createSortingHeader('Branch'),
         cell: renderBranchCell,
     },
     {
-        accessorKey: 'category',
+        accessorKey: 'category_id',
         ...createSortingHeader('Category'),
         cell: renderCategoryCell,
     },

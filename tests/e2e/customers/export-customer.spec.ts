@@ -2,8 +2,9 @@ import { test, expect } from '@playwright/test';
 import { createCustomer } from '../helpers';
 import * as fs from 'fs';
 import * as path from 'path';
+import ExcelJS from 'exceljs';
 
-test('export customers to Excel works correctly', async ({ page }) => {
+test('export customers and verify all columns', async ({ page }) => {
   // Create a customer to ensure data exists
   await createCustomer(page);
   
@@ -25,11 +26,33 @@ test('export customers to Excel works correctly', async ({ page }) => {
   const destPath = path.join(downloadsDir, download.suggestedFilename());
   await download.saveAs(destPath);
 
-  // Validate file
-  expect(download.suggestedFilename()).toMatch(/customers_export_.*\.xlsx$/i);
+  // Validate file exists
   expect(fs.existsSync(destPath)).toBeTruthy();
 
-  // Basic check of file content (zip header)
-  const header = fs.readFileSync(destPath).slice(0, 2).toString('utf8');
-  expect(header).toBe('PK');
+  // Verify columns using ExcelJS
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.readFile(destPath);
+  const worksheet = workbook.getWorksheet(1);
+  const headerRow = worksheet.getRow(1);
+  
+  const expectedColumns = [
+    'ID',
+    'Name',
+    'Email',
+    'Phone',
+    'Address',
+    'Branch',
+    'Category',
+    'Status',
+    'Notes',
+    'Created At',
+  ];
+
+  const actualColumns = headerRow.values as string[];
+  // ExcelJS headerRow.values is 1-indexed, first element is null or empty
+  const cleanActualColumns = actualColumns.filter(v => v !== null && v !== undefined && v !== '');
+
+  for (const expected of expectedColumns) {
+    expect(cleanActualColumns).toContain(expected);
+  }
 });
