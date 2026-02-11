@@ -92,6 +92,7 @@ export function createTextColumn<T = Record<string, unknown>>(
 
     return {
         ...baseColumn,
+        enableSorting: false,
         header: label,
     };
 }
@@ -120,6 +121,7 @@ export function createDateColumn<T = Record<string, unknown>>(
 
     return {
         ...baseColumn,
+        enableSorting: false,
         header: label,
     };
 }
@@ -169,6 +171,7 @@ export function createCurrencyColumn<T = Record<string, unknown>>(
 
     return {
         ...baseColumn,
+        enableSorting: false,
         header: label,
     };
 }
@@ -215,6 +218,7 @@ export function createNumberColumn<T = Record<string, unknown>>(
 
     return {
         ...baseColumn,
+        enableSorting: false,
         header: label,
     };
 }
@@ -267,6 +271,7 @@ export function createLinkColumn<T = Record<string, unknown>>(
 
     return {
         ...baseColumn,
+        enableSorting: false,
         header: label,
     };
 }
@@ -393,6 +398,7 @@ export function createBadgeColumn<T = Record<string, unknown>>(
 
     return {
         ...baseColumn,
+        enableSorting: false,
         header: label,
     };
 }
