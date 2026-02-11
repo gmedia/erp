@@ -98,6 +98,20 @@ describe('Product API Endpoints', function () {
             ->and($response->json('data.0.name'))->toBe('Searchable Product');
     });
 
+    test('index supports sorting by category name', function () {
+        $categoryA = ProductCategory::factory()->create(['name' => 'AAA Category']);
+        $categoryB = ProductCategory::factory()->create(['name' => 'BBB Category']);
+
+        Product::factory()->create(['category_id' => $categoryB->id]);
+        Product::factory()->create(['category_id' => $categoryA->id]);
+
+        $response = getJson('/api/products?sort_by=category&sort_direction=asc&per_page=10');
+
+        $response->assertOk();
+        expect($response->json('data.0.category.name'))->toBe('AAA Category')
+            ->and($response->json('data.1.category.name'))->toBe('BBB Category');
+    });
+
     test('store creates product with valid data', function () {
         $cat = ProductCategory::factory()->create();
         $unit = Unit::factory()->create();

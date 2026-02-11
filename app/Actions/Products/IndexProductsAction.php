@@ -40,12 +40,22 @@ class IndexProductsAction
             'is_sellable' => $request->get('is_sellable'),
         ]);
 
-        $this->filterService->applySorting(
-            $query,
-            $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'code', 'name', 'type', 'category_id', 'unit_id', 'cost', 'selling_price', 'status', 'created_at', 'updated_at']
-        );
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'category') {
+            $query
+                ->leftJoin('product_categories', 'products.category_id', '=', 'product_categories.id')
+                ->select('products.*')
+                ->orderBy('product_categories.name', $sortDirection);
+        } else {
+            $this->filterService->applySorting(
+                $query,
+                $sortBy,
+                $sortDirection,
+                ['id', 'code', 'name', 'type', 'category_id', 'unit_id', 'cost', 'selling_price', 'status', 'created_at', 'updated_at']
+            );
+        }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
     }
