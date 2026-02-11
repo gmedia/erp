@@ -38,8 +38,8 @@ export const assetLocationColumns: ColumnDef<AssetLocation>[] = [
         cell: renderBranchCell,
     },
     {
-        accessorKey: 'parent',
-        header: 'Parent Location',
+        accessorKey: 'parent_id',
+        ...createSortingHeader('Parent Location'),
         cell: renderParentCell,
     },
     createActionsColumn<AssetLocation>(),
