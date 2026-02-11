@@ -1,10 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { login, createCoaVersion } from '../helpers';
 
 test('export coa versions end‑to‑end', async ({ page }) => {
-  // 1️⃣ Login and navigate to coa versions page
-  await login(page);
-  await page.goto('/coa-versions');
+  // 1️⃣ Create data to ensure export is not empty (optional but good)
+  await createCoaVersion(page);
 
   // 2️⃣ Click the Export button
   const exportButton = page.getByRole('button', { name: /Export/i });
@@ -16,6 +15,7 @@ test('export coa versions end‑to‑end', async ({ page }) => {
   const download = await downloadPromise;
 
   // 4️⃣ Verify the download was successful
-  expect(download.suggestedFilename()).toContain('coa_versions');
-  expect(download.suggestedFilename()).toContain('.xlsx');
+  expect(download.suggestedFilename()).toMatch(/^coa_versions.*\.xlsx$/);
+  
+  // Optional: Check content type if needed, but filename check is usually enough for E2E
 });
