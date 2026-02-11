@@ -46,6 +46,7 @@ export const assetModelColumns: ColumnDef<AssetModel>[] = [
         accessorKey: 'specs',
         header: 'Specs',
         cell: renderSpecsCell,
+        enableSorting: false,
     },
     createActionsColumn<AssetModel>(),
 ];
