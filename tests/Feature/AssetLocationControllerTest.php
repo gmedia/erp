@@ -67,6 +67,20 @@ describe('Asset Location API Endpoints', function () {
         expect($response->json('data'))->toHaveCount(1);
     });
 
+    test('index supports sorting by branch name', function () {
+        $branchA = Branch::factory()->create(['name' => 'AAA Branch']);
+        $branchB = Branch::factory()->create(['name' => 'BBB Branch']);
+
+        AssetLocation::factory()->create(['branch_id' => $branchB->id]);
+        AssetLocation::factory()->create(['branch_id' => $branchA->id]);
+
+        $response = getJson('/api/asset-locations?sort_by=branch&sort_direction=asc&per_page=10');
+
+        $response->assertOk();
+        expect($response->json('data.0.branch.name'))->toBe('AAA Branch')
+            ->and($response->json('data.1.branch.name'))->toBe('BBB Branch');
+    });
+
     test('store creates new asset location', function () {
         $branch = Branch::factory()->create();
 
