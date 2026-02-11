@@ -13,7 +13,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { formatDate } from '@/lib/utils';
-import { formatCurrency } from '@/utils/formatters';
+import { formatRupiah } from '@/utils/formatters';
 
 import { Employee } from '@/types/entity';
 import { useTranslation } from '@/contexts/i18n-context';
@@ -70,7 +70,7 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
                         <ViewField label="Branch" value={branchName} />
                         <ViewField
                             label="Salary"
-                            value={formatCurrency(item.salary)}
+                            value={formatRupiah(item.salary)}
                         />
 
                         {/* Date Section */}

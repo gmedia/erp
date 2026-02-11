@@ -62,7 +62,12 @@ export const employeeColumns: ColumnDef<Employee>[] = [
         ...createSortingHeader('Branch'),
         cell: renderBranchCell,
     },
-    createCurrencyColumn<Employee>({ accessorKey: 'salary', label: 'Salary' }),
+    createCurrencyColumn<Employee>({
+        accessorKey: 'salary',
+        label: 'Salary',
+        currency: 'IDR',
+        locale: 'id-ID',
+    }),
     createDateColumn<Employee>({
         accessorKey: 'hire_date',
         label: 'Hire Date',
