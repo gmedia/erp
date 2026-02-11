@@ -90,6 +90,33 @@ describe('COA Version API Endpoints', function () {
             ->assertJsonPath('data.1.name', 'B Version');
     });
 
+    test('index sorts by status', function () {
+        CoaVersion::factory()->create(['status' => 'draft', 'fiscal_year_id' => $this->fiscalYear->id]);
+        CoaVersion::factory()->create(['status' => 'active', 'fiscal_year_id' => $this->fiscalYear->id]);
+        CoaVersion::factory()->create(['status' => 'archived', 'fiscal_year_id' => $this->fiscalYear->id]);
+
+        $response = getJson('/api/coa-versions?sort_by=status&sort_direction=asc');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.0.status', 'draft')
+            ->assertJsonPath('data.1.status', 'active')
+            ->assertJsonPath('data.2.status', 'archived');
+    });
+
+    test('index sorts by fiscal year name', function () {
+        $fyA = FiscalYear::factory()->create(['name' => 'FY 2024', 'status' => 'open']);
+        $fyB = FiscalYear::factory()->create(['name' => 'FY 2025', 'status' => 'open']);
+
+        CoaVersion::factory()->create(['name' => 'V FY2025', 'fiscal_year_id' => $fyB->id]);
+        CoaVersion::factory()->create(['name' => 'V FY2024', 'fiscal_year_id' => $fyA->id]);
+
+        $response = getJson('/api/coa-versions?sort_by=fiscal_year.name&sort_direction=asc&per_page=10');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.0.fiscal_year.name', 'FY 2024')
+            ->assertJsonPath('data.1.fiscal_year.name', 'FY 2025');
+    });
+
     test('index filters by fiscal year', function () {
         $otherFY = FiscalYear::factory()->create(['name' => 'FY 2027']);
         

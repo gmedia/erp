@@ -14,7 +14,14 @@ class IndexCoaVersionRequest extends SimpleCrudIndexRequest
 
     public function rules(): array
     {
-        return array_merge(parent::rules(), [
+        $rules = parent::rules();
+        $rules['sort_by'] = [
+            'nullable',
+            'string',
+            'in:id,name,fiscal_year_id,fiscal_year.name,fiscal_year_name,status,created_at,updated_at',
+        ];
+
+        return array_merge($rules, [
             'status' => ['nullable', 'string', 'in:draft,active,archived'],
             'fiscal_year_id' => ['nullable', 'integer', 'exists:fiscal_years,id'],
         ]);
