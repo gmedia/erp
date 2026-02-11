@@ -1,0 +1,16 @@
+deploy prod:
+  stage: deploy
+  environment:
+    name: prod
+  script:
+    - |
+      curl --request POST \
+      --form token=$DEPLOYMENT_TOKEN \
+      --form ref=main \
+      --form "variables[DEPLOY_APP]=erp" \
+      https://gitlab.com/api/v4/projects/$DEPLOYMENT_PROJECT/trigger/pipeline
+  interruptible: true
+  dependencies: []
+  retry: 2
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'prod'
