@@ -1822,6 +1822,25 @@ export async function editFiscalYear(
 }
 
 /**
+ * Delete a fiscal year.
+ */
+export async function deleteFiscalYear(page: Page, name: string): Promise<void> {
+  await searchFiscalYear(page, name);
+
+  const row = page.locator('tr', { hasText: name }).first();
+  const actionsBtn = row.getByRole('button', { name: /Actions/i });
+  await actionsBtn.click();
+
+  const deleteBtn = page.getByRole('menuitem', { name: /Delete/i });
+  await deleteBtn.click();
+
+  const confirmBtn = page.getByRole('alertdialog').getByRole('button', { name: /Delete/i });
+  await confirmBtn.click();
+
+  await expect(page.locator('tr', { hasText: name })).not.toBeVisible();
+}
+
+/**
  * Create a new COA version via the UI.
  *
  * @param page - Playwright Page object.
