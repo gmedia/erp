@@ -4,8 +4,14 @@ import { login } from '../helpers';
 test.describe('Account Mapping Sorting', () => {
     test('should sort account mappings by all columns', async ({ page }) => {
         await login(page);
-        await page.goto('/account-mappings');
-        await page.waitForLoadState('networkidle');
+        const initialListPromise = page.waitForResponse(response =>
+            response.url().includes('/api/account-mappings') &&
+            response.request().method() === 'GET' &&
+            response.status() === 200
+        );
+        await page.goto('/account-mappings', { waitUntil: 'domcontentloaded' });
+        await initialListPromise;
+        await expect(page.getByRole('columnheader', { name: 'Source Account', exact: true })).toBeVisible({ timeout: 15000 });
 
         // We can't easily create specific sortable data names like "AAAA" and "ZZZZ" because 
         // Account Mapping relies on existing Accounts (Seed Data).

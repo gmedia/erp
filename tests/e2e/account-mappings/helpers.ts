@@ -34,8 +34,7 @@ export async function createAccountMapping(page: Page): Promise<{
   const timestamp = Date.now();
 
   await login(page);
-  await page.goto('/account-mappings');
-  await page.waitForLoadState('networkidle');
+  await page.goto('/account-mappings', { waitUntil: 'domcontentloaded' });
 
   const addBtn = page.getByRole('button', { name: /Add/i }).first();
   await expect(addBtn).toBeVisible({ timeout: 15000 });
@@ -112,9 +111,22 @@ export async function createAccountMapping(page: Page): Promise<{
 export async function searchAccountMappings(page: Page, query: string): Promise<void> {
   const input = page.getByPlaceholder('Search account mappings...');
   await input.waitFor({ state: 'visible' });
+  const skeleton = page.locator('tbody .h-4.w-full.bg-muted');
   await input.fill(query);
+  const requestPromise = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/account-mappings') &&
+      response.request().method() === 'GET' &&
+      response.status() < 400,
+    { timeout: 60000 },
+  );
+  const skeletonCyclePromise = (async () => {
+    await skeleton.first().waitFor({ state: 'visible', timeout: 2000 });
+    await skeleton.first().waitFor({ state: 'detached', timeout: 60000 });
+  })();
   await input.press('Enter');
-  await page.waitForLoadState('networkidle');
+  await Promise.any([requestPromise, skeletonCyclePromise]).catch(() => {});
+  await skeleton.first().waitFor({ state: 'detached', timeout: 60000 }).catch(() => {});
 }
 
 export function findAccountMappingRow(page: Page, sourceCode: string, targetCode: string) {
