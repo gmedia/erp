@@ -41,7 +41,7 @@ class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
             $query,
             $this->filters['sort_by'] ?? 'created_at',
             $this->filters['sort_direction'] ?? 'desc',
-            ['id', 'asset_code', 'name', 'purchase_date', 'purchase_cost', 'status', 'created_at']
+            ['id', 'asset_code', 'name', 'purchase_date', 'purchase_cost', 'status', 'created_at', 'category', 'branch']
         );
 
         return $query;
