@@ -2447,7 +2447,7 @@ export async function createAssetLocation(
   await expect(addButton).toBeVisible();
   await addButton.click();
 
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByRole('dialog', { name: /Add New Asset Location/i });
   await expect(dialog).toBeVisible();
 
   // Fill the form
@@ -2514,7 +2514,7 @@ export async function editAssetLocation(
   await expect(editItem).toBeVisible();
   await editItem.click({ force: true });
 
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByRole('dialog', { name: /Edit Asset Location/i });
   await expect(dialog).toBeVisible();
 
   // Update fields if provided
@@ -2561,7 +2561,7 @@ export async function createAsset(
 
   // Open the "Add Asset" dialog
   await page.getByRole('button', { name: /Add/i }).click();
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByRole('dialog', { name: /Add New Asset/i });
   await expect(dialog).toBeVisible();
 
   // Fill required fields
