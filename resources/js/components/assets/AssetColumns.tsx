@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { Badge } from '@/components/ui/badge';
 import {
     createActionsColumn,
@@ -71,5 +71,7 @@ export const assetColumns: ColumnDef<Asset>[] = [
         accessorKey: 'purchase_date',
         label: 'Purchase Date',
     }),
-    createActionsColumn<Asset>(),
+    createActionsColumn<Asset>({
+        viewPath: (asset) => `/assets/${asset.ulid}`,
+    }),
 ];
