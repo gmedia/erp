@@ -14,7 +14,7 @@ class ExportAssetMovementsAction
     {
         $filters = array_filter($request->validated());
 
-        $filename = 'asset_movements_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+        $filename = 'asset-movements-export-' . now()->format('Y-m-d-H-i-s') . '.xlsx';
         $filePath = 'exports/' . $filename;
 
         Excel::store(new AssetMovementExport($filters), $filePath, 'public');
