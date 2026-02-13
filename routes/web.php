@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -12,9 +13,7 @@ Route::get('/', function () {
 Route::post('locale/{locale}', [LocaleController::class, 'update'])->name('locale.update');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 require __DIR__ . '/settings.php';
@@ -44,7 +43,6 @@ require __DIR__ . '/asset_model.php';
 require __DIR__ . '/asset_location.php';
 require __DIR__ . '/asset.php';
 require __DIR__ . '/asset_movement.php';
-
 
 
 
