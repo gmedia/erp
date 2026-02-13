@@ -9,7 +9,7 @@
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
         "types": "tsc --noEmit",
-        "test:e2e": "php artisan migrate:fresh --seed && npx playwright test",
+        "test:e2e": "php artisan migrate:fresh --seed && vite build && npx playwright test",
         "blade:formatter": "blade-formatter --write resources/**/*.blade.php"
     },
     "devDependencies": {
