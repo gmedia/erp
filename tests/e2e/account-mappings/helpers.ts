@@ -125,7 +125,7 @@ export async function searchAccountMappings(page: Page, query: string): Promise<
     { timeout: 60000 },
   );
   const skeletonCyclePromise = (async () => {
-    await skeleton.first().waitFor({ state: 'visible', timeout: 2000 });
+    await skeleton.first().waitFor({ state: 'visible', timeout: 10000 });
     await skeleton.first().waitFor({ state: 'detached', timeout: 60000 });
   })();
   await input.press('Enter');

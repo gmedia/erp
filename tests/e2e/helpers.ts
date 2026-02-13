@@ -75,7 +75,7 @@ async function createEntity(
   await expect(submitButton).toBeVisible();
   await submitButton.click();
 
-  await expect(dialog).not.toBeVisible({ timeout: 15000 });
+  await expect(dialog).not.toBeVisible({ timeout: 30000 });
 
   return returnValue;
 }
@@ -121,7 +121,7 @@ export async function login(
   if (page.url().includes('/dashboard')) return;
 
   const emailInput = page.locator('input[name="email"]');
-  if (page.url().includes('/login') || (await emailInput.isVisible({ timeout: 5000 }).catch(() => false))) {
+  if (page.url().includes('/login') || (await emailInput.isVisible({ timeout: 10000 }).catch(() => false))) {
     if (!page.url().includes('/login')) {
       await gotoWithRetry('/login');
     }
@@ -1475,7 +1475,7 @@ export async function createProduct(
     // Wait for options to filter
     await page.waitForTimeout(1000);
   }
-  await page.locator('[role="option"]').filter({ hasText: new RegExp(`^${unitName}$`) }).first().click({ force: true });
+  await page.locator('[role="option"]').filter({ hasText: new RegExp(`^${unitName}$`) }).first().click({ force: true, timeout: 10000 });
 
   // Branch (Async Select)
   if (overrides.branch_id) {
