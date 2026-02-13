@@ -18,7 +18,7 @@ test.describe('Asset Location Filters', () => {
 
         // Open filter dialog
         await page.getByRole('button', { name: /Filters/i }).click();
-        const dialog = page.getByRole('dialog');
+        const dialog = page.getByRole('dialog', { name: /Filters/i });
         await expect(dialog).toBeVisible();
 
         // Find Branch filter trigger - it's a combobox or button with the placeholder
@@ -53,7 +53,7 @@ test.describe('Asset Location Filters', () => {
 
         // Create a child location under this parent using the UI for maximum E2E coverage
         await page.getByRole('button', { name: /Add/i }).first().click();
-        const createDialog = page.getByRole('dialog');
+        const createDialog = page.getByRole('dialog', { name: /Add New Asset Location/i });
         await expect(createDialog).toBeVisible();
 
         const childName = `Child-${Date.now()}`;
@@ -74,7 +74,7 @@ test.describe('Asset Location Filters', () => {
 
         // Now filter by that parent
         await page.getByRole('button', { name: /Filters/i }).click();
-        const filterDialog = page.getByRole('dialog');
+        const filterDialog = page.getByRole('dialog', { name: /Filters/i });
         await expect(filterDialog).toBeVisible();
 
         const filterTrigger = filterDialog.getByRole('combobox').filter({ hasText: /All Locations|Parent Location/i }).first();
