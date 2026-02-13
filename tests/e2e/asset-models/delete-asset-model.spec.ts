@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { login, createAssetModel, searchAssetModel } from '../helpers';
 
 test.describe('Asset Models - Delete', () => {
     test.beforeEach(async ({ page }) => {
@@ -10,32 +10,25 @@ test.describe('Asset Models - Delete', () => {
     test('should delete an asset model', async ({ page }) => {
         await expect(page.locator('table')).toBeVisible();
 
-        // Create a temporary model to delete or use existing
-        // Ideally we should create one to ensure test isolation
-        await page.getByRole('button', { name: 'Add', exact: true }).click();
-        const modelName = `Model To Delete ${Date.now()}`;
-        await page.getByLabel('Model Name').fill(modelName);
+        // Create a temporary model to delete
+        const modelName = await createAssetModel(page, {
+            model_name: `Model To Delete ${Date.now()}`
+        });
         
-        // We need to fill category too
-        await page.getByRole('combobox').click();
-        await page.getByRole('option').first().click();
-        
-        await page.getByRole('button', { name: 'Add', exact: true }).click();
-        await expect(page.getByRole('dialog')).not.toBeVisible();
         await expect(page.locator('table')).toContainText(modelName);
 
-        // Find the row with the specific model name
-        const row = page.locator('tbody tr', { hasText: modelName });
-        const actionsButton = row.getByRole('button', { name: 'Actions' });
+        // Find the row and delete
+        const row = page.locator('tbody tr', { hasText: modelName }).first();
+        const actionsButton = row.getByRole('button', { name: /Actions/i });
         await actionsButton.click();
 
-        const deleteButton = page.getByRole('menuitem', { name: 'Delete' });
+        const deleteButton = page.getByRole('menuitem', { name: /Delete/i });
         await deleteButton.click();
 
         // Confirm deletion
-        const confirmDialog = page.getByRole('alertdialog');
+        const confirmDialog = page.getByRole('dialog').or(page.getByRole('alertdialog')).filter({ hasText: /Delete/i }).last();
         await expect(confirmDialog).toBeVisible();
-        await confirmDialog.getByRole('button', { name: 'Delete' }).click();
+        await confirmDialog.getByRole('button', { name: /Delete/i }).click();
 
         // Verify success
         await expect(page.locator('table')).not.toContainText(modelName);

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { login, createAssetModel, editAssetModel } from '../helpers';
 
 test.describe('Asset Models - Edit', () => {
     test.beforeEach(async ({ page }) => {
@@ -7,34 +7,20 @@ test.describe('Asset Models - Edit', () => {
         await page.goto('/asset-models');
     });
 
-    test('should edit an existing asset model', async ({ page }) => {
-        await expect(page.locator('table')).toBeVisible();
-
-        // Click on the first row or an action button to edit
-        const firstRow = page.locator('tbody tr').first();
-        const actionsButton = firstRow.getByRole('button', { name: 'Actions' });
-        await actionsButton.click();
-
-        const editButton = page.getByRole('menuitem', { name: 'Edit' });
-        await editButton.click();
-
-        await expect(page.getByRole('dialog')).toBeVisible();
-        await expect(page.getByRole('heading', { name: 'Edit Asset Model' })).toBeVisible();
+    test('should edit an asset model', async ({ page }) => {
+        // Create an model to edit
+        const modelName = await createAssetModel(page, {
+            model_name: 'Model To Edit ' + Date.now()
+        });
 
         // Update form
         const newModelName = `Updated Model ${Date.now()}`;
-        await page.getByLabel('Model Name').fill(newModelName);
-        
-        // Update Specs
-        await page.getByLabel('Specifications (JSON)').fill('{"updated": "true"}');
+        await editAssetModel(page, modelName, {
+            model_name: newModelName,
+            specs: '{"updated": "true"}'
+        });
 
-        // Submit
-        await page.getByRole('button', { name: 'Update', exact: true }).click();
-
-        // Verify success
-        await expect(page.getByRole('dialog')).not.toBeVisible();
-
-        // Verify in table
+        // Verify changes in the list
         await expect(page.locator('table')).toContainText(newModelName);
     });
 });
