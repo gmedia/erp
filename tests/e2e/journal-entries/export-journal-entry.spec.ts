@@ -8,8 +8,8 @@ test('export journal entries works correctly', async ({ page }) => {
   await login(page);
   await createJournalEntry(page);
   
-  // Ensure we are on the page
   await page.goto('/journal-entries');
+  await page.waitForLoadState('networkidle');
 
   const exportBtn = page.getByRole('button', { name: /Export/i });
   await expect(exportBtn).toBeVisible();
@@ -19,7 +19,7 @@ test('export journal entries works correctly', async ({ page }) => {
     exportBtn.click(),
   ]);
 
-  const downloadsDir = path.resolve('e2e/test-results', 'downloads');
+  const downloadsDir = path.resolve('test-results/downloads');
   if (!fs.existsSync(downloadsDir)) {
     fs.mkdirSync(downloadsDir, { recursive: true });
   }
@@ -28,4 +28,9 @@ test('export journal entries works correctly', async ({ page }) => {
 
   expect(download.suggestedFilename()).toMatch(/journal_entries_export_.*\.xlsx$/i);
   expect(fs.existsSync(destPath)).toBeTruthy();
+  
+  // Clean up
+  if (fs.existsSync(destPath)) {
+    fs.unlinkSync(destPath);
+  }
 });

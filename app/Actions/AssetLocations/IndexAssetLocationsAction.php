@@ -28,12 +28,22 @@ class IndexAssetLocationsAction
             ]);
         }
 
-        $this->filterService->applySorting(
-            $query,
-            $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'code', 'name', 'branch_id', 'parent_id', 'created_at', 'updated_at']
-        );
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'branch') {
+            $query
+                ->leftJoin('branches', 'asset_locations.branch_id', '=', 'branches.id')
+                ->select('asset_locations.*')
+                ->orderBy('branches.name', $sortDirection);
+        } else {
+            $this->filterService->applySorting(
+                $query,
+                $sortBy,
+                $sortDirection,
+                ['id', 'code', 'name', 'branch_id', 'parent_id', 'created_at', 'updated_at']
+            );
+        }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
     }

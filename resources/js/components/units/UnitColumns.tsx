@@ -14,7 +14,11 @@ export interface Unit {
 export const unitColumns: ColumnDef<Unit>[] = [
     createSelectColumn<Unit>(),
     createTextColumn<Unit>({ accessorKey: 'name', label: 'Name' }),
-    createTextColumn<Unit>({ accessorKey: 'symbol', label: 'Symbol' }),
+    createTextColumn<Unit>({
+        accessorKey: 'symbol',
+        label: 'Symbol',
+        enableSorting: false,
+    }),
     createDateColumn<Unit>({ accessorKey: 'created_at', label: 'Created At' }),
     createDateColumn<Unit>({ accessorKey: 'updated_at', label: 'Updated At' }),
     createActionsColumn<Unit>(),

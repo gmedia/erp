@@ -52,7 +52,7 @@ class JournalEntryExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
 
     public function headings(): array
     {
-        return ['ID', 'Entry Number', 'Date', 'Reference', 'Description', 'Fiscal Year', 'Status', 'Created By', 'Created At'];
+        return ['ID', 'Entry Number', 'Date', 'Reference', 'Description', 'Total Amount', 'Fiscal Year', 'Status', 'Created By', 'Created At'];
     }
 
     public function map($journalEntry): array
@@ -63,6 +63,7 @@ class JournalEntryExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
             $journalEntry->entry_date->format('Y-m-d'),
             $journalEntry->reference,
             $journalEntry->description,
+            (float) $journalEntry->lines->sum('debit'),
             $journalEntry->fiscalYear->name ?? '',
             $journalEntry->status,
             $journalEntry->createdBy->name ?? '',

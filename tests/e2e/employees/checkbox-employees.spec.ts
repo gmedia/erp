@@ -10,10 +10,13 @@ test('checkbox visibility in DataTable', async ({ page }) => {
   await expect(headerCheckbox).toHaveCount(0);
   
   // Verify checkbox in body rows
-  // Wait for data to load
-  await page.waitForSelector('tbody tr');
+  // Wait for loading to finish (skeletons to disappear)
+  await expect(page.locator('[data-slot="skeleton"]')).toHaveCount(0);
+
+  // Wait for data to load if any
+  const dataRows = page.locator('tbody tr').filter({ hasNotText: 'No results.' });
+  const rowCount = await dataRows.count();
   const bodyCheckboxes = page.locator('tbody').getByRole('checkbox');
-  const rowCount = await page.locator('tbody tr').count();
   
   if (rowCount > 0) {
     // There should be one checkbox per row if the first column is select

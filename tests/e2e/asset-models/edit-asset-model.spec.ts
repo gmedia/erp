@@ -1,26 +1,26 @@
 import { test, expect } from '@playwright/test';
-import { createAssetModel, searchAssetModel, editAssetModel, login } from '../helpers';
+import { login, createAssetModel, editAssetModel } from '../helpers';
 
-test('edit asset model end-to-end', async ({ page }) => {
-  await login(page);
+test.describe('Asset Models - Edit', () => {
+    test.beforeEach(async ({ page }) => {
+        await login(page);
+        await page.goto('/asset-models');
+    });
 
-  const timestamp = Date.now();
-  const modelName = await createAssetModel(page, {
-    model_name: `Model To Edit ${timestamp}`,
-    manufacturer: 'Original Manufacturer',
-  });
+    test('should edit an asset model', async ({ page }) => {
+        // Create an model to edit
+        const modelName = await createAssetModel(page, {
+            model_name: 'Model To Edit ' + Date.now()
+        });
 
-  await page.goto('/asset-models');
-  await searchAssetModel(page, modelName);
+        // Update form
+        const newModelName = `Updated Model ${Date.now()}`;
+        await editAssetModel(page, modelName, {
+            model_name: newModelName,
+            specs: '{"updated": "true"}'
+        });
 
-  const updatedName = `Updated Model Name ${timestamp}`;
-  await editAssetModel(page, modelName, {
-    model_name: updatedName,
-  });
-
-  await page.waitForTimeout(1000);
-  await searchAssetModel(page, updatedName);
-  
-  const row = page.locator('tr', { hasText: updatedName }).first();
-  await expect(row).toBeVisible();
+        // Verify changes in the list
+        await expect(page.locator('table')).toContainText(newModelName);
+    });
 });

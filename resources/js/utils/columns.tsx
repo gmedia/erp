@@ -46,6 +46,7 @@ export type ActionsColumnOptions<T = Record<string, unknown>> = {
     onEdit?: (row: T) => void;
     onDelete?: (row: T) => void;
     onView?: (row: T) => void;
+    viewPath?: (row: T) => string;
     enableHiding?: boolean;
 };
 
@@ -92,6 +93,7 @@ export function createTextColumn<T = Record<string, unknown>>(
 
     return {
         ...baseColumn,
+        enableSorting: false,
         header: label,
     };
 }
@@ -120,6 +122,7 @@ export function createDateColumn<T = Record<string, unknown>>(
 
     return {
         ...baseColumn,
+        enableSorting: false,
         header: label,
     };
 }
@@ -169,6 +172,7 @@ export function createCurrencyColumn<T = Record<string, unknown>>(
 
     return {
         ...baseColumn,
+        enableSorting: false,
         header: label,
     };
 }
@@ -215,6 +219,7 @@ export function createNumberColumn<T = Record<string, unknown>>(
 
     return {
         ...baseColumn,
+        enableSorting: false,
         header: label,
     };
 }
@@ -267,6 +272,7 @@ export function createLinkColumn<T = Record<string, unknown>>(
 
     return {
         ...baseColumn,
+        enableSorting: false,
         header: label,
     };
 }
@@ -311,16 +317,20 @@ export function createUrlColumn<T extends Record<string, unknown>>(
 export function createActionsColumn<T = Record<string, unknown>>(
     options: ActionsColumnOptions<T> = {},
 ): ColumnDef<T> {
-    const { onEdit, onDelete, onView, enableHiding = false } = options;
+    const { onEdit, onDelete, onView, viewPath, enableHiding = false } = options;
 
     return {
         id: 'actions',
         enableHiding,
+        meta: {
+            viewPath,
+        },
         cell: ({ row }) => {
             const item = row.original as T;
             return (
                 <GenericActions
                     item={item}
+                    viewUrl={viewPath ? viewPath(item) : undefined}
                     onView={onView}
                     onEdit={onEdit ? () => onEdit(item) : undefined}
                     onDelete={onDelete ? () => onDelete(item) : undefined}
@@ -393,6 +403,7 @@ export function createBadgeColumn<T = Record<string, unknown>>(
 
     return {
         ...baseColumn,
+        enableSorting: false,
         header: label,
     };
 }

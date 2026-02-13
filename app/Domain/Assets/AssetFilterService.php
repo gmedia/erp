@@ -40,4 +40,25 @@ class AssetFilterService
             $query->where('condition', $filters['condition']);
         }
     }
+
+    public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
+    {
+        if (!in_array($sortBy, $allowedSorts)) {
+            return;
+        }
+
+        $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'category') {
+            $query->join('asset_categories', 'assets.asset_category_id', '=', 'asset_categories.id')
+                ->orderBy('asset_categories.name', $sortDirection)
+                ->select('assets.*');
+        } elseif ($sortBy === 'branch') {
+            $query->join('branches', 'assets.branch_id', '=', 'branches.id')
+                ->orderBy('branches.name', $sortDirection)
+                ->select('assets.*');
+        } else {
+            $query->orderBy($sortBy, $sortDirection);
+        }
+    }
 }

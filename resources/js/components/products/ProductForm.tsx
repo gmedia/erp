@@ -65,8 +65,8 @@ const renderGeneralInfoSection = () => (
 
 const renderPricingSection = () => (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t pt-4 mt-2">
-        <InputField name="cost" label="Cost" type="number" placeholder="0.00" />
-        <InputField name="selling_price" label="Selling Price" type="number" placeholder="0.00" />
+        <InputField name="cost" label="Cost" type="number" placeholder="0.00" prefix="Rp" />
+        <InputField name="selling_price" label="Selling Price" type="number" placeholder="0.00" prefix="Rp" />
         <InputField name="markup_percentage" label="Markup %" type="number" placeholder="0.00" />
     </div>
 );

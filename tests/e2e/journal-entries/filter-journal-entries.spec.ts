@@ -14,32 +14,23 @@ test('filter journal entries end-to-end', async ({ page }) => {
   // Actually createJournalEntry finishes on the page.
   
   // Open Filter
-  /*
-  const filterBtn = page.getByRole('button', { name: /Filter/i });
+  const filterBtn = page.getByRole('button', { name: /Filter/i }).first();
   await filterBtn.click();
-  */
-
-  // Filter by Status (assuming default is Draft)
-  // Or Search text
-  // Let's use the Status filter if available
-  // TODO: Re-enable Status filter test when Filter Modal interaction is stable
-  /*
-  const statusTrigger = page.locator('button').filter({ hasText: /Select status|Draft|Posted/i });
-  // Ensure modal is open and Status filter is present
-  await expect(statusTrigger).toBeVisible();
   
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  // Filter by Status (Draft)
+  const statusTrigger = dialog.locator('button').filter({ hasText: /Select status|Draft|Posted|Void/i });
   await statusTrigger.click();
-  await page.getByRole('option', { name: 'Draft' }).click();
+  await page.getByRole('option', { name: 'Draft', exact: true }).click();
   
-  const applyBtn = page.getByRole('button', { name: /Apply/i });
+  const applyBtn = dialog.getByRole('button', { name: /Apply|Filter/i }).last();
   await applyBtn.click();
-  */
+  await page.waitForLoadState('networkidle');
 
-  // Use Search input also as filter
-  const searchInput = page.locator('input[placeholder*="Search"]');
-  await expect(searchInput).toBeVisible({ timeout: 10000 });
-  await searchInput.fill(uniqueRef);
-  await searchInput.press('Enter');
-  
-  await expect(page.locator(`text=${uniqueRef}`)).toBeVisible();
+  // Verify result contains the unique reference and status is DRAFT
+  const row = page.locator('tr', { hasText: uniqueRef }).first();
+  await expect(row).toBeVisible();
+  await expect(row).toContainText('DRAFT');
 });

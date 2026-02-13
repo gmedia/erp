@@ -36,7 +36,7 @@ class AssetMovementController extends Controller
         ]);
 
         if ($request->filled('search')) {
-            $filterService->applySearch($query, $request->search, ['reference', 'notes']);
+            $filterService->applySearch($query, $request->search, ['reference', 'notes', 'asset_name', 'asset_code']);
         } else {
             $filterService->applyAdvancedFilters($query, $request->all());
         }

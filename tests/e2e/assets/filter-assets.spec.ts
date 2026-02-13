@@ -14,27 +14,17 @@ test('filter assets by search and status end-to-end', async ({ page }) => {
 
   const searchInput = page.getByPlaceholder(/Search assets.../i);
   await searchInput.clear();
-  await searchInput.fill(assetName!);
-  await Promise.all([
-    page.waitForResponse(response => 
-      response.url().includes('/api/assets') && 
-      response.status() === 200
-    ),
-    searchInput.press('Enter')
-  ]);
   
+  await searchInput.fill(assetName!);
+  await searchInput.press('Enter');
+  
+  // expect has built-in retry/wait
   await expect(page.locator('tbody tr').first()).toContainText(assetName!);
 
   // 2. Test Status Filter
   // Reset search
   await searchInput.clear();
-  await Promise.all([
-    page.waitForResponse(response => 
-      response.url().includes('/api/assets') && 
-      response.status() === 200
-    ),
-    searchInput.press('Enter')
-  ]);
+  await searchInput.press('Enter');
 
   // Open Filters modal
   await page.getByRole('button', { name: /Filters/i }).click();
@@ -48,15 +38,8 @@ test('filter assets by search and status end-to-end', async ({ page }) => {
   await statusOption.click();
   
   // Click Apply Filters
-  await Promise.all([
-    page.waitForResponse(response => 
-      response.url().includes('/api/assets') && 
-      response.url().includes('status=active') &&
-      response.status() === 200
-    ).catch(() => null), // Catch if it resolves too fast or different param
-    filterDialog.getByRole('button', { name: /Apply Filters/i }).click()
-  ]);
-
+  await filterDialog.getByRole('button', { name: /Apply Filters/i }).click();
+  
   // Wait for modal to close
   await expect(filterDialog).not.toBeVisible();
 

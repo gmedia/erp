@@ -1,9 +1,10 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { createActionsColumn } from '@/utils/columns';
+import { createActionsColumn, createSortingHeader } from '@/utils/columns';
 
 export interface AssetMovement {
     id: number;
@@ -28,8 +29,27 @@ export interface AssetMovement {
 
 export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
     {
+        id: 'select',
+        header: ({ table }) => (
+            <Checkbox
+                checked={table.getIsAllPageRowsSelected()}
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Select all"
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Select row"
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
         accessorKey: 'asset',
-        header: 'Asset',
+        ...createSortingHeader('Asset'),
         cell: ({ row }) => {
             const asset = row.original.asset;
             if (!asset) return '-';
@@ -43,7 +63,7 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
     },
     {
         accessorKey: 'movement_type',
-        header: 'Type',
+        ...createSortingHeader('Type'),
         cell: ({ row }) => (
             <Badge variant="outline" className="capitalize">
                 {row.getValue('movement_type')}
@@ -52,7 +72,7 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
     },
     {
         accessorKey: 'moved_at',
-        header: 'Date',
+        ...createSortingHeader('Date'),
         cell: ({ row }) => {
             const date = row.getValue('moved_at') as string;
             return date ? format(new Date(date), 'PPP') : '-';
@@ -88,7 +108,7 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
     },
     {
         accessorKey: 'reference',
-        header: 'Ref/Notes',
+        ...createSortingHeader('Ref/Notes'),
         cell: ({ row }) => (
             <div className="max-w-[200px]">
                 <div className="text-xs font-semibold">{row.original.reference || '-'}</div>
@@ -98,7 +118,7 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
     },
     {
         accessorKey: 'created_by',
-        header: 'PIC',
+        ...createSortingHeader('PIC'),
     },
     createActionsColumn<AssetMovement>(),
 ];

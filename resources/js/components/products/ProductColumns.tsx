@@ -73,16 +73,12 @@ export const productColumns: ColumnDef<Product>[] = [
         label: 'Cost',
         currency: 'IDR',
         locale: 'id-ID',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
     }),
     createCurrencyColumn<Product>({
         accessorKey: 'selling_price',
         label: 'Price',
         currency: 'IDR',
         locale: 'id-ID',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
     }),
     {
         accessorKey: 'status',

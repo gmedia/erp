@@ -8,23 +8,17 @@ async function fillVisibleSearch(page: Page, value: string): Promise<void> {
 }
 
 async function clickFirstMatchingOption(page: Page, name: RegExp): Promise<void> {
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const option = page
-      .locator('[role="option"]:visible')
-      .filter({ hasText: name })
-      .first();
-    await option.waitFor({ state: 'visible', timeout: 15000 });
-    try {
-      await option.scrollIntoViewIfNeeded();
-      await option.click();
-      return;
-    } catch (error) {
-      if (attempt === 4) throw error;
-    }
-  }
-
-  throw new Error(`Option not found: ${name}`);
+  const options = page.locator('[role="option"]:visible').filter({ hasText: name });
+  await expect(options.first()).toBeVisible({ timeout: 15000 });
+  
+  const option = options.first();
+  await option.scrollIntoViewIfNeeded();
+  await option.click();
+  
+  // Wait for the listbox/dropdown to disappear after selection
+  await expect(page.locator('[role="listbox"]:visible')).toHaveCount(0, { timeout: 15000 });
 }
+
 
 export async function createAccountMapping(page: Page): Promise<{
   sourceCode: string;
@@ -34,8 +28,7 @@ export async function createAccountMapping(page: Page): Promise<{
   const timestamp = Date.now();
 
   await login(page);
-  await page.goto('/account-mappings');
-  await page.waitForLoadState('networkidle');
+  await page.goto('/account-mappings', { waitUntil: 'domcontentloaded' });
 
   const addBtn = page.getByRole('button', { name: /Add/i }).first();
   await expect(addBtn).toBeVisible({ timeout: 15000 });
@@ -50,20 +43,25 @@ export async function createAccountMapping(page: Page): Promise<{
   // 1. Select Source COA Version
   await combos.nth(0).click();
   await fillVisibleSearch(page, 'COA 2025 Standard');
-  // Use a regex that matches the option text more loosely to avoid issues with formatting
-  await clickFirstMatchingOption(page, /COA 2025 Standard/);
+  // Use a more specific regex to avoid issues with formatting
+  await clickFirstMatchingOption(page, /COA 2025 Standard \(/);
 
   // 2. Select Source Account
   await combos.nth(1).click();
   
   // Helper to select first available option and return its code
   const selectFirstOptionAndGetCode = async (retries = 3): Promise<string> => {
+      // Small wait to ensure dropdown animations or data loading has started
+      await page.waitForTimeout(500);
+      
       for (let i = 0; i < retries; i++) {
           try {
               // Wait for listbox to finish loading
-              await expect(page.locator('[role="listbox"][aria-busy="false"]')).toBeVisible({ timeout: 10000 });
+              const listbox = page.locator('[role="listbox"]:visible');
+              await expect(listbox).toBeVisible({ timeout: 10000 });
+              await expect(listbox).not.toHaveAttribute('aria-busy', 'true', { timeout: 10000 });
               
-              const options = page.locator('[role="option"]');
+              const options = listbox.locator('[role="option"]');
               await expect(options.first()).toBeVisible({ timeout: 5000 });
               
               const firstOption = options.first();
@@ -72,10 +70,14 @@ export async function createAccountMapping(page: Page): Promise<{
               
               const code = text.split(' - ')[0].trim();
               await firstOption.click();
+              
+              // Wait for this specific listbox to disappear
+              await expect(listbox).not.toBeVisible({ timeout: 10000 });
+              
               return code;
           } catch (e) {
               if (i === retries - 1) throw e;
-              await page.waitForTimeout(500);
+              await page.waitForTimeout(1000);
           }
       }
       return ''; // Should not reach here
@@ -87,7 +89,7 @@ export async function createAccountMapping(page: Page): Promise<{
   // 3. Select Target COA Version
   await combos.nth(2).click();
   await fillVisibleSearch(page, 'COA 2026 Enhanced');
-  await clickFirstMatchingOption(page, /COA 2026 Enhanced/);
+  await clickFirstMatchingOption(page, /COA 2026 Enhanced \(/);
 
   // 4. Select Target Account
   await combos.nth(3).click();
@@ -96,6 +98,7 @@ export async function createAccountMapping(page: Page): Promise<{
   // 5. Select Type (Rename)
   await combos.nth(4).click();
   await clickFirstMatchingOption(page, /^Rename$/);
+
 
   const notes = `notes-${timestamp}`;
   await dialog.locator('textarea[name="notes"]').fill(notes);
@@ -112,9 +115,22 @@ export async function createAccountMapping(page: Page): Promise<{
 export async function searchAccountMappings(page: Page, query: string): Promise<void> {
   const input = page.getByPlaceholder('Search account mappings...');
   await input.waitFor({ state: 'visible' });
+  const skeleton = page.locator('tbody .h-4.w-full.bg-muted');
   await input.fill(query);
+  const requestPromise = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/account-mappings') &&
+      response.request().method() === 'GET' &&
+      response.status() < 400,
+    { timeout: 60000 },
+  );
+  const skeletonCyclePromise = (async () => {
+    await skeleton.first().waitFor({ state: 'visible', timeout: 2000 });
+    await skeleton.first().waitFor({ state: 'detached', timeout: 60000 });
+  })();
   await input.press('Enter');
-  await page.waitForLoadState('networkidle');
+  await Promise.any([requestPromise, skeletonCyclePromise]).catch(() => {});
+  await skeleton.first().waitFor({ state: 'detached', timeout: 60000 }).catch(() => {});
 }
 
 export function findAccountMappingRow(page: Page, sourceCode: string, targetCode: string) {

@@ -47,12 +47,22 @@ class IndexCoaVersionsAction extends SimpleCrudIndexAction
             ]);
         }
 
-        $this->filterService->applySorting(
-            $query,
-            $request->get('sort_by', $this->getDefaultSortBy()),
-            strtolower($request->get('sort_direction', $this->getDefaultSortDirection())) === 'asc' ? 'asc' : 'desc',
-            $this->getSortableFields()
-        );
+        $sortBy = $request->get('sort_by', $this->getDefaultSortBy());
+        $sortDirection = strtolower($request->get('sort_direction', $this->getDefaultSortDirection())) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'fiscal_year.name' || $sortBy === 'fiscal_year_name') {
+            $query
+                ->leftJoin('fiscal_years', 'coa_versions.fiscal_year_id', '=', 'fiscal_years.id')
+                ->select('coa_versions.*')
+                ->orderBy('fiscal_years.name', $sortDirection);
+        } else {
+            $this->filterService->applySorting(
+                $query,
+                $sortBy,
+                $sortDirection,
+                $this->getSortableFields()
+            );
+        }
 
         return $query->paginate($request->get('per_page', $this->getDefaultPerPage()));
     }

@@ -190,8 +190,9 @@ export function DataTable<T>({
         if (!onEdit && !onDelete && !onView && !extraActionItems) {
             return columns;
         }
-        return columns.map((col) => {
+                return columns.map((col) => {
             if (col.id === 'actions') {
+                const viewPath = (col.meta as any)?.viewPath;
                 return {
                     ...col,
                     cell: ({ row }: { row: { original: T } }) => (
@@ -201,6 +202,9 @@ export function DataTable<T>({
                             onEdit={onEdit!}
                             onDelete={onDelete!}
                             extraItems={extraActionItems}
+                            viewUrl={
+                                viewPath ? viewPath(row.original) : undefined
+                            }
                         />
                     ),
                 };
@@ -223,6 +227,11 @@ export function DataTable<T>({
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         manualPagination: true,
+        meta: {
+            onView,
+            onEdit,
+            onDelete,
+        },
     });
 
     React.useEffect(() => {

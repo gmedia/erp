@@ -23,7 +23,7 @@ class ExportAssetRequest extends FormRequest
             'employee_id' => ['nullable', 'exists:employees,id'],
             'status' => ['nullable', 'string', 'in:draft,active,maintenance,disposed,lost'],
             'condition' => ['nullable', 'string', 'in:good,needs_repair,damaged'],
-            'sort_by' => ['nullable', 'string', 'in:asset_code,name,purchase_date,status,created_at'],
+            'sort_by' => ['nullable', 'string', 'in:asset_code,name,purchase_date,status,created_at,category,branch'],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
         ];
     }

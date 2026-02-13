@@ -68,6 +68,7 @@ const renderEmployeeWorkInfoSection = () => (
             label="Salary"
             type="number"
             placeholder="50000"
+            prefix="Rp"
         />
     </>
 );

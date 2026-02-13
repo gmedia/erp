@@ -107,7 +107,7 @@ export const AssetModelForm = memo<AssetModelFormProps>(function AssetModelForm(
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={entity ? 'Edit' : 'Add New Asset Model'}
+            title={entity ? 'Edit Asset Model' : 'Add New Asset Model'}
             onSubmit={handleSubmit}
             isLoading={isLoading}
         >

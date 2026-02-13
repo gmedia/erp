@@ -14,7 +14,11 @@ export interface ProductCategory {
 export const productCategoryColumns: ColumnDef<ProductCategory>[] = [
     createSelectColumn<ProductCategory>(),
     createTextColumn<ProductCategory>({ accessorKey: 'name', label: 'Name' }),
-    createTextColumn<ProductCategory>({ accessorKey: 'description', label: 'Description' }),
+    createTextColumn<ProductCategory>({
+        accessorKey: 'description',
+        label: 'Description',
+        enableSorting: false,
+    }),
     createDateColumn<ProductCategory>({ accessorKey: 'created_at', label: 'Created At' }),
     createDateColumn<ProductCategory>({ accessorKey: 'updated_at', label: 'Updated At' }),
     createActionsColumn<ProductCategory>(),

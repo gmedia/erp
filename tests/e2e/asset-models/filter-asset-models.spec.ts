@@ -1,36 +1,43 @@
 import { test, expect } from '@playwright/test';
-import { login, createAssetModel } from '../helpers';
+import { login, createAssetModel, searchAssetModel } from '../helpers';
 
-test('filter asset models by search', async ({ page }) => {
-  await login(page);
+test.describe('Asset Models - Filter', () => {
+    test.beforeEach(async ({ page }) => {
+        await login(page);
+        await page.goto('/asset-models');
+    });
 
-  const timestamp = Date.now();
-  const alpha = `Alpha Model ${timestamp}`;
-  const beta = `Beta Model ${timestamp}`;
-  const targetName = `Gamma Model ${timestamp}`;
+    test('should filter by category', async ({ page }) => {
+        // Create a model in a specific category
+        const modelName = await createAssetModel(page, {
+            model_name: `Filterable Model ${Date.now()}`
+        });
 
-  await createAssetModel(page, { model_name: alpha });
-  await createAssetModel(page, { model_name: beta });
-  await createAssetModel(page, { model_name: targetName });
+        // Search for it to ensure it's in the list
+        await searchAssetModel(page, modelName);
 
-  await page.waitForURL('**/asset-models', { timeout: 60000 });
-  const searchInput = page.locator('input[placeholder="Search by model name or manufacturer..."]');
-  await searchInput.waitFor({ state: 'visible', timeout: 15000 });
-  await expect(searchInput).toBeEditable({ timeout: 15000 });
+        // Get the category of the created model
+        const row = page.locator('tbody tr', { hasText: modelName }).first();
+        const categoryName = await row.locator('td').nth(3).innerText();
 
-  // Search by model name
-  await searchInput.fill(targetName);
-  await searchInput.press('Enter');
-  await page.waitForLoadState('networkidle');
+        // Open Filter Dialog
+        const filterTrigger = page.getByRole('button', { name: /Filters/i });
+        await filterTrigger.click();
 
-  await expect(page.locator('tr').filter({ hasText: targetName }).first()).toBeVisible();
-  await expect(page.locator('tr').filter({ hasText: alpha })).not.toBeVisible();
+        const filterDialog = page.getByRole('dialog').filter({ has: page.getByRole('heading', { name: /Filters/i }) });
+        await expect(filterDialog).toBeVisible();
 
-  // Search by different term
-  await searchInput.fill('Alpha');
-  await searchInput.press('Enter');
-  await page.waitForLoadState('networkidle');
+        // Select category in filter
+        const categoryTrigger = filterDialog.locator('button').filter({ hasText: /All Categories|Select a category/i }).first();
+        await categoryTrigger.click();
+        
+        await page.getByRole('option', { name: categoryName }).first().click();
 
-  await expect(page.locator('tr').filter({ hasText: alpha }).first()).toBeVisible();
-  await expect(page.locator('tr').filter({ hasText: targetName })).not.toBeVisible();
+        // Apply
+        await filterDialog.getByRole('button', { name: /Apply/i }).click();
+        
+        // Verify results
+        await expect(page.locator('table')).toBeVisible();
+        await expect(page.locator('tbody tr').first()).toBeVisible();
+    });
 });

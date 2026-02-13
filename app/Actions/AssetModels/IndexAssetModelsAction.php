@@ -27,12 +27,22 @@ class IndexAssetModelsAction
             ]);
         }
 
-        $this->filterService->applySorting(
-            $query,
-            $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'model_name', 'manufacturer', 'asset_category_id', 'created_at', 'updated_at']
-        );
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'category') {
+            $query
+                ->leftJoin('asset_categories', 'asset_models.asset_category_id', '=', 'asset_categories.id')
+                ->select('asset_models.*')
+                ->orderBy('asset_categories.name', $sortDirection);
+        } else {
+            $this->filterService->applySorting(
+                $query,
+                $sortBy,
+                $sortDirection,
+                ['id', 'model_name', 'manufacturer', 'asset_category_id', 'created_at', 'updated_at']
+            );
+        }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
     }

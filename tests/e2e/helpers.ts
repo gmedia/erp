@@ -2117,11 +2117,9 @@ export async function editJournalEntry(
     const row = page.locator('tr', { hasText: query }).first();
     await expect(row).toBeVisible();
 
-    const actionsBtn = row.getByRole('button', { name: /Actions/i });
-    await actionsBtn.click();
-
-    const editItem = page.getByRole('menuitem', { name: /Edit/i });
-    await editItem.click();
+    const actionsCell = row.locator('td').last();
+    // Edit is the second button (index 1)
+    await actionsCell.locator('button').nth(1).click();
 
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
@@ -2286,6 +2284,7 @@ export async function createAssetModel(
     model_name: string;
     manufacturer: string;
     asset_category_id: string;
+    specs: string;
   }> = {}
 ): Promise<string> {
   const timestamp = Date.now();
@@ -2294,19 +2293,18 @@ export async function createAssetModel(
   // First create an asset category if not provided
   let categoryName = overrides.asset_category_id;
   if (!categoryName) {
-    await createAssetCategory(page, {});
-    // The category was created, we'll select it by searching
-    categoryName = 'Category';
+    categoryName = `Category ${timestamp}`;
+    await createAssetCategory(page, { name: categoryName });
   }
 
   await login(page);
   await page.goto('/asset-models', { waitUntil: 'domcontentloaded', timeout: 60000 });
 
-  const addButton = page.getByRole('button', { name: /Add/i });
+  const addButton = page.getByRole('button', { name: /Add/i, exact: true });
   await expect(addButton).toBeVisible();
   await addButton.click();
 
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByRole('dialog', { name: 'Add New Asset Model' });
   await expect(dialog).toBeVisible();
 
   // Fill the form
@@ -2315,20 +2313,30 @@ export async function createAssetModel(
 
   if (overrides.manufacturer) {
     await dialog.locator('input[name="manufacturer"]').fill(overrides.manufacturer);
+  } else {
+    await dialog.locator('input[name="manufacturer"]').fill('Test Manufacturer');
   }
 
   // Select category
-  await dialog.locator('button:has-text("Select a category")').click();
+  const categoryTrigger = dialog.locator('button').filter({ hasText: /Select a category/i });
+  await categoryTrigger.click();
   const searchInput = page.getByPlaceholder('Search...').filter({ visible: true }).last();
   if (await searchInput.isVisible()) {
-    await searchInput.fill('');
+    await searchInput.fill(categoryName);
   }
   await page.waitForTimeout(500);
-  const categoryOption = page.getByRole('option').first();
+  const categoryOption = page.getByRole('option', { name: categoryName, exact: true }).first();
   await categoryOption.click();
 
+  // Specs (JSON)
+  if (overrides.specs) {
+    await dialog.locator('textarea[name="specs"]').fill(overrides.specs);
+  } else {
+    await dialog.locator('textarea[name="specs"]').fill('{"test": "data"}');
+  }
+
   // Submit
-  const submitButton = dialog.getByRole('button', { name: /Add/i });
+  const submitButton = dialog.getByRole('button', { name: /Add/i, exact: true });
   await expect(submitButton).toBeVisible();
   await submitButton.click();
 
@@ -2342,13 +2350,22 @@ export async function createAssetModel(
  * Search for an asset model by name.
  */
 export async function searchAssetModel(page: Page, query: string): Promise<void> {
-  await page.fill('input[placeholder="Search by model name or manufacturer..."]', query);
-  await page.press('input[placeholder="Search by model name or manufacturer..."]', 'Enter');
-  await page.waitForLoadState('networkidle');
+  const searchInput = page.getByPlaceholder('Search by model name or manufacturer...');
+  await expect(searchInput).toBeVisible();
+  await searchInput.clear();
+  await searchInput.fill(query);
+  await searchInput.press('Enter');
+  
+  // Wait for the table to refresh
+  await page.waitForResponse(resp => 
+    resp.url().includes('/api/asset-models') && 
+    resp.url().includes('search=') &&
+    resp.status() === 200
+  );
 
   // Wait for the row containing the query to appear
-  const row = page.locator('tr').filter({ hasText: query }).first();
-  await row.waitFor({ state: 'visible', timeout: 10000 });
+  const row = page.locator('tbody tr').filter({ hasText: query }).first();
+  await expect(row).toBeVisible({ timeout: 10000 });
 }
 
 /**
@@ -2357,15 +2374,14 @@ export async function searchAssetModel(page: Page, query: string): Promise<void>
 export async function editAssetModel(
   page: Page,
   modelName: string,
-  updates: { model_name?: string; manufacturer?: string }
+  updates: { model_name?: string; manufacturer?: string; specs?: string }
 ): Promise<void> {
   // Locate the asset model first
   await searchAssetModel(page, modelName);
 
   // Locate the row and open the Actions menu
-  const row = page.locator('tr', { hasText: modelName }).first();
+  const row = page.locator('tbody tr', { hasText: modelName }).first();
   await expect(row).toBeVisible();
-  await row.waitFor({ state: 'attached' });
   const actionsBtn = row.getByRole('button', { name: /Actions/i });
   await expect(actionsBtn).toBeVisible();
   await actionsBtn.click({ force: true });
@@ -2375,7 +2391,7 @@ export async function editAssetModel(
   await expect(editItem).toBeVisible();
   await editItem.click({ force: true });
 
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByRole('dialog', { name: 'Edit Asset Model' });
   await expect(dialog).toBeVisible();
 
   // Update fields if provided
@@ -2385,6 +2401,9 @@ export async function editAssetModel(
   if (updates.manufacturer) {
     await dialog.locator('input[name="manufacturer"]').fill(updates.manufacturer);
   }
+  if (updates.specs) {
+    await dialog.locator('textarea[name="specs"]').fill(updates.specs);
+  }
 
   // Submit the edit dialog
   const updateBtn = dialog.getByRole('button', { name: /Update/i });
@@ -2393,6 +2412,14 @@ export async function editAssetModel(
 
   // Wait for dialog to close
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
+
+  // Clear search to show updated row if it no longer matches old name
+  const searchInput = page.getByPlaceholder('Search by model name or manufacturer...');
+  if (await searchInput.isVisible()) {
+    await searchInput.clear();
+    await searchInput.press('Enter');
+    await page.waitForResponse(resp => resp.url().includes('/api/asset-models') && resp.status() === 200);
+  }
 }
 
 /**
@@ -2449,7 +2476,7 @@ export async function createAssetLocation(
   await expect(addButton).toBeVisible();
   await addButton.click();
 
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByRole('dialog', { name: /Add New Asset Location/i });
   await expect(dialog).toBeVisible();
 
   // Fill the form
@@ -2516,7 +2543,7 @@ export async function editAssetLocation(
   await expect(editItem).toBeVisible();
   await editItem.click({ force: true });
 
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByRole('dialog', { name: /Edit Asset Location/i });
   await expect(dialog).toBeVisible();
 
   // Update fields if provided
@@ -2563,7 +2590,7 @@ export async function createAsset(
 
   // Open the "Add Asset" dialog
   await page.getByRole('button', { name: /Add/i }).click();
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByRole('dialog', { name: /Add New Asset/i });
   await expect(dialog).toBeVisible();
 
   // Fill required fields
@@ -2612,3 +2639,153 @@ export async function createAsset(
   return assetCode;
 }
 
+
+// ---------------------------------------------------
+// Asset Movement helpers
+// ---------------------------------------------------
+
+/**
+ * Create a new asset movement via the UI.
+ */
+export async function createAssetMovement(
+  page: Page,
+  overrides: Partial<{
+    asset_id: string; // This can be the name or code
+    movement_type: string;
+    to_branch_id: string;
+    to_location_id: string;
+    to_department_id: string;
+    to_employee_id: string;
+    reference: string;
+    notes: string;
+  }> = {}
+): Promise<string> {
+  await login(page);
+  await page.goto('/asset-movements');
+
+  // Open the "Add Movement" dialog
+  await page.getByRole('button', { name: /Add/i }).click();
+  const dialog = page.getByRole('dialog', { name: /movement/i });
+  await expect(dialog).toBeVisible();
+
+  // Select Asset (AsyncSelect)
+  const assetTrigger = dialog.locator('button').filter({ hasText: /Select asset/i });
+  await assetTrigger.click();
+  if (overrides.asset_id) {
+    const assetSearchInput = page.getByPlaceholder('Search...').last();
+    await assetSearchInput.fill(overrides.asset_id);
+    await page.waitForTimeout(1000); // Wait for results
+  }
+  const assetOption = page.getByRole('option').first();
+  await expect(assetOption).toBeVisible();
+  await assetOption.click();
+
+  // Select Movement Type (Select)
+  if (overrides.movement_type) {
+    const typeTrigger = dialog.locator('button').filter({ hasText: /Transfer|Assign|Return|Dispose|Adjustment/i }).first();
+    await typeTrigger.click();
+    // Use regex to match the label starting with the type name
+    await page.getByRole('option', { name: new RegExp(`^${overrides.movement_type}`, 'i') }).click();
+  }
+
+  // Handle specific fields based on movement type
+  const movementType = overrides.movement_type ?? 'Transfer';
+  
+  if (movementType.toLowerCase() === 'transfer') {
+    // Branch
+    const branchTrigger = dialog.locator('button').filter({ hasText: /Select destination branch/i });
+    await branchTrigger.click();
+    if (overrides.to_branch_id) {
+      const branchSearchInput = page.getByPlaceholder('Search...').last();
+      await branchSearchInput.fill(overrides.to_branch_id);
+      await page.waitForTimeout(500);
+    }
+    const branchOption = page.getByRole('option').first();
+    await expect(branchOption).toBeVisible();
+    await branchOption.click();
+
+    // Location
+    const locationTrigger = dialog.locator('button').filter({ hasText: /Select destination location/i });
+    await locationTrigger.click();
+    if (overrides.to_location_id) {
+      const locationSearchInput = page.getByPlaceholder('Search...').last();
+      await locationSearchInput.fill(overrides.to_location_id);
+      await page.waitForTimeout(500);
+    }
+    const locationOption = page.getByRole('option').first();
+    await expect(locationOption).toBeVisible();
+    await locationOption.click();
+  } else if (movementType.toLowerCase() === 'assign') {
+    // Department
+    const deptTrigger = dialog.locator('button').filter({ hasText: /Select department/i });
+    await deptTrigger.click();
+    if (overrides.to_department_id) {
+      const deptSearchInput = page.getByPlaceholder('Search...').last();
+      await deptSearchInput.fill(overrides.to_department_id);
+      await page.waitForTimeout(500);
+    }
+    const deptOption = page.getByRole('option').first();
+    await expect(deptOption).toBeVisible();
+    await deptOption.click();
+
+    // Employee
+    const empTrigger = dialog.locator('button').filter({ hasText: /Select employee/i });
+    await empTrigger.click();
+    if (overrides.to_employee_id) {
+      const empSearchInput = page.getByPlaceholder('Search...').last();
+      await empSearchInput.fill(overrides.to_employee_id);
+      await page.waitForTimeout(500);
+    }
+    const empOption = page.getByRole('option').first();
+    await expect(empOption).toBeVisible();
+    await empOption.click();
+  }
+
+  if (overrides.reference) {
+    await dialog.locator('input[name="reference"]').fill(overrides.reference);
+  }
+
+  if (overrides.notes) {
+    await dialog.locator('textarea[name="notes"]').fill(overrides.notes);
+  }
+
+  // Submit
+  const submitBtn = dialog.getByRole('button', { name: /Record Movement/i }).last();
+  await submitBtn.click();
+
+  // Wait for dialog to disappear
+  await expect(dialog).not.toBeVisible({ timeout: 15000 });
+
+  return overrides.reference ?? 'Movement';
+}
+
+/**
+ * Search for an asset movement.
+ */
+export async function searchAssetMovement(page: Page, query: string): Promise<void> {
+  const searchInput = page.locator('input[placeholder*="Search"], input[placeholder*="Filter"]').first();
+  await expect(searchInput).toBeVisible();
+  await searchInput.fill(query);
+  await page.keyboard.press('Enter');
+  await page.waitForLoadState('networkidle');
+}
+
+/**
+ * Delete an asset movement.
+ */
+export async function deleteAssetMovement(page: Page, reference: string): Promise<void> {
+  await searchAssetMovement(page, reference);
+  const row = page.locator('tr', { hasText: reference }).first();
+  await expect(row).toBeVisible();
+
+  const actionsBtn = row.getByRole('button', { name: /Actions/i });
+  await actionsBtn.click();
+
+  const deleteItem = page.getByRole('menuitem', { name: /Delete/i });
+  await deleteItem.click();
+
+  const confirmBtn = page.getByRole('button', { name: /Delete/i }).last();
+  await confirmBtn.click();
+
+  await expect(row).not.toBeVisible();
+}

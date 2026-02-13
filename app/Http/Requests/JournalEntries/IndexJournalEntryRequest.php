@@ -21,7 +21,7 @@ class IndexJournalEntryRequest extends FormRequest
             'status' => ['nullable', Rule::in(['draft', 'posted', 'void'])],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],
-            'sort_by' => ['nullable', 'string', 'in:entry_date,entry_number,created_at'],
+            'sort_by' => ['nullable', 'string', 'in:entry_date,entry_number,description,reference,total_debit,status,created_at'],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
         ];
     }

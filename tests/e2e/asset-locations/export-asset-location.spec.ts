@@ -10,13 +10,19 @@ test('export asset locations', async ({ page }) => {
   // Click the export button
   const exportButton = page.getByRole('button', { name: /Export/i });
   await expect(exportButton).toBeVisible();
-  await exportButton.click();
+  
+  // Intercept the download or wait for the toast
+  const [download] = await Promise.all([
+    page.waitForEvent('download').catch(() => null), // Some systems might trigger a download
+    exportButton.click(),
+  ]);
 
-  // Wait for the export to complete - expect a toast or download URL
-  await page.waitForTimeout(2000);
-
-  // Verify export was triggered (toast message or download)
-  const toast = page.locator('[data-sonner-toast]');
-  const hasToast = await toast.isVisible({ timeout: 5000 }).catch(() => false);
-  expect(hasToast || true).toBeTruthy(); // Export was initiated
+  if (download) {
+      expect(download.suggestedFilename()).toContain('asset_locations_export');
+  } else {
+      // If no download event, look for toast
+      const toast = page.locator('[data-sonner-toast]');
+      await expect(toast).toBeVisible({ timeout: 10000 });
+      await expect(toast).toContainText(/Export|Success|Downloading/i);
+  }
 });

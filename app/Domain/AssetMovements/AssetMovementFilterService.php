@@ -9,6 +9,25 @@ class AssetMovementFilterService
 {
     use BaseFilterService;
 
+    public function applySearch(Builder $query, string $search, array $searchFields): void
+    {
+        $query->where(function ($q) use ($search, $searchFields) {
+            foreach ($searchFields as $field) {
+                if ($field === 'asset_name') {
+                    $q->orWhereHas('asset', function ($sq) use ($search) {
+                        $sq->where('name', 'like', "%{$search}%");
+                    });
+                } elseif ($field === 'asset_code') {
+                    $q->orWhereHas('asset', function ($sq) use ($search) {
+                        $sq->where('asset_code', 'like', "%{$search}%");
+                    });
+                } else {
+                    $q->orWhere($field, 'like', "%{$search}%");
+                }
+            }
+        });
+    }
+
     /**
      * @param Builder<\App\Models\AssetMovement> $query
      * @param array<string, mixed> $filters

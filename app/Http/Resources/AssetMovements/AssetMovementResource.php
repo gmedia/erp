@@ -11,8 +11,22 @@ class AssetMovementResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'asset_id' => $this->asset_id,
+            'asset' => [
+                'id' => $this->asset_id,
+                'name' => $this->asset?->name,
+                'asset_code' => $this->asset?->asset_code,
+            ],
             'movement_type' => $this->movement_type,
             'moved_at' => $this->moved_at?->toIso8601String(),
+            'from_branch_id' => $this->from_branch_id,
+            'to_branch_id' => $this->to_branch_id,
+            'from_location_id' => $this->from_location_id,
+            'to_location_id' => $this->to_location_id,
+            'from_department_id' => $this->from_department_id,
+            'to_department_id' => $this->to_department_id,
+            'from_employee_id' => $this->from_employee_id,
+            'to_employee_id' => $this->to_employee_id,
             'from_branch' => $this->fromBranch?->name,
             'to_branch' => $this->toBranch?->name,
             'from_location' => $this->fromLocation?->name,

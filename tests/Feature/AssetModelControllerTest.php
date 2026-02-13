@@ -67,6 +67,20 @@ describe('Asset Model API Endpoints', function () {
         expect($response->json('data'))->toHaveCount(1);
     });
 
+    test('index supports sorting by category name', function () {
+        $categoryA = AssetCategory::factory()->create(['name' => 'AAA Category']);
+        $categoryB = AssetCategory::factory()->create(['name' => 'BBB Category']);
+
+        AssetModel::factory()->create(['asset_category_id' => $categoryB->id]);
+        AssetModel::factory()->create(['asset_category_id' => $categoryA->id]);
+
+        $response = getJson('/api/asset-models?sort_by=category&sort_direction=asc&per_page=10');
+
+        $response->assertOk();
+        expect($response->json('data.0.category.name'))->toBe('AAA Category')
+            ->and($response->json('data.1.category.name'))->toBe('BBB Category');
+    });
+
     test('store creates new asset model', function () {
         $category = AssetCategory::factory()->create();
 

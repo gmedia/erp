@@ -57,8 +57,8 @@ class AssetMovementExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
     {
         return [
             $movement->id,
-            $movement->asset->asset_code,
-            $movement->asset->name,
+            $movement->asset?->asset_code,
+            $movement->asset?->name,
             $movement->movement_type,
             $movement->moved_at?->format('Y-m-d H:i:s'),
             $movement->fromBranch?->name,

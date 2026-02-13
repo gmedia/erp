@@ -1,6 +1,6 @@
 'use client';
 
-import { createActionsColumn, createDateColumn, createTextColumn, createBadgeColumn, createSelectColumn } from '@/utils/columns';
+import { createActionsColumn, createDateColumn, createTextColumn, createBadgeColumn, createSelectColumn, createSortingHeader } from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
 import { type CoaVersion } from '@/types/coa-version';
 
@@ -8,8 +8,9 @@ export const coaVersionColumns: ColumnDef<CoaVersion>[] = [
     createSelectColumn<CoaVersion>(),
     createTextColumn<CoaVersion>({ accessorKey: 'name', label: 'Name' }),
     {
+        id: 'fiscal_year.name',
         accessorKey: 'fiscal_year.name',
-        header: 'Fiscal Year',
+        ...createSortingHeader('Fiscal Year'),
         cell: (info) => info.row.original.fiscal_year?.name || '-',
     },
     createBadgeColumn<CoaVersion>({

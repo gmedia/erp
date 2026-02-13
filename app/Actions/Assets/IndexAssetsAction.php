@@ -38,7 +38,7 @@ class IndexAssetsAction
             $query,
             $request->get('sort_by', 'created_at'),
             strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'asset_code', 'name', 'purchase_date', 'purchase_cost', 'status', 'created_at']
+            ['id', 'asset_code', 'name', 'purchase_date', 'purchase_cost', 'status', 'created_at', 'category', 'branch']
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);

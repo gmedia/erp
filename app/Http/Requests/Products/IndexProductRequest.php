@@ -24,7 +24,7 @@ class IndexProductRequest extends FormRequest
             'is_manufactured' => ['nullable', 'boolean'],
             'is_purchasable' => ['nullable', 'boolean'],
             'is_sellable' => ['nullable', 'boolean'],
-            'sort_by' => ['nullable', 'string', 'in:id,code,name,type,category_id,unit_id,cost,selling_price,status,created_at,updated_at'],
+            'sort_by' => ['nullable', 'string', 'in:id,code,name,type,category,category_id,unit_id,cost,selling_price,status,created_at,updated_at'],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],
