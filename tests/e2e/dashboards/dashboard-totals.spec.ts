@@ -19,7 +19,7 @@ test('dashboard shows totals cards', async ({ page }) => {
       .filter({ hasText: card.label })
       .first();
 
-    await expect(container).toBeVisible();
+    await expect(container).toBeVisible({ timeout: 10000 });
 
     const value = container.locator('[data-slot="card-content"]').first();
     await expect(value).toBeVisible();

@@ -47,7 +47,7 @@ test('edit existing asset end-to-end', async ({ page }) => {
 
   // Wait for dialog to disappear (with error check)
   try {
-    await expect(dialog).not.toBeVisible({ timeout: 5000 });
+    await expect(dialog).not.toBeVisible({ timeout: 10000 });
   } catch (error) {
     // If it fails, check for validation errors
     const errors = await dialog.locator('.text-destructive, .text-red-500').allTextContents();

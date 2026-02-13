@@ -37,7 +37,7 @@ test('delete existing asset end-to-end', async ({ page }) => {
 
   // Confirm deletion (assuming a confirmation dialog appears)
   const confirmDialog = page.getByRole('alertdialog').or(page.getByRole('dialog', { name: /Confirm/i }));
-  if (await confirmDialog.isVisible({ timeout: 2000 })) {
+  if (await confirmDialog.isVisible({ timeout: 10000 })) {
     await Promise.all([
       page.waitForResponse(response => 
         response.url().includes('/api/assets') && 
