@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { login, createAssetModel, searchAssetModel } from '../helpers';
 
 test.describe('Asset Models - View', () => {
     test.beforeEach(async ({ page }) => {
@@ -9,44 +9,29 @@ test.describe('Asset Models - View', () => {
 
     test('should view asset model details', async ({ page }) => {
         // Create a model to view
-        const modelName = 'Viewable Model ' + Date.now();
-        await page.getByRole('button', { name: 'Add' }).click();
-        await page.getByLabel('Model Name').fill(modelName);
-        await page.getByLabel('Manufacturer').fill('Viewable Mfg');
-        await page.getByRole('combobox').click();
-        await page.getByRole('option').first().click();
-        await page.getByRole('button', { name: 'Add', exact: true }).click();
-        await expect(page.getByRole('dialog')).not.toBeVisible();
+        const modelName = await createAssetModel(page, {
+            model_name: 'Viewable Model ' + Date.now(),
+            manufacturer: 'Viewable Mfg'
+        });
 
         // Search for it
-        const searchInput = page.getByPlaceholder('Search by model name or manufacturer...');
-        await searchInput.fill(modelName);
-        
-        const searchResponse = page.waitForResponse(resp => 
-            resp.url().includes('/api/asset-models') && 
-            (resp.url().includes('search=') || resp.request().url().includes('search=')) && // Check request or response URL
-            resp.status() === 200
-        );
-        await searchInput.press('Enter');
-        await searchResponse;
+        await searchAssetModel(page, modelName);
 
         // Click on the row action
-        const row = page.locator('tr', { hasText: modelName }).first();
+        const row = page.locator('tbody tr', { hasText: modelName }).first();
         await expect(row).toBeVisible();
-        const actionsButton = row.getByRole('button', { name: 'Actions' });
+        const actionsButton = row.getByRole('button', { name: /Actions/i });
         await actionsButton.click();
 
         const viewButton = page.getByRole('menuitem', { name: /View/i });
         await viewButton.click();
 
         // Expect a modal
-        await expect(page.getByRole('dialog')).toBeVisible();
-        // The DialogTitle renders the model_name
-        await expect(page.getByRole('heading', { name: modelName })).toBeVisible();
+        const viewDialog = page.getByRole('dialog').filter({ has: page.getByRole('heading', { name: modelName }) });
+        await expect(viewDialog).toBeVisible();
 
         // Check for content
-        const dialog = page.getByRole('dialog');
-        await expect(dialog.getByText(modelName).first()).toBeVisible();
-        await expect(dialog.getByText('Viewable Mfg')).toBeVisible();
+        await expect(viewDialog.getByText(modelName).first()).toBeVisible();
+        await expect(viewDialog.getByText('Viewable Mfg')).toBeVisible();
     });
 });

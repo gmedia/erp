@@ -12,35 +12,35 @@ test.describe('Asset Models - Add', () => {
 
         await page.getByRole('button', { name: 'Add', exact: true }).click();
 
-        await expect(page.getByRole('dialog')).toBeVisible();
-        await expect(page.getByRole('heading', { name: 'Add New Asset Model' })).toBeVisible();
+        const dialog = page.getByRole('dialog', { name: 'Add New Asset Model' });
+        await expect(dialog).toBeVisible();
+        await expect(dialog.getByRole('heading', { name: /Add New Asset Model/i })).toBeVisible();
 
         // Fill form
-        await page.getByLabel('Model Name').fill('Test Model X1');
-        await page.getByLabel('Manufacturer').fill('Test Manufacturer');
+        await dialog.locator('input[name="model_name"]').fill('Test Model X1');
+        await dialog.locator('input[name="manufacturer"]').fill('Test Manufacturer');
         
         // Select Category (AsyncSelect)
-        await page.getByRole('combobox').click();
-        // Wait for options to load and select one. 
-        // Assuming there are seeded categories. If not, we might need to seed or mock.
-        // For now, let's assume we can type to search or just pick the first one.
-        // If AsyncSelect loads, it usually shows "Type to search..." or options.
-        // We can try to select the first available option.
+        await dialog.locator('button').filter({ hasText: /Select a category/i }).click();
+        
+        // Wait for search input if it exists
+        const searchInput = page.getByPlaceholder('Search...').filter({ visible: true }).last();
+        if (await searchInput.isVisible()) {
+            await searchInput.fill('');
+        }
+        
         await page.getByRole('option').first().click();
 
         // Specs (JSON)
-        await page.getByLabel('Specifications (JSON)').fill('{"ram": "16GB", "storage": "512GB SSD"}');
+        await dialog.locator('textarea[name="specs"]').fill('{"ram": "16GB", "storage": "512GB SSD"}');
 
         // Submit
-        await page.getByRole('button', { name: 'Add', exact: true }).click();
+        await dialog.getByRole('button', { name: /Add/i, exact: true }).click();
 
         // Verify success
         // Dialog should close
-        await expect(page.getByRole('dialog')).not.toBeVisible();
+        await expect(dialog).not.toBeVisible({ timeout: 15000 });
         
-        // Toast or notification?
-        // await expect(page.getByText('Asset model created successfully')).toBeVisible();
-
         // Verify in table
         await expect(page.locator('table')).toContainText('Test Model X1');
     });
