@@ -23,7 +23,7 @@
 | Frontend Column Utils | `@/resources/js/utils/columns.tsx` | Shared column builders (createTextColumn, createSortingHeader, createSelectColumn, dll) |
 | Entity Configs | `@/resources/js/utils/entityConfigs.ts` | Config semua entity (simple/complex classification) |
 | Backend Export Actions | `@/app/Actions/{Module}/Export{Module}Action.php` | Kolom export per modul |
-| Backend Filter Services | `@/app/Services/{Module}FilterService.php` | Logic sorting/filter per modul |
+| Backend Filter Services | `@/app/Domain/{Module}/{Entity}FilterService.php` | Logic sorting/filter per modul |
 
 ### Teknologi
 - **Test Runner**: Playwright
@@ -302,7 +302,7 @@ Setiap modul CRUD harus memiliki test untuk:
 
 - [ ] Untuk setiap modul, periksa apakah SEMUA `sortable_columns` di registry di atas didukung oleh backend
   - Cek validation rules di `@/app/Http/Requests/{Module}/Index{Module}Request.php` → field `sort_by`
-  - Cek sorting logic di `@/app/Services/{Module}FilterService.php` atau `@/app/Actions/{Module}/Index{Module}Action.php`
+  - Cek sorting logic di `@/app/Domain/{Module}/{Entity}FilterService.php` atau `@/app/Actions/{Module}/Index{Module}Action.php`
 - [ ] **Jika ada kolom sortable di frontend tapi TIDAK didukung backend:**
   - Opsi A: Tambah support sorting di backend (update validation + query)
   - Opsi B: Hapus sorting di frontend (set `enableSorting: false` di kolom tersebut)

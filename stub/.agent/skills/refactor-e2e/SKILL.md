@@ -71,7 +71,7 @@ mcp_filesystem_read_file(path: "app/Http/Requests/{Module}/Index{Entity}Request.
 
 1. **Sort validation** — Pastikan SEMUA `sortable_columns` dari Columns.tsx ada di `sort_by` validation rule
    - Jika missing: tambahkan ke `sort_by` validation
-   - Cek juga sorting logic di `FilterService` atau `Action`
+   - Cek juga sorting logic di `FilterService` (`app/Domain/{Module}/`) atau `Action`
 
 2. **Export columns** — Baca Export Action:
    ```

@@ -13,7 +13,6 @@
 import { test, expect, Page } from '@playwright/test';
 import { login } from './helpers';
 import * as fs from 'fs';
-import * as path from 'path';
 import ExcelJS from 'exceljs';
 
 // ==================== INTERFACES ====================

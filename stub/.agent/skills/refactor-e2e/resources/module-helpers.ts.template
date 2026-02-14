@@ -29,25 +29,32 @@ export async function create{{Entity}}(page: Page, overrides?: Record<string, st
     const identifier = overrides?.name || `Test-{{Entity}}-${uniqueId}`;
     await createEntity(page, {
         route: '{{route}}',
-        apiPath: '{{apiPath}}',
+        returnField: 'name',
         fields: [
-            { type: 'text', label: 'Name', value: identifier },
-            // Tambahkan field lain sesuai form
-            // { type: 'text', label: 'Code', value: `CODE-${uniqueId}` },
-            // { type: 'async-select', label: 'Department', value: 'IT' },
-            // { type: 'select', label: 'Status', value: 'active' },
+            { name: 'name', type: 'text', defaultValue: identifier },
+            // Tambahkan field lain sesuai form.
+            // Field types: 'text' | 'email' | 'select' | 'textarea'
+            // Untuk 'select': tambahkan 'selector' (text trigger button) dan 'optionSelector' jika perlu
+            // Contoh: { name: 'code', type: 'text', defaultValue: `CODE-${uniqueId}` },
+            // Contoh: { name: 'department', type: 'select', selector: 'Select Department', defaultValue: 'IT' },
         ],
     }, overrides);
 
     return identifier;
 
-    // CONTOH COMPLEX CRUD (dengan async select):
+    // CONTOH COMPLEX CRUD (manual tanpa createEntity):
+    // Gunakan ini jika form terlalu kompleks untuk createEntity()
     // const name = overrides?.name || `Test-{{Entity}}-${uniqueId}`;
-    // await page.getByRole('button', { name: /add|tambah/i }).click();
-    // await page.getByLabel('Name').fill(name);
-    // await fillAsyncSelect(page, 'Department', 'IT');
-    // await page.getByRole('button', { name: /save|simpan|submit/i }).click();
-    // await page.waitForResponse(r => r.url().includes('{{apiPath}}') && r.status() < 400).catch(() => null);
+    // await login(page);
+    // await page.goto('{{route}}');
+    // await page.getByRole('button', { name: /Add/i }).click();
+    // await page.fill('input[name="name"]', name);
+    // // Untuk async select, gunakan pattern:
+    // // await page.click('button:has-text("Select Department")');
+    // // await page.getByRole('option', { name: 'IT' }).click();
+    // const dialog = page.getByRole('dialog');
+    // await dialog.getByRole('button', { name: /Add/ }).click();
+    // await expect(dialog).not.toBeVisible({ timeout: 30000 });
     // return name;
 }
 
