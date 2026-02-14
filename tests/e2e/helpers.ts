@@ -1,7 +1,7 @@
 import { Page, expect } from '@playwright/test';
 
 // Generic entity creation helper
-interface EntityField {
+export interface EntityField {
   name: string;
   type: 'text' | 'email' | 'select' | 'textarea';
   selector?: string;
@@ -9,7 +9,7 @@ interface EntityField {
   optionSelector?: string;
 }
 
-interface EntityConfig {
+export interface EntityConfig {
   route: string;
   fields: EntityField[];
   returnField: string; // field name to return as identifier
@@ -23,7 +23,7 @@ interface EntityConfig {
  * @param overrides - Optional field overrides.
  * @returns The unique identifier field value used for the created entity.
  */
-async function createEntity(
+export async function createEntity(
   page: Page,
   config: EntityConfig,
   overrides: Record<string, string> = {}
