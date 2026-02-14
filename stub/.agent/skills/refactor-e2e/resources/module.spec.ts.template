@@ -1,0 +1,54 @@
+/**
+ * Module Spec Template
+ *
+ * Template untuk file tests/e2e/{module}/{entity}.spec.ts
+ *
+ * INSTRUKSI AI:
+ * 1. Ganti semua {{...}} placeholder dengan nilai dari REGISTRY MODUL
+ * 2. Import helpers dari ./helpers (module-level)
+ * 3. Jika modul punya custom test beyond 9 standar, tambahkan di bawah generateModuleTests()
+ */
+
+import { generateModuleTests } from '../shared-test-factories';
+import { create{{Entity}}, search{{Entity}} } from './helpers';
+// import { edit{{Entity}} } from './helpers'; // Uncomment jika edit helper tersedia
+
+generateModuleTests({
+    entityName: '{{Entity}}',
+    entityNamePlural: '{{Entities}}',
+    route: '{{route}}',
+    apiPath: '{{apiPath}}',
+
+    // Callbacks
+    createEntity: (page) => create{{Entity}}(page),
+    searchEntity: (page, identifier) => search{{Entity}}(page, identifier),
+    // editEntity: (page, identifier, updates) => edit{{Entity}}(page, identifier, updates),
+    // editUpdates: { name: `{{Entity}}-Updated-${Date.now()}` },
+
+    // DataTable
+    sortableColumns: [
+        // Isi dari REGISTRY MODUL → sortable_columns
+        // Contoh: 'Name', 'Created At', 'Updated At'
+    ],
+
+    // View
+    viewType: '{{viewType}}', // 'dialog' atau 'page'
+    viewDialogTitle: '{{viewDialogTitle}}', // Jika viewType = 'dialog'
+    // viewUrlPattern: /\/{{module}}\/\w+/, // Jika viewType = 'page'
+
+    // Export
+    exportApiPath: '{{exportApiPath}}',
+    expectedExportColumns: [
+        // Isi dari kolom DataTable + ID
+        // Contoh: 'ID', 'Name', 'Created At', 'Updated At'
+    ],
+
+    // Filter (opsional)
+    // filterTests: [
+    //     { filterName: 'Status', filterType: 'combobox', filterValue: 'Active', expectedText: 'Active' },
+    // ],
+});
+
+// ==================== CUSTOM TESTS (jika diperlukan) ====================
+// Tambahkan test spesifik modul yang tidak tercakup oleh 9 test standar
+// Contoh: test navigasi ke profile page untuk assets

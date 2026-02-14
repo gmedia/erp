@@ -94,6 +94,25 @@ export function DepartmentForm({ department, onSubmit, onCancel }: DepartmentFor
 - ❌ JANGAN hapus `data-testid`
 - ✅ BOLEH tambah `data-testid` baru
 
+### DataTable Column Consistency Rules
+
+Saat refactor komponen Columns.tsx, pastikan konsistensi berikut:
+
+1. **Select Column** — WAJIB gunakan `createSelectColumn()` dari `@/utils/columns.tsx`
+   - ❌ JANGAN buat custom select/checkbox column
+   - `createSelectColumn()` sengaja TIDAK punya header checkbox
+
+2. **Actions Column** — WAJIB gunakan `createActionsColumn()` dari `@/utils/columns.tsx`
+   - ❌ JANGAN buat custom icon buttons untuk actions
+   - `createActionsColumn()` menggunakan dropdown menu pattern
+
+3. **Sortable Columns** — Gunakan `createTextColumn()` (default sortable) atau `createSortingHeader()`
+   - Jika kolom TIDAK boleh sortable: set `enableSorting: false`
+   - Pastikan setiap kolom sortable di frontend JUGA didukung di backend (validation rules)
+
+> **PENGARUH KE E2E TEST**: Konsistensi ini memungkinkan shared test factories bekerja untuk semua modul.
+> Lihat skill `refactor-e2e` dan `tests/e2e/REFACTORING_PLAN.md` untuk detail.
+
 ---
 
 ## ⚠️ ANTI OVER-ENGINEERING

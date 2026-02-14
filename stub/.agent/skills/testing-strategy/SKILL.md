@@ -94,13 +94,21 @@ $this->assertTrue($validator->fails());
 
 ## 🌐 E2E Test (Playwright)
 
+> **PENTING**: Untuk refactoring E2E test existing, gunakan skill `refactor-e2e` dan baca `tests/e2e/REFACTORING_PLAN.md`.
+
 | Flow | Test Cases |
 |------|------------|
-| Create | Open modal, fill form, submit, see new item |
-| Edit | Click edit, modify, save, verify |
-| Delete | Click delete, confirm, item gone |
+| Search | Search entity by identifier |
+| Filters | Open filter dialog, apply filter |
+| Add | Open modal, fill form, submit, see new item |
+| View | Click actions → View, verify detail |
+| Edit | Click actions → Edit, modify, save, verify |
+| Export | Click export, download file, verify columns via ExcelJS |
+| Checkbox | Body checkbox visible, header checkbox NOT visible |
+| Sorting | Click all sortable column headers |
+| Delete | Click actions → Delete, confirm, item gone |
 
-**PENTING**: Gunakan `data-testid` untuk selectors
+**Selectors**: Gunakan `getByRole()`, `getByLabel()`, `getByPlaceholder()` — bukan `data-testid`
 
 ---
 

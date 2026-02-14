@@ -1,0 +1,131 @@
+/**
+ * Module Helpers Template
+ *
+ * Template untuk file tests/e2e/{module}/helpers.ts
+ *
+ * INSTRUKSI AI:
+ * 1. Ganti semua {{...}} placeholder
+ * 2. Import shared helpers dari '../helpers' (login, createEntity, fillAsyncSelect)
+ * 3. Setiap modul WAJIB export minimal: create{{Entity}} dan search{{Entity}}
+ * 4. Sesuaikan fields dan selectors dengan form modul yang sebenarnya
+ */
+
+import { Page } from '@playwright/test';
+import { createEntity, login } from '../helpers';
+// import { fillAsyncSelect } from '../helpers'; // Uncomment jika modul punya async select
+
+/**
+ * Create a new {{Entity}} and return its identifier (name/code/email).
+ *
+ * INSTRUKSI AI:
+ * - Sesuaikan entityConfig.fields dengan form field SEBENARNYA di frontend
+ * - Untuk Simple CRUD: biasanya hanya field 'name'
+ * - Untuk Complex CRUD: lihat form component di resources/js/components/{module}/{Entity}Form.tsx
+ */
+export async function create{{Entity}}(page: Page, overrides?: Record<string, string>): Promise<string> {
+    const uniqueId = `${Date.now()}`;
+
+    // CONTOH SIMPLE CRUD:
+    const identifier = overrides?.name || `Test-{{Entity}}-${uniqueId}`;
+    await createEntity(page, {
+        route: '{{route}}',
+        apiPath: '{{apiPath}}',
+        fields: [
+            { type: 'text', label: 'Name', value: identifier },
+            // Tambahkan field lain sesuai form
+            // { type: 'text', label: 'Code', value: `CODE-${uniqueId}` },
+            // { type: 'async-select', label: 'Department', value: 'IT' },
+            // { type: 'select', label: 'Status', value: 'active' },
+        ],
+    }, overrides);
+
+    return identifier;
+
+    // CONTOH COMPLEX CRUD (dengan async select):
+    // const name = overrides?.name || `Test-{{Entity}}-${uniqueId}`;
+    // await page.getByRole('button', { name: /add|tambah/i }).click();
+    // await page.getByLabel('Name').fill(name);
+    // await fillAsyncSelect(page, 'Department', 'IT');
+    // await page.getByRole('button', { name: /save|simpan|submit/i }).click();
+    // await page.waitForResponse(r => r.url().includes('{{apiPath}}') && r.status() < 400).catch(() => null);
+    // return name;
+}
+
+/**
+ * Search for a {{Entity}} by identifier.
+ *
+ * INSTRUKSI AI:
+ * - Gunakan search input placeholder yang SESUAI dengan frontend
+ * - Lihat REGISTRY MODUL di REFACTORING_PLAN.md untuk search_placeholder
+ */
+export async function search{{Entity}}(page: Page, identifier: string): Promise<void> {
+    const searchInput = page.getByPlaceholder('{{searchPlaceholder}}');
+    await searchInput.fill(identifier);
+    await searchInput.press('Enter');
+    await page.waitForResponse(
+        r => r.url().includes('{{apiPath}}') && r.status() < 400
+    ).catch(() => null);
+}
+
+/**
+ * Edit a {{Entity}} via actions dropdown.
+ *
+ * INSTRUKSI AI:
+ * - Jika modul pakai dropdown actions → gunakan getByRole('menuitem')
+ * - Jika modul pakai icon buttons → cari button langsung
+ * - Sesuaikan fields yang di-edit dengan form yang sebenarnya
+ */
+export async function edit{{Entity}}(
+    page: Page,
+    identifier: string,
+    updates: Record<string, string>,
+): Promise<void> {
+    await search{{Entity}}(page, identifier);
+
+    // Open actions dropdown
+    const firstRow = page.locator('tbody tr').first();
+    await firstRow.getByRole('button').last().click();
+
+    // Click Edit
+    await page.getByRole('menuitem', { name: 'Edit' }).click();
+
+    // Wait for dialog
+    const dialog = page.getByRole('dialog');
+    await dialog.waitFor({ state: 'visible' });
+
+    // Update fields
+    if (updates.name) {
+        await dialog.getByLabel('Name').fill(updates.name);
+    }
+    // Tambahkan updates untuk field lain sesuai kebutuhan
+
+    // Submit
+    await dialog.getByRole('button', { name: /save|update|simpan/i }).click();
+    await page.waitForResponse(
+        r => r.url().includes('{{apiPath}}') && r.status() < 400
+    ).catch(() => null);
+}
+
+/**
+ * Delete a {{Entity}} via actions dropdown.
+ *
+ * INSTRUKSI AI:
+ * - Biasanya seragam untuk semua modul
+ * - Jangan ubah pattern ini kecuali modul punya custom delete flow
+ */
+export async function delete{{Entity}}(page: Page, identifier: string): Promise<void> {
+    await search{{Entity}}(page, identifier);
+
+    // Open actions dropdown
+    const firstRow = page.locator('tbody tr').first();
+    await firstRow.getByRole('button').last().click();
+
+    // Click Delete
+    await page.getByRole('menuitem', { name: 'Delete' }).click();
+
+    // Confirm
+    await page.getByRole('button', { name: /continue|confirm|delete|hapus/i }).click();
+    await page.waitForResponse(
+        r => r.url().includes('{{apiPath}}') && r.status() < 400
+    ).catch(() => null);
+}
