@@ -57,6 +57,13 @@ export interface ModuleTestConfig {
     // Overrides (opsional — untuk modul dengan pattern non-standar)
     actionsPattern?: 'dropdown' | 'icon-buttons';  // default: 'dropdown'
     customBeforeEach?: (page: Page) => Promise<void>;
+
+    // Custom action callbacks (WAJIB jika actionsPattern = 'icon-buttons')
+    // Karena icon-buttons tidak punya dropdown menu, AI harus definisikan
+    // cara klik View/Edit/Delete secara eksplisit per modul
+    customViewAction?: (page: Page) => Promise<void>;
+    customEditAction?: (page: Page) => Promise<void>;
+    customDeleteAction?: (page: Page) => Promise<void>;
 }
 
 // ==================== HELPER FUNCTIONS ====================
@@ -138,11 +145,9 @@ export function generateModuleTests(config: ModuleTestConfig) {
             const identifier = await config.createEntity(page);
             await config.searchEntity(page, identifier);
 
-            if (config.actionsPattern === 'icon-buttons') {
-                // Handle icon-button based view
-                const firstRow = page.locator('tbody tr').first();
-                // Click the Eye/View icon button
-                await firstRow.getByRole('button').first().click();
+            if (config.actionsPattern === 'icon-buttons' && config.customViewAction) {
+                // Modul dengan icon buttons — gunakan custom callback
+                await config.customViewAction(page);
             } else {
                 // Default: dropdown menu
                 await openActionsMenu(page, config);
@@ -167,10 +172,9 @@ export function generateModuleTests(config: ModuleTestConfig) {
             const identifier = await config.createEntity(page);
             await config.searchEntity(page, identifier);
 
-            if (config.actionsPattern === 'icon-buttons') {
-                const firstRow = page.locator('tbody tr').first();
-                // Click delete icon (usually last button, red trash icon)
-                await firstRow.getByRole('button').last().click();
+            if (config.actionsPattern === 'icon-buttons' && config.customDeleteAction) {
+                // Modul dengan icon buttons — gunakan custom callback
+                await config.customDeleteAction(page);
             } else {
                 await openActionsMenu(page, config);
                 await page.getByRole('menuitem', { name: 'Delete' }).click();
