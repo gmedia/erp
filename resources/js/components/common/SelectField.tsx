@@ -55,7 +55,7 @@ export default function SelectField({
                             value={field.value !== undefined && field.value !== null ? String(field.value) : undefined}
                             disabled={disabled}
                         >
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger className="w-full" aria-label={label}>
                                 <span>
                                     {(field.value !== undefined && field.value !== null && field.value !== '')
                                         ? options.find(

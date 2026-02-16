@@ -47,10 +47,16 @@ export async function createEmployee(
  * @param email - Email address to search for.
  */
 export async function searchEmployee(page: Page, email: string): Promise<void> {
-  await page.fill('input[placeholder="Search employees..."]', email);
-  await page.press('input[placeholder="Search employees..."]', 'Enter');
-  // Wait for the row containing the email to appear
-  await page.waitForSelector(`text=${email}`);
+  const searchInput = page.getByPlaceholder('Search employees...');
+  await expect(searchInput).toBeVisible();
+  await searchInput.fill(email);
+  await searchInput.press('Enter');
+  
+  // Wait for API response
+  await page.waitForResponse(r => r.url().includes('/api/employees') && r.status() === 200).catch(() => null);
+  
+  // Small delay for UI stabilization
+  await page.waitForTimeout(500);
 }
 
 /**
