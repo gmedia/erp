@@ -1,0 +1,286 @@
+/**
+ * Shared Test Factories
+ *
+ * Generates 9 standardized E2E tests for any CRUD module.
+ * All modules MUST comply with the ModuleTestConfig interface.
+ */
+
+import { test, expect, Page } from '@playwright/test';
+import { login } from './helpers';
+import * as fs from 'fs';
+import ExcelJS from 'exceljs';
+
+// ==================== INTERFACES ====================
+
+export interface FilterTestConfig {
+    filterName: string;
+    filterType: 'combobox' | 'select' | 'text' | 'date';
+    filterValue: string;
+    expectedText: string;
+}
+
+export interface ModuleTestConfig {
+    // Identitas modul
+    entityName: string;           // PascalCase singular: 'Department'
+    entityNamePlural: string;     // PascalCase plural: 'Departments'
+    route: string;                // Frontend route: '/departments'
+    apiPath: string;              // API base path: '/api/departments'
+
+    // Callbacks (WAJIB)
+    createEntity: (page: Page) => Promise<string>;  // Return identifier (name/code/email)
+    searchEntity: (page: Page, identifier: string) => Promise<void>;
+
+    // Callbacks (OPSIONAL)
+    editEntity?: (page: Page, identifier: string, updates: Record<string, string>) => Promise<void>;
+    editUpdates?: Record<string, string>;
+
+    // DataTable config
+    sortableColumns: string[];    // Label text kolom sortable PERSIS seperti di UI
+
+    // View config
+    viewType: 'dialog' | 'page';
+    viewDialogTitle?: string;     // Required jika viewType = 'dialog'
+    viewUrlPattern?: RegExp;      // Required jika viewType = 'page'
+
+    // Export config
+    exportApiPath: string;        // '/api/departments/export'
+    expectedExportColumns: string[];
+
+    // Filter config (opsional)
+    filterTests?: FilterTestConfig[];
+
+    // Overrides (opsional — untuk modul dengan pattern non-standar)
+    actionsPattern?: 'dropdown' | 'icon-buttons';  // default: 'dropdown'
+    customBeforeEach?: (page: Page) => Promise<void>;
+
+    // Custom action callbacks (WAJIB jika actionsPattern = 'icon-buttons')
+    customViewAction?: (page: Page) => Promise<void>;
+    customEditAction?: (page: Page) => Promise<void>;
+    customDeleteAction?: (page: Page) => Promise<void>;
+}
+
+// ==================== HELPER FUNCTIONS ====================
+
+async function waitForApiResponse(page: Page, apiPath: string): Promise<void> {
+    await page.waitForResponse(
+        r => r.url().includes(apiPath) && r.status() < 400
+    ).catch(() => null);
+}
+
+async function openActionsMenu(page: Page, config: ModuleTestConfig): Promise<void> {
+    if (config.actionsPattern === 'icon-buttons') {
+        return;
+    }
+    // Default: dropdown menu
+    const firstRow = page.locator('tbody tr').first();
+    await firstRow.getByRole('button').last().click();
+}
+
+// ==================== TEST FACTORY ====================
+
+export function generateModuleTests(config: ModuleTestConfig) {
+    test.describe(`${config.entityName} E2E Tests`, () => {
+        let createdIdentifier: string;
+
+        test.beforeEach(async ({ page }) => {
+            await login(page);
+            await page.goto(config.route);
+            await waitForApiResponse(page, config.apiPath);
+            if (config.customBeforeEach) {
+                await config.customBeforeEach(page);
+            }
+        });
+
+        // ==================== 1. ADD ====================
+        test(`can add new ${config.entityName}`, async ({ page }) => {
+            createdIdentifier = await config.createEntity(page);
+            expect(createdIdentifier).toBeTruthy();
+
+            // Verify entity appears in table
+            await config.searchEntity(page, createdIdentifier);
+            await expect(page.getByText(createdIdentifier).first()).toBeVisible();
+        });
+
+        // ==================== 2. SEARCH ====================
+        test(`can search ${config.entityNamePlural}`, async ({ page }) => {
+            // Create entity first
+            const identifier = await config.createEntity(page);
+
+            // Search for it
+            await config.searchEntity(page, identifier);
+
+            // Verify found
+            await expect(page.getByText(identifier).first()).toBeVisible();
+        });
+
+        // ==================== 3. EDIT ====================
+        test(`can edit ${config.entityName}`, async ({ page }) => {
+            if (!config.editEntity || !config.editUpdates) {
+                test.skip();
+                return;
+            }
+
+            const identifier = await config.createEntity(page);
+            await config.searchEntity(page, identifier);
+
+            await config.editEntity(page, identifier, config.editUpdates);
+
+            // Verify updated value appears
+            const updatedValue = Object.values(config.editUpdates)[0];
+            await config.searchEntity(page, updatedValue);
+            await expect(page.getByText(updatedValue).first()).toBeVisible();
+        });
+
+        // ==================== 4. VIEW ====================
+        test(`can view ${config.entityName}`, async ({ page }) => {
+            const identifier = await config.createEntity(page);
+            await config.searchEntity(page, identifier);
+
+            if (config.actionsPattern === 'icon-buttons' && config.customViewAction) {
+                await config.customViewAction(page);
+            } else {
+                await openActionsMenu(page, config);
+                await page.getByRole('menuitem', { name: 'View' }).click();
+            }
+
+            if (config.viewType === 'dialog') {
+                const dialog = page.getByRole('dialog');
+                await expect(dialog).toBeVisible();
+                await expect(dialog.getByText(identifier)).toBeVisible();
+            } else {
+                if (config.viewUrlPattern) {
+                    await expect(page).toHaveURL(config.viewUrlPattern);
+                }
+                await expect(page.getByText(identifier).first()).toBeVisible();
+            }
+        });
+
+        // ==================== 5. DELETE ====================
+        test(`can delete ${config.entityName}`, async ({ page }) => {
+            const identifier = await config.createEntity(page);
+            await config.searchEntity(page, identifier);
+
+            if (config.actionsPattern === 'icon-buttons' && config.customDeleteAction) {
+                await config.customDeleteAction(page);
+            } else {
+                await openActionsMenu(page, config);
+                await page.getByRole('menuitem', { name: 'Delete' }).click();
+            }
+
+            // Confirm delete dialog
+            const confirmButton = page.getByRole('button', { name: /continue|confirm|delete|yes|hapus/i });
+            await confirmButton.click();
+
+            await waitForApiResponse(page, config.apiPath);
+
+            // Verify deleted — search should not find it
+            await config.searchEntity(page, identifier);
+            await expect(page.getByText(identifier)).not.toBeVisible();
+        });
+
+        // ==================== 6. EXPORT ====================
+        test(`can export ${config.entityNamePlural}`, async ({ page }) => {
+            // Create at least one entity so export is not empty
+            await config.createEntity(page);
+
+            const downloadPromise = page.waitForEvent('download');
+            await page.getByRole('button', { name: /export/i }).click();
+            const download = await downloadPromise;
+
+            // Save and verify columns
+            const filePath = `/tmp/test-export-${config.entityName}-${Date.now()}.xlsx`;
+            await download.saveAs(filePath);
+
+            const workbook = new ExcelJS.Workbook();
+            await workbook.xlsx.readFile(filePath);
+            const worksheet = workbook.getWorksheet(1);
+            expect(worksheet).toBeTruthy();
+
+            const headerRow = worksheet!.getRow(1);
+            const headers: string[] = [];
+            headerRow.eachCell((cell) => {
+                if (cell.value) headers.push(String(cell.value));
+            });
+
+            for (const col of config.expectedExportColumns) {
+                expect(headers).toContain(col);
+            }
+
+            // Cleanup
+            fs.unlinkSync(filePath);
+        });
+
+        // ==================== 7. CHECKBOX ====================
+        test(`${config.entityNamePlural} datatable has correct checkbox behavior`, async ({ page }) => {
+            // Create entity to ensure table has rows
+            await config.createEntity(page);
+            await page.goto(config.route);
+            await waitForApiResponse(page, config.apiPath);
+
+            // Header: TIDAK boleh ada checkbox
+            const headerCheckboxes = page.locator('thead').locator('button[role="checkbox"]');
+            await expect(headerCheckboxes).toHaveCount(0);
+
+            // Body: HARUS ada checkbox
+            const bodyCheckbox = page.locator('tbody tr').first().locator('button[role="checkbox"]');
+            await expect(bodyCheckbox).toBeVisible();
+        });
+
+        // ==================== 8. SORTING ====================
+        test(`can sort ${config.entityNamePlural} by all columns`, async ({ page }) => {
+            // Create entity to ensure table has data
+            await config.createEntity(page);
+            await page.goto(config.route);
+            await waitForApiResponse(page, config.apiPath);
+
+            for (const column of config.sortableColumns) {
+                const sortButton = page.getByRole('button', { name: column, exact: true });
+                await expect(sortButton).toBeVisible();
+
+                // Sort ASC
+                await sortButton.click();
+                await waitForApiResponse(page, config.apiPath);
+
+                // Sort DESC
+                await sortButton.click();
+                await waitForApiResponse(page, config.apiPath);
+            }
+        });
+
+        // ==================== 9. FILTERS ====================
+        test(`can filter ${config.entityNamePlural}`, async ({ page }) => {
+            if (!config.filterTests || config.filterTests.length === 0) {
+                // Minimal: verify filter button exists
+                const filterButton = page.getByRole('button', { name: /filter/i });
+                if (await filterButton.isVisible()) {
+                    await filterButton.click();
+                    const dialog = page.getByRole('dialog');
+                    await expect(dialog).toBeVisible();
+                }
+                return;
+            }
+
+            // Full filter test
+            const filterButton = page.getByRole('button', { name: /filter/i });
+            await filterButton.click();
+
+            for (const filterTest of config.filterTests) {
+                if (filterTest.filterType === 'combobox') {
+                    const combobox = page.getByRole('combobox', { name: filterTest.filterName });
+                    await combobox.click();
+                    await page.getByRole('option', { name: filterTest.filterValue }).click();
+                } else if (filterTest.filterType === 'text') {
+                    await page.getByLabel(filterTest.filterName).fill(filterTest.filterValue);
+                }
+            }
+
+            // Apply filter
+            const applyButton = page.getByRole('button', { name: /apply|terapkan/i });
+            if (await applyButton.isVisible()) {
+                await applyButton.click();
+            }
+
+            await waitForApiResponse(page, config.apiPath);
+        });
+    });
+}
