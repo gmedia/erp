@@ -25,10 +25,9 @@ class AssetMovementFactory extends Factory
             'to_department_id' => \App\Models\Department::factory(),
             'from_employee_id' => \App\Models\Employee::factory(),
             'to_employee_id' => \App\Models\Employee::factory(),
-            'created_by' => \App\Models\User::factory(),
+            'created_by' => User::factory(),
             'reference' => $this->faker->optional()->bothify('MOV-#####'),
             'notes' => $this->faker->optional()->sentence(),
-            'created_by' => $this->faker->boolean(70) ? User::factory() : null,
         ];
     }
 }

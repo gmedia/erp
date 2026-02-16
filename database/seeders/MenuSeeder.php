@@ -86,7 +86,7 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'asset_movement',
                         'display_name' => 'Asset Movement',
-                        'permissions' => ['asset_movement'],
+                        'permissions' => ['asset_movement', 'asset_movement.create', 'asset_movement.edit', 'asset_movement.delete'],
                         'icon' => 'ArrowLeftRight',
                         'url' => 'asset-movements',
                         'child' => [],

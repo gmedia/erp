@@ -17,7 +17,7 @@ test('it can export asset movements', function () {
     Excel::fake();
 
     $response = $this->actingAs($user)
-        ->post(route('api.asset-movements.export'));
+        ->post(route('asset-movements.export'));
 
     $response->assertOk();
 

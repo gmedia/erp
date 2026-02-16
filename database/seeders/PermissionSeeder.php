@@ -193,7 +193,23 @@ class PermissionSeeder extends Seeder
             [
                 'name' => 'asset_movement',
                 'display_name' => 'Asset Movement',
-                'child' => [],
+                'child' => [
+                    [
+                        'name' => 'asset_movement.create',
+                        'display_name' => 'Create Asset Movement',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset_movement.edit',
+                        'display_name' => 'Edit Asset Movement',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset_movement.delete',
+                        'display_name' => 'Delete Asset Movement',
+                        'child' => [],
+                    ],
+                ],
             ],
             [
                 'name' => 'trial_balance_report',
