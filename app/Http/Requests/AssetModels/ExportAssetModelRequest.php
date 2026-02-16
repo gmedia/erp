@@ -16,7 +16,7 @@ class ExportAssetModelRequest extends FormRequest
         return [
             'search' => ['nullable', 'string'],
             'asset_category_id' => ['nullable', 'exists:asset_categories,id'],
-            'sort_by' => ['nullable', 'string', 'in:model_name,manufacturer,created_at'],
+            'sort_by' => ['nullable', 'string', 'in:id,model_name,manufacturer,category,asset_category_id,created_at,updated_at'],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
         ];
     }
