@@ -234,7 +234,7 @@ export function generateModuleTests(config: ModuleTestConfig) {
             await waitForApiResponse(page, config.apiPath);
 
             for (const column of config.sortableColumns) {
-                const sortButton = page.getByRole('button', { name: column, exact: true });
+                const sortButton = page.locator('thead').getByRole('button', { name: column, exact: true });
                 await expect(sortButton).toBeVisible();
 
                 // Sort ASC

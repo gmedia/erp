@@ -1,10 +1,9 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { createActionsColumn, createSortingHeader } from '@/utils/columns';
+import { createActionsColumn, createSelectColumn, createSortingHeader } from '@/utils/columns';
 
 export interface AssetMovement {
     id: number;
@@ -28,25 +27,7 @@ export interface AssetMovement {
 }
 
 export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
-    {
-        id: 'select',
-        header: ({ table }) => (
-            <Checkbox
-                checked={table.getIsAllPageRowsSelected()}
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
+    createSelectColumn<AssetMovement>(),
     {
         accessorKey: 'asset',
         ...createSortingHeader('Asset'),

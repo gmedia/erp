@@ -1,6 +1,11 @@
-import { FieldDescriptor, createAsyncSelectFilterField, createSelectFilterField } from '@/components/common/filters';
+import { FieldDescriptor, createAsyncSelectFilterField, createSelectFilterField, createTextFilterField } from '@/components/common/filters';
 
 export const createAssetMovementFilterFields = (): FieldDescriptor[] => [
+    createTextFilterField(
+        'search',
+        'Search',
+        'Search movements...'
+    ),
     createAsyncSelectFilterField(
         'asset_id',
         'Asset',
