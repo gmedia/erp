@@ -25,9 +25,6 @@ import { format } from 'date-fns';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import axios from 'axios';
-import { AssetMovementForm } from '@/components/asset-movements/AssetMovementForm';
-import { AssetMovementFormData } from '@/utils/schemas';
 import {
     Activity,
     AlertCircle,
@@ -58,7 +55,6 @@ interface Props {
         data: Asset & {
             ulid: string;
             qrcode_url?: string;
-            movements?: any[];
             maintenances?: any[];
             stocktake_items?: any[];
             depreciation_lines?: any[];
@@ -68,8 +64,6 @@ interface Props {
 
 export default function AssetProfile({ asset }: Props) {
     const item = asset.data;
-    const [isMovementFormOpen, setIsMovementFormOpen] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'N/A';
@@ -193,20 +187,6 @@ export default function AssetProfile({ asset }: Props) {
         printWindow.document.close();
     };
 
-    const handleMovementSubmit = useCallback(async (data: AssetMovementFormData) => {
-        setIsSubmitting(true);
-        try {
-            await axios.post('/api/asset-movements', data);
-            toast.success('Movement recorded successfully');
-            setIsMovementFormOpen(false);
-            router.reload({ only: ['asset'] });
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to record movement');
-        } finally {
-            setIsSubmitting(false);
-        }
-    }, []);
-
     const breadcrumbs = [
         { title: 'Assets', href: '/assets' },
         { title: item.asset_code, href: '#' },
@@ -291,27 +271,10 @@ export default function AssetProfile({ asset }: Props) {
                                 >
                                     {item.condition?.replace('_', ' ') || 'Unknown'}
                                 </Badge>
-                                <Button 
-                                    size="sm" 
-                                    variant="outline" 
-                                    className="gap-2 mt-2"
-                                    onClick={() => setIsMovementFormOpen(true)}
-                                >
-                                    <History className="h-4 w-4" />
-                                    Move/Assign
-                                </Button>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <AssetMovementForm
-                    open={isMovementFormOpen}
-                    onOpenChange={setIsMovementFormOpen}
-                    asset={item as any}
-                    onSubmit={handleMovementSubmit}
-                    isLoading={isSubmitting}
-                />
 
                 <Tabs defaultValue="summary" className="w-full">
                     <div className="overflow-x-auto no-scrollbar">
