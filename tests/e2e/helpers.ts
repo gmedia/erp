@@ -50,32 +50,57 @@ export async function createEntity(
     }
 
     if (field.type === 'select') {
-      await page.click(`button:has-text("${field.selector}")`);
+      // Find the combobox by role and name (using partial match for robustness)
+      const combobox = page.getByRole('combobox', { name: new RegExp(field.selector || value, 'i') }).first();
+      await expect(combobox).toBeVisible();
+      await combobox.click();
       
-      // Type in the search box to filter results (handles pagination)
-      const searchInput = page.getByPlaceholder('Search...').filter({ visible: true }).last();
+      // Wait for listbox to be visible
+      const listbox = page.getByRole('listbox');
+      await expect(listbox).toBeVisible();
+
+      // Search if input is available
+      const searchInput = listbox.getByPlaceholder('Search...');
       if (await searchInput.isVisible()) {
         await searchInput.fill(value);
+        // Wait for debounce and fetch
+        await page.waitForTimeout(500);
       }
-      
-      await page.getByRole('option', { name: value }).click();
-    } else if (field.type === 'textarea') {
+
+      // Click the option
+      const option = listbox.getByRole('option', { name: new RegExp(value, 'i') }).first();
+      await expect(option).toBeVisible();
+      await option.click();
+
+      // Wait for listbox to disappear
+      await expect(listbox).not.toBeVisible();
+    }
+ else if (field.type === 'textarea') {
       await page.fill(`textarea[name="${field.name}"]`, value);
     } else {
       await page.fill(`input[name="${field.name}"]`, value);
     }
   }
 
-  // Ensure any modal overlay/backdrop is removed before submitting
-  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
-    state: 'detached',
-  });
+  // Ensure the dialog is visible before interacting
   const dialog = page.getByRole('dialog');
-  const submitButton = dialog.getByRole('button', { name: /Add/ });
+  await expect(dialog).toBeVisible();
+  const submitButton = dialog.getByRole('button', { name: /Add|Tambah|Create|Buat|Update|Perbarui|Submit|Kirim/i });
   await expect(submitButton).toBeVisible();
   await submitButton.click();
 
-  await expect(dialog).not.toBeVisible({ timeout: 30000 });
+  // Wait for dialog to disappear with a descriptive error
+  try {
+      await expect(dialog).not.toBeVisible({ timeout: 15000 });
+  } catch (error) {
+      console.error(`Dialog did not close after 15s. Likely validation error or backend failure.`);
+      // Check for visible error messages in the dialog
+      const errorMessages = await dialog.locator('.text-destructive, .text-red-500, [role="alert"]').allTextContents();
+      if (errorMessages.length > 0) {
+          console.error(`Found error messages in dialog: ${errorMessages.join(', ')}`);
+      }
+      throw error;
+  }
 
   return returnValue;
 }
@@ -135,105 +160,6 @@ export async function login(
 
   await page.waitForURL('**/dashboard', { timeout: 60000 });
 }
-
-/**
- * Create a new employee via the UI.
- *
- * @param page - Playwright Page object.
- * @param overrides - Optional fields to override the default values.
- * @returns The unique email used for the created employee.
- */
-export async function createEmployee(
-  page: Page,
-  overrides: Partial<{
-    name: string;
-    email: string;
-    phone: string;
-    salary: string;
-    department_id: string;
-    position_id: string;
-    branch_id: string;
-  }> = {}
-): Promise<string> {
-  const timestamp = Date.now();
-  const defaultEmail = `${Math.random().toString(36).substring(2,7)}${timestamp}@example.com`;
-
-  const config: EntityConfig = {
-    route: '/employees',
-    returnField: 'email',
-    fields: [
-      { name: 'name', type: 'text', defaultValue: `Employee ${timestamp}` },
-      { name: 'email', type: 'email', defaultValue: defaultEmail },
-      { name: 'phone', type: 'text', defaultValue: '08123456789' },
-      { name: 'department_id', type: 'select', selector: 'Select a department', defaultValue: 'Engineering' },
-      { name: 'position_id', type: 'select', selector: 'Select a position', defaultValue: 'Senior Developer' },
-      { name: 'branch_id', type: 'select', selector: 'Select a branch', defaultValue: 'Head Office' },
-      { name: 'salary', type: 'text', defaultValue: '5000000' },
-    ],
-  };
-
-  return createEntity(page, config, overrides);
-}
-
-/**
- * Search for an employee by email.
- *
- * @param page - Playwright Page object.
- * @param email - Email address to search for.
- */
-export async function searchEmployee(page: Page, email: string): Promise<void> {
-  await page.fill('input[placeholder="Search employees..."]', email);
-  await page.press('input[placeholder="Search employees..."]', 'Enter');
-  // Wait for the row containing the email to appear
-  await page.waitForSelector(`text=${email}`);
-}
-
-/**
- * Edit an existing employee.
- *
- * @param page - Playwright Page object.
- * @param email - Email of the employee to edit.
- * @param updates - Fields to update (name and/or salary).
- */
-export async function editEmployee(
-  page: Page,
-  email: string,
-  updates: { name?: string; salary?: string }
-): Promise<void> {
-  // Locate the employee first
-  await searchEmployee(page, email);
-
-  // Locate the row and open the Actions menu
-  const row = page.locator('tr', { hasText: email }).first();
-  await expect(row).toBeVisible();
-  await row.waitFor({ state: 'attached' });
-  const actionsBtn = row.getByRole('button', { name: /Actions/i });
-  await expect(actionsBtn).toBeVisible();
-  await actionsBtn.click({ force: true });
-
-  // Click the Edit menu item
-  const editItem = page.getByRole('menuitem', { name: /Edit/i });
-  await expect(editItem).toBeVisible();
-  await editItem.click({ force: true });
-
-  // Update fields if provided
-  if (updates.name) {
-    await page.fill('input[name="name"]', updates.name);
-  }
-  if (updates.salary) {
-    await page.fill('input[name="salary"]', updates.salary);
-  }
-
-  // Submit the edit dialog
-  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
-    state: 'detached',
-  });
-  const editDialog = page.getByRole('dialog');
-  const updateBtn = editDialog.getByRole('button', { name: /Update/ });
-  await expect(updateBtn).toBeVisible();
-  await updateBtn.click();
-}
-
 
 
 // ---------------------------------------------------

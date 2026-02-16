@@ -72,7 +72,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
 
         // Validate sort_by to prevent SQL injection
-        $allowedSortColumns = ['name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at'];
+        $allowedSortColumns = ['name', 'email', 'phone', 'department_id', 'position_id', 'branch_id', 'salary', 'hire_date', 'created_at', 'updated_at'];
         if (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);
         }

@@ -49,6 +49,7 @@ export default function AsyncSelectField({
                             labelFn={labelFn}
                             valueFn={valueFn}
                             initialLabel={initialLabel}
+                            label={label}
                         />
                     </FormControl>
                     <FormMessage />
