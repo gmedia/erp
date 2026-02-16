@@ -36,6 +36,11 @@ class IndexAssetLocationsAction
                 ->leftJoin('branches', 'asset_locations.branch_id', '=', 'branches.id')
                 ->select('asset_locations.*')
                 ->orderBy('branches.name', $sortDirection);
+        } elseif ($sortBy === 'parent') {
+            $query
+                ->leftJoin('asset_locations as parents', 'asset_locations.parent_id', '=', 'parents.id')
+                ->select('asset_locations.*')
+                ->orderBy('parents.name', $sortDirection);
         } else {
             $this->filterService->applySorting(
                 $query,

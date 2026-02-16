@@ -42,9 +42,19 @@ class AssetLocationExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
 
         $sortBy = $this->filters['sort_by'] ?? 'created_at';
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
-        $allowedSortColumns = ['code', 'name', 'branch_id', 'parent_id', 'created_at'];
+        $allowedSortColumns = ['code', 'name', 'branch_id', 'parent_id', 'created_at', 'updated_at'];
 
-        if (in_array($sortBy, $allowedSortColumns)) {
+        if ($sortBy === 'branch') {
+            $query
+                ->leftJoin('branches', 'asset_locations.branch_id', '=', 'branches.id')
+                ->select('asset_locations.*')
+                ->orderBy('branches.name', $sortDirection);
+        } elseif ($sortBy === 'parent') {
+            $query
+                ->leftJoin('asset_locations as parents', 'asset_locations.parent_id', '=', 'parents.id')
+                ->select('asset_locations.*')
+                ->orderBy('parents.name', $sortDirection);
+        } elseif (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);
         }
 

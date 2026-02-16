@@ -22,6 +22,7 @@ export interface AsyncSelectProps {
     labelFn?: (item: any) => string; // To extract label from item
     valueFn?: (item: any) => string; // To extract value from item
     initialLabel?: string; // Optional initial label to avoid extra fetch
+    label?: string; // For accessibility and E2E testing
 }
 
 export function AsyncSelect({
@@ -33,6 +34,7 @@ export function AsyncSelect({
     labelFn = (item) => item.name,
     valueFn = (item) => item.id.toString(),
     initialLabel,
+    label,
 }: AsyncSelectProps) {
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState('');
@@ -120,6 +122,7 @@ export function AsyncSelect({
                 <Button
                     variant="outline"
                     role="combobox"
+                    aria-label={label}
                     aria-expanded={open}
                     className={cn(
                         'w-full justify-between font-normal',

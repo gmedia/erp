@@ -9,7 +9,7 @@ export function createAssetLocationFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             'Search',
-            'Search by code or name...',
+            'Search asset locations...',
         ),
         createAsyncSelectFilterField(
             'branch_id',

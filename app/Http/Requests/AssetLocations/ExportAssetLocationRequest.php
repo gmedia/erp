@@ -17,7 +17,7 @@ class ExportAssetLocationRequest extends FormRequest
             'search' => ['nullable', 'string'],
             'branch_id' => ['nullable', 'exists:branches,id'],
             'parent_id' => ['nullable', 'exists:asset_locations,id'],
-            'sort_by' => ['nullable', 'string', 'in:code,name,created_at'],
+            'sort_by' => ['nullable', 'string', 'in:code,name,branch,parent,created_at,updated_at'],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
         ];
     }

@@ -66,10 +66,9 @@ export function FilterModal({
                                     ?.displayName === 'AsyncSelect');
 
                         const commonProps = {
-                            value: tempFilters[field.name] ?? '',
-                            placeholder:
-                                (element?.props as { placeholder?: string })
-                                    ?.placeholder ?? '',
+                            name: field.name,
+                            value: tempFilters[field.name] || '',
+                            label: field.label,
                         };
 
                         const onChangeHandler = (

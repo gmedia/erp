@@ -38,7 +38,7 @@ export const assetLocationColumns: ColumnDef<AssetLocation>[] = [
         cell: renderBranchCell,
     },
     {
-        accessorKey: 'parent_id',
+        accessorKey: 'parent',
         ...createSortingHeader('Parent Location'),
         cell: renderParentCell,
     },
