@@ -12,7 +12,7 @@ class IndexAccountMappingRequest extends SimpleCrudIndexRequest
             'type' => ['nullable', 'string', 'in:merge,split,rename'],
             'source_coa_version_id' => ['nullable', 'integer', 'exists:coa_versions,id'],
             'target_coa_version_id' => ['nullable', 'integer', 'exists:coa_versions,id'],
-            'sort_by' => ['nullable', 'string', 'in:id,type,source,target,created_at,updated_at'],
+            'sort_by' => ['nullable', 'string', 'in:id,type,source,target,notes,created_at,updated_at'],
         ]);
     }
 }

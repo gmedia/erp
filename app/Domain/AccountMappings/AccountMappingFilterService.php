@@ -55,7 +55,7 @@ class AccountMappingFilterService
             $query->join('accounts as target_acc', 'account_mappings.target_account_id', '=', 'target_acc.id')
                 ->orderBy('target_acc.code', $sortDirection)
                 ->select('account_mappings.*');
-        } elseif (in_array($sortBy, ['id', 'type', 'created_at', 'updated_at'], true)) {
+        } elseif (in_array($sortBy, ['id', 'type', 'notes', 'created_at', 'updated_at'], true)) {
             $query->orderBy($sortBy, $sortDirection);
         } else {
             $query->orderBy('created_at', 'desc');

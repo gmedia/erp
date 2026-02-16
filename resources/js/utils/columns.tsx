@@ -82,6 +82,10 @@ export function createTextColumn<T = Record<string, unknown>>(
 
     const baseColumn: ColumnDef<T> = {
         accessorKey: accessorKey as string,
+        cell: ({ row }) => {
+            const value = row.getValue(accessorKey as string);
+            return <div>{value ? String(value) : '-'}</div>;
+        },
     };
 
     if (enableSorting) {

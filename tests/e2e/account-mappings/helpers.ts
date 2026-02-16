@@ -133,6 +133,44 @@ export async function searchAccountMappings(page: Page, query: string): Promise<
   await skeleton.first().waitFor({ state: 'detached', timeout: 60000 }).catch(() => {});
 }
 
-export function findAccountMappingRow(page: Page, sourceCode: string, targetCode: string) {
-  return page.locator('tr', { hasText: sourceCode }).filter({ hasText: targetCode }).first();
+export function findAccountMappingRow(page: Page, sourceCode: string) {
+  return page.locator('tr', { hasText: sourceCode }).first();
+}
+
+/**
+ * Edit an existing account mapping.
+ */
+export async function editAccountMapping(
+  page: Page,
+  sourceCode: string,
+  updates: { notes?: string; type?: string }
+): Promise<void> {
+  await searchAccountMappings(page, sourceCode);
+
+  const row = findAccountMappingRow(page, sourceCode);
+  await expect(row).toBeVisible();
+  
+  const actionsBtn = row.getByRole('button', { name: /Actions/i });
+  await actionsBtn.click();
+
+  const editItem = page.getByRole('menuitem', { name: /Edit/i });
+  await editItem.click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  if (updates.notes) {
+    await dialog.locator('textarea[name="notes"]').fill(updates.notes);
+  }
+
+  if (updates.type) {
+    const typeTrigger = dialog.locator('button').filter({ hasText: /Rename|Merge|Split/i });
+    await typeTrigger.click();
+    await page.getByRole('option', { name: updates.type, exact: true }).click();
+  }
+
+  const updateBtn = dialog.getByRole('button', { name: /Update/i });
+  await updateBtn.click();
+
+  await expect(dialog).not.toBeVisible({ timeout: 15000 });
 }

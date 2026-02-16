@@ -1,6 +1,6 @@
 'use client';
 
-import { createActionsColumn, createBadgeColumn, createDateColumn, createSelectColumn, createSortingHeader } from '@/utils/columns';
+import { createActionsColumn, createBadgeColumn, createDateColumn, createSelectColumn, createSortingHeader, createTextColumn } from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
 import { type AccountMapping } from '@/types/account-mapping';
 
@@ -40,6 +40,7 @@ export const accountMappingColumns: ColumnDef<AccountMapping>[] = [
             split: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
         },
     }),
+    createTextColumn<AccountMapping>({ accessorKey: 'notes', label: 'Notes' }),
     createDateColumn<AccountMapping>({ accessorKey: 'created_at', label: 'Created At' }),
     createActionsColumn<AccountMapping>(),
 ];
