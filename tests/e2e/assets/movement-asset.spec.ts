@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { login, createAsset } from '../helpers';
+import { createAsset } from './helpers';
+import { login } from '../helpers';
 
 test('record asset movement end-to-end', async ({ page }) => {
   // Create a fresh asset
