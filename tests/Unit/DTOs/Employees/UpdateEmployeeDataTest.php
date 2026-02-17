@@ -2,6 +2,8 @@
 
 use App\DTOs\Employees\UpdateEmployeeData;
 
+uses()->group('employees');
+
 test('fromArray creates DTO with all fields', function () {
     $data = [
         'name' => 'John Doe',
