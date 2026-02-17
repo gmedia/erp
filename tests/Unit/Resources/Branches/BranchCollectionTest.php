@@ -5,7 +5,7 @@ use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('branches', 'resources');
+uses(RefreshDatabase::class)->group('branches');
 
 test('to array transforms collection', function () {
     $branches = Branch::factory()->count(3)->create();

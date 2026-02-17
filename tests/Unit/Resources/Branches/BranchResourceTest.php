@@ -5,7 +5,7 @@ use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('branches', 'resources');
+uses(RefreshDatabase::class)->group('branches');
 
 test('to array returns correct structure', function () {
     $branch = Branch::factory()->create(['name' => 'Main Branch']);

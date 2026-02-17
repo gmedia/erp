@@ -4,7 +4,7 @@ use App\Http\Requests\Branches\UpdateBranchRequest;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('branches', 'requests');
+uses(RefreshDatabase::class)->group('branches');
 
 test('authorize returns true', function () {
     $request = new UpdateBranchRequest();

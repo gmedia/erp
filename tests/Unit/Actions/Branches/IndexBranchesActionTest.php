@@ -6,7 +6,7 @@ use App\Models\Branch;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('branches', 'actions');
+uses(RefreshDatabase::class)->group('branches');
 
 test('execute returns paginated results', function () {
     Branch::factory()->count(3)->create();

@@ -2,7 +2,7 @@
 
 use App\Http\Requests\Branches\ExportBranchRequest;
 
-uses()->group('branches', 'requests');
+uses()->group('branches');
 
 test('authorize returns true', function () {
     $request = new ExportBranchRequest();

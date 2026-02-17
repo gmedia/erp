@@ -4,7 +4,7 @@ use App\Domain\Branches\BranchFilterService;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('branches', 'domain');
+uses(RefreshDatabase::class)->group('branches');
 
 test('apply search filters by name', function () {
     Branch::factory()->create(['name' => 'HQ']);
