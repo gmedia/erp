@@ -4,7 +4,7 @@ use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class)->group('settings');
 
 test('two factor settings page can be rendered', function () {
     if (! Features::canManageTwoFactorAuthentication()) {
