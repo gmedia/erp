@@ -1,6 +1,6 @@
 <?php
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class)->group('auth');
 
 test('registration screen can be rendered', function () {
     $response = $this->get(route('register'));
