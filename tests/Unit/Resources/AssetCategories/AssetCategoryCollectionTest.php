@@ -5,7 +5,7 @@ use App\Http\Resources\AssetCategories\AssetCategoryResource;
 use App\Models\AssetCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('asset-categories', 'unit', 'resources');
+uses(RefreshDatabase::class)->group('asset-categories');
 
 test('asset category collection uses asset category resource', function () {
     AssetCategory::factory()->count(3)->create();

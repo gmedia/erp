@@ -3,7 +3,7 @@
 use App\Models\AssetCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('asset-categories', 'unit', 'models');
+uses(RefreshDatabase::class)->group('asset-categories');
 
 test('it has fillable attributes', function () {
     $category = AssetCategory::create([

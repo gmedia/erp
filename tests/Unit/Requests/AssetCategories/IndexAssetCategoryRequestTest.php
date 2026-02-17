@@ -2,7 +2,7 @@
 
 use App\Http\Requests\AssetCategories\IndexAssetCategoryRequest;
 
-uses()->group('asset-categories', 'unit', 'requests');
+uses()->group('asset-categories');
 
 test('index asset category request rules allow correct sort fields', function () {
     $request = new IndexAssetCategoryRequest();

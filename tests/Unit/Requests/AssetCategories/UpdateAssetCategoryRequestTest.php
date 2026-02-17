@@ -7,7 +7,7 @@ use App\Models\AssetCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\Rule;
 
-uses(RefreshDatabase::class)->group('asset-categories', 'unit', 'requests');
+uses(RefreshDatabase::class)->group('asset-categories');
 
 test('update asset category request authorize returns true', function () {
     $request = new UpdateAssetCategoryRequest();

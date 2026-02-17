@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
-uses(RefreshDatabase::class)->group('asset-categories', 'unit', 'actions');
+uses(RefreshDatabase::class)->group('asset-categories');
 
 test('export asset categories action execute generates excel file', function () {
     Carbon::setTestNow(now());

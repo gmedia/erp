@@ -2,7 +2,7 @@
 
 use App\Http\Requests\AssetCategories\ExportAssetCategoryRequest;
 
-uses()->group('asset-categories', 'unit', 'requests');
+uses()->group('asset-categories');
 
 test('export asset category request rules are present', function () {
     $request = new ExportAssetCategoryRequest();

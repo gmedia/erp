@@ -2,7 +2,7 @@
 
 use App\Http\Requests\AssetCategories\StoreAssetCategoryRequest;
 
-uses()->group('asset-categories', 'unit', 'requests');
+uses()->group('asset-categories');
 
 test('store asset category request authorize returns true', function () {
     $request = new StoreAssetCategoryRequest();

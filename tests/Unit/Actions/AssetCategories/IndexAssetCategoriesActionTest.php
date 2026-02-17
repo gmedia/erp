@@ -6,7 +6,7 @@ use App\Models\AssetCategory;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('asset-categories', 'unit', 'actions');
+uses(RefreshDatabase::class)->group('asset-categories');
 
 test('index asset categories action execute returns paginated results', function () {
     AssetCategory::factory()->count(3)->create();

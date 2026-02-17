@@ -4,7 +4,7 @@ use App\Domain\AssetCategories\AssetCategoryFilterService;
 use App\Models\AssetCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('asset-categories', 'unit', 'domain');
+uses(RefreshDatabase::class)->group('asset-categories');
 
 test('asset category filter service applies name search', function () {
     $needle = 'ACAT-' . uniqid();
