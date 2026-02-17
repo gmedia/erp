@@ -1,36 +1,13 @@
 <?php
 
-use App\Models\Employee;
-use App\Models\Permission;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+namespace Tests\Feature\Permissions;
 
+use App\Models\Permission;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
 uses(RefreshDatabase::class)->group('permissions');
-
-/**
- * Helper function to create a user with an employee that has specific permissions.
- */
-function createUserWithPermissionPageAccess(array $permissionNames = []): User
-{
-    $user = User::factory()->create();
-    $employee = Employee::factory()->create(['user_id' => $user->id]);
-
-    if (!empty($permissionNames)) {
-        $permissions = [];
-        foreach ($permissionNames as $name) {
-            $permissions[] = Permission::firstOrCreate(
-                ['name' => $name],
-                ['display_name' => ucwords(str_replace('.', ' ', $name))]
-            )->id;
-        }
-        $employee->permissions()->sync($permissions);
-    }
-
-    return $user;
-}
 
 describe('Permission Page Access', function () {
     test('unauthenticated user cannot access permissions page', function () {
@@ -40,7 +17,7 @@ describe('Permission Page Access', function () {
     });
 
     test('authenticated user without permission cannot access permissions page', function () {
-        $user = createUserWithPermissionPageAccess([]);
+        $user = createTestUserWithPermissions([]);
         actingAs($user);
 
         $response = get('/permissions');
@@ -49,7 +26,7 @@ describe('Permission Page Access', function () {
     });
 
     test('authenticated user with permission can access permissions page', function () {
-        $user = createUserWithPermissionPageAccess(['permission']);
+        $user = createTestUserWithPermissions(['permission']);
         actingAs($user);
 
         $response = get('/permissions');
@@ -67,7 +44,7 @@ describe('Permission Page Access', function () {
         Permission::factory()->create(['name' => 'test.permission.2', 'display_name' => 'Test Permission 2']);
         Permission::factory()->create(['name' => 'test.permission.3', 'display_name' => 'Test Permission 3']);
 
-        $user = createUserWithPermissionPageAccess(['permission']);
+        $user = createTestUserWithPermissions(['permission']);
         actingAs($user);
 
         $response = get('/permissions');
