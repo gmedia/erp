@@ -1,12 +1,13 @@
 <?php
 
+namespace Tests\Feature\Dashboard;
+
 use App\Models\Asset;
 use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
@@ -39,4 +40,3 @@ describe('Dashboard', function () {
         );
     });
 });
-
