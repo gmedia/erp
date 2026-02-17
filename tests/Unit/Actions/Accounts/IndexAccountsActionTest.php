@@ -8,7 +8,7 @@ use App\Models\CoaVersion;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('accounts', 'actions');
+uses(RefreshDatabase::class)->group('accounts');
 
 beforeEach(function () {
     $this->filterService = new AccountFilterService();

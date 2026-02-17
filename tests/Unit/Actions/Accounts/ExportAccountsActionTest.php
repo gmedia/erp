@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
-uses(RefreshDatabase::class)->group('accounts', 'actions');
+uses(RefreshDatabase::class)->group('accounts');
 
 test('execute stores export file and returns json response', function () {
     Excel::fake();

@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\postJson;
 
-uses(RefreshDatabase::class)->group('accounts', 'export');
+uses(RefreshDatabase::class)->group('accounts');
 
 describe('Account Export API', function () {
     beforeEach(function () {

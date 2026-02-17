@@ -5,7 +5,7 @@ use App\Models\CoaVersion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
 
-uses(RefreshDatabase::class)->group('accounts', 'requests');
+uses(RefreshDatabase::class)->group('accounts');
 
 test('it validates required fields', function () {
     $request = new StoreAccountRequest();

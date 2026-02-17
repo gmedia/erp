@@ -5,7 +5,7 @@ use App\Models\Account;
 use App\Models\CoaVersion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('accounts', 'resources');
+uses(RefreshDatabase::class)->group('accounts');
 
 test('it returns collection of resources', function () {
     $coaVersion = CoaVersion::factory()->create();

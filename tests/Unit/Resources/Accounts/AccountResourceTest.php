@@ -4,7 +4,7 @@ use App\Http\Resources\Accounts\AccountResource;
 use App\Models\Account;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('accounts', 'resources');
+uses(RefreshDatabase::class)->group('accounts');
 
 test('it formats account data', function () {
     $account = Account::factory()->create([

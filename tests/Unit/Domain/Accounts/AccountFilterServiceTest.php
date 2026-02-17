@@ -4,7 +4,7 @@ use App\Domain\Accounts\AccountFilterService;
 use App\Models\Account;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('accounts', 'domain');
+uses(RefreshDatabase::class)->group('accounts');
 
 beforeEach(function () {
     $this->filterService = new AccountFilterService();

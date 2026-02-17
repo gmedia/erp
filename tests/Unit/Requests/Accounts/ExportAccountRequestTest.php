@@ -3,7 +3,7 @@
 use App\Http\Requests\Accounts\ExportAccountRequest;
 use Illuminate\Support\Facades\Validator;
 
-uses()->group('accounts', 'requests');
+uses()->group('accounts');
 
 test('it validates required coa_version_id', function () {
     $request = new ExportAccountRequest();

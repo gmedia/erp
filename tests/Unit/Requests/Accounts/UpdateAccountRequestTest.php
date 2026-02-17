@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Routing\Route;
 
-uses(RefreshDatabase::class)->group('accounts', 'requests');
+uses(RefreshDatabase::class)->group('accounts');
 
 test('it validates required fields', function () {
     $coaVersion = CoaVersion::factory()->create();
