@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Feature\Reports;
+
 use App\Models\Account;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
@@ -12,7 +14,7 @@ use function Pest\Laravel\get;
 use function Pest\Laravel\seed;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('reports', 'reports-legacy');
+uses(RefreshDatabase::class)->group('reports');
 
 beforeEach(function () {
     // seed(); // Avoid full seed to prevent conflicts/slowness

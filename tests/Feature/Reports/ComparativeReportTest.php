@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Feature\Reports;
+
 use App\Models\Account;
 use App\Models\AccountMapping;
 use App\Models\CoaVersion;
