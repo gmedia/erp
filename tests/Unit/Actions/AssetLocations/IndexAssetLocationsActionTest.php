@@ -7,7 +7,7 @@ use App\Models\AssetLocation;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('asset-locations', 'actions');
+uses(RefreshDatabase::class)->group('asset-locations');
 
 test('execute returns paginated results', function () {
     AssetLocation::factory()->count(3)->create();

@@ -4,7 +4,7 @@ use App\Http\Resources\AssetLocations\AssetLocationCollection;
 use App\Models\AssetLocation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('asset-locations', 'resources');
+uses(RefreshDatabase::class)->group('asset-locations');
 
 test('to array transforms collection', function () {
     $assetLocations = AssetLocation::factory()->count(3)->create();

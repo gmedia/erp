@@ -2,7 +2,7 @@
 
 use App\Http\Requests\AssetLocations\IndexAssetLocationRequest;
 
-uses()->group('asset-locations', 'requests');
+uses()->group('asset-locations');
 
 test('authorize returns true', function () {
     $request = new IndexAssetLocationRequest();
@@ -16,7 +16,7 @@ test('rules returns correct validation rules', function () {
         'search' => ['nullable', 'string'],
         'branch_id' => ['nullable', 'exists:branches,id'],
         'parent_id' => ['nullable', 'exists:asset_locations,id'],
-        'sort_by' => ['nullable', 'string', 'in:id,code,name,branch,branch_id,parent_id,created_at,updated_at'],
+        'sort_by' => ['nullable', 'string', 'in:id,code,name,branch,branch_id,parent,parent_id,created_at,updated_at'],
         'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
         'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
         'page' => ['nullable', 'integer', 'min:1'],

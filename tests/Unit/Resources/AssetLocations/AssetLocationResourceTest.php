@@ -5,7 +5,7 @@ use App\Models\AssetLocation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('asset-locations', 'resources');
+uses(RefreshDatabase::class)->group('asset-locations');
 
 test('to array returns correct structure', function () {
     $assetLocation = AssetLocation::factory()->create([

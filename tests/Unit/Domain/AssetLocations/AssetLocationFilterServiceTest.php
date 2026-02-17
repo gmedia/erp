@@ -4,7 +4,7 @@ use App\Domain\AssetLocations\AssetLocationFilterService;
 use App\Models\AssetLocation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('asset-locations', 'domain');
+uses(RefreshDatabase::class)->group('asset-locations');
 
 test('apply search filters by name', function () {
     AssetLocation::factory()->create(['name' => 'Warehouse A']);

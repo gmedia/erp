@@ -2,7 +2,7 @@
 
 use App\Http\Requests\AssetLocations\StoreAssetLocationRequest;
 
-uses()->group('asset-locations', 'requests');
+uses()->group('asset-locations');
 
 test('authorize returns true', function () {
     $request = new StoreAssetLocationRequest();
