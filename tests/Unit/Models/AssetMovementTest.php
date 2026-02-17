@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Models;
 
 use App\Models\Asset;
 use App\Models\AssetMovement;
@@ -10,7 +10,6 @@ use App\Models\Employee;
 use App\Models\AssetLocation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 uses(RefreshDatabase::class)->group('asset-movements');
 

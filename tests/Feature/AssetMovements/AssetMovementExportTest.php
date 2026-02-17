@@ -1,23 +1,29 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\AssetMovements;
 
 use App\Models\AssetMovement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class)->group('asset-movements');
 
+beforeEach(function () {
+    $user = createTestUserWithPermissions(['asset_movement', 'asset_movement.export']);
+    actingAs($user);
+});
+
 test('it can export asset movements', function () {
-    \Illuminate\Support\Carbon::setTestNow('2023-01-01 00:00:00');
+    Carbon::setTestNow('2023-01-01 00:00:00');
     
-    $user = createTestUserWithPermissions(['asset_movement']);
     AssetMovement::factory()->count(3)->create();
 
     Excel::fake();
 
-    $response = $this->actingAs($user)
-        ->post(route('asset-movements.export'));
+    $response = postJson('/api/asset-movements/export');
 
     $response->assertOk();
 
