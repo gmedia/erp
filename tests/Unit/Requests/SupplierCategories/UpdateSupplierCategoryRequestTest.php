@@ -4,7 +4,7 @@ use App\Http\Requests\SupplierCategories\UpdateSupplierCategoryRequest;
 use App\Models\SupplierCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('supplier-categories', 'requests');
+uses(RefreshDatabase::class)->group('supplier-categories');
 
 test('authorize returns true', function () {
     $request = new UpdateSupplierCategoryRequest();

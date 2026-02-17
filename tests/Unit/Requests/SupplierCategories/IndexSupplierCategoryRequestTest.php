@@ -2,7 +2,7 @@
 
 use App\Http\Requests\SupplierCategories\IndexSupplierCategoryRequest;
 
-uses()->group('supplier-categories', 'requests');
+uses()->group('supplier-categories');
 
 test('authorize returns true', function () {
     $request = new IndexSupplierCategoryRequest();

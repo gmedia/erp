@@ -6,7 +6,7 @@ use App\Models\SupplierCategory;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('supplier-categories', 'actions');
+uses(RefreshDatabase::class)->group('supplier-categories');
 
 test('execute returns paginated results', function () {
     SupplierCategory::factory()->count(3)->create();

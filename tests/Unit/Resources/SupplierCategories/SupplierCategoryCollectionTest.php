@@ -5,7 +5,7 @@ use App\Models\SupplierCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('supplier-categories', 'resources');
+uses(RefreshDatabase::class)->group('supplier-categories');
 
 test('to array transforms collection', function () {
     $categories = SupplierCategory::factory()->count(3)->create();

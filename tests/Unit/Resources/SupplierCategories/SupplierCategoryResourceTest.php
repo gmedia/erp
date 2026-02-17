@@ -5,7 +5,7 @@ use App\Models\SupplierCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('supplier-categories', 'resources');
+uses(RefreshDatabase::class)->group('supplier-categories');
 
 test('to array returns correct structure', function () {
     $category = SupplierCategory::factory()->create(['name' => 'Raw Materials']);
