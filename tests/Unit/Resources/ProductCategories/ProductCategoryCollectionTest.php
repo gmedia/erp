@@ -5,7 +5,7 @@ use App\Models\ProductCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('product-categories', 'resources');
+uses(RefreshDatabase::class)->group('product-categories');
 
 test('to array transforms collection', function () {
     $categories = ProductCategory::factory()->count(3)->create();

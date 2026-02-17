@@ -5,7 +5,7 @@ use App\Models\ProductCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('product-categories', 'resources');
+uses(RefreshDatabase::class)->group('product-categories');
 
 test('to array returns correct structure', function () {
     $category = ProductCategory::factory()->create(['name' => 'Electronics']);

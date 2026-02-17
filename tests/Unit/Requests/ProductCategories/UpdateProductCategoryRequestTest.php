@@ -4,7 +4,7 @@ use App\Http\Requests\ProductCategories\UpdateProductCategoryRequest;
 use App\Models\ProductCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('product-categories', 'requests');
+uses(RefreshDatabase::class)->group('product-categories');
 
 test('authorize returns true', function () {
     $request = new UpdateProductCategoryRequest();

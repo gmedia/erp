@@ -2,7 +2,7 @@
 
 use App\Http\Requests\ProductCategories\StoreProductCategoryRequest;
 
-uses()->group('product-categories', 'requests');
+uses()->group('product-categories');
 
 test('authorize returns true', function () {
     $request = new StoreProductCategoryRequest();

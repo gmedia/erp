@@ -2,7 +2,7 @@
 
 use App\Http\Requests\ProductCategories\IndexProductCategoryRequest;
 
-uses()->group('product-categories', 'requests');
+uses()->group('product-categories');
 
 test('authorize returns true', function () {
     $request = new IndexProductCategoryRequest();

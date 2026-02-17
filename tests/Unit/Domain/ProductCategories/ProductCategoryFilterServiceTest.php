@@ -4,7 +4,7 @@ use App\Domain\ProductCategories\ProductCategoryFilterService;
 use App\Models\ProductCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('product-categories', 'domain');
+uses(RefreshDatabase::class)->group('product-categories');
 
 test('apply search filters by name', function () {
     ProductCategory::factory()->create(['name' => 'Electronics']);
