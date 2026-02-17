@@ -5,7 +5,7 @@ use App\Models\CustomerCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('customer-categories', 'resources');
+uses(RefreshDatabase::class)->group('customer-categories');
 
 test('to array returns correct structure', function () {
     $category = CustomerCategory::factory()->create(['name' => 'VIP']);

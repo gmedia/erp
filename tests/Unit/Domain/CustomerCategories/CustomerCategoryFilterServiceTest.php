@@ -4,7 +4,7 @@ use App\Domain\CustomerCategories\CustomerCategoryFilterService;
 use App\Models\CustomerCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('customer-categories', 'domain');
+uses(RefreshDatabase::class)->group('customer-categories');
 
 test('apply search filters by name', function () {
     CustomerCategory::factory()->create(['name' => 'VIP']);

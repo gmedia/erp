@@ -4,7 +4,7 @@ use App\Http\Requests\CustomerCategories\UpdateCustomerCategoryRequest;
 use App\Models\CustomerCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('customer-categories', 'requests');
+uses(RefreshDatabase::class)->group('customer-categories');
 
 test('authorize returns true', function () {
     $request = new UpdateCustomerCategoryRequest();

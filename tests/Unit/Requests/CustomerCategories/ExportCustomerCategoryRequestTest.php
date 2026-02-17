@@ -2,7 +2,7 @@
 
 use App\Http\Requests\CustomerCategories\ExportCustomerCategoryRequest;
 
-uses()->group('customer-categories', 'requests');
+uses()->group('customer-categories');
 
 test('authorize returns true', function () {
     $request = new ExportCustomerCategoryRequest();

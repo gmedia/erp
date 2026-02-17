@@ -2,7 +2,7 @@
 
 use App\Http\Requests\CustomerCategories\IndexCustomerCategoryRequest;
 
-uses()->group('customer-categories', 'requests');
+uses()->group('customer-categories');
 
 test('authorize returns true', function () {
     $request = new IndexCustomerCategoryRequest();

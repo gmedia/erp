@@ -6,7 +6,7 @@ use App\Models\CustomerCategory;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('customer-categories', 'actions');
+uses(RefreshDatabase::class)->group('customer-categories');
 
 test('execute returns paginated results', function () {
     CustomerCategory::factory()->count(3)->create();
