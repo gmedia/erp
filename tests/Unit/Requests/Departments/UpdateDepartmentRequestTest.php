@@ -4,7 +4,7 @@ use App\Http\Requests\Departments\UpdateDepartmentRequest;
 use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('departments', 'requests');
+uses(RefreshDatabase::class)->group('departments');
 
 test('authorize returns true', function () {
     $request = new UpdateDepartmentRequest();

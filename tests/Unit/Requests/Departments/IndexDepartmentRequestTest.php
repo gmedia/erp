@@ -2,7 +2,7 @@
 
 use App\Http\Requests\Departments\IndexDepartmentRequest;
 
-uses()->group('departments', 'requests');
+uses()->group('departments');
 
 test('authorize returns true', function () {
     $request = new IndexDepartmentRequest();

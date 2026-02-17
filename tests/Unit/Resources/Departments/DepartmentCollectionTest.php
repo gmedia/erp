@@ -5,7 +5,7 @@ use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('departments', 'resources');
+uses(RefreshDatabase::class)->group('departments');
 
 test('to array transforms collection of departments', function () {
     $departments = Department::factory()->count(3)->create();

@@ -6,7 +6,7 @@ use App\Models\Department;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('departments', 'actions');
+uses(RefreshDatabase::class)->group('departments');
 
 test('execute returns paginated results', function () {
     Department::factory()->count(3)->create();

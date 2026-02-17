@@ -4,7 +4,7 @@ use App\Domain\Departments\DepartmentFilterService;
 use App\Models\Department;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('departments', 'domain');
+uses(RefreshDatabase::class)->group('departments');
 
 test('apply search filters by name', function () {
     Department::factory()->create(['name' => 'IT Dept']);
