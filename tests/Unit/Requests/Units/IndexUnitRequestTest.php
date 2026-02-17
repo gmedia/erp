@@ -2,7 +2,7 @@
 
 use App\Http\Requests\Units\IndexUnitRequest;
 
-uses()->group('units', 'requests');
+uses()->group('units');
 
 test('authorize returns true', function () {
     $request = new IndexUnitRequest();

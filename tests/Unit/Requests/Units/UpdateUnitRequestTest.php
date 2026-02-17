@@ -4,7 +4,7 @@ use App\Http\Requests\Units\UpdateUnitRequest;
 use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('units', 'requests');
+uses(RefreshDatabase::class)->group('units');
 
 test('authorize returns true', function () {
     $request = new UpdateUnitRequest();

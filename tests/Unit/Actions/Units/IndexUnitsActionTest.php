@@ -6,7 +6,7 @@ use App\Models\Unit;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('units', 'actions');
+uses(RefreshDatabase::class)->group('units');
 
 test('execute returns paginated results', function () {
     Unit::factory()->count(3)->create();

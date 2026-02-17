@@ -5,7 +5,7 @@ use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('units', 'resources');
+uses(RefreshDatabase::class)->group('units');
 
 test('to array transforms collection', function () {
     $units = Unit::factory()->count(3)->create();

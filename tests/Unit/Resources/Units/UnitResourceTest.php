@@ -5,7 +5,7 @@ use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('units', 'resources');
+uses(RefreshDatabase::class)->group('units');
 
 test('to array returns correct structure', function () {
     $unit = Unit::factory()->create([
