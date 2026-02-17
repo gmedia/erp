@@ -5,7 +5,7 @@ use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('positions', 'resources');
+uses(RefreshDatabase::class)->group('positions');
 
 test('to array returns correct structure', function () {
     $position = Position::factory()->create([

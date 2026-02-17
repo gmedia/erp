@@ -2,7 +2,7 @@
 
 use App\Http\Requests\Positions\IndexPositionRequest;
 
-uses()->group('positions', 'requests');
+uses()->group('positions');
 
 test('authorize returns true', function () {
     $request = new IndexPositionRequest();

@@ -5,7 +5,7 @@ use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('positions', 'resources');
+uses(RefreshDatabase::class)->group('positions');
 
 test('to array transforms collection of positions', function () {
     $positions = Position::factory()->count(3)->create();

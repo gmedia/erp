@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
-uses(RefreshDatabase::class)->group('positions', 'actions');
+uses(RefreshDatabase::class)->group('positions');
 
 test('execute generates excel file and returns url', function () {
     Carbon::setTestNow(now());

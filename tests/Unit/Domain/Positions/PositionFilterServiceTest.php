@@ -4,7 +4,7 @@ use App\Domain\Positions\PositionFilterService;
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('positions', 'domain');
+uses(RefreshDatabase::class)->group('positions');
 
 test('apply search filters by name', function () {
     Position::factory()->create(['name' => 'Manager']);

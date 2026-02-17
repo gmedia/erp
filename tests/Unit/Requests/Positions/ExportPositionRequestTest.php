@@ -2,7 +2,7 @@
 
 use App\Http\Requests\Positions\ExportPositionRequest;
 
-uses()->group('positions', 'requests');
+uses()->group('positions');
 
 test('authorize returns true', function () {
     $request = new ExportPositionRequest();

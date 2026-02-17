@@ -2,7 +2,7 @@
 
 use App\Http\Requests\Positions\StorePositionRequest;
 
-uses()->group('positions', 'requests');
+uses()->group('positions');
 
 test('authorize returns true', function () {
     $request = new StorePositionRequest();

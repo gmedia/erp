@@ -6,7 +6,7 @@ use App\Models\Position;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('positions', 'actions');
+uses(RefreshDatabase::class)->group('positions');
 
 test('execute returns paginated results', function () {
     Position::factory()->count(3)->create();
