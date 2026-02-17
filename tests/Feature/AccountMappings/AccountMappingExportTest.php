@@ -11,7 +11,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\postJson;
 
-uses(RefreshDatabase::class)->group('account-mappings', 'export');
+uses(RefreshDatabase::class)->group('account-mappings');
 
 describe('Account Mapping Export API', function () {
     beforeEach(function () {

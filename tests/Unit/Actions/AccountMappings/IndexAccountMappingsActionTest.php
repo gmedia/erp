@@ -8,7 +8,7 @@ use App\Models\AccountMapping;
 use App\Models\CoaVersion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('account-mappings', 'actions');
+uses(RefreshDatabase::class)->group('account-mappings');
 
 beforeEach(function () {
     $this->filterService = new AccountMappingFilterService();
