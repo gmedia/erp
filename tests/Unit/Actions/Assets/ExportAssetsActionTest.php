@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
-uses(RefreshDatabase::class)->group('assets', 'asset-unit');
+uses(RefreshDatabase::class)->group('assets');
 
 test('export assets action returns json with url', function () {
     Excel::fake();

@@ -9,7 +9,7 @@ use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
 
-uses(RefreshDatabase::class)->group('assets', 'asset-unit');
+uses(RefreshDatabase::class)->group('assets');
 
 test('store asset request validation results', function (array $data, bool $shouldPass) {
     // Preparation for foreign keys

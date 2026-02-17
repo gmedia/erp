@@ -5,7 +5,7 @@ namespace Tests\Unit\Requests\Assets;
 use App\Http\Requests\Assets\UpdateAssetRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('assets', 'asset-unit');
+uses(RefreshDatabase::class)->group('assets');
 
 test('update asset request validation rules', function () {
     $request = new UpdateAssetRequest();

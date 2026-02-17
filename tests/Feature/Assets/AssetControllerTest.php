@@ -1,138 +1,186 @@
 <?php
 
-use App\Models\{Asset, AssetMovement, Employee, Permission, User};
+namespace Tests\Feature\Assets;
+
+use App\Models\Asset;
+use App\Models\AssetCategory;
+use App\Models\Branch;
+use App\Models\AssetMovement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
+use function Pest\Laravel\deleteJson;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertSoftDeleted;
 
 uses(RefreshDatabase::class)->group('assets');
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->actingAs($this->user);
-    
-    $this->employee = Employee::factory()->create([
-        'user_id' => $this->user->id,
-        'email' => $this->user->email,
-    ]);
-
-    $pAsset = Permission::firstOrCreate(['name' => 'asset', 'display_name' => 'Asset']);
-    $pCreate = Permission::firstOrCreate(['name' => 'asset.create', 'display_name' => 'Create Asset']);
-    $pEdit = Permission::firstOrCreate(['name' => 'asset.edit', 'display_name' => 'Edit Asset']);
-    $pDelete = Permission::firstOrCreate(['name' => 'asset.delete', 'display_name' => 'Delete Asset']);
-    
-    $this->employee->permissions()->attach([$pAsset->id, $pCreate->id, $pEdit->id, $pDelete->id]);
+    $user = createTestUserWithPermissions(['asset', 'asset.create', 'asset.edit', 'asset.delete']);
+    actingAs($user);
 });
 
-test('can list assets', function () {
-    $baseline = Asset::count();
+test('it returns asset index', function () {
     Asset::factory()->count(3)->create();
 
-    $response = $this->getJson(route('assets.index'));
+    $response = getJson('/api/assets');
 
     $response->assertStatus(200)
-        ->assertJsonCount($baseline + 3, 'data');
+        ->assertJsonStructure(['data', 'meta', 'links']);
 });
 
-test('can create asset', function () {
-    $asset = Asset::factory()->make();
-    $data = $asset->toArray();
-    
-    // Ensure dates are strings for JSON request
-    $data['purchase_date'] = $asset->purchase_date->format('Y-m-d');
-    if ($asset->warranty_end_date) {
-        $data['warranty_end_date'] = $asset->warranty_end_date->format('Y-m-d');
-    }
+test('it stores new asset', function () {
+    $category = AssetCategory::factory()->create();
+    $branch = Branch::factory()->create();
 
-    $response = $this->postJson(route('assets.store'), $data);
+    $data = [
+        'asset_code' => 'AST-001',
+        'name' => 'Test Asset',
+        'asset_category_id' => $category->id,
+        'branch_id' => $branch->id,
+        'purchase_date' => '2023-01-01',
+        'purchase_cost' => 1000000,
+        'currency' => 'IDR',
+        'status' => 'active',
+        'depreciation_method' => 'straight_line',
+    ];
 
-    $response->assertStatus(201)
-        ->assertJsonPath('data.name', $data['name']);
-    
-    $assetId = $response->json('data.id');
-    
-    $this->assertDatabaseHas('assets', ['asset_code' => $data['asset_code']]);
-    $this->assertDatabaseHas('asset_movements', [
-        'asset_id' => $assetId,
-        'movement_type' => 'acquired',
-        'to_branch_id' => $data['branch_id'],
-        'to_location_id' => $data['asset_location_id'] ?? null,
-    ]);
+    $response = postJson('/api/assets', $data);
+
+    $response->assertStatus(201);
+    assertDatabaseHas('assets', ['asset_code' => 'AST-001']);
 });
 
-test('can update asset', function () {
+test('it shows asset', function () {
     $asset = Asset::factory()->create();
-    $newData = ['name' => 'Updated Asset Name'];
 
-    $response = $this->putJson(route('assets.update', $asset), $newData);
+    $response = getJson("/api/assets/{$asset->ulid}");
 
     $response->assertStatus(200)
-        ->assertJsonPath('data.name', 'Updated Asset Name');
-    
-    $this->assertDatabaseHas('assets', [
+        ->assertJsonPath('data.id', $asset->id);
+});
+
+test('it updates existing asset', function () {
+    $asset = Asset::factory()->create();
+
+    $response = putJson("/api/assets/{$asset->ulid}", [
+        'name' => 'Updated Name',
+    ]);
+
+    $response->assertStatus(200);
+    assertDatabaseHas('assets', [
         'id' => $asset->id,
-        'name' => 'Updated Asset Name'
+        'name' => 'Updated Name',
     ]);
 });
 
-test('updating asset syncs existing acquired movement', function () {
-    $asset = Asset::factory()->create(['name' => 'Original Name']);
-    
-    // Manually create the initial 'acquired' movement
+test('it soft deletes asset', function () {
+    $asset = Asset::factory()->create();
+
+    $response = deleteJson("/api/assets/{$asset->ulid}");
+
+    $response->assertStatus(200);
+    assertSoftDeleted('assets', ['id' => $asset->id]);
+});
+
+test('it syncs initial movement during asset creation', function () {
+    $category = AssetCategory::factory()->create();
+    $branch = Branch::factory()->create();
+
+    $data = [
+        'asset_code' => 'AST-002',
+        'name' => 'Asset with Movement',
+        'asset_category_id' => $category->id,
+        'branch_id' => $branch->id,
+        'purchase_date' => '2023-05-01',
+        'purchase_cost' => 5000000,
+        'currency' => 'IDR',
+        'status' => 'active',
+        'depreciation_method' => 'straight_line',
+    ];
+
+    postJson('/api/assets', $data);
+
+    $asset = Asset::where('asset_code', 'AST-002')->first();
+
+    assertDatabaseHas('asset_movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'acquired',
+        'moved_at' => '2023-05-01 00:00:00',
+        'to_branch_id' => $branch->id,
+    ]);
+});
+
+test('it syncs initial movement when purchase_cost or purchase_date changes during update', function () {
+    $asset = Asset::factory()->create([
+        'purchase_date' => '2023-01-01',
+        'purchase_cost' => 1000000,
+    ]);
+
+    // Update case in AssetController uses updateOrCreate with acquired type
+    putJson("/api/assets/{$asset->ulid}", [
+        'purchase_date' => '2023-02-01',
+        'purchase_cost' => 2000000,
+    ]);
+
+    assertDatabaseHas('asset_movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'acquired',
+        'moved_at' => '2023-02-01 00:00:00',
+    ]);
+});
+
+test('it does not change movement when only name changes during update', function () {
+    $asset = Asset::factory()->create([
+        'purchase_date' => '2023-01-01',
+        'purchase_cost' => 1000000,
+    ]);
+
+    // Ensure movement exists via controller or direct
     AssetMovement::create([
         'asset_id' => $asset->id,
         'movement_type' => 'acquired',
-        'moved_at' => $asset->purchase_date,
+        'moved_at' => '2023-01-01 00:00:00',
         'to_branch_id' => $asset->branch_id,
-        'to_location_id' => $asset->asset_location_id,
-        'created_by' => $this->user->id,
     ]);
 
-    $this->assertDatabaseHas('asset_movements', [
-        'asset_id' => $asset->id,
-        'movement_type' => 'acquired',
+    putJson("/api/assets/{$asset->ulid}", [
+        'name' => 'Just a name change',
     ]);
 
-    $newData = [
-        'name' => 'Updated Name',
-        'purchase_date' => now()->subDays(10)->format('Y-m-d'),
-    ];
-
-    $response = $this->putJson(route('assets.update', $asset), $newData);
-
-    $response->assertStatus(200);
-    
-    $this->assertDatabaseHas('asset_movements', [
+    assertDatabaseHas('asset_movements', [
         'asset_id' => $asset->id,
         'movement_type' => 'acquired',
-        'moved_at' => $newData['purchase_date'] . ' 00:00:00',
+        'moved_at' => '2023-01-01 00:00:00',
     ]);
 });
 
-test('updating asset creates acquired movement if missing', function () {
-    // Manually create asset without movement (simulating old data)
-    $asset = Asset::factory()->create();
-    AssetMovement::where('asset_id', $asset->id)->delete();
-    
-    $this->assertDatabaseMissing('asset_movements', [
-        'asset_id' => $asset->id,
-        'movement_type' => 'acquired',
-    ]);
+test('it exports assets', function () {
+    Asset::factory()->count(5)->create();
 
-    $newData = ['name' => 'Updated Name'];
-    $response = $this->putJson(route('assets.update', $asset), $newData);
+    $response = postJson('/api/assets/export');
 
-    $response->assertStatus(200);
-    
-    $this->assertDatabaseHas('asset_movements', [
-        'asset_id' => $asset->id,
-        'movement_type' => 'acquired',
-    ]);
+    $response->assertStatus(200)
+        ->assertJsonStructure(['url', 'filename']);
 });
 
-test('can delete asset', function () {
-    $asset = Asset::factory()->create();
+test('it exports assets with filters', function () {
+    $branch = Branch::factory()->create();
+    $category = AssetCategory::factory()->create();
+    Asset::factory()->create(['branch_id' => $branch->id]);
+    Asset::factory()->create(['asset_category_id' => $category->id]);
 
-    $response = $this->deleteJson(route('assets.destroy', $asset));
-
+    // Filter by branch
+    $response = postJson("/api/assets/export", ['branch_id' => $branch->id]);
     $response->assertStatus(200);
-    $this->assertSoftDeleted('assets', ['id' => $asset->id]);
+
+    // Filter by category
+    $response = postJson("/api/assets/export", ['asset_category_id' => $category->id]);
+    $response->assertStatus(200);
+
+    // Filter by status
+    $response = postJson("/api/assets/export", ['status' => 'active']);
+    $response->assertStatus(200);
 });

@@ -5,7 +5,7 @@ namespace Tests\Unit\Requests\Assets;
 use App\Http\Requests\Assets\IndexAssetRequest;
 use Illuminate\Support\Facades\Validator;
 
-uses()->group('assets', 'asset-unit');
+uses()->group('assets');
 
 test('index asset request validation rules', function () {
     $request = new IndexAssetRequest();

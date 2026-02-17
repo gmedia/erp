@@ -9,7 +9,7 @@ use App\Models\Asset;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-uses(RefreshDatabase::class)->group('assets', 'asset-unit');
+uses(RefreshDatabase::class)->group('assets');
 
 test('index assets action returns paginated results', function () {
     Asset::factory()->count(20)->create();

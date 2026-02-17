@@ -7,7 +7,7 @@ use App\Models\Asset;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
-uses(RefreshDatabase::class)->group('assets', 'asset-unit');
+uses(RefreshDatabase::class)->group('assets');
 
 test('asset collection transforms assets correctly', function () {
     $assets = Asset::factory()->count(1)->create();
