@@ -1,10 +1,10 @@
 <?php
 
+namespace Tests\Feature\Users;
+
 use App\Models\Employee;
-use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\get;
@@ -12,28 +12,6 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class)->group('users');
-
-/**
- * Helper function to create a user with an employee that has specific permissions.
- */
-function createUserWithUserPageAccess(array $permissionNames = []): User
-{
-    $user = User::factory()->create();
-    $employee = Employee::factory()->create(['user_id' => $user->id]);
-
-    if (!empty($permissionNames)) {
-        $permissions = [];
-        foreach ($permissionNames as $name) {
-            $permissions[] = Permission::firstOrCreate(
-                ['name' => $name],
-                ['display_name' => ucwords(str_replace('.', ' ', $name))]
-            )->id;
-        }
-        $employee->permissions()->sync($permissions);
-    }
-
-    return $user;
-}
 
 describe('User Page Access', function () {
     test('unauthenticated user cannot access users page', function () {
@@ -43,7 +21,7 @@ describe('User Page Access', function () {
     });
 
     test('authenticated user without permission cannot access users page', function () {
-        $user = createUserWithUserPageAccess([]);
+        $user = createTestUserWithPermissions([]);
         actingAs($user);
 
         $response = get('/users');
@@ -52,7 +30,7 @@ describe('User Page Access', function () {
     });
 
     test('authenticated user with permission can access users page', function () {
-        $user = createUserWithUserPageAccess(['user']);
+        $user = createTestUserWithPermissions(['user']);
         actingAs($user);
 
         $response = get('/users');
@@ -64,7 +42,7 @@ describe('User Page Access', function () {
 
 describe('Get User By Employee API', function () {
     beforeEach(function () {
-        $user = createUserWithUserPageAccess(['user']);
+        $user = createTestUserWithPermissions(['user']);
         actingAs($user);
     });
 
@@ -112,7 +90,7 @@ describe('Get User By Employee API', function () {
 
 describe('Update User API', function () {
     beforeEach(function () {
-        $user = createUserWithUserPageAccess(['user']);
+        $user = createTestUserWithPermissions(['user']);
         actingAs($user);
     });
 
@@ -221,7 +199,7 @@ describe('Update User API', function () {
 
 describe('User API Permission Tests', function () {
     test('getUserByEmployee returns 403 when user lacks user permission', function () {
-        $user = createUserWithUserPageAccess([]);
+        $user = createTestUserWithPermissions([]);
         actingAs($user);
 
         $employee = Employee::factory()->create();
@@ -232,7 +210,7 @@ describe('User API Permission Tests', function () {
     });
 
     test('updateUser returns 403 when user lacks user permission', function () {
-        $user = createUserWithUserPageAccess([]);
+        $user = createTestUserWithPermissions([]);
         actingAs($user);
 
         $employee = Employee::factory()->create(['user_id' => null]);

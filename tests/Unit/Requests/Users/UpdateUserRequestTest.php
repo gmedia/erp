@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Unit\Requests\Users;
+
 use App\Http\Requests\Users\UpdateUserRequest;
 use App\Models\Employee;
 use App\Models\User;
