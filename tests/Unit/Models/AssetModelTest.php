@@ -5,7 +5,7 @@ use App\Models\AssetModel;
 use App\Models\Asset;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(Tests\TestCase::class, RefreshDatabase::class)->in('Unit');
+uses(RefreshDatabase::class)->group('asset-models');
 
 test('asset model has correct fillable fields', function () {
     $model = new AssetModel();
@@ -16,7 +16,7 @@ test('asset model has correct fillable fields', function () {
         'model_name',
         'specs',
     ]);
-})->group('asset-models');
+});
 
 test('asset model belongs to an asset category', function () {
     $category = AssetCategory::factory()->create();
@@ -24,7 +24,7 @@ test('asset model belongs to an asset category', function () {
     
     expect($model->category)->toBeInstanceOf(AssetCategory::class)
         ->and($model->category->id)->toBe($category->id);
-})->group('asset-models');
+});
 
 test('asset model has many assets', function () {
     $model = AssetModel::factory()->create();
@@ -33,7 +33,7 @@ test('asset model has many assets', function () {
     expect($model->assets)->toHaveCount(1)
         ->and($model->assets->first())->toBeInstanceOf(Asset::class)
         ->and($model->assets->first()->id)->toBe($asset->id);
-})->group('asset-models');
+});
 
 test('asset model casts specs to array', function () {
     $model = AssetModel::factory()->create([
@@ -42,4 +42,4 @@ test('asset model casts specs to array', function () {
     
     expect($model->specs)->toBeArray()
         ->and($model->specs)->toBe(['color' => 'red', 'weight' => '1kg']);
-})->group('asset-models');
+});
