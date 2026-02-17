@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { login, createJournalEntry } from '../helpers';
+import { login } from '../helpers';
+import { createJournalEntry } from '../journal-entries/helpers';
 
 test.describe('Posting Journal End-to-End', () => {
   test.setTimeout(120000);

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { createEmployee, login } from '../helpers';
+import { login } from '../helpers';
+import { createEmployee } from '../employees/helpers';
 
 test.describe('User Management', () => {
     test.beforeEach(async ({ page }) => {
