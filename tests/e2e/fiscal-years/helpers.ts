@@ -1,5 +1,4 @@
 import { Page, expect } from '@playwright/test';
-import { login } from '../helpers';
 
 /**
  * Helper to pick a date from the DatePickerField.
@@ -41,9 +40,7 @@ export async function createFiscalYear(
   const random = Math.floor(Math.random() * 10000);
   const name = overrides.name ?? `FY ${timestamp}-${random}`;
 
-  await login(page);
-  await page.goto('/fiscal-years');
-  await page.waitForLoadState('networkidle');
+
 
   const addButton = page.getByRole('button', { name: /Add/i });
   await addButton.waitFor({ state: 'visible' });

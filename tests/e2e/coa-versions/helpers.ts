@@ -1,5 +1,4 @@
 import { Page, expect } from '@playwright/test';
-import { login } from '../helpers';
 
 /**
  * Create a new COA version via the UI.
@@ -14,10 +13,6 @@ export async function createCoaVersion(
 ): Promise<string> {
   const timestamp = Date.now();
   const defaultName = `COA Version ${timestamp}`;
-
-  await login(page);
-  await page.goto('/coa-versions');
-  await page.waitForLoadState('networkidle');
 
   const addButton = page.getByRole('button', { name: /Add/i });
   await expect(addButton).toBeVisible();

@@ -1,5 +1,10 @@
+import { test } from '@playwright/test';
 import { generateModuleTests } from '../shared-test-factories';
 import { createAccountMapping, searchAccountMappings, editAccountMapping } from './helpers';
+
+// Account mapping creation involves 5 combobox selections with async loading,
+// which can exceed the default 60s timeout.
+test.setTimeout(120_000);
 
 generateModuleTests({
   entityName: 'Account Mapping',

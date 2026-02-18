@@ -1,5 +1,4 @@
 import { Page, expect } from '@playwright/test';
-import { login } from '../helpers';
 
 /**
  * Create a new journal entry via the UI.
@@ -27,13 +26,7 @@ export async function createJournalEntry(
   const defaultRef = `REF-${timestamp}-${random}`;
   const defaultDesc = `Journal Entry ${timestamp}`;
 
-  // 1️⃣ Login
-  await login(page);
-
-  // 2️⃣ Navigate to Journal Entries page
-  await page.goto('/journal-entries');
-
-  // 3️⃣ Open the "Add Journal Entry" dialog
+  // Open the "Add Journal Entry" dialog
   const addButton = page.getByRole('button', { name: /Add/i });
   await expect(addButton).toBeVisible();
   await addButton.click();
