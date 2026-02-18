@@ -50,14 +50,16 @@ describe('Department API Endpoints', function () {
     });
 
     test('index supports search filtering', function () {
-        Department::factory()->create(['name' => 'IT Dept']);
+        Department::query()->delete();
+
+        Department::factory()->create(['name' => 'XQZFIND Dept']);
         Department::factory()->create(['name' => 'HR Dept']);
 
-        $response = getJson('/api/departments?search=IT');
+        $response = getJson('/api/departments?search=XQZFIND');
 
         $response->assertOk();
         expect($response->json('data'))->toHaveCount(1)
-            ->and($response->json('data.0.name'))->toBe('IT Dept');
+            ->and($response->json('data.0.name'))->toBe('XQZFIND Dept');
     });
 
     test('index sorts results', function () {
