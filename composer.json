@@ -18,7 +18,8 @@
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
         "lorisleiva/laravel-actions": "^2.9",
-        "maatwebsite/excel": "^3.1"
+        "maatwebsite/excel": "^3.1",
+        "sentry/sentry-laravel": "^4.20"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.6",
