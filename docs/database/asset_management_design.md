@@ -390,7 +390,7 @@ Tabel terlibat:
 Tujuan: membuat dokumen perpindahan aset (mutasi antar cabang/ruang/PIC) dan audit trail.
 
 Jenis menu: Complex CRUD  
-Agent skill: `feature-non-crud`
+Agent skill: `feature-crud-complex`
 
 Tabel terlibat:
 * `asset_movements`
