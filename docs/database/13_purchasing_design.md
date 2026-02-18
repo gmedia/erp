@@ -81,6 +81,7 @@ Header dokumen permintaan pembelian internal.
 | `required_date` | Date | Tanggal kebutuhan diharapkan (nullable) |
 | `priority` | Enum | `low`, `normal`, `high`, `urgent` (default: `normal`) |
 | `status` | Enum | `draft`, `pending_approval`, `approved`, `rejected`, `partially_ordered`, `fully_ordered`, `cancelled` |
+| `estimated_amount` | Decimal(15,2) | Total estimasi biaya PR — cache dari SUM(items.estimated_total) (nullable) |
 | `notes` | Text | Catatan (nullable) |
 | `approved_by` | BigInt | FK -> `users` (nullable, yang menyetujui) |
 | `approved_at` | Timestamp | Waktu persetujuan (nullable) |
@@ -103,6 +104,7 @@ Detail item yang diminta pada PR.
 | `quantity` | Decimal(15,2) | Jumlah yang diminta |
 | `quantity_ordered` | Decimal(15,2) | Jumlah yang sudah masuk PO (cache, default 0) |
 | `estimated_unit_price` | Decimal(15,2) | Estimasi harga satuan (nullable) |
+| `estimated_total` | Decimal(15,2) | quantity × estimated_unit_price (cache, nullable) |
 | `notes` | Text | Catatan per item (nullable) |
 | `created_at` | Timestamp | |
 | `updated_at` | Timestamp | |
@@ -111,6 +113,13 @@ Detail item yang diminta pada PR.
 
 > [!NOTE]
 > `quantity_ordered` adalah field cache yang dihitung dari total `purchase_order_items` yang mereferensi item ini. Berguna untuk mendeteksi apakah PR sudah fully ordered atau partially ordered.
+
+> [!IMPORTANT]
+> Relasi `purchase_order_items.purchase_request_item_id` adalah **Many-to-One**: beberapa PO items bisa mereferensi satu PR item (split order scenario). Invariant yang harus dijaga:
+> ```
+> SUM(poi.quantity) WHERE poi.purchase_request_item_id = X
+>   MUST EQUAL purchase_request_items[X].quantity_ordered
+> ```
 
 ---
 
@@ -133,7 +142,7 @@ Header dokumen pesanan pembelian ke supplier.
 | `tax_amount` | Decimal(15,2) | Total pajak (cache, default 0) |
 | `discount_amount` | Decimal(15,2) | Total diskon (cache, default 0) |
 | `grand_total` | Decimal(15,2) | Total keseluruhan (cache) |
-| `status` | Enum | `draft`, `confirmed`, `partially_received`, `fully_received`, `cancelled`, `closed` |
+| `status` | Enum | `draft`, `pending_approval`, `confirmed`, `rejected`, `partially_received`, `fully_received`, `cancelled`, `closed` |
 | `notes` | Text | Catatan (nullable) |
 | `shipping_address` | Text | Alamat pengiriman (nullable) |
 | `approved_by` | BigInt | FK -> `users` (nullable) |
@@ -204,6 +213,7 @@ Detail item yang diterima pada GR.
 | `goods_receipt_id` | BigInt | FK -> `goods_receipts` |
 | `purchase_order_item_id` | BigInt | FK -> `purchase_order_items` (traceability ke PO item) |
 | `product_id` | BigInt | FK -> `products` |
+| `unit_id` | BigInt | FK -> `units` (nullable, default: unit dari PO item) |
 | `quantity_received` | Decimal(15,2) | Jumlah yang diterima |
 | `quantity_accepted` | Decimal(15,2) | Jumlah yang lolos QC / diterima baik |
 | `quantity_rejected` | Decimal(15,2) | Jumlah yang ditolak / rusak (default 0) |
@@ -217,7 +227,7 @@ Detail item yang diterima pada GR.
 > [!IMPORTANT]
 > Saat GR di-confirm:
 > 1. Update `purchase_order_items.quantity_received` += `quantity_accepted`.
-> 2. Update `product_stocks.quantity_on_hand` += `quantity_accepted` untuk branch yang bersangkutan.
+> 2. Update `product_stocks.quantity_on_hand` += `quantity_accepted` untuk **branch di `goods_receipts.branch_id`** (bukan `purchase_orders.branch_id`, karena bisa berbeda).
 > 3. Hitung ulang `product_stocks.average_cost` berdasarkan weighted average.
 > 4. Evaluasi status PO: jika semua item PO sudah fully received → `fully_received`, jika sebagian → `partially_received`.
 
@@ -233,6 +243,7 @@ Header dokumen retur barang ke supplier.
 | `id` | BigInt | Primary Key |
 | `return_number` | String | Nomor retur (unique), generated, mis. SR-2026-000001 |
 | `purchase_order_id` | BigInt | FK -> `purchase_orders` |
+| `goods_receipt_id` | BigInt | FK -> `goods_receipts` (nullable, untuk traceability langsung ke GR) |
 | `supplier_id` | BigInt | FK -> `suppliers` |
 | `branch_id` | BigInt | FK -> `branches` |
 | `return_date` | Date | Tanggal retur |
@@ -243,7 +254,7 @@ Header dokumen retur barang ke supplier.
 | `created_at` | Timestamp | |
 | `updated_at` | Timestamp | |
 
-**Index (disarankan):** `return_number` (unique), `purchase_order_id`, `supplier_id`, `return_date`
+**Index (disarankan):** `return_number` (unique), `purchase_order_id`, `goods_receipt_id`, `supplier_id`, `return_date`
 
 #### 8. `supplier_return_items`
 Detail item yang dikembalikan.
@@ -254,6 +265,7 @@ Detail item yang dikembalikan.
 | `supplier_return_id` | BigInt | FK -> `supplier_returns` |
 | `goods_receipt_item_id` | BigInt | FK -> `goods_receipt_items` (traceability ke GR item) |
 | `product_id` | BigInt | FK -> `products` |
+| `unit_id` | BigInt | FK -> `units` (nullable, default: unit dari GR item) |
 | `quantity_returned` | Decimal(15,2) | Jumlah yang diretur |
 | `unit_price` | Decimal(15,2) | Harga satuan (referensi dari GR) |
 | `notes` | Text | Catatan (nullable) |
@@ -299,6 +311,22 @@ Format penomoran otomatis:
 *   PO: `PO-{YYYY}-{seq:6}` → PO-2026-000001
 *   GR: `GR-{YYYY}-{seq:6}` → GR-2026-000001
 *   SR: `SR-{YYYY}-{seq:6}` → SR-2026-000001
+
+Disarankan menggunakan tabel `document_sequences` untuk mengelola auto-increment per prefix per tahun:
+
+| Kolom | Tipe Data | Keterangan |
+| :--- | :--- | :--- |
+| `id` | BigInt | Primary Key |
+| `prefix` | String | Prefix dokumen (mis. `PR`, `PO`, `GR`, `SR`) |
+| `year` | Integer | Tahun (mis. 2026) |
+| `last_number` | Integer | Nomor terakhir yang digunakan (default: 0) |
+| `created_at` | Timestamp | |
+| `updated_at` | Timestamp | |
+
+**Unique Constraint:** `(prefix, year)`
+
+> [!NOTE]
+> Saat membuat dokumen baru, increment `last_number` secara atomik (menggunakan `DB::transaction` + `lockForUpdate`) untuk menghindari duplikasi nomor di lingkungan concurrent.
 
 ### Perhitungan Harga PO Item
 ```
@@ -449,7 +477,10 @@ Tabel terlibat:
 
 ---
 
-## 6. Integrasi Akuntansi (Opsional — Tahap Berikutnya)
+## 6. Integrasi Akuntansi
+
+> [!WARNING]
+> **Decision Required**: Apakah modul Purchasing akan langsung memposting jurnal akuntansi (AP entry) saat GR confirmed, atau ini ditunda ke fase berikutnya? Keputusan ini mempengaruhi apakah kolom `journal_entry_id` disertakan di migration awal atau ditambahkan nanti.
 
 Saat siap diintegrasikan dengan modul akuntansi, berikut posting jurnal yang umum:
 
@@ -467,3 +498,68 @@ Saat siap diintegrasikan dengan modul akuntansi, berikut posting jurnal yang umu
 
 > [!TIP]
 > Untuk integrasi akuntansi, tambahkan kolom `journal_entry_id` (FK -> `journal_entries`, nullable) pada tabel `goods_receipts` dan `supplier_returns` saat modul akuntansi pembelian diaktifkan.
+
+---
+
+## 7. Integrasi dengan Pipeline & Approval System
+
+Modul Purchasing terintegrasi dengan Pipeline System (`10_pipeline_design.md`) untuk lifecycle management dan Approval System (`11_approval_design.md`) untuk proses persetujuan.
+
+### Purchase Request Lifecycle (via Pipeline)
+
+```mermaid
+stateDiagram-v2
+    [*] --> draft
+    draft --> pending_approval : Submit (trigger approval)
+    pending_approval --> approved : Approval completed
+    pending_approval --> rejected : Approval rejected
+    rejected --> draft : Revise & resubmit
+    approved --> partially_ordered : Sebagian item masuk PO
+    approved --> fully_ordered : Semua item masuk PO
+    partially_ordered --> fully_ordered : Sisa item masuk PO
+    draft --> cancelled : Cancel
+    fully_ordered --> [*]
+    cancelled --> [*]
+```
+
+**Pipeline:** `pr_lifecycle`
+- entity_type: `App\Models\PurchaseRequest`
+- Transisi `Submit` men-trigger `trigger_approval` action dengan `approval_flow_code` yang sesuai berdasarkan nilai PR.
+- Transisi `approved → partially_ordered` dan `partially_ordered → fully_ordered` dikontrol otomatis saat PO dibuat dari PR items.
+
+### Purchase Order Lifecycle (via Pipeline)
+
+```mermaid
+stateDiagram-v2
+    [*] --> draft
+    draft --> pending_approval : Submit (trigger approval, jika perlu)
+    draft --> confirmed : Confirm (jika tidak perlu approval)
+    pending_approval --> confirmed : Approval completed
+    pending_approval --> rejected : Approval rejected
+    rejected --> draft : Revise
+    confirmed --> partially_received : Partial GR confirmed
+    confirmed --> fully_received : Full GR confirmed
+    partially_received --> fully_received : Final GR confirmed
+    confirmed --> cancelled : Cancel
+    fully_received --> closed : Close PO
+    cancelled --> [*]
+    closed --> [*]
+```
+
+**Pipeline:** `po_lifecycle`
+- entity_type: `App\Models\PurchaseOrder`
+- Transisi `confirmed → partially_received → fully_received` dikontrol oleh Goods Receipt processing, bukan user manual.
+- Approval hanya diperlukan untuk PO bernilai tinggi (ditentukan oleh `conditions` di `approval_flows`).
+
+### Hubungan Antar Dokumen & Pipeline
+
+| Aksi User | Pipeline PR | Pipeline PO | Approval |
+| :--- | :--- | :--- | :--- |
+| Submit PR | `draft → pending_approval` | — | Flow PR aktif |
+| Approve PR | `pending_approval → approved` | — | Callback |
+| Create PO from PR | Auto-update `partially_ordered` / `fully_ordered` | `draft` (PO baru) | — |
+| Submit PO | — | `draft → pending_approval` | Flow PO aktif (jika perlu) |
+| Confirm GR | — | Auto-update `partially_received` / `fully_received` | — |
+
+> [!NOTE]
+> Dokumen purchasing **tidak boleh** di-delete. Gunakan status `cancelled` untuk membatalkan. Ini menjaga integritas audit trail di Pipeline State Logs dan Approval Audit Logs.

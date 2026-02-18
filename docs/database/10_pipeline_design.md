@@ -74,6 +74,7 @@ Definisi pipeline per tipe entitas. Satu tipe entitas bisa memiliki lebih dari s
 | `code` | String | Kode unik pipeline (unique, mis. `asset_lifecycle`, `po_flow`) |
 | `entity_type` | String | Nama class model (polymorphic, mis. `App\Models\Asset`) |
 | `description` | Text | Deskripsi pipeline (nullable) |
+| `version` | Integer | Versi pipeline (default: 1) |
 | `is_active` | Boolean | Apakah pipeline aktif (default: true) |
 | `conditions` | JSON | Kondisi kapan pipeline ini berlaku (nullable, mis. `{"asset_type": "vehicle"}`) |
 | `created_by` | BigInt | FK -> `users` (nullable) |
@@ -87,6 +88,12 @@ Definisi pipeline per tipe entitas. Satu tipe entitas bisa memiliki lebih dari s
 > - Asset kendaraan → pipeline khusus dengan state `inspection_due`.
 > - Asset IT equipment → pipeline standar tanpa state inspeksi.
 > - PO domestik vs PO impor → flow yang berbeda.
+
+> [!IMPORTANT]
+> **Versioning Strategy**: Saat pipeline di-update (state/transisi diubah), increment `version`. Entitas yang sedang in-flight tetap terikat pada `pipeline_id` yang sama — perubahan pipeline berlaku untuk transisi **berikutnya**, bukan transisi yang sedang berjalan. Jika perubahan bersifat breaking (state dihapus), buat pipeline baru dan deaktifkan yang lama.
+
+> [!CAUTION]
+> **Soft Delete**: Tabel konfigurasi (`pipelines`, `pipeline_states`, `pipeline_transitions`) **tidak boleh di-delete** jika masih ada entitas yang menggunakannya. Gunakan `is_active = false` untuk menonaktifkan. Menghapus state/transition yang direferensi oleh log historis akan merusak audit trail.
 
 #### 2. `pipeline_states`
 Daftar state yang valid dalam satu pipeline. Setiap state memiliki atribut visual dan klasifikasi tipe.
@@ -167,6 +174,22 @@ Guard conditions adalah JSON yang mendefinisikan syarat (`AND`) agar transisi bi
 > [!NOTE]
 > Guard conditions dievaluasi secara **AND** — semua kondisi harus terpenuhi. Jika diperlukan logika OR, gunakan `custom_rule`.
 
+##### Format Error Response Guard
+Saat guard conditions gagal, pipeline engine mengembalikan error terstruktur agar UI bisa menampilkan alasan spesifik:
+
+```json
+{
+  "transition_blocked": true,
+  "transition_code": "dispose",
+  "failed_guards": [
+    {"type": "field_check", "field": "purchase_cost", "operator": ">", "value": 0, "message": "Purchase cost harus lebih dari 0"},
+    {"type": "relation_check", "relation": "movements", "operator": "count_gte", "value": 1, "message": "Aset harus memiliki minimal 1 movement"}
+  ]
+}
+```
+
+UI dapat menggunakan `failed_guards[].message` untuk menampilkan tooltip pada tombol yang di-disable.
+
 #### 4. `pipeline_transition_actions`
 Side-effect otomatis yang dijalankan saat transisi berhasil. Dieksekusi secara berurutan berdasarkan `execution_order`.
 
@@ -205,7 +228,7 @@ Side-effect otomatis yang dijalankan saat transisi berhasil. Dieksekusi secara b
 ### B. Tracking State Per Entitas
 
 #### 5. `pipeline_entity_states`
-State saat ini dari setiap entitas yang menggunakan pipeline. Satu record per entitas.
+State saat ini dari setiap entitas yang menggunakan pipeline. Satu record per entitas per pipeline.
 
 | Kolom | Tipe Data | Keterangan |
 | :--- | :--- | :--- |
@@ -220,7 +243,7 @@ State saat ini dari setiap entitas yang menggunakan pipeline. Satu record per en
 | `created_at` | Timestamp | |
 | `updated_at` | Timestamp | |
 
-**Unique Constraint (disarankan):** `(entity_type, entity_id)` — satu entitas hanya punya satu state aktif.
+**Unique Constraint (disarankan):** `(pipeline_id, entity_type, entity_id)` — satu entitas punya satu state aktif per pipeline.
 
 **Index (disarankan):** `(entity_type, entity_id)`, `current_state_id`, `pipeline_id`
 
@@ -380,15 +403,20 @@ stateDiagram-v2
 stateDiagram-v2
     [*] --> draft
     draft --> pending_approval : Submit
-    pending_approval --> approved : Approve
+    pending_approval --> confirmed : Approve
     pending_approval --> rejected : Reject
     rejected --> draft : Revise
-    approved --> in_progress : Start Processing
-    in_progress --> completed : Complete
-    in_progress --> cancelled : Cancel
-    completed --> [*]
+    confirmed --> partially_received : Partial GR
+    confirmed --> fully_received : Full GR
+    confirmed --> cancelled : Cancel
+    partially_received --> fully_received : Final GR
+    fully_received --> closed : Close
     cancelled --> [*]
+    closed --> [*]
 ```
+
+> [!NOTE]
+> State PO di pipeline ini **harus konsisten** dengan enum `status` di tabel `purchase_orders` (`13_purchasing_design.md`). Transisi `confirmed → partially_received → fully_received` dikendalikan otomatis oleh Goods Receipt processing, bukan oleh user secara manual.
 
 **Pipeline:** `po_flow`
 - entity_type: `App\Models\PurchaseOrder`
@@ -397,10 +425,11 @@ stateDiagram-v2
 | :--- | :--- | :--- | :--- |
 | `draft` | Draft | initial | `#6B7280` |
 | `pending_approval` | Pending Approval | intermediate | `#F59E0B` |
-| `approved` | Approved | intermediate | `#10B981` |
+| `confirmed` | Confirmed | intermediate | `#10B981` |
 | `rejected` | Rejected | intermediate | `#EF4444` |
-| `in_progress` | In Progress | intermediate | `#3B82F6` |
-| `completed` | Completed | final | `#059669` |
+| `partially_received` | Partially Received | intermediate | `#3B82F6` |
+| `fully_received` | Fully Received | intermediate | `#059669` |
+| `closed` | Closed | final | `#6B7280` |
 | `cancelled` | Cancelled | final | `#9CA3AF` |
 
 ---
@@ -412,11 +441,11 @@ Dengan desain polymorphic ini, tabel-tabel entitas **tidak perlu diubah secara s
 | Tabel Entitas | Kolom `status` (existing) | Dikelola oleh Pipeline |
 | :--- | :--- | :--- |
 | `assets` | `draft`, `active`, `maintenance`, `disposed`, `lost` | ✅ |
-| `purchase_requests` | `draft`, `pending_approval`, `approved`, `rejected`, … | ✅ |
-| `purchase_orders` | `draft`, `pending_approval`, `confirmed`, … | ✅ |
+| `purchase_requests` | `draft`, `pending_approval`, `approved`, `rejected`, `partially_ordered`, `fully_ordered`, `cancelled` | ✅ |
+| `purchase_orders` | `draft`, `pending_approval`, `confirmed`, `rejected`, `partially_received`, `fully_received`, `cancelled`, `closed` | ✅ |
 | `journal_entries` | `draft`, `pending_approval`, `posted`, … | ✅ |
 | `asset_stocktakes` | `draft`, `in_progress`, `completed`, `cancelled` | ✅ |
-| `asset_depreciation_runs` | `draft`, `calculated`, `posted`, `void` | ✅ |
+| `asset_depreciation_runs` | `draft`, `calculated`, `posted`, `void` | ✅ (desain tabel belum diformalkan — lihat roadmap) |
 
 > [!IMPORTANT]
 > Kolom `status` di tabel entitas **tetap dipertahankan** sebagai cache/shortcut query. Pipeline engine men-sync kolom ini melalui aksi `update_field` agar tidak ada breaking change pada query/filter existing.

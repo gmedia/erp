@@ -70,21 +70,45 @@ Template alur approval. Satu flow per tipe dokumen (atau per kombinasi tipe + ko
 | :--- | :--- | :--- |
 | `id` | BigInt | Primary Key |
 | `name` | String | Nama flow (mis. "PR Approval – Standard", "PO Approval – High Value") |
+| `code` | String | Kode unik flow (unique, mis. `pr_standard`, `po_high_value`) |
 | `approvable_type` | String | Nama class model (polymorphic, mis. `App\Models\PurchaseRequest`) |
 | `description` | Text | Deskripsi flow (nullable) |
 | `is_active` | Boolean | Apakah flow aktif (default: true) |
-| `conditions` | JSON | Kondisi tambahan kapan flow ini berlaku (nullable, mis. `{"min_amount": 10000000}`) |
+| `conditions` | JSON | Kondisi tambahan kapan flow ini berlaku (nullable, lihat format di bawah) |
 | `created_by` | BigInt | FK -> `users` (nullable) |
 | `created_at` | Timestamp | |
 | `updated_at` | Timestamp | |
 
-**Index (disarankan):** `approvable_type`, `is_active`
+**Index (disarankan):** `approvable_type`, `is_active`, `code` (unique)
+
+> [!TIP]
+> Kolom `code` digunakan oleh Pipeline System (`10_pipeline_design.md`) untuk mereferensi flow pada action `trigger_approval`. Contoh: `{"approval_flow_code": "po_high_value"}`.
 
 > [!TIP]
 > Kolom `conditions` memungkinkan multiple flow untuk tipe dokumen yang sama. Contoh:
 > - PR ≤ Rp 10 juta → 1 level approval (Manager).
 > - PR > Rp 10 juta → 2 level approval (Manager → Direktur).
 > - PO > Rp 100 juta → 3 level approval (Procurement → Finance → Direktur).
+
+##### Format `conditions`
+Kolom `conditions` menggunakan format JSON yang konsisten dengan `guard_conditions` di Pipeline System:
+
+```json
+{
+  "field_checks": [
+    {"field": "total_amount", "operator": ">", "value": 10000000},
+    {"field": "priority", "operator": "in", "value": ["high", "urgent"]}
+  ]
+}
+```
+
+| Operator | Penjelasan |
+| :--- | :--- |
+| `=`, `!=`, `>`, `<`, `>=`, `<=` | Perbandingan standar |
+| `in`, `not_in` | Cek apakah nilai ada di dalam array |
+| `is_null`, `is_not_null` | Cek null |
+
+Saat dokumen di-submit, sistem mengevaluasi `conditions` dari semua flow yang cocok dengan `approvable_type`, dan memilih flow yang paling spesifik (paling banyak kondisi terpenuhi). Jika tidak ada yang cocok, gunakan flow tanpa conditions (default flow).
 
 #### 2. `approval_flow_steps`
 Detail setiap level/tahap dalam satu flow. Diurutkan berdasarkan `step_order`.
@@ -101,11 +125,20 @@ Detail setiap level/tahap dalam satu flow. Diurutkan berdasarkan `step_order`.
 | `approver_department_id` | BigInt | FK -> `departments` (nullable, jika `approver_type = department_head`) |
 | `required_action` | Enum | `approve`, `review`, `acknowledge` (default: `approve`) |
 | `auto_approve_after_hours` | Integer | Auto-approve setelah N jam tanpa respons (nullable, 0 = tidak pernah) |
+| `escalate_after_hours` | Integer | Eskalasi setelah N jam tanpa respons (nullable, 0 = tidak pernah) |
+| `escalation_user_id` | BigInt | FK -> `users` (nullable, user target eskalasi jika bukan step berikutnya) |
 | `can_reject` | Boolean | Apakah tahap ini bisa me-reject dokumen (default: true) |
 | `created_at` | Timestamp | |
 | `updated_at` | Timestamp | |
 
 **Unique Constraint (disarankan):** `(approval_flow_id, step_order)`
+
+> [!NOTE]
+> **Eskalasi**: Jika `escalate_after_hours > 0` dan tidak ada respons dalam waktu tersebut:
+> - Jika `escalation_user_id` diisi → notifikasi dikirim ke user tersebut dan user tersebut berhak mengambil tindakan.
+> - Jika `escalation_user_id` kosong → step di-skip dan lanjut ke step berikutnya.
+> - Event `escalated` dicatat di audit log.
+> - Implementasi: menggunakan scheduled job yang sama dengan auto-approve.
 
 ##### Penjelasan `approver_type`
 
@@ -141,7 +174,8 @@ Instance approval untuk satu dokumen. Dibuat otomatis saat dokumen di-submit unt
 
 **Index (disarankan):** `(approvable_type, approvable_id)`, `status`, `approval_flow_id`, `submitted_by`
 
-**Unique Constraint (disarankan):** `(approvable_type, approvable_id)` — satu dokumen hanya punya satu approval request aktif.
+> [!IMPORTANT]
+> **Tidak menggunakan unique constraint** pada `(approvable_type, approvable_id)` karena satu dokumen bisa memiliki beberapa approval request (1 aktif + N cancelled dari resubmit). Validasi "hanya boleh ada satu request non-cancelled per dokumen" dilakukan di **application level**.
 
 > [!NOTE]
 > Jika sebuah dokumen di-reject lalu di-submit ulang, approval request lama akan di-cancel (`cancelled`) dan dibuat yang baru. Dengan demikian, histori approval sebelumnya tetap tersimpan.
@@ -286,8 +320,8 @@ Dengan desain polymorphic ini, tabel-tabel dokumen **tidak perlu diubah secara s
 
 | Tabel Dokumen | Status yang Perlu Ditambahkan/Diverifikasi |
 | :--- | :--- |
-| `purchase_requests` | `draft`, `pending_approval`, `approved`, `rejected`, `cancelled`, … |
-| `purchase_orders` | `draft`, `pending_approval`, `confirmed`, … |
+| `purchase_requests` | `draft`, `pending_approval`, `approved`, `rejected`, `partially_ordered`, `fully_ordered`, `cancelled` |
+| `purchase_orders` | `draft`, `pending_approval`, `confirmed`, `rejected`, `partially_received`, `fully_received`, `cancelled`, `closed` |
 | `journal_entries` | `draft`, `pending_approval`, `posted`, … |
 
 > [!IMPORTANT]
@@ -437,3 +471,48 @@ Fitur khusus:
 8.  Finance Director klik **Approve** → step 2 status → `approved`.
 9.  Approval request status → `approved`. PR status → `approved`.
 10. Kolom `purchase_requests.approved_by` diupdate dengan user Finance Director, `approved_at` diupdate.
+
+---
+
+## 8. Integrasi dengan Pipeline System
+
+Approval System dan Pipeline System (`10_pipeline_design.md`) bekerja sebagai **dua engine yang saling melengkapi**:
+
+### Hubungan
+*   **Pipeline** mengatur lifecycle keseluruhan entitas (semua state dan transisi).
+*   **Approval** mengatur proses persetujuan di dalam satu transisi pipeline (mis. `draft → pending_approval`).
+*   Pipeline memanggil Approval saat transisi memerlukan persetujuan (`requires_approval = true`).
+*   Approval memanggil kembali Pipeline saat keputusan final dibuat.
+
+### Mekanisme Callback (Event-Driven)
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Pipeline as Pipeline Engine
+    participant Approval as Approval Engine
+    participant Approver
+
+    User->>Pipeline: Trigger transition (e.g. Submit PO)
+    Pipeline->>Pipeline: Check guards, permissions
+    Pipeline->>Approval: trigger_approval action
+    Approval->>Approval: Create approval_request + steps
+    Approval->>Approver: Send notification
+    Approver->>Approval: Approve / Reject
+    Approval->>Pipeline: Dispatch ApprovalCompleted / ApprovalRejected event
+    Pipeline->>Pipeline: Execute next transition based on event
+```
+
+### Events yang Di-dispatch
+
+| Event | Kapan | Payload |
+| :--- | :--- | :--- |
+| `ApprovalCompleted` | Semua step approved | `{approvable_type, approvable_id, approval_request_id, final_approver_id}` |
+| `ApprovalRejected` | Salah satu step rejected | `{approvable_type, approvable_id, approval_request_id, rejected_by, rejection_reason}` |
+
+Pipeline Engine mendengarkan event ini via Laravel Event Listener dan menjalankan transisi yang sesuai:
+*   `ApprovalCompleted` → transisi ke state positif (mis. `confirmed`, `approved`).
+*   `ApprovalRejected` → transisi ke state negatif (mis. `rejected`, kembali ke `draft`).
+
+> [!IMPORTANT]
+> Komunikasi antar engine bersifat **event-driven (loose coupling)**, bukan direct method call. Ini memungkinkan kedua sistem digunakan secara independen atau bersama-sama.
