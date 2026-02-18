@@ -26,7 +26,7 @@ Instruksi:
    - E2E menggunakan `generateModuleTests()` dari `shared-test-factories.ts`
 5. Verifikasi:
    - `./vendor/bin/sail test --group {modul-names}`
-   - `npx playwright test tests/e2e/{modul-names}/`
+   - `./vendor/bin/sail npx playwright test tests/e2e/{modul-names}/`
 ```
 
 ### 2. CRUD Complex
@@ -58,7 +58,7 @@ Instruksi:
    - E2E helper di file terpisah: `tests/e2e/{modul-names}/helpers.ts`
 5. Verifikasi:
    - `./vendor/bin/sail test --group {modul-names}`
-   - `npx playwright test tests/e2e/{modul-names}/`
+   - `./vendor/bin/sail npx playwright test tests/e2e/{modul-names}/`
 ```
 
 ### 3. Non-CRUD
@@ -85,7 +85,7 @@ Instruksi:
    - E2E helper (jika ada interaksi CRUD) di `tests/e2e/{modul-names}/helpers.ts`
 5. Verifikasi:
    - `./vendor/bin/sail test --group {modul-names}`
-   - `npx playwright test tests/e2e/{modul-names}/`
+   - `./vendor/bin/sail npx playwright test tests/e2e/{modul-names}/`
 ```
 
 ---
