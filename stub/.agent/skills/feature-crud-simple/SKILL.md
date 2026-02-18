@@ -57,9 +57,9 @@ Apakah modul ini:
 ### Tests
 | Path | Base Trait |
 |------|------------|
-| `tests/Unit/{Feature}Test.php` | Pest syntax |
-| `tests/Feature/{Feature}ControllerTest.php` | `SimpleCrudTestTrait` |
-| `tests/Feature/{Feature}ExportTest.php` | `SimpleCrudExportTestTrait` |
+| `tests/Unit/Models/{Feature}Test.php` | Pest syntax |
+| `tests/Feature/{Features}/{Feature}ControllerTest.php` | `SimpleCrudTestTrait` |
+| `tests/Feature/{Features}/{Feature}ExportTest.php` | `SimpleCrudExportTestTrait` |
 | `tests/Unit/Actions/{Features}/Index{Features}ActionTest.php` | `SimpleCrudIndexActionTestTrait` |
 | `tests/Unit/Actions/{Features}/Export{Features}ActionTest.php` | `SimpleCrudExportActionTestTrait` |
 | `tests/Unit/Domain/{Features}/{Feature}FilterServiceTest.php` | `SimpleCrudFilterServiceTestTrait` |
@@ -69,7 +69,8 @@ Apakah modul ini:
 | `tests/Unit/Requests/{Features}/Update{Feature}RequestTest.php` | `SimpleCrudUpdateRequestTestTrait` |
 | `tests/Unit/Resources/{Features}/{Feature}ResourceTest.php` | `SimpleCrudResourceTestTrait` |
 | `tests/Unit/Resources/{Features}/{Feature}CollectionTest.php` | `SimpleCrudCollectionTestTrait` |
-| `tests/e2e/{features}/{feature}.spec.ts` | Uses `runSimpleCrudE2ETests()` |
+| `tests/e2e/{features}/helpers.ts` | Module-specific helper functions |
+| `tests/e2e/{features}/{feature}.spec.ts` | Uses `generateModuleTests()` |
 
 ---
 
@@ -466,24 +467,15 @@ class {Feature}ExportTest extends TestCase
 ```
 
 #### E2E Tests
-```typescript
-// tests/e2e/{features}/{feature}.spec.ts
-import { runSimpleCrudE2ETests } from '../simple-crud-tests';
-import { create{Feature}, search{Feature}, edit{Feature} } from '../helpers';
 
-runSimpleCrudE2ETests({
-  entityName: '{feature}',
-  entityNamePlural: '{features}',
-  route: '/{features}',
-  searchPlaceholder: 'Search {features}...',
-  createEntity: create{Feature},
-  searchEntity: search{Feature},
-  editEntity: edit{Feature},
-});
-```
+> **PENTING:** Ikuti standar dari `tests/e2e/REFACTORING_PLAN.md`.
+> Helper functions WAJIB di file terpisah (`tests/e2e/{features}/helpers.ts`), bukan di `helpers.ts` global.
 
-#### E2E Helper Functions (tambah ke tests/e2e/helpers.ts)
 ```typescript
+// tests/e2e/{features}/helpers.ts
+import { Page, expect } from '@playwright/test';
+import { login, createEntity, EntityConfig } from '../helpers';
+
 export async function create{Feature}(
   page: Page,
   overrides: Partial<{ name: string }> = {}
@@ -507,37 +499,28 @@ export async function search{Feature}(page: Page, name: string): Promise<void> {
   await page.press('input[placeholder="Search {features}..."]', 'Enter');
   await page.waitForSelector(`text=${name}`);
 }
+```
 
-export async function edit{Feature}(
-  page: Page,
-  name: string,
-  updates: { name?: string }
-): Promise<void> {
-  await search{Feature}(page, name);
+```typescript
+// tests/e2e/{features}/{feature}.spec.ts
+import { generateModuleTests, ModuleTestConfig } from '../shared-test-factories';
+import { create{Feature}, search{Feature} } from './helpers';
 
-  const row = page.locator('tr', { hasText: name }).first();
-  await expect(row).toBeVisible();
-  await row.waitFor({ state: 'attached' });
-  const actionsBtn = row.getByRole('button', { name: /Actions/i });
-  await expect(actionsBtn).toBeVisible();
-  await actionsBtn.click({ force: true });
+const config: ModuleTestConfig = {
+  entityName: '{Feature}',
+  entityNamePlural: '{Features}',
+  route: '/{features}',
+  apiPath: '/api/{features}',
+  createEntity: create{Feature},
+  searchEntity: search{Feature},
+  sortableColumns: ['Name', 'Created At', 'Updated At'],
+  viewType: 'dialog',
+  viewDialogTitle: '{Feature} Details',
+  exportApiPath: '/api/{features}/export',
+  expectedExportColumns: ['ID', 'Name', 'Created At', 'Updated At'],
+};
 
-  const editItem = page.getByRole('menuitem', { name: /Edit/i });
-  await expect(editItem).toBeVisible();
-  await editItem.click({ force: true });
-
-  if (updates.name) {
-    await page.fill('input[name="name"]', updates.name);
-  }
-
-  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
-    state: 'detached',
-  });
-  const dialog = page.getByRole('dialog');
-  const updateBtn = dialog.getByRole('button', { name: /Update/ });
-  await expect(updateBtn).toBeVisible();
-  await updateBtn.click();
-}
+generateModuleTests(config);
 ```
 
 ---
@@ -634,14 +617,14 @@ export const {feature}Config = createSimpleEntityConfig({
    - Export test
 
 3. **E2E Tests:**
-   - Tambah helper functions ke `helpers.ts`
-   - Buat spec file
+   - Buat helper functions di `tests/e2e/{features}/helpers.ts`
+   - Buat spec file di `tests/e2e/{features}/{feature}.spec.ts` menggunakan `generateModuleTests()`
 
 ### Phase 5: Verification
 ```bash
 // turbo-all
-./vendor/bin/sail test --filter={Feature}
-./vendor/bin/sail npm run test:e2e tests/e2e/{features}
+./vendor/bin/sail test --group {features}
+npx playwright test tests/e2e/{features}/
 ```
 
 ---
@@ -671,16 +654,18 @@ export const {feature}Config = createSimpleEntityConfig({
 - [ ] API base menggunakan kebab-case plural
 
 ### Testing
-- [ ] Unit Model test menggunakan Pest syntax
+- [ ] Unit Model test di `tests/Unit/Models/` menggunakan Pest syntax
+- [ ] Feature tests di `tests/Feature/{Features}/` subfolder
 - [ ] Semua Action tests menggunakan traits
 - [ ] FilterService test menggunakan trait
 - [ ] Semua Request tests menggunakan traits
 - [ ] Semua Resource tests menggunakan traits
 - [ ] Feature Controller test menggunakan `SimpleCrudTestTrait`
 - [ ] Feature Export test menggunakan `SimpleCrudExportTestTrait`
-- [ ] E2E test menggunakan `runSimpleCrudE2ETests()`
-- [ ] E2E helpers ditambahkan ke `helpers.ts`
-- [ ] Semua tests pass
+- [ ] Group annotation `->group('{features}')` di SEMUA test files
+- [ ] E2E test menggunakan `generateModuleTests()` dari `shared-test-factories.ts`
+- [ ] E2E helpers di `tests/e2e/{features}/helpers.ts` (bukan global)
+- [ ] Semua tests pass: `sail test --group {features}` + `npx playwright test tests/e2e/{features}/`
 
 ### Naming Conventions
 - [ ] Semua file mengikuti naming conventions
