@@ -6,7 +6,7 @@ description: Panduan refactor E2E test per modul menggunakan shared test factori
 # Refactor E2E Tests
 
 Gunakan skill ini untuk refactoring E2E test satu modul pada satu waktu.
-Selalu baca `@/tests/e2e/REFACTORING_PLAN.md` terlebih dahulu untuk mendapatkan registry modul lengkap.
+Baca modul existing yang sejenis sebagai referensi pattern sebelum refactoring.
 
 ## 🔌 MCP Tools yang Digunakan
 
@@ -16,26 +16,28 @@ Selalu baca `@/tests/e2e/REFACTORING_PLAN.md` terlebih dahulu untuk mendapatkan 
 | `mcp_laravel-boost_last-error` | Debug backend errors saat test |
 | `mcp_laravel-boost_database-schema` | Verify kolom export match database |
 | `mcp_laravel-boost_list-routes` | Verify API routes per modul |
-| `mcp_filesystem_read_file` | Baca file referensi dan REFACTORING_PLAN.md |
+| `mcp_filesystem_read_file` | Baca file referensi existing |
 
 ---
 
 ## 🎯 WORKFLOW PER MODUL
 
-### Langkah 1: Baca Registry Modul
+### Langkah 1: Identifikasi Modul
 
-```
-mcp_filesystem_read_file(path: "tests/e2e/REFACTORING_PLAN.md")
-```
-
-Cari modul yang akan direfactor di section **REGISTRY MODUL**. Catat:
-- `slug` — nama folder modul
+Cari modul yang akan direfactor. Catat informasi berikut dari kode existing:
+- `slug` — nama folder modul (kebab-case)
 - `route` — URL frontend
 - `api` — API endpoint
 - `export_api` — API export endpoint
-- `sortable_columns` — kolom yang harus ditest sorting
+- `sortable_columns` — kolom yang harus ditest sorting (dari Columns.tsx)
 - `view_type` — 'dialog' atau 'page'
 - `checkbox_header` — apakah header checkbox ada (harusnya `false`)
+
+Referensi modul yang sudah direfactor:
+```
+mcp_filesystem_read_file(path: "tests/e2e/departments/helpers.ts")
+mcp_filesystem_read_file(path: "tests/e2e/departments/department.spec.ts")
+```
 
 ### Langkah 2: Periksa Frontend (SEBELUM Menulis Test)
 
@@ -225,7 +227,7 @@ await page.getByRole('menuitem', { name: 'Delete' }).click();
 
 ## 📋 CHECKLIST PER MODUL
 
-- [ ] Baca REFACTORING_PLAN.md → catat data modul
+- [ ] Identifikasi data modul dari kode existing (Columns, Routes, API)
 - [ ] Periksa frontend: Columns.tsx konsisten (select, actions, sorting)
 - [ ] Periksa backend: sorting validation, export columns
 - [ ] Buat/update `{module}/helpers.ts`

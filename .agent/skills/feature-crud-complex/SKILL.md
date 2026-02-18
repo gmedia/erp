@@ -1412,7 +1412,7 @@ export const {feature}Config = createComplexEntityConfig({
 
 #### 4.1. Pest Tests
 
-Lokasi test files sesuai `tests/REFACTORING_PLAN.md`:
+Lokasi test files:
 - Feature: `tests/Feature/{Features}/{Feature}ControllerTest.php`
 - Feature Export: `tests/Feature/{Features}/{Feature}ExportTest.php`
 - Unit Model: `tests/Unit/Models/{Feature}Test.php`
@@ -1429,7 +1429,7 @@ Buat tests following pattern dari `tests/Feature/Employees/EmployeeControllerTes
 
 #### 4.2. E2E Tests
 
-Lokasi sesuai `tests/e2e/REFACTORING_PLAN.md`:
+Lokasi E2E test files:
 - Helpers: `tests/e2e/{features}/helpers.ts`
 - Spec: `tests/e2e/{features}/{feature}.spec.ts`
 

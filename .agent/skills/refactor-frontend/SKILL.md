@@ -111,7 +111,7 @@ Saat refactor komponen Columns.tsx, pastikan konsistensi berikut:
    - Pastikan setiap kolom sortable di frontend JUGA didukung di backend (validation rules)
 
 > **PENGARUH KE E2E TEST**: Konsistensi ini memungkinkan shared test factories bekerja untuk semua modul.
-> Lihat skill `refactor-e2e` dan `tests/e2e/REFACTORING_PLAN.md` untuk detail.
+> Lihat skill `refactor-e2e` untuk detail standar E2E test.
 
 ---
 

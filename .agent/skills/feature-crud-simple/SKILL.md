@@ -468,8 +468,8 @@ class {Feature}ExportTest extends TestCase
 
 #### E2E Tests
 
-> **PENTING:** Ikuti standar dari `tests/e2e/REFACTORING_PLAN.md`.
-> Helper functions WAJIB di file terpisah (`tests/e2e/{features}/helpers.ts`), bukan di `helpers.ts` global.
+> **PENTING:** Helper functions WAJIB di file terpisah (`tests/e2e/{features}/helpers.ts`), bukan di `helpers.ts` global.
+> Gunakan `generateModuleTests()` dari `tests/e2e/shared-test-factories.ts`.
 
 ```typescript
 // tests/e2e/{features}/helpers.ts
