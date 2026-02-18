@@ -8,6 +8,14 @@ Dokumen ini menjelaskan struktur database untuk sistem persetujuan berlapis (Mul
 
 Sistem approval didesain sebagai **engine terpisah** yang dapat di-attach ke tipe dokumen apapun (Purchase Request, Purchase Order, Journal Entry, Asset Disposal, dll.) melalui hubungan **polymorphic**. Hal ini menghindari duplikasi kolom `approved_by`, `approved_at`, `rejection_reason` di setiap tabel dokumen.
 
+### Hubungan dengan Modul Lain
+
+| Modul | Referensi Desain | Hubungan |
+| :--- | :--- | :--- |
+| **Pipeline** | `10_pipeline_design.md` | Pipeline memanggil Approval pada transisi yang memerlukan persetujuan |
+| **Purchasing** | `13_purchasing_design.md` | PR & PO memerlukan approval sebelum diproses |
+| **Chart of Accounts** | `01_chart_of_accounts_design.md` | Journal Entry mungkin memerlukan approval sebelum posting |
+
 ### Komponen Utama
 *   **Approval Flow**: Template konfigurasi alur approval per tipe dokumen. Mendefinisikan berapa level/tahap persetujuan yang diperlukan.
 *   **Approval Flow Steps**: Detail setiap level/tahap approval dalam satu flow, termasuk siapa yang berhak menyetujui (approver).
@@ -459,6 +467,12 @@ Fitur khusus:
 2.  Admin menambahkan 2 step:
     - Step 1: `department_head` — kepala departemen peminta (required: `approve`)
     - Step 2: `role` → "Finance Director" (required: `approve`)
+
+> [!NOTE]
+> Format `conditions` di contoh ini menggunakan shorthand `min_amount`. Dalam implementasi, gunakan format `field_checks` yang konsisten dengan Pipeline System:
+> ```json
+> {"field_checks": [{"field": "estimated_amount", "operator": ">", "value": 10000000}]}
+> ```
 
 **Eksekusi:**
 1.  Staff HR membuat PR senilai Rp 25 Juta → status: `draft`.

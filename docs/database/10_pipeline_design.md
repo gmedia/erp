@@ -6,7 +6,20 @@ Dokumen ini menjelaskan struktur database untuk sistem **Pipeline & Lifecycle** 
 
 ### Filosofi Desain
 
-Sistem pipeline didesain sebagai **engine terpisah** yang dapat di-attach ke tipe entitas apapun (Asset, Purchase Request, Purchase Order, Journal Entry, dll.) melalui hubungan **polymorphic**. Setiap tipe entitas memiliki satu atau lebih **pipeline** yang mendefinisikan state yang valid dan transisi antar-state.
+Sistem pipeline didesain sebagai **engine terpisah** yang mengelola lifecycle entitas melalui state machine yang dapat dikonfigurasi. Setiap entitas (Asset, PO, PR, JE, dll.) memiliki satu lifecycle yang deterministik — hanya transisi yang didefinisikan yang boleh terjadi.
+
+### Hubungan dengan Modul Lain
+
+| Modul | Referensi Desain | Hubungan |
+| :--- | :--- | :--- |
+| **Approval** | `11_approval_design.md` | Pipeline memanggil Approval pada transisi yang memerlukan persetujuan |
+| **Asset Management** | `12_asset_management_design.md` | Asset lifecycle dikelola oleh pipeline |
+| **Purchasing** | `13_purchasing_design.md` | PR & PO lifecycle dikelola oleh pipeline |
+| **Chart of Accounts** | `01_chart_of_accounts_design.md` | Journal Entry lifecycle dikelola oleh pipeline |
+
+### Filosofi State Machine
+
+Setiap tipe entitas memiliki satu atau lebih **pipeline** yang mendefinisikan state yang valid dan transisi antar-state. Pipeline di-attach ke entitas melalui hubungan **polymorphic**.
 
 > [!IMPORTANT]
 > **Pipeline vs Approval**: Pipeline mengatur **lifecycle keseluruhan** suatu entitas (mis. `draft → pending_approval → approved → in_progress → completed`), sedangkan Approval System (lihat `11_approval_design.md`) mengatur **proses persetujuan** di dalam satu transisi (mis. saat status berubah dari `pending_approval` ke `approved`). Keduanya saling melengkapi — pipeline memanggil approval engine pada transisi yang memerlukan persetujuan.

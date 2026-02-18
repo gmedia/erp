@@ -4,6 +4,10 @@ Dokumen ini menjelaskan struktur database untuk modul Purchasing dalam sistem ER
 
 ## 1. Gambaran Umum
 
+### Filosofi Desain
+
+Modul Purchasing mengikuti alur standar procurement: Request → Order → Receipt → (optional) Return. Setiap tahap memiliki dokumen tersendiri dengan header-detail pattern. Modul ini terintegrasi dengan Pipeline System untuk lifecycle management dan Approval System untuk proses persetujuan.
+
 ### Alur Proses Pembelian
 
 ```
@@ -11,11 +15,27 @@ Purchase Request (PR)  →  Purchase Order (PO)  →  Goods Receipt (GR)
    [permintaan]            [pesanan ke supplier]     [penerimaan barang]
 ```
 
+### Hubungan dengan Modul Lain
+
+| Modul | Referensi Desain | Hubungan |
+| :--- | :--- | :--- |
+| **Pipeline** | `10_pipeline_design.md` | PR & PO lifecycle dikelola oleh pipeline |
+| **Approval** | `11_approval_design.md` | PR & PO memerlukan approval sebelum diproses |
+| **Products** | `00_products_design.md` | Produk yang dibeli & update stok |
+| **Chart of Accounts** | `01_chart_of_accounts_design.md` | Posting AP dan inventory ke jurnal |
+
 ### Komponen Utama
 *   **Purchase Request (PR)**: Permintaan pembelian internal dari departemen/cabang. Membutuhkan approval sebelum dikonversi menjadi PO.
 *   **Purchase Order (PO)**: Pesanan resmi ke supplier. Satu PR bisa menjadi satu atau lebih PO (split). Satu PO juga bisa menggabungkan item dari beberapa PR.
 *   **Goods Receipt (GR)**: Penerimaan barang dari supplier berdasarkan PO. Satu PO bisa diterima bertahap (partial receipt).
 *   **Return to Supplier**: Pengembalian barang ke supplier setelah GR (opsional, untuk barang cacat/salah kirim).
+
+### Prinsip Desain
+1.  **Header-Detail Pattern**: Setiap dokumen (PR, PO, GR, SR) menggunakan pola header + items untuk fleksibilitas.
+2.  **Full Traceability**: Setiap item bisa dilacak dari PR → PO → GR → SR melalui FK chain.
+3.  **Partial Processing**: PO bisa diterima bertahap, PR bisa dikonversi bertahap ke PO.
+4.  **Cache Fields**: Field seperti `quantity_ordered`, `quantity_received`, `subtotal`, `grand_total` adalah cache yang dijaga konsistensinya oleh application logic.
+5.  **No Hard Delete**: Dokumen purchasing **tidak boleh di-delete**. Gunakan status `cancelled` untuk pembatalan, menjaga integritas audit trail.
 
 ### Integrasi dengan Master Data yang Sudah Ada
 *   **Supplier**: `suppliers` (penyedia barang/jasa).
@@ -294,7 +314,9 @@ Detail item yang dikembalikan.
 
 ### Status Purchase Order
 *   `draft`: PO baru dibuat, belum dikonfirmasi ke supplier.
+*   `pending_approval`: PO diajukan, menunggu persetujuan (jika diperlukan).
 *   `confirmed`: PO sudah dikonfirmasi/dikirim ke supplier.
+*   `rejected`: PO ditolak (jika melalui approval).
 *   `partially_received`: Sebagian barang sudah diterima (GR).
 *   `fully_received`: Semua barang sudah diterima.
 *   `cancelled`: PO dibatalkan.
