@@ -33,18 +33,7 @@ export function AppSidebar() {
         })),
     }));
 
-    const footerNavItems: NavItem[] = [
-        {
-            title: t('nav.repository'),
-            href: 'https://github.com/laravel/react-starter-kit',
-            icon: Folder,
-        },
-        {
-            title: t('nav.documentation'),
-            href: 'https://laravel.com/docs/starter-kits#react',
-            icon: BookOpen,
-        },
-    ];
+    const footerNavItems: NavItem[] = [];
 
     return (
         <Sidebar collapsible="icon" variant="inset">
