@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
 
         // Seed admin user for Playwright test
         $admin = User::updateOrCreate(
-            ['email' => 'admin@admin.com'],
+            ['email' => config('app.admin')],
             [
                 'name' => 'Admin User',
                 'password' => Hash::make('password'),
@@ -57,7 +57,7 @@ class DatabaseSeeder extends Seeder
         $branchId = Branch::query()->value('id');
 
         Employee::updateOrCreate([
-            'email' => 'admin@admin.com',
+            'email' => config('app.admin'),
             'user_id' => $admin->id,
         ], [
             'name' => 'Admin User',

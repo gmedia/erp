@@ -502,7 +502,7 @@ class PermissionSeeder extends Seeder
 
         $permissions = $this->createPermissions($permissions);
         
-        $admin = Employee::where('email', 'admin@admin.com')->first();
+        $admin = Employee::where('email', config('app.admin'))->first();
         $admin->permissions()->sync($permissions);
     }
 

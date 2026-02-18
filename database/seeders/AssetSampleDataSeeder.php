@@ -19,8 +19,8 @@ class AssetSampleDataSeeder extends Seeder
 {
     public function run(): void
     {
-        $adminUser = User::where('email', 'admin@admin.com')->first();
-        $adminEmployee = Employee::where('email', 'admin@admin.com')->first();
+        $adminUser = User::where('email', config('app.admin'))->first();
+        $adminEmployee = Employee::where('email', config('app.admin'))->first();
         $defaultDepartment = Department::query()->orderBy('id')->first();
 
         $supplier = Supplier::query()->orderBy('id')->first();

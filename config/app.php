@@ -126,4 +126,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+     |--------------------------------------------------------------------------
+     | Admin Email
+     |--------------------------------------------------------------------------
+     |
+     | This email address is used to identify the admin user of the application.
+     | It is used to send notifications and other important messages to the admin.
+     |
+     */
+    
+    'admin' => env('APP_ADMIN', 'admin@dokfin.id'),
+
 ];

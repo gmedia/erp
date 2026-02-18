@@ -109,14 +109,14 @@ export async function createEntity(
  * Logs in a user using the provided credentials.
  *
  * @param page - Playwright Page object.
- * @param email - User email address. Defaults to 'admin@admin.com'.
+ * @param email - User email address. Defaults to 'admin@dokfin.id'.
  * @param password - User password. Defaults to 'password'.
  *
  * @returns A promise that resolves when navigation to the dashboard is complete.
  */
 export async function login(
   page: Page,
-  email = 'admin@admin.com',
+  email = 'admin@dokfin.id',
   password = 'password'
 ): Promise<void> {
   if (page.url().includes('/dashboard')) return;
