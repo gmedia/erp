@@ -1,5 +1,4 @@
 import { Page, expect } from '@playwright/test';
-import { login } from '../helpers';
 import { createAssetCategory } from '../asset-categories/helpers';
 
 /**
@@ -28,7 +27,7 @@ export async function createAssetModel(
     await createAssetCategory(page, { name: categoryName });
   }
 
-  await login(page);
+  // Navigate back to asset-models (createAssetCategory navigates away)
   await page.goto('/asset-models', { waitUntil: 'domcontentloaded', timeout: 60000 });
 
   const addButton = page.getByRole('button', { name: /Add/i, exact: true });

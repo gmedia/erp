@@ -30,7 +30,6 @@ task.*
 /.cline*
 /.roo*
 /.kilocode*
-/.agent*
 /.trae*
 
 # IDE helper

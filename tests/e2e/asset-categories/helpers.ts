@@ -41,12 +41,14 @@ export async function createAssetCategory(
  * @param query - Query string to search for.
  */
 export async function searchAssetCategory(page: Page, query: string): Promise<void> {
-  await page.fill('input[placeholder="Search asset categories..."]', query);
-  await page.press('input[placeholder="Search asset categories..."]', 'Enter');
+  const searchInput = page.getByPlaceholder('Search asset categories...');
+  await searchInput.fill(query);
+  await searchInput.press('Enter');
   
-  // Wait for the row containing the query to appear
-  const row = page.locator('tr').filter({ hasText: query }).first();
-  await row.waitFor({ state: 'visible', timeout: 10000 });
+  // Wait for API response
+  await page.waitForResponse(
+    r => r.url().includes('/api/asset-categories') && r.status() < 400
+  ).catch(() => null);
 }
 
 /**

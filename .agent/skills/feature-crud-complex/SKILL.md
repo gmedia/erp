@@ -103,21 +103,21 @@ resources/js/
 ### Testing
 ```
 tests/
-├── Feature/{Feature}ControllerTest.php   # Controller integration tests
-├── Feature/{Feature}ExportTest.php       # Export functionality tests
+├── Feature/{Features}/
+│   ├── {Feature}ControllerTest.php       # Controller integration tests
+│   └── {Feature}ExportTest.php           # Export functionality tests
 ├── Unit/
-│   ├── {Feature}Test.php                 # Model tests
+│   ├── Models/{Feature}Test.php          # Model tests
 │   ├── Actions/{Features}/*Test.php
 │   ├── Domain/{Features}/*Test.php
 │   ├── Requests/{Features}/*Test.php
 │   └── Resources/{Features}/*Test.php
 └── e2e/{features}/
-    ├── add-{feature}.spec.ts
-    ├── edit-{feature}.spec.ts
-    ├── delete-{feature}.spec.ts
-    ├── filter-{features}.spec.ts
-    └── export-{feature}.spec.ts
+    ├── helpers.ts                        # Module-specific helper functions
+    └── {feature}.spec.ts                 # Uses generateModuleTests()
 ```
+
+> **PENTING:** Group annotation `->group('{features}')` di SEMUA test files (kebab-case).
 
 ---
 
@@ -1410,20 +1410,35 @@ export const {feature}Config = createComplexEntityConfig({
 
 ### Phase 4: Testing
 
-#### 4.1. Feature Tests
+#### 4.1. Pest Tests
+
+Lokasi test files:
+- Feature: `tests/Feature/{Features}/{Feature}ControllerTest.php`
+- Feature Export: `tests/Feature/{Features}/{Feature}ExportTest.php`
+- Unit Model: `tests/Unit/Models/{Feature}Test.php`
+- Unit lainnya: `tests/Unit/{Layer}/{Features}/`
+
+Group annotation `->group('{features}')` di SEMUA file (kebab-case).
+
+Buat tests following pattern dari `tests/Feature/Employees/EmployeeControllerTest.php`.
 
 ```bash
 // turbo
-./vendor/bin/sail test --filter={Feature}
+./vendor/bin/sail test --group {features}
 ```
-
-Buat tests following pattern dari `tests/Feature/EmployeeControllerTest.php`
 
 #### 4.2. E2E Tests
 
+Lokasi E2E test files:
+- Helpers: `tests/e2e/{features}/helpers.ts`
+- Spec: `tests/e2e/{features}/{feature}.spec.ts`
+
+Menggunakan `generateModuleTests()` dari `tests/e2e/shared-test-factories.ts`.
+Helper functions WAJIB di file terpisah per-modul, bukan di `helpers.ts` global.
+
 ```bash
 // turbo
-./vendor/bin/sail npm run test:e2e -- --grep={feature}
+npx playwright test tests/e2e/{features}/
 ```
 
 ---
@@ -1450,15 +1465,18 @@ Before marking complete:
 - [ ] Entity config uses `createComplexEntityConfig()`
 
 **Testing:**
-- [ ] Feature tests cover all CRUD + export
-- [ ] Unit tests for Model, Requests, Resources, Actions
-- [ ] E2E tests for add, edit, delete, filter, export
+- [ ] Feature tests di `tests/Feature/{Features}/` subfolder
+- [ ] Unit tests di `tests/Unit/{Layer}/{Features}/`
+- [ ] Group annotation `->group('{features}')` di SEMUA test files
+- [ ] E2E test menggunakan `generateModuleTests()` dari `shared-test-factories.ts`
+- [ ] E2E helpers di `tests/e2e/{features}/helpers.ts` (bukan global)
+- [ ] All tests pass
 
 **Running Tests:**
 ```bash
-// turbo
-./vendor/bin/sail test --filter={Feature}
-./vendor/bin/sail npm run test:e2e -- --grep={feature}
+// turbo-all
+./vendor/bin/sail test --group {features}
+npx playwright test tests/e2e/{features}/
 ```
 
 ---

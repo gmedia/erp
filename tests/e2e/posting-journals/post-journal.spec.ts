@@ -6,8 +6,9 @@ test.describe('Posting Journal End-to-End', () => {
   test.setTimeout(120000);
 
   test('should bulk post draft journal entries', async ({ page }) => {
-    // 1. Login
+    // 1. Login and navigate to journal entries
     await login(page);
+    await page.goto('/journal-entries');
 
     // 2. Create a draft journal entry to ensure we have data
     const timestamp = Date.now();

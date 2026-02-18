@@ -94,7 +94,7 @@ $this->assertTrue($validator->fails());
 
 ## 🌐 E2E Test (Playwright)
 
-> **PENTING**: Untuk refactoring E2E test existing, gunakan skill `refactor-e2e` dan baca `tests/e2e/REFACTORING_PLAN.md`.
+> **PENTING**: Untuk refactoring E2E test existing, gunakan skill `refactor-e2e`.
 
 | Flow | Test Cases |
 |------|------------|

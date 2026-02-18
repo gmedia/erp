@@ -63,7 +63,6 @@ export async function create{{Entity}}(page: Page, overrides?: Record<string, st
  *
  * INSTRUKSI AI:
  * - Gunakan search input placeholder yang SESUAI dengan frontend
- * - Lihat REGISTRY MODUL di REFACTORING_PLAN.md untuk search_placeholder
  */
 export async function search{{Entity}}(page: Page, identifier: string): Promise<void> {
     const searchInput = page.getByPlaceholder('{{searchPlaceholder}}');

@@ -1,5 +1,4 @@
 import { Page, expect } from '@playwright/test';
-import { login } from '../helpers';
 
 async function fillVisibleSearch(page: Page, value: string): Promise<void> {
   const input = page.locator('input[placeholder="Search..."]:visible');
@@ -20,15 +19,16 @@ async function clickFirstMatchingOption(page: Page, name: RegExp): Promise<void>
 }
 
 
+/**
+ * Create a new account mapping via the UI.
+ * NOTE: Assumes page is already logged in and on /account-mappings (handled by test.beforeEach).
+ */
 export async function createAccountMapping(page: Page): Promise<{
   sourceCode: string;
   targetCode: string;
   notes: string;
 }> {
   const timestamp = Date.now();
-
-  await login(page);
-  await page.goto('/account-mappings', { waitUntil: 'domcontentloaded' });
 
   const addBtn = page.getByRole('button', { name: /Add/i }).first();
   await expect(addBtn).toBeVisible({ timeout: 15000 });
