@@ -9,7 +9,7 @@ const config = {
   toolbarActions: (
     <ImportDialog
       title="Import Employees"
-      importRoute="/employees/import"
+      importRoute="/api/employees/import"
       templateHeaders={[
         'name',
         'email',

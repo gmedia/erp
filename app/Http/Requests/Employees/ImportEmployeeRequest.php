@@ -22,7 +22,7 @@ class ImportEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => 'required|file|mimes:xlsx,xls,csv|max:10240', // Max 10MB
+            'file' => 'required|file|mimes:xlsx,xls,csv,txt|max:10240', // Max 10MB
         ];
     }
 }

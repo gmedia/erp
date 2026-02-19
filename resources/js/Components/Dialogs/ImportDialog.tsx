@@ -1,4 +1,4 @@
-import { Button } from '@/Components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -7,11 +7,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/Components/ui/dialog';
-import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
-import { useToast } from '@/Hooks/use-toast';
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 import { router } from '@inertiajs/react';
+import axios from 'axios';
 import { AlertCircle, CheckCircle, Download, FileSpreadsheet, Loader2, Upload, X } from 'lucide-react';
 import { useState } from 'react';
 
@@ -40,7 +41,6 @@ export default function ImportDialog({
     skipped: number;
     errors: { row: number; field: string; message: string }[];
   } | null>(null);
-  const { toast } = useToast();
 
   const downloadTemplate = () => {
     // Create CSV content
@@ -87,9 +87,7 @@ export default function ImportDialog({
       },
       onError: (errors) => {
         setLoading(false);
-        toast({
-          variant: "destructive",
-          title: "Import Failed",
+        toast.error("Import Failed", {
           description: "There was an error uploading the file.",
         });
       },
@@ -107,31 +105,22 @@ export default function ImportDialog({
     formData.append('file', file);
 
     try {
-      const response = await window.axios.post(importRoute, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
+      const response = await axios.post(importRoute, formData);
       setLoading(false);
       setResult(response.data);
       if (response.data.imported > 0) {
-        toast({
-          title: "Import Completed",
+        toast.success("Import Completed", {
           description: `Successfully imported ${response.data.imported} rows.`,
         });
         if (onSuccess) onSuccess();
         // optionally refresh the page data
         router.reload();
       } else if (response.data.errors.length > 0) {
-        toast({
-          variant: "destructive",
-          title: "Import Finished with Errors",
+        toast.error("Import Finished with Errors", {
           description: "Check the error list below.",
         });
       } else {
-         toast({
-          title: "Import Completed",
+         toast.success("Import Completed", {
           description: "No data was imported.",
         });
       }
@@ -139,15 +128,11 @@ export default function ImportDialog({
       setLoading(false);
       // Handle validation errors from Laravel (422)
       if (error.response && error.response.status === 422) {
-         toast({
-          variant: "destructive",
-          title: "Validation Error",
+         toast.error("Validation Error", {
           description: error.response.data.message || "Invalid file.",
         });
       } else {
-        toast({
-          variant: "destructive",
-          title: "Import Failed",
+        toast.error("Import Failed", {
           description: "An unexpected error occurred.",
         });
       }
