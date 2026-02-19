@@ -9,8 +9,6 @@
 | Modul | V1 (Saat Ini) | V2 (Target) |
 | :--- | :--- | :--- |
 | Products | `docs/database/00_products_design.md` | `docs/database/00_products_design_v2.md` |
-| COA | `docs/database/01_chart_of_accounts_design.md` | `docs/database/01_chart_of_accounts_design_v2.md` |
-| Assets | `docs/database/12_asset_management_design.md` | `docs/database/12_asset_management_design_v2.md` |
 
 ---
 
