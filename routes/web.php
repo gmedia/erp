@@ -43,6 +43,6 @@ require __DIR__ . '/asset_model.php';
 require __DIR__ . '/asset_location.php';
 require __DIR__ . '/asset.php';
 require __DIR__ . '/asset_movement.php';
-
+require __DIR__ . '/asset_maintenance.php';
 
 

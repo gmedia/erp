@@ -90,6 +90,11 @@ import { assetMovementColumns } from '@/components/asset-movements/AssetMovement
 import { createAssetMovementFilterFields } from '@/components/asset-movements/AssetMovementFilters';
 import { AssetMovementForm } from '@/components/asset-movements/AssetMovementForm';
 import { AssetMovementViewModal } from '@/components/asset-movements/AssetMovementViewModal';
+import { assetMaintenanceColumns } from '@/components/asset-maintenances/AssetMaintenanceColumns';
+import { createAssetMaintenanceFilterFields } from '@/components/asset-maintenances/AssetMaintenanceFilters';
+import { AssetMaintenanceForm } from '@/components/asset-maintenances/AssetMaintenanceForm';
+import { AssetMaintenanceViewModal } from '@/components/asset-maintenances/AssetMaintenanceViewModal';
+import { type AssetMaintenance } from '@/types/asset-maintenance';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -576,4 +581,33 @@ export const assetMovementConfig = createComplexEntityConfig({
     entityNameForSearch: 'movement',
     viewModalComponent: AssetMovementViewModal as any,
     getDeleteMessage: () => 'This action cannot be undone. This will permanently delete this movement record.',
+});
+
+export const assetMaintenanceConfig = createComplexEntityConfig<AssetMaintenance>({
+    entityName: 'Asset Maintenance',
+    entityNamePlural: 'Asset Maintenances',
+    apiEndpoint: '/api/asset-maintenances',
+    exportEndpoint: '/api/asset-maintenances/export',
+    queryKey: ['asset-maintenances'],
+    breadcrumbs: [{ title: 'Asset Maintenances', href: '/asset-maintenances' }],
+    initialFilters: {
+        search: '',
+        asset_id: '',
+        maintenance_type: '',
+        status: '',
+        supplier_id: '',
+        scheduled_from: '',
+        scheduled_to: '',
+        performed_from: '',
+        performed_to: '',
+        cost_min: '',
+        cost_max: '',
+    },
+    columns: assetMaintenanceColumns,
+    filterFields: createAssetMaintenanceFilterFields(),
+    formComponent: AssetMaintenanceForm,
+    formType: 'complex',
+    entityNameForSearch: 'maintenance',
+    viewModalComponent: AssetMaintenanceViewModal,
+    getDeleteMessage: () => 'This action cannot be undone. This will permanently delete this maintenance record.',
 });

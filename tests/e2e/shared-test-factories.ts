@@ -265,12 +265,29 @@ export function generateModuleTests(config: ModuleTestConfig) {
             await filterButton.click();
 
             for (const filterTest of config.filterTests) {
-                if (filterTest.filterType === 'combobox') {
-                    const combobox = page.getByRole('combobox', { name: filterTest.filterName });
+                const container = page
+                    .locator('label', { hasText: filterTest.filterName })
+                    .locator('..');
+
+                if (filterTest.filterType === 'text') {
+                    await container.locator('input').first().fill(filterTest.filterValue);
+                    continue;
+                }
+
+                if (filterTest.filterType === 'date') {
+                    await container.locator('input').first().fill(filterTest.filterValue);
+                    continue;
+                }
+
+                if (filterTest.filterType === 'combobox' || filterTest.filterType === 'select') {
+                    const combobox = container.getByRole('combobox').first();
                     await combobox.click();
-                    await page.getByRole('option', { name: filterTest.filterValue }).click();
-                } else if (filterTest.filterType === 'text') {
-                    await page.getByLabel(filterTest.filterName).fill(filterTest.filterValue);
+                    await page
+                        .getByRole('option', {
+                            name: new RegExp(filterTest.filterValue, 'i'),
+                        })
+                        .first()
+                        .click();
                 }
             }
 

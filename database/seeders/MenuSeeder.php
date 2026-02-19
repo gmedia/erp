@@ -91,6 +91,14 @@ class MenuSeeder extends Seeder
                         'url' => 'asset-movements',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'asset_maintenance',
+                        'display_name' => 'Asset Maintenance',
+                        'permissions' => ['asset_maintenance', 'asset_maintenance.create', 'asset_maintenance.edit', 'asset_maintenance.delete'],
+                        'icon' => 'Wrench',
+                        'url' => 'asset-maintenances',
+                        'child' => [],
+                    ],
 
                 ],
             ],

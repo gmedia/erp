@@ -285,3 +285,20 @@ export const assetMovementFormSchema = z.object({
 });
 
 export type AssetMovementFormData = z.infer<typeof assetMovementFormSchema>;
+
+export const assetMaintenanceFormSchema = z.object({
+    asset_id: z.string().min(1, { message: 'Asset is required.' }),
+    maintenance_type: z.enum(['preventive', 'corrective', 'calibration', 'other'], {
+        message: 'Maintenance type is required.',
+    }),
+    status: z.enum(['scheduled', 'in_progress', 'completed', 'cancelled'], {
+        message: 'Status is required.',
+    }),
+    scheduled_at: z.date({ message: 'Scheduled date is required.' }),
+    performed_at: z.date().optional().nullable(),
+    supplier_id: z.string().default(''),
+    cost: z.string().default('0'),
+    notes: z.string().default(''),
+});
+
+export type AssetMaintenanceFormData = z.infer<typeof assetMaintenanceFormSchema>;

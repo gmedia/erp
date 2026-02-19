@@ -212,6 +212,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'asset_maintenance',
+                'display_name' => 'Asset Maintenance',
+                'child' => [
+                    [
+                        'name' => 'asset_maintenance.create',
+                        'display_name' => 'Create Asset Maintenance',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset_maintenance.edit',
+                        'display_name' => 'Edit Asset Maintenance',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset_maintenance.delete',
+                        'display_name' => 'Delete Asset Maintenance',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'trial_balance_report',
                 'display_name' => 'Trial Balance Report',
                 'child' => [],
