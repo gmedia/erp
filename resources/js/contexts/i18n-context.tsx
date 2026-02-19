@@ -57,11 +57,6 @@ export interface Translations {
         password: string;
         remember_me: string;
         forgot_password: string;
-        sign_up: string;
-        no_account: string;
-        register: string;
-        register_title: string;
-        register_description: string;
     };
     employees: {
         title: string;
@@ -207,11 +202,6 @@ const defaultTranslations: Translations = {
         password: 'Password',
         remember_me: 'Remember me',
         forgot_password: 'Forgot password?',
-        sign_up: 'Sign up',
-        no_account: "Don't have an account?",
-        register: 'Register',
-        register_title: 'Create an account',
-        register_description: 'Enter your details below to create your account',
     },
     employees: {
         title: 'Employees',

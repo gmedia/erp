@@ -44,12 +44,7 @@
         "email": "Alamat email",
         "password": "Kata sandi",
         "remember_me": "Ingat saya",
-        "forgot_password": "Lupa kata sandi?",
-        "sign_up": "Daftar",
-        "no_account": "Belum punya akun?",
-        "register": "Daftar",
-        "register_title": "Buat akun",
-        "register_description": "Masukkan detail Anda di bawah ini untuk membuat akun"
+        "forgot_password": "Lupa kata sandi?"
     },
     "employees": {
         "title": "Karyawan",
