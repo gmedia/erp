@@ -75,6 +75,8 @@ export interface DataTableProps<T> {
     onView?: (item: T) => void;
     /** Optional extra items for the actions dropdown */
     extraActionItems?: React.ReactNode[];
+    /** Optional extra items for the toolbar */
+    extraToolbarActions?: React.ReactNode;
     /** Optional entity name for default search placeholder */
     entityName?: string;
 }
@@ -109,6 +111,7 @@ export function DataTable<T>({
     onDelete,
     onView,
     extraActionItems,
+    extraToolbarActions,
     entityName,
 }: DataTableProps<T>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -282,6 +285,7 @@ export function DataTable<T>({
                 isFilterModalOpen={isFilterModalOpen}
                 setIsFilterModalOpen={setIsFilterModalOpen}
                 onAdd={onAdd}
+                extraActions={extraToolbarActions}
                 onExport={handleExport}
                 exporting={exporting}
                 hasData={data.length > 0}

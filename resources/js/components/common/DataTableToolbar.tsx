@@ -39,6 +39,7 @@ interface DataTableToolbarProps<T> {
 
     // Actions
     onAdd?: () => void;
+    extraActions?: React.ReactNode;
 
     // Export functionality
     onExport: () => void;
@@ -68,6 +69,7 @@ export function DataTableToolbar<T>({
     isFilterModalOpen,
     setIsFilterModalOpen,
     onAdd,
+    extraActions,
     onExport,
     exporting,
     hasData,
@@ -123,6 +125,8 @@ export function DataTableToolbar<T>({
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Add
                     </Button>
+
+                    {extraActions}
 
                     <Button
                         variant="outline"

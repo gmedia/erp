@@ -7,6 +7,7 @@ use App\Actions\Employees\IndexEmployeesAction;
 use App\Actions\Employees\SyncEmployeePermissionsAction;
 use App\Domain\Employees\EmployeeFilterService;
 use App\Http\Requests\Employees\ExportEmployeeRequest;
+use App\Http\Requests\Employees\ImportEmployeeRequest;
 use App\Http\Requests\Employees\IndexEmployeeRequest;
 use App\Http\Requests\Employees\StoreEmployeeRequest;
 use App\Http\Requests\Employees\SyncPermissionsRequest;
@@ -100,6 +101,19 @@ class EmployeeController extends Controller
     public function export(ExportEmployeeRequest $request): JsonResponse
     {
         return (new ExportEmployeesAction)->execute($request);
+    }
+
+    /**
+     * Import employees from Excel/CSV.
+     *
+     * @param  \App\Http\Requests\Employees\ImportEmployeeRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function import(ImportEmployeeRequest $request): JsonResponse
+    {
+        $summary = (new \App\Actions\Employees\ImportEmployeesAction)->execute($request->file('file'));
+
+        return response()->json($summary);
     }
 
     /**

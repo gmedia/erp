@@ -18,5 +18,6 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
         Route::put('employees/{employee}', [EmployeeController::class, 'update'])->middleware('permission:employee.edit,true');
         Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->middleware('permission:employee.delete,true');
         Route::post('employees/export', [EmployeeController::class, 'export']);
+        Route::post('employees/import', [EmployeeController::class, 'import'])->middleware('permission:employee.create,true');
     });
 });
