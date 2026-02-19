@@ -88,6 +88,59 @@ Instruksi:
    - `./vendor/bin/sail npx playwright test tests/e2e/{modul-names}/`
 ```
 
+### 4. Import Feature (untuk modul CRUD existing)
+
+```
+Tambahkan fitur Import Excel pada modul CRUD `Employees`.
+
+Spesifikasi:
+- Format file: Excel (.xlsx, .xls) dan CSV (.csv)
+- Kolom import: name (required), email (required, unique), phone, department_id (FK → departments by name), position_id (FK → positions by name), branch_id (FK → branches by name), salary (decimal), hire_date (date, format Y-m-d)
+- Resolusi FK: lookup by `name` pada tabel relasi (departments, positions, branches)
+  - Jika FK name tidak ditemukan → row gagal dengan error message
+- Validasi per-row: sama seperti StoreEmployeeRequest (required, unique, format)
+- Mode: insert only (skip existing by email) ATAU insert + update (upsert by email)
+- Response: JSON summary { imported: N, skipped: N, errors: [{row, field, message}] }
+
+Instruksi:
+1. Pelajari pattern existing:
+   - Export: `app/Exports/EmployeeExport.php` dan `ExportEmployeesAction.php` sebagai referensi Maatwebsite/Excel concern
+   - Controller: `EmployeeController.php` → method `export()` sebagai referensi flow
+   - Route: `routes/employee.php` → `POST employees/export`
+   - Request Validation: `StoreEmployeeRequest.php` → reuse aturan validasi
+2. Backend — buat file baru:
+   - `app/Imports/EmployeeImport.php` — implement `ToCollection`, `WithHeadingRow`, `WithValidation`, `SkipsOnFailure`, `SkipsFailures`
+   - `app/Actions/Employees/ImportEmployeesAction.php` — orchestrate import + return summary
+   - `app/Http/Requests/Employees/ImportEmployeeRequest.php` — validate file upload (mimes, max size)
+3. Backend — modifikasi file:
+   - `EmployeeController.php` → tambah method `import(ImportEmployeeRequest $request)`
+   - `routes/employee.php` → tambah `Route::post('employees/import', ...)->middleware('permission:employee.create,true')`
+4. Frontend — buat/modifikasi:
+   - Buat komponen `ImportDialog.tsx` (generic, reusable) atau `EmployeeImportDialog.tsx`
+     - Upload file input (accept .xlsx, .xls, .csv)
+     - Download template button (kolom header sesuai format)
+     - Progress indicator + result summary (imported/skipped/errors)
+   - Modifikasi halaman `employees/index` → tambah tombol "Import" di samping tombol "Export"
+5. Testing Pest:
+   - `tests/Feature/Employees/EmployeeImportTest.php`
+     - Test upload valid file → assert imported count
+     - Test upload file with invalid rows → assert error responses
+     - Test upload file with unknown FK names → assert row errors
+     - Test upload non-Excel file → assert 422 validation error
+     - Test upload empty file → assert appropriate response
+     - Test duplicate email handling (skip/upsert)
+   - Group annotation: `->group('employees')`
+6. Verifikasi:
+   - `./vendor/bin/sail test --group employees`
+   - Manual: upload file Excel di browser → cek data masuk ke tabel employees
+
+Catatan Penting:
+- Gunakan `Maatwebsite\Excel` (sudah terinstall, dipakai untuk export)
+- Heading row di Excel harus match: name, email, phone, department, position, branch, salary, hire_date
+- FK resolution: kolom "department" di Excel berisi NAMA department, bukan ID
+- Template download: buat Excel template kosong dengan header yang benar
+```
+
 ---
 
 ## Ringkasan
@@ -97,3 +150,4 @@ Instruksi:
 | Simple CRUD | `/create-feature` | `feature-crud-simple` | `departments` | ❌ |
 | Complex CRUD | `/create-feature` | `feature-crud-complex` | `employees`/`suppliers`/`customers` | ❌ |
 | Non-CRUD | `/create-feature` | `feature-non-crud` | Tergantung spec | `docs/{MODUL}.md` |
+| Import Feature | — | — | `employees` (export pattern) | ❌ |
