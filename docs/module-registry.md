@@ -338,6 +338,7 @@ npx playwright test tests/e2e/{module-slug}/
 | 7 | Checkbox | Body punya checkbox, header TIDAK punya |
 | 8 | Sorting | Semua sortable columns bisa diklik |
 | 9 | Delete | Entity terhapus dari tabel |
+| 10 | Import | Dialog import tampil dan berhasil memicu notifikasi hasil/error |
 
 ---
 
