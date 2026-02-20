@@ -23,8 +23,7 @@ class UpdateSupplierRequest extends FormRequest
         return [
             'name' => 'sometimes|required|string|max:255',
             'email' => [
-                'sometimes',
-                'required',
+                'nullable',
                 'email',
                 Rule::unique('suppliers', 'email')->ignore($this->route('supplier')->id),
             ],

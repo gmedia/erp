@@ -27,8 +27,7 @@ test('rules returns correct validation rules', function () {
     expect($request->rules())->toEqual([
         'name' => 'sometimes|required|string|max:255',
         'email' => [
-            'sometimes',
-            'required',
+            'nullable',
             'email',
             \Illuminate\Validation\Rule::unique('suppliers', 'email')->ignore($supplier->id),
         ],

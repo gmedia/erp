@@ -6,7 +6,9 @@ use App\Actions\Suppliers\ExportSuppliersAction;
 use App\Actions\Suppliers\IndexSuppliersAction;
 use App\Domain\Suppliers\SupplierFilterService;
 use App\Http\Controllers\Controller;
+use App\Actions\Suppliers\ImportSuppliersAction;
 use App\Http\Requests\Suppliers\ExportSupplierRequest;
+use App\Http\Requests\Suppliers\ImportSupplierRequest;
 use App\Http\Requests\Suppliers\IndexSupplierRequest;
 use App\Http\Requests\Suppliers\StoreSupplierRequest;
 use App\Http\Requests\Suppliers\UpdateSupplierRequest;
@@ -75,10 +77,20 @@ class SupplierController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Supplier $supplier): JsonResponse
+    public function destroy(Supplier $supplier): \Illuminate\Http\Response
     {
         $supplier->delete();
 
-        return response()->json(null, 204);
+        return response()->noContent();
+    }
+
+    /**
+     * Import suppliers from an Excel file.
+     */
+    public function import(ImportSupplierRequest $request): JsonResponse
+    {
+        $summary = (new ImportSuppliersAction)->execute($request->file('file'));
+
+        return response()->json($summary);
     }
 }

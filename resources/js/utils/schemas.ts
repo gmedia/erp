@@ -90,7 +90,7 @@ export type CustomerFormData = z.infer<typeof customerFormSchema>;
 // Schema for supplier form data
 export const supplierFormSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    email: z.string().email({ message: 'Please enter a valid email address.' }),
+    email: z.string().email({ message: 'Please enter a valid email address.' }).or(z.literal('')).optional(),
     phone: z
         .string()
         .min(10, { message: 'Phone number must be at least 10 digits.' })
@@ -98,7 +98,7 @@ export const supplierFormSchema = z.object({
             message: 'Please enter a valid phone number.',
         })
         .or(z.literal('')),
-    address: z.string().min(5, { message: 'Address must be at least 5 characters.' }),
+    address: z.string().optional(),
     branch_id: z.string().optional(),
     category_id: z.string().min(1, { message: 'Category is required.' }),
     status: z.enum(['active', 'inactive'], {
