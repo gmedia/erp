@@ -1,7 +1,7 @@
 'use client';
 
 import { createEntityCrudPage } from '@/components/common/EntityCrudPage';
-import ImportDialog from '@/Components/Dialogs/ImportDialog';
+import ImportDialog from '@/components/common/ImportDialog';
 import { employeeConfig } from '@/utils/entityConfigs';
 
 const config = {
