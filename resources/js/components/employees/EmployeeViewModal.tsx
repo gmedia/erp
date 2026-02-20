@@ -60,17 +60,26 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
 
                     <div className="space-y-4 py-4">
                         {/* Basic Info Section */}
+                        <ViewField label="NIK" value={item.employee_id} />
                         <ViewField label="Name" value={item.name} />
                         <ViewField label="Email" value={item.email} />
                         <ViewField label="Phone" value={item.phone} />
 
                         {/* Work Info Section */}
+                        <ViewField
+                            label="Status"
+                            value={
+                                item.employment_status === 'intern'
+                                    ? 'Intern'
+                                    : 'Regular'
+                            }
+                        />
                         <ViewField label="Department" value={departmentName} />
                         <ViewField label="Position" value={positionName} />
                         <ViewField label="Branch" value={branchName} />
                         <ViewField
                             label="Salary"
-                            value={formatRupiah(item.salary)}
+                            value={formatRupiah(item.salary || 0)}
                         />
 
                         {/* Date Section */}
@@ -78,6 +87,12 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
                             label="Hire Date"
                             value={formatDate(item.hire_date)}
                         />
+                        {item.termination_date && (
+                            <ViewField
+                                label="Termination Date"
+                                value={formatDate(item.termination_date as string)}
+                            />
+                        )}
                     </div>
 
                     <DialogFooter>

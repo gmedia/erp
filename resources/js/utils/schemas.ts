@@ -29,6 +29,7 @@ export type UnitFormData = z.infer<typeof unitFormSchema>;
 
 // Schema for employee form data
 export const employeeFormSchema = z.object({
+    employee_id: z.string().min(1, { message: 'Employee ID is required.' }),
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
     email: z.string().email({ message: 'Please enter a valid email address.' }),
     phone: z
@@ -36,21 +37,30 @@ export const employeeFormSchema = z.object({
         .min(10, { message: 'Phone number must be at least 10 digits.' })
         .regex(/^[\d\s\-+().]+$/, {
             message: 'Please enter a valid phone number.',
-        }),
+        })
+        .or(z.literal(''))
+        .optional(),
     department_id: z.string().min(1, { message: 'Department is required.' }),
     position_id: z.string().min(1, { message: 'Position is required.' }),
     branch_id: z.string().min(1, { message: 'Branch is required.' }),
     salary: z
         .string()
-        .min(1, { message: 'Salary is required.' })
-        .transform((val) => val.replace(/[,\s]/g, ''))
+        .optional()
+        .transform((val) => val?.replace(/[,\s]/g, '') || '')
         .pipe(
-            z.string().regex(/^\d+(\.\d{1,2})?$/, {
-                message:
-                    'Please enter a valid salary amount (e.g., 50000 or 50000.00).',
-            }),
+            z.union([
+                z.literal(''),
+                z.string().regex(/^\d+(\.\d{1,2})?$/, {
+                    message:
+                        'Please enter a valid salary amount (e.g., 50000 or 50000.00).',
+                }),
+            ])
         ),
     hire_date: z.date({ message: 'Hire date is required.' }),
+    employment_status: z.enum(['regular', 'intern'], {
+        message: 'Employment status is required.',
+    }),
+    termination_date: z.date().optional().nullable(),
 });
 
 export type EmployeeFormData = z.infer<typeof employeeFormSchema>;

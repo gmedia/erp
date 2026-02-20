@@ -27,6 +27,7 @@ export async function createEmployee(
     route: '/employees',
     returnField: 'email',
     fields: [
+      { name: 'employee_id', type: 'text', defaultValue: `EMP-${timestamp.toString().slice(-5)}` },
       { name: 'name', type: 'text', defaultValue: `Employee ${timestamp}` },
       { name: 'email', type: 'email', defaultValue: defaultEmail },
       { name: 'phone', type: 'text', defaultValue: '08123456789' },
@@ -34,6 +35,7 @@ export async function createEmployee(
       { name: 'position_id', type: 'select', selector: 'Position', defaultValue: 'Senior Developer' },
       { name: 'branch_id', type: 'select', selector: 'Branch', defaultValue: 'Head Office' },
       { name: 'salary', type: 'text', defaultValue: '5000000' },
+      { name: 'employment_status', type: 'select', selector: 'Employment Status', defaultValue: 'Regular' },
     ],
   };
 

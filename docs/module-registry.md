@@ -111,7 +111,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   api: /api/employees
   export_api: /api/employees/export
   search_placeholder: "Search employees..."
-  sortable_columns: [Name, Email, Phone, Department, Position, Branch, Salary, Hire Date]
+  sortable_columns: [NIK, Name, Email, Phone, Department, Position, Branch, Salary, Status, Hire Date]
   view_type: dialog
   checkbox_header: false
 
@@ -269,7 +269,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
 
 | # | Modul | Group | Feature Files | Unit Model | Catatan |
 |---|-------|-------|---------------|------------|---------|
-| 1 | Employees | `employees` | `EmployeeControllerTest`, `EmployeeExportTest` | `EmployeeTest` | Ada `UpdateEmployeeDataTest` (DTO) |
+| 1 | Employees | `employees` | `EmployeeControllerTest`, `EmployeeExportTest`, `EmployeeImportTest` | `EmployeeTest` | Ada `UpdateEmployeeDataTest` (DTO) |
 | 2 | Customers | `customers` | `CustomerControllerTest`, `CustomerExportTest` | `CustomerTest` | — |
 | 3 | Suppliers | `suppliers` | `SupplierControllerTest`, `SupplierExportTest` | `SupplierTest` | — |
 | 4 | Products | `products` | `ProductControllerTest`, `ProductExportTest` | `ProductTest` | — |

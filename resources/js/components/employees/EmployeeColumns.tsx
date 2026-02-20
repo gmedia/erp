@@ -1,5 +1,6 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { ColumnDef } from '@tanstack/react-table';
 
 import {
@@ -41,7 +42,26 @@ const renderBranchCell = ({ row }: { row: { original: Employee } }) => {
 
 export const employeeColumns: ColumnDef<Employee>[] = [
     createSelectColumn<Employee>(),
+    {
+        id: 'employee_id',
+        accessorKey: 'employee_id',
+        ...createSortingHeader('NIK'),
+        cell: ({ row }) => <div>{row.original.employee_id}</div>,
+    },
     createTextColumn<Employee>({ accessorKey: 'name', label: 'Name' }),
+    {
+        id: 'employment_status',
+        accessorKey: 'employment_status',
+        ...createSortingHeader('Status'),
+        cell: ({ row }) => {
+            const status = row.original.employment_status;
+            return (
+                <Badge variant={status === 'intern' ? 'secondary' : 'default'}>
+                    {status === 'intern' ? 'Intern' : 'Regular'}
+                </Badge>
+            );
+        },
+    },
     createEmailColumn<Employee>({ accessorKey: 'email', label: 'Email' }),
     createPhoneColumn<Employee>({ accessorKey: 'phone', label: 'Phone' }),
     {

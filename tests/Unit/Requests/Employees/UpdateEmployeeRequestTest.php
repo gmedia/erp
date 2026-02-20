@@ -30,6 +30,7 @@ describe('UpdateEmployeeRequest', function () {
         $rules = $request->rules();
 
         expect($rules)->toHaveKeys([
+            'employee_id',
             'name',
             'email',
             'phone',
@@ -37,7 +38,9 @@ describe('UpdateEmployeeRequest', function () {
             'position_id',
             'branch_id',
             'salary',
-            'hire_date'
+            'hire_date',
+            'employment_status',
+            'termination_date'
         ]);
     });
 

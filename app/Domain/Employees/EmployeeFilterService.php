@@ -37,6 +37,11 @@ class EmployeeFilterService
             $query->where('branch_id', $filters['branch_id']);
         }
 
+        // Employment status filter
+        if (! empty($filters['employment_status'])) {
+            $query->where('employment_status', $filters['employment_status']);
+        }
+
         // Salary range filtering
         if (! empty($filters['salary_min'])) {
             $query->where('salary', '>=', $filters['salary_min']);

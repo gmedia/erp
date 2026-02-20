@@ -26,6 +26,12 @@ class UpdateEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'employee_id' => [
+                'sometimes',
+                'required',
+                'string',
+                Rule::unique('employees', 'employee_id')->ignore($this->route('employee')->id),
+            ],
             'name' => 'sometimes|required|string|max:255',
             'email' => [
                 'sometimes',
@@ -37,8 +43,10 @@ class UpdateEmployeeRequest extends FormRequest
             'department_id' => 'sometimes|required|exists:departments,id',
             'position_id' => 'sometimes|required|exists:positions,id',
             'branch_id' => 'sometimes|required|exists:branches,id',
-            'salary' => 'sometimes|required|numeric|min:0',
+            'salary' => 'nullable|numeric|min:0',
             'hire_date' => 'sometimes|required|date',
+            'employment_status' => 'sometimes|required|string|in:regular,intern',
+            'termination_date' => 'nullable|date',
         ];
     }
 }

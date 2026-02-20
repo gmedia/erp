@@ -42,6 +42,7 @@ test('fillable attributes are defined correctly', function () {
     $fillable = (new Employee)->getFillable();
 
     expect($fillable)->toBe([
+        'employee_id',
         'name',
         'email',
         'phone',
@@ -51,5 +52,7 @@ test('fillable attributes are defined correctly', function () {
         'user_id',
         'salary',
         'hire_date',
+        'employment_status',
+        'termination_date',
     ]);
 });

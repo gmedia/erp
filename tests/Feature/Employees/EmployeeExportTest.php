@@ -239,6 +239,7 @@ describe('EmployeeExport', function () {
 
         expect($headings)->toBe([
             'ID',
+            'NIK',
             'Name',
             'Email',
             'Phone',
@@ -246,6 +247,7 @@ describe('EmployeeExport', function () {
             'Position',
             'Branch',
             'Salary',
+            'Status',
             'Hire Date',
             'Created At',
         ]);
@@ -271,6 +273,7 @@ describe('EmployeeExport', function () {
 
         expect($mapped)->toBe([
             $employee->id,
+            $employee->employee_id,
             'John Doe',
             'john@example.com',
             '555-1234',
@@ -278,6 +281,7 @@ describe('EmployeeExport', function () {
             'Senior Developer',
             $employee->branch->name,
             '85000.50',
+            $employee->employment_status,
             '2023-03-15',
             '2023-01-10T14:30:00+00:00',
         ]);
@@ -300,7 +304,7 @@ describe('EmployeeExport', function () {
         $export = new EmployeeExport([]);
         $mapped = $export->map($employee);
 
-        expect($mapped[3])->toBeNull(); // Phone field should be null
+        expect($mapped[4])->toBeNull(); // Phone field should be null
     });
 
     test('handles empty filters gracefully', function () {

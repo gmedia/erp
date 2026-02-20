@@ -15,6 +15,7 @@ export interface EntityCrudConfig<T = Record<string, unknown>>
     columns: ColumnDef<T>[];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     viewModalComponent?: React.ComponentType<any>;
+    toolbarActions?: React.ReactNode;
 }
 
 // Simplified form props mapper
@@ -115,6 +116,7 @@ export function createEntityCrudPage<T = Record<string, unknown>>(
                             filterFields: config.filterFields,
                             entityName: config.entityNameForSearch,
                             onView: props.onView,
+                            extraToolbarActions: config.toolbarActions,
                         }),
 
                         mapFormProps: createFormPropsMapper(

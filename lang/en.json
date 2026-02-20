@@ -44,12 +44,7 @@
         "email": "Email address",
         "password": "Password",
         "remember_me": "Remember me",
-        "forgot_password": "Forgot password?",
-        "sign_up": "Sign up",
-        "no_account": "Don't have an account?",
-        "register": "Register",
-        "register_title": "Create an account",
-        "register_description": "Enter your details below to create your account"
+        "forgot_password": "Forgot password?"
     },
     "employees": {
         "title": "Employees",

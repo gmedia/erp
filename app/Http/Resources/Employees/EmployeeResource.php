@@ -20,6 +20,7 @@ class EmployeeResource extends JsonResource
     {
         return [
             'id' => $this->resource->id,
+            'employee_id' => $this->resource->employee_id,
             'name' => $this->resource->name,
             'email' => $this->resource->email,
             'phone' => $this->resource->phone,
@@ -35,8 +36,10 @@ class EmployeeResource extends JsonResource
                 'id' => $this->resource->branch_id,
                 'name' => $this->resource->branch?->name,
             ],
-            'salary' => (string) $this->resource->salary,
+            'employment_status' => $this->resource->employment_status,
+            'salary' => $this->resource->salary ? (string) $this->resource->salary : null,
             'hire_date' => $this->resource->hire_date?->toIso8601String(),
+            'termination_date' => $this->resource->termination_date?->toIso8601String(),
             'created_at' => $this->resource->created_at?->toIso8601String(),
             'updated_at' => $this->resource->updated_at?->toIso8601String(),
         ];

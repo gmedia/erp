@@ -67,6 +67,7 @@ class Employee extends Model
      * @var list<string>
      */
     protected $fillable = [
+        'employee_id',
         'name',
         'email',
         'phone',
@@ -76,6 +77,8 @@ class Employee extends Model
         'user_id',
         'salary',
         'hire_date',
+        'employment_status',
+        'termination_date',
     ];
 
     /**
@@ -85,6 +88,7 @@ class Employee extends Model
      */
     protected $casts = [
         'hire_date' => 'date',
+        'termination_date' => 'date',
         'salary' => 'decimal:2',
     ];
 

@@ -123,6 +123,7 @@ describe('Employee API Endpoints', function () {
         $branch = \App\Models\Branch::factory()->create();
 
         $employeeData = [
+            'employee_id' => 'EMP-001',
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'phone' => '555-1234',
@@ -131,6 +132,7 @@ describe('Employee API Endpoints', function () {
             'branch_id' => $branch->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
+            'employment_status' => 'regular',
         ];
 
         $response = postJson('/api/employees', $employeeData);
@@ -174,13 +176,14 @@ describe('Employee API Endpoints', function () {
 
         $response->assertUnprocessable()
             ->assertJsonValidationErrors([
+                'employee_id',
                 'name',
                 'email',
                 'department_id',
                 'position_id',
                 'branch_id',
-                'salary',
-                'hire_date'
+                'hire_date',
+                'employment_status',
             ]);
     });
 
@@ -191,6 +194,7 @@ describe('Employee API Endpoints', function () {
         $branch = \App\Models\Branch::factory()->create();
 
         $response = postJson('/api/employees', [
+            'employee_id' => 'EMP-002',
             'name' => 'New Employee',
             'email' => 'existing@example.com',
             'department_id' => $department->id,
@@ -198,6 +202,7 @@ describe('Employee API Endpoints', function () {
             'branch_id' => $branch->id,
             'salary' => '50000.00',
             'hire_date' => '2023-01-01',
+            'employment_status' => 'regular',
         ]);
 
         $response->assertUnprocessable()
@@ -298,22 +303,28 @@ describe('Employee API Endpoints', function () {
         $employee = Employee::factory()->create();
 
         $response = putJson("/api/employees/{$employee->id}", [
+            'employee_id' => '', // Empty ID
             'name' => '', // Empty name
             'email' => 'invalid-email', // Invalid email format
             'department_id' => 'invalid-dept', // Invalid department
             'branch_id' => 'invalid-branch', // Invalid branch
             'salary' => '-100', // Negative salary
             'hire_date' => 'invalid-date', // Invalid date
+            'employment_status' => 'invalid-status', // Invalid enum
+            'termination_date' => 'invalid-date', // Invalid date
         ]);
 
         $response->assertUnprocessable()
             ->assertJsonValidationErrors([
+                'employee_id',
                 'name',
                 'email',
                 'department_id',
                 'branch_id',
                 'salary',
-                'hire_date'
+                'hire_date',
+                'employment_status',
+                'termination_date'
             ]);
     });
 
@@ -329,8 +340,8 @@ describe('Employee API Endpoints', function () {
             'department_id' => $department->id,
             'position_id' => $position->id,
             'branch_id' => $branch->id,
-            'salary' => '60000.00',
             'hire_date' => '2023-01-01',
+            'employment_status' => 'regular',
         ]);
 
         $response->assertOk();
@@ -347,8 +358,8 @@ describe('Employee API Endpoints', function () {
             'department_id' => $department->id,
             'position_id' => $position->id,
             'branch_id' => $branch->id,
-            'salary' => '50000.00',
             'hire_date' => '2023-01-01',
+            'employment_status' => 'regular',
         ]);
 
         $response->assertNotFound();
@@ -425,6 +436,7 @@ describe('Employee API Permission Tests', function () {
         $branch = \App\Models\Branch::factory()->create();
 
         $response = postJson('/api/employees', [
+            'employee_id' => 'EMP-003',
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'department_id' => $department->id,
@@ -432,6 +444,7 @@ describe('Employee API Permission Tests', function () {
             'branch_id' => $branch->id,
             'salary' => '50000.00',
             'hire_date' => '2023-01-01',
+            'employment_status' => 'regular',
         ]);
 
         $response->assertForbidden()
