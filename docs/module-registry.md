@@ -111,7 +111,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   api: /api/employees
   export_api: /api/employees/export
   search_placeholder: "Search employees..."
-  sortable_columns: [Name, Email, Phone, Department, Position, Branch, Salary, Hire Date]
+  sortable_columns: [NIK, Name, Email, Phone, Department, Position, Branch, Salary, Status, Hire Date]
   view_type: dialog
   checkbox_header: false
 

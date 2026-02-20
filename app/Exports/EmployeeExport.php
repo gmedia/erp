@@ -28,7 +28,8 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
+                $q->where('employee_id', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%");
             });
@@ -47,6 +48,11 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         // Apply branch filter (by branch_id)
         if (! empty($this->filters['branch_id'])) {
             $query->where('branch_id', $this->filters['branch_id']);
+        }
+
+        // Apply employment status filter
+        if (! empty($this->filters['employment_status'])) {
+            $query->where('employment_status', $this->filters['employment_status']);
         }
 
         // Apply salary range filters
@@ -72,7 +78,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
 
         // Validate sort_by to prevent SQL injection
-        $allowedSortColumns = ['name', 'email', 'phone', 'department_id', 'position_id', 'branch_id', 'salary', 'hire_date', 'created_at', 'updated_at'];
+        $allowedSortColumns = ['name', 'email', 'phone', 'employee_id', 'department_id', 'position_id', 'branch_id', 'salary', 'employment_status', 'hire_date', 'created_at', 'updated_at'];
         if (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);
         }
@@ -84,6 +90,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
     {
         return [
             'ID',
+            'NIK',
             'Name',
             'Email',
             'Phone',
@@ -91,6 +98,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             'Position',
             'Branch',
             'Salary',
+            'Status',
             'Hire Date',
             'Created At',
         ];
@@ -100,6 +108,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
     {
         return [
             $employee->id,
+            $employee->employee_id,
             $employee->name,
             $employee->email,
             $employee->phone,
@@ -107,6 +116,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             $employee->position?->name,
             $employee->branch?->name,
             $employee->salary,
+            $employee->employment_status,
             $employee->hire_date->format('Y-m-d'),
             $employee->created_at?->toIso8601String(),
         ];

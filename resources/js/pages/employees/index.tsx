@@ -11,6 +11,7 @@ const config = {
       title="Import Employees"
       importRoute="/api/employees/import"
       templateHeaders={[
+        'employee_id',
         'name',
         'email',
         'phone',
@@ -19,6 +20,8 @@ const config = {
         'branch',
         'salary',
         'hire_date',
+        'employment_status',
+        'termination_date',
       ]}
     />
   ),

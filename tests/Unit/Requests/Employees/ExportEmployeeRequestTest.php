@@ -27,6 +27,7 @@ test('rules returns validation rules', function () {
     expect($rules['department_id'])->toBe(['nullable', 'integer', 'exists:departments,id']);
     expect($rules['position_id'])->toBe(['nullable', 'integer', 'exists:positions,id']);
     expect($rules['branch_id'])->toBe(['nullable', 'integer', 'exists:branches,id']);
-    expect($rules['sort_by'])->toBe(['nullable', 'string', 'in:id,name,email,department_id,position_id,salary,hire_date,created_at,updated_at']);
+    expect($rules['employment_status'])->toBe(['nullable', 'string', 'in:regular,intern']);
+    expect($rules['sort_by'])->toBe(['nullable', 'string', 'in:id,employee_id,name,email,department_id,position_id,salary,employment_status,hire_date,created_at,updated_at']);
     expect($rules['sort_direction'])->toBe(['nullable', 'string', 'in:asc,desc']);
 });

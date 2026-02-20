@@ -2,6 +2,7 @@
 
 import {
     createAsyncSelectFilterField,
+    createSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
@@ -27,6 +28,15 @@ export function createEmployeeFilterFields(): FieldDescriptor[] {
             'Branch',
             '/api/branches',
             'Select a branch',
+        ),
+        createSelectFilterField(
+            'employment_status',
+            'Status',
+            [
+                { label: 'Regular', value: 'regular' },
+                { label: 'Intern', value: 'intern' },
+            ],
+            'Select status',
         ),
     ];
 }

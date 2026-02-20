@@ -42,7 +42,12 @@ const renderBranchCell = ({ row }: { row: { original: Employee } }) => {
 
 export const employeeColumns: ColumnDef<Employee>[] = [
     createSelectColumn<Employee>(),
-    createTextColumn<Employee>({ accessorKey: 'employee_id', label: 'NIK' }),
+    {
+        id: 'employee_id',
+        accessorKey: 'employee_id',
+        ...createSortingHeader('NIK'),
+        cell: ({ row }) => <div>{row.original.employee_id}</div>,
+    },
     createTextColumn<Employee>({ accessorKey: 'name', label: 'Name' }),
     {
         id: 'employment_status',
