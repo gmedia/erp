@@ -164,10 +164,6 @@ This ERP system is designed for:
     ```
     sail npm run test:e2e
     ```
-- Start analyzing using the SonarQube scanner
-    ```
-    docker run -u root --rm -v "$(pwd):/var/www/html" -w /var/www/html sonarsource/sonar-scanner-cli:11
-    ```
 ## Technologies
 - [x] Laravel, React.js, Inertia.js, Vite.js, Shadcn UI, Tailwind CSS, TypeScript, ESLint, Prettier, PHPUnit, Pest, FakerPHP. ([Link](https://ui.shadcn.com/docs/installation/laravel))
 - [x] Sail. ([Link](https://laravel.com/docs/12.x/sail))
@@ -178,7 +174,7 @@ This ERP system is designed for:
 - [x] Playwright. ([Link](https://playwright.dev/docs/intro))
 - [ ] Security Advisories Health Check. ([Link](https://github.com/spatie/security-advisories-health-check))
 - [ ] npm-check-updates. ([Link](https://github.com/raineorshine/npm-check-updates))
-- [x] Laravel CSP. ([Link](https://github.com/spatie/laravel-csp))
+- [ ] Laravel CSP. ([Link](https://github.com/spatie/laravel-csp))
 - [ ] SonarQube. ([Link](https://docs.sonarsource.com/sonarqube-community-build/server-installation/from-docker-image/installation-overview))
 - [x] Laravel Actions. ([Link](https://github.com/lorisleiva/laravel-actions))
 - [x] Scramble. ([Link](https://github.com/dedoc/scramble))
