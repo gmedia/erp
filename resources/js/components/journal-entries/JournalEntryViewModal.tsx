@@ -35,7 +35,7 @@ export function JournalEntryViewModal({
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-[95vw] sm:max-w-7xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Journal Entry Details</DialogTitle>
                     <DialogDescription>
@@ -76,7 +76,7 @@ export function JournalEntryViewModal({
                     </div>
                 </div>
 
-                <div className="border rounded-md">
+                <div className="border rounded-md overflow-x-auto">
                     <Table>
                         <TableHeader>
                             <TableRow>
