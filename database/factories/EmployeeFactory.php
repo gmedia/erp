@@ -26,17 +26,20 @@ class EmployeeFactory extends Factory
     public function definition(): array
     {
         return [
+            'employee_id' => 'EMP-' . $this->faker->unique()->randomNumber(5, true),
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'phone' => $this->faker->optional()->phoneNumber(),
             'department_id' => Department::factory(),
             'position_id' => Position::factory(),
             'branch_id' => \App\Models\Branch::factory(),
-            'user_id' => User::factory(),
-            // Two‑decimal salary between 30 000 and 150 000
-            'salary' => $this->faker->randomFloat(2, 30000, 150000),
+            'user_id' => $this->faker->boolean(20) ? User::factory() : null,
+            // nullable two-decimal salary
+            'salary' => $this->faker->optional(0.8, null)->randomFloat(2, 30000, 150000),
             // Random hire date within the last 10 years
             'hire_date' => $this->faker->dateTimeBetween('-10 years', 'now')->format('Y-m-d'),
+            'employment_status' => $this->faker->randomElement(['regular', 'intern']),
+            'termination_date' => $this->faker->boolean(20) ? $this->faker->dateTimeBetween('-1 years', 'now')->format('Y-m-d') : null,
         ];
     }
 }

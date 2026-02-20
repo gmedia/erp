@@ -20,14 +20,17 @@ class StoreEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'employee_id' => 'required|string|unique:employees,employee_id',
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:employees,email',
             'phone' => 'nullable|string|max:20',
             'department_id' => 'required|exists:departments,id',
             'position_id' => 'required|exists:positions,id',
             'branch_id' => 'required|exists:branches,id',
-            'salary' => 'required|numeric|min:0',
+            'salary' => 'nullable|numeric|min:0',
             'hire_date' => 'required|date',
+            'employment_status' => 'required|string|in:regular,intern',
+            'termination_date' => 'nullable|date',
         ];
     }
 }

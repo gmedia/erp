@@ -37,14 +37,17 @@ class EmployeeImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
 
             // 1. Validate the row data
             $validator = Validator::make($row->toArray(), [
+                'employee_id' => 'required|string',
                 'name' => 'required|string|max:255',
                 'email' => 'required|email', // We check uniqueness manually for upsert/skip logic
                 'phone' => 'nullable|string|max:20',
                 'department' => 'required|string',
                 'position' => 'required|string',
                 'branch' => 'required|string',
-                'salary' => 'required|numeric|min:0',
+                'salary' => 'nullable|numeric|min:0',
                 'hire_date' => 'required|date_format:Y-m-d',
+                'employment_status' => 'required|string|in:regular,intern',
+                'termination_date' => 'nullable|date_format:Y-m-d',
             ]);
 
             if ($validator->fails()) {
@@ -94,13 +97,16 @@ class EmployeeImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                 $employee = Employee::updateOrCreate(
                     ['email' => $row['email']], // Look up by email
                     [
+                        'employee_id' => $row['employee_id'],
                         'name' => $row['name'],
                         'phone' => $row['phone'],
                         'department_id' => $departmentId,
                         'position_id' => $positionId,
                         'branch_id' => $branchId,
-                        'salary' => $row['salary'],
+                        'salary' => $row['salary'] ?? null,
                         'hire_date' => $row['hire_date'],
+                        'employment_status' => $row['employment_status'],
+                        'termination_date' => $row['termination_date'] ?? null,
                         // 'user_id' => null, // Optional: logic to create/link user
                     ]
                 );

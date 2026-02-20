@@ -11,6 +11,7 @@ import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import NameField from '@/components/common/NameField';
+import SelectField from '@/components/common/SelectField';
 
 import { Employee, EmployeeFormData } from '@/types/entity';
 import { employeeFormSchema } from '@/utils/schemas';
@@ -28,6 +29,11 @@ interface EmployeeFormProps {
  */
 const renderEmployeeBasicInfoSection = () => (
     <>
+        <InputField
+            name="employee_id"
+            label="Employee ID (NIK)"
+            placeholder="EMP-001"
+        />
         <NameField name="name" label="Name" placeholder="John Doe" />
         <InputField
             name="email"
@@ -45,6 +51,14 @@ const renderEmployeeBasicInfoSection = () => (
 
 const renderEmployeeWorkInfoSection = () => (
     <>
+        <SelectField
+            name="employment_status"
+            label="Employment Status"
+            options={[
+                { value: 'regular', label: 'Regular' },
+                { value: 'intern', label: 'Intern' },
+            ]}
+        />
         <AsyncSelectField
             name="department_id"
             label="Department"
@@ -65,7 +79,7 @@ const renderEmployeeWorkInfoSection = () => (
         />
         <InputField
             name="salary"
-            label="Salary"
+            label="Salary (Optional)"
             type="number"
             placeholder="50000"
             prefix="Rp"
@@ -74,14 +88,28 @@ const renderEmployeeWorkInfoSection = () => (
 );
 
 const renderEmployeeHireDateSection = () => (
-    <DatePickerField
-        name="hire_date"
-        label="Hire Date"
-        placeholder="Pick a date"
-        disabled={(date: Date) =>
-            date > new Date() || date < new Date('1900-01-01')
-        }
-    />
+    <div className="flex gap-4">
+        <div className="flex-1">
+            <DatePickerField
+                name="hire_date"
+                label="Hire Date"
+                placeholder="Pick a date"
+                disabled={(date: Date) =>
+                    date > new Date() || date < new Date('1900-01-01')
+                }
+            />
+        </div>
+        <div className="flex-1">
+            <DatePickerField
+                name="termination_date"
+                label="Termination Date (Optional)"
+                placeholder="Pick a date"
+                disabled={(date: Date) =>
+                    date < new Date('1900-01-01')
+                }
+            />
+        </div>
+    </div>
 );
 
 /**
@@ -92,6 +120,7 @@ const getEmployeeFormDefaults = (
 ): EmployeeFormData => {
     if (!employee) {
         return {
+            employee_id: '',
             name: '',
             email: '',
             phone: '',
@@ -100,10 +129,13 @@ const getEmployeeFormDefaults = (
             branch_id: '',
             salary: '',
             hire_date: new Date(),
+            employment_status: 'regular',
+            termination_date: null,
         };
     }
 
     return {
+        employee_id: employee.employee_id || '',
         name: employee.name,
         email: employee.email,
         phone: employee.phone,
@@ -121,6 +153,8 @@ const getEmployeeFormDefaults = (
                 : String(employee.branch),
         salary: employee.salary || '',
         hire_date: new Date(employee.hire_date),
+        employment_status: employee.employment_status || 'regular',
+        termination_date: employee.termination_date ? new Date(employee.termination_date) : null,
     };
 };
 
@@ -150,6 +184,7 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
         onSubmit({
             ...data,
             hire_date: format(data.hire_date, 'yyyy-MM-dd') as any,
+            termination_date: data.termination_date ? format(data.termination_date, 'yyyy-MM-dd') as any : null,
         });
     };
 

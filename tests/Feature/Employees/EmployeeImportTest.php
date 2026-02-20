@@ -21,8 +21,8 @@ beforeEach(function () {
 test('can import employees from csv file', function () {
     // Header + 1 row
     $csvContent = implode("\n", [
-        'name,email,phone,department,position,branch,salary,hire_date',
-        'John Doe,john@example.com,08123456789,IT,Developer,Head Office,10000000,2023-01-01',
+        'employee_id,name,email,phone,department,position,branch,salary,hire_date,employment_status',
+        'EMP-001,John Doe,john@example.com,08123456789,IT,Developer,Head Office,10000000,2023-01-01,regular',
     ]);
     
     $file = UploadedFile::fake()->createWithContent('employees.csv', $csvContent);
@@ -51,10 +51,10 @@ test('returns validation errors for invalid rows', function () {
     // Row 2: Missing email
     // Row 3: Invalid Date
     $csvContent = implode("\n", [
-        'name,email,phone,department,position,branch,salary,hire_date',
-        'Valid User,valid@example.com,0812345,IT,Developer,Head Office,5000000,2023-01-01',
-        'No Email,,0812345,IT,Developer,Head Office,5000000,2023-01-01',
-        'Invalid Date,inv@example.com,0812345,IT,Developer,Head Office,5000000,not-a-date',
+        'employee_id,name,email,phone,department,position,branch,salary,hire_date,employment_status',
+        'EMP-002,Valid User,valid@example.com,0812345,IT,Developer,Head Office,5000000,2023-01-01,regular',
+        'EMP-003,No Email,,0812345,IT,Developer,Head Office,5000000,2023-01-01,regular',
+        'EMP-004,Invalid Date,inv@example.com,0812345,IT,Developer,Head Office,5000000,not-a-date,regular',
     ]);
     
     $file = UploadedFile::fake()->createWithContent('employees_invalid.csv', $csvContent);
@@ -79,8 +79,8 @@ test('returns validation errors for invalid rows', function () {
 
 test('returns errors for unknown foreign keys', function () {
     $csvContent = implode("\n", [
-        'name,email,phone,department,position,branch,salary,hire_date',
-        'Unknown Dept,test@example.com,0812345,Unknown,Developer,Head Office,5000000,2023-01-01',
+        'employee_id,name,email,phone,department,position,branch,salary,hire_date,employment_status',
+        'EMP-005,Unknown Dept,test@example.com,0812345,Unknown,Developer,Head Office,5000000,2023-01-01,regular',
     ]);
     
     $file = UploadedFile::fake()->createWithContent('employees_fk.csv', $csvContent);
@@ -104,8 +104,8 @@ test('skips/upserts existing email', function () {
     ]);
 
     $csvContent = implode("\n", [
-        'name,email,phone,department,position,branch,salary,hire_date',
-        'New Name,exist@example.com,0812345,IT,Developer,Head Office,9000000,2023-01-01',
+        'employee_id,name,email,phone,department,position,branch,salary,hire_date,employment_status',
+        'EMP-123,New Name,exist@example.com,0812345,IT,Developer,Head Office,9000000,2023-01-01,regular',
     ]);
     
     $file = UploadedFile::fake()->createWithContent('employees_upsert.csv', $csvContent);
