@@ -99,6 +99,14 @@ class MenuSeeder extends Seeder
                         'url' => 'asset-maintenances',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'asset_stocktake',
+                        'display_name' => 'Asset stocktake',
+                        'permissions' => ['asset_stocktake', 'asset_stocktake.create', 'asset_stocktake.edit', 'asset_stocktake.delete'],
+                        'icon' => 'Wrench',
+                        'url' => 'asset-stocktakes',
+                        'child' => [],
+                    ],
 
                 ],
             ],

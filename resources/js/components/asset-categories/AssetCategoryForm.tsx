@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useEffect, memo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import { assetCategoryFormSchema, AssetCategoryFormData } from '@/utils/schemas';
@@ -24,7 +25,9 @@ export const AssetCategoryForm = memo<AssetCategoryFormProps>(function AssetCate
     onSubmit,
     isLoading = false,
 }) {
-    const form = useForm<AssetCategoryFormData>({
+    type AssetCategoryFormInput = z.input<typeof assetCategoryFormSchema>;
+
+    const form = useForm<AssetCategoryFormInput, any, AssetCategoryFormData>({
         resolver: zodResolver(assetCategoryFormSchema),
         defaultValues: {
             code: '',

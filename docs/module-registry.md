@@ -200,6 +200,15 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
 
+- slug: asset-stocktakes
+  route: /asset-stocktakes
+  api: /api/asset-stocktakes
+  export_api: /api/asset-stocktakes/export
+  search_placeholder: "Search stocktakes..."
+  sortable_columns: [Reference, Branch, Planned Date, Performed Date, Status, Created By]
+  view_type: dialog
+  checkbox_header: false
+
 - slug: fiscal-years
   route: /fiscal-years
   api: /api/fiscal-years
@@ -273,6 +282,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
 | 10 | COA Versions | `coa-versions` | `CoaVersionControllerTest`, `CoaVersionExportTest` | `CoaVersionTest` | — |
 | 11 | Fiscal Years | `fiscal-years` | `FiscalYearControllerTest`, `FiscalYearExportTest` | `FiscalYearTest` | — |
 | 12 | Journal Entries | `journal-entries` | `JournalEntryControllerTest`, `JournalEntryExportTest` | `JournalEntryTest` | — |
+| 13 | Asset Stocktakes | `asset-stocktakes` | `AssetStocktakeControllerTest`, `AssetStocktakeExportTest` | `AssetStocktakeTest` | — |
 
 ---
 

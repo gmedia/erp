@@ -34,7 +34,7 @@ interface EntityFormProps<T extends FieldValues = FieldValues> {
     children: React.ReactNode;
     isLoading?: boolean;
     /** The form object returned by react‑hook‑form's useForm */
-    form: UseFormReturn<T>;
+    form: UseFormReturn<any, any, T>;
     /** Optional – disable the submit button manually (e.g. for custom validation) */
     submitDisabled?: boolean;
     /** Optional – custom class name for the DialogContent (e.g. for wider forms) */

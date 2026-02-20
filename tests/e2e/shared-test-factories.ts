@@ -62,9 +62,11 @@ export interface ModuleTestConfig {
 // ==================== HELPER FUNCTIONS ====================
 
 async function waitForApiResponse(page: Page, apiPath: string): Promise<void> {
-    await page.waitForResponse(
-        r => r.url().includes(apiPath) && r.status() < 400
-    ).catch(() => null);
+    await page
+        .waitForResponse(r => r.url().includes(apiPath) && r.status() < 400, {
+            timeout: 5000,
+        })
+        .catch(() => null);
 }
 
 async function openActionsMenu(page: Page, config: ModuleTestConfig): Promise<void> {
