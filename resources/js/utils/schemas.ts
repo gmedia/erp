@@ -302,3 +302,15 @@ export const assetMaintenanceFormSchema = z.object({
 });
 
 export type AssetMaintenanceFormData = z.infer<typeof assetMaintenanceFormSchema>;
+
+export const assetStocktakeFormSchema = z.object({
+    branch_id: z.string().min(1, { message: 'Branch is required.' }),
+    reference: z.string().min(1, { message: 'Reference is required.' }),
+    planned_at: z.date({ message: 'Planned date is required.' }),
+    performed_at: z.date().optional().nullable(),
+    status: z.enum(['draft', 'in_progress', 'completed', 'cancelled'], {
+        message: 'Status is required.',
+    }),
+});
+
+export type AssetStocktakeFormData = z.infer<typeof assetStocktakeFormSchema>;

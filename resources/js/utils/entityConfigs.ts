@@ -611,3 +611,33 @@ export const assetMaintenanceConfig = createComplexEntityConfig<AssetMaintenance
     viewModalComponent: AssetMaintenanceViewModal,
     getDeleteMessage: () => 'This action cannot be undone. This will permanently delete this maintenance record.',
 });
+
+import { assetStocktakeColumns } from '@/components/asset-stocktakes/AssetStocktakeColumns';
+import { createAssetStocktakeFilterFields } from '@/components/asset-stocktakes/AssetStocktakeFilters';
+import { AssetStocktakeForm } from '@/components/asset-stocktakes/AssetStocktakeForm';
+import { AssetStocktakeViewModal } from '@/components/asset-stocktakes/AssetStocktakeViewModal';
+import { type AssetStocktake } from '@/types/asset-stocktake';
+
+export const assetStocktakeConfig = createComplexEntityConfig<AssetStocktake>({
+    entityName: 'Asset Stocktake',
+    entityNamePlural: 'Asset Stocktakes',
+    apiEndpoint: '/api/asset-stocktakes',
+    exportEndpoint: '/api/asset-stocktakes/export',
+    queryKey: ['asset-stocktakes'],
+    breadcrumbs: [{ title: 'Asset Stocktakes', href: '/asset-stocktakes' }],
+    initialFilters: {
+        search: '',
+        branch_id: '',
+        status: '',
+        planned_at_from: '',
+        planned_at_to: '',
+    },
+    columns: assetStocktakeColumns,
+    filterFields: createAssetStocktakeFilterFields(),
+    formComponent: AssetStocktakeForm,
+    formType: 'complex',
+    entityNameForSearch: 'stocktake',
+    viewModalComponent: AssetStocktakeViewModal,
+    getDeleteMessage: (item: { reference?: string }) =>
+        `This action cannot be undone. This will permanently delete stocktake ${item.reference}.`,
+});

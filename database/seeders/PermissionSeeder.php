@@ -510,6 +510,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'asset_stocktake',
+                'display_name' => 'Asset Stocktake',
+                'child' => [
+                    [
+                        'name' => 'asset_stocktake.create',
+                        'display_name' => 'Create Asset Stocktake',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset_stocktake.edit',
+                        'display_name' => 'Edit Asset Stocktake',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset_stocktake.delete',
+                        'display_name' => 'Delete Asset Stocktake',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],
