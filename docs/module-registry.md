@@ -128,6 +128,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   route: /suppliers
   api: /api/suppliers
   export_api: /api/suppliers/export
+  import_api: /api/suppliers/import
   search_placeholder: "Search suppliers..."
   sortable_columns: [Name, Email, Phone, Branch, Category, Status]
   view_type: dialog

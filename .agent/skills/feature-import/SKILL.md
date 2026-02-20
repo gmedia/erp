@@ -5,14 +5,14 @@ description: Workflow untuk menambahkan fitur import data melalui file Excel pad
 
 # Feature Import Excel
 
-Skill ini digunakan untuk menambahkan fitur **Import** (biasanya via `.xlsx`, `.xls`, `.csv`) pada modul CRUD yang sudah ada. Arsitektur fitur import ini mengadopsi pola yang digunakan pada modul `Employee`.
+Skill ini digunakan untuk menambahkan fitur **Import** (biasanya via `.xlsx`, `.xls`, `.csv`) pada modul CRUD yang sudah ada. Arsitektur fitur import ini mengadopsi pola yang digunakan pada modul `Employee` dan `Supplier`.
 
 ## 1. Persiapan & Analisis
 
 Sebelum membuat file, pelajari modul target:
 1. Pahami struktur tabel dan kolom mandatory.
 2. Identifikasi _Foreign Key_ (FK) referensi yang diperlukan. Misalnya, field `department_id` mereferensikan tabel `departments`. Di excel, user akan mengisi _Nama Department_, bukan ID.
-3. Identifikasi _Unique Key_ untuk kebutuhan _Upsert_ (Insert atau Update). Misalnya email pada _Employee_, atau kode pada _Asset_.
+3. Identifikasi _Unique Key_ untuk kebutuhan _Upsert_ (Insert atau Update). Misalnya email pada _Employee_, email/nama pada _Supplier_, atau kode pada _Asset_.
 
 ## 2. Struktur Backend
 
