@@ -60,6 +60,7 @@ class DatabaseSeeder extends Seeder
             'email' => config('app.admin'),
             'user_id' => $admin->id,
         ], [
+            'employee_id' => 'EMP-00000',
             'name' => 'Admin User',
             'phone' => '1234567890',
             'department_id' => $departmentId,
@@ -67,6 +68,7 @@ class DatabaseSeeder extends Seeder
             'branch_id' => $branchId,
             'salary' => 100000,
             'hire_date' => now(),
+            'employment_status' => 'regular',
         ]);
 
         $this->call([
