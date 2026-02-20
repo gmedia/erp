@@ -110,6 +110,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   route: /employees
   api: /api/employees
   export_api: /api/employees/export
+  import_api: /api/employees/import
   search_placeholder: "Search employees..."
   sortable_columns: [NIK, Name, Email, Phone, Department, Position, Branch, Salary, Status, Hire Date]
   view_type: dialog
@@ -147,6 +148,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   route: /assets
   api: /api/assets
   export_api: /api/assets/export
+  import_api: /api/assets/import
   search_placeholder: "Search assets..."
   sortable_columns: [Code, Name, Category, Branch, Status, Cost, Purchase Date]
   view_type: page  # navigasi ke /assets/{ulid}

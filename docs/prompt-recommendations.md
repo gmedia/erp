@@ -114,4 +114,4 @@ Spesifikasi:
 | Simple CRUD | `/create-feature` | `feature-crud-simple` | `departments` | ❌ |
 | Complex CRUD | `/create-feature` | `feature-crud-complex` | `employees`/`suppliers`/`customers` | ❌ |
 | Non-CRUD | `/create-feature` | `feature-non-crud` | Tergantung spec | `docs/{MODUL}.md` |
-| Import Feature | `/create-import` | `feature-import` | `employees`/`suppliers` (import pattern) | ❌ |
+| Import Feature | `/create-import` | `feature-import` | `employees`/`suppliers`/`assets` (import pattern) | ❌ |
