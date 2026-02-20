@@ -41,7 +41,7 @@ export function AssetViewModal({ open, onClose, item }: AssetViewModalProps) {
             case 'active':
                 return 'default';
             case 'maintenance':
-                return 'warning';
+                return 'outline';
             case 'disposed':
                 return 'destructive';
             case 'lost':
@@ -56,7 +56,7 @@ export function AssetViewModal({ open, onClose, item }: AssetViewModalProps) {
             case 'good':
                 return 'default';
             case 'needs_repair':
-                return 'warning';
+                return 'outline';
             case 'damaged':
                 return 'destructive';
             default:

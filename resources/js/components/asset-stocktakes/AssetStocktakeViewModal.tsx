@@ -1,4 +1,12 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { formatDate } from '@/lib/utils';
 import { AssetStocktake } from '@/types/asset-stocktake';
 
 interface AssetStocktakeViewModalProps {
@@ -11,28 +19,46 @@ export function AssetStocktakeViewModal({ open, onClose, item }: AssetStocktakeV
     if (!item) return null;
 
     return (
-        <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent>
+        <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+            <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
-                    <DialogTitle>{item.reference}</DialogTitle>
+                    <DialogTitle>Stocktake Details</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4">
-                    <div>
-                        <span className="font-semibold">Branch:</span> {item.branch.name}
-                    </div>
-                    <div>
-                        <span className="font-semibold">Planned Date:</span> {new Date(item.planned_at).toLocaleDateString()}
-                    </div>
-                    <div>
-                        <span className="font-semibold">Performed Date:</span> {item.performed_at ? new Date(item.performed_at).toLocaleDateString() : '-'}
-                    </div>
-                    <div>
-                        <span className="font-semibold">Status:</span> {item.status}
-                    </div>
-                    <div>
-                        <span className="font-semibold">Created By:</span> {item.created_by?.name || '-'}
+
+                <div className="space-y-4 py-2">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span className="text-muted-foreground block text-xs">Reference</span>
+                            <span className="font-medium">{item.reference}</span>
+                        </div>
+                        <div>
+                            <span className="text-muted-foreground block text-xs">Branch</span>
+                            <span className="font-medium">{item.branch?.name || '-'}</span>
+                        </div>
+                        <div>
+                            <span className="text-muted-foreground block text-xs">Planned Date</span>
+                            <span>{formatDate(item.planned_at)}</span>
+                        </div>
+                        <div>
+                            <span className="text-muted-foreground block text-xs">Performed Date</span>
+                            <span>{item.performed_at ? formatDate(item.performed_at) : '-'}</span>
+                        </div>
+                        <div>
+                            <span className="text-muted-foreground block text-xs">Status</span>
+                            <span className="capitalize">{item.status}</span>
+                        </div>
+                        <div>
+                            <span className="text-muted-foreground block text-xs">Created By</span>
+                            <span>{item.created_by?.name || '-'}</span>
+                        </div>
                     </div>
                 </div>
+
+                <DialogFooter>
+                    <Button type="button" onClick={onClose}>
+                        Close
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );

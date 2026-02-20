@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { memo, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -56,7 +57,9 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(function Ass
 }) {
     const defaultValues = useMemo(() => getAssetMaintenanceFormDefaults(item), [item]);
 
-    const form = useForm<AssetMaintenanceFormData>({
+    type AssetMaintenanceFormInput = z.input<typeof assetMaintenanceFormSchema>;
+
+    const form = useForm<AssetMaintenanceFormInput, any, AssetMaintenanceFormData>({
         resolver: zodResolver(assetMaintenanceFormSchema),
         defaultValues,
     });

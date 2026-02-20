@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
-import { SelectField } from '@/components/common/SelectField';
+import SelectField from '@/components/common/SelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 
 import { AssetStocktake } from '@/types/asset-stocktake';
