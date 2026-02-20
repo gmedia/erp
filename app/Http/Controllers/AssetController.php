@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Assets\{IndexAssetsAction, ExportAssetsAction};
-use App\Http\Requests\Assets\{IndexAssetRequest, StoreAssetRequest, UpdateAssetRequest, ExportAssetRequest};
+use App\Actions\Assets\{IndexAssetsAction, ExportAssetsAction, ImportAssetsAction};
+use App\Http\Requests\Assets\{IndexAssetRequest, StoreAssetRequest, UpdateAssetRequest, ExportAssetRequest, ImportAssetRequest};
 use App\Http\Resources\Assets\{AssetResource, AssetCollection};
 use App\DTOs\Assets\UpdateAssetData;
 use App\Models\{Asset, AssetMovement};
@@ -40,7 +40,7 @@ class AssetController extends Controller
             'to_department_id' => $asset->department_id,
             'to_employee_id' => $asset->employee_id,
             'notes' => 'Initial acquisition',
-            'created_by' => auth()->id(),
+            'created_by' => $request->user()->id,
         ]);
 
         return response()->json([
@@ -102,7 +102,7 @@ class AssetController extends Controller
                 'to_department_id' => $asset->department_id,
                 'to_employee_id' => $asset->employee_id,
                 'notes' => 'Initial acquisition (synced)',
-                'created_by' => auth()->id(),
+                'created_by' => $request->user()->id,
             ]
         );
 
@@ -124,5 +124,15 @@ class AssetController extends Controller
     public function export(ExportAssetRequest $request, ExportAssetsAction $action): JsonResponse
     {
         return $action->execute($request);
+    }
+
+    public function import(ImportAssetRequest $request, ImportAssetsAction $action): JsonResponse
+    {
+        /** @var \Illuminate\Http\UploadedFile $file */
+        $file = $request->file('file');
+        
+        $summary = $action->execute($file);
+        
+        return response()->json($summary);
     }
 }
