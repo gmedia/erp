@@ -38,20 +38,17 @@ export function InputField({
             render={({ field }) => (
                 <FormItem className={className}>
                     <FormLabel>{label}</FormLabel>
-                    <FormControl>
-                        <div className="relative flex items-center">
-                            {prefix && (
-                                <div className="absolute left-3 flex items-center pointer-events-none text-muted-foreground select-none">
-                                    {prefix}
-                                </div>
-                            )}
+                    <div className="relative flex items-center">
+                        {prefix && (
+                            <div className="absolute left-3 flex items-center pointer-events-none text-muted-foreground select-none">
+                                {prefix}
+                            </div>
+                        )}
+                        <FormControl>
                             <Input
                                 type={type}
                                 placeholder={placeholder}
-                                className={cn(
-                                    prefix && "pl-10",
-                                    suffix && "pr-10"
-                                )}
+                                className={cn(prefix && "pl-10", suffix && "pr-10")}
                                 value={
                                     field.value as
                                         | string
@@ -65,13 +62,13 @@ export function InputField({
                                 ref={field.ref}
                                 {...props}
                             />
-                            {suffix && (
-                                <div className="absolute right-3 flex items-center pointer-events-none text-muted-foreground select-none">
-                                    {suffix}
-                                </div>
-                            )}
-                        </div>
-                    </FormControl>
+                        </FormControl>
+                        {suffix && (
+                            <div className="absolute right-3 flex items-center pointer-events-none text-muted-foreground select-none">
+                                {suffix}
+                            </div>
+                        )}
+                    </div>
                     <FormMessage />
                     {children}
                 </FormItem>

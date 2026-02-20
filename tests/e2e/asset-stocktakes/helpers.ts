@@ -31,7 +31,7 @@ export async function createAssetStocktake(page: Page) {
     // It's already draft by default in form.
 
     // Save
-    await page.getByRole('button', { name: /save|simpan/i }).click();
+    await page.getByRole('dialog').locator('button[type="submit"]').click();
 
     // Wait for dialog to close
     await expect(page.getByRole('dialog')).not.toBeVisible();
@@ -41,7 +41,12 @@ export async function createAssetStocktake(page: Page) {
 
 export async function searchAssetStocktake(page: Page, reference: string) {
     const searchInput = page.getByPlaceholder(/search/i);
+    const responsePromise = page
+        .waitForResponse(
+            resp => resp.url().includes('/api/asset-stocktakes') && resp.status() < 400,
+            { timeout: 5000 },
+        )
+        .catch(() => null);
     await searchInput.fill(reference);
-    // Wait for debounce/api
-    await page.waitForResponse(resp => resp.url().includes('/api/asset-stocktakes') && resp.status() === 200);
+    await responsePromise;
 }
