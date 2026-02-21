@@ -210,6 +210,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   sortable_columns: [Reference, Branch, Planned Date, Performed Date, Status, Created By]
   view_type: dialog
   checkbox_header: false
+  note: "Memiliki custom action 'Perform' yang navigasi ke page /asset-stocktakes/{ulid}/perform. Juga memiliki endpoint nested /items untuk AssetStocktakeItem."
 
 - slug: fiscal-years
   route: /fiscal-years
