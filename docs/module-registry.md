@@ -254,6 +254,16 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   api: /api/asset-depreciation-runs
   view_type: page
   note: "Non-CRUD feature for calculating and posting asset depreciation."
+
+- slug: asset-reports/register
+  route: /reports/assets/register
+  api: /api/assets
+  export_api: /reports/assets/register/export
+  search_placeholder: "Search assets..."
+  sortable_columns: [Code, Name, Category, Branch, Status, Cost, Purchase Date]
+  view_type: dialog
+  checkbox_header: false
+  note: "Laporan Asset Register (Non-CRUD), menggunakan read-only data table dengan advanced filter."
 ```
 
 ---
@@ -307,6 +317,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
 | 6 | Reports | `reports` | `Feature/Reports/*.php` (5 files) | Ada legacy + new tests |
 | 7 | Posting Journals | `posting-journals` | `Feature/PostingJournals/PostingJournalTest.php` | — |
 | 8 | Asset Depreciation Runs | `asset-depreciation-runs` | `Feature/AssetDepreciationRuns/*.php` | — |
+| 9 | Asset Reports | `asset-reports` | `Feature/AssetRegisterTest.php` | Laporan Asset Register |
 
 ---
 
