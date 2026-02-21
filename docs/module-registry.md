@@ -264,6 +264,16 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
   note: "Laporan Asset Register (Non-CRUD), menggunakan read-only data table dengan advanced filter."
+
+- slug: book-value-depreciation-reports
+  route: /reports/book-value-depreciation
+  api: /reports/book-value-depreciation
+  export_api: /reports/book-value-depreciation/export
+  search_placeholder: "Search..."
+  sortable_columns: [Asset Code, Asset Name, Purchase Date, Purchase Cost, Accum. Depreciation, Book Value]
+  view_type: dialog
+  checkbox_header: false
+  note: "Laporan Book Value & Depreciation (Non-CRUD), menggunakan read-only data table dengan filter."
 ```
 
 ---
@@ -318,6 +328,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
 | 7 | Posting Journals | `posting-journals` | `Feature/PostingJournals/PostingJournalTest.php` | — |
 | 8 | Asset Depreciation Runs | `asset-depreciation-runs` | `Feature/AssetDepreciationRuns/*.php` | — |
 | 9 | Asset Reports | `asset-reports` | `Feature/AssetRegisterTest.php` | Laporan Asset Register |
+| 10 | Book Value Reports | `book-value-depreciation-reports` | `Feature/Reports/BookValueDepreciationReportTest.php` | Laporan Book Value & Depreciation |
 
 ---
 
