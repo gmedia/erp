@@ -17,6 +17,8 @@ interface AssetStocktakeFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     assetStocktake?: AssetStocktake | null;
+    item?: AssetStocktake | null;
+    entity?: AssetStocktake | null;
     onSubmit: (data: AssetStocktakeFormData) => void;
     isLoading?: boolean;
 }
@@ -68,8 +70,8 @@ const getAssetStocktakeFormDefaults = (assetStocktake?: AssetStocktake | null): 
 
     return {
         branch_id: String(assetStocktake.branch_id),
-        reference: assetStocktake.reference,
-        planned_at: new Date(assetStocktake.planned_at),
+        reference: assetStocktake.reference || '',
+        planned_at: assetStocktake.planned_at ? new Date(assetStocktake.planned_at) : new Date(),
         performed_at: assetStocktake.performed_at ? new Date(assetStocktake.performed_at) : null,
         status: assetStocktake.status,
     };
@@ -79,12 +81,16 @@ export const AssetStocktakeForm = memo<AssetStocktakeFormProps>(function AssetSt
     open,
     onOpenChange,
     assetStocktake,
+    item,
+    entity,
     onSubmit,
     isLoading = false,
 }) {
+    const activeAssetStocktake = assetStocktake || item || entity;
+
     const defaultValues = useMemo(
-        () => getAssetStocktakeFormDefaults(assetStocktake),
-        [assetStocktake],
+        () => getAssetStocktakeFormDefaults(activeAssetStocktake),
+        [activeAssetStocktake],
     );
 
     const form = useForm<AssetStocktakeFormData>({
@@ -101,7 +107,7 @@ export const AssetStocktakeForm = memo<AssetStocktakeFormProps>(function AssetSt
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={assetStocktake ? 'Edit Asset Stocktake' : 'Add New Asset Stocktake'}
+            title={activeAssetStocktake ? 'Edit Asset Stocktake' : 'Add New Asset Stocktake'}
             onSubmit={onSubmit}
             isLoading={isLoading}
             className="sm:max-w-[600px]"
