@@ -71,7 +71,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'asset',
                 'display_name' => 'Asset',
-                'permissions' => ['asset'],
+                'permissions' => ['asset', 'asset_depreciation_run'],
                 'icon' => 'Package',
                 'url' => null,
                 'child' => [
@@ -105,6 +105,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['asset_stocktake', 'asset_stocktake.create', 'asset_stocktake.edit', 'asset_stocktake.delete'],
                         'icon' => 'ClipboardCheck',
                         'url' => 'asset-stocktakes',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset_depreciation_run',
+                        'display_name' => 'Depreciation Run',
+                        'permissions' => ['asset_depreciation_run'],
+                        'icon' => 'Calculator',
+                        'url' => 'asset-depreciation-runs',
                         'child' => [],
                     ],
 

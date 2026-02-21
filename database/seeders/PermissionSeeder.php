@@ -531,6 +531,17 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'asset_depreciation_run',
+                'display_name' => 'Asset Depreciation Run',
+                'child' => [
+                    [
+                        'name' => 'asset_depreciation_run.create',
+                        'display_name' => 'Create Asset Depreciation Run',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],

@@ -248,6 +248,12 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
   note: "Actions menggunakan icon buttons (Eye, Pencil, Trash) bukan dropdown menu"
+
+- slug: asset-depreciation-runs
+  route: /asset-depreciation-runs
+  api: /api/asset-depreciation-runs
+  view_type: page
+  note: "Non-CRUD feature for calculating and posting asset depreciation."
 ```
 
 ---
@@ -300,6 +306,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
 | 5 | Users | `users` | `Feature/Users/UserControllerTest.php` | — |
 | 6 | Reports | `reports` | `Feature/Reports/*.php` (5 files) | Ada legacy + new tests |
 | 7 | Posting Journals | `posting-journals` | `Feature/PostingJournals/PostingJournalTest.php` | — |
+| 8 | Asset Depreciation Runs | `asset-depreciation-runs` | `Feature/AssetDepreciationRuns/*.php` | — |
 
 ---
 
