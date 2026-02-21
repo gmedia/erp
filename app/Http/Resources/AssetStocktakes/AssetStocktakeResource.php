@@ -13,6 +13,7 @@ class AssetStocktakeResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'ulid' => $this->ulid,
             'reference' => $this->reference,
             'branch' => [
                 'id' => $this->branch_id,

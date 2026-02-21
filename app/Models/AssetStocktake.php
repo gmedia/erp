@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,9 +10,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AssetStocktake extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUlids;
 
     protected $fillable = [
+        'ulid',
         'branch_id',
         'reference',
         'planned_at',
@@ -40,5 +42,15 @@ class AssetStocktake extends Model
     public function items(): HasMany
     {
         return $this->hasMany(AssetStocktakeItem::class);
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'ulid';
+    }
+
+    public function uniqueIds(): array
+    {
+        return ['ulid'];
     }
 }

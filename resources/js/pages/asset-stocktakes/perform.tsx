@@ -9,6 +9,7 @@ import { Loader2 } from 'lucide-react';
 interface PerformPageProps {
     stocktake: {
         id: number;
+        ulid: string;
         branch_id: number;
         reference: string;
         status: string;
@@ -28,8 +29,8 @@ export default function PerformAssetStocktakePage({ stocktake }: PerformPageProp
     ];
 
     useEffect(() => {
-        fetchItems(stocktake.id);
-    }, [stocktake.id, fetchItems]);
+        fetchItems(stocktake.ulid);
+    }, [stocktake.ulid, fetchItems]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -53,7 +54,7 @@ export default function PerformAssetStocktakePage({ stocktake }: PerformPageProp
                                 stocktakeBranchId={stocktake.branch_id}
                                 items={items}
                                 loading={loading}
-                                onSave={(data) => saveItems(stocktake.id, data)}
+                                onSave={(data) => saveItems(stocktake.ulid, data)}
                             />
                         )}
                     </CardContent>

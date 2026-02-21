@@ -11,10 +11,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('asset-stocktakes/index');
     })->name('asset-stocktakes')->middleware('permission:asset_stocktake');
 
-    Route::get('asset-stocktakes/{assetStocktake}/perform', function (AssetStocktake $assetStocktake) {
-        $assetStocktake->load('branch');
+    Route::get('asset-stocktakes/{asset_stocktake_ulid}/perform', function (AssetStocktake $asset_stocktake_ulid) {
+        $asset_stocktake_ulid->load('branch');
         return Inertia::render('asset-stocktakes/perform', [
-            'stocktake' => $assetStocktake
+            'stocktake' => $asset_stocktake_ulid
         ]);
     })->name('asset-stocktakes.perform')->middleware('permission:asset_stocktake.edit,true');
 });

@@ -54,7 +54,7 @@ export const assetStocktakeColumns: ColumnDef<AssetStocktake>[] = [
                     onDelete={meta?.onDelete}
                     extraItems={[
                         <DropdownMenuItem key="perform" asChild>
-                            <Link href={`/asset-stocktakes/${item.id}/perform`} className="w-full">
+                            <Link href={`/asset-stocktakes/${item.ulid}/perform`} className="w-full">
                                 Perform
                             </Link>
                         </DropdownMenuItem>

@@ -1,6 +1,7 @@
 import { BaseEntity } from './entity';
 
 export interface AssetStocktake extends BaseEntity {
+    ulid: string;
     reference: string;
     branch_id: number;
     branch: {

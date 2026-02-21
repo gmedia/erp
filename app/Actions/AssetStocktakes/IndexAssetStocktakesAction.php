@@ -38,7 +38,7 @@ class IndexAssetStocktakesAction
             $query,
             $request->get('sort_by', 'created_at'),
             strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'reference', 'branch', 'planned_at', 'performed_at', 'status', 'created_by', 'created_at', 'updated_at']
+            ['id', 'ulid', 'reference', 'branch', 'planned_at', 'performed_at', 'status', 'created_by', 'created_at', 'updated_at']
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);

@@ -22,7 +22,7 @@ test.describe('Asset Stocktake Items', () => {
 
         // 4. Check if there are items or empty state
         await expect(
-            page.locator('tbody tr').first().or(page.getByText(/no assets expected/i))
+            page.locator('tbody tr').first()
         ).toBeVisible({ timeout: 15000 });
 
         const rows = page.locator('tbody tr');

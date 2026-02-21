@@ -624,6 +624,7 @@ export const assetStocktakeConfig = createComplexEntityConfig<AssetStocktake>({
     apiEndpoint: '/api/asset-stocktakes',
     exportEndpoint: '/api/asset-stocktakes/export',
     queryKey: ['asset-stocktakes'],
+    identifierKey: 'ulid',
     breadcrumbs: [{ title: 'Asset Stocktakes', href: '/asset-stocktakes' }],
     initialFilters: {
         search: '',

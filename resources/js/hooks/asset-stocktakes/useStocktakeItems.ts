@@ -18,11 +18,11 @@ export const useStocktakeItems = () => {
     const [loading, setLoading] = useState(false);
     const [items, setItems] = useState<StocktakeItem[]>([]);
 
-    const fetchItems = useCallback(async (stocktakeId: number | string) => {
+    const fetchItems = useCallback(async (identifier: string | number) => {
         setLoading(true);
         try {
             const response = await axios.get(
-                `/api/asset-stocktakes/${stocktakeId}/items`,
+                `/api/asset-stocktakes/${identifier}/items`,
             );
             // Map the data so 'result' is initialized properly for form
             const mappedItems = response.data.data.map((item: any) => ({
@@ -39,11 +39,11 @@ export const useStocktakeItems = () => {
     }, []);
 
     const saveItems = useCallback(
-        async (stocktakeId: number | string, data: { items: StocktakeItem[] }) => {
+        async (identifier: string | number, data: { items: StocktakeItem[] }) => {
             setLoading(true);
             try {
                 await axios.post(
-                    `/api/asset-stocktakes/${stocktakeId}/items`,
+                    `/api/asset-stocktakes/${identifier}/items`,
                     data,
                 );
                 toast.success('Stocktake items saved successfully.');

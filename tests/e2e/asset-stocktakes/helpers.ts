@@ -64,5 +64,5 @@ export async function navigateToPerformStocktake(page: Page, reference: string) 
     await page.getByRole('menuitem', { name: /perform/i }).click();
 
     // Verify navigation to perform page
-    await expect(page).toHaveURL(/\/asset-stocktakes\/\d+\/perform/);
+    await expect(page).toHaveURL(/\/asset-stocktakes\/[0-9A-HJKMNP-TV-Z]{26}\/perform/i);
 }
