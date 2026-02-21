@@ -219,6 +219,141 @@ class AssetSampleDataSeeder extends Seeder
                 ]
             );
         }
+
+        $laptopAsset = Asset::where('asset_code', 'FA-000001')->first();
+        $printerAsset = Asset::where('asset_code', 'FA-000002')->first();
+        $carAsset = Asset::where('asset_code', 'FA-000003')->first();
+        $warehouse = AssetLocation::where('branch_id', $headOffice->id)->where('code', 'WAREHOUSE')->first();
+
+        // 1. Asset Movement (Transfer Printer)
+        if ($printerAsset && $warehouse && $itRoom && $defaultDepartment) {
+            if ($printerAsset->asset_location_id !== $warehouse->id) {
+                AssetMovement::create([
+                    'asset_id' => $printerAsset->id,
+                    'movement_type' => 'transfer',
+                    'moved_at' => now()->subMonths(2)->toDateString(),
+                    'from_branch_id' => $headOffice->id,
+                    'to_branch_id' => $headOffice->id,
+                    'from_location_id' => $itRoom->id,
+                    'to_location_id' => $warehouse->id,
+                    'from_department_id' => $defaultDepartment->id,
+                    'to_department_id' => $defaultDepartment->id,
+                    'reference' => 'TRF-001',
+                    'created_by' => $adminUser?->id,
+                ]);
+                $printerAsset->update(['asset_location_id' => $warehouse->id]);
+            }
+        }
+
+        // 2. Asset Maintenance
+        if ($laptopAsset && ! \App\Models\AssetMaintenance::where('asset_id', $laptopAsset->id)->exists()) {
+            \App\Models\AssetMaintenance::create([
+                'asset_id' => $laptopAsset->id,
+                'supplier_id' => $supplier->id,
+                'maintenance_type' => 'corrective',
+                'notes' => 'Screen Replacement - Replaced broken LCD screen.',
+                'scheduled_at' => now()->subMonths(3)->toDateString(),
+                'performed_at' => now()->subMonths(3)->addDays(2)->toDateString(),
+                'cost' => 1500000,
+                'status' => 'completed',
+                'created_by' => $adminUser?->id,
+            ]);
+        }
+
+        if ($carAsset && ! \App\Models\AssetMaintenance::where('asset_id', $carAsset->id)->exists()) {
+            \App\Models\AssetMaintenance::create([
+                'asset_id' => $carAsset->id,
+                'supplier_id' => $supplier->id,
+                'maintenance_type' => 'preventive',
+                'notes' => 'Routine Service (10,000 KM) - Oil change and general checkup.',
+                'scheduled_at' => now()->addDays(5)->toDateString(),
+                'status' => 'scheduled',
+                'created_by' => $adminUser?->id,
+            ]);
+        }
+
+        // 3. Asset Stocktake & Items Check
+        if (! \App\Models\AssetStocktake::where('branch_id', $headOffice->id)->exists()) {
+            $stocktake = \App\Models\AssetStocktake::create([
+                'branch_id' => $headOffice->id,
+                'reference' => 'STK-' . date('Ym'),
+                'planned_at' => now()->subDays(1),
+                'performed_at' => now(),
+                'status' => 'completed',
+                'created_by' => $adminUser?->id,
+            ]);
+
+            if ($laptopAsset) {
+                \App\Models\AssetStocktakeItem::create([
+                    'asset_stocktake_id' => $stocktake->id,
+                    'asset_id' => $laptopAsset->id,
+                    'expected_branch_id' => $headOffice->id,
+                    'expected_location_id' => $itRoom?->id,
+                    'found_branch_id' => $headOffice->id,
+                    'found_location_id' => $itRoom?->id,
+                    'result' => 'found',
+                    'checked_at' => now(),
+                    'checked_by' => $adminUser?->id,
+                ]);
+            }
+
+            if ($printerAsset) {
+                \App\Models\AssetStocktakeItem::create([
+                    'asset_stocktake_id' => $stocktake->id,
+                    'asset_id' => $printerAsset->id,
+                    'expected_branch_id' => $headOffice->id,
+                    'expected_location_id' => $warehouse?->id,
+                    'result' => 'missing',
+                    'checked_at' => now(),
+                    'checked_by' => $adminUser?->id,
+                ]);
+            }
+
+            if ($carAsset) {
+                \App\Models\AssetStocktakeItem::create([
+                    'asset_stocktake_id' => $stocktake->id,
+                    'asset_id' => $carAsset->id,
+                    'expected_branch_id' => $headOffice->id,
+                    'expected_location_id' => null,
+                    'found_branch_id' => $headOffice->id,
+                    'found_location_id' => null,
+                    'result' => 'found',
+                    'checked_at' => now(),
+                    'checked_by' => $adminUser?->id,
+                ]);
+            }
+        }
+
+        // 4. Depreciation Run & Journal Post
+        $fiscalYear = \App\Models\FiscalYear::where('status', 'open')->first();
+        if ($fiscalYear) {
+            $periodStart = now()->subMonth()->startOfMonth();
+            $periodEnd = now()->subMonth()->endOfMonth();
+            
+            // Generate some random depreciation_expense_account_id if none exists to avoid validation error in PostToJournal
+            $expenseAcc = \App\Models\Account::where('type', 'expense')->first();
+            $accumAcc = \App\Models\Account::where('type', 'asset')->first(); // Normally "accumulated_depreciation" but using closest standard type if unavailable
+            
+            if ($expenseAcc && $accumAcc) {
+                // Ensure all seeded assets have accounts set
+                Asset::whereNull('depreciation_expense_account_id')->update([
+                    'depreciation_expense_account_id' => $expenseAcc->id,
+                    'accumulated_depr_account_id' => $accumAcc->id,
+                ]);
+
+                if (! \App\Models\AssetDepreciationRun::where('fiscal_year_id', $fiscalYear->id)->where('period_start', $periodStart->toDateString())->exists()) {
+                    $calculateAction = app(\App\Actions\AssetDepreciationRuns\CalculateDepreciationAction::class);
+                    $run = $calculateAction->execute([
+                        'fiscal_year_id' => $fiscalYear->id,
+                        'period_start' => $periodStart->toDateString(),
+                        'period_end' => $periodEnd->toDateString(),
+                    ]);
+
+                    $postAction = app(\App\Actions\AssetDepreciationRuns\PostDepreciationToJournalAction::class);
+                    $postAction->execute($run);
+                }
+            }
+        }
     }
 }
 
