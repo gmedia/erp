@@ -23,39 +23,7 @@ interface AssetStocktakeFormProps {
     isLoading?: boolean;
 }
 
-const renderFields = () => (
-    <>
-        <AsyncSelectField
-            name="branch_id"
-            label="Branch"
-            url="/api/branches"
-            placeholder="Select a branch"
-        />
-        <InputField
-            name="reference"
-            label="Reference"
-            placeholder="ST-2024-001"
-        />
-        <DatePickerField
-            name="planned_at"
-            label="Planned Date"
-        />
-        <DatePickerField
-            name="performed_at"
-            label="Performed Date"
-        />
-        <SelectField
-            name="status"
-            label="Status"
-            options={[
-                { value: 'draft', label: 'Draft' },
-                { value: 'in_progress', label: 'In Progress' },
-                { value: 'completed', label: 'Completed' },
-                { value: 'cancelled', label: 'Cancelled' },
-            ]}
-        />
-    </>
-);
+
 
 const getAssetStocktakeFormDefaults = (assetStocktake?: AssetStocktake | null): AssetStocktakeFormData => {
     if (!assetStocktake) {
@@ -69,7 +37,7 @@ const getAssetStocktakeFormDefaults = (assetStocktake?: AssetStocktake | null): 
     }
 
     return {
-        branch_id: String(assetStocktake.branch_id),
+        branch_id: assetStocktake.branch_id ? String(assetStocktake.branch_id) : (assetStocktake.branch?.id ? String(assetStocktake.branch.id) : ''),
         reference: assetStocktake.reference || '',
         planned_at: assetStocktake.planned_at ? new Date(assetStocktake.planned_at) : new Date(),
         performed_at: assetStocktake.performed_at ? new Date(assetStocktake.performed_at) : null,
@@ -112,7 +80,37 @@ export const AssetStocktakeForm = memo<AssetStocktakeFormProps>(function AssetSt
             isLoading={isLoading}
             className="sm:max-w-[600px]"
         >
-            {renderFields()}
+            <AsyncSelectField
+                key={`branch-select-${activeAssetStocktake?.id || 'new'}`}
+                name="branch_id"
+                label="Branch"
+                url="/api/branches"
+                placeholder="Select a branch"
+                initialLabel={activeAssetStocktake?.branch?.name}
+            />
+            <InputField
+                name="reference"
+                label="Reference"
+                placeholder="ST-2024-001"
+            />
+            <DatePickerField
+                name="planned_at"
+                label="Planned Date"
+            />
+            <DatePickerField
+                name="performed_at"
+                label="Performed Date"
+            />
+            <SelectField
+                name="status"
+                label="Status"
+                options={[
+                    { value: 'draft', label: 'Draft' },
+                    { value: 'in_progress', label: 'In Progress' },
+                    { value: 'completed', label: 'Completed' },
+                    { value: 'cancelled', label: 'Cancelled' },
+                ]}
+            />
         </EntityForm>
     );
 });
