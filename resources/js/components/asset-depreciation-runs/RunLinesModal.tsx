@@ -39,7 +39,7 @@ export function RunLinesModal({ runId, open, onClose }: RunLinesModalProps) {
 
     return (
         <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-            <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
+            <DialogContent className="max-w-[95vw] sm:max-w-7xl max-h-[90vh] flex flex-col">
                 <DialogHeader>
                     <DialogTitle>Depreciation Run Lines</DialogTitle>
                 </DialogHeader>
