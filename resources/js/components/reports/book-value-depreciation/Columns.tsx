@@ -45,7 +45,7 @@ export interface BookValueDepreciationReportItem {
     },
     {
         accessorKey: 'purchase_cost',
-        ...createSortingHeader('Purchase Cost', 'justify-end'),
+        ...createSortingHeader('Purchase Cost'),
         cell: ({ row }) => <div className="text-right">{formatCurrency(row.getValue('purchase_cost'))}</div>,
     },
     {
@@ -62,12 +62,12 @@ export interface BookValueDepreciationReportItem {
     },
     {
         accessorKey: 'accumulated_depreciation',
-        ...createSortingHeader('Accum. Depreciation', 'justify-end'),
+        ...createSortingHeader('Accum. Depreciation'),
         cell: ({ row }) => <div className="text-right">{formatCurrency(row.getValue('accumulated_depreciation'))}</div>,
     },
     {
         accessorKey: 'book_value',
-        ...createSortingHeader('Book Value', 'justify-end'),
+        ...createSortingHeader('Book Value'),
         cell: ({ row }) => <div className="text-right font-medium">{formatCurrency(row.getValue('book_value'))}</div>,
     },
 ];

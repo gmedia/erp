@@ -56,7 +56,7 @@ export default function AssetRegisterReport() {
     return (
         <>
             <Head title="Asset Register Report" />
-            <AppLayout breadcrumbs={[{ title: 'Reports' }, { title: 'Asset Register', href: '/reports/assets/register' }]}>
+            <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Asset Register', href: '/reports/assets/register' }]}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                     <div className="rounded-lg bg-white">
                         <DataTable

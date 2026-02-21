@@ -27,7 +27,7 @@ test.describe('Book Value & Depreciation Report', () => {
     });
 
     test('should be able to search for an asset', async ({ page }) => {
-        const searchInput = page.getByPlaceholder('Search...');
+        const searchInput = page.getByPlaceholder('Search code, name...');
         await searchInput.fill('IT-001'); // Assuming IT-001 exists from seeders or we just search
         
         // Wait for debounce and API

@@ -40,7 +40,7 @@ export default function BookValueDepreciationReport() {
     return (
         <>
             <Head title="Book Value & Depreciation Report" />
-            <AppLayout breadcrumbs={[{ title: 'Reports' }, { title: 'Book Value & Depreciation', href: '/reports/book-value-depreciation' }]}>
+            <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Book Value & Depreciation', href: '/reports/book-value-depreciation' }]}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                     <div className="rounded-lg bg-white">
                         <DataTable
