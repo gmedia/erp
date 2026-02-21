@@ -7,6 +7,9 @@ use App\Models\User;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class)->group('book-value-depreciation-reports');
 
@@ -92,14 +95,20 @@ test('it can filter the report by category and branch', function () {
         ->assertJsonPath('data.0.asset_code', 'FR-001');
 })->group('book-value-depreciation-reports');
 
-test('it can export the report data to csv', function () {
+test('it can export the report data to excel', function () {
+    Carbon::setTestNow(Carbon::parse('2026-01-01 10:00:00'));
+    Excel::fake();
+    Storage::fake('public');
+
     $response = actingAs($this->user)
         ->postJson(route('reports.book-value-depreciation.export'))
         ->assertOk()
-        ->assertJsonStructure(['data', 'filename']);
+        ->assertJsonStructure(['url', 'filename']);
 
-    $csvData = $response->json('data');
-    expect($csvData)->toHaveCount(2); // Header + 1 row
-    expect($csvData[0][0])->toEqual('Asset Code');
-    expect($csvData[1][0])->toEqual('IT-001');
+    $filename = $response->json('filename');
+    expect($filename)->toStartWith('book_value_depreciation_report_2026-01-01_10-00-00_');
+    expect($filename)->toEndWith('.xlsx');
+    
+    Excel::assertStored('exports/' . $filename, 'public');
+    Carbon::setTestNow();
 })->group('book-value-depreciation-reports');
