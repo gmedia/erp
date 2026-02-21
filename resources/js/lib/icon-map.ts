@@ -42,6 +42,7 @@ import {
     ClipboardCheck,
     FileText,
     ArrowLeftRight,
+    TrendingDown,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -87,6 +88,7 @@ const iconMap: Record<string, LucideIcon> = {
     ClipboardCheck,
     FileText,
     ArrowLeftRight,
+    TrendingDown,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

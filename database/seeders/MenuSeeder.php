@@ -134,6 +134,14 @@ class MenuSeeder extends Seeder
                         'child' => [],
                     ],
                     [
+                        'name' => 'book_value_depreciation_report',
+                        'display_name' => 'Book Value & Depreciation',
+                        'permissions' => ['asset'],
+                        'icon' => 'TrendingDown',
+                        'url' => 'reports/book-value-depreciation',
+                        'child' => [],
+                    ],
+                    [
                         'name' => 'trial_balance_report',
                         'display_name' => 'Trial Balance Report',
                         'permissions' => ['trial_balance_report'],
