@@ -11,7 +11,7 @@ class AssetDepreciationLineResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'period' => $this->run?->period_start . ' - ' . $this->run?->period_end,
+            'period' => $this->run?->period_start?->format('Y-m-d') . ' - ' . $this->run?->period_end?->format('Y-m-d'),
             'fiscal_year' => $this->run?->fiscalYear?->year,
             'amount' => (string) $this->amount,
             'accumulated_before' => (string) $this->accumulated_before,
