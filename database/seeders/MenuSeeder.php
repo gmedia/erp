@@ -121,10 +121,18 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'report',
                 'display_name' => 'Report',
-                'permissions' => ['trial_balance_report', 'balance_sheet_report', 'income_statement_report', 'cash_flow_report', 'comparative_report'],
+                'permissions' => ['trial_balance_report', 'balance_sheet_report', 'income_statement_report', 'cash_flow_report', 'comparative_report', 'asset'],
                 'icon' => 'PieChart',
                 'url' => null,
                 'child' => [
+                    [
+                        'name' => 'asset_register_report',
+                        'display_name' => 'Asset Register',
+                        'permissions' => ['asset'],
+                        'icon' => 'FileText',
+                        'url' => 'reports/assets/register',
+                        'child' => [],
+                    ],
                     [
                         'name' => 'trial_balance_report',
                         'display_name' => 'Trial Balance Report',
