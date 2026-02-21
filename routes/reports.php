@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AssetReportController;
+use App\Http\Controllers\BookValueDepreciationReportController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,7 +16,7 @@ Route::middleware(['auth', 'verified'])->prefix('reports')->group(function () {
     Route::get('assets/register', [AssetReportController::class, 'register'])->name('reports.assets.register')->middleware('permission:asset');
     Route::post('assets/register/export', [AssetReportController::class, 'exportRegister'])->name('reports.assets.register.export')->middleware('permission:asset');
 
-    Route::get('book-value-depreciation', [\App\Http\Controllers\BookValueDepreciationReportController::class, 'index'])->name('reports.book-value-depreciation')->middleware('permission:asset');
-    Route::post('book-value-depreciation/export', [\App\Http\Controllers\BookValueDepreciationReportController::class, 'export'])->name('reports.book-value-depreciation.export')->middleware('permission:asset');
+    Route::get('book-value-depreciation', [BookValueDepreciationReportController::class, 'index'])->name('reports.book-value-depreciation')->middleware('permission:asset');
+    Route::post('book-value-depreciation/export', [BookValueDepreciationReportController::class, 'export'])->name('reports.book-value-depreciation.export')->middleware('permission:asset');
 });
 
