@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
-import { AlertCircle, CheckCircle, Download, FileSpreadsheet, Loader2, Upload, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Download, FileText, Loader2, PlusCircle, X } from 'lucide-react';
 import { useState } from 'react';
 
 interface ImportDialogProps {
@@ -144,7 +144,7 @@ export default function ImportDialog({
       <DialogTrigger asChild>
         {trigger || (
           <Button variant="outline">
-            <Upload className="mr-2 h-4 w-4" />
+            <PlusCircle className="mr-2 h-4 w-4" />
             Import
           </Button>
         )}
@@ -175,7 +175,7 @@ export default function ImportDialog({
             <div className="mt-4 space-y-3 rounded-md border p-3 text-sm">
               <div className="flex items-center gap-4 font-medium">
                 <div className="flex items-center text-green-600">
-                  <CheckCircle className="mr-1.5 h-4 w-4" />
+                  <CheckCircle2 className="mr-1.5 h-4 w-4" />
                   Imported: {result.imported}
                 </div>
                 <div className="flex items-center text-yellow-600">

@@ -50,3 +50,19 @@ export async function searchAssetStocktake(page: Page, reference: string) {
     await searchInput.fill(reference);
     await responsePromise;
 }
+
+export async function navigateToPerformStocktake(page: Page, reference: string) {
+    await searchAssetStocktake(page, reference);
+
+    // Find the row containing the reference
+    const row = page.getByRole('row', { name: new RegExp(reference, 'i') }).first();
+    
+    // Click the actions dropdown menu
+    await row.getByRole('button', { name: /open menu|actions/i }).click();
+    
+    // Click 'Perform' action
+    await page.getByRole('menuitem', { name: /perform/i }).click();
+
+    // Verify navigation to perform page
+    await expect(page).toHaveURL(/\/asset-stocktakes\/\d+\/perform/);
+}

@@ -3,13 +3,15 @@
 import { AssetStocktake } from '@/types/asset-stocktake';
 import { ColumnDef } from '@tanstack/react-table';
 import {
-    createActionsColumn,
     createBadgeColumn,
     createDateColumn,
     createSelectColumn,
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
+import { GenericActions } from '@/components/common/ActionsDropdown';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { Link } from '@inertiajs/react';
 
 export const assetStocktakeColumns: ColumnDef<AssetStocktake>[] = [
     createSelectColumn<AssetStocktake>(),
@@ -38,5 +40,27 @@ export const assetStocktakeColumns: ColumnDef<AssetStocktake>[] = [
         ...createSortingHeader('Created By'),
         cell: ({ row }) => row.original.created_by?.name || '-',
     },
-    createActionsColumn<AssetStocktake>(),
+    {
+        id: 'actions_custom',
+        enableHiding: false,
+        cell: ({ row, table }) => {
+            const item = row.original;
+            const meta = table.options.meta as any;
+            return (
+                <GenericActions
+                    item={item}
+                    onView={meta?.onView}
+                    onEdit={meta?.onEdit}
+                    onDelete={meta?.onDelete}
+                    extraItems={[
+                        <DropdownMenuItem key="perform" asChild>
+                            <Link href={`/asset-stocktakes/${item.id}/perform`} className="w-full">
+                                Perform
+                            </Link>
+                        </DropdownMenuItem>
+                    ]}
+                />
+            );
+        },
+    },
 ];

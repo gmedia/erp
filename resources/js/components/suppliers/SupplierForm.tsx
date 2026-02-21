@@ -112,7 +112,7 @@ export const SupplierForm = memo<SupplierFormProps>(function SupplierForm({
     );
 
     const form = useForm<SupplierFormData>({
-        resolver: zodResolver(supplierFormSchema),
+        resolver: zodResolver(supplierFormSchema as any),
         defaultValues,
     });
 
@@ -123,7 +123,7 @@ export const SupplierForm = memo<SupplierFormProps>(function SupplierForm({
 
     return (
         <EntityForm<SupplierFormData>
-            form={form}
+            form={form as any}
             open={open}
             onOpenChange={onOpenChange}
             title={supplier ? 'Edit Supplier' : 'Add New Supplier'}

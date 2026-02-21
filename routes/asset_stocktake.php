@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AssetStocktakeController;
+use App\Http\Controllers\AssetStocktakeItemController;
+use App\Models\AssetStocktake;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -8,6 +10,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('asset-stocktakes', function () {
         return Inertia::render('asset-stocktakes/index');
     })->name('asset-stocktakes')->middleware('permission:asset_stocktake');
+
+    Route::get('asset-stocktakes/{assetStocktake}/perform', function (AssetStocktake $assetStocktake) {
+        $assetStocktake->load('branch');
+        return Inertia::render('asset-stocktakes/perform', [
+            'stocktake' => $assetStocktake
+        ]);
+    })->name('asset-stocktakes.perform')->middleware('permission:asset_stocktake.edit,true');
 });
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
@@ -18,5 +27,8 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
         Route::put('asset-stocktakes/{assetStocktake}', [AssetStocktakeController::class, 'update'])->middleware('permission:asset_stocktake.edit,true');
         Route::delete('asset-stocktakes/{assetStocktake}', [AssetStocktakeController::class, 'destroy'])->middleware('permission:asset_stocktake.delete,true');
         Route::post('asset-stocktakes/export', [AssetStocktakeController::class, 'export']);
+
+        Route::get('asset-stocktakes/{assetStocktake}/items', [AssetStocktakeItemController::class, 'getItems']);
+        Route::post('asset-stocktakes/{assetStocktake}/items', [AssetStocktakeItemController::class, 'syncItems'])->middleware('permission:asset_stocktake.edit,true');
     });
 });
