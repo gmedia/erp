@@ -101,9 +101,9 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'asset_stocktake',
-                        'display_name' => 'Asset stocktake',
+                        'display_name' => 'Asset Stocktake',
                         'permissions' => ['asset_stocktake', 'asset_stocktake.create', 'asset_stocktake.edit', 'asset_stocktake.delete'],
-                        'icon' => 'Wrench',
+                        'icon' => 'ClipboardCheck',
                         'url' => 'asset-stocktakes',
                         'child' => [],
                     ],
