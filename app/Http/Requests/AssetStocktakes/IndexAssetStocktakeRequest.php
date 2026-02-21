@@ -17,7 +17,7 @@ class IndexAssetStocktakeRequest extends FormRequest
             'search' => ['nullable', 'string'],
             'branch_id' => ['nullable', 'exists:branches,id'],
             'status' => ['nullable', 'in:draft,in_progress,completed,cancelled'],
-            'sort_by' => ['nullable', 'string', 'in:id,reference,planned_at,performed_at,status,created_at,updated_at'],
+            'sort_by' => ['nullable', 'string', 'in:id,reference,branch,planned_at,performed_at,status,created_by,created_at,updated_at'],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],

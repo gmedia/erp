@@ -34,4 +34,25 @@ class AssetStocktakeFilterService
             $query->whereDate('planned_at', '<=', $filters['planned_at_to']);
         }
     }
+
+    public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
+    {
+        if (!in_array($sortBy, $allowedSorts)) {
+            return;
+        }
+
+        $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'branch') {
+            $query->join('branches', 'asset_stocktakes.branch_id', '=', 'branches.id')
+                ->orderBy('branches.name', $sortDirection)
+                ->select('asset_stocktakes.*');
+        } elseif ($sortBy === 'created_by') {
+            $query->join('users', 'asset_stocktakes.created_by', '=', 'users.id')
+                ->orderBy('users.name', $sortDirection)
+                ->select('asset_stocktakes.*');
+        } else {
+            $query->orderBy($sortBy, $sortDirection);
+        }
+    }
 }
