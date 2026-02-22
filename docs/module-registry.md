@@ -150,7 +150,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   export_api: /api/assets/export
   import_api: /api/assets/import
   search_placeholder: "Search assets..."
-  sortable_columns: [Code, Name, Category, Branch, Status, Cost, Purchase Date]
+  sortable_columns: [Code, Name, Category, Branch, Status, Cost, Purchase Date, Location, Department, Employee, Supplier]
   view_type: page  # navigasi ke /assets/{ulid}
   view_url_pattern: "/assets/\\w+"
   checkbox_header: false

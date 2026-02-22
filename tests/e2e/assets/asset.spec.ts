@@ -22,7 +22,11 @@ generateModuleTests({
     'Branch', 
     'Status', 
     'Cost', 
-    'Purchase Date'
+    'Purchase Date',
+    'Location',
+    'Department',
+    'Employee',
+    'Supplier'
   ],
   
   expectedExportColumns: [

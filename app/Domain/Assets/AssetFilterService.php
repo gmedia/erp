@@ -60,6 +60,22 @@ class AssetFilterService
             $query->join('branches', 'assets.branch_id', '=', 'branches.id')
                 ->orderBy('branches.name', $sortDirection)
                 ->select('assets.*');
+        } elseif ($sortBy === 'location') {
+            $query->leftJoin('asset_locations', 'assets.asset_location_id', '=', 'asset_locations.id')
+                ->orderBy('asset_locations.name', $sortDirection)
+                ->select('assets.*');
+        } elseif ($sortBy === 'department') {
+            $query->leftJoin('departments', 'assets.department_id', '=', 'departments.id')
+                ->orderBy('departments.name', $sortDirection)
+                ->select('assets.*');
+        } elseif ($sortBy === 'employee') {
+            $query->leftJoin('employees', 'assets.employee_id', '=', 'employees.id')
+                ->orderBy('employees.name', $sortDirection)
+                ->select('assets.*');
+        } elseif ($sortBy === 'supplier') {
+            $query->leftJoin('suppliers', 'assets.supplier_id', '=', 'suppliers.id')
+                ->orderBy('suppliers.name', $sortDirection)
+                ->select('assets.*');
         } else {
             $query->orderBy($sortBy, $sortDirection);
         }

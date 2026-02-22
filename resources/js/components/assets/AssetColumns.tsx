@@ -56,6 +56,26 @@ export const assetColumns: ColumnDef<Asset>[] = [
         cell: renderRelationCell('branch'),
     },
     {
+        accessorKey: 'location',
+        ...createSortingHeader('Location'),
+        cell: renderRelationCell('location'),
+    },
+    {
+        accessorKey: 'department',
+        ...createSortingHeader('Department'),
+        cell: renderRelationCell('department'),
+    },
+    {
+        accessorKey: 'employee',
+        ...createSortingHeader('Employee'),
+        cell: renderRelationCell('employee'),
+    },
+    {
+        accessorKey: 'supplier',
+        ...createSortingHeader('Supplier'),
+        cell: renderRelationCell('supplier'),
+    },
+    {
         accessorKey: 'status',
         ...createSortingHeader('Status'),
         cell: renderStatusCell,

@@ -24,7 +24,7 @@ class IndexAssetRequest extends FormRequest
             'supplier_id' => ['nullable', 'exists:suppliers,id'],
             'status' => ['nullable', 'string', 'in:draft,active,maintenance,disposed,lost'],
             'condition' => ['nullable', 'string', 'in:good,needs_repair,damaged'],
-            'sort_by' => ['nullable', 'string', 'in:id,asset_code,name,purchase_date,purchase_cost,status,created_at,category,branch'],
+            'sort_by' => ['nullable', 'string', 'in:id,asset_code,name,purchase_date,purchase_cost,status,created_at,category,branch,location,department,employee,supplier'],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],
