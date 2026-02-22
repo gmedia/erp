@@ -43,7 +43,6 @@ export function createMaintenanceCostReportFilterFields(): FieldDescriptor[] {
             'maintenance_type',
             'Type',
             [
-                { value: '', label: 'All Types' },
                 { value: 'preventive', label: 'Preventive' },
                 { value: 'corrective', label: 'Corrective' },
                 { value: 'calibration', label: 'Calibration' },
@@ -55,7 +54,6 @@ export function createMaintenanceCostReportFilterFields(): FieldDescriptor[] {
             'status',
             'Status',
             [
-                { value: '', label: 'All Statuses' },
                 { value: 'scheduled', label: 'Scheduled' },
                 { value: 'in_progress', label: 'In Progress' },
                 { value: 'completed', label: 'Completed' },
