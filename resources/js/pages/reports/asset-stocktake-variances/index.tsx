@@ -5,8 +5,8 @@ import AppLayout from '@/layouts/app-layout';
 import { DataTable } from '@/components/common/DataTableCore';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
-import { varianceColumns, AssetStocktakeVarianceItem } from '@/components/asset-stocktakes/variance/Columns';
-import { createVarianceFilterFields } from '@/components/asset-stocktakes/variance/Filters';
+import { varianceColumns, AssetStocktakeVarianceItem } from '@/components/reports/asset-stocktake-variances/Columns';
+import { createVarianceFilterFields } from '@/components/reports/asset-stocktake-variances/Filters';
 
 export default function StocktakeVarianceReport() {
     const filterFields = createVarianceFilterFields();
@@ -41,7 +41,7 @@ export default function StocktakeVarianceReport() {
             <Head title="Stocktake Variance Report" />
             <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Stocktake Variance', href: '/asset-stocktake-variances' }]}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                    <div className="rounded-lg bg-white shadow-sm border">
+                    <div className="rounded-lg bg-white">
                         <DataTable
                             columns={varianceColumns}
                             data={data}

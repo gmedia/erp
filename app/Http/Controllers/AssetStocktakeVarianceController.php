@@ -15,7 +15,7 @@ class AssetStocktakeVarianceController extends Controller
 {
     public function page(): Response
     {
-        return Inertia::render('asset-stocktakes/variance');
+        return Inertia::render('reports/asset-stocktake-variances/index');
     }
 
     public function index(IndexAssetStocktakeVarianceRequest $request, IndexAssetStocktakeVarianceAction $action): JsonResponse
