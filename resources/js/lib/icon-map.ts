@@ -43,6 +43,7 @@ import {
     FileText,
     ArrowLeftRight,
     TrendingDown,
+    AlertTriangle,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -90,6 +91,7 @@ const iconMap: Record<string, LucideIcon> = {
     ArrowLeftRight,
     TrendingDown,
     maintenance_cost_report: Wrench,
+    AlertTriangle,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

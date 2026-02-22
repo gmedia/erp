@@ -43,7 +43,11 @@ test('it generates expected items when none exist', function () {
     // Create an asset in different branch
     Asset::factory()->create(['status' => 'active']);
 
-    $response = getJson("/api/asset-stocktakes/{$this->stocktake->id}/items");
+    $response = getJson("/api/asset-stocktakes/{$this->stocktake->ulid}/items");
+    
+    if ($response->status() !== 200) {
+        $response->dump();
+    }
 
     $response->assertStatus(200)
         ->assertJsonCount(2, 'data');
@@ -65,7 +69,7 @@ test('it returns saved items if exist', function () {
         'result' => 'found',
     ]);
 
-    $response = getJson("/api/asset-stocktakes/{$this->stocktake->id}/items");
+    $response = getJson("/api/asset-stocktakes/{$this->stocktake->ulid}/items");
 
     $response->assertStatus(200)
         ->assertJsonCount(1, 'data');
@@ -91,7 +95,7 @@ test('it can sync items and update status', function () {
         ]
     ];
 
-    $response = postJson("/api/asset-stocktakes/{$this->stocktake->id}/items", $payload);
+    $response = postJson("/api/asset-stocktakes/{$this->stocktake->ulid}/items", $payload);
 
     $response->assertStatus(200);
 

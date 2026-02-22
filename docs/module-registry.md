@@ -284,6 +284,16 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
   note: "Laporan Biaya Perawatan/Maintenance Cost (Non-CRUD), menggunakan read-only data table dengan filter."
+
+- slug: asset-stocktake-variances
+  route: /asset-stocktake-variances
+  api: /api/asset-stocktake-variances
+  export_api: /api/asset-stocktake-variances/export
+  search_placeholder: "Search code, name, notes..."
+  sortable_columns: [Asset Code, Asset Name, Expected Location, Found Location, Result, Notes, Checked By, Checked At]
+  view_type: dialog
+  checkbox_header: false
+  note: "Laporan Stocktake Variance (Non-CRUD), menggunakan read-only data table dengan filter."
 ```
 
 ---
@@ -339,6 +349,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
 | 8 | Asset Depreciation Runs | `asset-depreciation-runs` | `Feature/AssetDepreciationRuns/*.php` | — |
 | 9 | Asset Reports | `asset-reports` | `Feature/AssetRegisterTest.php` | Laporan Asset Register |
 | 10 | Book Value Reports | `book-value-depreciation-reports` | `Feature/Reports/BookValueDepreciationReportTest.php` | Laporan Book Value & Depreciation |
+| 11 | Stocktake Variance Reports | `asset-stocktakes` | `Feature/AssetStocktakes/AssetStocktakeVarianceControllerTest.php` | Laporan Stocktake Variance |
 
 ---
 

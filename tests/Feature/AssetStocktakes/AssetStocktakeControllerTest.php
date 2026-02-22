@@ -55,7 +55,7 @@ test('it can update asset stocktake', function () {
         'branch_id' => $this->branch->id,
     ]);
 
-    $response = putJson("/api/asset-stocktakes/{$stocktake->id}", [
+    $response = putJson("/api/asset-stocktakes/{$stocktake->ulid}", [
         'reference' => 'ST-UPDATED',
         // branch_id not sent, validation rule might require it if not careful, 
         // but my UpdateRequest had 'sometimes' and exists check.
@@ -70,7 +70,7 @@ test('it can update asset stocktake', function () {
 test('it can delete asset stocktake', function () {
     $stocktake = AssetStocktake::factory()->create();
 
-    $response = deleteJson("/api/asset-stocktakes/{$stocktake->id}");
+    $response = deleteJson("/api/asset-stocktakes/{$stocktake->ulid}");
 
     $response->assertNoContent();
     assertDatabaseMissing('asset_stocktakes', ['id' => $stocktake->id]);

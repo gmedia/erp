@@ -150,6 +150,14 @@ class MenuSeeder extends Seeder
                         'child' => [],
                     ],
                     [
+                        'name' => 'stocktake_variance_report',
+                        'display_name' => 'Stocktake Variance',
+                        'permissions' => ['asset_stocktake'],
+                        'icon' => 'AlertTriangle',
+                        'url' => 'asset-stocktake-variances',
+                        'child' => [],
+                    ],
+                    [
                         'name' => 'trial_balance_report',
                         'display_name' => 'Trial Balance Report',
                         'permissions' => ['trial_balance_report'],
