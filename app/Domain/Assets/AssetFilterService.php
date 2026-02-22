@@ -33,6 +33,9 @@ class AssetFilterService
         if (!empty($filters['employee_id'])) {
             $query->where('employee_id', $filters['employee_id']);
         }
+        if (!empty($filters['supplier_id'])) {
+            $query->where('supplier_id', $filters['supplier_id']);
+        }
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }

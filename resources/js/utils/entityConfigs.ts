@@ -548,6 +548,10 @@ export const assetConfig = createComplexEntityConfig<Asset>({
     initialFilters: {
         search: '',
         asset_category_id: '',
+        asset_location_id: '',
+        department_id: '',
+        employee_id: '',
+        supplier_id: '',
         branch_id: '',
         status: '',
         condition: '',

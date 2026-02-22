@@ -21,6 +21,7 @@ class IndexAssetRequest extends FormRequest
             'asset_location_id' => ['nullable', 'exists:asset_locations,id'],
             'department_id' => ['nullable', 'exists:departments,id'],
             'employee_id' => ['nullable', 'exists:employees,id'],
+            'supplier_id' => ['nullable', 'exists:suppliers,id'],
             'status' => ['nullable', 'string', 'in:draft,active,maintenance,disposed,lost'],
             'condition' => ['nullable', 'string', 'in:good,needs_repair,damaged'],
             'sort_by' => ['nullable', 'string', 'in:id,asset_code,name,purchase_date,purchase_cost,status,created_at,category,branch'],

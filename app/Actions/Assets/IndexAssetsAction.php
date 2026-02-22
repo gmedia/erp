@@ -29,6 +29,7 @@ class IndexAssetsAction
                 'asset_location_id' => $request->get('asset_location_id'),
                 'department_id' => $request->get('department_id'),
                 'employee_id' => $request->get('employee_id'),
+                'supplier_id' => $request->get('supplier_id'),
                 'status' => $request->get('status'),
                 'condition' => $request->get('condition'),
             ]);
