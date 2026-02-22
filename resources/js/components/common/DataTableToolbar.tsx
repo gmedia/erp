@@ -121,10 +121,12 @@ export function DataTableToolbar<T>({
                         onClearAll={onClearAllFilters}
                     />
 
-                    <Button size="sm" onClick={onAdd}>
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Add
-                    </Button>
+                    {onAdd && (
+                        <Button size="sm" onClick={onAdd}>
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Add
+                        </Button>
+                    )}
 
                     {extraActions}
 
