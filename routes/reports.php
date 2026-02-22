@@ -18,5 +18,8 @@ Route::middleware(['auth', 'verified'])->prefix('reports')->group(function () {
 
     Route::get('book-value-depreciation', [BookValueDepreciationReportController::class, 'index'])->name('reports.book-value-depreciation')->middleware('permission:asset');
     Route::post('book-value-depreciation/export', [BookValueDepreciationReportController::class, 'export'])->name('reports.book-value-depreciation.export')->middleware('permission:asset');
+
+    Route::get('maintenance-cost', [\App\Http\Controllers\MaintenanceCostReportController::class, 'index'])->name('reports.maintenance-cost')->middleware('permission:asset');
+    Route::post('maintenance-cost/export', [\App\Http\Controllers\MaintenanceCostReportController::class, 'export'])->name('reports.maintenance-cost.export')->middleware('permission:asset');
 });
 

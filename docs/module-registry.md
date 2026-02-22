@@ -274,6 +274,16 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
   note: "Laporan Book Value & Depreciation (Non-CRUD), menggunakan read-only data table dengan filter."
+
+- slug: maintenance-cost-reports
+  route: /reports/maintenance-cost
+  api: /reports/maintenance-cost
+  export_api: /reports/maintenance-cost/export
+  search_placeholder: "Search code, name, notes..."
+  sortable_columns: [Asset Code, Asset Name, Type, Status, Scheduled At, Performed At, Vendor, Cost]
+  view_type: dialog
+  checkbox_header: false
+  note: "Laporan Biaya Perawatan/Maintenance Cost (Non-CRUD), menggunakan read-only data table dengan filter."
 ```
 
 ---

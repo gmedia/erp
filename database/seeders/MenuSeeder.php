@@ -142,6 +142,14 @@ class MenuSeeder extends Seeder
                         'child' => [],
                     ],
                     [
+                        'name' => 'maintenance_cost_report',
+                        'display_name' => 'Maintenance Cost',
+                        'permissions' => ['asset'],
+                        'icon' => 'maintenance_cost_report',
+                        'url' => 'reports/maintenance-cost',
+                        'child' => [],
+                    ],
+                    [
                         'name' => 'trial_balance_report',
                         'display_name' => 'Trial Balance Report',
                         'permissions' => ['trial_balance_report'],

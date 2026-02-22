@@ -89,6 +89,7 @@ const iconMap: Record<string, LucideIcon> = {
     FileText,
     ArrowLeftRight,
     TrendingDown,
+    maintenance_cost_report: Wrench,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {
