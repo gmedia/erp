@@ -53,6 +53,12 @@ class IndexAssetStocktakeVarianceAction
 
         if (in_array($sortBy, ['id', 'result', 'checked_at'])) {
             $query->orderBy($sortBy, $sortDirection);
+        } elseif ($sortBy === 'stocktake_reference') {
+            $query->orderBy(
+                \App\Models\AssetStocktake::select('reference')
+                    ->whereColumn('asset_stocktakes.id', 'asset_stocktake_items.asset_stocktake_id'),
+                $sortDirection
+            );
         } elseif ($sortBy === 'asset_code' || $sortBy === 'asset_name') {
             $query->orderBy(
                 \App\Models\Asset::select($sortBy === 'asset_code' ? 'asset_code' : 'name')
