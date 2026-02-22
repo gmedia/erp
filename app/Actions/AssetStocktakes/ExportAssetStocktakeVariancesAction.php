@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportAssetStocktakeVariancesAction
 {
-    public function execute(ExportAssetStocktakeVarianceRequest $request): StreamedResponse
+    public function execute(ExportAssetStocktakeVarianceRequest $request): JsonResponse
     {
         $query = AssetStocktakeItem::query()
             ->with([
@@ -53,12 +53,32 @@ class ExportAssetStocktakeVariancesAction
 
         if (in_array($sortBy, ['id', 'result', 'checked_at'])) {
             $query->orderBy($sortBy, $sortDirection);
+        } elseif ($sortBy === 'stocktake_reference') {
+            $query->orderBy(
+                \App\Models\AssetStocktake::select('reference')
+                    ->whereColumn('asset_stocktakes.id', 'asset_stocktake_items.asset_stocktake_id'),
+                $sortDirection
+            );
         } elseif ($sortBy === 'asset_code' || $sortBy === 'asset_name') {
             $query->orderBy(
                 \App\Models\Asset::select($sortBy === 'asset_code' ? 'asset_code' : 'name')
                     ->whereColumn('assets.id', 'asset_stocktake_items.asset_id'),
                 $sortDirection
             );
+        } elseif ($sortBy === 'expected_branch' || $sortBy === 'found_branch') {
+             $column = $sortBy === 'expected_branch' ? 'expected_branch_id' : 'found_branch_id';
+             $query->orderBy(
+                 \App\Models\Branch::select('name')
+                     ->whereColumn('branches.id', "asset_stocktake_items.{$column}"),
+                 $sortDirection
+             );
+        } elseif ($sortBy === 'expected_location' || $sortBy === 'found_location') {
+             $column = $sortBy === 'expected_location' ? 'expected_location_id' : 'found_location_id';
+             $query->orderBy(
+                 \App\Models\AssetLocation::select('name')
+                     ->whereColumn('asset_locations.id', "asset_stocktake_items.{$column}"),
+                 $sortDirection
+             );
         } else {
             $query->orderBy('checked_at', 'desc');
         }
@@ -113,13 +133,18 @@ class ExportAssetStocktakeVariancesAction
         }
 
         $fileName = 'asset_stocktake_variances_' . date('Ymd_His') . '.xlsx';
+        $filePath = 'exports/' . $fileName;
 
-        return response()->streamDownload(function () use ($spreadsheet) {
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('php://output');
-        }, $fileName, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Cache-Control' => 'max-age=0',
+        if (!\Illuminate\Support\Facades\Storage::disk('public')->exists('exports')) {
+            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('exports');
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save(storage_path('app/public/' . $filePath));
+
+        return response()->json([
+            'url' => \Illuminate\Support\Facades\Storage::url($filePath),
+            'filename' => $fileName,
         ]);
     }
 }

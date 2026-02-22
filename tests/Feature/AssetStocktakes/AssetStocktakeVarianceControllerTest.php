@@ -107,5 +107,8 @@ test('it can export variance to excel', function () {
     $response = postJson('/api/asset-stocktake-variances/export');
 
     $response->assertOk()
-        ->assertDownload();
+         ->assertJsonStructure([
+            'url',
+            'filename',
+        ]);
 });
