@@ -1,5 +1,6 @@
-import { createColumnHelper } from '@tanstack/react-table';
+import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
+import { createSortingHeader } from '@/utils/columns';
 
 export interface AssetStocktakeVarianceItem {
     id: number;
@@ -23,45 +24,51 @@ export interface AssetStocktakeVarianceItem {
     checked_by_name: string;
 }
 
-const columnHelper = createColumnHelper<AssetStocktakeVarianceItem>();
-
-export const varianceColumns = [
-    columnHelper.accessor('stocktake_reference', {
-        header: 'Stocktake Ref',
-        cell: (info) => info.getValue() || '-',
-    }),
-    columnHelper.accessor('asset_code', {
-        header: 'Asset Code',
-        cell: (info) => info.getValue() || '-',
-    }),
-    columnHelper.accessor('asset_name', {
-        header: 'Asset Name',
-        cell: (info) => info.getValue() || '-',
-    }),
-    columnHelper.accessor('expected_branch_name', {
+export const varianceColumns: ColumnDef<AssetStocktakeVarianceItem>[] = [
+    {
+        accessorKey: 'stocktake_reference',
+        ...createSortingHeader('Stocktake Ref'),
+        cell: ({ row }) => <div className="font-medium">{row.getValue('stocktake_reference') || '-'}</div>,
+    },
+    {
+        accessorKey: 'asset_code',
+        ...createSortingHeader('Asset Code'),
+        cell: ({ row }) => <div>{row.getValue('asset_code') || '-'}</div>,
+    },
+    {
+        accessorKey: 'asset_name',
+        ...createSortingHeader('Asset Name'),
+        cell: ({ row }) => <div>{row.getValue('asset_name') || '-'}</div>,
+    },
+    {
+        accessorKey: 'expected_branch_name',
         id: 'expected_branch',
-        header: 'Expected Branch',
-        cell: (info) => info.getValue() || '-',
-    }),
-    columnHelper.accessor('expected_location_name', {
+        ...createSortingHeader('Expected Branch'),
+        cell: ({ row }) => <div>{row.getValue('expected_branch') || '-'}</div>,
+    },
+    {
+        accessorKey: 'expected_location_name',
         id: 'expected_location',
-        header: 'Expected Location',
-        cell: (info) => info.getValue() || '-',
-    }),
-    columnHelper.accessor('found_branch_name', {
+        ...createSortingHeader('Expected Location'),
+        cell: ({ row }) => <div>{row.getValue('expected_location') || '-'}</div>,
+    },
+    {
+        accessorKey: 'found_branch_name',
         id: 'found_branch',
-        header: 'Found Branch',
-        cell: (info) => info.getValue() || '-',
-    }),
-    columnHelper.accessor('found_location_name', {
+        ...createSortingHeader('Found Branch'),
+        cell: ({ row }) => <div>{row.getValue('found_branch') || '-'}</div>,
+    },
+    {
+        accessorKey: 'found_location_name',
         id: 'found_location',
-        header: 'Found Location',
-        cell: (info) => info.getValue() || '-',
-    }),
-    columnHelper.accessor('result', {
-        header: 'Result',
-        cell: (info) => {
-            const val = info.getValue()?.toLowerCase();
+        ...createSortingHeader('Found Location'),
+        cell: ({ row }) => <div>{row.getValue('found_location') || '-'}</div>,
+    },
+    {
+        accessorKey: 'result',
+        ...createSortingHeader('Result'),
+        cell: ({ row }) => {
+            const val = (row.getValue('result') as string)?.toLowerCase();
             let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'default';
             if (val === 'damaged') variant = 'destructive';
             if (val === 'missing') variant = 'destructive';
@@ -69,22 +76,25 @@ export const varianceColumns = [
             
             return <Badge variant={variant}>{val?.toUpperCase() || '-'}</Badge>;
         },
-    }),
-    columnHelper.accessor('notes', {
+    },
+    {
+        accessorKey: 'notes',
         header: 'Notes',
-        cell: (info) => info.getValue() || '-',
+        cell: ({ row }) => <div>{row.getValue('notes') || '-'}</div>,
         enableSorting: false,
-    }),
-    columnHelper.accessor('checked_at', {
-        header: 'Checked At',
-        cell: (info) => {
-            const date = info.getValue();
-            return date ? new Date(date).toLocaleString() : '-';
+    },
+    {
+        accessorKey: 'checked_at',
+        ...createSortingHeader('Checked At'),
+        cell: ({ row }) => {
+            const date = row.getValue('checked_at') as string;
+            return <div>{date ? new Date(date).toLocaleString() : '-'}</div>;
         },
-    }),
-    columnHelper.accessor('checked_by_name', {
+    },
+    {
+        accessorKey: 'checked_by_name',
         header: 'Checked By',
-        cell: (info) => info.getValue() || '-',
+        cell: ({ row }) => <div>{row.getValue('checked_by_name') || '-'}</div>,
         enableSorting: false,
-    }),
+    },
 ];
