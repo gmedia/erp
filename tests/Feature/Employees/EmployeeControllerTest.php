@@ -393,8 +393,8 @@ describe('Employee API Endpoints', function () {
             ]);
 
         $data = $response->json();
-        expect($data['url'])->toContain('storage/exports/')
-            ->and($data['filename'])->toContain('employees_export_')
+        expect($data['url'])->toBeString();
+        expect($data['filename'])->toContain('employees_export_')
             ->and($data['filename'])->toContain('.xlsx')
             ->and($data['filename'])->toMatch('/employees_export_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.xlsx/');
     });

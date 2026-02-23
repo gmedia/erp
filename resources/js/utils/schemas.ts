@@ -324,3 +324,23 @@ export const assetStocktakeFormSchema = z.object({
 });
 
 export type AssetStocktakeFormData = z.infer<typeof assetStocktakeFormSchema>;
+
+export const pipelineFormSchema = z.object({
+    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    code: z.string().min(2, { message: 'Code must be at least 2 characters.' }),
+    entity_type: z.string().min(1, { message: 'Entity Type is required.' }),
+    description: z.string().optional(),
+    version: z.string().optional(),
+    is_active: z.union([z.boolean(), z.string()]).default(true),
+    conditions: z.string().optional().refine((val) => {
+        if (!val || val.trim() === '') return true;
+        try {
+            JSON.parse(val);
+            return true;
+        } catch {
+            return false;
+        }
+    }, { message: 'Conditions must be valid JSON.' }),
+});
+
+export type PipelineFormData = z.infer<typeof pipelineFormSchema>;

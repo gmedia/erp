@@ -646,3 +646,27 @@ export const assetStocktakeConfig = createComplexEntityConfig<AssetStocktake>({
     getDeleteMessage: (item: { reference?: string }) =>
         `This action cannot be undone. This will permanently delete stocktake ${item.reference}.`,
 });
+
+import { pipelineColumns } from '@/components/pipelines/PipelineColumns';
+import { createPipelineFilterFields } from '@/components/pipelines/PipelineFilters';
+import { PipelineForm } from '@/components/pipelines/PipelineForm';
+import { PipelineViewModal } from '@/components/pipelines/PipelineViewModal';
+import { type Pipeline } from '@/types/entity';
+
+export const pipelineConfig = createComplexEntityConfig<Pipeline>({
+    entityName: 'Pipeline',
+    entityNamePlural: 'Pipelines',
+    apiEndpoint: '/api/pipelines',
+    exportEndpoint: '/api/pipelines/export',
+    queryKey: ['pipelines'],
+    breadcrumbs: [{ title: 'Pipelines', href: '/pipelines' }],
+    initialFilters: { search: '', entity_type: '', is_active: '' },
+    columns: pipelineColumns,
+    filterFields: createPipelineFilterFields(),
+    formComponent: PipelineForm,
+    formType: 'complex',
+    entityNameForSearch: 'pipeline',
+    viewModalComponent: PipelineViewModal,
+    getDeleteMessage: (item: { name?: string }) =>
+        `This action cannot be undone. This will permanently delete the pipeline "${item.name}".`,
+});

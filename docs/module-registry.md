@@ -294,6 +294,15 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
   note: "Laporan Stocktake Variance (Non-CRUD), menggunakan read-only data table dengan filter."
+
+- slug: pipelines
+  route: /pipelines
+  api: /api/pipelines
+  export_api: /api/pipelines/export
+  search_placeholder: "Search name, code, or description..."
+  sortable_columns: [Name, Code, Entity, Version, Creator, Status]
+  view_type: dialog
+  checkbox_header: false
 ```
 
 ---
@@ -332,6 +341,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
 | 11 | Fiscal Years | `fiscal-years` | `FiscalYearControllerTest`, `FiscalYearExportTest` | `FiscalYearTest` | — |
 | 12 | Journal Entries | `journal-entries` | `JournalEntryControllerTest`, `JournalEntryExportTest` | `JournalEntryTest` | — |
 | 13 | Asset Stocktakes | `asset-stocktakes` | `AssetStocktakeControllerTest`, `AssetStocktakeExportTest` | `AssetStocktakeTest` | — |
+| 14 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
 
 ---
 
