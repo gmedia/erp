@@ -28,7 +28,7 @@ class ExportAssetModelsAction
 
         Excel::store(new AssetModelExport($filters), $filePath, 'public');
 
-        $url = Storage::url($filePath);
+        $url = Storage::disk('public')->url($filePath);
 
         return response()->json([
             'url' => $url,

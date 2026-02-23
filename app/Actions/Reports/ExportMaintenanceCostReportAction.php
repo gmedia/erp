@@ -24,7 +24,7 @@ class ExportMaintenanceCostReportAction
 
         Excel::store(new MaintenanceCostExport($filters), $filePath, 'public', $writerType);
 
-        $url = Storage::url($filePath);
+        $url = Storage::disk('public')->url($filePath);
 
         return response()->json([
             'url' => $url,

@@ -37,7 +37,7 @@ class ExportSuppliersAction
         Excel::store(new SupplierExport($filters), $filePath, 'public');
 
         // Generate the public URL for download
-        $url = Storage::url($filePath);
+        $url = Storage::disk('public')->url($filePath);
 
         return response()->json([
             'url' => $url,
