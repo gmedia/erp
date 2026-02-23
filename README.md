@@ -158,7 +158,7 @@ This ERP system is designed for:
     ```
 - Run server for coverage report
     ```
-    sail run php -S 0.0.0.0:9000 -t coverage-html
+    sail run php -S 0.0.0.0:9300 -t coverage-html
     ```
 - Run Playwright e2e test
     ```
