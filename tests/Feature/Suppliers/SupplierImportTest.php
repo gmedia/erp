@@ -3,7 +3,10 @@
 use App\Models\Branch;
 use App\Models\Supplier;
 use App\Models\SupplierCategory;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+
+uses(RefreshDatabase::class)->group('suppliers');
 
 beforeEach(function () {
     // Create user with necessary permissions

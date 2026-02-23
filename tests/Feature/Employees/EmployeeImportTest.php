@@ -5,8 +5,11 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Maatwebsite\Excel\Facades\Excel;
+
+uses(RefreshDatabase::class)->group('employees');
 
 beforeEach(function () {
     // Create user with necessary permissions using the helper function

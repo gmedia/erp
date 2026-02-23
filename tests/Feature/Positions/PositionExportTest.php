@@ -9,14 +9,15 @@ uses(RefreshDatabase::class)->group('positions');
 describe('PositionExport', function () {
 
     test('query applies search filter', function () {
-        Position::factory()->create(['name' => 'Manager']);
+        // Use unique name to avoid collision with seeded data
+        Position::factory()->create(['name' => 'UniqueManagerPos']);
         Position::factory()->create(['name' => 'Staff']);
 
-        $export = new PositionExport(['search' => 'Man']);
+        $export = new PositionExport(['search' => 'UniqueManagerPos']);
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(1)
-            ->and($results->first()->name)->toBe('Manager');
+            ->and($results->first()->name)->toBe('UniqueManagerPos');
     });
 
     test('map function returns correct data', function () {

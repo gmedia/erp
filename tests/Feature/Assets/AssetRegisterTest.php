@@ -2,6 +2,9 @@
 
 use App\Models\Asset;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class)->group('assets');
 
 it('can view asset register report', function () {
     $user = createTestUserWithPermissions(['asset']);

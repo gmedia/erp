@@ -12,7 +12,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use function Pest\Laravel\actingAs;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('assets');
 
 beforeEach(function () {
     // Create user with necessary permissions
