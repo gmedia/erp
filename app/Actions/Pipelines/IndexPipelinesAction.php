@@ -28,12 +28,21 @@ class IndexPipelinesAction
             'is_active' => $request->get('is_active'),
         ]);
 
-        $this->filterService->applySorting(
-            $query,
-            $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'name', 'code', 'entity_type', 'version', 'is_active', 'created_at', 'updated_at']
-        );
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        if ($sortBy === 'created_by') {
+            $query->leftJoin('users as creator', 'pipelines.created_by', '=', 'creator.id')
+                  ->orderBy('creator.name', $sortDirection)
+                  ->select('pipelines.*');
+        } else {
+            $this->filterService->applySorting(
+                $query,
+                $sortBy,
+                $sortDirection,
+                ['id', 'name', 'code', 'entity_type', 'version', 'is_active', 'created_at', 'updated_at']
+            );
+        }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
     }

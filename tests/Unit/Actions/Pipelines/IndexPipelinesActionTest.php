@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Actions\Pipelines;
+namespace Tests\Unit\Actions\Pipelines;
 
 use App\Actions\Pipelines\IndexPipelinesAction;
 use App\Domain\Pipelines\PipelineFilterService;
@@ -8,7 +8,7 @@ use App\Http\Requests\Pipelines\IndexPipelineRequest;
 use App\Models\Pipeline;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class)->group('pipelines', 'actions');
+uses(RefreshDatabase::class)->group('pipelines');
 
 it('indexes pipelines with pagination', function () {
     Pipeline::factory()->count(15)->create();
@@ -43,4 +43,19 @@ it('filters pipelines by search', function () {
 
     expect($result->total())->toBe(1);
     expect($result->first()->name)->toBe('Testing Name 123');
+});
+
+it('sorts pipelines by created_by', function () {
+    $user1 = \App\Models\User::factory()->create(['name' => 'Alice User']);
+    $user2 = \App\Models\User::factory()->create(['name' => 'Zack User']);
+
+    Pipeline::factory()->create(['created_by' => $user2->id, 'name' => 'Pipeline Z']);
+    Pipeline::factory()->create(['created_by' => $user1->id, 'name' => 'Pipeline A']);
+
+    $request = IndexPipelineRequest::create('/api/pipelines', 'GET', ['sort_by' => 'created_by', 'sort_direction' => 'asc']);
+    $action = new IndexPipelinesAction(app(PipelineFilterService::class));
+    $result = $action->execute($request);
+
+    expect($result->total())->toBe(2);
+    expect($result->first()->name)->toBe('Pipeline A');
 });

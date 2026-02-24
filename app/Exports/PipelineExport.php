@@ -44,7 +44,11 @@ class PipelineExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
         $allowedSortColumns = ['name', 'code', 'entity_type', 'version', 'is_active', 'created_at'];
 
-        if (in_array($sortBy, $allowedSortColumns)) {
+        if ($sortBy === 'created_by') {
+            $query->leftJoin('users as creator', 'pipelines.created_by', '=', 'creator.id')
+                  ->orderBy('creator.name', $sortDirection === 'asc' ? 'asc' : 'desc')
+                  ->select('pipelines.*');
+        } elseif (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection == 'asc' ? 'asc' : 'desc');
         }
 
