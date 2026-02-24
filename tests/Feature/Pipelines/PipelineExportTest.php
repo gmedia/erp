@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('pipelines');
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
+    $this->user = createTestUserWithPermissions(['pipeline']);
 });
 
 it('can export pipelines', function () {

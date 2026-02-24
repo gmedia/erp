@@ -44,6 +44,7 @@ import {
     ArrowLeftRight,
     TrendingDown,
     AlertTriangle,
+    GitMerge,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -92,6 +93,7 @@ const iconMap: Record<string, LucideIcon> = {
     TrendingDown,
     maintenance_cost_report: Wrench,
     AlertTriangle,
+    GitMerge,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

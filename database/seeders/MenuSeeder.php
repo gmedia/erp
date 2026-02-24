@@ -202,7 +202,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'master.data',
                 'display_name' => 'Master Data',
-                'permissions' => ['department', 'position', 'branch', 'customer_category', 'supplier_category', 'product_category', 'unit', 'product', 'fiscal_year', 'coa_version', 'account', 'account_mapping', 'asset_category', 'asset_model', 'asset_location', 'accounts'],
+                'permissions' => ['department', 'position', 'branch', 'customer_category', 'supplier_category', 'product_category', 'unit', 'product', 'fiscal_year', 'coa_version', 'account', 'account_mapping', 'asset_category', 'asset_model', 'asset_location', 'accounts', 'pipeline'],
                 'icon' => 'Database',
                 'url' => null,
                 'child' => [
@@ -324,6 +324,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['asset_location', 'asset_location.create', 'asset_location.edit', 'asset_location.delete'],
                         'icon' => 'Map',
                         'url' => 'asset-locations',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'pipeline',
+                        'display_name' => 'Pipeline',
+                        'permissions' => ['pipeline', 'pipeline.create', 'pipeline.edit', 'pipeline.delete'],
+                        'icon' => 'GitMerge',
+                        'url' => 'pipelines',
                         'child' => [],
                     ],
                 ],

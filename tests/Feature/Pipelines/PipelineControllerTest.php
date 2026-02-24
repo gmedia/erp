@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 uses(RefreshDatabase::class)->group('pipelines');
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
+    $this->user = createTestUserWithPermissions(['pipeline', 'pipeline.create', 'pipeline.edit', 'pipeline.delete']);
 });
 
 it('can list pipelines', function () {

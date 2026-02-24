@@ -542,6 +542,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'pipeline',
+                'display_name' => 'Pipeline',
+                'child' => [
+                    [
+                        'name' => 'pipeline.create',
+                        'display_name' => 'Create Pipeline',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'pipeline.edit',
+                        'display_name' => 'Edit Pipeline',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'pipeline.delete',
+                        'display_name' => 'Delete Pipeline',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],
