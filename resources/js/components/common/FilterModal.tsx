@@ -67,9 +67,7 @@ export function FilterModal({
 
                         const commonProps = {
                             name: field.name,
-                            value: isSelect 
-                                ? (tempFilters[field.name] || undefined)
-                                : (tempFilters[field.name] || ''),
+                            value: tempFilters[field.name] ?? '', // Always pass a defined string to prevent uncontrolled-to-controlled warning
                             label: field.label,
                         };
 

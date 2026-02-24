@@ -21,4 +21,17 @@ class ExportPipelineRequest extends FormRequest
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
         ];
     }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('is_active')) {
+            if ($this->is_active === '' || $this->is_active === null) {
+                $this->merge(['is_active' => null]);
+            } else {
+                $this->merge([
+                    'is_active' => filter_var($this->is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+                ]);
+            }
+        }
+    }
 }
