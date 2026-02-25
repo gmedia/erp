@@ -23,5 +23,10 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
         Route::apiResource('pipelines.states', \App\Http\Controllers\PipelineStateController::class)
             ->scoped(['state' => 'id'])
             ->except(['show']);
+
+        // Pipeline Transitions nested routes
+        Route::apiResource('pipelines.transitions', \App\Http\Controllers\PipelineTransitionController::class)
+            ->scoped(['transition' => 'id'])
+            ->except(['show']);
     });
 });

@@ -303,7 +303,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   sortable_columns: [Name, Code, Entity, Version, Creator, Status]
   view_type: dialog
   checkbox_header: false
-  note: "Memiliki embedded sub-form untuk Pipeline States yang dapat diakses di dalam Edit modal."
+  note: "Memiliki embedded sub-form untuk Pipeline States dan Pipeline Transitions yang dapat diakses di dalam Edit modal."
 ```
 
 ---

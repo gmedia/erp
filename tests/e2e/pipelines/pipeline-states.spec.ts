@@ -19,6 +19,9 @@ test.describe('Pipeline State Configuration', () => {
 
     await expect(page.getByRole('dialog')).toBeVisible();
 
+    // Navigate to States tab
+    await page.getByRole('tab', { name: 'States' }).click();
+
     // The Pipeline States table should be visible
     await expect(page.getByText('Pipeline States', { exact: true })).toBeVisible();
     await expect(page.getByText('No states added yet')).toBeVisible();

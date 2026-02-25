@@ -356,3 +356,49 @@ export const pipelineStateFormSchema = z.object({
 });
 
 export type PipelineStateFormData = z.infer<typeof pipelineStateFormSchema>;
+
+export const pipelineTransitionActionFormSchema = z.object({
+    id: z.number().optional().nullable(),
+    action_type: z.enum(['update_field', 'create_record', 'send_notification', 'dispatch_job', 'trigger_approval', 'webhook', 'custom']),
+    execution_order: z.union([z.number(), z.string()]).transform((val) => Number(val)),
+    config: z.string().optional().refine((val) => {
+        if (!val || val.trim() === '') return true;
+        try {
+            JSON.parse(val);
+            return true;
+        } catch {
+            return false;
+        }
+    }, { message: 'Config must be valid JSON.' }),
+    is_async: z.union([z.boolean(), z.string()]).default(false).transform((val) => val === 'true' || val === true),
+    on_failure: z.enum(['abort', 'continue', 'log_and_continue']).default('abort'),
+    is_active: z.union([z.boolean(), z.string()]).default(true).transform((val) => val === 'true' || val === true),
+});
+
+export type PipelineTransitionActionFormData = z.infer<typeof pipelineTransitionActionFormSchema>;
+
+export const pipelineTransitionFormSchema = z.object({
+    from_state_id: z.number().or(z.string().transform(Number)),
+    to_state_id: z.number().or(z.string().transform(Number)),
+    name: z.string().min(1, 'Name is required'),
+    code: z.string().min(1, 'Code is required'),
+    description: z.string().nullable().optional(),
+    required_permission: z.string().nullable().optional(),
+    guard_conditions: z.string().optional().refine((val) => {
+        if (!val || val.trim() === '') return true;
+        try {
+            JSON.parse(val);
+            return true;
+        } catch {
+            return false;
+        }
+    }, { message: 'Guard conditions must be valid JSON.' }),
+    requires_confirmation: z.union([z.boolean(), z.string()]).default(false).transform((val) => val === 'true' || val === true),
+    requires_comment: z.union([z.boolean(), z.string()]).default(false).transform((val) => val === 'true' || val === true),
+    requires_approval: z.union([z.boolean(), z.string()]).default(false).transform((val) => val === 'true' || val === true),
+    sort_order: z.union([z.number(), z.string()]).transform((val) => Number(val)),
+    is_active: z.union([z.boolean(), z.string()]).default(true).transform((val) => val === 'true' || val === true),
+    actions: z.array(pipelineTransitionActionFormSchema).optional(),
+});
+
+export type PipelineTransitionFormData = z.infer<typeof pipelineTransitionFormSchema>;

@@ -40,4 +40,9 @@ class Pipeline extends Model
     {
         return $this->hasMany(PipelineState::class)->orderBy('sort_order', 'asc');
     }
+
+    public function transitions(): HasMany
+    {
+        return $this->hasMany(PipelineTransition::class)->orderBy('sort_order', 'asc');
+    }
 }

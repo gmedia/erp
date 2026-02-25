@@ -13,6 +13,8 @@ import NameField from '@/components/common/NameField';
 import { Pipeline } from '@/types/entity';
 import { PipelineFormData, pipelineFormSchema } from '@/utils/schemas';
 import { PipelineStateManager } from './PipelineStateManager';
+import { PipelineTransitionManager } from './PipelineTransitionManager';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface PipelineFormProps {
     open: boolean;
@@ -128,9 +130,33 @@ export const PipelineForm = memo<PipelineFormProps>(function PipelineForm({
             onSubmit={handleSubmit}
             isLoading={isLoading}
         >
-            {renderBasicInfoSection()}
-            {renderDetailsSection()}
-            {pipeline && <PipelineStateManager pipelineId={pipeline.id} />}
+            {pipeline ? (
+                <Tabs defaultValue="details">
+                    <TabsList className="mb-4">
+                        <TabsTrigger value="details">Details</TabsTrigger>
+                        <TabsTrigger value="states">States</TabsTrigger>
+                        <TabsTrigger value="transitions">Transitions</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="details" className="space-y-4">
+                        {renderBasicInfoSection()}
+                        {renderDetailsSection()}
+                    </TabsContent>
+                    
+                    <TabsContent value="states" className="space-y-4">
+                        <PipelineStateManager pipelineId={pipeline.id} />
+                    </TabsContent>
+                    
+                    <TabsContent value="transitions" className="space-y-4">
+                        <PipelineTransitionManager pipelineId={pipeline.id} />
+                    </TabsContent>
+                </Tabs>
+            ) : (
+                <div className="space-y-4">
+                    {renderBasicInfoSection()}
+                    {renderDetailsSection()}
+                </div>
+            )}
         </EntityForm>
     );
 });
