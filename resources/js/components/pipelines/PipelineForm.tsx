@@ -12,6 +12,7 @@ import NameField from '@/components/common/NameField';
 
 import { Pipeline } from '@/types/entity';
 import { PipelineFormData, pipelineFormSchema } from '@/utils/schemas';
+import { PipelineStateManager } from './PipelineStateManager';
 
 interface PipelineFormProps {
     open: boolean;
@@ -129,6 +130,7 @@ export const PipelineForm = memo<PipelineFormProps>(function PipelineForm({
         >
             {renderBasicInfoSection()}
             {renderDetailsSection()}
+            {pipeline && <PipelineStateManager pipelineId={pipeline.id} />}
         </EntityForm>
     );
 });

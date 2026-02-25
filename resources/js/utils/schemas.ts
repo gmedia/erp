@@ -344,3 +344,15 @@ export const pipelineFormSchema = z.object({
 });
 
 export type PipelineFormData = z.infer<typeof pipelineFormSchema>;
+
+export const pipelineStateFormSchema = z.object({
+    code: z.string().min(1, 'Code is required'),
+    name: z.string().min(1, 'Name is required'),
+    type: z.enum(['initial', 'intermediate', 'final']),
+    color: z.string().nullable().optional(),
+    icon: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
+    sort_order: z.union([z.number(), z.string()]).transform((val) => Number(val)),
+});
+
+export type PipelineStateFormData = z.infer<typeof pipelineStateFormSchema>;

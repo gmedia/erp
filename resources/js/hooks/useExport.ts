@@ -35,8 +35,20 @@ export function useExport({
                 },
             });
 
+            let downloadUrl = response.data.url;
+            try {
+                // Convert absolute URL to relative path if it's the same hostname.
+                // This prevents cross-origin issues in testing (Playwright) while keeping it working locally on different ports.
+                const urlObj = new URL(downloadUrl);
+                if (urlObj.hostname === window.location.hostname) {
+                    downloadUrl = urlObj.pathname + urlObj.search;
+                }
+            } catch (e) {
+                // Ignore if it's already a relative URL or parse fails
+            }
+
             const a = document.createElement('a');
-            a.href = response.data.url;
+            a.href = downloadUrl;
             a.download = response.data.filename || filename || 'export.xlsx';
             document.body.appendChild(a);
             a.click();

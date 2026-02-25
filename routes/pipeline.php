@@ -18,5 +18,10 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
         Route::put('/pipelines/{pipeline}', [PipelineController::class, 'update'])->middleware('permission:pipeline.edit,true');
         Route::delete('/pipelines/{pipeline}', [PipelineController::class, 'destroy'])->middleware('permission:pipeline.delete,true');
         Route::post('/pipelines/export', [PipelineController::class, 'export']);
+
+        // Pipeline States nested routes
+        Route::apiResource('pipelines.states', \App\Http\Controllers\PipelineStateController::class)
+            ->scoped(['state' => 'id'])
+            ->except(['show']);
     });
 });

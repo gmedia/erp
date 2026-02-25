@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class Pipeline extends Model
 {
     use HasFactory;
@@ -32,5 +34,10 @@ class Pipeline extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function states(): HasMany
+    {
+        return $this->hasMany(PipelineState::class)->orderBy('sort_order', 'asc');
     }
 }
