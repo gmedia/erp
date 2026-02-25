@@ -145,7 +145,7 @@ class MenuSeeder extends Seeder
                         'name' => 'maintenance_cost_report',
                         'display_name' => 'Maintenance Cost',
                         'permissions' => ['asset'],
-                        'icon' => 'maintenance_cost_report',
+                        'icon' => 'Wrench',
                         'url' => 'reports/maintenance-cost',
                         'child' => [],
                     ],
@@ -202,7 +202,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'master.data',
                 'display_name' => 'Master Data',
-                'permissions' => ['department', 'position', 'branch', 'customer_category', 'supplier_category', 'product_category', 'unit', 'product', 'fiscal_year', 'coa_version', 'account', 'account_mapping', 'asset_category', 'asset_model', 'asset_location', 'accounts'],
+                'permissions' => ['department', 'position', 'branch', 'warehouse', 'customer_category', 'supplier_category', 'product_category', 'unit', 'product', 'fiscal_year', 'coa_version', 'account', 'account_mapping', 'asset_category', 'asset_model', 'asset_location', 'accounts'],
                 'icon' => 'Database',
                 'url' => null,
                 'child' => [
@@ -228,6 +228,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['branch', 'branch.create', 'branch.edit', 'branch.delete'],
                         'icon' => 'GitBranch',
                         'url' => 'branches',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'warehouse',
+                        'display_name' => 'Warehouse',
+                        'permissions' => ['warehouse', 'warehouse.create', 'warehouse.edit', 'warehouse.delete'],
+                        'icon' => 'Warehouse',
+                        'url' => 'warehouses',
                         'child' => [],
                     ],
                     [

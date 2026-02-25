@@ -76,6 +76,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'warehouse',
+                'display_name' => 'Warehouse',
+                'child' => [
+                    [
+                        'name' => 'warehouse.create',
+                        'display_name' => 'Create Warehouse',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'warehouse.edit',
+                        'display_name' => 'Edit Warehouse',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'warehouse.delete',
+                        'display_name' => 'Delete Warehouse',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'employee',
                 'display_name' => 'Employee',
                 'child' => [

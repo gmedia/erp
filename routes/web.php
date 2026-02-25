@@ -24,6 +24,7 @@ require __DIR__ . '/department.php';
 require __DIR__ . '/permission.php';
 require __DIR__ . '/user.php';
 require __DIR__ . '/branch.php';
+require __DIR__ . '/warehouse.php';
 require __DIR__ . '/customer.php';
 require __DIR__ . '/supplier.php';
 require __DIR__ . '/supplier_category.php';
@@ -46,6 +47,5 @@ require __DIR__ . '/asset_movement.php';
 require __DIR__ . '/asset_maintenance.php';
 require __DIR__ . '/asset_stocktake.php';
 require __DIR__ . '/asset_depreciation_run.php';
-
 
 
