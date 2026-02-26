@@ -39,7 +39,7 @@ class EntityStateController extends Controller
             }
         }
 
-        $entity = app($modelClass)->where('ulid', $entityId)->first() ?? app($modelClass)->find($entityId);
+        $entity = app($modelClass)->resolveRouteBinding($entityId) ?? app($modelClass)->find($entityId);
         
         if (!$entity) {
             abort(404, "Entity not found");

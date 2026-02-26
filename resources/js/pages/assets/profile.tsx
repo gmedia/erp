@@ -66,8 +66,10 @@ interface Props {
 
 export default function AssetProfile({ asset }: Props) {
     const item = asset.data;
+    const [timelineKey, setTimelineKey] = useState(Date.now());
 
     const handleStateChange = useCallback(() => {
+        setTimelineKey(Date.now());
         router.reload({ only: ['asset'] });
     }, []);
 
@@ -708,7 +710,7 @@ export default function AssetProfile({ asset }: Props) {
 
                     {/* Timeline Tab */}
                     <TabsContent value="timeline" className="mt-6">
-                        <EntityStateTimeline entityType="asset" entityId={item.ulid} />
+                        <EntityStateTimeline key={timelineKey} entityType="asset" entityId={item.ulid} />
                     </TabsContent>
                 </Tabs>
             </div>

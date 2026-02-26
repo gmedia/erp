@@ -309,7 +309,13 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   route: (embedded in Asset Profile)
   api: /api/entity-states/{entityType}/{entityId}
   view_type: embedded
-  note: "Embedded pipeline actions & timeline component for entities like Asset."
+  note: "Embedded pipeline actions component for entities like Asset."
+
+- slug: entity-state-timeline
+  route: (embedded in Asset Profile)
+  api: /api/entity-states/{entityType}/{entityId}/timeline
+  view_type: embedded
+  note: "Embedded timeline feature tracking state transitions for entities."
 ```
 
 ---
@@ -368,6 +374,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
 | 10 | Book Value Reports | `book-value-depreciation-reports` | `Feature/Reports/BookValueDepreciationReportTest.php` | Laporan Book Value & Depreciation |
 | 11 | Stocktake Variance Reports | `asset-stocktakes` | `Feature/AssetStocktakes/AssetStocktakeVarianceControllerTest.php` | Laporan Stocktake Variance |
 | 12 | Entity State Actions | `entity-state-actions` | `Feature/EntityStates/EntityStateControllerTest.php` | Pipeline actions engine per entitas |
+| 13 | Entity State Timeline | `entity-state-timeline` | `Feature/EntityStates/EntityStateTimelineTest.php` | Timeline history component per entitas |
 
 ---
 
