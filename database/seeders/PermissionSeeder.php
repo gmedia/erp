@@ -97,6 +97,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'stock_transfer',
+                'display_name' => 'Stock Transfer',
+                'child' => [
+                    [
+                        'name' => 'stock_transfer.create',
+                        'display_name' => 'Create Stock Transfer',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'stock_transfer.edit',
+                        'display_name' => 'Edit Stock Transfer',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'stock_transfer.delete',
+                        'display_name' => 'Delete Stock Transfer',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'employee',
                 'display_name' => 'Employee',
                 'child' => [

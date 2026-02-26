@@ -145,6 +145,15 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
 
+- slug: stock-transfers
+  route: /stock-transfers
+  api: /api/stock-transfers
+  export_api: /api/stock-transfers/export
+  search_placeholder: "Search stock transfers..."
+  sortable_columns: [Transfer Number, From Warehouse, To Warehouse, Transfer Date, Expected Arrival, Status]
+  view_type: dialog
+  checkbox_header: false
+
 - slug: products
   route: /products
   api: /api/products

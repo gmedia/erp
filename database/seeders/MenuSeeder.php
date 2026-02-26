@@ -119,6 +119,23 @@ class MenuSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'inventory',
+                'display_name' => 'Inventory',
+                'permissions' => ['stock_transfer'],
+                'icon' => 'Box',
+                'url' => null,
+                'child' => [
+                    [
+                        'name' => 'stock_transfer',
+                        'display_name' => 'Stock Transfers',
+                        'permissions' => ['stock_transfer', 'stock_transfer.create', 'stock_transfer.edit', 'stock_transfer.delete'],
+                        'icon' => 'ArrowDownUp',
+                        'url' => 'stock-transfers',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'report',
                 'display_name' => 'Report',
                 'permissions' => ['trial_balance_report', 'balance_sheet_report', 'income_statement_report', 'cash_flow_report', 'comparative_report', 'asset'],

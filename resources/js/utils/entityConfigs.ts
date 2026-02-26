@@ -95,6 +95,11 @@ import { createAssetMaintenanceFilterFields } from '@/components/asset-maintenan
 import { AssetMaintenanceForm } from '@/components/asset-maintenances/AssetMaintenanceForm';
 import { AssetMaintenanceViewModal } from '@/components/asset-maintenances/AssetMaintenanceViewModal';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
+import { stockTransferColumns } from '@/components/stock-transfers/StockTransferColumns';
+import { createStockTransferFilterFields } from '@/components/stock-transfers/StockTransferFilters';
+import { StockTransferForm } from '@/components/stock-transfers/StockTransferForm';
+import { StockTransferViewModal } from '@/components/stock-transfers/StockTransferViewModal';
+import { type StockTransfer } from '@/types/stock-transfer';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -304,6 +309,29 @@ export const supplierConfig = createComplexEntityConfig({
     viewModalComponent: SupplierViewModal,
     getDeleteMessage: (supplier: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${supplier.name}'s supplier record.`,
+});
+
+export const stockTransferConfig = createComplexEntityConfig<StockTransfer>({
+    entityName: 'Stock Transfer',
+    entityNamePlural: 'Stock Transfers',
+    apiEndpoint: '/api/stock-transfers',
+    exportEndpoint: '/api/stock-transfers/export',
+    queryKey: ['stock-transfers'],
+    breadcrumbs: [{ title: 'Stock Transfers', href: '/stock-transfers' }],
+    initialFilters: {
+        search: '',
+        from_warehouse_id: '',
+        to_warehouse_id: '',
+        status: '',
+    },
+    columns: stockTransferColumns,
+    filterFields: createStockTransferFilterFields(),
+    formComponent: StockTransferForm,
+    formType: 'complex',
+    entityNameForSearch: 'stock transfer',
+    viewModalComponent: StockTransferViewModal,
+    getDeleteMessage: (transfer: { transfer_number?: string | null }) =>
+        `This action cannot be undone. This will cancel stock transfer ${transfer.transfer_number || ''}.`,
 });
 
 export const supplierCategoryConfig = createSimpleEntityConfig({

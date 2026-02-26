@@ -324,3 +324,26 @@ export const assetStocktakeFormSchema = z.object({
 });
 
 export type AssetStocktakeFormData = z.infer<typeof assetStocktakeFormSchema>;
+
+export const stockTransferFormSchema = z.object({
+    transfer_number: z.string().optional(),
+    from_warehouse_id: z.string().min(1, { message: 'From warehouse is required.' }),
+    to_warehouse_id: z.string().min(1, { message: 'To warehouse is required.' }),
+    transfer_date: z.date({ message: 'Transfer date is required.' }),
+    expected_arrival_date: z.date().optional().nullable(),
+    status: z.enum(['draft', 'pending_approval', 'approved', 'in_transit', 'received', 'cancelled'], {
+        message: 'Status is required.',
+    }),
+    notes: z.string().optional(),
+    requested_by: z.string().optional(),
+    items: z.array(z.object({
+        product_id: z.string().min(1, { message: 'Product is required.' }),
+        unit_id: z.string().min(1, { message: 'Unit is required.' }),
+        quantity: z.coerce.number().gt(0, { message: 'Quantity must be greater than 0.' }),
+        quantity_received: z.coerce.number().min(0).optional().default(0),
+        unit_cost: z.coerce.number().min(0).optional().default(0),
+        notes: z.string().optional(),
+    })).min(1, { message: 'At least 1 item is required.' }),
+});
+
+export type StockTransferFormData = z.infer<typeof stockTransferFormSchema>;
