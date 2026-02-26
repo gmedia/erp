@@ -568,6 +568,11 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'pipeline_audit_trail',
+                'display_name' => 'Pipeline Audit Trail',
+                'child' => [],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],

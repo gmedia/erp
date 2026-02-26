@@ -323,6 +323,16 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: page
   note: "Pipeline monitoring dashboard with summary cards, state distribution chart, and stale entity detection."
 
+- slug: pipeline-audit-trail
+  route: /pipeline-audit-trail
+  api: /pipeline-audit-trail (Accepts application/json)
+  export_api: /api/pipeline-audit-trail/export
+  search_placeholder: "Search entity ID, performer, comment..."
+  sortable_columns: [Date, Pipeline, Entity Type, Entity ID, From State, To State, Transition, Performed By, Comment]
+  view_type: dialog
+  checkbox_header: false
+  note: "Non-CRUD feature for viewing and exporting pipeline state logs. Read-only Data Table with Detail modal."
+
 ## Testing
 
 E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
@@ -384,6 +394,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 11 | Stocktake Variance Reports | `asset-stocktakes` | `Feature/AssetStocktakes/AssetStocktakeVarianceControllerTest.php` | Laporan Stocktake Variance |
 | 12 | Entity State Actions | `entity-state-actions` | `Feature/EntityStates/EntityStateControllerTest.php` | Pipeline actions engine per entitas |
 | 13 | Entity State Timeline | `entity-state-timeline` | `Feature/EntityStates/EntityStateTimelineTest.php` | Timeline history component per entitas |
+| 14 | Pipeline Audit Trail | `pipeline-audit-trail` | `Feature/PipelineAuditTrail/PipelineAuditTrailControllerTest.php` | Log seluruh transisi state pipeline |
 
 ---
 

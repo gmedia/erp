@@ -331,7 +331,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'admin',
                 'display_name' => 'Admin',
-                'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline'],
+                'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline', 'pipeline_audit_trail'],
                 'icon' => 'Shield',
                 'url' => null,
                 'child' => [
@@ -365,6 +365,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['pipeline', 'pipeline.create', 'pipeline.edit', 'pipeline.delete'],
                         'icon' => 'GitMerge',
                         'url' => 'pipelines',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'pipeline_audit_trail',
+                        'display_name' => 'Pipeline Audit Trail',
+                        'permissions' => ['pipeline_audit_trail'],
+                        'icon' => 'FileSearch',
+                        'url' => 'pipeline-audit-trail',
                         'child' => [],
                     ],
                 ],
