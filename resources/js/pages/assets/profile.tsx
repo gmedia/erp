@@ -90,20 +90,7 @@ export default function AssetProfile({ asset }: Props) {
         }).format(Number(value));
     };
 
-    const getStatusVariant = (status: string) => {
-        switch (status) {
-            case 'active':
-                return 'default';
-            case 'maintenance':
-                return 'secondary';
-            case 'disposed':
-                return 'destructive';
-            case 'lost':
-                return 'destructive';
-            default:
-                return 'outline';
-        }
-    };
+
 
     const getConditionVariant = (condition: string) => {
         switch (condition) {
@@ -267,19 +254,11 @@ export default function AssetProfile({ asset }: Props) {
                                 </div>
                             )}
                             <div className="flex flex-col gap-2">
-                                <Badge
-                                    variant={getStatusVariant(item.status)}
-                                    className={`px-4 py-1.5 text-sm font-medium capitalize lg:self-end w-fit ${item.status === 'active' ? 'animate-pulse' : ''}`}
-                                >
-                                    {item.status}
-                                </Badge>
-                                <div className="mt-1">
-                                    <EntityStateActions 
-                                        entityType="asset" 
-                                        entityId={item.ulid} 
-                                        onStateChange={handleStateChange} 
-                                    />
-                                </div>
+                                <EntityStateActions 
+                                    entityType="asset" 
+                                    entityId={item.ulid} 
+                                    onStateChange={handleStateChange} 
+                                />
                             </div>
                         </div>
                     </div>
