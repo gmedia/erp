@@ -50,37 +50,37 @@ export function StateDistributionChart({ data, isLoading }: StateDistributionCha
         .join(', ');
 
     return (
-        <Card className="h-full flex flex-col">
+        <Card className="h-full flex flex-col overflow-hidden">
             <CardHeader className="pb-2">
                 <CardTitle>State Distribution</CardTitle>
                 <CardDescription>Visual breakdown of {total} entities</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col md:flex-row items-center justify-center gap-8 py-4">
+            <CardContent className="flex-1 flex flex-col items-center gap-6 py-4">
                 {/* CSS Donut Chart */}
-                <div className="relative w-48 h-48 flex-shrink-0 drop-shadow-md">
+                <div className="relative w-36 h-36 flex-shrink-0 drop-shadow-md">
                     <div 
                         className="w-full h-full rounded-full transition-all duration-500 ease-in-out"
                         style={{ background: `conic-gradient(${gradientStops})` }}
                     />
                     {/* Inner circle for donut hole */}
-                    <div className="absolute inset-0 m-auto w-32 h-32 bg-card rounded-full shadow-inner z-10 flex items-center justify-center flex-col">
-                        <span className="text-3xl font-bold">{total}</span>
-                        <span className="text-xs text-muted-foreground uppercase tracking-wider">Total</span>
+                    <div className="absolute inset-0 m-auto w-24 h-24 bg-card rounded-full shadow-inner z-10 flex items-center justify-center flex-col">
+                        <span className="text-2xl font-bold">{total}</span>
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</span>
                     </div>
                 </div>
 
                 {/* Legend */}
-                <div className="flex flex-col gap-2 min-w-40 max-h-48 overflow-y-auto pr-2">
+                <div className="flex flex-col gap-1.5 w-full max-h-40 overflow-y-auto">
                     {data.filter(item => item.count > 0).map((item) => (
-                        <div key={item.state_id} className="flex items-center justify-between text-sm">
-                            <div className="flex items-center gap-2">
+                        <div key={item.state_id} className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2 min-w-0">
                                 <span 
-                                    className="w-3 h-3 rounded-full flex-shrink-0 ring-1 ring-border" 
+                                    className="w-2.5 h-2.5 rounded-full flex-shrink-0 ring-1 ring-border" 
                                     style={{ backgroundColor: item.color }} 
                                 />
-                                <span className="font-medium truncate max-w-[120px]" title={item.name}>{item.name}</span>
+                                <span className="font-medium truncate" title={item.name}>{item.name}</span>
                             </div>
-                            <span className="text-muted-foreground ml-4 tabular-nums w-12 text-right">
+                            <span className="text-muted-foreground ml-3 tabular-nums flex-shrink-0">
                                 {Math.round((item.count / total) * 100)}%
                             </span>
                         </div>
