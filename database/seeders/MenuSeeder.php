@@ -145,7 +145,7 @@ class MenuSeeder extends Seeder
                         'name' => 'maintenance_cost_report',
                         'display_name' => 'Maintenance Cost',
                         'permissions' => ['asset'],
-                        'icon' => 'maintenance_cost_report',
+                        'icon' => 'Wrench',
                         'url' => 'reports/maintenance-cost',
                         'child' => [],
                     ],
@@ -329,10 +329,10 @@ class MenuSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'setting',
-                'display_name' => 'Setting',
-                'permissions' => ['permission', 'user'],
-                'icon' => 'Settings',
+                'name' => 'admin',
+                'display_name' => 'Admin',
+                'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline'],
+                'icon' => 'Shield',
                 'url' => null,
                 'child' => [
                     [

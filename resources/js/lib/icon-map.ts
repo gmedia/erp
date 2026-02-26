@@ -94,7 +94,6 @@ const iconMap: Record<string, LucideIcon> = {
     FileText,
     ArrowLeftRight,
     TrendingDown,
-    maintenance_cost_report: Wrench,
     AlertTriangle,
     GitMerge,
     BarChart3,
