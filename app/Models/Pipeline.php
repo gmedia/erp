@@ -45,4 +45,9 @@ class Pipeline extends Model
     {
         return $this->hasMany(PipelineTransition::class)->orderBy('sort_order', 'asc');
     }
+
+    public function entityStates(): HasMany
+    {
+        return $this->hasMany(PipelineEntityState::class);
+    }
 }

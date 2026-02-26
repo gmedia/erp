@@ -25,6 +25,8 @@ import { format } from 'date-fns';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
+import { EntityStateActions } from '@/components/pipeline/EntityStateActions';
+import { EntityStateTimeline } from '@/components/pipeline/EntityStateTimeline';
 import {
     Activity,
     AlertCircle,
@@ -64,6 +66,10 @@ interface Props {
 
 export default function AssetProfile({ asset }: Props) {
     const item = asset.data;
+
+    const handleStateChange = useCallback(() => {
+        router.reload({ only: ['asset'] });
+    }, []);
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'N/A';
@@ -261,16 +267,17 @@ export default function AssetProfile({ asset }: Props) {
                             <div className="flex flex-col gap-2">
                                 <Badge
                                     variant={getStatusVariant(item.status)}
-                                    className={`px-4 py-1.5 text-sm font-medium capitalize ${item.status === 'active' ? 'animate-pulse' : ''}`}
+                                    className={`px-4 py-1.5 text-sm font-medium capitalize lg:self-end w-fit ${item.status === 'active' ? 'animate-pulse' : ''}`}
                                 >
                                     {item.status}
                                 </Badge>
-                                <Badge
-                                    variant={getConditionVariant(item.condition || '')}
-                                    className="px-4 py-1.5 text-sm font-medium capitalize"
-                                >
-                                    {item.condition?.replace('_', ' ') || 'Unknown'}
-                                </Badge>
+                                <div className="mt-1">
+                                    <EntityStateActions 
+                                        entityType="asset" 
+                                        entityId={item.ulid} 
+                                        onStateChange={handleStateChange} 
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -298,6 +305,10 @@ export default function AssetProfile({ asset }: Props) {
                         <TabsTrigger value="depreciation" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <TrendingDown className="mr-2 h-4 w-4" />
                             Depreciation
+                        </TabsTrigger>
+                        <TabsTrigger value="timeline" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                            <History className="mr-2 h-4 w-4" />
+                            Timeline
                         </TabsTrigger>
                     </TabsList>
                 </div>
@@ -693,6 +704,11 @@ export default function AssetProfile({ asset }: Props) {
                                 )}
                             </CardContent>
                         </Card>
+                    </TabsContent>
+
+                    {/* Timeline Tab */}
+                    <TabsContent value="timeline" className="mt-6">
+                        <EntityStateTimeline entityType="asset" entityId={item.ulid} />
                     </TabsContent>
                 </Tabs>
             </div>

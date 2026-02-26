@@ -28,5 +28,10 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
         Route::apiResource('pipelines.transitions', \App\Http\Controllers\PipelineTransitionController::class)
             ->scoped(['transition' => 'id'])
             ->except(['show']);
+            
+        // Entity State Actions
+        Route::get('/entity-states/{entityType}/{entityId}', [\App\Http\Controllers\EntityStateController::class, 'getState']);
+        Route::post('/entity-states/{entityType}/{entityId}/transition', [\App\Http\Controllers\EntityStateController::class, 'executeTransition']);
+        Route::get('/entity-states/{entityType}/{entityId}/timeline', [\App\Http\Controllers\EntityStateController::class, 'getTimeline']);
     });
 });

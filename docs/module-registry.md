@@ -304,6 +304,12 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
   note: "Memiliki embedded sub-form untuk Pipeline States dan Pipeline Transitions yang dapat diakses di dalam Edit modal."
+
+- slug: entity-state-actions
+  route: (embedded in Asset Profile)
+  api: /api/entity-states/{entityType}/{entityId}
+  view_type: embedded
+  note: "Embedded pipeline actions & timeline component for entities like Asset."
 ```
 
 ---
@@ -361,6 +367,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
 | 9 | Asset Reports | `asset-reports` | `Feature/AssetRegisterTest.php` | Laporan Asset Register |
 | 10 | Book Value Reports | `book-value-depreciation-reports` | `Feature/Reports/BookValueDepreciationReportTest.php` | Laporan Book Value & Depreciation |
 | 11 | Stocktake Variance Reports | `asset-stocktakes` | `Feature/AssetStocktakes/AssetStocktakeVarianceControllerTest.php` | Laporan Stocktake Variance |
+| 12 | Entity State Actions | `entity-state-actions` | `Feature/EntityStates/EntityStateControllerTest.php` | Pipeline actions engine per entitas |
 
 ---
 
