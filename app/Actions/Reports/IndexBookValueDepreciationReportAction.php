@@ -36,7 +36,7 @@ class IndexBookValueDepreciationReportAction
         // Apply sorting (with basic validation in request)
         $query->orderBy($sortBy, $sortDirection);
 
-        $perPage = $request->get('limit', 10);
+        $perPage = $request->get('per_page', 15);
         
         return $query->paginate($perPage)->withQueryString();
     }
