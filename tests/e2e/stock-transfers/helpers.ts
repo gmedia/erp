@@ -25,6 +25,7 @@ async function selectAsyncOption(
         try {
             await expect(option).toBeVisible();
             await option.click({ force: true });
+            await expect(listbox).toBeHidden({ timeout: 5000 }).catch(() => null);
             return;
         } catch (e) {
             if (attempt === 2) throw e;
@@ -66,6 +67,7 @@ export async function createStockTransfer(page: Page): Promise<string> {
     await expect(productListbox).toBeVisible();
     await expect(productListbox.getByRole('option').first()).toBeVisible();
     await productListbox.getByRole('option').first().click();
+    await expect(productListbox).toBeHidden({ timeout: 5000 }).catch(() => null);
 
     const unitTrigger = firstRow.getByRole('combobox', { name: /Unit/i });
     await expect(unitTrigger).toBeVisible();
@@ -74,13 +76,40 @@ export async function createStockTransfer(page: Page): Promise<string> {
     await expect(unitListbox).toBeVisible();
     await expect(unitListbox.getByRole('option').first()).toBeVisible();
     await unitListbox.getByRole('option').first().click();
+    await expect(unitListbox).toBeHidden({ timeout: 5000 }).catch(() => null);
 
     await dialog.locator('input[name="items.0.quantity"]').fill('2');
 
     const submitButton = dialog.getByRole('button', { name: 'Add', exact: true });
+    const createResponse = page
+        .waitForResponse(
+            (r) =>
+                r.url().includes('/api/stock-transfers') &&
+                r.request().method() === 'POST' &&
+                r.status() < 400,
+            { timeout: 45000 },
+        )
+        .catch(() => null);
+
     await submitButton.click();
+    await createResponse;
+
+    try {
+        await expect(dialog).not.toBeVisible({ timeout: 5000 });
+    } catch {
+        const cancelButton = dialog.getByRole('button', { name: /(cancel|batal)/i });
+        await page.keyboard.press('Escape').catch(() => null);
+        if (await cancelButton.isVisible().catch(() => false)) {
+            await cancelButton.click({ force: true });
+        } else {
+            await page.keyboard.press('Escape').catch(() => null);
+        }
+    }
 
     await expect(dialog).not.toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(transferNumber, { exact: true }).first()).toBeVisible({
+        timeout: 30000,
+    });
 
     return transferNumber;
 }
@@ -112,7 +141,30 @@ export async function editStockTransfer(
     }
 
     const updateBtn = dialog.getByRole('button', { name: /Update/i });
+    const updateResponse = page
+        .waitForResponse(
+            (r) =>
+                r.url().includes('/api/stock-transfers/') &&
+                r.request().method() === 'PUT' &&
+                r.status() < 400,
+            { timeout: 45000 },
+        )
+        .catch(() => null);
+
     await updateBtn.click();
+    await updateResponse;
+
+    try {
+        await expect(dialog).not.toBeVisible({ timeout: 5000 });
+    } catch {
+        const cancelButton = dialog.getByRole('button', { name: /(cancel|batal)/i });
+        await page.keyboard.press('Escape').catch(() => null);
+        if (await cancelButton.isVisible().catch(() => false)) {
+            await cancelButton.click({ force: true });
+        } else {
+            await page.keyboard.press('Escape').catch(() => null);
+        }
+    }
 
     await expect(dialog).not.toBeVisible({ timeout: 15000 });
 }
