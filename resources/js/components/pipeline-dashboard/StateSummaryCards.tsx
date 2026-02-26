@@ -14,12 +14,12 @@ export function StateSummaryCards({ data, isLoading }: StateSummaryCardsProps) {
                 {[...Array(4)].map((_, i) => (
                     <Card key={i} className="animate-pulse">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-transparent bg-gray-200 rounded">
+                            <CardTitle className="text-sm font-medium text-transparent bg-muted rounded">
                                 Loading State...
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-transparent bg-gray-200 rounded w-12 h-8">0</div>
+                            <div className="text-2xl font-bold text-transparent bg-muted rounded w-12 h-8">0</div>
                         </CardContent>
                     </Card>
                 ))}
@@ -29,7 +29,7 @@ export function StateSummaryCards({ data, isLoading }: StateSummaryCardsProps) {
 
     if (!data || data.length === 0) {
         return (
-            <div className="w-full rounded-lg border border-dashed p-8 text-center text-gray-500">
+            <div className="w-full rounded-lg border border-dashed p-8 text-center text-muted-foreground">
                 No state data available for the selected pipeline.
             </div>
         );
@@ -41,7 +41,7 @@ export function StateSummaryCards({ data, isLoading }: StateSummaryCardsProps) {
                 <Card key={state.state_id} className="overflow-hidden transition-all hover:shadow-md">
                     <div className="h-2 w-full" style={{ backgroundColor: state.color }} />
                     <CardHeader className="flex flex-row items-center justify-between pb-2 pt-4">
-                        <CardTitle className="text-sm font-medium text-gray-600">
+                        <CardTitle className="text-sm font-medium text-muted-foreground">
                             {state.name}
                         </CardTitle>
                     </CardHeader>

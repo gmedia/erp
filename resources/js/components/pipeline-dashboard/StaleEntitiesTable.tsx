@@ -17,12 +17,12 @@ export function StaleEntitiesTable({ data, isLoading, staleDaysThreshold }: Stal
         return (
             <Card className="col-span-1 md:col-span-2 lg:col-span-3">
                 <CardHeader>
-                    <CardTitle className="text-transparent bg-gray-200 rounded w-48 animate-pulse">Loading...</CardTitle>
+                    <CardTitle className="text-transparent bg-muted rounded w-48 animate-pulse">Loading...</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-4">
                         {[...Array(3)].map((_, i) => (
-                            <div key={i} className="h-12 bg-gray-100 animate-pulse rounded" />
+                            <div key={i} className="h-12 bg-muted animate-pulse rounded" />
                         ))}
                     </div>
                 </CardContent>
@@ -35,7 +35,7 @@ export function StaleEntitiesTable({ data, isLoading, staleDaysThreshold }: Stal
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <div>
-                        <CardTitle className="flex items-center gap-2 text-amber-600">
+                        <CardTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
                             <AlertCircle className="h-5 w-5" />
                             Stale Entities
                         </CardTitle>
@@ -44,7 +44,7 @@ export function StaleEntitiesTable({ data, isLoading, staleDaysThreshold }: Stal
                         </CardDescription>
                     </div>
                     <div>
-                        <Badge variant="outline" className="font-mono text-xs text-amber-600 border-amber-200 bg-amber-50">
+                        <Badge variant="outline" className="font-mono text-xs text-amber-700 border-amber-300 bg-amber-50 dark:text-amber-400 dark:border-amber-500/30 dark:bg-amber-500/10">
                             {data.length} {data.length === 50 ? '+' : ''} detected
                         </Badge>
                     </div>
@@ -52,8 +52,8 @@ export function StaleEntitiesTable({ data, isLoading, staleDaysThreshold }: Stal
             </CardHeader>
             <CardContent>
                 {data.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center p-8 text-center border rounded-lg border-dashed text-muted-foreground bg-gray-50/50">
-                        <Clock className="h-8 w-8 mb-2 text-gray-400" />
+                    <div className="flex flex-col items-center justify-center p-8 text-center border rounded-lg border-dashed text-muted-foreground bg-muted/50">
+                        <Clock className="h-8 w-8 mb-2 text-muted-foreground/60" />
                         <p>No stale entities found.</p>
                         <p className="text-sm">Everything is moving smoothly through the pipeline.</p>
                     </div>
@@ -97,7 +97,7 @@ export function StaleEntitiesTable({ data, isLoading, staleDaysThreshold }: Stal
                                                 </span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-right text-amber-600 font-bold">
+                                        <TableCell className="text-right text-amber-600 dark:text-amber-400 font-bold">
                                             {entity.days_in_state}
                                         </TableCell>
                                     </TableRow>

@@ -12,10 +12,10 @@ export function StateDistributionChart({ data, isLoading }: StateDistributionCha
         return (
             <Card className="h-[350px] animate-pulse">
                 <CardHeader>
-                    <CardTitle className="text-transparent bg-gray-200 rounded w-48">Loading Chart</CardTitle>
+                    <CardTitle className="text-transparent bg-muted rounded w-48">Loading Chart</CardTitle>
                 </CardHeader>
                 <CardContent className="flex items-center justify-center h-48">
-                    <div className="h-32 w-32 rounded-full border-8 border-gray-100 border-t-gray-200 animate-spin" />
+                    <div className="h-32 w-32 rounded-full border-8 border-muted border-t-muted-foreground/30 animate-spin" />
                 </CardContent>
             </Card>
         );
@@ -57,13 +57,13 @@ export function StateDistributionChart({ data, isLoading }: StateDistributionCha
             </CardHeader>
             <CardContent className="flex-1 flex flex-col md:flex-row items-center justify-center gap-8 py-4">
                 {/* CSS Donut Chart */}
-                <div className="relative w-48 h-48 flex-shrink-0" style={{ filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.1))' }}>
+                <div className="relative w-48 h-48 flex-shrink-0 drop-shadow-md">
                     <div 
                         className="w-full h-full rounded-full transition-all duration-500 ease-in-out"
                         style={{ background: `conic-gradient(${gradientStops})` }}
                     />
                     {/* Inner circle for donut hole */}
-                    <div className="absolute inset-0 m-auto w-32 h-32 bg-white rounded-full shadow-inner z-10 flex items-center justify-center flex-col">
+                    <div className="absolute inset-0 m-auto w-32 h-32 bg-card rounded-full shadow-inner z-10 flex items-center justify-center flex-col">
                         <span className="text-3xl font-bold">{total}</span>
                         <span className="text-xs text-muted-foreground uppercase tracking-wider">Total</span>
                     </div>
@@ -75,7 +75,7 @@ export function StateDistributionChart({ data, isLoading }: StateDistributionCha
                         <div key={item.state_id} className="flex items-center justify-between text-sm">
                             <div className="flex items-center gap-2">
                                 <span 
-                                    className="w-3 h-3 rounded-full flex-shrink-0 ring-1 ring-gray-200" 
+                                    className="w-3 h-3 rounded-full flex-shrink-0 ring-1 ring-border" 
                                     style={{ backgroundColor: item.color }} 
                                 />
                                 <span className="font-medium truncate max-w-[120px]" title={item.name}>{item.name}</span>

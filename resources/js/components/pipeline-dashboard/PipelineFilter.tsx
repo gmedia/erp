@@ -19,7 +19,7 @@ export function PipelineFilter({
     onStaleDaysChange
 }: PipelineFilterProps) {
     return (
-        <Card className="mb-6 shadow-sm">
+        <Card className="shadow-sm">
             <CardContent className="flex flex-col sm:flex-row gap-6 p-4 items-end">
                 <div className="space-y-2 w-full sm:w-64">
                     <Label htmlFor="pipeline-filter" className="text-xs font-semibold uppercase text-muted-foreground">
@@ -29,7 +29,7 @@ export function PipelineFilter({
                         value={selectedPipelineId?.toString() || 'all'} 
                         onValueChange={onChange}
                     >
-                        <SelectTrigger id="pipeline-filter" className="border-gray-300">
+                        <SelectTrigger id="pipeline-filter">
                             <SelectValue placeholder="All Active Pipelines" />
                         </SelectTrigger>
                         <SelectContent>
@@ -51,7 +51,7 @@ export function PipelineFilter({
                         value={staleDays.toString()} 
                         onValueChange={onStaleDaysChange}
                     >
-                        <SelectTrigger id="stale-days" className="border-gray-300">
+                        <SelectTrigger id="stale-days">
                             <SelectValue placeholder="Select days" />
                         </SelectTrigger>
                         <SelectContent>
