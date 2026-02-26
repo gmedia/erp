@@ -65,7 +65,7 @@ export const StockTransferViewModal = React.memo(
 
         return (
             <Dialog open={open} onOpenChange={onClose}>
-                <DialogContent className="max-w-4xl">
+                <DialogContent className="max-w-[95vw] sm:max-w-7xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Stock Transfer Details</DialogTitle>
                         <DialogDescription>{t('common.view_details')}</DialogDescription>
