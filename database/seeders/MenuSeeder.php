@@ -352,6 +352,14 @@ class MenuSeeder extends Seeder
                         'child' => [],
                     ],
                     [
+                        'name' => 'pipeline_dashboard',
+                        'display_name' => 'Pipeline Dashboard',
+                        'permissions' => ['pipeline_dashboard'],
+                        'icon' => 'BarChart3',
+                        'url' => 'pipeline-dashboard',
+                        'child' => [],
+                    ],
+                    [
                         'name' => 'pipeline',
                         'display_name' => 'Pipeline',
                         'permissions' => ['pipeline', 'pipeline.create', 'pipeline.edit', 'pipeline.delete'],

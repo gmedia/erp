@@ -46,6 +46,7 @@ import {
     TrendingDown,
     AlertTriangle,
     GitMerge,
+    BarChart3,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -96,6 +97,7 @@ const iconMap: Record<string, LucideIcon> = {
     maintenance_cost_report: Wrench,
     AlertTriangle,
     GitMerge,
+    BarChart3,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

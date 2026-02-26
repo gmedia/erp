@@ -563,6 +563,11 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'pipeline_dashboard',
+                'display_name' => 'Pipeline Dashboard',
+                'child' => [],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],

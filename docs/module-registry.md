@@ -312,11 +312,20 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   note: "Embedded pipeline actions component for entities like Asset."
 
 - slug: entity-state-timeline
-  route: (embedded in Asset Profile)
-  api: /api/entity-states/{entityType}/{entityId}/timeline
-  view_type: embedded
-  note: "Embedded timeline feature tracking state transitions for entities."
-```
+  route: /api/entities/{entity_type}/{id}/timeline
+  api: /api/entities/{entity_type}/{id}/timeline
+  view_type: modal
+  note: "View only modal endpoint for timeline data."
+
+- slug: pipeline-dashboard
+  route: /pipeline-dashboard
+  api: /api/pipeline-dashboard/data
+  view_type: page
+  note: "Pipeline monitoring dashboard with summary cards, state distribution chart, and stale entity detection."
+
+## Testing
+
+E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 
 ---
 

@@ -8,9 +8,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('pipelines', function () {
         return Inertia::render('pipelines/index');
     })->name('pipelines')->middleware('permission:pipeline');
+
+    Route::get('pipeline-dashboard', [\App\Http\Controllers\PipelineDashboardController::class, 'index'])
+        ->name('pipeline-dashboard')
+        ->middleware('permission:pipeline_dashboard');
 });
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {    
+    Route::get('/pipeline-dashboard/data', [\App\Http\Controllers\PipelineDashboardController::class, 'getData'])
+        ->middleware('permission:pipeline_dashboard');
+
     Route::middleware('permission:pipeline,true')->group(function () {        
         Route::get('/pipelines', [PipelineController::class, 'index']);
         Route::post('/pipelines', [PipelineController::class, 'store'])->middleware('permission:pipeline.create,true');
