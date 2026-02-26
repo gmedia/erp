@@ -118,6 +118,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'inventory_stocktake',
+                'display_name' => 'Inventory Stocktake',
+                'child' => [
+                    [
+                        'name' => 'inventory_stocktake.create',
+                        'display_name' => 'Create Inventory Stocktake',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'inventory_stocktake.edit',
+                        'display_name' => 'Edit Inventory Stocktake',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'inventory_stocktake.delete',
+                        'display_name' => 'Delete Inventory Stocktake',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'employee',
                 'display_name' => 'Employee',
                 'child' => [

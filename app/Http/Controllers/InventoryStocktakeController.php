@@ -1,0 +1,113 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Actions\InventoryStocktakes\ExportInventoryStocktakesAction;
+use App\Actions\InventoryStocktakes\IndexInventoryStocktakesAction;
+use App\Actions\InventoryStocktakes\SyncInventoryStocktakeItemsAction;
+use App\DTOs\InventoryStocktakes\UpdateInventoryStocktakeData;
+use App\Http\Requests\InventoryStocktakes\ExportInventoryStocktakeRequest;
+use App\Http\Requests\InventoryStocktakes\IndexInventoryStocktakeRequest;
+use App\Http\Requests\InventoryStocktakes\StoreInventoryStocktakeRequest;
+use App\Http\Requests\InventoryStocktakes\UpdateInventoryStocktakeRequest;
+use App\Http\Resources\InventoryStocktakes\InventoryStocktakeCollection;
+use App\Http\Resources\InventoryStocktakes\InventoryStocktakeResource;
+use App\Models\InventoryStocktake;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+class InventoryStocktakeController extends Controller
+{
+    public function index(IndexInventoryStocktakeRequest $request, IndexInventoryStocktakesAction $action): JsonResponse
+    {
+        $stocktakes = $action->execute($request);
+
+        return (new InventoryStocktakeCollection($stocktakes))->response();
+    }
+
+    public function store(StoreInventoryStocktakeRequest $request, SyncInventoryStocktakeItemsAction $syncItems): JsonResponse
+    {
+        $data = $request->validated();
+        $items = $data['items'] ?? null;
+        unset($data['items']);
+
+        $data['created_by'] = Auth::id();
+
+        $stocktake = DB::transaction(function () use ($data, $items, $syncItems) {
+            $stocktake = InventoryStocktake::create($data);
+
+            if (empty($stocktake->stocktake_number)) {
+                $stocktake->update([
+                    'stocktake_number' => 'SO-' . now()->format('Y') . '-' . str_pad((string) $stocktake->id, 6, '0', STR_PAD_LEFT),
+                ]);
+            }
+
+            if (is_array($items)) {
+                $syncItems->execute($stocktake, $items);
+            }
+
+            return $stocktake;
+        });
+
+        $stocktake->load(['warehouse', 'productCategory', 'createdBy', 'completedBy', 'items.product', 'items.unit', 'items.countedBy']);
+
+        return (new InventoryStocktakeResource($stocktake))
+            ->response()
+            ->setStatusCode(201);
+    }
+
+    public function show(InventoryStocktake $inventoryStocktake): JsonResponse
+    {
+        $inventoryStocktake->load([
+            'warehouse',
+            'productCategory',
+            'createdBy',
+            'completedBy',
+            'items.product',
+            'items.unit',
+            'items.countedBy',
+        ]);
+
+        return (new InventoryStocktakeResource($inventoryStocktake))->response();
+    }
+
+    public function update(UpdateInventoryStocktakeRequest $request, InventoryStocktake $inventoryStocktake, SyncInventoryStocktakeItemsAction $syncItems): JsonResponse
+    {
+        $validated = $request->validated();
+        $items = $validated['items'] ?? null;
+        unset($validated['items']);
+
+        if (($validated['status'] ?? null) === 'completed' && $inventoryStocktake->completed_at === null) {
+            $validated['completed_by'] = Auth::id();
+            $validated['completed_at'] = now()->toIso8601String();
+        }
+
+        $dto = UpdateInventoryStocktakeData::fromArray($validated);
+
+        DB::transaction(function () use ($inventoryStocktake, $dto, $items, $syncItems) {
+            $inventoryStocktake->update($dto->toArray());
+
+            if (is_array($items)) {
+                $syncItems->execute($inventoryStocktake, $items);
+            }
+        });
+
+        $inventoryStocktake->load(['warehouse', 'productCategory', 'items.product', 'items.unit', 'items.countedBy']);
+
+        return (new InventoryStocktakeResource($inventoryStocktake))->response();
+    }
+
+    public function destroy(InventoryStocktake $inventoryStocktake): JsonResponse
+    {
+        $inventoryStocktake->update(['status' => 'cancelled']);
+
+        return response()->json(null, 204);
+    }
+
+    public function export(ExportInventoryStocktakeRequest $request, ExportInventoryStocktakesAction $action): JsonResponse
+    {
+        return $action->execute($request);
+    }
+}
+

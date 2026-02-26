@@ -100,6 +100,11 @@ import { createStockTransferFilterFields } from '@/components/stock-transfers/St
 import { StockTransferForm } from '@/components/stock-transfers/StockTransferForm';
 import { StockTransferViewModal } from '@/components/stock-transfers/StockTransferViewModal';
 import { type StockTransfer } from '@/types/stock-transfer';
+import { inventoryStocktakeColumns } from '@/components/inventory-stocktakes/InventoryStocktakeColumns';
+import { createInventoryStocktakeFilterFields } from '@/components/inventory-stocktakes/InventoryStocktakeFilters';
+import { InventoryStocktakeForm } from '@/components/inventory-stocktakes/InventoryStocktakeForm';
+import { InventoryStocktakeViewModal } from '@/components/inventory-stocktakes/InventoryStocktakeViewModal';
+import { type InventoryStocktake } from '@/types/inventory-stocktake';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -332,6 +337,29 @@ export const stockTransferConfig = createComplexEntityConfig<StockTransfer>({
     viewModalComponent: StockTransferViewModal,
     getDeleteMessage: (transfer: { transfer_number?: string | null }) =>
         `This action cannot be undone. This will cancel stock transfer ${transfer.transfer_number || ''}.`,
+});
+
+export const inventoryStocktakeConfig = createComplexEntityConfig<InventoryStocktake>({
+    entityName: 'Inventory Stocktake',
+    entityNamePlural: 'Inventory Stocktakes',
+    apiEndpoint: '/api/inventory-stocktakes',
+    exportEndpoint: '/api/inventory-stocktakes/export',
+    queryKey: ['inventory-stocktakes'],
+    breadcrumbs: [{ title: 'Inventory Stocktakes', href: '/inventory-stocktakes' }],
+    initialFilters: {
+        search: '',
+        warehouse_id: '',
+        product_category_id: '',
+        status: '',
+    },
+    columns: inventoryStocktakeColumns,
+    filterFields: createInventoryStocktakeFilterFields(),
+    formComponent: InventoryStocktakeForm,
+    formType: 'complex',
+    entityNameForSearch: 'inventory stocktake',
+    viewModalComponent: InventoryStocktakeViewModal,
+    getDeleteMessage: (stocktake: { stocktake_number?: string | null }) =>
+        `This action cannot be undone. This will cancel inventory stocktake ${stocktake.stocktake_number || ''}.`,
 });
 
 export const supplierCategoryConfig = createSimpleEntityConfig({
