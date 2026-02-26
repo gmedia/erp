@@ -126,7 +126,7 @@ export function EntityStateActions({ entityType, entityId, onStateChange }: Prop
                                                 backgroundColor: transition.to_state.color,
                                                 color: 'white'
                                             } : undefined}
-                                            className="h-8 shadow-sm"
+                                            className="h-8 shadow-sm cursor-pointer"
                                         >
                                             {processing && selectedTransition?.id === transition.id && (
                                                 <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
