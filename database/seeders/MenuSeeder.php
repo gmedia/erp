@@ -339,7 +339,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'admin',
                 'display_name' => 'Admin',
-                'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline', 'pipeline_audit_trail'],
+                'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline', 'pipeline_audit_trail', 'approval_flow'],
                 'icon' => 'Shield',
                 'url' => null,
                 'child' => [
@@ -381,6 +381,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['pipeline_audit_trail'],
                         'icon' => 'FileSearch',
                         'url' => 'pipeline-audit-trail',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'approval_flow',
+                        'display_name' => 'Approval Flow',
+                        'permissions' => ['approval_flow', 'approval_flow.create', 'approval_flow.edit', 'approval_flow.delete'],
+                        'icon' => 'CheckCircle',
+                        'url' => 'approval-flows',
                         'child' => [],
                     ],
                 ],

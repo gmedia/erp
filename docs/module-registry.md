@@ -305,6 +305,16 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   checkbox_header: false
   note: "Memiliki embedded sub-form untuk Pipeline States dan Pipeline Transitions yang dapat diakses di dalam Edit modal."
 
+- slug: approval-flows
+  route: /approval-flows
+  api: /api/approval-flows
+  export_api: /api/approval-flows/export
+  search_placeholder: "Search by Code or Name..."
+  sortable_columns: [Code, Name, Approvable Type, Status, Created At]
+  view_type: dialog
+  checkbox_header: false
+  note: "Memiliki dynamic nested array untuk Approval Flow Steps (mengatur role/user, SLA auto-approve, dll) via formik/react-hook-form."
+
 - slug: entity-state-actions
   route: (embedded in Asset Profile)
   api: /api/entity-states/{entityType}/{entityId}
@@ -380,6 +390,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 12 | Journal Entries | `journal-entries` | `JournalEntryControllerTest`, `JournalEntryExportTest` | `JournalEntryTest` | — |
 | 13 | Asset Stocktakes | `asset-stocktakes` | `AssetStocktakeControllerTest`, `AssetStocktakeExportTest` | `AssetStocktakeTest` | — |
 | 14 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
+| 15 | Approval Flows | `approval-flows` | `ApprovalFlowControllerTest` | `ApprovalFlowTest`, `ApprovalFlowStepTest` | Memiliki `ApprovalFlowFilterServiceTest` & `UpdateApprovalFlowDataTest` |
 
 ---
 

@@ -48,6 +48,7 @@ import {
     GitMerge,
     BarChart3,
     FileSearch,
+    CheckCircle,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -99,6 +100,7 @@ const iconMap: Record<string, LucideIcon> = {
     GitMerge,
     BarChart3,
     FileSearch,
+    CheckCircle,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

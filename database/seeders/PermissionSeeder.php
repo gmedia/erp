@@ -578,6 +578,27 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'approval_flow',
+                'display_name' => 'Approval Flow',
+                'child' => [
+                    [
+                        'name' => 'approval_flow.create',
+                        'display_name' => 'Create Approval Flow',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'approval_flow.edit',
+                        'display_name' => 'Edit Approval Flow',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'approval_flow.delete',
+                        'display_name' => 'Delete Approval Flow',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],

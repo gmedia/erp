@@ -47,6 +47,6 @@ require __DIR__ . '/asset_maintenance.php';
 require __DIR__ . '/asset_stocktake.php';
 require __DIR__ . '/asset_depreciation_run.php';
 require __DIR__ . '/pipeline.php';
-
+require __DIR__ . '/approval_flow.php';
 
 

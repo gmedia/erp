@@ -670,3 +670,26 @@ export const pipelineConfig = createComplexEntityConfig<Pipeline>({
     getDeleteMessage: (item: { name?: string }) =>
         `This action cannot be undone. This will permanently delete the pipeline "${item.name}".`,
 });
+
+import { approvalFlowColumns } from '@/components/approval-flows/ApprovalFlowColumns';
+import { createApprovalFlowFilterFields } from '@/components/approval-flows/ApprovalFlowFilters';
+import { ApprovalFlowForm } from '@/components/approval-flows/ApprovalFlowForm';
+import { ApprovalFlowViewModal } from '@/components/approval-flows/ApprovalFlowViewModal';
+
+export const approvalFlowConfig = createComplexEntityConfig<any>({
+    entityName: 'Approval Flow',
+    entityNamePlural: 'Approval Flows',
+    apiEndpoint: '/api/approval-flows',
+    exportEndpoint: '/api/approval-flows/export',
+    queryKey: ['approval-flows'],
+    breadcrumbs: [{ title: 'Approval Flows', href: '/approval-flows' }],
+    initialFilters: { search: '', approvable_type: '', is_active: '' },
+    columns: approvalFlowColumns as any,
+    filterFields: createApprovalFlowFilterFields(),
+    formComponent: ApprovalFlowForm,
+    formType: 'complex',
+    entityNameForSearch: 'approval flow',
+    viewModalComponent: ApprovalFlowViewModal,
+    getDeleteMessage: (item: { name?: string }) =>
+        `This action cannot be undone. This will permanently delete the approval flow "${item.name}".`,
+});
