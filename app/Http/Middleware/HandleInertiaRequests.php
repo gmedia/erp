@@ -46,7 +46,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
-            'companyName' => Setting::get('company_name', config('app.name')),
+            'companyName' => $this->getCompanyName(),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
@@ -57,6 +57,18 @@ class HandleInertiaRequests extends Middleware
             'translations' => $this->getTranslations(),
             'menus' => $this->getMenus(),
         ];
+    }
+
+    /**
+     * Get company name from cache or database.
+     *
+     * @return string
+     */
+    protected function getCompanyName(): string
+    {
+        return cache()->remember('app.company_name', 3600, function () {
+            return Setting::get('company_name') ?? config('app.name', 'Laravel');
+        });
     }
 
     /**
