@@ -108,7 +108,7 @@ chmod -R ugo+rw "database"
 chown -R 1000:1000 "database"
 
 # Fix agent skill script permissions
-for agent_dir in .agent .trae .kilocode .roo .cline; do
+for agent_dir in .agent .trae .kilocode .roo .cline .claude; do
     if [ -d "$agent_dir" ]; then
         chmod +x \
             "$agent_dir/skills/wizard.sh" \

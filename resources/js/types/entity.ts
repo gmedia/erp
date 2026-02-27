@@ -34,4 +34,5 @@ export type { Product, ProductFormData } from './product';
 export type { FiscalYear, FiscalYearFormData, FiscalYearFilters } from './fiscal-year';
 export type { AssetModel, AssetModelFormData, AssetModelFilters } from './asset-model';
 export type { AssetLocation, AssetLocationFormData, AssetLocationFilters } from './asset-location';
+export type { Pipeline } from './pipeline';
 export type { Warehouse, WarehouseFormData, WarehouseFilters } from './warehouse';

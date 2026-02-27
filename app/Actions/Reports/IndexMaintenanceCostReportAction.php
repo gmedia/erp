@@ -74,7 +74,7 @@ class IndexMaintenanceCostReportAction
              return $query->get();
         }
 
-        $perPage = $request->get('limit', 10);
+        $perPage = $request->get('per_page', 15);
         
         return $query->paginate($perPage)->withQueryString();
     }

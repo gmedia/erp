@@ -46,7 +46,7 @@ class ExportAccountMappingsAction
         Excel::store(new AccountMappingExport($validated, $query), $filePath, 'public');
 
         return response()->json([
-            'url' => Storage::url($filePath),
+            'url' => Storage::disk('public')->url($filePath),
             'filename' => $filename,
         ]);
     }

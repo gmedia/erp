@@ -249,6 +249,11 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'asset_dashboard',
+                'display_name' => 'Asset Dashboard',
+                'child' => [],
+            ],
+            [
                 'name' => 'asset_profile',
                 'display_name' => 'Asset Profile',
                 'child' => [],
@@ -603,6 +608,37 @@ class PermissionSeeder extends Seeder
                         'child' => [],
                     ],
                 ],
+            ],
+            [
+                'name' => 'pipeline',
+                'display_name' => 'Pipeline',
+                'child' => [
+                    [
+                        'name' => 'pipeline.create',
+                        'display_name' => 'Create Pipeline',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'pipeline.edit',
+                        'display_name' => 'Edit Pipeline',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'pipeline.delete',
+                        'display_name' => 'Delete Pipeline',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'pipeline_dashboard',
+                'display_name' => 'Pipeline Dashboard',
+                'child' => [],
+            ],
+            [
+                'name' => 'pipeline_audit_trail',
+                'display_name' => 'Pipeline Audit Trail',
+                'child' => [],
             ],
             [
                 'name' => 'permission',

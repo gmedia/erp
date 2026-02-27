@@ -1,22 +1,10 @@
+import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     createAsyncSelectFilterField,
     createSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
-import { Input } from '@/components/ui/input';
-import * as React from 'react';
-
-export function createDateFilterField(
-    name: string,
-    label: string,
-): FieldDescriptor {
-    return {
-        name,
-        label,
-        component: <Input type="date" className="block w-full" />,
-    };
-}
 
 export function createMaintenanceCostReportFilterFields(): FieldDescriptor[] {
     return [
@@ -61,7 +49,15 @@ export function createMaintenanceCostReportFilterFields(): FieldDescriptor[] {
             ],
             'Select status'
         ),
-        createDateFilterField('start_date', 'Start Date'),
-        createDateFilterField('end_date', 'End Date'),
+        {
+            name: 'start_date',
+            label: 'Start Date',
+            component: <FilterDatePicker placeholder="Start Date" />,
+        },
+        {
+            name: 'end_date',
+            label: 'End Date',
+            component: <FilterDatePicker placeholder="End Date" />,
+        },
     ];
 }

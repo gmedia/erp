@@ -76,6 +76,14 @@ class MenuSeeder extends Seeder
                 'url' => null,
                 'child' => [
                     [
+                        'name' => 'asset_dashboard',
+                        'display_name' => 'Asset Dashboard',
+                        'permissions' => ['asset_dashboard'],
+                        'icon' => 'BarChart',
+                        'url' => 'asset-dashboard',
+                        'child' => [],
+                    ],
+                    [
                         'name' => 'asset_data',
                         'display_name' => 'Asset Data',
                         'permissions' => ['asset', 'asset.create', 'asset.edit', 'asset.delete'],
@@ -227,7 +235,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'master.data',
                 'display_name' => 'Master Data',
-                'permissions' => ['department', 'position', 'branch', 'warehouse', 'customer_category', 'supplier_category', 'product_category', 'unit', 'product', 'fiscal_year', 'coa_version', 'account', 'account_mapping', 'asset_category', 'asset_model', 'asset_location', 'accounts'],
+                'permissions' => ['department', 'position', 'branch', 'warehouse', 'customer_category', 'supplier_category', 'product_category', 'unit', 'product', 'fiscal_year', 'coa_version', 'account', 'account_mapping', 'asset_category', 'asset_model', 'asset_location', 'accounts', 'pipeline'],
                 'icon' => 'Database',
                 'url' => null,
                 'child' => [
@@ -364,7 +372,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'admin',
                 'display_name' => 'Admin',
-                'permissions' => ['permission', 'user'],
+                'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline', 'pipeline_audit_trail'],
                 'icon' => 'Shield',
                 'url' => null,
                 'child' => [
@@ -382,6 +390,30 @@ class MenuSeeder extends Seeder
                         'permissions' => ['user'],
                         'icon' => 'User',
                         'url' => 'users',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'pipeline_dashboard',
+                        'display_name' => 'Pipeline Dashboard',
+                        'permissions' => ['pipeline_dashboard'],
+                        'icon' => 'BarChart3',
+                        'url' => 'pipeline-dashboard',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'pipeline',
+                        'display_name' => 'Pipeline',
+                        'permissions' => ['pipeline', 'pipeline.create', 'pipeline.edit', 'pipeline.delete'],
+                        'icon' => 'GitMerge',
+                        'url' => 'pipelines',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'pipeline_audit_trail',
+                        'display_name' => 'Pipeline Audit Trail',
+                        'permissions' => ['pipeline_audit_trail'],
+                        'icon' => 'FileSearch',
+                        'url' => 'pipeline-audit-trail',
                         'child' => [],
                     ],
                 ],

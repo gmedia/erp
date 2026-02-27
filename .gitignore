@@ -31,6 +31,7 @@ task.*
 /.roo*
 /.kilocode*
 /.trae*
+/.claude*
 
 # IDE helper
 _ide_helper.php

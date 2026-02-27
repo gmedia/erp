@@ -1,0 +1,30 @@
+
+> build
+> vite build
+
+vite v7.1.5 building for production...
+[plugin @laravel/vite-plugin-wayfinder] Types generated for actions, routes, form variants
+transforming...
+✓ 3420 modules transformed.
+✗ Build failed in 11.39s
+error during build:
+resources/js/components/pipelines/PipelineForm.tsx (9:9): "SelectField" is not exported by "resources/js/components/common/SelectField.tsx", imported by "resources/js/components/pipelines/PipelineForm.tsx".
+file: /var/www/html/resources/js/components/pipelines/PipelineForm.tsx:9:9
+
+ 7: import EntityForm from '@/components/common/EntityForm';
+ 8: import { InputField } from '@/components/common/InputField';
+ 9: import { SelectField } from '@/components/common/SelectField';
+             ^
+10: import { TextareaField } from '@/components/common/TextareaField';
+11: import NameField from '@/components/common/NameField';
+
+    at getRollupError (file:///var/www/html/node_modules/rollup/dist/es/shared/parseAst.js:401:41)
+    at error (file:///var/www/html/node_modules/rollup/dist/es/shared/parseAst.js:397:42)
+    at Module.error (file:///var/www/html/node_modules/rollup/dist/es/shared/node-entry.js:16875:16)
+    at Module.traceVariable (file:///var/www/html/node_modules/rollup/dist/es/shared/node-entry.js:17327:29)
+    at ModuleScope.findVariable (file:///var/www/html/node_modules/rollup/dist/es/shared/node-entry.js:14997:39)
+    at ReturnValueScope.findVariable (file:///var/www/html/node_modules/rollup/dist/es/shared/node-entry.js:5620:38)
+    at FunctionBodyScope.findVariable (file:///var/www/html/node_modules/rollup/dist/es/shared/node-entry.js:5620:38)
+    at Identifier.bind (file:///var/www/html/node_modules/rollup/dist/es/shared/node-entry.js:5394:40)
+    at CallExpression.bind (file:///var/www/html/node_modules/rollup/dist/es/shared/node-entry.js:2781:28)
+    at CallExpression.bind (file:///var/www/html/node_modules/rollup/dist/es/shared/node-entry.js:12058:15)

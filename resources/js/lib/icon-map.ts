@@ -4,6 +4,7 @@ import {
     IdCard,
     LayoutGrid,
     LucideIcon,
+    Settings,
     Settings2,
     LayoutList,
     Users,
@@ -44,6 +45,9 @@ import {
     ArrowLeftRight,
     TrendingDown,
     AlertTriangle,
+    GitMerge,
+    BarChart3,
+    FileSearch,
     Warehouse,
 } from 'lucide-react';
 
@@ -83,6 +87,7 @@ const iconMap: Record<string, LucideIcon> = {
     Link,
     Layers,
     Map,
+    Settings,
     Shield,
     Lock,
     User,
@@ -92,6 +97,9 @@ const iconMap: Record<string, LucideIcon> = {
     ArrowLeftRight,
     TrendingDown,
     AlertTriangle,
+    GitMerge,
+    BarChart3,
+    FileSearch,
     Warehouse,
 };
 

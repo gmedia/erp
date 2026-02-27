@@ -25,6 +25,8 @@ import { format } from 'date-fns';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
+import { EntityStateActions } from '@/components/pipeline/EntityStateActions';
+import { EntityStateTimeline } from '@/components/pipeline/EntityStateTimeline';
 import {
     Activity,
     AlertCircle,
@@ -64,6 +66,12 @@ interface Props {
 
 export default function AssetProfile({ asset }: Props) {
     const item = asset.data;
+    const [timelineKey, setTimelineKey] = useState(Date.now());
+
+    const handleStateChange = useCallback(() => {
+        setTimelineKey(Date.now());
+        router.reload({ only: ['asset'] });
+    }, []);
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'N/A';
@@ -82,20 +90,7 @@ export default function AssetProfile({ asset }: Props) {
         }).format(Number(value));
     };
 
-    const getStatusVariant = (status: string) => {
-        switch (status) {
-            case 'active':
-                return 'default';
-            case 'maintenance':
-                return 'secondary';
-            case 'disposed':
-                return 'destructive';
-            case 'lost':
-                return 'destructive';
-            default:
-                return 'outline';
-        }
-    };
+
 
     const getConditionVariant = (condition: string) => {
         switch (condition) {
@@ -259,18 +254,11 @@ export default function AssetProfile({ asset }: Props) {
                                 </div>
                             )}
                             <div className="flex flex-col gap-2">
-                                <Badge
-                                    variant={getStatusVariant(item.status)}
-                                    className={`px-4 py-1.5 text-sm font-medium capitalize ${item.status === 'active' ? 'animate-pulse' : ''}`}
-                                >
-                                    {item.status}
-                                </Badge>
-                                <Badge
-                                    variant={getConditionVariant(item.condition || '')}
-                                    className="px-4 py-1.5 text-sm font-medium capitalize"
-                                >
-                                    {item.condition?.replace('_', ' ') || 'Unknown'}
-                                </Badge>
+                                <EntityStateActions 
+                                    entityType="asset" 
+                                    entityId={item.ulid} 
+                                    onStateChange={handleStateChange} 
+                                />
                             </div>
                         </div>
                     </div>
@@ -278,7 +266,7 @@ export default function AssetProfile({ asset }: Props) {
 
                 <Tabs defaultValue="summary" className="w-full">
                     <div className="overflow-x-auto no-scrollbar">
-                        <TabsList className="inline-flex h-auto w-full min-w-max md:grid md:grid-cols-5 bg-muted/50 p-1">
+                        <TabsList className="inline-flex h-auto w-full min-w-max md:grid md:grid-cols-6 bg-muted/50">
                         <TabsTrigger value="summary" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <Info className="mr-2 h-4 w-4" />
                             Summary
@@ -298,6 +286,10 @@ export default function AssetProfile({ asset }: Props) {
                         <TabsTrigger value="depreciation" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <TrendingDown className="mr-2 h-4 w-4" />
                             Depreciation
+                        </TabsTrigger>
+                        <TabsTrigger value="timeline" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                            <History className="mr-2 h-4 w-4" />
+                            Timeline
                         </TabsTrigger>
                     </TabsList>
                 </div>
@@ -693,6 +685,11 @@ export default function AssetProfile({ asset }: Props) {
                                 )}
                             </CardContent>
                         </Card>
+                    </TabsContent>
+
+                    {/* Timeline Tab */}
+                    <TabsContent value="timeline" className="mt-6">
+                        <EntityStateTimeline key={timelineKey} entityType="asset" entityId={item.ulid} />
                     </TabsContent>
                 </Tabs>
             </div>

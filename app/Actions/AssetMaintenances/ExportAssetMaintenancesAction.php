@@ -20,7 +20,7 @@ class ExportAssetMaintenancesAction
         Excel::store(new AssetMaintenanceExport($filters), $filePath, 'public');
 
         return response()->json([
-            'url' => Storage::url($filePath),
+            'url' => Storage::disk('public')->url($filePath),
             'filename' => $filename,
         ]);
     }

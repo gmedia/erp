@@ -96,7 +96,7 @@ abstract class SimpleCrudExportAction
         Excel::store($export, $filePath, 'public');
 
         // Generate the public URL for download
-        $url = Storage::url($filePath);
+        $url = Storage::disk('public')->url($filePath);
 
         return response()->json([
             'url' => $url,

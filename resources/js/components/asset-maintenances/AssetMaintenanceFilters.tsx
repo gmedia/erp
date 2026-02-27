@@ -1,3 +1,4 @@
+import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     type FieldDescriptor,
     createAsyncSelectFilterField,
@@ -35,22 +36,22 @@ export const createAssetMaintenanceFilterFields = (): FieldDescriptor[] => [
     {
         name: 'scheduled_from',
         label: 'Scheduled From',
-        component: <Input type="date" />,
+        component: <FilterDatePicker placeholder="Scheduled From" />,
     },
     {
         name: 'scheduled_to',
         label: 'Scheduled To',
-        component: <Input type="date" />,
+        component: <FilterDatePicker placeholder="Scheduled To" />,
     },
     {
         name: 'performed_from',
         label: 'Performed From',
-        component: <Input type="date" />,
+        component: <FilterDatePicker placeholder="Performed From" />,
     },
     {
         name: 'performed_to',
         label: 'Performed To',
-        component: <Input type="date" />,
+        component: <FilterDatePicker placeholder="Performed To" />,
     },
     {
         name: 'cost_min',

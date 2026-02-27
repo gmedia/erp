@@ -68,7 +68,7 @@ class ExportFiscalYearsAction extends SimpleCrudExportAction
         Excel::store($export, $filePath, 'public');
 
         return response()->json([
-            'url' => Storage::url($filePath),
+            'url' => Storage::disk('public')->url($filePath),
             'filename' => $filename,
         ]);
     }

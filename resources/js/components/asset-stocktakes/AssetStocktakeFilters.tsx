@@ -1,10 +1,10 @@
+import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     type FieldDescriptor,
     createAsyncSelectFilterField,
     createSelectFilterField,
     createTextFilterField,
 } from '@/components/common/filters';
-import { Input } from '@/components/ui/input';
 
 export function createAssetStocktakeFilterFields(): FieldDescriptor[] {
     return [
@@ -24,12 +24,12 @@ export function createAssetStocktakeFilterFields(): FieldDescriptor[] {
         {
             name: 'planned_at_from',
             label: 'Planned From',
-            component: <Input type="date" />,
+            component: <FilterDatePicker placeholder="Planned From" />,
         },
         {
             name: 'planned_at_to',
             label: 'Planned To',
-            component: <Input type="date" />,
+            component: <FilterDatePicker placeholder="Planned To" />,
         },
     ];
 }

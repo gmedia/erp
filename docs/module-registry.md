@@ -322,7 +322,54 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
   note: "Laporan Stocktake Variance (Non-CRUD), menggunakan read-only data table dengan filter."
-```
+
+- slug: pipelines
+  route: /pipelines
+  api: /api/pipelines
+  export_api: /api/pipelines/export
+  search_placeholder: "Search name, code, or description..."
+  sortable_columns: [Name, Code, Entity, Version, Creator, Status]
+  view_type: dialog
+  checkbox_header: false
+  note: "Memiliki embedded sub-form untuk Pipeline States dan Pipeline Transitions yang dapat diakses di dalam Edit modal."
+
+- slug: entity-state-actions
+  route: (embedded in Asset Profile)
+  api: /api/entity-states/{entityType}/{entityId}
+  view_type: embedded
+  note: "Embedded pipeline actions component for entities like Asset."
+
+- slug: entity-state-timeline
+  route: /api/entities/{entity_type}/{id}/timeline
+  api: /api/entities/{entity_type}/{id}/timeline
+  view_type: modal
+  note: "View only modal endpoint for timeline data."
+
+- slug: pipeline-dashboard
+  route: /pipeline-dashboard
+  api: /api/pipeline-dashboard/data
+  view_type: page
+  note: "Pipeline monitoring dashboard with summary cards, state distribution chart, and stale entity detection."
+
+- slug: pipeline-audit-trail
+  route: /pipeline-audit-trail
+  api: /pipeline-audit-trail (Accepts application/json)
+  export_api: /api/pipeline-audit-trail/export
+  search_placeholder: "Search entity ID, performer, comment..."
+  sortable_columns: [Date, Pipeline, Entity Type, Entity ID, From State, To State, Transition, Performed By, Comment]
+  view_type: dialog
+  checkbox_header: false
+  note: "Non-CRUD feature for viewing and exporting pipeline state logs. Read-only Data Table with Detail modal."
+
+- modul: Asset Dashboard
+  group: asset-dashboard
+  tests:
+    - tests/e2e/asset-dashboard/asset-dashboard.spec.ts
+  note: "Non-CRUD feature for visualizing asset distribution, condition, maintenance, and warranty alerts."
+
+## Testing
+
+E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 
 ---
 
@@ -360,6 +407,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
 | 11 | Fiscal Years | `fiscal-years` | `FiscalYearControllerTest`, `FiscalYearExportTest` | `FiscalYearTest` | — |
 | 12 | Journal Entries | `journal-entries` | `JournalEntryControllerTest`, `JournalEntryExportTest` | `JournalEntryTest` | — |
 | 13 | Asset Stocktakes | `asset-stocktakes` | `AssetStocktakeControllerTest`, `AssetStocktakeExportTest` | `AssetStocktakeTest` | — |
+| 14 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
 
 ---
 
@@ -378,6 +426,10 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
 | 9 | Asset Reports | `asset-reports` | `Feature/AssetRegisterTest.php` | Laporan Asset Register |
 | 10 | Book Value Reports | `book-value-depreciation-reports` | `Feature/Reports/BookValueDepreciationReportTest.php` | Laporan Book Value & Depreciation |
 | 11 | Stocktake Variance Reports | `asset-stocktakes` | `Feature/AssetStocktakes/AssetStocktakeVarianceControllerTest.php` | Laporan Stocktake Variance |
+| 12 | Entity State Actions | `entity-state-actions` | `Feature/EntityStates/EntityStateControllerTest.php` | Pipeline actions engine per entitas |
+| 13 | Entity State Timeline | `entity-state-timeline` | `Feature/EntityStates/EntityStateTimelineTest.php` | Timeline history component per entitas |
+| 14 | Pipeline Audit Trail | `pipeline-audit-trail` | `Feature/PipelineAuditTrail/PipelineAuditTrailControllerTest.php` | Log seluruh transisi state pipeline |
+| 15 | Asset Dashboard | `asset-dashboard` | `Feature/AssetDashboard/AssetDashboardControllerTest.php` | Dashboard Visualisasi Aset |
 
 ---
 

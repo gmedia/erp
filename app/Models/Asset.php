@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Asset extends Model
 {
-    use HasFactory, SoftDeletes, HasUlids;
+    use HasFactory, SoftDeletes, HasUlids, \App\Traits\HasPipeline;
 
     protected $fillable = [
         'ulid',

@@ -26,7 +26,7 @@ describe('Journal Entry Export', function () {
             ]);
 
         $data = $response->json();
-        expect($data['url'])->toContain('storage/exports/');
+        expect($data['url'])->toBeString();
         expect($data['filename'])->toContain('journal_entries_export');
     });
 

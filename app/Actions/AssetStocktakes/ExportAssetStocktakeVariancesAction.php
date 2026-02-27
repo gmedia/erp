@@ -143,7 +143,7 @@ class ExportAssetStocktakeVariancesAction
         $writer->save(storage_path('app/public/' . $filePath));
 
         return response()->json([
-            'url' => \Illuminate\Support\Facades\Storage::url($filePath),
+            'url' => \Illuminate\Support\Facades\Storage::disk('public')->url($filePath),
             'filename' => $fileName,
         ]);
     }
