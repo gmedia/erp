@@ -17,25 +17,25 @@ class SettingSeeder extends Seeder
             [
                 'group' => 'general',
                 'key' => 'company_name',
-                'value' => '',
+                'value' => 'Dokfin',
                 'type' => 'string',
             ],
             [
                 'group' => 'general',
                 'key' => 'company_address',
-                'value' => '',
+                'value' => 'Jl. Siliwangi No.32G, Nogotirto, Kec. Gamping, Kab. Sleman, Daerah Istimewa Yogyakarta, 55592',
                 'type' => 'string',
             ],
             [
                 'group' => 'general',
                 'key' => 'company_phone',
-                'value' => '',
+                'value' => '+62274380345',
                 'type' => 'string',
             ],
             [
                 'group' => 'general',
                 'key' => 'company_email',
-                'value' => '',
+                'value' => 'mail@dokfin.com',
                 'type' => 'string',
             ],
 
