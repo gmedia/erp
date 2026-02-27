@@ -76,6 +76,14 @@ class MenuSeeder extends Seeder
                 'url' => null,
                 'child' => [
                     [
+                        'name' => 'asset_dashboard',
+                        'display_name' => 'Asset Dashboard',
+                        'permissions' => ['asset'],
+                        'icon' => 'BarChart',
+                        'url' => 'asset-dashboard',
+                        'child' => [],
+                    ],
+                    [
                         'name' => 'asset_data',
                         'display_name' => 'Asset Data',
                         'permissions' => ['asset', 'asset.create', 'asset.edit', 'asset.delete'],

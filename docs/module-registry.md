@@ -333,6 +333,12 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   checkbox_header: false
   note: "Non-CRUD feature for viewing and exporting pipeline state logs. Read-only Data Table with Detail modal."
 
+- modul: Asset Dashboard
+  group: asset-dashboard
+  tests:
+    - tests/e2e/asset-dashboard/asset-dashboard.spec.ts
+  note: "Non-CRUD feature for visualizing asset distribution, condition, maintenance, and warranty alerts."
+
 ## Testing
 
 E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
@@ -395,6 +401,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 12 | Entity State Actions | `entity-state-actions` | `Feature/EntityStates/EntityStateControllerTest.php` | Pipeline actions engine per entitas |
 | 13 | Entity State Timeline | `entity-state-timeline` | `Feature/EntityStates/EntityStateTimelineTest.php` | Timeline history component per entitas |
 | 14 | Pipeline Audit Trail | `pipeline-audit-trail` | `Feature/PipelineAuditTrail/PipelineAuditTrailControllerTest.php` | Log seluruh transisi state pipeline |
+| 15 | Asset Dashboard | `asset-dashboard` | `Feature/AssetDashboard/AssetDashboardControllerTest.php` | Dashboard Visualisasi Aset |
 
 ---
 
