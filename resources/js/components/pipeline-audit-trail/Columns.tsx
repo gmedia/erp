@@ -49,9 +49,8 @@ export const createPipelineAuditTrailColumns = ({ onViewDetail }: ColumnsProps):
     },
     {
         accessorKey: 'entity_type',
-        header: 'Entity Type',
+        ...createSortingHeader('Entity Type'),
         cell: ({ row }) => <div>{row.original.entity_type_short}</div>,
-        enableSorting: true,
     },
     {
         accessorKey: 'entity_id',
@@ -103,9 +102,8 @@ export const createPipelineAuditTrailColumns = ({ onViewDetail }: ColumnsProps):
     },
     {
         accessorKey: 'performed_by',
-        header: 'Performed By',
+        ...createSortingHeader('Performed By'),
         cell: ({ row }) => <div>{row.original.performed_by_name}</div>,
-        enableSorting: true,
     },
     {
         accessorKey: 'comment',
