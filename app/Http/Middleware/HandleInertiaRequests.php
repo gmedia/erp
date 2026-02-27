@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Http\Resources\MenuResource;
 use App\Models\Employee;
 use App\Models\Menu;
+use App\Models\Setting;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -45,6 +46,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            'companyName' => Setting::get('company_name', config('app.name')),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),

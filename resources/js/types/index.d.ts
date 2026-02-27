@@ -42,6 +42,7 @@ export interface SharedData {
         user: import('./user').User;
     };
     name: string;
+    companyName: string;
     quote?: {
         message: string;
         author: string;
