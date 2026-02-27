@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Warehouses\ExportWarehousesAction;
 use App\Actions\Warehouses\IndexWarehousesAction;
+use App\Domain\Warehouses\WarehouseFilterService;
 use App\Http\Requests\Warehouses\ExportWarehouseRequest;
 use App\Http\Requests\Warehouses\IndexWarehouseRequest;
 use App\Http\Requests\Warehouses\StoreWarehouseRequest;
@@ -27,7 +28,7 @@ class WarehouseController extends Controller
      */
     public function index(IndexWarehouseRequest $request): JsonResponse
     {
-        $warehouses = (new IndexWarehousesAction())->execute($request);
+        $warehouses = (new IndexWarehousesAction(app(WarehouseFilterService::class)))->execute($request);
 
         return (new WarehouseCollection($warehouses))->response();
     }
@@ -38,6 +39,7 @@ class WarehouseController extends Controller
     public function store(StoreWarehouseRequest $request): JsonResponse
     {
         $warehouse = Warehouse::create($request->validated());
+        $warehouse->load(['branch']);
 
         return (new WarehouseResource($warehouse))
             ->response()
@@ -49,6 +51,8 @@ class WarehouseController extends Controller
      */
     public function show(Warehouse $warehouse): JsonResponse
     {
+        $warehouse->load(['branch']);
+
         return (new WarehouseResource($warehouse))->response();
     }
 
@@ -58,6 +62,7 @@ class WarehouseController extends Controller
     public function update(UpdateWarehouseRequest $request, Warehouse $warehouse): JsonResponse
     {
         $warehouse->update($request->validated());
+        $warehouse->load(['branch']);
 
         return (new WarehouseResource($warehouse))->response();
     }
@@ -75,8 +80,8 @@ class WarehouseController extends Controller
     /**
      * Export warehouses to Excel based on filters.
      */
-    public function export(ExportWarehouseRequest $request): JsonResponse
+    public function export(ExportWarehouseRequest $request, ExportWarehousesAction $action): JsonResponse
     {
-        return (new ExportWarehousesAction())->execute($request);
+        return $action->execute($request);
     }
 }

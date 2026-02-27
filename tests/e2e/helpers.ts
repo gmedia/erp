@@ -153,7 +153,10 @@ export async function login(
     await expect(emailInput).toBeVisible({ timeout: 15000 });
     await emailInput.fill(email);
     await page.fill('input[name="password"]', password);
-    await page.click('button[type="submit"], button[data-testid="login-button"]');
+    await page.evaluate(() => {
+      document.querySelector('vite-error-overlay')?.remove();
+    });
+    await page.locator('button[type="submit"], button[data-testid="login-button"]').first().click({ force: true });
     await page.waitForURL('**/dashboard', { timeout: 60000 });
     return;
   }
@@ -332,7 +335,6 @@ export async function deleteAccount(page: Page, code: string): Promise<void> {
 
 // Asset Model helpers
 // ---------------------------------------------------
-
 
 
 

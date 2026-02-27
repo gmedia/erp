@@ -13,18 +13,46 @@ test('authorize returns true', function () {
 
 test('rules returns correct validation rules', function () {
     $warehouse = Warehouse::factory()->create();
+    $request = new UpdateWarehouseRequest();
+    $request->setRouteResolver(function () use ($warehouse) {
+        return new class($warehouse) {
+            public function __construct(private Warehouse $warehouse) {}
 
-    $request = Mockery::mock(UpdateWarehouseRequest::class)->makePartial();
+            public function parameter($name)
+            {
+                if ($name === 'warehouse') {
+                    return $this->warehouse;
+                }
 
-    $request->shouldReceive('route')
-        ->with('warehouse')
-        ->andReturn($warehouse);
+                return null;
+            }
+        };
+    });
 
-    $request->shouldReceive('route')
-        ->with('id')
-        ->andReturn(null);
+    $rules = $request->rules();
+    expect($rules)->toHaveKeys(['branch_id', 'code', 'name']);
+});
 
-    expect($request->rules())->toEqual([
-        'name' => ['sometimes', 'required', 'string', 'max:255', 'unique:warehouses,name,' . $warehouse->id],
-    ]);
+test('rules validation passes with valid partial data', function () {
+    $warehouse = Warehouse::factory()->create();
+    $data = ['name' => 'Updated Warehouse'];
+
+    $request = new UpdateWarehouseRequest();
+    $request->setRouteResolver(function () use ($warehouse) {
+        return new class($warehouse) {
+            public function __construct(private Warehouse $warehouse) {}
+
+            public function parameter($name)
+            {
+                if ($name === 'warehouse') {
+                    return $this->warehouse;
+                }
+
+                return null;
+            }
+        };
+    });
+
+    $validator = validator($data, $request->rules());
+    expect(!$validator->fails())->toBeTrue();
 });

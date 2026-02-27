@@ -2,7 +2,7 @@ import { type FormComponentType } from '@/components/common/EntityCrudPage';
 import { type FieldDescriptor } from '@/components/common/filters';
 import { type FilterState } from '@/hooks/useCrudFilters';
 import { type BreadcrumbItem } from '@/types';
-import { type EntityWithId } from '@/types/entity';
+import { type EntityWithId, type Warehouse } from '@/types/entity';
 import { type ColumnDef } from '@tanstack/react-table';
 import * as React from 'react';
 
@@ -67,6 +67,10 @@ import { createSupplierFilterFields } from '@/components/suppliers/SupplierFilte
 import { SupplierForm } from '@/components/suppliers/SupplierForm';
 import { createSimpleEntityColumns } from '@/utils/columns';
 import { SupplierViewModal } from '@/components/suppliers/SupplierViewModal';
+import { warehouseColumns } from '@/components/warehouses/WarehouseColumns';
+import { createWarehouseFilterFields } from '@/components/warehouses/WarehouseFilters';
+import { WarehouseForm } from '@/components/warehouses/WarehouseForm';
+import { WarehouseViewModal } from '@/components/warehouses/WarehouseViewModal';
 import { productColumns } from '@/components/products/ProductColumns';
 import { createProductFilterFields } from '@/components/products/ProductFilters';
 import { ProductForm } from '@/components/products/ProductForm';
@@ -237,11 +241,22 @@ export const branchConfig = createSimpleEntityConfig({
     filterPlaceholder: 'Search branches...',
 });
 
-export const warehouseConfig = createSimpleEntityConfig({
+export const warehouseConfig = createComplexEntityConfig<Warehouse>({
     entityName: 'Warehouse',
     entityNamePlural: 'Warehouses',
-    apiBase: 'warehouses',
-    filterPlaceholder: 'Search warehouses...',
+    apiEndpoint: '/api/warehouses',
+    exportEndpoint: '/api/warehouses/export',
+    queryKey: ['warehouses'],
+    breadcrumbs: [{ title: 'Warehouses', href: '/warehouses' }],
+    initialFilters: { search: '', branch_id: '' },
+    columns: warehouseColumns,
+    filterFields: createWarehouseFilterFields(),
+    formComponent: WarehouseForm,
+    formType: 'complex',
+    entityNameForSearch: 'warehouse',
+    viewModalComponent: WarehouseViewModal,
+    getDeleteMessage: (item: { name?: string; code?: string }) =>
+        `This action cannot be undone. This will permanently delete warehouse ${item.code} (${item.name}).`,
 });
 
 // Configuration for complex entities (employees) - using factory for consistency

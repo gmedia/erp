@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Warehouse;
+use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\actingAs;
@@ -38,7 +39,7 @@ describe('Warehouse API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'name', 'created_at', 'updated_at']
+                    '*' => ['id', 'branch_id', 'branch', 'code', 'name', 'created_at', 'updated_at']
                 ],
                 'meta' => ['total', 'per_page', 'current_page']
             ]);
@@ -76,7 +77,10 @@ describe('Warehouse API Endpoints', function () {
     });
 
     test('store creates warehouse', function () {
+        $branch = Branch::factory()->create();
         $data = [
+            'branch_id' => $branch->id,
+            'code' => 'WH-NEW',
             'name' => 'New Warehouse',
         ];
 
@@ -85,18 +89,47 @@ describe('Warehouse API Endpoints', function () {
         $response->assertCreated()
             ->assertJsonFragment(['name' => 'New Warehouse']);
 
-        assertDatabaseHas('warehouses', ['name' => 'New Warehouse']);
+        assertDatabaseHas('warehouses', ['name' => 'New Warehouse', 'code' => 'WH-NEW', 'branch_id' => $branch->id]);
     });
 
     test('store validates unique name', function () {
+        $branch = Branch::factory()->create();
         Warehouse::factory()->create(['name' => 'Existing Warehouse']);
 
         $response = postJson('/api/warehouses', [
+            'branch_id' => $branch->id,
+            'code' => 'WH-EXIST',
             'name' => 'Existing Warehouse',
         ]);
 
         $response->assertUnprocessable()
             ->assertJsonValidationErrors(['name']);
+    });
+
+    test('index supports filtering by branch', function () {
+        $branch1 = Branch::factory()->create(['name' => 'Branch 1']);
+        $branch2 = Branch::factory()->create(['name' => 'Branch 2']);
+
+        Warehouse::factory()->create(['branch_id' => $branch1->id]);
+        Warehouse::factory()->count(2)->create(['branch_id' => $branch2->id]);
+
+        $response = getJson("/api/warehouses?branch_id={$branch1->id}");
+
+        $response->assertOk();
+        expect($response->json('data'))->toHaveCount(1);
+    });
+
+    test('index supports sorting by branch name', function () {
+        $branchA = Branch::factory()->create(['name' => 'A Branch']);
+        $branchB = Branch::factory()->create(['name' => 'B Branch']);
+
+        Warehouse::factory()->create(['branch_id' => $branchA->id, 'name' => 'Warehouse 1']);
+        Warehouse::factory()->create(['branch_id' => $branchB->id, 'name' => 'Warehouse 2']);
+
+        $response = getJson('/api/warehouses?sort_by=branch&sort_direction=asc');
+
+        $response->assertOk();
+        expect($response->json('data.0.branch.name'))->toBe('A Branch');
     });
 
     test('update modifies warehouse', function () {

@@ -2,29 +2,40 @@
 
 namespace App\Actions\Warehouses;
 
-use App\Actions\Concerns\SimpleCrudExportAction;
 use App\Exports\WarehouseExport;
-use App\Models\Warehouse;
-use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
+use App\Http\Requests\Warehouses\ExportWarehouseRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Action to export warehouses to Excel based on filters.
  */
-class ExportWarehousesAction extends SimpleCrudExportAction
+class ExportWarehousesAction
 {
-    protected function getModelClass(): string
+    public function execute(ExportWarehouseRequest $request): JsonResponse
     {
-        return Warehouse::class;
-    }
+        $validated = $request->validated();
 
-    protected function getExportInstance(array $filters, ?Builder $query): FromQuery
-    {
-        return new WarehouseExport($filters, $query);
-    }
+        $filters = [
+            'search' => $validated['search'] ?? null,
+            'branch_id' => $validated['branch_id'] ?? null,
+            'sort_by' => $validated['sort_by'] ?? 'created_at',
+            'sort_direction' => $validated['sort_direction'] ?? 'desc',
+        ];
 
-    protected function getFilenamePrefix(): string
-    {
-        return 'warehouses';
+        $filters = array_filter($filters);
+
+        $filename = 'warehouses_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+        $filePath = 'exports/' . $filename;
+
+        Excel::store(new WarehouseExport($filters), $filePath, 'public');
+
+        $url = Storage::url($filePath);
+
+        return response()->json([
+            'url' => $url,
+            'filename' => $filename,
+        ]);
     }
 }

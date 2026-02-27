@@ -6,4 +6,17 @@ use App\Http\Requests\SimpleCrudExportRequest;
 
 class ExportWarehouseRequest extends SimpleCrudExportRequest
 {
+    public function rules(): array
+    {
+        $rules = parent::rules();
+        $rules['sort_by'] = [
+            'nullable',
+            'string',
+            'in:id,code,name,branch,created_at,updated_at',
+        ];
+
+        return array_merge($rules, [
+            'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
+        ]);
+    }
 }

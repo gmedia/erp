@@ -12,11 +12,20 @@ generateModuleTests({
     editEntity: (page, identifier, updates) => editWarehouse(page, identifier, updates),
     editUpdates: { name: `Warehouse-Updated-${Date.now()}` },
 
-    sortableColumns: ['Name', 'Created At', 'Updated At'],
+    sortableColumns: ['Code', 'Name', 'Branch'],
 
     viewType: 'dialog',
     viewDialogTitle: 'Warehouse Details',
 
     exportApiPath: '/api/warehouses/export',
-    expectedExportColumns: ['ID', 'Name', 'Created At', 'Updated At'],
+    expectedExportColumns: ['ID', 'Code', 'Name', 'Branch', 'Created At'],
+
+    filterTests: [
+        {
+            filterName: 'Branch',
+            filterType: 'combobox',
+            filterValue: 'Branch 1',
+            expectedText: 'Branch 1',
+        },
+    ],
 });

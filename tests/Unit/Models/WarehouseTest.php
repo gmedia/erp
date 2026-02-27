@@ -13,6 +13,8 @@ test('factory creates a valid warehouse', function () {
     assertDatabaseHas('warehouses', ['id' => $warehouse->id]);
 
     expect($warehouse->getAttributes())->toMatchArray([
+        'branch_id' => $warehouse->branch_id,
+        'code' => $warehouse->code,
         'name' => $warehouse->name,
     ]);
 });
@@ -21,7 +23,8 @@ test('fillable attributes are defined correctly', function () {
     $fillable = (new Warehouse)->getFillable();
 
     expect($fillable)->toBe([
+        'branch_id',
+        'code',
         'name',
     ]);
 });
-

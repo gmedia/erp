@@ -21,10 +21,10 @@ test('execute generates excel file and returns url', function () {
     $request = Mockery::mock(ExportWarehouseRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'search' => null,
+        'branch_id' => null,
         'sort_by' => 'created_at',
         'sort_direction' => 'desc',
     ]);
-    $request->shouldReceive('filled')->with('search')->andReturn(false);
 
     $result = $action->execute($request);
 
@@ -49,10 +49,10 @@ test('execute filters export by search term', function () {
     $request = Mockery::mock(ExportWarehouseRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'search' => 'Main',
+        'branch_id' => null,
         'sort_by' => 'created_at',
         'sort_direction' => 'desc',
     ]);
-    $request->shouldReceive('filled')->with('search')->andReturn(true);
 
     $action->execute($request);
 

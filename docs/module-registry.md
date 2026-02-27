@@ -62,16 +62,6 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
 
-- slug: warehouses
-  route: /warehouses
-  api: /api/warehouses
-  export_api: /api/warehouses/export
-  search_placeholder: "Search warehouses..."
-  sortable_columns: [Name, Created At, Updated At]
-  view_type: dialog
-  view_dialog_title: "Warehouse Details"
-  checkbox_header: false
-
 - slug: supplier-categories
   route: /supplier-categories
   api: /api/supplier-categories
@@ -114,6 +104,16 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   sortable_columns: [Name, Created At, Updated At]
   non_sortable_columns: [Symbol]
   view_type: dialog
+  checkbox_header: false
+
+- slug: warehouses
+  route: /warehouses
+  api: /api/warehouses
+  export_api: /api/warehouses/export
+  search_placeholder: "Search warehouses..."
+  sortable_columns: [Code, Name, Branch]
+  view_type: dialog
+  view_dialog_title: "Warehouse Details"
   checkbox_header: false
 
 - slug: employees

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Branch;
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,6 +24,8 @@ class WarehouseFactory extends Factory
     public function definition(): array
     {
         return [
+            'branch_id' => Branch::factory(),
+            'code' => $this->faker->unique()->bothify('WH-###'),
             'name' => $this->faker->company() . ' Warehouse',
         ];
     }
