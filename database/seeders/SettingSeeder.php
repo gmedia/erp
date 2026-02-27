@@ -29,7 +29,7 @@ class SettingSeeder extends Seeder
             [
                 'group' => 'general',
                 'key' => 'company_phone',
-                'value' => '+62274380345',
+                'value' => '+62 274 380 345',
                 'type' => 'string',
             ],
             [
