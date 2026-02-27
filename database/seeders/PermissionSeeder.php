@@ -587,6 +587,17 @@ class PermissionSeeder extends Seeder
                 'display_name' => 'User',
                 'child' => [],
             ],
+            [
+                'name' => 'admin_setting',
+                'display_name' => 'Admin Setting',
+                'child' => [
+                    [
+                        'name' => 'admin_setting.edit',
+                        'display_name' => 'Edit Admin Setting',
+                        'child' => [],
+                    ],
+                ],
+            ],
         ];
 
         $permissions = $this->createPermissions($permissions);

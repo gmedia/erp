@@ -339,6 +339,14 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
     - tests/e2e/asset-dashboard/asset-dashboard.spec.ts
   note: "Non-CRUD feature for visualizing asset distribution, condition, maintenance, and warranty alerts."
 
+- slug: admin-settings
+  route: /admin-settings
+  api: PUT /admin-settings
+  view_type: page
+  note: "Non-CRUD settings page. Grouped key-value form (General, Regional). Requires admin_setting permission."
+  tests:
+    - tests/e2e/admin-settings/admin-settings.spec.ts
+
 ## Testing
 
 E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
@@ -402,6 +410,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 13 | Entity State Timeline | `entity-state-timeline` | `Feature/EntityStates/EntityStateTimelineTest.php` | Timeline history component per entitas |
 | 14 | Pipeline Audit Trail | `pipeline-audit-trail` | `Feature/PipelineAuditTrail/PipelineAuditTrailControllerTest.php` | Log seluruh transisi state pipeline |
 | 15 | Asset Dashboard | `asset-dashboard` | `Feature/AssetDashboard/AssetDashboardControllerTest.php` | Dashboard Visualisasi Aset |
+| 16 | Admin Settings | `admin-settings` | `Feature/AdminSettings/AdminSettingControllerTest.php`, `Unit/Models/SettingTest.php` | Non-CRUD settings page (General, Regional) |
 
 ---
 

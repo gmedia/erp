@@ -339,10 +339,18 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'admin',
                 'display_name' => 'Admin',
-                'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline', 'pipeline_audit_trail'],
+                'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline', 'pipeline_audit_trail', 'admin_setting'],
                 'icon' => 'Shield',
                 'url' => null,
                 'child' => [
+                    [
+                        'name' => 'admin_setting',
+                        'display_name' => 'Setting',
+                        'permissions' => ['admin_setting', 'admin_setting.edit'],
+                        'icon' => 'Settings',
+                        'url' => 'admin-settings',
+                        'child' => [],
+                    ],
                     [
                         'name' => 'permission',
                         'display_name' => 'Permission',
