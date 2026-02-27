@@ -186,6 +186,11 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'asset_dashboard',
+                'display_name' => 'Asset Dashboard',
+                'child' => [],
+            ],
+            [
                 'name' => 'asset_profile',
                 'display_name' => 'Asset Profile',
                 'child' => [],
