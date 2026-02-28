@@ -424,7 +424,7 @@ export const approvalFlowFormSchema = z.object({
             escalation_user_id: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
             can_reject: z.union([z.boolean(), z.string()]).transform((val) => val === true || val === 'true'),
         })
-    ).min(1, 'At least one step is required'),
+    ).optional(),
 });
 
 export type ApprovalFlowFormData = z.infer<typeof approvalFlowFormSchema>;

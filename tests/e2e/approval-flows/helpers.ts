@@ -42,26 +42,8 @@ export async function createApprovalFlow(
   // Description
   await page.fill('textarea[name="description"]', 'E2E testing description');
 
-  // Dialog interaction loop for nested steps
-  await page.fill('input[name="steps.0.name"]', 'Manager Review');
-  
-  const stepActionCombobox = page.getByRole('combobox', { name: /Required Action/i }).first();
-  await expect(stepActionCombobox).toBeVisible();
-  await stepActionCombobox.click();
-  await page.getByRole('option', { name: 'Review', exact: true }).click();
-
-  // Approver type (Specific Role for easier E2E execution without selecting dynamic comboboxes)
-  const approverTypeCombobox = page.getByRole('combobox', { name: /Approver Type/i }).first();
-  await approverTypeCombobox.click();
-  await page.getByRole('option', { name: 'Specific Role', exact: true }).click({ force: true });
-  await page.fill('input[name="steps.0.approver_role_id"]', '1');
-
-  // Ensure the dialog is visible before interacting
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
-  
-  // Wait for React hook form to synchronize before submitting
-  await expect(page.locator('input[name="steps.0.approver_role_id"]')).toHaveValue('1');
   
   const submitButton = dialog.locator('button[type="submit"]');
   await expect(submitButton).toBeVisible();

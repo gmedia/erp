@@ -33,20 +33,22 @@ class ApprovalFlowController extends Controller
                 'created_by' => auth()->id(),
             ]);
 
-            foreach ($validated['steps'] as $index => $stepData) {
-                $flow->steps()->create([
-                    'step_order' => $index + 1,
-                    'name' => $stepData['name'],
-                    'approver_type' => $stepData['approver_type'],
-                    'approver_user_id' => $stepData['approver_user_id'] ?? null,
-                    'approver_role_id' => $stepData['approver_role_id'] ?? null,
-                    'approver_department_id' => $stepData['approver_department_id'] ?? null,
-                    'required_action' => $stepData['required_action'],
-                    'auto_approve_after_hours' => $stepData['auto_approve_after_hours'] ?? null,
-                    'escalate_after_hours' => $stepData['escalate_after_hours'] ?? null,
-                    'escalation_user_id' => $stepData['escalation_user_id'] ?? null,
-                    'can_reject' => $stepData['can_reject'] ?? true,
-                ]);
+            if (!empty($validated['steps'])) {
+                foreach ($validated['steps'] as $index => $stepData) {
+                    $flow->steps()->create([
+                        'step_order' => $index + 1,
+                        'name' => $stepData['name'],
+                        'approver_type' => $stepData['approver_type'],
+                        'approver_user_id' => $stepData['approver_user_id'] ?? null,
+                        'approver_role_id' => $stepData['approver_role_id'] ?? null,
+                        'approver_department_id' => $stepData['approver_department_id'] ?? null,
+                        'required_action' => $stepData['required_action'],
+                        'auto_approve_after_hours' => $stepData['auto_approve_after_hours'] ?? null,
+                        'escalate_after_hours' => $stepData['escalate_after_hours'] ?? null,
+                        'escalation_user_id' => $stepData['escalation_user_id'] ?? null,
+                        'can_reject' => $stepData['can_reject'] ?? true,
+                    ]);
+                }
             }
 
             return $flow->load(['steps.user', 'steps.department', 'creator']);

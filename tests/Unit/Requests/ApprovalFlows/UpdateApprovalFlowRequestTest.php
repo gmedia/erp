@@ -36,7 +36,7 @@ test('rules returns correct validation rules', function () {
         'is_active' => 'boolean',
         'conditions' => 'nullable|array',
         
-        'steps' => 'sometimes|required|array|min:1',
+        'steps' => 'nullable|array',
         'steps.*.id' => 'nullable|exists:approval_flow_steps,id',
         'steps.*.name' => 'required|string|max:255',
         'steps.*.approver_type' => 'required|in:user,role,department_head',

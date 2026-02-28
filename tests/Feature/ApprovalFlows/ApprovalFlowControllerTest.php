@@ -185,8 +185,7 @@ describe('Approval Flow API Endpoints', function () {
             ->assertJsonValidationErrors([
                 'name',
                 'code',
-                'approvable_type',
-                'steps'
+                'approvable_type'
             ]);
     });
 

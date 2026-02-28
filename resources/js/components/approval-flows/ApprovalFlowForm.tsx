@@ -11,8 +11,8 @@ import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import NameField from '@/components/common/NameField';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2 } from 'lucide-react';
 import { type ApprovalFlow } from '@/types/entity';
+import { ApprovalFlowStepManager } from './ApprovalFlowStepManager';
 import { approvalFlowFormSchema, type ApprovalFlowFormData } from '@/utils/schemas';
 import AsyncSelectField from '../common/AsyncSelectField';
 
@@ -35,20 +35,7 @@ const getFormDefaults = (item?: ApprovalFlow | null): any => {
             description: '',
             is_active: true,
             conditions: '',
-            steps: [
-                {
-                    name: 'Step 1',
-                    approver_type: 'user',
-                    approver_user_id: null,
-                    approver_role_id: null,
-                    approver_department_id: null,
-                    required_action: 'approve',
-                    auto_approve_after_hours: null,
-                    escalate_after_hours: null,
-                    escalation_user_id: null,
-                    can_reject: true,
-                }
-            ],
+            steps: [],
         };
     }
 
@@ -89,7 +76,7 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(function ApprovalFlo
         defaultValues,
     });
 
-    const { fields, append, remove } = useFieldArray({
+    const fieldArrayProps = useFieldArray({
         control: form.control,
         name: 'steps',
     });
@@ -120,7 +107,7 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(function ApprovalFlo
             isLoading={isLoading}
             className="max-w-4xl"
         >
-            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+            <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                     <NameField name="name" label="Flow Name" placeholder="e.g. Standard PR Flow" />
                     <InputField name="code" label="Code" placeholder="e.g. std_pr_flow" />
@@ -162,130 +149,9 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(function ApprovalFlo
                     rows={2}
                 />
 
-                <div className="mt-8 border-t pt-4">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-medium">Approval Steps</h3>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => append({
-                                name: `Step ${fields.length + 1}`,
-                                approver_type: 'user',
-                                approver_user_id: null,
-                                approver_role_id: null,
-                                approver_department_id: null,
-                                required_action: 'approve',
-                                auto_approve_after_hours: null,
-                                escalate_after_hours: null,
-                                escalation_user_id: null,
-                                can_reject: true,
-                            })}
-                        >
-                            <Plus className="w-4 h-4 mr-2" /> Add Step
-                        </Button>
-                    </div>
-
-                    <div className="space-y-4">
-                        {fields.map((field, index) => {
-                            const approverType = form.watch(`steps.${index}.approver_type`);
-                            
-                            return (
-                                <div key={field.id} className="border p-4 rounded-md shadow-sm relative space-y-4 bg-gray-50">
-                                    <div className="absolute top-2 right-2">
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="icon"
-                                            className="text-red-500 hover:text-red-700"
-                                            onClick={() => remove(index)}
-                                            disabled={fields.length === 1}
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4 pr-8">
-                                        <InputField name={`steps.${index}.name`} label="Step Name" placeholder="e.g. Manager Approval" />
-                                        <SelectField
-                                            name={`steps.${index}.required_action`}
-                                            label="Required Action"
-                                            options={[
-                                                { value: 'approve', label: 'Approve' },
-                                                { value: 'review', label: 'Review' },
-                                                { value: 'acknowledge', label: 'Acknowledge' },
-                                            ]}
-                                        />
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <SelectField
-                                            name={`steps.${index}.approver_type`}
-                                            label="Approver Type"
-                                            options={[
-                                                { value: 'user', label: 'Specific User' },
-                                                { value: 'department_head', label: 'Department Head' },
-                                                { value: 'role', label: 'Specific Role' },
-                                            ]}
-                                        />
-                                        
-                                        {approverType === 'user' && (
-                                            <AsyncSelectField
-                                                name={`steps.${index}.approver_user_id`}
-                                                label="Select User"
-                                                url="/api/users"
-                                                labelFn={(user) => user.name}
-                                                valueFn={(user) => String(user.id)}
-                                                placeholder="Select user..."
-                                            />
-                                        )}
-                                        {approverType === 'department_head' && (
-                                            <AsyncSelectField
-                                                name={`steps.${index}.approver_department_id`}
-                                                label="Select Department"
-                                                url="/api/departments"
-                                                labelFn={(dept) => dept.name}
-                                                valueFn={(dept) => String(dept.id)}
-                                                placeholder="Select department..."
-                                            />
-                                        )}
-                                        {approverType === 'role' && (
-                                            <InputField
-                                                name={`steps.${index}.approver_role_id`}
-                                                label="Role ID"
-                                                type="number"
-                                                placeholder="Enter Role ID"
-                                            />
-                                        )}
-                                    </div>
-
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <InputField
-                                            name={`steps.${index}.auto_approve_after_hours`}
-                                            label="Auto Approve After (Hours)"
-                                            type="number"
-                                            placeholder="e.g. 48"
-                                        />
-                                        <InputField
-                                            name={`steps.${index}.escalate_after_hours`}
-                                            label="Escalate After (Hours)"
-                                            type="number"
-                                            placeholder="e.g. 24"
-                                        />
-                                        <AsyncSelectField
-                                            name={`steps.${index}.escalation_user_id`}
-                                            label="Escalate To User"
-                                            url="/api/users"
-                                            labelFn={(user) => user.name}
-                                            valueFn={(user) => String(user.id)}
-                                            placeholder="Select user..."
-                                        />
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
+                {item && (
+                    <ApprovalFlowStepManager fieldArrayProps={fieldArrayProps} />
+                )}
             </div>
         </EntityForm>
     );
