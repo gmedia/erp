@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -23,6 +24,9 @@ export function AssetMaintenanceViewModal({ open, onClose, item }: AssetMaintena
             <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                     <DialogTitle>Maintenance Details</DialogTitle>
+                    <DialogDescription>
+                        View complete maintenance information for the selected asset.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4 py-2">
