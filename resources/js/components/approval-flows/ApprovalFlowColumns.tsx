@@ -3,37 +3,7 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { createSortingHeader, createSelectColumn, createActionsColumn } from '@/utils/columns';
 
-export interface ApprovalFlowStep {
-    id?: number;
-    approval_flow_id?: number;
-    step_order: number;
-    name: string;
-    approver_type: 'user' | 'role' | 'department_head';
-    approver_user_id: number | null;
-    approver_role_id: number | null;
-    approver_department_id: number | null;
-    required_action: 'approve' | 'review' | 'acknowledge';
-    auto_approve_after_hours: number | null;
-    escalate_after_hours: number | null;
-    escalation_user_id: number | null;
-    can_reject: boolean;
-    user?: { id: number; name: string };
-    department?: { id: number; name: string };
-}
-
-export interface ApprovalFlow {
-    id: number;
-    code: string;
-    name: string;
-    approvable_type: string;
-    description: string | null;
-    is_active: boolean;
-    conditions: any | null;
-    created_at: string;
-    updated_at: string;
-    creator?: { id: number; name: string };
-    steps?: ApprovalFlowStep[];
-}
+import { type ApprovalFlow } from '@/types/entity';
 
 export const approvalFlowColumns: ColumnDef<ApprovalFlow>[] = [
     createSelectColumn<ApprovalFlow>(),

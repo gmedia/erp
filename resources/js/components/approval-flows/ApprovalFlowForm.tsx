@@ -12,34 +12,9 @@ import { TextareaField } from '@/components/common/TextareaField';
 import NameField from '@/components/common/NameField';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
-import { type ApprovalFlow } from './ApprovalFlowColumns';
+import { type ApprovalFlow } from '@/types/entity';
+import { approvalFlowFormSchema, type ApprovalFlowFormData } from '@/utils/schemas';
 import AsyncSelectField from '../common/AsyncSelectField';
-
-export const approvalFlowFormSchema = z.object({
-    name: z.string().min(1, 'Name is required'),
-    code: z.string().min(1, 'Code is required'),
-    approvable_type: z.string().min(1, 'Approvable Type is required'),
-    description: z.string().nullable().optional(),
-    is_active: z.union([z.boolean(), z.string()]).transform((val) => val === true || val === 'true'),
-    conditions: z.string().nullable().optional(),
-    steps: z.array(
-        z.object({
-            id: z.number().optional(),
-            name: z.string().min(1, 'Step name is required'),
-            approver_type: z.enum(['user', 'role', 'department_head']),
-            approver_user_id: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
-            approver_role_id: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
-            approver_department_id: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
-            required_action: z.enum(['approve', 'review', 'acknowledge']),
-            auto_approve_after_hours: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
-            escalate_after_hours: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
-            escalation_user_id: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
-            can_reject: z.union([z.boolean(), z.string()]).transform((val) => val === true || val === 'true'),
-        })
-    ).min(1, 'At least one step is required'),
-});
-
-export type ApprovalFlowFormData = z.infer<typeof approvalFlowFormSchema>;
 
 interface ApprovalFlowFormProps {
     open: boolean;
