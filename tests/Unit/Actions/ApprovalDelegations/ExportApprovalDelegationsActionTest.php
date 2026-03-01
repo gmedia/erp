@@ -4,24 +4,37 @@ use App\Actions\ApprovalDelegations\ExportApprovalDelegationsAction;
 use App\Models\ApprovalDelegation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class)->group('approval-delegations');
 
-test('executes query for export', function () {
+test('executes export and returns file info', function () {
+    Storage::fake('public');
+    Excel::shouldReceive('store')->once();
+
     ApprovalDelegation::factory()->count(5)->create();
 
     $action = app(ExportApprovalDelegationsAction::class);
-    $query = $action->execute([]);
+    $result = $action->execute([]);
 
-    expect($query->count())->toBe(5);
+    expect($result)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    
+    $data = $result->getData(true);
+    expect($data)->toHaveKeys(['url', 'filename'])
+        ->and($data['filename'])->toContain('approval_delegations_export_')
+        ->and($data['filename'])->toContain('.xlsx');
 });
 
-test('executes query for export with filters', function () {
+test('executes export with filters', function () {
+    Storage::fake('public');
+    Excel::shouldReceive('store')->once();
+
     ApprovalDelegation::factory()->create(['is_active' => true]);
     ApprovalDelegation::factory()->create(['is_active' => false]);
 
     $action = app(ExportApprovalDelegationsAction::class);
-    $query = $action->execute(['is_active' => true]);
+    $result = $action->execute(['is_active' => true]);
 
-    expect($query->count())->toBe(1);
+    expect($result)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
 });

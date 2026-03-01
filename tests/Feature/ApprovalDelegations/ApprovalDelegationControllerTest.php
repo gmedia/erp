@@ -12,15 +12,15 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
 
-uses(RefreshDatabase::class)->group('approval-delegations');
+uses(RefreshDatabase::class)->group('approval_delegations');
 
 describe('Approval Delegation API Endpoints', function () {
     beforeEach(function () {
         $user = createTestUserWithPermissions([
-            'approval-delegation',
-            'approval-delegation.create',
-            'approval-delegation.edit',
-            'approval-delegation.delete'
+            'approval_delegation',
+            'approval_delegation.create',
+            'approval_delegation.edit',
+            'approval_delegation.delete'
         ]);
 
         actingAs($user);
@@ -98,6 +98,26 @@ describe('Approval Delegation API Endpoints', function () {
             ->assertJsonFragment(['reason' => 'Test reason']);
 
         assertDatabaseHas('approval_delegations', ['reason' => 'Test reason']);
+    });
+
+    test('store returns 403 without approval_delegation.create permission', function () {
+        $user = createTestUserWithPermissions(['approval_delegation']);
+        actingAs($user);
+
+        $delegator = User::factory()->create();
+        $delegate = User::factory()->create();
+        $data = [
+            'delegator_user_id' => $delegator->id,
+            'delegate_user_id' => $delegate->id,
+            'start_date' => '2026-03-01',
+            'end_date' => '2026-03-10',
+            'reason' => 'Test reason',
+            'is_active' => true,
+        ];
+
+        $response = postJson('/api/approval-delegations', $data);
+
+        $response->assertForbidden();
     });
 
     test('store validates delegate cannot be delegator', function () {
