@@ -50,6 +50,7 @@ import {
     FileSearch,
     CheckCircle,
     UserPlus,
+    Inbox,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -103,6 +104,7 @@ const iconMap: Record<string, LucideIcon> = {
     FileSearch,
     CheckCircle,
     UserPlus,
+    Inbox,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

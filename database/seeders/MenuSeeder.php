@@ -20,6 +20,14 @@ class MenuSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'my_approvals',
+                'display_name' => 'My Approvals',
+                'permissions' => [],
+                'icon' => 'Inbox',
+                'url' => 'my-approvals',
+                'child' => [],
+            ],
+            [
                 'name' => 'employee',
                 'display_name' => 'Employee',
                 'permissions' => ['employee', 'employee.create', 'employee.edit', 'employee.delete'],
