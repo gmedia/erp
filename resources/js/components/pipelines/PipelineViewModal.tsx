@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { type Pipeline } from '@/types/entity';
 
 interface PipelineViewModalProps {
@@ -15,6 +15,9 @@ export function PipelineViewModal({ open, onClose, item }: PipelineViewModalProp
             <DialogContent className="max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>{item.name}</DialogTitle>
+                    <DialogDescription>
+                        View complete pipeline information for the selected item.
+                    </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
