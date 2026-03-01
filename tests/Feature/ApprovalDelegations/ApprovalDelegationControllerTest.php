@@ -12,7 +12,7 @@ use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
 
-uses(RefreshDatabase::class)->group('approval_delegations');
+uses(RefreshDatabase::class)->group('approval-delegations');
 
 describe('Approval Delegation API Endpoints', function () {
     beforeEach(function () {
