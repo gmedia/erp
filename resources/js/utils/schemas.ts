@@ -1,5 +1,22 @@
 import * as z from 'zod';
 
+// Schema for approval delegations
+export const approvalDelegationFormSchema = z.object({
+    delegator_user_id: z.string().min(1, { message: 'Delegator is required.' }),
+    delegate_user_id: z.string().min(1, { message: 'Delegate is required.' }),
+    approvable_type: z.string().optional(),
+    start_date: z.date({ message: 'Start date is required.' }),
+    end_date: z.date({ message: 'End date is required.' }),
+    reason: z.string().optional(),
+    is_active: z.union([z.boolean(), z.string()]).default(true).transform((val) => val === true || val === 'true' || val === '1'),
+}).refine(data => data.delegator_user_id !== data.delegate_user_id, {
+    message: 'Delegator and Delegate cannot be the same user.',
+    path: ['delegate_user_id'],
+}).refine(data => data.end_date >= data.start_date, {
+    message: 'End date must be after or equal to start date.',
+    path: ['end_date'],
+});
+
 // Schema for simple entities (departments, positions)
 export const simpleEntitySchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),

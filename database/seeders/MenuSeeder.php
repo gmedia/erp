@@ -337,9 +337,9 @@ class MenuSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'admin',
+                 'name' => 'admin',
                 'display_name' => 'Admin',
-                'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline', 'pipeline_audit_trail', 'admin_setting', 'approval_flow'],
+                'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline', 'pipeline_audit_trail', 'admin_setting', 'approval_flow', 'approval_delegation'],
                 'icon' => 'Shield',
                 'url' => null,
                 'child' => [
@@ -397,6 +397,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['approval_flow', 'approval_flow.create', 'approval_flow.edit', 'approval_flow.delete'],
                         'icon' => 'CheckCircle',
                         'url' => 'approval-flows',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'approval_delegation',
+                        'display_name' => 'Approval Delegation',
+                        'permissions' => ['approval_delegation', 'approval_delegation.create', 'approval_delegation.edit', 'approval_delegation.delete'],
+                        'icon' => 'UserPlus',
+                        'url' => 'approval-delegations',
                         'child' => [],
                     ],
                 ],

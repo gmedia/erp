@@ -35,6 +35,7 @@ export type { FiscalYear, FiscalYearFormData, FiscalYearFilters } from './fiscal
 export type { AssetModel, AssetModelFormData, AssetModelFilters } from './asset-model';
 export type { AssetLocation, AssetLocationFormData, AssetLocationFilters } from './asset-location';
 export type { Pipeline } from './pipeline';
+export type { ApprovalDelegation, ApprovalDelegationFormData, ApprovalDelegationFilters } from './approval-delegation';
 
 export interface ApprovalFlowStep {
     id?: number;

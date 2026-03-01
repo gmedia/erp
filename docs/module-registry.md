@@ -315,6 +315,15 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   checkbox_header: false
   note: "Memiliki dynamic nested array untuk Approval Flow Steps (mengatur role/user, SLA auto-approve, dll) via formik/react-hook-form."
 
+- slug: approval-delegations
+  route: /approval-delegations
+  api: /api/approval-delegations
+  export_api: /api/approval-delegations/export
+  search_placeholder: "Search delegator, delegate, or reason..."
+  sortable_columns: [Delegator, Delegate, Approvable Type, Start Date, End Date, Reason, Status]
+  view_type: dialog
+  checkbox_header: false
+
 - slug: entity-state-actions
   route: (embedded in Asset Profile)
   api: /api/entity-states/{entityType}/{entityId}
@@ -399,6 +408,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 13 | Asset Stocktakes | `asset-stocktakes` | `AssetStocktakeControllerTest`, `AssetStocktakeExportTest` | `AssetStocktakeTest` | — |
 | 14 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
 | 15 | Approval Flows | `approval-flows` | `ApprovalFlowControllerTest` | `ApprovalFlowTest`, `ApprovalFlowStepTest` | Memiliki `ApprovalFlowFilterServiceTest` & `UpdateApprovalFlowDataTest` |
+| 16 | Approval Delegations | `approval-delegations` | `ApprovalDelegationControllerTest`, `ApprovalDelegationExportTest` | `ApprovalDelegationTest` | Memiliki `ApprovalDelegationFilterServiceTest` & `UpdateApprovalDelegationDataTest` |
 
 ---
 

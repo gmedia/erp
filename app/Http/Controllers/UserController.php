@@ -29,6 +29,30 @@ class UserController extends Controller
     }
 
     /**
+     * Get users for API dropdowns
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $query = User::query();
+
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+        }
+
+        // Return formatted for AsyncSelectField expect { id, name }
+        $users = $query->limit(50)->get(['id', 'name']);
+        
+        return response()->json([
+            'data' => $users
+        ]);
+    }
+
+    /**
      * Get user data for an employee.
      *
      * Returns the user linked to the employee, or null if no user is linked.

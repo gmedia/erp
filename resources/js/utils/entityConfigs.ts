@@ -693,3 +693,26 @@ export const approvalFlowConfig = createComplexEntityConfig<any>({
     getDeleteMessage: (item: { name?: string }) =>
         `This action cannot be undone. This will permanently delete the approval flow "${item.name}".`,
 });
+
+import { approvalDelegationColumns } from '@/components/approval-delegations/ApprovalDelegationColumns';
+import { createApprovalDelegationFilterFields } from '@/components/approval-delegations/ApprovalDelegationFilters';
+import { ApprovalDelegationForm } from '@/components/approval-delegations/ApprovalDelegationForm';
+import { ApprovalDelegationViewModal } from '@/components/approval-delegations/ApprovalDelegationViewModal';
+
+export const approvalDelegationConfig = createComplexEntityConfig<any>({
+    entityName: 'Approval Delegation',
+    entityNamePlural: 'Approval Delegations',
+    apiEndpoint: '/api/approval-delegations',
+    exportEndpoint: '/api/approval-delegations/export',
+    queryKey: ['approval-delegations'],
+    breadcrumbs: [{ title: 'Approval Delegations', href: '/approval-delegations' }],
+    initialFilters: { search: '', delegator_user_id: '', delegate_user_id: '', is_active: '', start_date_from: '', start_date_to: '' },
+    columns: approvalDelegationColumns as any,
+    filterFields: createApprovalDelegationFilterFields(),
+    formComponent: ApprovalDelegationForm,
+    formType: 'complex',
+    entityNameForSearch: 'approval delegation',
+    viewModalComponent: ApprovalDelegationViewModal,
+    getDeleteMessage: () =>
+        `This action cannot be undone. This will permanently delete the selected approval delegation.`,
+});
