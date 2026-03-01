@@ -49,6 +49,7 @@ import {
     BarChart3,
     FileSearch,
     CheckCircle,
+    UserPlus,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -101,6 +102,7 @@ const iconMap: Record<string, LucideIcon> = {
     BarChart3,
     FileSearch,
     CheckCircle,
+    UserPlus,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

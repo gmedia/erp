@@ -9,6 +9,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::get('users', [UserController::class, 'apiIndex']);
+    Route::get('users/{user}', [UserController::class, 'apiShow']);
     Route::middleware('permission:user,true')->group(function () {
         Route::get('employees/{employee}/user', [UserController::class, 'getUserByEmployee']);
         Route::post('employees/{employee}/user', [UserController::class, 'updateUser']);

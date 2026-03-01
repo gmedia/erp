@@ -53,6 +53,22 @@ class UserController extends Controller
     }
 
     /**
+     * Get a single user for API dropdowns
+     *
+     * @param \App\Models\User $user
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiShow(User $user): JsonResponse
+    {
+        return response()->json([
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+            ]
+        ]);
+    }
+
+    /**
      * Get user data for an employee.
      *
      * Returns the user linked to the employee, or null if no user is linked.
