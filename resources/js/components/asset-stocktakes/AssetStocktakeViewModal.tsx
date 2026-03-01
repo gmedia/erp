@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -23,6 +24,9 @@ export function AssetStocktakeViewModal({ open, onClose, item }: AssetStocktakeV
             <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                     <DialogTitle>Stocktake Details</DialogTitle>
+                    <DialogDescription>
+                        View complete stocktake information for the selected record.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4 py-2">
