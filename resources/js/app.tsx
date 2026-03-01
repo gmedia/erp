@@ -36,7 +36,7 @@ createInertiaApp({
         
         // Update on every subsequent page finish
         router.on('finish', (event) => {
-            const newCompanyName = (event.detail.page.props as any).companyName;
+            const newCompanyName = ((event as any).detail?.page?.props as any)?.companyName;
             if (newCompanyName) {
                 (window as any).__APP_COMPANY_NAME__ = newCompanyName;
             }
