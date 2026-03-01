@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -23,6 +24,9 @@ export function AssetMovementViewModal({ open, onClose, item }: AssetMovementVie
             <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                     <DialogTitle>Movement Details</DialogTitle>
+                    <DialogDescription>
+                        View detailed information for this asset movement.
+                    </DialogDescription>
                 </DialogHeader>
                 
                 <div className="space-y-4 py-2">

@@ -1,6 +1,7 @@
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
@@ -25,6 +26,9 @@ export function DetailModal({ item, open, onOpenChange }: DetailModalProps) {
             <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
                 <DialogHeader>
                     <DialogTitle>Audit Trail Detail</DialogTitle>
+                    <DialogDescription>
+                        View complete transition details and metadata for this audit trail record.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <ScrollArea className="flex-1 pr-4">
