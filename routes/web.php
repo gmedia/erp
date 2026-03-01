@@ -51,3 +51,4 @@ require __DIR__ . '/admin_setting.php';
 
 require __DIR__ . '/approval_flow.php';
 require __DIR__ . '/approval-delegations.php';
+require __DIR__ . '/my_approvals.php';

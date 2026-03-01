@@ -366,6 +366,14 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/admin-settings/admin-settings.spec.ts
 
+- slug: my-approvals
+  route: /my-approvals
+  api: POST /my-approvals/{id}/approve
+  view_type: page
+  note: "Non-CRUD approval inbox page. Shows pending, approved, rejected, and all requests for the logged-in user."
+  tests:
+    - tests/e2e/my-approvals/my-approvals.spec.ts
+
 ## Testing
 
 E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
@@ -432,6 +440,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 14 | Pipeline Audit Trail | `pipeline-audit-trail` | `Feature/PipelineAuditTrail/PipelineAuditTrailControllerTest.php` | Log seluruh transisi state pipeline |
 | 15 | Asset Dashboard | `asset-dashboard` | `Feature/AssetDashboard/AssetDashboardControllerTest.php` | Dashboard Visualisasi Aset |
 | 16 | Admin Settings | `admin-settings` | `Feature/AdminSettings/AdminSettingControllerTest.php`, `Unit/Models/SettingTest.php` | Non-CRUD settings page (General, Regional) |
+| 17 | My Approvals | `my-approvals` | `Feature/MyApprovalControllerTest.php` | Inbox for user to approve/reject documents |
 
 ---
 

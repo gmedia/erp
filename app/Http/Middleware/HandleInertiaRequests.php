@@ -56,7 +56,24 @@ class HandleInertiaRequests extends Middleware
             'availableLocales' => config('app.available_locales', ['en', 'id']),
             'translations' => $this->getTranslations(),
             'menus' => $this->getMenus(),
+            'pendingApprovalsCount' => $this->getPendingApprovalsCount(),
         ];
+    }
+
+    protected function getPendingApprovalsCount(): int
+    {
+        $userId = \Illuminate\Support\Facades\Auth::id();
+        if (!$userId) return 0;
+        
+        return \App\Models\ApprovalRequestStep::where('status', 'pending')
+            ->whereHas('request', function ($q) {
+                $q->whereIn('status', ['pending', 'in_progress']);
+            })
+            ->whereHas('flowStep', function ($q) use ($userId) {
+                $q->where('approver_type', 'user')
+                  ->where('approver_user_id', $userId);
+            })
+            ->count();
     }
 
     /**

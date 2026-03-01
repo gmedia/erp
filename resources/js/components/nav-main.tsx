@@ -18,8 +18,11 @@ import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
 
+import { Badge } from '@/components/ui/badge';
+
 export function NavMain({ items = [] }: { items: NavItem[] }) {
-    const page = usePage();
+    const page = usePage<{ pendingApprovalsCount?: number }>();
+    const pendingCount = page.props.pendingApprovalsCount || 0;
     const { t } = useTranslation();
 
     return (
@@ -68,6 +71,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                                         <span>
                                                             {subItem.title}
                                                         </span>
+                                                        {subItem.href === '/my-approvals' && pendingCount > 0 && (
+                                                            <Badge variant="destructive" className="ml-auto flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-[10px]">
+                                                                {pendingCount}
+                                                            </Badge>
+                                                        )}
                                                     </Link>
                                                 </SidebarMenuSubButton>
                                             </SidebarMenuSubItem>
@@ -86,6 +94,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                 <Link href={item.href} prefetch>
                                     {item.icon && <item.icon />}
                                     <span>{item.title}</span>
+                                    {item.href === '/my-approvals' && pendingCount > 0 && (
+                                        <Badge variant="destructive" className="ml-auto flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-[10px]">
+                                            {pendingCount}
+                                        </Badge>
+                                    )}
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
