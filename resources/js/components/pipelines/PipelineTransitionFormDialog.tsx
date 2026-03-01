@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { 
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogFooter
@@ -128,6 +129,9 @@ export function PipelineTransitionFormDialog({
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{transition ? 'Edit Transition' : 'New Transition'}</DialogTitle>
+                    <DialogDescription>
+                        Configure state transition rules, conditions, and actions for this pipeline.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <Form {...(form as any)}>
