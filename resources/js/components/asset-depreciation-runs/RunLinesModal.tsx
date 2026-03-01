@@ -1,6 +1,7 @@
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
@@ -42,6 +43,9 @@ export function RunLinesModal({ runId, open, onClose }: RunLinesModalProps) {
             <DialogContent className="max-w-[95vw] sm:max-w-7xl max-h-[90vh] flex flex-col">
                 <DialogHeader>
                     <DialogTitle>Depreciation Run Lines</DialogTitle>
+                    <DialogDescription>
+                        View detailed depreciation line items for the selected run.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="flex-1 overflow-auto border rounded-md">
