@@ -14,34 +14,30 @@ class ApprovalDelegationSeeder extends Seeder
      */
     public function run(): void
     {
-        $users = User::pluck('id')->toArray();
+        $financeDirector = User::where('email', 'director.finance@dokfin.id')->first();
+        $hrManager = User::where('email', 'manager.hr@dokfin.id')->first();
+        $itStaff = User::where('email', 'staff.it@dokfin.id')->first();
 
-        // If we don't have enough users, create some
-        if (count($users) < 5) {
-            $users = User::factory()->count(10)->create()->pluck('id')->toArray();
-        }
+        // 1. Finance Director delegates to HR Manager (Active now)
+        ApprovalDelegation::create([
+            'delegator_user_id' => $financeDirector->id,
+            'delegate_user_id' => $hrManager->id,
+            'approvable_type' => null, // All types
+            'start_date' => now()->subDays(2),
+            'end_date' => now()->addDays(5),
+            'reason' => 'Annual Leave',
+            'is_active' => true,
+        ]);
 
-        // Create 20 random delegations
-        for ($i = 0; $i < 20; $i++) {
-            $delegatorId = strval($this->getRandomElement($users));
-            $delegateId = strval($this->getRandomElement($users, [$delegatorId]));
-
-            ApprovalDelegation::factory()->create([
-                'delegator_user_id' => $delegatorId,
-                'delegate_user_id' => $delegateId,
-            ]);
-        }
-    }
-
-    /**
-     * Get a random element from an array, excluding specific values.
-     */
-    private function getRandomElement(array $array, array $exclude = [])
-    {
-        $filtered = array_diff($array, $exclude);
-        if (empty($filtered)) {
-            return $array[array_rand($array)];
-        }
-        return $filtered[array_rand($filtered)];
+        // 2. HR Manager delegates to IT Staff (Future)
+        ApprovalDelegation::create([
+            'delegator_user_id' => $hrManager->id,
+            'delegate_user_id' => $itStaff->id,
+            'approvable_type' => 'App\Models\PurchaseRequest',
+            'start_date' => now()->addMonths(1),
+            'end_date' => now()->addMonths(1)->addDays(7),
+            'reason' => 'Overseas Duty',
+            'is_active' => true,
+        ]);
     }
 }

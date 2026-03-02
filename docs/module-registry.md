@@ -374,6 +374,13 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/my-approvals/my-approvals.spec.ts
 
+- slug: approval-history
+  api: GET /api/entity-states/{entityType}/{id}/approvals
+  view_type: component
+  note: "Non-CRUD component embedded in entity profiles to show the timeline of approval requests and steps."
+  tests:
+    - tests/e2e/approval-history/approval-history.spec.ts
+
 ## Testing
 
 E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
@@ -441,6 +448,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 15 | Asset Dashboard | `asset-dashboard` | `Feature/AssetDashboard/AssetDashboardControllerTest.php` | Dashboard Visualisasi Aset |
 | 16 | Admin Settings | `admin-settings` | `Feature/AdminSettings/AdminSettingControllerTest.php`, `Unit/Models/SettingTest.php` | Non-CRUD settings page (General, Regional) |
 | 17 | My Approvals | `my-approvals` | `Feature/MyApprovalControllerTest.php` | Inbox for user to approve/reject documents |
+| 18 | Approval History | `approval-history` | `Feature/EntityApprovalHistoryControllerTest.php` | Component showing timeline history of approvals per entity |
 
 ---
 

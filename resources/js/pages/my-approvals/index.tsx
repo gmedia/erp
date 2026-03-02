@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Head, usePage, router } from '@inertiajs/react';
+import { Head, usePage, router, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDistanceToNow } from 'date-fns';
-import { CircleCheck, CircleX, Clock, Check, X, Eye } from 'lucide-react';
+import { Clock, Check, X, Eye } from 'lucide-react';
 
 export default function MyApprovalsPage({ pending, approved, rejected, all }: any) {
     const [actionDialog, setActionDialog] = useState<{ open: boolean, type: 'approve' | 'reject' | null, requestStep: any }>({
@@ -45,14 +45,27 @@ export default function MyApprovalsPage({ pending, approved, rejected, all }: an
         });
     };
 
+    const getDocUrl = (request: any) => {
+        const type = request.approvable_type.split('\\').pop();
+        const id = request.approvable_id;
+        const ulid = request.approvable?.ulid;
+        
+        switch (type) {
+            case 'Asset':
+                return `/assets/${ulid || id}`;
+            default:
+                return '#';
+        }
+    };
+
     const StatusBadge = ({ status }: { status: string }) => {
         switch (status) {
             case 'pending':
                 return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" /> Pending</Badge>;
             case 'approved':
-                return <Badge variant="default" className="bg-green-600 hover:bg-green-700"><CircleCheck className="w-3 h-3 mr-1" /> Approved</Badge>;
+                return <Badge variant="default" className="bg-green-600 hover:bg-green-700"><Check className="w-3 h-3 mr-1" /> Approved</Badge>;
             case 'rejected':
-                return <Badge variant="destructive"><CircleX className="w-3 h-3 mr-1" /> Rejected</Badge>;
+                return <Badge variant="destructive"><X className="w-3 h-3 mr-1" /> Rejected</Badge>;
             default:
                 return <Badge variant="outline">{status}</Badge>;
         }
@@ -88,6 +101,12 @@ export default function MyApprovalsPage({ pending, approved, rejected, all }: an
                                     <h4 className="text-md font-semibold mt-2">
                                         {step.flowStep?.name || 'Approval Step'}
                                     </h4>
+                                    {step.request.approvable && (
+                                        <div className="text-sm font-medium">
+                                            {step.request.approvable.asset_code && <span className="mr-2 font-mono text-xs bg-muted px-1 rounded">{step.request.approvable.asset_code}</span>}
+                                            {step.request.approvable.name || step.request.approvable.description}
+                                        </div>
+                                    )}
                                     <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
                                         <span>Submitted by {step.request.submitter?.name || 'Unknown'}</span>
                                         <span>•</span>
@@ -116,9 +135,9 @@ export default function MyApprovalsPage({ pending, approved, rejected, all }: an
                                         </>
                                     )}
                                     <Button size="sm" variant="ghost" asChild>
-                                        <a href="#">
+                                        <Link href={getDocUrl(step.request)}>
                                             <Eye className="h-4 w-4 mr-2" /> View Doc
-                                        </a>
+                                        </Link>
                                     </Button>
                                 </div>
                             </div>

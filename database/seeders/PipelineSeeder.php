@@ -117,9 +117,10 @@ class PipelineSeeder extends Seeder
                 'guard_conditions'      => null,
                 'requires_confirmation' => false,
                 'requires_comment'      => false,
-                'requires_approval'     => false,
+                'requires_approval'     => true,
                 'sort_order'            => 10,
                 'actions' => [
+                    ['action_type' => 'trigger_approval', 'execution_order' => 5, 'config' => []],
                     ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'active']],
                 ],
             ],

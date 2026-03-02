@@ -3,11 +3,15 @@
 namespace App\Actions\EntityStates;
 
 use App\Models\PipelineTransition;
+use App\Actions\Approvals\TriggerApprovalAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class ExecuteTransitionActionsAction
 {
+    public function __construct(
+        protected TriggerApprovalAction $triggerApprovalAction
+    ) {}
     /**
      * Execute all actions defined for a specific transition on a given entity.
      * 
@@ -32,6 +36,7 @@ class ExecuteTransitionActionsAction
                     'create_record' => $this->handleCreateRecord($entity, $params),
                     'send_notification' => $this->handleSendNotification($entity, $params),
                     'dispatch_job' => $this->handleDispatchJob($entity, $params),
+                    'trigger_approval' => $this->handleTriggerApproval($entity, $params),
                     'custom' => $this->handleCustomAction($entity, $params),
                     default => throw new \Exception("Unsupported transition action type: {$type}"),
                 };
@@ -85,7 +90,13 @@ class ExecuteTransitionActionsAction
     private function handleDispatchJob(Model $entity, array $params): bool
     {
         // MVP: Not implemented fully. Log a warning
-        Log::warning("'dispatch_job' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->id})");
+        Log::warning("'dispatch_job' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->getKey()})");
+        return true;
+    }
+
+    private function handleTriggerApproval(Model $entity, array $params): bool
+    {
+        $this->triggerApprovalAction->execute($entity, $params);
         return true;
     }
 
