@@ -4,6 +4,7 @@ import * as React from 'react';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
@@ -28,6 +29,9 @@ export function AssetCategoryViewModal({
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>Asset Category Details</DialogTitle>
+                    <DialogDescription>
+                        View complete details for the selected asset category.
+                    </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">

@@ -31,7 +31,16 @@
         }
     </style>
 
-    <title inertia>{{ config('app.name', 'Laravel') }}</title>
+    @php
+        $appCompanyName = $companyName ?? config('app.name', 'Laravel');
+    @endphp
+
+    <title inertia>{{ $appCompanyName }}</title>
+
+    <script>
+        // Set company name in window before React loads
+        window.__APP_COMPANY_NAME__ = '{{ $appCompanyName }}';
+    </script>
 
     <link rel="icon" href="/asset-files/dokfin/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">

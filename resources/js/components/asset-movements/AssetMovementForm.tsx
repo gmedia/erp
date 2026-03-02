@@ -95,7 +95,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(function AssetMove
             isLoading={isLoading}
             className="sm:max-w-[600px]"
         >
-            <div className="space-y-6">
+            {open && <div className="space-y-6">
                 {!asset && !isEdit && (
                     <div className="grid grid-cols-1 gap-4">
                         <AsyncSelectField
@@ -175,7 +175,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(function AssetMove
                     <InputField name="reference" label="Reference / Document #" placeholder="e.g. TRF-2024-001" />
                     <TextareaField name="notes" label="Notes" placeholder="Reason for movement..." />
                 </div>
-            </div>
+            </div>}
         </EntityForm>
     );
 });
