@@ -47,7 +47,7 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
                                     value={item.creator?.name || 'System'}
                                 />
                                 <div className="flex flex-col">
-                                    <span className="text-sm font-semibold text-gray-500 mb-1">Status</span>
+                                    <span className="text-sm font-semibold text-muted-foreground mb-1">Status</span>
                                     <div>
                                         <Badge
                                             variant={
@@ -69,8 +69,8 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
 
                             {item.conditions && (
                                 <div>
-                                    <span className="font-semibold block text-gray-500 text-sm">Conditions</span>
-                                    <pre className="bg-gray-100 p-3 rounded-md mt-1 text-sm overflow-x-auto whitespace-pre-wrap">
+                                    <span className="font-semibold block text-muted-foreground text-sm">Conditions</span>
+                                    <pre className="bg-muted p-3 rounded-md mt-1 text-sm overflow-x-auto whitespace-pre-wrap text-foreground">
                                         {typeof item.conditions === 'string'
                                             ? item.conditions
                                             : JSON.stringify(item.conditions, null, 2)}
@@ -80,28 +80,28 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
 
                             {/* Steps Section */}
                             <div>
-                                <span className="font-semibold block text-gray-500 text-sm mb-2">Steps</span>
+                                <span className="font-semibold block text-muted-foreground text-sm mb-2">Steps</span>
                                 <div className="space-y-3">
                                     {item.steps?.map((step) => (
-                                        <div key={step.id || step.step_order} className="border p-4 rounded-md shadow-sm">
+                                        <div key={step.id || step.step_order} className="border p-4 rounded-md shadow-sm bg-card">
                                             <div className="flex justify-between items-center mb-2">
                                                 <span className="font-medium">Step {step.step_order}: {step.name}</span>
                                                 <Badge variant="outline">{step.required_action.toUpperCase()}</Badge>
                                             </div>
-                                            <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                                                <div>Approver Type: <span className="font-medium text-gray-900 capitalize">{step.approver_type.replace('_', ' ')}</span></div>
-                                                {step.approver_type === 'user' && <div>User: <span className="font-medium text-gray-900">{step.user?.name || `ID: ${step.approver_user_id}`}</span></div>}
-                                                {step.approver_type === 'department_head' && <div>Dept: <span className="font-medium text-gray-900">{step.department?.name || `ID: ${step.approver_department_id}`}</span></div>}
-                                                {step.approver_type === 'role' && <div>Role ID: <span className="font-medium text-gray-900">{step.approver_role_id}</span></div>}
+                                            <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                                                <div>Approver Type: <span className="font-medium text-foreground capitalize">{step.approver_type.replace('_', ' ')}</span></div>
+                                                {step.approver_type === 'user' && <div>User: <span className="font-medium text-foreground">{step.user?.name || `ID: ${step.approver_user_id}`}</span></div>}
+                                                {step.approver_type === 'department_head' && <div>Dept: <span className="font-medium text-foreground">{step.department?.name || `ID: ${step.approver_department_id}`}</span></div>}
+                                                {step.approver_type === 'role' && <div>Role ID: <span className="font-medium text-foreground">{step.approver_role_id}</span></div>}
                                                 
-                                                {step.auto_approve_after_hours && <div>Auto Approve: <span className="font-medium text-gray-900">{step.auto_approve_after_hours}h</span></div>}
-                                                {step.escalate_after_hours && <div>Escalate After: <span className="font-medium text-gray-900">{step.escalate_after_hours}h</span></div>}
-                                                <div>Can Reject: <span className="font-medium text-gray-900">{step.can_reject ? 'Yes' : 'No'}</span></div>
+                                                {step.auto_approve_after_hours && <div>Auto Approve: <span className="font-medium text-foreground">{step.auto_approve_after_hours}h</span></div>}
+                                                {step.escalate_after_hours && <div>Escalate After: <span className="font-medium text-foreground">{step.escalate_after_hours}h</span></div>}
+                                                <div>Can Reject: <span className="font-medium text-foreground">{step.can_reject ? 'Yes' : 'No'}</span></div>
                                             </div>
                                         </div>
                                     ))}
                                     {(!item.steps || item.steps.length === 0) && (
-                                        <p className="text-gray-500 italic">No steps defined for this approval flow.</p>
+                                        <p className="text-muted-foreground italic">No steps defined for this approval flow.</p>
                                     )}
                                 </div>
                             </div>
