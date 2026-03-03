@@ -352,6 +352,16 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   checkbox_header: false
   note: "Non-CRUD feature for viewing and exporting pipeline state logs. Read-only Data Table with Detail modal."
 
+- slug: approval-audit-trail
+  route: /approval-audit-trail
+  api: /api/approval-audit-trail
+  export_api: /api/approval-audit-trail/export
+  search_placeholder: "Search IP, Document ID, user..."
+  sortable_columns: [Date, Document Type, Document ID, Event, Actor, Step]
+  view_type: dialog
+  checkbox_header: false
+  note: "Non-CRUD feature for viewing and exporting approval audit trail logs. Read-only Data Table with Detail modal."
+
 - modul: Asset Dashboard
   group: asset-dashboard
   tests:
@@ -458,6 +468,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 17 | My Approvals | `my-approvals` | `Feature/MyApprovalControllerTest.php` | Inbox for user to approve/reject documents |
 | 18 | Approval History | `approval-history` | `Feature/EntityApprovalHistoryControllerTest.php` | Component showing timeline history of approvals per entity |
 | 19 | Approval Monitoring | `approval-monitoring` | `Feature/ApprovalMonitoring/ApprovalMonitoringControllerTest.php` | Monitoring dashboard connecting to GetApprovalMonitoringDataAction |
+| 20 | Approval Audit Trail | `approval-audit-trail` | `Feature/ApprovalAuditTrail/ApprovalAuditTrailControllerTest.php` | Log seluruh histori approval |
 
 ---
 

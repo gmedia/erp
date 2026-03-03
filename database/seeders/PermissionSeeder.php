@@ -630,6 +630,17 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'approval_audit_trail',
+                'display_name' => 'Approval Audit Trail',
+                'child' => [
+                    [
+                        'name' => 'approval_audit_trail.export',
+                        'display_name' => 'Export Approval Audit Trail',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],

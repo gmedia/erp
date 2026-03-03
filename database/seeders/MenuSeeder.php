@@ -347,7 +347,7 @@ class MenuSeeder extends Seeder
             [
                  'name' => 'admin',
                 'display_name' => 'Admin',
-                'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline', 'pipeline_audit_trail', 'admin_setting', 'approval_flow', 'approval_delegation'],
+                'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline', 'pipeline_audit_trail', 'admin_setting', 'approval_flow', 'approval_delegation', 'approval_monitoring', 'approval_audit_trail'],
                 'icon' => 'Shield',
                 'url' => null,
                 'child' => [
@@ -421,6 +421,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['approval_flow'],
                         'icon' => 'Activity',
                         'url' => 'approval-monitoring',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'approval_audit_trail',
+                        'display_name' => 'Approval Audit Trail',
+                        'permissions' => ['approval_audit_trail'],
+                        'icon' => 'FileSearch',
+                        'url' => 'approval-audit-trail',
                         'child' => [],
                     ],
                 ],
