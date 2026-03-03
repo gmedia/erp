@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { type ApprovalFlow } from '@/types/entity';
 import { ApprovalFlowStepManager } from './ApprovalFlowStepManager';
 import { approvalFlowFormSchema, type ApprovalFlowFormData } from '@/utils/schemas';
+import { APPROVABLE_TYPE_OPTIONS } from '@/constants/model-options';
 import AsyncSelectField from '../common/AsyncSelectField';
 
 interface ApprovalFlowFormProps {
@@ -117,15 +118,7 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(function ApprovalFlo
                     <SelectField
                         name="approvable_type"
                         label="Approvable Type"
-                        options={[
-                            { value: 'App\\Models\\PurchaseRequest', label: 'Purchase Request' },
-                            { value: 'App\\Models\\PurchaseOrder', label: 'Purchase Order' },
-                            { value: 'App\\Models\\JournalEntry', label: 'Journal Entry' },
-                            { value: 'App\\Models\\Asset', label: 'Asset' },
-                            { value: 'App\\Models\\AssetMovement', label: 'Asset Movement' },
-                            { value: 'App\\Models\\AssetMaintenance', label: 'Asset Maintenance' },
-                            { value: 'App\\Models\\AssetStocktake', label: 'Asset Stocktake' },
-                        ]}
+                        options={[...APPROVABLE_TYPE_OPTIONS]}
                     />
                     <SelectField
                         name="is_active"
