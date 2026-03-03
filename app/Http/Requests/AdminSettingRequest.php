@@ -26,6 +26,7 @@ class AdminSettingRequest extends FormRequest
             'company_address' => ['nullable', 'string', 'max:1000'],
             'company_phone' => ['nullable', 'string', 'max:50'],
             'company_email' => ['nullable', 'string', 'email', 'max:255'],
+            'company_logo' => ['nullable', 'file', 'mimetypes:image/svg+xml', 'max:2048'],
             'timezone' => ['nullable', 'string', 'max:100', 'timezone:all'],
             'currency' => ['nullable', 'string', 'max:10'],
             'date_format' => ['nullable', 'string', 'max:20'],

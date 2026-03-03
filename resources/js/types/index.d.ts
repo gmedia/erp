@@ -43,6 +43,7 @@ export interface SharedData {
     };
     name: string;
     companyName?: string | null;
+    companyLogoUrl?: string | null;
     quote?: {
         message: string;
         author: string;

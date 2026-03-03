@@ -3,6 +3,8 @@
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class)->group('admin-settings');
 
@@ -47,6 +49,8 @@ describe('AdminSettingController@index', function () {
             ->has('settings.general.company_address')
             ->has('settings.general.company_phone')
             ->has('settings.general.company_email')
+            ->has('settings.general.company_logo_path')
+            ->has('settings.general.company_logo_url')
             ->has('settings.regional.timezone')
             ->has('settings.regional.currency')
             ->has('settings.regional.date_format')
@@ -161,5 +165,23 @@ describe('AdminSettingController@update', function () {
         expect(Setting::get('company_name'))->toBe('Updated Company');
         // company_phone should remain unchanged
         expect(Setting::get('company_phone'))->toBe('111');
+    });
+
+    test('user can upload company logo svg', function () {
+        Storage::fake(config('filesystems.default'));
+
+        $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
+
+        $response = $this->actingAs($user)->put(route('admin-settings.update'), [
+            'company_logo' => UploadedFile::fake()->create('logo.svg', 10, 'image/svg+xml'),
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
+
+        $storedPath = Setting::get('company_logo_path');
+        expect($storedPath)->toBeString();
+
+        Storage::disk(config('filesystems.default'))->assertExists($storedPath);
     });
 });

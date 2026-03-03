@@ -9,6 +9,7 @@ use App\Models\Setting;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -47,6 +48,7 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'companyName' => $this->getCompanyName(),
+            'companyLogoUrl' => $this->getCompanyLogoUrl(),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
@@ -86,6 +88,20 @@ class HandleInertiaRequests extends Middleware
         return cache()->remember('app.company_name', 3600, function () {
             return Setting::get('company_name') ?? config('app.name', 'Laravel');
         });
+    }
+
+    /**
+     * Get company logo URL from default filesystem.
+     */
+    protected function getCompanyLogoUrl(): ?string
+    {
+        $logoPath = Setting::get('company_logo_path');
+
+        if (! is_string($logoPath) || $logoPath === '') {
+            return null;
+        }
+
+        return Storage::disk(config('filesystems.default'))->url($logoPath);
     }
 
     /**

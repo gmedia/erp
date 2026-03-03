@@ -17,6 +17,7 @@ interface SettingsData {
         company_address?: string;
         company_phone?: string;
         company_email?: string;
+        company_logo_url?: string | null;
     };
     regional?: {
         timezone?: string;
@@ -53,6 +54,7 @@ function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
                     preserveScroll: true,
                 }}
                 className="space-y-6"
+                encType="multipart/form-data"
             >
                 {({ processing, recentlySuccessful, errors }) => (
                     <>
@@ -119,6 +121,32 @@ function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
                             {errors.company_email && (
                                 <p className="text-sm text-destructive">
                                     {errors.company_email}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="company_logo">Company Logo (SVG)</Label>
+                            {settings?.company_logo_url && (
+                                <img
+                                    src={settings.company_logo_url}
+                                    alt="Current company logo"
+                                    className="h-14 w-auto rounded border object-contain p-2"
+                                />
+                            )}
+                            <Input
+                                id="company_logo"
+                                name="company_logo"
+                                type="file"
+                                accept=".svg,image/svg+xml"
+                                className="mt-1 block w-full"
+                            />
+                            <p className="text-sm text-muted-foreground">
+                                Upload file SVG. Jika kosong, aplikasi tetap menggunakan logo default.
+                            </p>
+                            {errors.company_logo && (
+                                <p className="text-sm text-destructive">
+                                    {errors.company_logo}
                                 </p>
                             )}
                         </div>
