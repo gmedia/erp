@@ -5,7 +5,6 @@ export async function createApprovalFlow(
   page: Page,
   overrides: Record<string, string> = {}
 ): Promise<string> {
-  page.on('console', msg => console.log('PAGE LOG:', msg.text()));
   page.on('pageerror', err => console.log('PAGE ERROR:', err.message));
 
   const addButton = page.getByRole('button', { name: /Add/i });

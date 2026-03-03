@@ -12,6 +12,7 @@ import { type Account } from '@/types/account';
 import { type CoaVersion } from '@/types/coa-version';
 import { AccountTree } from '@/components/accounts/AccountTree';
 import { AccountForm } from '@/components/accounts/AccountForm';
+import { useExport } from '@/hooks/useExport';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -47,6 +48,7 @@ export default function AccountIndex() {
     const [search, setSearch] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isActionLoading, setIsActionLoading] = useState(false);
+    const { exporting, exportData } = useExport({ endpoint: '/api/accounts/export' });
 
     // Form states
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -157,21 +159,11 @@ export default function AccountIndex() {
         }
     };
 
-    const handleExport = async () => {
-        try {
-            const response = await axios.post('/api/accounts/export', {
-                coa_version_id: selectedVersionId,
-                search: search,
-            });
-            
-            if (response.data.url) {
-                window.location.href = response.data.url;
-            }
-            
-            toast.success(response.data.message || 'Export started');
-        } catch (error) {
-            toast.error('Failed to export accounts');
-        }
+    const handleExport = () => {
+        exportData({
+            coa_version_id: selectedVersionId || undefined,
+            search: search,
+        });
     };
 
     return (
@@ -199,8 +191,8 @@ export default function AccountIndex() {
                             </SelectContent>
                         </Select>
 
-                        <Button variant="outline" size="icon" onClick={handleExport} disabled={!selectedVersionId}>
-                            <Download className="h-4 w-4" />
+                        <Button variant="outline" size="icon" onClick={handleExport} disabled={!selectedVersionId || exporting}>
+                            {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
                         </Button>
                     </div>
                 </div>
