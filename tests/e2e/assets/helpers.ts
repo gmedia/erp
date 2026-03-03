@@ -107,6 +107,29 @@ export async function searchAsset(page: Page, query: string): Promise<void> {
   // Passive wait: don't assert rows here to allow for "search after delete" tests
 }
 
+/**
+ * Create a high-value asset (purchase_cost > 100M) to trigger approval flow.
+ */
+export async function createHighValueAsset(
+  page: Page,
+  overrides: Partial<{
+    asset_code: string;
+    name: string;
+    category: string;
+    branch: string;
+    purchase_cost: string;
+  }> = {}
+): Promise<string> {
+  return createAsset(page, {
+    asset_code: overrides.asset_code ?? `HVA-${Date.now()}`,
+    name: overrides.name ?? `High Value Asset ${Date.now()}`,
+    category: overrides.category ?? 'IT Equipment',
+    branch: overrides.branch ?? 'Head Office',
+    purchase_cost: overrides.purchase_cost ?? '150000000', // 150M > 100M threshold
+    ...overrides,
+  });
+}
+
 export async function deleteAsset(page: Page, identifier: string): Promise<void> {
     await searchAsset(page, identifier);
 
