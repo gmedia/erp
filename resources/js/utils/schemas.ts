@@ -453,3 +453,27 @@ export const inventoryStocktakeFormSchema = z.object({
 });
 
 export type InventoryStocktakeFormData = z.infer<typeof inventoryStocktakeFormSchema>;
+
+export const stockAdjustmentFormSchema = z.object({
+    adjustment_number: z.string().optional(),
+    warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
+    adjustment_date: z.date({ message: 'Adjustment date is required.' }),
+    adjustment_type: z.enum(['damage', 'expired', 'shrinkage', 'correction', 'stocktake_result', 'initial_stock', 'other'], {
+        message: 'Adjustment type is required.',
+    }),
+    status: z.enum(['draft', 'pending_approval', 'approved', 'cancelled'], {
+        message: 'Status is required.',
+    }),
+    inventory_stocktake_id: z.string().optional(),
+    notes: z.string().optional(),
+    items: z.array(z.object({
+        product_id: z.string().min(1, { message: 'Product is required.' }),
+        unit_id: z.string().min(1, { message: 'Unit is required.' }),
+        quantity_before: z.coerce.number().min(0, { message: 'Quantity before must be at least 0.' }).optional().default(0),
+        quantity_adjusted: z.coerce.number().refine((n) => n !== 0, { message: 'Quantity adjusted cannot be 0.' }),
+        unit_cost: z.coerce.number().min(0, { message: 'Unit cost must be at least 0.' }).optional().default(0),
+        reason: z.string().optional(),
+    })).min(1, { message: 'At least 1 item is required.' }),
+});
+
+export type StockAdjustmentFormData = z.infer<typeof stockAdjustmentFormSchema>;

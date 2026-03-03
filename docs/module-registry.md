@@ -163,6 +163,15 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
 
+- slug: stock-adjustments
+  route: /stock-adjustments
+  api: /api/stock-adjustments
+  export_api: /api/stock-adjustments/export
+  search_placeholder: "Search stock adjustments..."
+  sortable_columns: [Adjustment Number, Warehouse, Adjustment Date, Adjustment Type, Status]
+  view_type: dialog
+  checkbox_header: false
+
 - slug: products
   route: /products
   api: /api/products
@@ -415,7 +424,10 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 11 | Fiscal Years | `fiscal-years` | `FiscalYearControllerTest`, `FiscalYearExportTest` | `FiscalYearTest` | — |
 | 12 | Journal Entries | `journal-entries` | `JournalEntryControllerTest`, `JournalEntryExportTest` | `JournalEntryTest` | — |
 | 13 | Asset Stocktakes | `asset-stocktakes` | `AssetStocktakeControllerTest`, `AssetStocktakeExportTest` | `AssetStocktakeTest` | — |
-| 14 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
+| 14 | Stock Transfers | `stock-transfers` | `StockTransferControllerTest`, `StockTransferExportTest` | `StockTransferTest` | — |
+| 15 | Inventory Stocktakes | `inventory-stocktakes` | `InventoryStocktakeControllerTest`, `InventoryStocktakeExportTest` | `InventoryStocktakeTest` | — |
+| 16 | Stock Adjustments | `stock-adjustments` | `StockAdjustmentControllerTest`, `StockAdjustmentExportTest` | `StockAdjustmentTest` | — |
+| 17 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
 
 ---
 

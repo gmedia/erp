@@ -139,6 +139,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'stock_adjustment',
+                'display_name' => 'Stock Adjustment',
+                'child' => [
+                    [
+                        'name' => 'stock_adjustment.create',
+                        'display_name' => 'Create Stock Adjustment',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'stock_adjustment.edit',
+                        'display_name' => 'Edit Stock Adjustment',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'stock_adjustment.delete',
+                        'display_name' => 'Delete Stock Adjustment',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'employee',
                 'display_name' => 'Employee',
                 'child' => [

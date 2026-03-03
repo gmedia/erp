@@ -109,6 +109,11 @@ import { createInventoryStocktakeFilterFields } from '@/components/inventory-sto
 import { InventoryStocktakeForm } from '@/components/inventory-stocktakes/InventoryStocktakeForm';
 import { InventoryStocktakeViewModal } from '@/components/inventory-stocktakes/InventoryStocktakeViewModal';
 import { type InventoryStocktake } from '@/types/inventory-stocktake';
+import { stockAdjustmentColumns } from '@/components/stock-adjustments/StockAdjustmentColumns';
+import { createStockAdjustmentFilterFields } from '@/components/stock-adjustments/StockAdjustmentFilters';
+import { StockAdjustmentForm } from '@/components/stock-adjustments/StockAdjustmentForm';
+import { StockAdjustmentViewModal } from '@/components/stock-adjustments/StockAdjustmentViewModal';
+import { type StockAdjustment } from '@/types/stock-adjustment';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -375,6 +380,29 @@ export const inventoryStocktakeConfig = createComplexEntityConfig<InventoryStock
     viewModalComponent: InventoryStocktakeViewModal,
     getDeleteMessage: (stocktake: { stocktake_number?: string | null }) =>
         `This action cannot be undone. This will cancel inventory stocktake ${stocktake.stocktake_number || ''}.`,
+});
+
+export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>({
+    entityName: 'Stock Adjustment',
+    entityNamePlural: 'Stock Adjustments',
+    apiEndpoint: '/api/stock-adjustments',
+    exportEndpoint: '/api/stock-adjustments/export',
+    queryKey: ['stock-adjustments'],
+    breadcrumbs: [{ title: 'Stock Adjustments', href: '/stock-adjustments' }],
+    initialFilters: {
+        search: '',
+        warehouse_id: '',
+        status: '',
+        adjustment_type: '',
+    },
+    columns: stockAdjustmentColumns,
+    filterFields: createStockAdjustmentFilterFields(),
+    formComponent: StockAdjustmentForm,
+    formType: 'complex',
+    entityNameForSearch: 'stock adjustment',
+    viewModalComponent: StockAdjustmentViewModal,
+    getDeleteMessage: (adjustment: { adjustment_number?: string | null }) =>
+        `This action cannot be undone. This will cancel stock adjustment ${adjustment.adjustment_number || ''}.`,
 });
 
 export const supplierCategoryConfig = createSimpleEntityConfig({
