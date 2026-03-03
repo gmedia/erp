@@ -159,6 +159,9 @@ class DatabaseSeeder extends Seeder
             ApprovalDelegationSampleSeeder::class,
             ProductSampleDataSeeder::class,
             AssetSampleDataSeeder::class,
+            StockTransferSampleDataSeeder::class,
+            InventoryStocktakeSampleDataSeeder::class,
+            StockAdjustmentSampleDataSeeder::class,
         ]);
 
         // Assign all permissions to sample users for easy testing
