@@ -8,7 +8,7 @@ uses(RefreshDatabase::class)->group('admin-settings');
 describe('Setting Model', function () {
     beforeEach(function () {
         // Seed default settings
-        $this->seed(\Database\Seeders\SettingSeeder::class);
+        $this->seed(\Database\Seeders\SettingSampleSeeder::class);
     });
 
     test('get returns default value when key does not exist', function () {

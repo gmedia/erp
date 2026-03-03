@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class ApprovalDelegationSeeder extends Seeder
+class ApprovalDelegationSampleSeeder extends Seeder
 {
     /**
      * Run the database seeds.
