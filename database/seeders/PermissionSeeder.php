@@ -160,6 +160,11 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'stock_movement',
+                'display_name' => 'Stock Movement',
+                'child' => [],
+            ],
+            [
                 'name' => 'employee',
                 'display_name' => 'Employee',
                 'child' => [

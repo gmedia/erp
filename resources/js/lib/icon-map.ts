@@ -54,6 +54,7 @@ import {
     Activity,
     Warehouse,
     Edit3,
+    History,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -111,6 +112,7 @@ const iconMap: Record<string, LucideIcon> = {
     Activity,
     Warehouse,
     Edit3,
+    History,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

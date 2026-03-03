@@ -39,8 +39,40 @@ export function useCrudFilters<T extends FilterState = FilterState>({
     initialPagination = { page: 1, per_page: 15 },
     resetPageOnFilterChange = true,
 }: UseCrudFiltersOptions<T> = {}): UseCrudFiltersResult<T> {
-    const [filters, setFiltersState] = useState<T>(initialFilters);
-    const [pagination, setPaginationState] = useState(initialPagination);
+    const [filters, setFiltersState] = useState<T>(() => {
+        if (typeof window === 'undefined') return initialFilters;
+
+        const params = new URLSearchParams(window.location.search);
+        const merged = { ...(initialFilters as Record<string, unknown>) };
+
+        for (const key of Object.keys(initialFilters)) {
+            const value = params.get(key);
+            if (value !== null) merged[key] = value;
+        }
+
+        if (!('search' in merged)) {
+            const search = params.get('search');
+            if (search !== null) merged.search = search;
+        }
+
+        return merged as T;
+    });
+
+    const [pagination, setPaginationState] = useState(() => {
+        if (typeof window === 'undefined') return initialPagination;
+
+        const params = new URLSearchParams(window.location.search);
+        const pageParam = params.get('page');
+        const perPageParam = params.get('per_page');
+
+        const page = pageParam ? Number(pageParam) : initialPagination.page;
+        const per_page = perPageParam ? Number(perPageParam) : initialPagination.per_page;
+
+        return {
+            page: Number.isFinite(page) && page > 0 ? page : initialPagination.page,
+            per_page: Number.isFinite(per_page) && per_page > 0 ? per_page : initialPagination.per_page,
+        };
+    });
 
     const setFilters = useCallback(
         (newFilters: Partial<T>) => {

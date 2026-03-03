@@ -389,6 +389,18 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   checkbox_header: false
   note: "Non-CRUD feature for viewing and exporting pipeline state logs. Read-only Data Table with Detail modal."
 
+- slug: stock-movements
+  route: /stock-movements
+  api: /stock-movements (Accepts application/json)
+  export_api: /api/stock-movements/export
+  search_placeholder: "Search reference, notes, product, warehouse..."
+  sortable_columns: [Moved At, Product, Warehouse, Type, Reference, Qty In, Qty Out, Balance, Unit Cost, Avg Cost, Created By]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD kartu stok digital. Read-only Data Table dengan filter product/warehouse/type/date dan drill-down reference."
+  tests:
+    - tests/e2e/stock-movements/stock-movement.spec.ts
+
 - modul: Asset Dashboard
   group: asset-dashboard
   tests:
@@ -499,6 +511,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 17 | My Approvals | `my-approvals` | `Feature/MyApprovalControllerTest.php` | Inbox for user to approve/reject documents |
 | 18 | Approval History | `approval-history` | `Feature/EntityApprovalHistoryControllerTest.php` | Component showing timeline history of approvals per entity |
 | 19 | Approval Monitoring | `approval-monitoring` | `Feature/ApprovalMonitoring/ApprovalMonitoringControllerTest.php` | Monitoring dashboard connecting to GetApprovalMonitoringDataAction |
+| 20 | Stock Movements | `stock-movements` | `Feature/StockMovements/*.php` (2 files) | Kartu stok (read-only) + export |
 
 ---
 
