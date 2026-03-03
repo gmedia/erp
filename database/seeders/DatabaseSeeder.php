@@ -152,10 +152,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             MenuSeeder::class,
-            SettingSampleSeeder::class,
-            PipelineSampleSeeder::class,
-            ApprovalFlowSampleSeeder::class,
-            ApprovalDelegationSampleSeeder::class,
+            SettingSampleDataSeeder::class,
+            PipelineSampleDataSeeder::class,
+            ApprovalFlowSampleDataSeeder::class,
+            ApprovalDelegationSampleDataSeeder::class,
             ProductSampleDataSeeder::class,
             AssetSampleDataSeeder::class,
         ]);

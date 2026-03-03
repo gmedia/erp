@@ -9,7 +9,7 @@ use App\Models\PipelineTransitionAction;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
-class PipelineSampleSeeder extends Seeder
+class PipelineSampleDataSeeder extends Seeder
 {
     /**
      * Seed the Asset Lifecycle pipeline with realistic configuration.
