@@ -456,6 +456,14 @@ class MenuSeeder extends Seeder
                         'url' => 'approval-delegations',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'approval_monitoring',
+                        'display_name' => 'Approval Monitoring',
+                        'permissions' => ['approval_flow'],
+                        'icon' => 'Activity',
+                        'url' => 'approval-monitoring',
+                        'child' => [],
+                    ],
                 ],
             ],
         ];

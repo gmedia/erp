@@ -709,6 +709,11 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'approval_monitoring',
+                'display_name' => 'Approval Monitoring',
+                'child' => [],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],
