@@ -20,11 +20,10 @@ class IndexInventoryStocktakeRequest extends FormRequest
             'status' => ['nullable', 'string', 'in:draft,in_progress,completed,cancelled'],
             'stocktake_date_from' => ['nullable', 'date'],
             'stocktake_date_to' => ['nullable', 'date'],
-            'sort_by' => ['nullable', 'string', 'in:id,stocktake_number,warehouse_id,stocktake_date,status,created_at,updated_at'],
+            'sort_by' => ['nullable', 'string', 'in:id,stocktake_number,warehouse_id,stocktake_date,status,product_category_id,created_at,updated_at'],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }
-

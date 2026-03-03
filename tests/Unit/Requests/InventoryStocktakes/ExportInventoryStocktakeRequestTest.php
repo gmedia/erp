@@ -23,3 +23,10 @@ test('rules contains export filter keys', function () {
     ]);
 });
 
+test('rules validation passes with product_category_id sort_by', function () {
+    $data = ['sort_by' => 'product_category_id'];
+
+    $validator = validator($data, (new ExportInventoryStocktakeRequest())->rules());
+
+    expect(!$validator->fails())->toBeTrue();
+});
