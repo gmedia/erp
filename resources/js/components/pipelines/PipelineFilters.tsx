@@ -3,6 +3,7 @@ import {
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
+import { APPROVABLE_TYPE_OPTIONS } from '@/constants/model-options';
 
 export function createPipelineFilterFields(): FieldDescriptor[] {
     return [
@@ -10,12 +11,7 @@ export function createPipelineFilterFields(): FieldDescriptor[] {
         createSelectFilterField(
             'entity_type',
             'Entity Type',
-            [
-                { value: 'App\\Models\\Asset', label: 'Asset' },
-                { value: 'App\\Models\\PurchaseOrder', label: 'Purchase Order' },
-                { value: 'App\\Models\\PurchaseRequest', label: 'Purchase Request' },
-                { value: 'App\\Models\\JournalEntry', label: 'Journal Entry' },
-            ],
+            [...APPROVABLE_TYPE_OPTIONS],
             'All Entities'
         ),
         createSelectFilterField(

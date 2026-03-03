@@ -342,6 +342,25 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   checkbox_header: false
   note: "Memiliki embedded sub-form untuk Pipeline States dan Pipeline Transitions yang dapat diakses di dalam Edit modal."
 
+- slug: approval-flows
+  route: /approval-flows
+  api: /api/approval-flows
+  export_api: /api/approval-flows/export
+  search_placeholder: "Search by Code or Name..."
+  sortable_columns: [Code, Name, Approvable Type, Status, Created At]
+  view_type: dialog
+  checkbox_header: false
+  note: "Memiliki dynamic nested array untuk Approval Flow Steps (mengatur role/user, SLA auto-approve, dll) via formik/react-hook-form."
+
+- slug: approval-delegations
+  route: /approval-delegations
+  api: /api/approval-delegations
+  export_api: /api/approval-delegations/export
+  search_placeholder: "Search delegator, delegate, or reason..."
+  sortable_columns: [Delegator, Delegate, Approvable Type, Start Date, End Date, Reason, Status]
+  view_type: dialog
+  checkbox_header: false
+
 - slug: entity-state-actions
   route: (embedded in Asset Profile)
   api: /api/entity-states/{entityType}/{entityId}
@@ -384,6 +403,21 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/admin-settings/admin-settings.spec.ts
 
+- slug: my-approvals
+  route: /my-approvals
+  api: POST /my-approvals/{id}/approve
+  view_type: page
+  note: "Non-CRUD approval inbox page. Shows pending, approved, rejected, and all requests for the logged-in user."
+  tests:
+    - tests/e2e/my-approvals/my-approvals.spec.ts
+
+- slug: approval-history
+  api: GET /api/entity-states/{entityType}/{id}/approvals
+  view_type: component
+  note: "Non-CRUD component embedded in entity profiles to show the timeline of approval requests and steps."
+  tests:
+    - tests/e2e/approval-history/approval-history.spec.ts
+
 ## Testing
 
 E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
@@ -424,10 +458,13 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 11 | Fiscal Years | `fiscal-years` | `FiscalYearControllerTest`, `FiscalYearExportTest` | `FiscalYearTest` | — |
 | 12 | Journal Entries | `journal-entries` | `JournalEntryControllerTest`, `JournalEntryExportTest` | `JournalEntryTest` | — |
 | 13 | Asset Stocktakes | `asset-stocktakes` | `AssetStocktakeControllerTest`, `AssetStocktakeExportTest` | `AssetStocktakeTest` | — |
-| 14 | Stock Transfers | `stock-transfers` | `StockTransferControllerTest`, `StockTransferExportTest` | `StockTransferTest` | — |
-| 15 | Inventory Stocktakes | `inventory-stocktakes` | `InventoryStocktakeControllerTest`, `InventoryStocktakeExportTest` | `InventoryStocktakeTest` | — |
-| 16 | Stock Adjustments | `stock-adjustments` | `StockAdjustmentControllerTest`, `StockAdjustmentExportTest` | `StockAdjustmentTest` | — |
-| 17 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
+| 14 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
+| 15 | Approval Flows | `approval-flows` | `ApprovalFlowControllerTest` | `ApprovalFlowTest`, `ApprovalFlowStepTest` | Memiliki `ApprovalFlowFilterServiceTest` & `UpdateApprovalFlowDataTest` |
+| 16 | Approval Delegations | `approval-delegations` | `ApprovalDelegationControllerTest`, `ApprovalDelegationExportTest` | `ApprovalDelegationTest` | Memiliki `ApprovalDelegationFilterServiceTest` & `UpdateApprovalDelegationDataTest` |
+| 17 | Stock Transfers | `stock-transfers` | `StockTransferControllerTest`, `StockTransferExportTest` | `StockTransferTest` | — |
+| 18 | Inventory Stocktakes | `inventory-stocktakes` | `InventoryStocktakeControllerTest`, `InventoryStocktakeExportTest` | `InventoryStocktakeTest` | — |
+| 19 | Stock Adjustments | `stock-adjustments` | `StockAdjustmentControllerTest`, `StockAdjustmentExportTest` | `StockAdjustmentTest` | — |
+| 20 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
 
 ---
 
@@ -451,6 +488,8 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 14 | Pipeline Audit Trail | `pipeline-audit-trail` | `Feature/PipelineAuditTrail/PipelineAuditTrailControllerTest.php` | Log seluruh transisi state pipeline |
 | 15 | Asset Dashboard | `asset-dashboard` | `Feature/AssetDashboard/AssetDashboardControllerTest.php` | Dashboard Visualisasi Aset |
 | 16 | Admin Settings | `admin-settings` | `Feature/AdminSettings/AdminSettingControllerTest.php`, `Unit/Models/SettingTest.php` | Non-CRUD settings page (General, Regional) |
+| 17 | My Approvals | `my-approvals` | `Feature/MyApprovalControllerTest.php` | Inbox for user to approve/reject documents |
+| 18 | Approval History | `approval-history` | `Feature/EntityApprovalHistoryControllerTest.php` | Component showing timeline history of approvals per entity |
 
 ---
 

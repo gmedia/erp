@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\ApprovalFlow;
+use App\Models\ApprovalRequest;
+use App\Models\ApprovalRequestStep;
 use App\Models\Asset;
 use App\Models\AssetCategory;
 use App\Models\AssetLocation;
@@ -355,12 +358,98 @@ class AssetSampleDataSeeder extends Seeder
                 'book_value'              => 3500000,
                 'pipeline_state'   => 'cancelled',
             ],
+
+            // ─── ASSETS WITH APPROVAL INTEGRATION ───────────────────
+            [
+                'asset_code'       => 'FA-000010',
+                'name'             => 'High-End Server Rack',
+                'asset_model_id'   => null,
+                'asset_category_id'=> $itCategory?->id,
+                'serial_number'    => 'SN-SRV-001',
+                'branch_id'        => $headOffice->id,
+                'asset_location_id'=> $itRoom?->id,
+                'department_id'    => $defaultDepartment?->id,
+                'employee_id'      => null,
+                'supplier_id'      => $supplier->id,
+                'purchase_date'    => now()->toDateString(),
+                'purchase_cost'    => 150000000, // > 100M
+                'currency'         => 'IDR',
+                'warranty_end_date'=> now()->addYears(3)->toDateString(),
+                'status'           => 'draft',
+                'condition'        => 'good',
+                'depreciation_method'     => 'straight_line',
+                'depreciation_start_date' => null,
+                'useful_life_months'      => 60,
+                'salvage_value'           => 0,
+                'accumulated_depreciation'=> 0,
+                'book_value'              => 150000000,
+                'pipeline_state'   => 'draft',
+                'approval_flow_code' => 'asset_registration_high_value',
+                'approval_status'  => 'pending',
+            ],
+            [
+                'asset_code'       => 'FA-000011',
+                'name'             => 'Manager Car (Toyota Camry)',
+                'asset_model_id'   => null,
+                'asset_category_id'=> $vehCategory?->id,
+                'serial_number'    => 'SN-TYT-002',
+                'branch_id'        => $headOffice->id,
+                'asset_location_id'=> null,
+                'department_id'    => $defaultDepartment?->id,
+                'employee_id'      => null,
+                'supplier_id'      => $supplier->id,
+                'purchase_date'    => now()->subYears(1)->toDateString(),
+                'purchase_cost'    => 450000000,
+                'currency'         => 'IDR',
+                'warranty_end_date'=> null,
+                'status'           => 'active',
+                'condition'        => 'good',
+                'depreciation_method'     => 'straight_line',
+                'depreciation_start_date' => now()->subYears(1)->toDateString(),
+                'useful_life_months'      => 60,
+                'salvage_value'           => 0,
+                'accumulated_depreciation'=> 90000000,
+                'book_value'              => 360000000,
+                'pipeline_state'   => 'active',
+            ],
+            [
+                'asset_code'       => 'FA-000012',
+                'name'             => 'Old Inkjet Printer',
+                'asset_model_id'   => null,
+                'asset_category_id'=> $itCategory?->id,
+                'serial_number'    => 'SN-EPS-002',
+                'branch_id'        => $headOffice->id,
+                'asset_location_id'=> null,
+                'department_id'    => $defaultDepartment?->id,
+                'employee_id'      => null,
+                'supplier_id'      => $supplier->id,
+                'purchase_date'    => now()->subYears(4)->toDateString(),
+                'purchase_cost'    => 5000000,
+                'currency'         => 'IDR',
+                'warranty_end_date'=> null,
+                'status'           => 'disposed',
+                'condition'        => 'damaged',
+                'depreciation_method'     => 'straight_line',
+                'depreciation_start_date' => now()->subYears(4)->toDateString(),
+                'useful_life_months'      => 36,
+                'salvage_value'           => 0,
+                'accumulated_depreciation'=> 5000000,
+                'book_value'              => 0,
+                'pipeline_state'   => 'disposed',
+            ],
         ];
 
         // ── Create Assets + Initial Movements ───────────────────────
         foreach ($assetsData as $data) {
             $pipelineStateCode = $data['pipeline_state'];
+            $approvalFlowCode = $data['approval_flow_code'] ?? null;
+            $approvalStatus = $data['approval_status'] ?? null;
+            $isDisposal = $data['is_disposal'] ?? false;
+
             unset($data['pipeline_state']);
+            unset($data['approval_flow_code']);
+            unset($data['approval_status']);
+            unset($data['is_disposal']);
 
             $asset = Asset::updateOrCreate(['asset_code' => $data['asset_code']], $data);
 
@@ -380,6 +469,66 @@ class AssetSampleDataSeeder extends Seeder
                     'created_by'         => $adminUser?->id,
                 ]
             );
+
+            // Handle Disposal Movement
+            if ($isDisposal) {
+                AssetMovement::updateOrCreate(
+                    ['asset_id' => $asset->id, 'movement_type' => 'dispose'],
+                    [
+                        'moved_at'           => now(),
+                        'from_branch_id'     => $asset->branch_id,
+                        'to_branch_id'       => null,
+                        'from_location_id'   => $asset->asset_location_id,
+                        'to_location_id'     => null,
+                        'from_department_id' => $asset->department_id,
+                        'to_department_id'   => null,
+                        'from_employee_id'   => $asset->employee_id,
+                        'to_employee_id'     => null,
+                        'reference'          => 'DISP-' . $asset->asset_code,
+                        'notes'              => 'Disposal initiated via seeder',
+                        'created_by'         => $adminUser?->id,
+                    ]
+                );
+            }
+
+            // Handle Approval Requests
+            if ($approvalFlowCode) {
+                $flow = ApprovalFlow::where('code', $approvalFlowCode)->first();
+                if ($flow) {
+                    $request = ApprovalRequest::updateOrCreate(
+                        [
+                            'approvable_type' => Asset::class,
+                            'approvable_id'   => $asset->id,
+                            'approval_flow_id'=> $flow->id,
+                        ],
+                        [
+                            'current_step_order' => $approvalStatus === 'approved' ? $flow->steps()->count() : 1,
+                            'status'             => $approvalStatus,
+                            'submitted_by'       => $adminUser?->id,
+                            'submitted_at'       => now(),
+                            'completed_at'       => $approvalStatus === 'approved' ? now() : null,
+                        ]
+                    );
+
+                    // Create Steps
+                    foreach ($flow->steps as $step) {
+                        ApprovalRequestStep::updateOrCreate(
+                            [
+                                'approval_request_id'   => $request->id,
+                                'approval_flow_step_id' => $step->id,
+                            ],
+                            [
+                                'step_order' => $step->step_order,
+                                'status'     => $approvalStatus === 'approved' ? 'approved' : ($step->step_order === 1 ? 'pending' : 'pending'),
+                                'acted_by'   => $approvalStatus === 'approved' ? $step->approver_user_id : null,
+                                'action'     => $approvalStatus === 'approved' ? 'approve' : null,
+                                'comments'   => $approvalStatus === 'approved' ? 'Approved via seeder' : null,
+                                'acted_at'   => $approvalStatus === 'approved' ? now() : null,
+                            ]
+                        );
+                    }
+                }
+            }
         }
 
         // ── Pipeline Assignment ─────────────────────────────────────
@@ -433,6 +582,17 @@ class AssetSampleDataSeeder extends Seeder
             // FA-000009: draft → cancelled
             'FA-000009' => [
                 ['draft', 'cancelled', null, 25],
+            ],
+            // FA-000010: stays in draft
+            'FA-000010' => [],
+            // FA-000011: draft → active
+            'FA-000011' => [
+                ['draft', 'active', null, 365],
+            ],
+            // FA-000012: draft → active → disposed
+            'FA-000012' => [
+                ['draft', 'active', null, 1460],
+                ['active', 'disposed', 'Approved via seeder', 10],
             ],
         ];
 

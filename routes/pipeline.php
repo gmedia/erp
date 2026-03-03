@@ -50,5 +50,8 @@ Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
         Route::get('/entity-states/{entityType}/{entityId}', [\App\Http\Controllers\EntityStateController::class, 'getState']);
         Route::post('/entity-states/{entityType}/{entityId}/transition', [\App\Http\Controllers\EntityStateController::class, 'executeTransition']);
         Route::get('/entity-states/{entityType}/{entityId}/timeline', [\App\Http\Controllers\EntityStateController::class, 'getTimeline']);
+        
+        // Entity Approval History
+        Route::get('/entity-states/{entityType}/{entityId}/approvals', [\App\Http\Controllers\EntityApprovalHistoryController::class, 'index']);
     });
 });

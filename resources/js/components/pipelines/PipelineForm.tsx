@@ -12,6 +12,7 @@ import NameField from '@/components/common/NameField';
 
 import { Pipeline } from '@/types/entity';
 import { PipelineFormData, pipelineFormSchema } from '@/utils/schemas';
+import { APPROVABLE_TYPE_OPTIONS } from '@/constants/model-options';
 import { PipelineStateManager } from './PipelineStateManager';
 import { PipelineTransitionManager } from './PipelineTransitionManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -31,12 +32,7 @@ const renderBasicInfoSection = () => (
         <SelectField
             name="entity_type"
             label="Entity Type"
-            options={[
-                { value: 'App\\Models\\Asset', label: 'Asset' },
-                { value: 'App\\Models\\PurchaseOrder', label: 'Purchase Order' },
-                { value: 'App\\Models\\PurchaseRequest', label: 'Purchase Request' },
-                { value: 'App\\Models\\JournalEntry', label: 'Journal Entry' },
-            ]}
+            options={[...APPROVABLE_TYPE_OPTIONS]}
         />
         <InputField name="version" label="Version" type="number" placeholder="1" />
     </>

@@ -3,11 +3,13 @@
 namespace App\Actions\EntityStates;
 
 use App\Models\PipelineTransition;
+use App\Traits\HandlesConditions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class EvaluateGuardAction
 {
+    use HandlesConditions;
     /**
      * Evaluate the guard conditions for a specific transition on a given entity.
      * 
@@ -27,26 +29,11 @@ class EvaluateGuardAction
         // 1. Evaluate field_checks: [ {"field": "status", "operator": "equals", "value": "active"} ]
         if (isset($guards['field_checks']) && is_array($guards['field_checks'])) {
             foreach ($guards['field_checks'] as $check) {
-                $field = $check['field'] ?? null;
-                $operator = $check['operator'] ?? 'equals';
-                $expectedValue = $check['value'] ?? null;
-
-                if (!$field) continue;
-
-                $actualValue = $entity->$field;
-
-                $passed = match ($operator) {
-                    'equals', '=' => $actualValue == $expectedValue,
-                    'not_equals', '!=' => $actualValue != $expectedValue,
-                    'greater_than', '>' => $actualValue > $expectedValue,
-                    'less_than', '<' => $actualValue < $expectedValue,
-                    'contains' => str_contains((string)$actualValue, (string)$expectedValue),
-                    'not_null' => !is_null($actualValue),
-                    'is_null' => is_null($actualValue),
-                    default => false,
-                };
-
-                if (!$passed) {
+                if (!$this->evaluateFieldCheck($check, $entity)) {
+                    $field = $check['field'] ?? 'unknown';
+                    $operator = $check['operator'] ?? 'equals';
+                    $expectedValue = $check['value'] ?? 'unknown';
+                    $actualValue = $entity->$field;
                     $failures[] = "Field check failed: {$field} must " . str_replace('_', ' ', $operator) . " '{$expectedValue}' (current value: '{$actualValue}')";
                 }
             }
@@ -55,36 +42,18 @@ class EvaluateGuardAction
         // 2. Evaluate relation_checks: [ {"relation": "category", "field": "code", "operator": "equals", "value": "IT"} ]
         if (isset($guards['relation_checks']) && is_array($guards['relation_checks'])) {
             foreach ($guards['relation_checks'] as $check) {
-                $relation = $check['relation'] ?? null;
-                $field = $check['field'] ?? null;
-                $operator = $check['operator'] ?? 'equals';
-                $expectedValue = $check['value'] ?? null;
+                if (!$this->evaluateRelationCheck($check, $entity)) {
+                    $relation = $check['relation'] ?? 'unknown';
+                    $field = $check['field'] ?? 'unknown';
+                    $operator = $check['operator'] ?? 'equals';
+                    $expectedValue = $check['value'] ?? 'unknown';
+                    
+                    if (!$entity->relationLoaded($relation)) {
+                        $entity->load($relation);
+                    }
+                    $relatedModel = $entity->getRelation($relation);
+                    $actualValue = $relatedModel ? $relatedModel->$field : 'null';
 
-                if (!$relation || !$field) continue;
-
-                // Load relation if not loaded
-                if (!$entity->relationLoaded($relation)) {
-                    $entity->load($relation);
-                }
-
-                $relatedModel = $entity->getRelation($relation);
-                
-                if (!$relatedModel) {
-                    $failures[] = "Relation check failed: relation '{$relation}' is empty";
-                    continue;
-                }
-
-                $actualValue = $relatedModel->$field;
-
-                $passed = match ($operator) {
-                    'equals', '=' => $actualValue == $expectedValue,
-                    'not_equals', '!=' => $actualValue != $expectedValue,
-                    'not_null' => !is_null($actualValue),
-                    'is_null' => is_null($actualValue),
-                    default => false,
-                };
-
-                if (!$passed) {
                     $failures[] = "Relation check failed: {$relation}.{$field} must " . str_replace('_', ' ', $operator) . " '{$expectedValue}' (current value: '{$actualValue}')";
                 }
             }

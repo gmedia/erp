@@ -25,6 +25,7 @@ import { format } from 'date-fns';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
+import { ApprovalHistoryTimeline } from '@/components/approvals/ApprovalHistoryTimeline';
 import { EntityStateActions } from '@/components/pipeline/EntityStateActions';
 import { EntityStateTimeline } from '@/components/pipeline/EntityStateTimeline';
 import {
@@ -266,7 +267,7 @@ export default function AssetProfile({ asset }: Props) {
 
                 <Tabs defaultValue="summary" className="w-full">
                     <div className="overflow-x-auto no-scrollbar">
-                        <TabsList className="inline-flex h-auto w-full min-w-max md:grid md:grid-cols-6 bg-muted/50">
+                        <TabsList className="inline-flex h-auto w-full min-w-max md:grid md:grid-cols-7 bg-muted/50">
                         <TabsTrigger value="summary" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <Info className="mr-2 h-4 w-4" />
                             Summary
@@ -290,6 +291,10 @@ export default function AssetProfile({ asset }: Props) {
                         <TabsTrigger value="timeline" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <History className="mr-2 h-4 w-4" />
                             Timeline
+                        </TabsTrigger>
+                        <TabsTrigger value="approvals" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                            <History className="mr-2 h-4 w-4" />
+                            Approvals
                         </TabsTrigger>
                     </TabsList>
                 </div>
@@ -690,6 +695,11 @@ export default function AssetProfile({ asset }: Props) {
                     {/* Timeline Tab */}
                     <TabsContent value="timeline" className="mt-6">
                         <EntityStateTimeline key={timelineKey} entityType="asset" entityId={item.ulid} />
+                    </TabsContent>
+
+                    {/* Approvals Tab */}
+                    <TabsContent value="approvals" className="mt-6">
+                        <ApprovalHistoryTimeline entityType="asset" entityId={item.ulid} />
                     </TabsContent>
                 </Tabs>
             </div>

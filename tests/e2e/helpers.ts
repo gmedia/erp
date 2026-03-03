@@ -36,7 +36,14 @@ export async function createEntity(
 
   // 3️⃣ Open the "Add Entity" dialog
   const addButton = page.getByRole('button', { name: /Add/i });
-  await expect(addButton).toBeVisible();
+  try {
+    await expect(addButton).toBeVisible({ timeout: 5000 });
+  } catch (error) {
+    console.error("Add button hidden. Page content:");
+    console.error(await page.textContent('body'));
+    await page.screenshot({ path: 'tests/e2e/test-results/debug-add-button.png' });
+    throw error;
+  }
   await addButton.click();
 
   // 4️⃣ Fill the form fields
@@ -120,6 +127,17 @@ export async function login(
   password = 'password'
 ): Promise<void> {
   if (page.url().includes('/dashboard')) return;
+
+  // Listen for uncaught JS errors
+  page.on('pageerror', exception => {
+    console.error(`Uncaught exception: "${exception}"`);
+  });
+  
+  // Listen for console errors
+  page.on('console', msg => {
+    if (msg.type() === 'error')
+      console.error(`Console Error text: "${msg.text()}"`);
+  });
 
   const gotoWithRetry = async (url: string): Promise<void> => {
     let lastError: unknown;

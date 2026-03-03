@@ -662,6 +662,53 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'approval_flow',
+                'display_name' => 'Approval Flow',
+                'child' => [
+                    [
+                        'name' => 'approval_flow.create',
+                        'display_name' => 'Create Approval Flow',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'approval_flow.edit',
+                        'display_name' => 'Edit Approval Flow',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'approval_flow.delete',
+                        'display_name' => 'Delete Approval Flow',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'approval_delegation',
+                'display_name' => 'Approval Delegation',
+                'child' => [
+                    [
+                        'name' => 'approval_delegation.create',
+                        'display_name' => 'Create Approval Delegation',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'approval_delegation.edit',
+                        'display_name' => 'Edit Approval Delegation',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'approval_delegation.delete',
+                        'display_name' => 'Delete Approval Delegation',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'approval_delegation.export',
+                        'display_name' => 'Export Approval Delegation',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],
@@ -684,10 +731,7 @@ class PermissionSeeder extends Seeder
             ],
         ];
 
-        $permissions = $this->createPermissions($permissions);
-        
-        $admin = Employee::where('email', config('app.admin'))->first();
-        $admin->permissions()->sync($permissions);
+        $this->createPermissions($permissions);
     }
 
     private function createPermissions(array $items, ?Permission $parent = null): array

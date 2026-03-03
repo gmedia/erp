@@ -1,5 +1,22 @@
 import * as z from 'zod';
 
+// Schema for approval delegations
+export const approvalDelegationFormSchema = z.object({
+    delegator_user_id: z.string().min(1, { message: 'Delegator is required.' }),
+    delegate_user_id: z.string().min(1, { message: 'Delegate is required.' }),
+    approvable_type: z.string().optional(),
+    start_date: z.date({ message: 'Start date is required.' }),
+    end_date: z.date({ message: 'End date is required.' }),
+    reason: z.string().optional(),
+    is_active: z.union([z.boolean(), z.string()]).default(true).transform((val) => val === true || val === 'true' || val === '1'),
+}).refine(data => data.delegator_user_id !== data.delegate_user_id, {
+    message: 'Delegator and Delegate cannot be the same user.',
+    path: ['delegate_user_id'],
+}).refine(data => data.end_date >= data.start_date, {
+    message: 'End date must be after or equal to start date.',
+    path: ['end_date'],
+});
+
 // Schema for simple entities (departments, positions)
 export const simpleEntitySchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -410,6 +427,32 @@ export const pipelineTransitionFormSchema = z.object({
 });
 
 export type PipelineTransitionFormData = z.infer<typeof pipelineTransitionFormSchema>;
+
+export const approvalFlowFormSchema = z.object({
+    name: z.string().min(1, 'Name is required'),
+    code: z.string().min(1, 'Code is required'),
+    approvable_type: z.string().min(1, 'Approvable Type is required'),
+    description: z.string().nullable().optional(),
+    is_active: z.union([z.boolean(), z.string()]).transform((val) => val === true || val === 'true'),
+    conditions: z.string().nullable().optional(),
+    steps: z.array(
+        z.object({
+            id: z.number().optional(),
+            name: z.string().min(1, 'Step name is required'),
+            approver_type: z.enum(['user', 'role', 'department_head']),
+            approver_user_id: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
+            approver_role_id: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
+            approver_department_id: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
+            required_action: z.enum(['approve', 'review', 'acknowledge']),
+            auto_approve_after_hours: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
+            escalate_after_hours: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
+            escalation_user_id: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
+            can_reject: z.union([z.boolean(), z.string()]).transform((val) => val === true || val === 'true'),
+        })
+    ).optional(),
+});
+
+export type ApprovalFlowFormData = z.infer<typeof approvalFlowFormSchema>;
 
 export const stockTransferFormSchema = z.object({
     transfer_number: z.string().optional(),
