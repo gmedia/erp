@@ -69,7 +69,7 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
         },
         {
             id: 'product_name',
-            ...createSortingHeader('Product'),
+            header: 'Product',
             cell: ({ row }) => (
                 <div className="space-y-0.5">
                     <div className="font-medium">
@@ -83,7 +83,7 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
         },
         {
             id: 'warehouse_name',
-            ...createSortingHeader('Warehouse'),
+            header: 'Warehouse',
             cell: ({ row }) => (
                 <div className="space-y-0.5">
                     <div className="font-medium">
@@ -155,7 +155,7 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
         }),
         {
             id: 'created_by',
-            ...createSortingHeader('Created By'),
+            header: 'Created By',
             cell: ({ row }) => <div>{row.original.created_by?.name ?? '-'}</div>,
         },
     ];
