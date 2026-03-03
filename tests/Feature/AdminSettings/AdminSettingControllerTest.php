@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 uses(RefreshDatabase::class)->group('admin-settings');
 
 beforeEach(function () {
-    $this->seed(\Database\Seeders\SettingSampleSeeder::class);
+    $this->seed(\Database\Seeders\SettingSampleDataSeeder::class);
 });
 
 describe('AdminSettingController@index', function () {
