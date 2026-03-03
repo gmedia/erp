@@ -51,16 +51,18 @@ import {
     CheckCircle,
     UserPlus,
     Inbox,
+    Activity,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
-    LayoutGrid,
-    Users,
-    IdCard,
-    Settings2,
-    LayoutList,
     BookOpen,
     Folder,
+    IdCard,
+    LayoutGrid,
+    Settings,
+    Settings2,
+    LayoutList,
+    Users,
     Truck,
     Book,
     FolderTree,
@@ -89,7 +91,6 @@ const iconMap: Record<string, LucideIcon> = {
     Link,
     Layers,
     Map,
-    Settings,
     Shield,
     Lock,
     User,
@@ -105,6 +106,7 @@ const iconMap: Record<string, LucideIcon> = {
     CheckCircle,
     UserPlus,
     Inbox,
+    Activity,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

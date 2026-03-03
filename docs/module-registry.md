@@ -380,6 +380,14 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   note: "Non-CRUD component embedded in entity profiles to show the timeline of approval requests and steps."
   tests:
     - tests/e2e/approval-history/approval-history.spec.ts
+    
+- slug: approval-monitoring
+  route: /approval-monitoring
+  api: GET /api/approval-monitoring/data
+  view_type: page
+  note: "Non-CRUD approval monitoring dashboard. Shows summary stats and overdue approvals."
+  tests:
+    - tests/e2e/approval-monitoring/approval-monitoring.spec.ts
 
 ## Testing
 
@@ -449,6 +457,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 16 | Admin Settings | `admin-settings` | `Feature/AdminSettings/AdminSettingControllerTest.php`, `Unit/Models/SettingTest.php` | Non-CRUD settings page (General, Regional) |
 | 17 | My Approvals | `my-approvals` | `Feature/MyApprovalControllerTest.php` | Inbox for user to approve/reject documents |
 | 18 | Approval History | `approval-history` | `Feature/EntityApprovalHistoryControllerTest.php` | Component showing timeline history of approvals per entity |
+| 19 | Approval Monitoring | `approval-monitoring` | `Feature/ApprovalMonitoring/ApprovalMonitoringControllerTest.php` | Monitoring dashboard connecting to GetApprovalMonitoringDataAction |
 
 ---
 
