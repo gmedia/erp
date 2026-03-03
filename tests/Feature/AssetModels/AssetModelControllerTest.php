@@ -68,6 +68,8 @@ describe('Asset Model API Endpoints', function () {
     });
 
     test('index supports sorting by category name', function () {
+        AssetModel::query()->delete();
+
         $categoryA = AssetCategory::factory()->create(['name' => 'AAA Category']);
         $categoryB = AssetCategory::factory()->create(['name' => 'BBB Category']);
 
