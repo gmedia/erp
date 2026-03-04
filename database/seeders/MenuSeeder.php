@@ -137,7 +137,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'inventory',
                 'display_name' => 'Inventory',
-                'permissions' => ['stock_transfer', 'inventory_stocktake', 'stock_adjustment', 'stock_movement'],
+                'permissions' => ['stock_transfer', 'inventory_stocktake', 'stock_adjustment', 'stock_movement', 'stock_monitor'],
                 'icon' => 'Box',
                 'url' => null,
                 'child' => [
@@ -171,6 +171,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['stock_movement'],
                         'icon' => 'History',
                         'url' => 'stock-movements',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'stock_monitor',
+                        'display_name' => 'Stock Monitor',
+                        'permissions' => ['stock_monitor'],
+                        'icon' => 'Activity',
+                        'url' => 'stock-monitor',
                         'child' => [],
                     ],
                 ],

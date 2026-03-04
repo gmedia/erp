@@ -401,6 +401,18 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/stock-movements/stock-movement.spec.ts
 
+- slug: stock-monitor
+  route: /stock-monitor
+  api: /stock-monitor (Accepts application/json)
+  export_api: /api/stock-monitor/export
+  search_placeholder: "Search product, category, warehouse, branch..."
+  sortable_columns: [Product, Category, Warehouse, Qty On Hand, Avg Cost, Stock Value, Last Movement]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD dashboard stok per produk per gudang, dengan summary per warehouse/category/branch dan low stock threshold."
+  tests:
+    - tests/e2e/stock-monitor/stock-monitor.spec.ts
+
 - modul: Asset Dashboard
   group: asset-dashboard
   tests:
@@ -512,6 +524,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 18 | Approval History | `approval-history` | `Feature/EntityApprovalHistoryControllerTest.php` | Component showing timeline history of approvals per entity |
 | 19 | Approval Monitoring | `approval-monitoring` | `Feature/ApprovalMonitoring/ApprovalMonitoringControllerTest.php` | Monitoring dashboard connecting to GetApprovalMonitoringDataAction |
 | 20 | Stock Movements | `stock-movements` | `Feature/StockMovements/*.php` (2 files) | Kartu stok (read-only) + export |
+| 21 | Stock Monitor | `stock-monitor` | `Feature/StockMonitor/StockMonitorControllerTest.php` | Dashboard stok per produk & gudang dengan low stock threshold |
 
 ---
 
