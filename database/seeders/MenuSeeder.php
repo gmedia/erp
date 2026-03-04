@@ -186,7 +186,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'report',
                 'display_name' => 'Report',
-                'permissions' => ['trial_balance_report', 'balance_sheet_report', 'income_statement_report', 'cash_flow_report', 'comparative_report', 'inventory_valuation_report', 'asset'],
+                'permissions' => ['trial_balance_report', 'balance_sheet_report', 'income_statement_report', 'cash_flow_report', 'comparative_report', 'inventory_valuation_report', 'stock_movement_report', 'asset'],
                 'icon' => 'PieChart',
                 'url' => null,
                 'child' => [
@@ -268,6 +268,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['inventory_valuation_report'],
                         'icon' => 'BarChart3',
                         'url' => 'reports/inventory-valuation',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'stock_movement_report',
+                        'display_name' => 'Stock Movement Report',
+                        'permissions' => ['stock_movement_report'],
+                        'icon' => 'ArrowLeftRight',
+                        'url' => 'reports/stock-movement',
                         'child' => [],
                     ],
                 ],

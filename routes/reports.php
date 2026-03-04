@@ -4,6 +4,7 @@ use App\Http\Controllers\AssetReportController;
 use App\Http\Controllers\BookValueDepreciationReportController;
 use App\Http\Controllers\InventoryValuationReportController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\StockMovementReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('reports')->group(function () {
@@ -25,4 +26,7 @@ Route::middleware(['auth', 'verified'])->prefix('reports')->group(function () {
 
     Route::get('inventory-valuation', [InventoryValuationReportController::class, 'index'])->name('reports.inventory-valuation')->middleware('permission:inventory_valuation_report');
     Route::post('inventory-valuation/export', [InventoryValuationReportController::class, 'export'])->name('reports.inventory-valuation.export')->middleware('permission:inventory_valuation_report');
+
+    Route::get('stock-movement', [StockMovementReportController::class, 'index'])->name('reports.stock-movement')->middleware('permission:stock_movement_report');
+    Route::post('stock-movement/export', [StockMovementReportController::class, 'export'])->name('reports.stock-movement.export')->middleware('permission:stock_movement_report');
 });

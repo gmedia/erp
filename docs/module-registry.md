@@ -413,6 +413,18 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/stock-movements/stock-movement.spec.ts
 
+- slug: stock-movement-report
+  route: /reports/stock-movement
+  api: /reports/stock-movement (Accepts application/json)
+  export_api: /reports/stock-movement/export
+  search_placeholder: "Search product, category, warehouse, branch..."
+  sortable_columns: [Product, Category, Warehouse, Total In, Total Out, Ending Balance, Last Movement]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD laporan pergerakan stok per periode (total masuk, total keluar, saldo akhir) per produk per gudang."
+  tests:
+    - tests/e2e/stock-movement-report/stock-movement-report.spec.ts
+
 - slug: stock-monitor
   route: /stock-monitor
   api: /stock-monitor (Accepts application/json)
@@ -538,6 +550,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 20 | Stock Movements | `stock-movements` | `Feature/StockMovements/*.php` (2 files) | Kartu stok (read-only) + export |
 | 21 | Stock Monitor | `stock-monitor` | `Feature/StockMonitor/StockMonitorControllerTest.php` | Dashboard stok per produk & gudang dengan low stock threshold |
 | 22 | Inventory Valuation Report | `inventory-valuation-report` | `Feature/Reports/InventoryValuationReportTest.php` | Laporan nilai persediaan per produk per gudang + export |
+| 23 | Stock Movement Report | `stock-movement-report` | `Feature/Reports/StockMovementReportTest.php` | Laporan pergerakan stok per periode + export |
 
 ---
 

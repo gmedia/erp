@@ -362,6 +362,11 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'stock_movement_report',
+                'display_name' => 'Stock Movement Report',
+                'child' => [],
+            ],
+            [
                 'name' => 'supplier_category',
                 'display_name' => 'Supplier Category',
                 'child' => [
