@@ -322,6 +322,18 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   checkbox_header: false
   note: "Laporan Biaya Perawatan/Maintenance Cost (Non-CRUD), menggunakan read-only data table dengan filter."
 
+- slug: inventory-valuation-reports
+  route: /reports/inventory-valuation
+  api: /reports/inventory-valuation
+  export_api: /reports/inventory-valuation/export
+  search_placeholder: "Search product, category, warehouse, branch..."
+  sortable_columns: [Product, Category, Unit, Warehouse, Qty On Hand, Avg Cost, Stock Value, Last Movement]
+  view_type: dialog
+  checkbox_header: false
+  note: "Laporan nilai persediaan per produk per gudang (quantity × average cost) dengan filter product/warehouse/branch/category."
+  tests:
+    - tests/e2e/inventory-valuation-report/inventory-valuation-report.spec.ts
+
 - slug: asset-stocktake-variances
   route: /asset-stocktake-variances
   api: /api/asset-stocktake-variances
@@ -525,6 +537,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 19 | Approval Monitoring | `approval-monitoring` | `Feature/ApprovalMonitoring/ApprovalMonitoringControllerTest.php` | Monitoring dashboard connecting to GetApprovalMonitoringDataAction |
 | 20 | Stock Movements | `stock-movements` | `Feature/StockMovements/*.php` (2 files) | Kartu stok (read-only) + export |
 | 21 | Stock Monitor | `stock-monitor` | `Feature/StockMonitor/StockMonitorControllerTest.php` | Dashboard stok per produk & gudang dengan low stock threshold |
+| 22 | Inventory Valuation Report | `inventory-valuation-report` | `Feature/Reports/InventoryValuationReportTest.php` | Laporan nilai persediaan per produk per gudang + export |
 
 ---
 

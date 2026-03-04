@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AssetReportController;
 use App\Http\Controllers\BookValueDepreciationReportController;
+use App\Http\Controllers\InventoryValuationReportController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,5 +22,7 @@ Route::middleware(['auth', 'verified'])->prefix('reports')->group(function () {
 
     Route::get('maintenance-cost', [\App\Http\Controllers\MaintenanceCostReportController::class, 'index'])->name('reports.maintenance-cost')->middleware('permission:asset');
     Route::post('maintenance-cost/export', [\App\Http\Controllers\MaintenanceCostReportController::class, 'export'])->name('reports.maintenance-cost.export')->middleware('permission:asset');
-});
 
+    Route::get('inventory-valuation', [InventoryValuationReportController::class, 'index'])->name('reports.inventory-valuation')->middleware('permission:inventory_valuation_report');
+    Route::post('inventory-valuation/export', [InventoryValuationReportController::class, 'export'])->name('reports.inventory-valuation.export')->middleware('permission:inventory_valuation_report');
+});
