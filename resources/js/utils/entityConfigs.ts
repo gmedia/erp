@@ -2,7 +2,7 @@ import { type FormComponentType } from '@/components/common/EntityCrudPage';
 import { type FieldDescriptor } from '@/components/common/filters';
 import { type FilterState } from '@/hooks/useCrudFilters';
 import { type BreadcrumbItem } from '@/types';
-import { type EntityWithId } from '@/types/entity';
+import { type EntityWithId, type Warehouse } from '@/types/entity';
 import { type ColumnDef } from '@tanstack/react-table';
 import * as React from 'react';
 
@@ -67,6 +67,10 @@ import { createSupplierFilterFields } from '@/components/suppliers/SupplierFilte
 import { SupplierForm } from '@/components/suppliers/SupplierForm';
 import { createSimpleEntityColumns } from '@/utils/columns';
 import { SupplierViewModal } from '@/components/suppliers/SupplierViewModal';
+import { warehouseColumns } from '@/components/warehouses/WarehouseColumns';
+import { createWarehouseFilterFields } from '@/components/warehouses/WarehouseFilters';
+import { WarehouseForm } from '@/components/warehouses/WarehouseForm';
+import { WarehouseViewModal } from '@/components/warehouses/WarehouseViewModal';
 import { productColumns } from '@/components/products/ProductColumns';
 import { createProductFilterFields } from '@/components/products/ProductFilters';
 import { ProductForm } from '@/components/products/ProductForm';
@@ -95,6 +99,21 @@ import { createAssetMaintenanceFilterFields } from '@/components/asset-maintenan
 import { AssetMaintenanceForm } from '@/components/asset-maintenances/AssetMaintenanceForm';
 import { AssetMaintenanceViewModal } from '@/components/asset-maintenances/AssetMaintenanceViewModal';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
+import { stockTransferColumns } from '@/components/stock-transfers/StockTransferColumns';
+import { createStockTransferFilterFields } from '@/components/stock-transfers/StockTransferFilters';
+import { StockTransferForm } from '@/components/stock-transfers/StockTransferForm';
+import { StockTransferViewModal } from '@/components/stock-transfers/StockTransferViewModal';
+import { type StockTransfer } from '@/types/stock-transfer';
+import { inventoryStocktakeColumns } from '@/components/inventory-stocktakes/InventoryStocktakeColumns';
+import { createInventoryStocktakeFilterFields } from '@/components/inventory-stocktakes/InventoryStocktakeFilters';
+import { InventoryStocktakeForm } from '@/components/inventory-stocktakes/InventoryStocktakeForm';
+import { InventoryStocktakeViewModal } from '@/components/inventory-stocktakes/InventoryStocktakeViewModal';
+import { type InventoryStocktake } from '@/types/inventory-stocktake';
+import { stockAdjustmentColumns } from '@/components/stock-adjustments/StockAdjustmentColumns';
+import { createStockAdjustmentFilterFields } from '@/components/stock-adjustments/StockAdjustmentFilters';
+import { StockAdjustmentForm } from '@/components/stock-adjustments/StockAdjustmentForm';
+import { StockAdjustmentViewModal } from '@/components/stock-adjustments/StockAdjustmentViewModal';
+import { type StockAdjustment } from '@/types/stock-adjustment';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -227,6 +246,24 @@ export const branchConfig = createSimpleEntityConfig({
     filterPlaceholder: 'Search branches...',
 });
 
+export const warehouseConfig = createComplexEntityConfig<Warehouse>({
+    entityName: 'Warehouse',
+    entityNamePlural: 'Warehouses',
+    apiEndpoint: '/api/warehouses',
+    exportEndpoint: '/api/warehouses/export',
+    queryKey: ['warehouses'],
+    breadcrumbs: [{ title: 'Warehouses', href: '/warehouses' }],
+    initialFilters: { search: '', branch_id: '' },
+    columns: warehouseColumns,
+    filterFields: createWarehouseFilterFields(),
+    formComponent: WarehouseForm,
+    formType: 'complex',
+    entityNameForSearch: 'warehouse',
+    viewModalComponent: WarehouseViewModal,
+    getDeleteMessage: (item: { name?: string; code?: string }) =>
+        `This action cannot be undone. This will permanently delete warehouse ${item.code} (${item.name}).`,
+});
+
 // Configuration for complex entities (employees) - using factory for consistency
 export const employeeConfig = createComplexEntityConfig({
     entityName: 'Employee',
@@ -297,6 +334,75 @@ export const supplierConfig = createComplexEntityConfig({
     viewModalComponent: SupplierViewModal,
     getDeleteMessage: (supplier: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${supplier.name}'s supplier record.`,
+});
+
+export const stockTransferConfig = createComplexEntityConfig<StockTransfer>({
+    entityName: 'Stock Transfer',
+    entityNamePlural: 'Stock Transfers',
+    apiEndpoint: '/api/stock-transfers',
+    exportEndpoint: '/api/stock-transfers/export',
+    queryKey: ['stock-transfers'],
+    breadcrumbs: [{ title: 'Stock Transfers', href: '/stock-transfers' }],
+    initialFilters: {
+        search: '',
+        from_warehouse_id: '',
+        to_warehouse_id: '',
+        status: '',
+    },
+    columns: stockTransferColumns,
+    filterFields: createStockTransferFilterFields(),
+    formComponent: StockTransferForm,
+    formType: 'complex',
+    entityNameForSearch: 'stock transfer',
+    viewModalComponent: StockTransferViewModal,
+    getDeleteMessage: (transfer: { transfer_number?: string | null }) =>
+        `This action cannot be undone. This will cancel stock transfer ${transfer.transfer_number || ''}.`,
+});
+
+export const inventoryStocktakeConfig = createComplexEntityConfig<InventoryStocktake>({
+    entityName: 'Inventory Stocktake',
+    entityNamePlural: 'Inventory Stocktakes',
+    apiEndpoint: '/api/inventory-stocktakes',
+    exportEndpoint: '/api/inventory-stocktakes/export',
+    queryKey: ['inventory-stocktakes'],
+    breadcrumbs: [{ title: 'Inventory Stocktakes', href: '/inventory-stocktakes' }],
+    initialFilters: {
+        search: '',
+        warehouse_id: '',
+        product_category_id: '',
+        status: '',
+    },
+    columns: inventoryStocktakeColumns,
+    filterFields: createInventoryStocktakeFilterFields(),
+    formComponent: InventoryStocktakeForm,
+    formType: 'complex',
+    entityNameForSearch: 'inventory stocktake',
+    viewModalComponent: InventoryStocktakeViewModal,
+    getDeleteMessage: (stocktake: { stocktake_number?: string | null }) =>
+        `This action cannot be undone. This will cancel inventory stocktake ${stocktake.stocktake_number || ''}.`,
+});
+
+export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>({
+    entityName: 'Stock Adjustment',
+    entityNamePlural: 'Stock Adjustments',
+    apiEndpoint: '/api/stock-adjustments',
+    exportEndpoint: '/api/stock-adjustments/export',
+    queryKey: ['stock-adjustments'],
+    breadcrumbs: [{ title: 'Stock Adjustments', href: '/stock-adjustments' }],
+    initialFilters: {
+        search: '',
+        warehouse_id: '',
+        status: '',
+        adjustment_type: '',
+    },
+    columns: stockAdjustmentColumns,
+    filterFields: createStockAdjustmentFilterFields(),
+    formComponent: StockAdjustmentForm,
+    formType: 'complex',
+    entityNameForSearch: 'stock adjustment',
+    viewModalComponent: StockAdjustmentViewModal,
+    getDeleteMessage: (adjustment: { adjustment_number?: string | null }) =>
+        `This action cannot be undone. This will cancel stock adjustment ${adjustment.adjustment_number || ''}.`,
 });
 
 export const supplierCategoryConfig = createSimpleEntityConfig({

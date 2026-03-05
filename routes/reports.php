@@ -2,7 +2,11 @@
 
 use App\Http\Controllers\AssetReportController;
 use App\Http\Controllers\BookValueDepreciationReportController;
+use App\Http\Controllers\InventoryStocktakeVarianceReportController;
+use App\Http\Controllers\InventoryValuationReportController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\StockAdjustmentReportController;
+use App\Http\Controllers\StockMovementReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('reports')->group(function () {
@@ -21,5 +25,16 @@ Route::middleware(['auth', 'verified'])->prefix('reports')->group(function () {
 
     Route::get('maintenance-cost', [\App\Http\Controllers\MaintenanceCostReportController::class, 'index'])->name('reports.maintenance-cost')->middleware('permission:asset');
     Route::post('maintenance-cost/export', [\App\Http\Controllers\MaintenanceCostReportController::class, 'export'])->name('reports.maintenance-cost.export')->middleware('permission:asset');
-});
 
+    Route::get('inventory-valuation', [InventoryValuationReportController::class, 'index'])->name('reports.inventory-valuation')->middleware('permission:inventory_valuation_report');
+    Route::post('inventory-valuation/export', [InventoryValuationReportController::class, 'export'])->name('reports.inventory-valuation.export')->middleware('permission:inventory_valuation_report');
+
+    Route::get('stock-movement', [StockMovementReportController::class, 'index'])->name('reports.stock-movement')->middleware('permission:stock_movement_report');
+    Route::post('stock-movement/export', [StockMovementReportController::class, 'export'])->name('reports.stock-movement.export')->middleware('permission:stock_movement_report');
+
+    Route::get('stock-adjustment', [StockAdjustmentReportController::class, 'index'])->name('reports.stock-adjustment')->middleware('permission:stock_adjustment_report');
+    Route::post('stock-adjustment/export', [StockAdjustmentReportController::class, 'export'])->name('reports.stock-adjustment.export')->middleware('permission:stock_adjustment_report');
+
+    Route::get('inventory-stocktake-variance', [InventoryStocktakeVarianceReportController::class, 'index'])->name('reports.inventory-stocktake-variance')->middleware('permission:inventory_stocktake_variance_report');
+    Route::post('inventory-stocktake-variance/export', [InventoryStocktakeVarianceReportController::class, 'export'])->name('reports.inventory-stocktake-variance.export')->middleware('permission:inventory_stocktake_variance_report');
+});

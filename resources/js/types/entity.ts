@@ -68,3 +68,4 @@ export interface ApprovalFlow {
     creator?: { id: number; name: string };
     steps?: ApprovalFlowStep[];
 }
+export type { Warehouse, WarehouseFormData, WarehouseFilters } from './warehouse';

@@ -106,6 +106,16 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
 
+- slug: warehouses
+  route: /warehouses
+  api: /api/warehouses
+  export_api: /api/warehouses/export
+  search_placeholder: "Search warehouses..."
+  sortable_columns: [Code, Name, Branch]
+  view_type: dialog
+  view_dialog_title: "Warehouse Details"
+  checkbox_header: false
+
 - slug: employees
   route: /employees
   api: /api/employees
@@ -132,6 +142,33 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   import_api: /api/suppliers/import
   search_placeholder: "Search suppliers..."
   sortable_columns: [Name, Email, Phone, Branch, Category, Status]
+  view_type: dialog
+  checkbox_header: false
+
+- slug: stock-transfers
+  route: /stock-transfers
+  api: /api/stock-transfers
+  export_api: /api/stock-transfers/export
+  search_placeholder: "Search stock transfers..."
+  sortable_columns: [Transfer Number, From Warehouse, To Warehouse, Transfer Date, Expected Arrival, Status]
+  view_type: dialog
+  checkbox_header: false
+
+- slug: inventory-stocktakes
+  route: /inventory-stocktakes
+  api: /api/inventory-stocktakes
+  export_api: /api/inventory-stocktakes/export
+  search_placeholder: "Search inventory stocktakes..."
+  sortable_columns: [Stocktake Number, Warehouse, Product Category, Stocktake Date, Status]
+  view_type: dialog
+  checkbox_header: false
+
+- slug: stock-adjustments
+  route: /stock-adjustments
+  api: /api/stock-adjustments
+  export_api: /api/stock-adjustments/export
+  search_placeholder: "Search stock adjustments..."
+  sortable_columns: [Adjustment Number, Warehouse, Adjustment Date, Adjustment Type, Status]
   view_type: dialog
   checkbox_header: false
 
@@ -285,6 +322,18 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   checkbox_header: false
   note: "Laporan Biaya Perawatan/Maintenance Cost (Non-CRUD), menggunakan read-only data table dengan filter."
 
+- slug: inventory-valuation-reports
+  route: /reports/inventory-valuation
+  api: /reports/inventory-valuation
+  export_api: /reports/inventory-valuation/export
+  search_placeholder: "Search product, category, warehouse, branch..."
+  sortable_columns: [Product, Category, Unit, Warehouse, Qty On Hand, Avg Cost, Stock Value, Last Movement]
+  view_type: dialog
+  checkbox_header: false
+  note: "Laporan nilai persediaan per produk per gudang (quantity × average cost) dengan filter product/warehouse/branch/category."
+  tests:
+    - tests/e2e/inventory-valuation-report/inventory-valuation-report.spec.ts
+
 - slug: asset-stocktake-variances
   route: /asset-stocktake-variances
   api: /api/asset-stocktake-variances
@@ -351,6 +400,66 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
   note: "Non-CRUD feature for viewing and exporting pipeline state logs. Read-only Data Table with Detail modal."
+
+- slug: stock-movements
+  route: /stock-movements
+  api: /stock-movements (Accepts application/json)
+  export_api: /api/stock-movements/export
+  search_placeholder: "Search reference, notes, product, warehouse..."
+  sortable_columns: [Moved At, Product, Warehouse, Type, Reference, Qty In, Qty Out, Balance, Unit Cost, Avg Cost, Created By]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD kartu stok digital. Read-only Data Table dengan filter product/warehouse/type/date dan drill-down reference."
+  tests:
+    - tests/e2e/stock-movements/stock-movement.spec.ts
+
+- slug: stock-movement-report
+  route: /reports/stock-movement
+  api: /reports/stock-movement (Accepts application/json)
+  export_api: /reports/stock-movement/export
+  search_placeholder: "Search product, category, warehouse, branch..."
+  sortable_columns: [Product, Category, Warehouse, Total In, Total Out, Ending Balance, Last Movement]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD laporan pergerakan stok per periode (total masuk, total keluar, saldo akhir) per produk per gudang."
+  tests:
+    - tests/e2e/stock-movement-report/stock-movement-report.spec.ts
+
+- slug: inventory-stocktake-variance-report
+  route: /reports/inventory-stocktake-variance
+  api: /reports/inventory-stocktake-variance (Accepts application/json)
+  export_api: /reports/inventory-stocktake-variance/export
+  search_placeholder: "Search stocktake, product, category, warehouse..."
+  sortable_columns: [Stocktake No., Stocktake Date, Product, Category, Warehouse, System Qty, Counted Qty, Variance, Result, Counted At]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD laporan selisih stock opname inventory (surplus/deficit) per produk per gudang."
+  tests:
+    - tests/e2e/inventory-stocktake-variance-report/inventory-stocktake-variance-report.spec.ts
+
+- slug: stock-adjustment-report
+  route: /reports/stock-adjustment
+  api: /reports/stock-adjustment (Accepts application/json)
+  export_api: /reports/stock-adjustment/export
+  search_placeholder: "Search number, warehouse, branch, type, status..."
+  sortable_columns: [Adjustment Date, Adjustment Type, Status, Warehouse, Adjustment Count, Total Qty Adjusted, Total Adjustment Value]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD laporan penyesuaian stok per tipe, periode, dan gudang dengan total nilai adjustment."
+  tests:
+    - tests/e2e/stock-adjustment-report/stock-adjustment-report.spec.ts
+
+- slug: stock-monitor
+  route: /stock-monitor
+  api: /stock-monitor (Accepts application/json)
+  export_api: /api/stock-monitor/export
+  search_placeholder: "Search product, category, warehouse, branch..."
+  sortable_columns: [Product, Category, Warehouse, Qty On Hand, Avg Cost, Stock Value, Last Movement]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD dashboard stok per produk per gudang, dengan summary per warehouse/category/branch dan low stock threshold."
+  tests:
+    - tests/e2e/stock-monitor/stock-monitor.spec.ts
 
 - slug: approval-audit-trail
   route: /approval-audit-trail
@@ -442,6 +551,10 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 14 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
 | 15 | Approval Flows | `approval-flows` | `ApprovalFlowControllerTest` | `ApprovalFlowTest`, `ApprovalFlowStepTest` | Memiliki `ApprovalFlowFilterServiceTest` & `UpdateApprovalFlowDataTest` |
 | 16 | Approval Delegations | `approval-delegations` | `ApprovalDelegationControllerTest`, `ApprovalDelegationExportTest` | `ApprovalDelegationTest` | Memiliki `ApprovalDelegationFilterServiceTest` & `UpdateApprovalDelegationDataTest` |
+| 17 | Stock Transfers | `stock-transfers` | `StockTransferControllerTest`, `StockTransferExportTest` | `StockTransferTest` | — |
+| 18 | Inventory Stocktakes | `inventory-stocktakes` | `InventoryStocktakeControllerTest`, `InventoryStocktakeExportTest` | `InventoryStocktakeTest` | — |
+| 19 | Stock Adjustments | `stock-adjustments` | `StockAdjustmentControllerTest`, `StockAdjustmentExportTest` | `StockAdjustmentTest` | — |
+| 20 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
 
 ---
 
@@ -463,12 +576,18 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 12 | Entity State Actions | `entity-state-actions` | `Feature/EntityStates/EntityStateControllerTest.php` | Pipeline actions engine per entitas |
 | 13 | Entity State Timeline | `entity-state-timeline` | `Feature/EntityStates/EntityStateTimelineTest.php` | Timeline history component per entitas |
 | 14 | Pipeline Audit Trail | `pipeline-audit-trail` | `Feature/PipelineAuditTrail/PipelineAuditTrailControllerTest.php` | Log seluruh transisi state pipeline |
-| 15 | Asset Dashboard | `asset-dashboard` | `Feature/AssetDashboard/AssetDashboardControllerTest.php` | Dashboard Visualisasi Aset |
-| 16 | Admin Settings | `admin-settings` | `Feature/AdminSettings/AdminSettingControllerTest.php`, `Unit/Models/SettingTest.php` | Non-CRUD settings page (General, Regional) |
-| 17 | My Approvals | `my-approvals` | `Feature/MyApprovalControllerTest.php` | Inbox for user to approve/reject documents |
-| 18 | Approval History | `approval-history` | `Feature/EntityApprovalHistoryControllerTest.php` | Component showing timeline history of approvals per entity |
-| 19 | Approval Monitoring | `approval-monitoring` | `Feature/ApprovalMonitoring/ApprovalMonitoringControllerTest.php` | Monitoring dashboard connecting to GetApprovalMonitoringDataAction |
-| 20 | Approval Audit Trail | `approval-audit-trail` | `Feature/ApprovalAuditTrail/ApprovalAuditTrailControllerTest.php` | Log seluruh histori approval |
+| 15 | Approval Audit Trail | `approval-audit-trail` | `Feature/ApprovalAuditTrail/ApprovalAuditTrailControllerTest.php` | Log seluruh histori approval |
+| 16 | Asset Dashboard | `asset-dashboard` | `Feature/AssetDashboard/AssetDashboardControllerTest.php` | Dashboard Visualisasi Aset |
+| 17 | Admin Settings | `admin-settings` | `Feature/AdminSettings/AdminSettingControllerTest.php`, `Unit/Models/SettingTest.php` | Non-CRUD settings page (General, Regional) |
+| 18 | My Approvals | `my-approvals` | `Feature/MyApprovalControllerTest.php` | Inbox for user to approve/reject documents |
+| 19 | Approval History | `approval-history` | `Feature/EntityApprovalHistoryControllerTest.php` | Component showing timeline history of approvals per entity |
+| 20 | Approval Monitoring | `approval-monitoring` | `Feature/ApprovalMonitoring/ApprovalMonitoringControllerTest.php` | Monitoring dashboard connecting to GetApprovalMonitoringDataAction |
+| 21 | Stock Movements | `stock-movements` | `Feature/StockMovements/*.php` (2 files) | Kartu stok (read-only) + export |
+| 22 | Stock Monitor | `stock-monitor` | `Feature/StockMonitor/StockMonitorControllerTest.php` | Dashboard stok per produk & gudang dengan low stock threshold |
+| 23 | Inventory Valuation Report | `inventory-valuation-report` | `Feature/Reports/InventoryValuationReportTest.php` | Laporan nilai persediaan per produk per gudang + export |
+| 24 | Stock Movement Report | `stock-movement-report` | `Feature/Reports/StockMovementReportTest.php` | Laporan pergerakan stok per periode + export |
+| 25 | Inventory Stocktake Variance Report | `inventory-stocktake-variance-report` | `Feature/Reports/InventoryStocktakeVarianceReportTest.php` | Laporan variance stock opname inventory + export |
+| 26 | Stock Adjustment Report | `stock-adjustment-report` | `Feature/Reports/StockAdjustmentReportTest.php` | Laporan penyesuaian stok per tipe/periode/gudang + export |
 
 ---
 

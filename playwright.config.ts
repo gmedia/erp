@@ -4,6 +4,7 @@ export default defineConfig({
   testDir: 'tests/e2e',
   outputDir: 'e2e/test-results',
   timeout: 60000,
+  globalSetup: './tests/e2e/global-setup',
   use: {
     browserName: 'chromium',
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:80',

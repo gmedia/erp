@@ -70,6 +70,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             BranchSeeder::class,
+            WarehouseSeeder::class,
             DepartmentSeeder::class,
             PositionSeeder::class,
             CustomerCategorySeeder::class,
@@ -158,6 +159,10 @@ class DatabaseSeeder extends Seeder
             ApprovalDelegationSampleDataSeeder::class,
             ProductSampleDataSeeder::class,
             AssetSampleDataSeeder::class,
+            StockTransferSampleDataSeeder::class,
+            InventoryStocktakeSampleDataSeeder::class,
+            StockAdjustmentSampleDataSeeder::class,
+            StockMovementSampleDataSeeder::class,
         ]);
 
         // Assign all permissions to sample users for easy testing

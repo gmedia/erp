@@ -76,6 +76,100 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'warehouse',
+                'display_name' => 'Warehouse',
+                'child' => [
+                    [
+                        'name' => 'warehouse.create',
+                        'display_name' => 'Create Warehouse',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'warehouse.edit',
+                        'display_name' => 'Edit Warehouse',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'warehouse.delete',
+                        'display_name' => 'Delete Warehouse',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'stock_transfer',
+                'display_name' => 'Stock Transfer',
+                'child' => [
+                    [
+                        'name' => 'stock_transfer.create',
+                        'display_name' => 'Create Stock Transfer',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'stock_transfer.edit',
+                        'display_name' => 'Edit Stock Transfer',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'stock_transfer.delete',
+                        'display_name' => 'Delete Stock Transfer',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'inventory_stocktake',
+                'display_name' => 'Inventory Stocktake',
+                'child' => [
+                    [
+                        'name' => 'inventory_stocktake.create',
+                        'display_name' => 'Create Inventory Stocktake',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'inventory_stocktake.edit',
+                        'display_name' => 'Edit Inventory Stocktake',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'inventory_stocktake.delete',
+                        'display_name' => 'Delete Inventory Stocktake',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'stock_adjustment',
+                'display_name' => 'Stock Adjustment',
+                'child' => [
+                    [
+                        'name' => 'stock_adjustment.create',
+                        'display_name' => 'Create Stock Adjustment',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'stock_adjustment.edit',
+                        'display_name' => 'Edit Stock Adjustment',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'stock_adjustment.delete',
+                        'display_name' => 'Delete Stock Adjustment',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'stock_movement',
+                'display_name' => 'Stock Movement',
+                'child' => [],
+            ],
+            [
+                'name' => 'stock_monitor',
+                'display_name' => 'Stock Monitor',
+                'child' => [],
+            ],
+            [
                 'name' => 'employee',
                 'display_name' => 'Employee',
                 'child' => [
@@ -260,6 +354,26 @@ class PermissionSeeder extends Seeder
             [
                 'name' => 'comparative_report',
                 'display_name' => 'Comparative Report',
+                'child' => [],
+            ],
+            [
+                'name' => 'inventory_valuation_report',
+                'display_name' => 'Inventory Valuation Report',
+                'child' => [],
+            ],
+            [
+                'name' => 'stock_movement_report',
+                'display_name' => 'Stock Movement Report',
+                'child' => [],
+            ],
+            [
+                'name' => 'inventory_stocktake_variance_report',
+                'display_name' => 'Inventory Stocktake Variance Report',
+                'child' => [],
+            ],
+            [
+                'name' => 'stock_adjustment_report',
+                'display_name' => 'Stock Adjustment Report',
                 'child' => [],
             ],
             [
