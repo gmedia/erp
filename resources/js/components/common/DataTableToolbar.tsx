@@ -89,8 +89,8 @@ export function DataTableToolbar<T>({
     return (
         <>
             {/* Toolbar */}
-            <div className="items-center justify-between py-4 lg:flex">
-                <div className="mb-2 flex items-center space-x-2">
+            <div className="flex flex-col gap-4 py-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex w-full items-center">
                     <Input
                         placeholder={searchPlaceholder}
                         value={searchValue}
@@ -99,7 +99,7 @@ export function DataTableToolbar<T>({
                         className="max-w-sm border-border bg-background placeholder:text-muted-foreground"
                     />
                 </div>
-                <div className="mb-2 flex items-center space-x-2">
+                <div className="flex flex-wrap items-center gap-2">
                     <Button
                         variant="outline"
                         size="sm"
