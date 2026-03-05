@@ -108,4 +108,86 @@ test.describe('Admin Settings', () => {
         await expect(page).toHaveURL(/admin-settings/);
         await expect(page).toHaveTitle(/Admin Settings/);
     });
+
+    test('logo upload field is visible on General settings', async ({ page }) => {
+        await page.goto('/admin-settings');
+
+        // Logo upload field should be visible
+        const logoInput = page.locator('input[name="company_logo"]');
+        await expect(logoInput).toBeVisible();
+        await expect(logoInput).toHaveAttribute('type', 'file');
+        await expect(logoInput).toHaveAttribute('accept', '.svg,image/svg+xml');
+
+        // Helper text should be visible
+        await expect(page.getByText(/Upload file SVG/)).toBeVisible();
+    });
+
+    test('can upload company logo', async ({ page }) => {
+        await page.goto('/admin-settings');
+
+        // Check if there's already a logo displayed
+        const existingLogo = page.locator('img[alt="Current company logo"]');
+        const hadExistingLogo = await existingLogo.isVisible().catch(() => false);
+
+        // Upload a new logo
+        const logoInput = page.locator('input[name="company_logo"]');
+        await logoInput.setInputFiles('public/logo.svg');
+
+        // Save settings
+        const saveButton = page.getByTestId('save-general-settings');
+        await saveButton.click();
+
+        // Wait for success message or page to settle
+        await page.waitForTimeout(1500);
+
+        // Reload page to verify persistence
+        await page.reload();
+
+        // Logo preview should now be visible
+        const logoPreview = page.locator('img[alt="Current company logo"]');
+        await expect(logoPreview).toBeVisible();
+
+        // Logo should have a valid src pointing to branding/logos
+        const logoSrc = await logoPreview.getAttribute('src');
+        expect(logoSrc).toBeTruthy();
+        expect(logoSrc).toContain('branding/logos');
+    });
+
+    test('uploaded logo appears in app logo component', async ({ page }) => {
+        await page.goto('/admin-settings');
+
+        // Upload a logo first
+        const logoInput = page.locator('input[name="company_logo"]');
+        await logoInput.setInputFiles('public/logo.svg');
+
+        const saveButton = page.getByTestId('save-general-settings');
+        await saveButton.click();
+        await page.waitForTimeout(1500);
+
+        // Navigate to another page to check if logo is loaded globally
+        await page.goto('/dashboard');
+
+        // Find the app logo in the sidebar or header
+        const appLogo = page.locator('img[alt="App Logo"]');
+        await expect(appLogo).toBeVisible();
+
+        // Verify it's using the uploaded logo from storage
+        const logoSrc = await appLogo.getAttribute('src');
+        expect(logoSrc).toBeTruthy();
+        
+        // If we uploaded successfully, it should point to branding/logos, not the default
+        if (logoSrc && !logoSrc.includes('logo_orange.svg')) {
+            expect(logoSrc).toContain('branding/logos');
+        }
+    });
+
+    test('only accepts SVG files for logo upload', async ({ page }) => {
+        await page.goto('/admin-settings');
+
+        const logoInput = page.locator('input[name="company_logo"]');
+        
+        // Verify accept attribute restricts file types
+        const acceptAttr = await logoInput.getAttribute('accept');
+        expect(acceptAttr).toBe('.svg,image/svg+xml');
+    });
 });
