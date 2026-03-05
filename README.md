@@ -13,13 +13,22 @@ This Enterprise Resource Planning (ERP) system is a comprehensive business manag
 ---
 
 ## Local development setup
-- Apply permission setup
+- Apply permission setup (Linux/macOS)
     ```
     sudo bash permission_setup.sh
     ```
+- Apply permission setup (Windows 11)
+    ```
+    bash ./permission_setup.sh
+    ```
+    > Run from Git Bash, or from PowerShell if Git Bash is installed.
 - Apply project setup
     ```
     bash project_setup.sh
+    ```
+- Apply project setup (Windows 11)
+    ```
+    bash ./project_setup.sh
     ```
 - Open App
     ```

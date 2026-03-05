@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminSettingRequest;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,6 +25,7 @@ class AdminSettingController extends Controller
     public function index(): Response
     {
         $settings = Setting::getGrouped();
+        $settings['general']['company_logo_url'] = $this->getCompanyLogoUrl();
 
         return Inertia::render('admin-settings/index', [
             'settings' => $settings,
@@ -36,10 +39,29 @@ class AdminSettingController extends Controller
     {
         $validated = $request->validated();
 
+        $uploadedLogo = $validated['company_logo'] ?? null;
+        unset($validated['company_logo']);
+
         foreach ($validated as $key => $value) {
             Setting::set($key, $value ?? '');
         }
 
+        if ($uploadedLogo instanceof UploadedFile) {
+            $path = $uploadedLogo->store('branding/logos', config('filesystems.default'));
+            Setting::set('company_logo_path', $path);
+        }
+
         return back()->with('success', 'Settings updated successfully.');
+    }
+
+    protected function getCompanyLogoUrl(): ?string
+    {
+        $logoPath = Setting::get('company_logo_path');
+
+        if (! is_string($logoPath) || $logoPath === '') {
+            return null;
+        }
+
+        return Storage::disk(config('filesystems.default'))->url($logoPath);
     }
 }

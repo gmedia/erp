@@ -38,6 +38,12 @@ class SettingSampleDataSeeder extends Seeder
                 'value' => 'mail@dokfin.com',
                 'type' => 'string',
             ],
+            [
+                'group' => 'general',
+                'key' => 'company_logo_path',
+                'value' => null,
+                'type' => 'string',
+            ],
 
             // Regional settings
             [

@@ -53,7 +53,7 @@ describe('Setting Model', function () {
         $general = Setting::getByGroup('general');
 
         expect($general)->toBeArray()
-            ->toHaveKeys(['company_name', 'company_address', 'company_phone', 'company_email']);
+            ->toHaveKeys(['company_name', 'company_address', 'company_phone', 'company_email', 'company_logo_path']);
     });
 
     test('castValue handles integer type', function () {
