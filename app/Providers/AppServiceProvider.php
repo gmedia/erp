@@ -67,6 +67,9 @@ class AppServiceProvider extends ServiceProvider
             });
 
             if (!empty($mailSettings)) {
+                // Force default mailer to smtp to ensure database settings are used
+                config(['mail.default' => 'smtp']);
+
                 if (isset($mailSettings['mail_host'])) {
                     config(['mail.mailers.smtp.host' => $mailSettings['mail_host']]);
                 }
