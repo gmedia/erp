@@ -41,7 +41,7 @@ Purchase Request (PR)  →  Purchase Order (PO)  →  Goods Receipt (GR)
 *   **Supplier**: `suppliers` (penyedia barang/jasa).
 *   **Produk**: `products`, `units` (barang yang dibeli).
 *   **Stok**: `product_stocks` (update stok saat GR).
-*   **Organisasi**: `branches`, `departments`, `employees`.
+*   **Organisasi**: `branches`, `warehouses`, `departments`, `employees`.
 *   **Akuntansi**: `accounts`, `journal_entries`, `journal_entry_lines` (posting AP & stok).
 
 ---
@@ -59,7 +59,7 @@ erDiagram
     units ||--o{ purchase_request_items : measured_in
 
     suppliers ||--o{ purchase_orders : ordered_from
-    branches ||--o{ purchase_orders : ordered_by_branch
+    warehouses ||--o{ purchase_orders : received_at_warehouse
 
     purchase_orders ||--o{ purchase_order_items : contains
     products ||--o{ purchase_order_items : ordered
@@ -67,7 +67,7 @@ erDiagram
     purchase_request_items ||--o{ purchase_order_items : sourced_from
 
     purchase_orders ||--o{ goods_receipts : received_for
-    branches ||--o{ goods_receipts : received_at
+    warehouses ||--o{ goods_receipts : received_at_warehouse
 
     goods_receipts ||--o{ goods_receipt_items : contains
     purchase_order_items ||--o{ goods_receipt_items : received_from
@@ -75,6 +75,7 @@ erDiagram
 
     purchase_orders ||--o{ supplier_returns : returned_from
     suppliers ||--o{ supplier_returns : returned_to
+    warehouses ||--o{ supplier_returns : returned_from_warehouse
 
     supplier_returns ||--o{ supplier_return_items : contains
     goods_receipt_items ||--o{ supplier_return_items : returned_from
@@ -153,7 +154,7 @@ Header dokumen pesanan pembelian ke supplier.
 | `id` | BigInt | Primary Key |
 | `po_number` | String | Nomor PO (unique), generated, mis. PO-2026-000001 |
 | `supplier_id` | BigInt | FK -> `suppliers` |
-| `branch_id` | BigInt | FK -> `branches` (cabang tujuan penerimaan) |
+| `warehouse_id` | BigInt | FK -> `warehouses` (gudang tujuan penerimaan) |
 | `order_date` | Date | Tanggal PO |
 | `expected_delivery_date` | Date | Tanggal perkiraan terima (nullable) |
 | `payment_terms` | String | Syarat pembayaran (nullable, mis. "Net 30") |
@@ -171,7 +172,7 @@ Header dokumen pesanan pembelian ke supplier.
 | `created_at` | Timestamp | |
 | `updated_at` | Timestamp | |
 
-**Index (disarankan):** `po_number` (unique), `status`, `supplier_id`, `branch_id`, `order_date`
+**Index (disarankan):** `po_number` (unique), `status`, `supplier_id`, `warehouse_id`, `order_date`
 
 #### 4. `purchase_order_items`
 Detail item yang dipesan pada PO.
@@ -210,7 +211,7 @@ Header dokumen penerimaan barang dari supplier.
 | `id` | BigInt | Primary Key |
 | `gr_number` | String | Nomor GR (unique), generated, mis. GR-2026-000001 |
 | `purchase_order_id` | BigInt | FK -> `purchase_orders` |
-| `branch_id` | BigInt | FK -> `branches` (cabang penerimaan) |
+| `warehouse_id` | BigInt | FK -> `warehouses` (gudang penerimaan) |
 | `receipt_date` | Date | Tanggal penerimaan |
 | `supplier_delivery_note` | String | Nomor surat jalan supplier (nullable) |
 | `status` | Enum | `draft`, `confirmed`, `cancelled` |
@@ -222,7 +223,7 @@ Header dokumen penerimaan barang dari supplier.
 | `created_at` | Timestamp | |
 | `updated_at` | Timestamp | |
 
-**Index (disarankan):** `gr_number` (unique), `purchase_order_id`, `branch_id`, `receipt_date`
+**Index (disarankan):** `gr_number` (unique), `purchase_order_id`, `warehouse_id`, `receipt_date`
 
 #### 6. `goods_receipt_items`
 Detail item yang diterima pada GR.
@@ -247,7 +248,7 @@ Detail item yang diterima pada GR.
 > [!IMPORTANT]
 > Saat GR di-confirm:
 > 1. Update `purchase_order_items.quantity_received` += `quantity_accepted`.
-> 2. Update `product_stocks.quantity_on_hand` += `quantity_accepted` untuk **branch di `goods_receipts.branch_id`** (bukan `purchase_orders.branch_id`, karena bisa berbeda).
+> 2. Update `product_stocks.quantity_on_hand` += `quantity_accepted` untuk **warehouse di `goods_receipts.warehouse_id`** (bukan `purchase_orders.warehouse_id`, karena bisa berbeda).
 > 3. Hitung ulang `product_stocks.average_cost` berdasarkan weighted average.
 > 4. Evaluasi status PO: jika semua item PO sudah fully received → `fully_received`, jika sebagian → `partially_received`.
 
@@ -265,7 +266,7 @@ Header dokumen retur barang ke supplier.
 | `purchase_order_id` | BigInt | FK -> `purchase_orders` |
 | `goods_receipt_id` | BigInt | FK -> `goods_receipts` (nullable, untuk traceability langsung ke GR) |
 | `supplier_id` | BigInt | FK -> `suppliers` |
-| `branch_id` | BigInt | FK -> `branches` |
+| `warehouse_id` | BigInt | FK -> `warehouses` |
 | `return_date` | Date | Tanggal retur |
 | `reason` | Enum | `defective`, `wrong_item`, `excess_quantity`, `damaged`, `other` |
 | `status` | Enum | `draft`, `confirmed`, `cancelled` |
@@ -378,7 +379,7 @@ Tabel terlibat:
 * `purchase_request_items`
 * `products`
 * `units`
-* `branches`
+* `warehouses`
 * `departments`
 * `employees`
 * `users` (kolom `created_by`, `approved_by`)
@@ -401,14 +402,14 @@ Tabel terlibat:
 * `products`
 * `units`
 * `suppliers`
-* `branches`
+* `warehouses`
 * `users` (kolom `created_by`, `approved_by`)
 
 Fitur khusus:
 * Bisa dibuat langsung atau dari PR.
 * Tracking progress penerimaan per item.
 * Print/export PO.
-* Filter: status, supplier, branch, date range.
+* Filter: status, supplier, warehouse, date range.
 
 #### 3) Goods Receipts
 Tujuan: mencatat penerimaan barang dari supplier berdasarkan PO.
@@ -423,7 +424,7 @@ Tabel terlibat:
 * `purchase_order_items`
 * `products`
 * `product_stocks` (update stok)
-* `branches`
+* `warehouses`
 * `employees` (kolom `received_by`)
 * `users` (kolom `created_by`, `confirmed_by`)
 
@@ -431,7 +432,7 @@ Fitur khusus:
 * Partial receipt (terima sebagian item PO).
 * QC check (quantity accepted vs rejected).
 * Auto-update stok saat confirm.
-* Filter: status, PO number, branch, date range.
+* Filter: status, PO number, warehouse, date range.
 
 #### 4) Supplier Returns
 Tujuan: mengelola pengembalian barang ke supplier.
@@ -448,7 +449,7 @@ Tabel terlibat:
 * `products`
 * `product_stocks` (update stok)
 * `suppliers`
-* `branches`
+* `warehouses`
 * `users` (kolom `created_by`)
 
 Fitur khusus:
@@ -469,7 +470,7 @@ Agent skill: `feature-non-crud`
 Tabel terlibat:
 * `purchase_orders`, `purchase_order_items`
 * `suppliers`
-* `branches`
+* `warehouses`
 * `products`
 
 #### 6) Purchase History Report
@@ -483,9 +484,10 @@ Tabel terlibat:
 * `goods_receipts`, `goods_receipt_items`
 * `suppliers`
 * `products`
+* `warehouses`
 
 #### 7) Goods Receipt Report
-Tujuan: daftar penerimaan barang per periode, per supplier, per branch.
+Tujuan: daftar penerimaan barang per periode, per supplier, per warehouse.
 
 Jenis menu: Non-CRUD
 Agent skill: `feature-non-crud`
@@ -495,7 +497,7 @@ Tabel terlibat:
 * `purchase_orders`
 * `suppliers`
 * `products`
-* `branches`
+* `warehouses`
 
 ---
 
