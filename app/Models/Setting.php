@@ -74,6 +74,10 @@ class Setting extends Model
             'value' => static::serializeValue($value, $setting->type),
         ]);
 
+        // Clear application caches
+        cache()->forget('app.company_name');
+        cache()->forget('app.mail_settings');
+
         return $setting->fresh();
     }
 
