@@ -39,6 +39,7 @@ class AdminSettingRequest extends FormRequest
             'mail_encryption' => ['nullable', 'string', 'max:20'],
             'mail_from_address' => ['nullable', 'string', 'email', 'max:255'],
             'mail_from_name' => ['nullable', 'string', 'max:255'],
+            'test_email' => ['nullable', 'string', 'email', 'max:255'],
         ];
     }
 }

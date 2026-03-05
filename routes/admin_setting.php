@@ -11,4 +11,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('admin-settings', [AdminSettingController::class, 'update'])
         ->name('admin-settings.update')
         ->middleware('permission:admin_setting.edit,true');
+
+    Route::post('admin-settings/test-smtp', [AdminSettingController::class, 'testSmtp'])
+        ->name('admin-settings.test-smtp')
+        ->middleware('permission:admin_setting.edit,true');
 });

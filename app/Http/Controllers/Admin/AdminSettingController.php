@@ -8,6 +8,9 @@ use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\Request;
+use App\Mail\TestSmtpMail;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -63,5 +66,23 @@ class AdminSettingController extends Controller
         }
 
         return Storage::disk(config('filesystems.default'))->url($logoPath);
+    }
+
+    /**
+     * Send a test SMTP email
+     */
+    public function testSmtp(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'test_email' => ['required', 'email', 'max:255'],
+        ]);
+
+        try {
+            Mail::to($request->input('test_email'))->send(new TestSmtpMail());
+            
+            return back()->with('success', 'Test email sent successfully. Please check your inbox.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['test_email' => 'Failed to send email: ' . $e->getMessage()]);
+        }
     }
 }

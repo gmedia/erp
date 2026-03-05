@@ -2,6 +2,7 @@ import AdminSettingController from '@/actions/App/Http/Controllers/Admin/AdminSe
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import AdminSettingsLayout from '@/layouts/admin-settings/layout';
@@ -479,6 +480,65 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
                     </>
                 )}
             </Form>
+
+            <Separator className="my-8" />
+
+            <div className="space-y-4">
+                <HeadingSmall
+                    title="Test SMTP Configuration"
+                    description="Send a test email to verify your settings are correct"
+                />
+
+                <Form
+                    {...AdminSettingController.testSmtp.form.post()}
+                    data-testid="test-smtp-form"
+                    options={{
+                        preserveScroll: true,
+                    }}
+                    className="flex w-full items-start gap-4"
+                >
+                    {({ processing, recentlySuccessful, errors }) => (
+                        <div className="flex-1 space-y-2">
+                            <div className="flex w-full items-center gap-4">
+                                <div className="flex-1">
+                                    <Label htmlFor="test_email" className="sr-only">Test Email</Label>
+                                    <Input
+                                        id="test_email"
+                                        name="test_email"
+                                        type="email"
+                                        placeholder="Enter email to test..."
+                                        className="w-full"
+                                    />
+                                </div>
+                                <Button
+                                    disabled={processing}
+                                    data-testid="send-test-email"
+                                >
+                                    {processing ? 'Sending...' : 'Send Test Email'}
+                                </Button>
+                            </div>
+
+                            {errors.test_email && (
+                                <p className="text-sm text-destructive">
+                                    {errors.test_email}
+                                </p>
+                            )}
+
+                            <Transition
+                                show={recentlySuccessful}
+                                enter="transition ease-in-out duration-300"
+                                enterFrom="opacity-0"
+                                leave="transition ease-in-out duration-300"
+                                leaveTo="opacity-0"
+                            >
+                                <p className="text-sm text-green-600">
+                                    Test email sent successfully! Check your inbox.
+                                </p>
+                            </Transition>
+                        </div>
+                    )}
+                </Form>
+            </div>
         </div>
     );
 }

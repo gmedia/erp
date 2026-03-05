@@ -227,4 +227,26 @@ test.describe('Admin Settings', () => {
         await page.reload();
         await expect(page.locator('input[name="mail_host"]')).toHaveValue('smtp.mailtrap.io');
     });
+
+    test('can send test smtp email', async ({ page }) => {
+        await page.goto('/admin-settings?group=smtp');
+
+        // Check if test email section is visible
+        await expect(page.getByText('Test SMTP Configuration')).toBeVisible();
+
+        // Target the test email input
+        const testEmailInput = page.locator('input[name="test_email"]');
+        await expect(testEmailInput).toBeVisible();
+
+        // Fill in a test email
+        await testEmailInput.fill('admin@dokfin.id');
+
+        // Click the send button
+        const sendTestButton = page.getByTestId('send-test-email');
+        await sendTestButton.click();
+
+        // Verify the success message appears
+        const successMessage = page.getByText('Test email sent successfully! Check your inbox.');
+        await expect(successMessage).toBeVisible({ timeout: 5000 });
+    });
 });
