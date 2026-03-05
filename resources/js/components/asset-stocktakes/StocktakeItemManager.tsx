@@ -17,9 +17,14 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { StocktakeItem } from '@/hooks/asset-stocktakes/useStocktakeItems';
-import { Loader2, Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
-import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import {
+    Controller,
+    FormProvider,
+    useFieldArray,
+    useForm,
+} from 'react-hook-form';
 
 interface FormValues {
     items: StocktakeItem[];
@@ -60,7 +65,7 @@ export function StocktakeItemManager({
                 if (item.result === 'moved') {
                     return {
                         ...item,
-                        found_branch_id: stocktakeBranchId, 
+                        found_branch_id: stocktakeBranchId,
                     };
                 }
                 return {
@@ -80,11 +85,21 @@ export function StocktakeItemManager({
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Asset Code</TableHead>
-                                <TableHead>Asset Name</TableHead>
-                                <TableHead>Result</TableHead>
-                                <TableHead>Location (If Moved)</TableHead>
-                                <TableHead>Notes</TableHead>
+                                <TableHead className="min-w-[150px]">
+                                    Asset Code
+                                </TableHead>
+                                <TableHead className="min-w-[200px]">
+                                    Asset Name
+                                </TableHead>
+                                <TableHead className="w-[180px]">
+                                    Result
+                                </TableHead>
+                                <TableHead className="w-[300px]">
+                                    Location (If Moved)
+                                </TableHead>
+                                <TableHead className="min-w-[250px]">
+                                    Notes
+                                </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -92,7 +107,7 @@ export function StocktakeItemManager({
                                 <TableRow>
                                     <TableCell
                                         colSpan={5}
-                                        className="text-center text-muted-foreground py-8"
+                                        className="py-8 text-center text-muted-foreground"
                                     >
                                         No assets expected for this stocktake.
                                     </TableCell>
@@ -101,7 +116,7 @@ export function StocktakeItemManager({
                                 fields.map((field, index) => (
                                     <TableRow key={field.id}>
                                         <TableCell>
-                                            <span className="font-semibold text-sm">
+                                            <span className="text-sm font-semibold">
                                                 {field.asset?.asset_code}
                                             </span>
                                         </TableCell>
@@ -114,20 +129,34 @@ export function StocktakeItemManager({
                                             <Controller
                                                 control={control}
                                                 name={`items.${index}.result`}
-                                                render={({ field: selectField }) => (
+                                                render={({
+                                                    field: selectField,
+                                                }) => (
                                                     <Select
-                                                        onValueChange={selectField.onChange}
-                                                        value={selectField.value}
+                                                        onValueChange={
+                                                            selectField.onChange
+                                                        }
+                                                        value={
+                                                            selectField.value
+                                                        }
                                                         disabled={loading}
                                                     >
                                                         <SelectTrigger>
                                                             <SelectValue placeholder="Select..." />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value="found">Found</SelectItem>
-                                                            <SelectItem value="missing">Missing</SelectItem>
-                                                            <SelectItem value="damaged">Damaged</SelectItem>
-                                                            <SelectItem value="moved">Moved</SelectItem>
+                                                            <SelectItem value="found">
+                                                                Found
+                                                            </SelectItem>
+                                                            <SelectItem value="missing">
+                                                                Missing
+                                                            </SelectItem>
+                                                            <SelectItem value="damaged">
+                                                                Damaged
+                                                            </SelectItem>
+                                                            <SelectItem value="moved">
+                                                                Moved
+                                                            </SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 )}
@@ -137,19 +166,36 @@ export function StocktakeItemManager({
                                             <Controller
                                                 control={control}
                                                 name={`items.${index}.result`}
-                                                render={({ field: resultField }) => {
-                                                    if (resultField.value === 'moved') {
+                                                render={({
+                                                    field: resultField,
+                                                }) => {
+                                                    if (
+                                                        resultField.value ===
+                                                        'moved'
+                                                    ) {
                                                         return (
                                                             <AsyncSelectField
                                                                 name={`items.${index}.found_location_id`}
                                                                 placeholder="Search location..."
                                                                 url={`/api/asset-locations?branch_id=${stocktakeBranchId}`}
-                                                                labelFn={(item) => item.name}
-                                                                valueFn={(item) => String(item.id)}
+                                                                labelFn={(
+                                                                    item,
+                                                                ) => item.name}
+                                                                valueFn={(
+                                                                    item,
+                                                                ) =>
+                                                                    String(
+                                                                        item.id,
+                                                                    )
+                                                                }
                                                             />
                                                         );
                                                     }
-                                                    return <span className="text-muted-foreground text-sm">-</span>;
+                                                    return (
+                                                        <span className="text-sm text-muted-foreground">
+                                                            -
+                                                        </span>
+                                                    );
                                                 }}
                                             />
                                         </TableCell>
@@ -157,10 +203,15 @@ export function StocktakeItemManager({
                                             <Controller
                                                 control={control}
                                                 name={`items.${index}.notes`}
-                                                render={({ field: inputField }) => (
+                                                render={({
+                                                    field: inputField,
+                                                }) => (
                                                     <Input
                                                         {...inputField}
-                                                        value={inputField.value || ''}
+                                                        value={
+                                                            inputField.value ||
+                                                            ''
+                                                        }
                                                         placeholder="Notes (optional)"
                                                         disabled={loading}
                                                     />
@@ -173,9 +224,12 @@ export function StocktakeItemManager({
                         </TableBody>
                     </Table>
                 </div>
-                
+
                 <div className="flex justify-end">
-                    <Button type="submit" disabled={loading || fields.length === 0}>
+                    <Button
+                        type="submit"
+                        disabled={loading || fields.length === 0}
+                    >
                         {loading ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
