@@ -437,6 +437,18 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/inventory-stocktake-variance-report/inventory-stocktake-variance-report.spec.ts
 
+- slug: stock-adjustment-report
+  route: /reports/stock-adjustment
+  api: /reports/stock-adjustment (Accepts application/json)
+  export_api: /reports/stock-adjustment/export
+  search_placeholder: "Search number, warehouse, branch, type, status..."
+  sortable_columns: [Adjustment Date, Adjustment Type, Status, Warehouse, Adjustment Count, Total Qty Adjusted, Total Adjustment Value]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD laporan penyesuaian stok per tipe, periode, dan gudang dengan total nilai adjustment."
+  tests:
+    - tests/e2e/stock-adjustment-report/stock-adjustment-report.spec.ts
+
 - slug: stock-monitor
   route: /stock-monitor
   api: /stock-monitor (Accepts application/json)
@@ -564,6 +576,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 22 | Inventory Valuation Report | `inventory-valuation-report` | `Feature/Reports/InventoryValuationReportTest.php` | Laporan nilai persediaan per produk per gudang + export |
 | 23 | Stock Movement Report | `stock-movement-report` | `Feature/Reports/StockMovementReportTest.php` | Laporan pergerakan stok per periode + export |
 | 24 | Inventory Stocktake Variance Report | `inventory-stocktake-variance-report` | `Feature/Reports/InventoryStocktakeVarianceReportTest.php` | Laporan variance stock opname inventory + export |
+| 25 | Stock Adjustment Report | `stock-adjustment-report` | `Feature/Reports/StockAdjustmentReportTest.php` | Laporan penyesuaian stok per tipe/periode/gudang + export |
 
 ---
 

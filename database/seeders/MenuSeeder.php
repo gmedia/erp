@@ -186,7 +186,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'report',
                 'display_name' => 'Report',
-                'permissions' => ['trial_balance_report', 'balance_sheet_report', 'income_statement_report', 'cash_flow_report', 'comparative_report', 'inventory_valuation_report', 'stock_movement_report', 'inventory_stocktake_variance_report', 'asset'],
+                'permissions' => ['trial_balance_report', 'balance_sheet_report', 'income_statement_report', 'cash_flow_report', 'comparative_report', 'inventory_valuation_report', 'stock_movement_report', 'inventory_stocktake_variance_report', 'stock_adjustment_report', 'asset'],
                 'icon' => 'PieChart',
                 'url' => null,
                 'child' => [
@@ -284,6 +284,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['inventory_stocktake_variance_report'],
                         'icon' => 'ClipboardList',
                         'url' => 'reports/inventory-stocktake-variance',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'stock_adjustment_report',
+                        'display_name' => 'Stock Adjustment Report',
+                        'permissions' => ['stock_adjustment_report'],
+                        'icon' => 'ClipboardCheck',
+                        'url' => 'reports/stock-adjustment',
                         'child' => [],
                     ],
                 ],
