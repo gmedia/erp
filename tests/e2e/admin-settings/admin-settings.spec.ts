@@ -13,6 +13,7 @@ test.describe('Admin Settings', () => {
         // Sidebar navigation should be visible
         await expect(page.getByRole('link', { name: 'General' })).toBeVisible();
         await expect(page.getByRole('link', { name: 'Regional' })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'SMTP' })).toBeVisible();
 
         // General settings heading should show
         await expect(page.getByText('General Settings')).toBeVisible();
@@ -189,5 +190,41 @@ test.describe('Admin Settings', () => {
         // Verify accept attribute restricts file types
         const acceptAttr = await logoInput.getAttribute('accept');
         expect(acceptAttr).toBe('.svg,image/svg+xml');
+    });
+
+    test('can navigate to SMTP settings and update values', async ({ page }) => {
+        await page.goto('/admin-settings');
+
+        // Click SMTP tab
+        await page.getByRole('link', { name: 'SMTP' }).click();
+        await expect(page).toHaveURL(/group=smtp/);
+
+        // SMTP settings heading should show
+        await expect(page.getByText('SMTP Settings')).toBeVisible();
+
+        // Check if all fields exist
+        await expect(page.locator('input[name="mail_host"]')).toBeVisible();
+        await expect(page.locator('input[name="mail_port"]')).toBeVisible();
+        await expect(page.locator('input[name="mail_username"]')).toBeVisible();
+        await expect(page.locator('input[name="mail_password"]')).toBeVisible();
+        await expect(page.locator('input[name="mail_encryption"]')).toBeVisible();
+        await expect(page.locator('input[name="mail_from_address"]')).toBeVisible();
+        await expect(page.locator('input[name="mail_from_name"]')).toBeVisible();
+
+        // Update SMTP host
+        const hostInput = page.locator('input[name="mail_host"]');
+        await hostInput.clear();
+        await hostInput.fill('smtp.mailtrap.io');
+
+        // Save
+        const saveButton = page.getByTestId('save-smtp-settings');
+        await saveButton.click();
+
+        // Wait for page to reload/settle
+        await page.waitForTimeout(1000);
+
+        // Verify persistence
+        await page.reload();
+        await expect(page.locator('input[name="mail_host"]')).toHaveValue('smtp.mailtrap.io');
     });
 });

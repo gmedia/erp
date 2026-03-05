@@ -26,6 +26,15 @@ interface SettingsData {
         number_format_decimal?: string;
         number_format_thousand?: string;
     };
+    smtp?: {
+        mail_host?: string;
+        mail_port?: string;
+        mail_username?: string;
+        mail_password?: string;
+        mail_encryption?: string;
+        mail_from_address?: string;
+        mail_from_name?: string;
+    };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -315,6 +324,165 @@ function RegionalSettings({
     );
 }
 
+function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
+    return (
+        <div className="space-y-6">
+            <HeadingSmall
+                title="SMTP Settings"
+                description="Configure outgoing email server (SMTP) details"
+            />
+
+            <Form
+                {...AdminSettingController.update.form.put()}
+                data-testid="smtp-settings-form"
+                options={{
+                    preserveScroll: true,
+                }}
+                className="space-y-6"
+            >
+                {({ processing, recentlySuccessful, errors }) => (
+                    <>
+                        <div className="grid gap-2">
+                            <Label htmlFor="mail_host">Mail Host</Label>
+                            <Input
+                                id="mail_host"
+                                name="mail_host"
+                                defaultValue={settings?.mail_host ?? ''}
+                                placeholder="e.g. smtp.mailgun.org"
+                                className="mt-1 block w-full"
+                            />
+                            {errors.mail_host && (
+                                <p className="text-sm text-destructive">
+                                    {errors.mail_host}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="mail_port">Mail Port</Label>
+                            <Input
+                                id="mail_port"
+                                name="mail_port"
+                                defaultValue={settings?.mail_port ?? ''}
+                                placeholder="e.g. 587"
+                                className="mt-1 block w-full"
+                            />
+                            {errors.mail_port && (
+                                <p className="text-sm text-destructive">
+                                    {errors.mail_port}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="mail_username">Mail Username</Label>
+                            <Input
+                                id="mail_username"
+                                name="mail_username"
+                                defaultValue={settings?.mail_username ?? ''}
+                                placeholder="e.g. postmaster@yourdomain.com"
+                                className="mt-1 block w-full"
+                            />
+                            {errors.mail_username && (
+                                <p className="text-sm text-destructive">
+                                    {errors.mail_username}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="mail_password">Mail Password</Label>
+                            <Input
+                                id="mail_password"
+                                name="mail_password"
+                                type="password"
+                                defaultValue={settings?.mail_password ?? ''}
+                                placeholder="e.g. secret123"
+                                className="mt-1 block w-full"
+                            />
+                            {errors.mail_password && (
+                                <p className="text-sm text-destructive">
+                                    {errors.mail_password}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="mail_encryption">Mail Encryption</Label>
+                            <Input
+                                id="mail_encryption"
+                                name="mail_encryption"
+                                defaultValue={settings?.mail_encryption ?? ''}
+                                placeholder="e.g. tls, ssl, or leave empty"
+                                className="mt-1 block w-full"
+                            />
+                            {errors.mail_encryption && (
+                                <p className="text-sm text-destructive">
+                                    {errors.mail_encryption}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="mail_from_address">From Address</Label>
+                            <Input
+                                id="mail_from_address"
+                                name="mail_from_address"
+                                type="email"
+                                defaultValue={settings?.mail_from_address ?? ''}
+                                placeholder="e.g. noreply@yourdomain.com"
+                                className="mt-1 block w-full"
+                            />
+                            {errors.mail_from_address && (
+                                <p className="text-sm text-destructive">
+                                    {errors.mail_from_address}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="mail_from_name">From Name</Label>
+                            <Input
+                                id="mail_from_name"
+                                name="mail_from_name"
+                                defaultValue={settings?.mail_from_name ?? ''}
+                                placeholder="e.g. My Company"
+                                className="mt-1 block w-full"
+                            />
+                            {errors.mail_from_name && (
+                                <p className="text-sm text-destructive">
+                                    {errors.mail_from_name}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <Button
+                                disabled={processing}
+                                data-testid="save-smtp-settings"
+                            >
+                                Save
+                            </Button>
+
+                            <Transition
+                                show={recentlySuccessful}
+                                enter="transition ease-in-out"
+                                enterFrom="opacity-0"
+                                leave="transition ease-in-out"
+                                leaveTo="opacity-0"
+                            >
+                                <p className="text-sm text-neutral-600">
+                                    Saved
+                                </p>
+                            </Transition>
+                        </div>
+                    </>
+                )}
+            </Form>
+        </div>
+    );
+}
+
 export default function AdminSettings({
     settings,
 }: {
@@ -337,6 +505,9 @@ export default function AdminSettings({
                 )}
                 {currentGroup === 'regional' && (
                     <RegionalSettings settings={settings.regional} />
+                )}
+                {currentGroup === 'smtp' && (
+                    <SmtpSettings settings={settings.smtp} />
                 )}
             </AdminSettingsLayout>
         </AppLayout>

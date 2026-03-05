@@ -21,6 +21,11 @@ const sidebarNavItems: NavItem[] = [
         href: '/admin-settings?group=regional',
         icon: null,
     },
+    {
+        title: 'SMTP',
+        href: '/admin-settings?group=smtp',
+        icon: null,
+    },
 ];
 
 export default function AdminSettingsLayout({
