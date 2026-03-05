@@ -137,10 +137,18 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'inventory',
                 'display_name' => 'Inventory',
-                'permissions' => ['stock_transfer', 'inventory_stocktake', 'stock_adjustment', 'stock_movement', 'stock_monitor'],
+                'permissions' => ['purchase_request', 'stock_transfer', 'inventory_stocktake', 'stock_adjustment', 'stock_movement', 'stock_monitor'],
                 'icon' => 'Box',
                 'url' => null,
                 'child' => [
+                    [
+                        'name' => 'purchase_request',
+                        'display_name' => 'Purchase Requests',
+                        'permissions' => ['purchase_request', 'purchase_request.create', 'purchase_request.edit', 'purchase_request.delete'],
+                        'icon' => 'FilePlus2',
+                        'url' => 'purchase-requests',
+                        'child' => [],
+                    ],
                     [
                         'name' => 'stock_transfer',
                         'display_name' => 'Stock Transfers',

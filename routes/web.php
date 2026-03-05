@@ -28,6 +28,7 @@ require __DIR__ . '/warehouse.php';
 require __DIR__ . '/stock_transfer.php';
 require __DIR__ . '/inventory_stocktake.php';
 require __DIR__ . '/stock_adjustment.php';
+require __DIR__ . '/purchase_request.php';
 require __DIR__ . '/stock_movement.php';
 require __DIR__ . '/stock_monitor.php';
 require __DIR__ . '/customer.php';

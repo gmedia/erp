@@ -114,6 +114,11 @@ import { createStockAdjustmentFilterFields } from '@/components/stock-adjustment
 import { StockAdjustmentForm } from '@/components/stock-adjustments/StockAdjustmentForm';
 import { StockAdjustmentViewModal } from '@/components/stock-adjustments/StockAdjustmentViewModal';
 import { type StockAdjustment } from '@/types/stock-adjustment';
+import { purchaseRequestColumns } from '@/components/purchase-requests/PurchaseRequestColumns';
+import { createPurchaseRequestFilterFields } from '@/components/purchase-requests/PurchaseRequestFilters';
+import { PurchaseRequestForm } from '@/components/purchase-requests/PurchaseRequestForm';
+import { PurchaseRequestViewModal } from '@/components/purchase-requests/PurchaseRequestViewModal';
+import { type PurchaseRequest } from '@/types/purchase-request';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -403,6 +408,33 @@ export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
     viewModalComponent: StockAdjustmentViewModal,
     getDeleteMessage: (adjustment: { adjustment_number?: string | null }) =>
         `This action cannot be undone. This will cancel stock adjustment ${adjustment.adjustment_number || ''}.`,
+});
+
+export const purchaseRequestConfig = createComplexEntityConfig<PurchaseRequest>({
+    entityName: 'Purchase Request',
+    entityNamePlural: 'Purchase Requests',
+    apiEndpoint: '/api/purchase-requests',
+    exportEndpoint: '/api/purchase-requests/export',
+    queryKey: ['purchase-requests'],
+    breadcrumbs: [{ title: 'Purchase Requests', href: '/purchase-requests' }],
+    initialFilters: {
+        search: '',
+        branch_id: '',
+        department_id: '',
+        requested_by: '',
+        priority: '',
+        status: '',
+        request_date_from: '',
+        request_date_to: '',
+    },
+    columns: purchaseRequestColumns,
+    filterFields: createPurchaseRequestFilterFields(),
+    formComponent: PurchaseRequestForm,
+    formType: 'complex',
+    entityNameForSearch: 'purchase request',
+    viewModalComponent: PurchaseRequestViewModal,
+    getDeleteMessage: (purchaseRequest: { pr_number?: string | null }) =>
+        `This action cannot be undone. This will cancel purchase request ${purchaseRequest.pr_number || ''}.`,
 });
 
 export const supplierCategoryConfig = createSimpleEntityConfig({

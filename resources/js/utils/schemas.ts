@@ -520,3 +520,30 @@ export const stockAdjustmentFormSchema = z.object({
 });
 
 export type StockAdjustmentFormData = z.infer<typeof stockAdjustmentFormSchema>;
+
+export const purchaseRequestFormSchema = z.object({
+    pr_number: z.string().optional(),
+    branch_id: z.string().min(1, { message: 'Branch is required.' }),
+    department_id: z.string().optional(),
+    requested_by: z.string().optional(),
+    request_date: z.date({ message: 'Request date is required.' }),
+    required_date: z.date().optional().nullable(),
+    priority: z.enum(['low', 'normal', 'high', 'urgent'], {
+        message: 'Priority is required.',
+    }),
+    status: z.enum(['draft', 'pending_approval', 'approved', 'rejected', 'partially_ordered', 'fully_ordered', 'cancelled'], {
+        message: 'Status is required.',
+    }),
+    estimated_amount: z.coerce.number().min(0).optional(),
+    notes: z.string().optional(),
+    rejection_reason: z.string().optional(),
+    items: z.array(z.object({
+        product_id: z.string().min(1, { message: 'Product is required.' }),
+        unit_id: z.string().min(1, { message: 'Unit is required.' }),
+        quantity: z.coerce.number().gt(0, { message: 'Quantity must be greater than 0.' }),
+        estimated_unit_price: z.coerce.number().min(0).optional().default(0),
+        notes: z.string().optional(),
+    })).min(1, { message: 'At least 1 item is required.' }),
+});
+
+export type PurchaseRequestFormData = z.infer<typeof purchaseRequestFormSchema>;

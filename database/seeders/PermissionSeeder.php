@@ -97,6 +97,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'purchase_request',
+                'display_name' => 'Purchase Request',
+                'child' => [
+                    [
+                        'name' => 'purchase_request.create',
+                        'display_name' => 'Create Purchase Request',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'purchase_request.edit',
+                        'display_name' => 'Edit Purchase Request',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'purchase_request.delete',
+                        'display_name' => 'Delete Purchase Request',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'stock_transfer',
                 'display_name' => 'Stock Transfer',
                 'child' => [
