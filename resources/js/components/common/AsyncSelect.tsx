@@ -125,12 +125,14 @@ export function AsyncSelect({
                     aria-label={label}
                     aria-expanded={open}
                     className={cn(
-                        'w-full justify-between font-normal',
+                        'w-full justify-between font-normal overflow-hidden min-w-0',
                         !value && 'text-muted-foreground',
                         className,
                     )}
                 >
-                    {selectedLabel || placeholder}
+                    <span className="truncate text-left flex-1">
+                        {selectedLabel || placeholder}
+                    </span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
