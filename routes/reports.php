@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AssetReportController;
 use App\Http\Controllers\BookValueDepreciationReportController;
+use App\Http\Controllers\InventoryStocktakeVarianceReportController;
 use App\Http\Controllers\InventoryValuationReportController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StockMovementReportController;
@@ -29,4 +30,7 @@ Route::middleware(['auth', 'verified'])->prefix('reports')->group(function () {
 
     Route::get('stock-movement', [StockMovementReportController::class, 'index'])->name('reports.stock-movement')->middleware('permission:stock_movement_report');
     Route::post('stock-movement/export', [StockMovementReportController::class, 'export'])->name('reports.stock-movement.export')->middleware('permission:stock_movement_report');
+
+    Route::get('inventory-stocktake-variance', [InventoryStocktakeVarianceReportController::class, 'index'])->name('reports.inventory-stocktake-variance')->middleware('permission:inventory_stocktake_variance_report');
+    Route::post('inventory-stocktake-variance/export', [InventoryStocktakeVarianceReportController::class, 'export'])->name('reports.inventory-stocktake-variance.export')->middleware('permission:inventory_stocktake_variance_report');
 });

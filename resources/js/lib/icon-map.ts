@@ -55,6 +55,7 @@ import {
     Warehouse,
     Edit3,
     History,
+    ClipboardList,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -113,6 +114,7 @@ const iconMap: Record<string, LucideIcon> = {
     Warehouse,
     Edit3,
     History,
+    ClipboardList,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

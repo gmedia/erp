@@ -425,6 +425,18 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/stock-movement-report/stock-movement-report.spec.ts
 
+- slug: inventory-stocktake-variance-report
+  route: /reports/inventory-stocktake-variance
+  api: /reports/inventory-stocktake-variance (Accepts application/json)
+  export_api: /reports/inventory-stocktake-variance/export
+  search_placeholder: "Search stocktake, product, category, warehouse..."
+  sortable_columns: [Stocktake No., Stocktake Date, Product, Category, Warehouse, System Qty, Counted Qty, Variance, Result, Counted At]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD laporan selisih stock opname inventory (surplus/deficit) per produk per gudang."
+  tests:
+    - tests/e2e/inventory-stocktake-variance-report/inventory-stocktake-variance-report.spec.ts
+
 - slug: stock-monitor
   route: /stock-monitor
   api: /stock-monitor (Accepts application/json)
@@ -551,6 +563,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 21 | Stock Monitor | `stock-monitor` | `Feature/StockMonitor/StockMonitorControllerTest.php` | Dashboard stok per produk & gudang dengan low stock threshold |
 | 22 | Inventory Valuation Report | `inventory-valuation-report` | `Feature/Reports/InventoryValuationReportTest.php` | Laporan nilai persediaan per produk per gudang + export |
 | 23 | Stock Movement Report | `stock-movement-report` | `Feature/Reports/StockMovementReportTest.php` | Laporan pergerakan stok per periode + export |
+| 24 | Inventory Stocktake Variance Report | `inventory-stocktake-variance-report` | `Feature/Reports/InventoryStocktakeVarianceReportTest.php` | Laporan variance stock opname inventory + export |
 
 ---
 

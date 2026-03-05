@@ -367,6 +367,11 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'inventory_stocktake_variance_report',
+                'display_name' => 'Inventory Stocktake Variance Report',
+                'child' => [],
+            ],
+            [
                 'name' => 'supplier_category',
                 'display_name' => 'Supplier Category',
                 'child' => [
