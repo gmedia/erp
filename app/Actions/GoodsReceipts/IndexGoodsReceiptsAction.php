@@ -59,6 +59,7 @@ class IndexGoodsReceiptsAction
             'purchase_order_id',
             'warehouse_id',
             'receipt_date',
+            'supplier_delivery_note',
             'status',
             'created_at',
             'updated_at',

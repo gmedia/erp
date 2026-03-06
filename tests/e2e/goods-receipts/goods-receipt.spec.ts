@@ -36,6 +36,7 @@ const config: ModuleTestConfig = {
         'PO Number',
         'Warehouse',
         'Receipt Date',
+        'Supplier Delivery Note',
         'Status',
     ],
     viewType: 'dialog',

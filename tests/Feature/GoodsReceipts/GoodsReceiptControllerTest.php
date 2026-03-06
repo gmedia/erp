@@ -92,6 +92,18 @@ test('index supports search and filters', function () {
         ->assertJsonCount(1, 'data');
 });
 
+test('index supports sorting by supplier delivery note', function () {
+    GoodsReceipt::factory()->create([
+        'supplier_delivery_note' => 'SJ-AAA',
+    ]);
+    GoodsReceipt::factory()->create([
+        'supplier_delivery_note' => 'SJ-BBB',
+    ]);
+
+    getJson('/api/goods-receipts?sort_by=supplier_delivery_note&sort_direction=desc')
+        ->assertOk();
+});
+
 test('store creates goods receipt with items', function () {
     [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
     $warehouse = Warehouse::factory()->create();

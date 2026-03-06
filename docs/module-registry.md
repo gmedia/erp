@@ -195,7 +195,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   api: /api/goods-receipts
   export_api: /api/goods-receipts/export
   search_placeholder: "Search GR number, supplier delivery note, or notes..."
-  sortable_columns: [GR Number, PO Number, Warehouse, Receipt Date, Status]
+  sortable_columns: [GR Number, PO Number, Warehouse, Receipt Date, Supplier Delivery Note, Status]
   view_type: dialog
   checkbox_header: false
 
