@@ -326,6 +326,14 @@ class MenuSeeder extends Seeder
                         'url' => 'reports/stock-adjustment',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'purchase_order_status_report',
+                        'display_name' => 'Purchase Order Status Report',
+                        'permissions' => ['purchase_order_status_report'],
+                        'icon' => 'ClipboardPenLine',
+                        'url' => 'reports/purchase-order-status',
+                        'child' => [],
+                    ],
                 ],
             ],
             [

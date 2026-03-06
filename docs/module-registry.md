@@ -485,6 +485,18 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/stock-adjustment-report/stock-adjustment-report.spec.ts
 
+- slug: purchase-order-status-report
+  route: /reports/purchase-order-status
+  api: /reports/purchase-order-status (Accepts application/json)
+  export_api: /reports/purchase-order-status/export
+  search_placeholder: "Search PO number, supplier, warehouse, or product..."
+  sortable_columns: [PO Number, Supplier, Warehouse, Status, Status Category, Ordered Qty, Received Qty, Outstanding Qty, Receipt Progress (%), Grand Total, Expected Delivery]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD laporan monitoring status purchase order (outstanding, partially received, closed) dengan agregasi kuantitas penerimaan."
+  tests:
+    - tests/e2e/purchase-order-status-report/purchase-order-status-report.spec.ts
+
 - slug: stock-monitor
   route: /stock-monitor
   api: /stock-monitor (Accepts application/json)
@@ -597,7 +609,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 3 | Dashboard | `dashboard` | `Feature/Dashboard/DashboardTest.php` | — |
 | 4 | Permissions | `permissions` | `Feature/Permissions/PermissionControllerTest.php` | — |
 | 5 | Users | `users` | `Feature/Users/UserControllerTest.php` | — |
-| 6 | Reports | `reports` | `Feature/Reports/*.php` (5 files) | Ada legacy + new tests |
+| 6 | Reports | `reports` | `Feature/Reports/*.php` (6 files) | Ada legacy + new tests |
 | 7 | Posting Journals | `posting-journals` | `Feature/PostingJournals/PostingJournalTest.php` | — |
 | 8 | Asset Depreciation Runs | `asset-depreciation-runs` | `Feature/AssetDepreciationRuns/*.php` | — |
 | 9 | Asset Reports | `asset-reports` | `Feature/AssetRegisterTest.php` | Laporan Asset Register |
@@ -617,6 +629,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 23 | Stock Movement Report | `stock-movement-report` | `Feature/Reports/StockMovementReportTest.php` | Laporan pergerakan stok per periode + export |
 | 24 | Inventory Stocktake Variance Report | `inventory-stocktake-variance-report` | `Feature/Reports/InventoryStocktakeVarianceReportTest.php` | Laporan variance stock opname inventory + export |
 | 25 | Stock Adjustment Report | `stock-adjustment-report` | `Feature/Reports/StockAdjustmentReportTest.php` | Laporan penyesuaian stok per tipe/periode/gudang + export |
+| 26 | Purchase Order Status Report | `purchase-order-status-report` | `Feature/Reports/PurchaseOrderStatusReportTest.php` | Laporan monitoring status PO (outstanding, partially received, closed) + export |
 
 ---
 

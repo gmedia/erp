@@ -461,6 +461,11 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'purchase_order_status_report',
+                'display_name' => 'Purchase Order Status Report',
+                'child' => [],
+            ],
+            [
                 'name' => 'supplier_category',
                 'display_name' => 'Supplier Category',
                 'child' => [
