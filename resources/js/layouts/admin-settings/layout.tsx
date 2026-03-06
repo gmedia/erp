@@ -1,9 +1,10 @@
+import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
 interface AdminSettingsLayoutProps extends PropsWithChildren {
@@ -58,7 +59,7 @@ export default function AdminSettingsLayout({
                                         'bg-muted': isActive,
                                     })}
                                 >
-                                    <Link href={item.href}>
+                                    <Link to={item.href}>
                                         {item.icon && (
                                             <item.icon className="h-4 w-4" />
                                         )}

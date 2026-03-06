@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -40,15 +40,12 @@ export default function CashFlow({ fiscalYears, selectedYearId, report }: Props)
     const parentIds = new Set(report.map((item) => item.parent_id).filter((id): id is number => id != null));
 
     const handleYearChange = (value: string) => {
-        router.get('/reports/cash-flow', { fiscal_year_id: value }, {
-            preserveState: true,
-            preserveScroll: true,
-        });
+        window.location.href = `/reports/cash-flow?fiscal_year_id=${value}`;
     };
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Cash Flow', href: '/reports/cash-flow' }]}>
-            <Head title="Cash Flow" />
+            <Helmet><title>Cash Flow</title></Helmet>
 
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

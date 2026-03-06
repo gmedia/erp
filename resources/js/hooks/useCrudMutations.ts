@@ -2,7 +2,7 @@
 
 import { handleApiError, type ApiError } from '@/utils/errorHandling';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import axios from '@/lib/axios';
 import { toast } from 'sonner';
 
 export interface UseCrudMutationsOptions {

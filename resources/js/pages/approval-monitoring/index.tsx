@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { OverdueApprovalsList } from '@/components/approval-monitoring/OverdueApprovalsList';
 import { SummaryCards } from '@/components/approval-monitoring/SummaryCards';
 import {
@@ -9,14 +10,13 @@ import {
 } from '@/components/ui/select';
 import { useApprovalMonitoring } from '@/hooks/useApprovalMonitoring';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
 
 export default function ApprovalMonitoringDashboard() {
     const { data, isLoading, filters, handleFilterChange } = useApprovalMonitoring();
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Home', href: '/' }, { title: 'Approval Monitoring', href: '#' }]}>
-            <Head title="Approval Monitoring" />
+            <Helmet><title>Approval Monitoring</title></Helmet>
             <div className="flex h-full flex-1 flex-col gap-6 p-4">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>

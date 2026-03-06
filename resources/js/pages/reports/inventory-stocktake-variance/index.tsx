@@ -1,5 +1,6 @@
 'use client';
 
+import { Helmet } from 'react-helmet-async';
 import { DataTable } from '@/components/common/DataTableCore';
 import {
     createInventoryStocktakeVarianceFilterFields,
@@ -11,7 +12,6 @@ import {
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
 
 export default function InventoryStocktakeVarianceReportPage() {
     const filterFields = createInventoryStocktakeVarianceFilterFields();
@@ -48,7 +48,7 @@ export default function InventoryStocktakeVarianceReportPage() {
 
     return (
         <>
-            <Head title="Inventory Stocktake Variance Report" />
+            <Helmet><title>Inventory Stocktake Variance Report</title></Helmet>
             <AppLayout
                 breadcrumbs={[
                     { title: 'Reports', href: '#' },

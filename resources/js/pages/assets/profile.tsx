@@ -1,5 +1,6 @@
 'use client';
 
+import { Helmet } from 'react-helmet-async';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -20,7 +21,6 @@ import {
 } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type Asset } from '@/types/asset';
-import { Head, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useCallback } from 'react';
@@ -71,7 +71,7 @@ export default function AssetProfile({ asset }: Props) {
 
     const handleStateChange = useCallback(() => {
         setTimelineKey(Date.now());
-        router.reload({ only: ['asset'] });
+        window.location.reload();
     }, []);
 
     const formatDate = (dateString: string | null) => {
@@ -190,7 +190,7 @@ export default function AssetProfile({ asset }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Asset Profile - ${item.asset_code}`} />
+            <Helmet><title>{`Asset Profile - ${item.asset_code}`}</title></Helmet>
 
             <div className="flex flex-col gap-6 p-6">
                 {/* Header Section - Enhanced */}

@@ -1,5 +1,4 @@
-import { SharedData } from '@/types';
-import { usePage } from '@inertiajs/react';
+import { useAuth } from '@/contexts/auth-context';
 import { ImgHTMLAttributes } from 'react';
 
 const defaultLogoPath = '/asset-files/dokfin/logo_orange.svg';
@@ -7,7 +6,7 @@ const defaultLogoPath = '/asset-files/dokfin/logo_orange.svg';
 export default function AppLogoIcon(
     props: ImgHTMLAttributes<HTMLImageElement>
 ) {
-    const { companyLogoUrl } = usePage<SharedData>().props;
+    const { companyLogoUrl } = useAuth();
 
     return <img {...props} src={companyLogoUrl ?? defaultLogoPath} alt="App Logo" />;
 }

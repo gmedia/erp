@@ -1,12 +1,12 @@
 'use client';
 
+import { Helmet } from 'react-helmet-async';
 import { DataTable } from '@/components/common/DataTableCore';
 import { createStockMonitorColumns, type StockMonitorItem } from '@/components/stock-monitor/Columns';
 import { createStockMonitorFilterFields } from '@/components/stock-monitor/Filters';
 import { StockMonitorSummaryCards } from '@/components/stock-monitor/SummaryCards';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -94,7 +94,7 @@ export default function StockMonitorPage({ filterOptions }: Props) {
 
     return (
         <>
-            <Head title="Stock Monitor" />
+            <Helmet><title>Stock Monitor</title></Helmet>
             <AppLayout
                 breadcrumbs={[
                     { title: 'Inventory', href: '#' },

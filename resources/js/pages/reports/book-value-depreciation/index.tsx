@@ -1,6 +1,6 @@
 'use client';
 
-import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import AppLayout from '@/layouts/app-layout';
 import { DataTable } from '@/components/common/DataTableCore';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
@@ -39,7 +39,7 @@ export default function BookValueDepreciationReport() {
 
     return (
         <>
-            <Head title="Book Value & Depreciation Report" />
+            <Helmet><title>Book Value & Depreciation Report</title></Helmet>
             <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Book Value & Depreciation', href: '/reports/book-value-depreciation' }]}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                     <div className="rounded-lg bg-white">

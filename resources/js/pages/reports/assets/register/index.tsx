@@ -1,6 +1,6 @@
 'use client';
 
-import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import AppLayout from '@/layouts/app-layout';
 import { DataTable } from '@/components/common/DataTableCore';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
@@ -55,7 +55,7 @@ export default function AssetRegisterReport() {
 
     return (
         <>
-            <Head title="Asset Register Report" />
+            <Helmet><title>Asset Register Report</title></Helmet>
             <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Asset Register', href: '/reports/assets/register' }]}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                     <div className="rounded-lg bg-white">

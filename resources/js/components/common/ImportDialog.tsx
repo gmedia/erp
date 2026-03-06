@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,7 +12,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { AlertCircle, CheckCircle2, Download, FileText, Loader2, PlusCircle, X } from 'lucide-react';
 import { useState } from 'react';
@@ -67,37 +67,7 @@ export default function ImportDialog({
     }
   };
 
-  const handleImport = () => {
-    if (!file) return;
-
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-
-    router.post(importRoute, formData, {
-      onSuccess: (page) => {
-        setLoading(false);
-        // The controller returns JSON, but Inertia handles it. 
-        // We might need to handle the response data differently if it's a pure JSON response vs Inertia visit.
-        // If the controller returns response()->json($summary), Inertia might treat it as a visit or we need to use axios.
-        // Let's use axios for this specific action to get the JSON response easily without page reload logic,
-        // OR better, checking how existing exports work. Existing exports rely on direct download.
-        // For import, we want to stay on the page and show summary.
-        // Let's use a standard fetch/axios approach for the import to handle the JSON response directly.
-      },
-      onError: (errors) => {
-        setLoading(false);
-        toast.error("Import Failed", {
-          description: "There was an error uploading the file.",
-        });
-      },
-      preserveState: true,
-      preserveScroll: true,
-    });
-  };
-
-  // Re-implementing handleImport to use axios for JSON response handling
-  const handleImportAxios = async () => {
+  const handleImport = async () => {
     if (!file) return;
 
     setLoading(true);
@@ -113,8 +83,7 @@ export default function ImportDialog({
           description: `Successfully imported ${response.data.imported} rows.`,
         });
         if (onSuccess) onSuccess();
-        // optionally refresh the page data
-        router.reload();
+        window.location.reload();
       } else if (response.data.errors.length > 0) {
         toast.error("Import Finished with Errors", {
           description: "Check the error list below.",
@@ -126,7 +95,6 @@ export default function ImportDialog({
       }
     } catch (error: any) {
       setLoading(false);
-      // Handle validation errors from Laravel (422)
       if (error.response && error.response.status === 422) {
          toast.error("Validation Error", {
           description: error.response.data.message || "Invalid file.",
@@ -138,6 +106,8 @@ export default function ImportDialog({
       }
     }
   };
+
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -220,7 +190,7 @@ export default function ImportDialog({
           </Button>
           <Button 
             type="button" 
-            onClick={handleImportAxios} 
+            onClick={handleImport} 
             disabled={!file || loading}
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

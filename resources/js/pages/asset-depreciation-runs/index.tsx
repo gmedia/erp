@@ -1,7 +1,7 @@
 'use client';
 
+import { Helmet } from 'react-helmet-async';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
 import { BreadcrumbItem } from '@/types';
 import { useAssetDepreciationRuns } from '@/hooks/useAssetDepreciationRuns';
 import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
@@ -93,7 +93,7 @@ export default function Index() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Asset Depreciation Runs" />
+            <Helmet><title>Asset Depreciation Runs</title></Helmet>
 
             <div className="flex flex-col gap-6 p-6">
                 <Card>

@@ -1,7 +1,8 @@
 'use client';
 
+import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 import { ColumnDef } from '@tanstack/react-table';
-import { Link, router } from '@inertiajs/react';
 import { Badge } from '@/components/ui/badge';
 import {
     createActionsColumn,
@@ -38,7 +39,7 @@ export const assetColumns: ColumnDef<Asset>[] = [
         ...createSortingHeader('Name'),
         cell: ({ row }) => (
             <Link
-                href={`/assets/${row.original.ulid}`}
+                to={`/assets/${row.original.ulid}`}
                 className="font-medium text-primary hover:underline"
             >
                 {row.original.name}

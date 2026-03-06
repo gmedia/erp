@@ -1,6 +1,6 @@
 'use client';
 
-import { router, usePage } from '@inertiajs/react';
+import { useAuth } from '@/contexts/auth-context';
 import {
     createContext,
     ReactNode,
@@ -301,18 +301,16 @@ export function I18nProvider({
     translations = defaultTranslations,
 }: I18nProviderProps) {
     // Function to switch locale - triggers full page reload to ensure all translations are updated
-    const setLocale = useCallback((newLocale: string) => {
-        router.post(
-            `/locale/${newLocale}`,
-            {},
-            {
-                preserveState: false,
-                preserveScroll: false,
-                onSuccess: () => {
-                    window.location.reload();
-                },
-            },
-        );
+    const setLocale = useCallback(async (newLocale: string) => {
+        try {
+            // Note: need to implement /locale/{locale} API later,
+            // or we handle this differently if purely SPA.
+            // For now, reload to fetch new translations from /api/v1/me
+            await fetch(`/locale/${newLocale}`, { method: 'POST' });
+            window.location.reload();
+        } catch (e) {
+            console.error(e);
+        }
     }, []);
 
     /**
@@ -379,13 +377,16 @@ export function I18nProvider({
  * Use this at the app level to wrap the entire application.
  */
 export function InertiaI18nProvider({ children }: { children: ReactNode }) {
-    const { props } = usePage<SharedPageProps>();
+    const { locale, translations } = useAuth();
+    
+    // We can fetch availableLocales from an environment variable or globally define it
+    const availableLocales = ['en', 'id'];
 
     return (
         <I18nProvider
-            locale={props.locale || 'en'}
-            availableLocales={props.availableLocales || ['en', 'id']}
-            translations={props.translations || defaultTranslations}
+            locale={locale || 'en'}
+            availableLocales={availableLocales}
+            translations={translations as any || defaultTranslations}
         >
             {children}
         </I18nProvider>

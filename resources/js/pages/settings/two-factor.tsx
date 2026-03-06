@@ -1,3 +1,8 @@
+import { Helmet } from 'react-helmet-async';
+import { useState } from 'react';
+import axios from '@/lib/axios';
+import { toast } from 'sonner';
+
 import HeadingSmall from '@/components/heading-small';
 import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
 import TwoFactorSetupModal from '@/components/two-factor-setup-modal';
@@ -6,11 +11,8 @@ import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { disable, enable, show } from '@/routes/two-factor';
 import { type BreadcrumbItem } from '@/types';
-import { Form, Head } from '@inertiajs/react';
 import { ShieldBan, ShieldCheck } from 'lucide-react';
-import { useState } from 'react';
 
 interface TwoFactorProps {
     requiresConfirmation?: boolean;
@@ -20,7 +22,7 @@ interface TwoFactorProps {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Two-Factor Authentication',
-        href: show.url(),
+        href: '/settings/two-factor',
     },
 ];
 
@@ -38,11 +40,39 @@ export default function TwoFactor({
         fetchRecoveryCodes,
         errors,
     } = useTwoFactorAuth();
+    
     const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
+    const [enabling, setEnabling] = useState(false);
+    const [disabling, setDisabling] = useState(false);
+
+    const enableTwoFactor = async () => {
+        setEnabling(true);
+        try {
+            await axios.post('/user/two-factor-authentication');
+            setShowSetupModal(true);
+        } catch (error) {
+            toast.error('Failed to enable two-factor authentication.');
+        } finally {
+            setEnabling(false);
+        }
+    };
+
+    const disableTwoFactor = async () => {
+        setDisabling(true);
+        try {
+            await axios.delete('/user/two-factor-authentication');
+            // Hard reload to reflect changes or manually update state
+            window.location.reload();
+        } catch (error) {
+            toast.error('Failed to disable two-factor authentication.');
+        } finally {
+            setDisabling(false);
+        }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Two-Factor Authentication" />
+            <Helmet><title>Two-Factor Authentication - {import.meta.env.VITE_APP_NAME || 'ERP'}</title></Helmet>
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
@@ -66,17 +96,13 @@ export default function TwoFactor({
                             />
 
                             <div className="relative inline">
-                                <Form {...disable.form()}>
-                                    {({ processing }) => (
-                                        <Button
-                                            variant="destructive"
-                                            type="submit"
-                                            disabled={processing}
-                                        >
-                                            <ShieldBan /> Disable 2FA
-                                        </Button>
-                                    )}
-                                </Form>
+                                <Button
+                                    variant="destructive"
+                                    onClick={disableTwoFactor}
+                                    disabled={disabling}
+                                >
+                                    <ShieldBan className="mr-2 h-4 w-4" /> Disable 2FA
+                                </Button>
                             </div>
                         </div>
                     ) : (
@@ -94,26 +120,17 @@ export default function TwoFactor({
                                     <Button
                                         onClick={() => setShowSetupModal(true)}
                                     >
-                                        <ShieldCheck />
+                                        <ShieldCheck className="mr-2 h-4 w-4" />
                                         Continue Setup
                                     </Button>
                                 ) : (
-                                    <Form
-                                        {...enable.form()}
-                                        onSuccess={() =>
-                                            setShowSetupModal(true)
-                                        }
+                                    <Button
+                                        onClick={enableTwoFactor}
+                                        disabled={enabling}
                                     >
-                                        {({ processing }) => (
-                                            <Button
-                                                type="submit"
-                                                disabled={processing}
-                                            >
-                                                <ShieldCheck />
-                                                Enable 2FA
-                                            </Button>
-                                        )}
-                                    </Form>
+                                        <ShieldCheck className="mr-2 h-4 w-4" />
+                                        Enable 2FA
+                                    </Button>
                                 )}
                             </div>
                         </div>

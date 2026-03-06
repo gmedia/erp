@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import AppLayout from '@/layouts/app-layout';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -43,15 +43,12 @@ export default function TrialBalance({ fiscalYears, selectedYearId, report }: Pr
     const parentIds = new Set(report.map((item) => item.parent_id).filter((id): id is number => id != null));
 
     const handleYearChange = (value: string) => {
-        router.get('/reports/trial-balance', { fiscal_year_id: value }, {
-            preserveState: true,
-            preserveScroll: true,
-        });
+        window.location.href = `/reports/trial-balance?fiscal_year_id=${value}`;
     };
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Trial Balance', href: '/reports/trial-balance' }]}>
-            <Head title="Trial Balance" />
+            <Helmet><title>Trial Balance</title></Helmet>
 
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

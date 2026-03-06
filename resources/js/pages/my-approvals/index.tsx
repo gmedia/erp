@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { Head, usePage, router, Link } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
+import axios from '@/lib/axios';
+import { toast } from 'sonner';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -31,18 +34,19 @@ export default function MyApprovalsPage({ pending, approved, rejected, all }: an
         setProcessing(true);
         const url = `/my-approvals/${actionDialog.requestStep.request.id}/${actionDialog.type}`;
 
-        router.post(url, { comments }, {
-            onSuccess: () => {
+        axios.post(url, { comments })
+            .then(() => {
                 setActionDialog({ open: false, type: null, requestStep: null });
+                toast.success(`Request ${actionDialog.type}d successfully`);
+                // Would normally invalidate query here or refresh
+            })
+            .catch((error) => {
+                toast.error(`Failed to ${actionDialog.type} request`);
+                console.error(error);
+            })
+            .finally(() => {
                 setProcessing(false);
-            },
-            onError: () => {
-                setProcessing(false);
-            },
-            onFinish: () => {
-                setProcessing(false);
-            }
-        });
+            });
     };
 
     const getDocUrl = (request: any) => {
@@ -135,7 +139,7 @@ export default function MyApprovalsPage({ pending, approved, rejected, all }: an
                                         </>
                                     )}
                                     <Button size="sm" variant="ghost" asChild>
-                                        <Link href={getDocUrl(step.request)}>
+                                        <Link to={getDocUrl(step.request)}>
                                             <Eye className="h-4 w-4 mr-2" /> View Doc
                                         </Link>
                                     </Button>
@@ -150,7 +154,9 @@ export default function MyApprovalsPage({ pending, approved, rejected, all }: an
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Home', href: '/' }, { title: 'My Approvals', href: '/my-approvals' }]}>
-            <Head title="My Approvals" />
+            <Helmet>
+                <title>My Approvals - {import.meta.env.VITE_APP_NAME || 'ERP'}</title>
+            </Helmet>
             
             <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
                 <div>

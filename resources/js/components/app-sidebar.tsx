@@ -12,16 +12,17 @@ import {
 } from '@/components/ui/sidebar';
 import { useTranslation } from '@/contexts/i18n-context';
 import { getIcon } from '@/lib/icon-map';
-import { dashboard } from '@/routes';
+
 import { type MenuItem, type NavItem } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from 'react-router-dom';
 import { BookOpen, Folder } from 'lucide-react';
 import AppLogo from './app-logo';
+import { useAuth } from '@/contexts/auth-context';
 
 export function AppSidebar() {
     const { t } = useTranslation();
-    const { menus } = usePage<{ menus: MenuItem[] }>().props;
-
+    const { menus } = useAuth();
+    
     const mainNavItems: NavItem[] = menus.map((menu) => ({
         title: menu.display_name,
         href: menu.url ?? '#',
@@ -41,7 +42,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
+                            <Link to="/dashboard">
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

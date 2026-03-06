@@ -1,9 +1,8 @@
 import AppLogoIcon from './app-logo-icon';
-import { usePage } from '@inertiajs/react';
-import { SharedData } from '@/types';
+import { useAuth } from '@/contexts/auth-context';
 
 export default function AppLogo() {
-    const { companyName } = usePage<SharedData>().props;
+    const { companyName } = useAuth();
     
     return (
         <>

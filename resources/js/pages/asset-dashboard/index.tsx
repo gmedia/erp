@@ -1,7 +1,7 @@
+import { Helmet } from 'react-helmet-async';
 import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
 import { useAssetDashboard } from '../../hooks/useAssetDashboard';
 import { SummaryCards } from '../../components/asset-dashboard/SummaryCards';
 import { StatusDistributionChart } from '../../components/asset-dashboard/StatusDistributionChart';
@@ -25,7 +25,7 @@ export default function AssetDashboard() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Asset Dashboard" />
+            <Helmet><title>Asset Dashboard</title></Helmet>
             <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 pb-12 w-full max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div>

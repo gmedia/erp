@@ -1,5 +1,7 @@
 'use client';
 
+import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 import { AssetStocktake } from '@/types/asset-stocktake';
 import { ColumnDef } from '@tanstack/react-table';
 import {
@@ -11,7 +13,6 @@ import {
 } from '@/utils/columns';
 import { GenericActions } from '@/components/common/ActionsDropdown';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { Link } from '@inertiajs/react';
 
 export const assetStocktakeColumns: ColumnDef<AssetStocktake>[] = [
     createSelectColumn<AssetStocktake>(),
@@ -54,7 +55,7 @@ export const assetStocktakeColumns: ColumnDef<AssetStocktake>[] = [
                     onDelete={meta?.onDelete}
                     extraItems={[
                         <DropdownMenuItem key="perform" asChild>
-                            <Link href={`/asset-stocktakes/${item.ulid}/perform`} className="w-full">
+                            <Link to={`/asset-stocktakes/${item.ulid}/perform`} className="w-full">
                                 Perform
                             </Link>
                         </DropdownMenuItem>

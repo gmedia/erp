@@ -15,14 +15,16 @@ import {
 } from '@/components/ui/sidebar';
 import { useTranslation } from '@/contexts/i18n-context';
 import { type NavItem } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
+import { useAuth } from '@/contexts/auth-context';
 
 import { Badge } from '@/components/ui/badge';
 
 export function NavMain({ items = [] }: { items: NavItem[] }) {
-    const page = usePage<{ pendingApprovalsCount?: number }>();
-    const pendingCount = page.props.pendingApprovalsCount || 0;
+    const { pendingApprovalsCount } = useAuth();
+    const location = useLocation();
+    const pendingCount = pendingApprovalsCount || 0;
     const { t } = useTranslation();
 
     return (
@@ -35,7 +37,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                             key={item.title}
                             asChild
                             defaultOpen={item.children.some((child) =>
-                                page.url.startsWith(child.href),
+                                location.pathname.startsWith(child.href),
                             )}
                             className="group/collapsible"
                         >
@@ -57,13 +59,12 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                             >
                                                 <SidebarMenuSubButton
                                                     asChild
-                                                    isActive={page.url.startsWith(
+                                                    isActive={location.pathname.startsWith(
                                                         subItem.href,
                                                     )}
                                                 >
                                                     <Link
-                                                        href={subItem.href}
-                                                        prefetch
+                                                        to={subItem.href}
                                                     >
                                                         {subItem.icon && (
                                                             <subItem.icon />
@@ -88,10 +89,10 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 asChild
-                                isActive={page.url.startsWith(item.href)}
+                                isActive={location.pathname.startsWith(item.href)}
                                 tooltip={{ children: item.title }}
                             >
-                                <Link href={item.href} prefetch>
+                                <Link to={item.href}>
                                     {item.icon && <item.icon />}
                                     <span>{item.title}</span>
                                     {item.href === '/my-approvals' && pendingCount > 0 && (

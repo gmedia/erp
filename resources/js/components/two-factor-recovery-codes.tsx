@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -6,10 +7,10 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { regenerateRecoveryCodes } from '@/routes/two-factor';
-import { Form } from '@inertiajs/react';
-import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
+import { Eye, EyeOff, LockKeyhole, RefreshCw, LoaderCircle } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import axios from '@/lib/axios';
+import { toast } from 'sonner';
 import AlertError from './alert-error';
 
 interface TwoFactorRecoveryCodesProps {
@@ -24,6 +25,7 @@ export default function TwoFactorRecoveryCodes({
     errors,
 }: TwoFactorRecoveryCodesProps) {
     const [codesAreVisible, setCodesAreVisible] = useState<boolean>(false);
+    const [processing, setProcessing] = useState(false);
     const codesSectionRef = useRef<HTMLDivElement | null>(null);
     const canRegenerateCodes = recoveryCodesList.length > 0 && codesAreVisible;
 
@@ -50,6 +52,20 @@ export default function TwoFactorRecoveryCodes({
         }
     }, [recoveryCodesList.length, fetchRecoveryCodes]);
 
+    const handleRegenerate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setProcessing(true);
+        try {
+            await axios.post('/user/two-factor-recovery-codes');
+            await fetchRecoveryCodes();
+            toast.success('Recovery codes regenerated successfully.');
+        } catch (error) {
+            toast.error('Failed to regenerate recovery codes.');
+        } finally {
+            setProcessing(false);
+        }
+    };
+
     const RecoveryCodeIconComponent = codesAreVisible ? EyeOff : Eye;
 
     return (
@@ -73,29 +89,28 @@ export default function TwoFactorRecoveryCodes({
                         aria-controls="recovery-codes-section"
                     >
                         <RecoveryCodeIconComponent
-                            className="size-4"
+                            className="size-4 mr-2"
                             aria-hidden="true"
                         />
                         {codesAreVisible ? 'Hide' : 'View'} Recovery Codes
                     </Button>
 
                     {canRegenerateCodes && (
-                        <Form
-                            {...regenerateRecoveryCodes.form()}
-                            options={{ preserveScroll: true }}
-                            onSuccess={fetchRecoveryCodes}
-                        >
-                            {({ processing }) => (
-                                <Button
-                                    variant="secondary"
-                                    type="submit"
-                                    disabled={processing}
-                                    aria-describedby="regenerate-warning"
-                                >
-                                    <RefreshCw /> Regenerate Codes
-                                </Button>
-                            )}
-                        </Form>
+                        <form onSubmit={handleRegenerate}>
+                            <Button
+                                variant="secondary"
+                                type="submit"
+                                disabled={processing}
+                                aria-describedby="regenerate-warning"
+                            >
+                                {processing ? (
+                                    <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                    <RefreshCw className="mr-2 h-4 w-4" />
+                                )}
+                                Regenerate Codes
+                            </Button>
+                        </form>
                     )}
                 </div>
                 <div

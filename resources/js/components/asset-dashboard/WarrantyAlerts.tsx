@@ -1,10 +1,11 @@
+import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WarrantyAlertItem } from '../../hooks/useAssetDashboard';
 import { AlertTriangle, Calendar, ChevronRight, ShieldCheck } from 'lucide-react';
 import { format } from 'date-fns';
-import { Link } from '@inertiajs/react';
 import { Badge } from '@/components/ui/badge';
 
 interface WarrantyAlertsProps {
@@ -75,7 +76,7 @@ export function WarrantyAlerts({ data, isLoading }: WarrantyAlertsProps) {
                             <div key={asset.id} className="p-4 hover:bg-muted/50 transition-colors">
                                 <div className="flex justify-between items-start mb-1">
                                     <Link 
-                                        href={`/assets/${asset.id}`}
+                                        to={`/assets/${asset.id}`}
                                         className="font-medium text-sm leading-tight text-foreground hover:text-primary hover:underline line-clamp-1 pr-2"
                                     >
                                         {asset.name}

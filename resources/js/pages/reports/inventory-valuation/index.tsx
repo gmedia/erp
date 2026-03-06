@@ -1,5 +1,6 @@
 'use client';
 
+import { Helmet } from 'react-helmet-async';
 import { DataTable } from '@/components/common/DataTableCore';
 import {
     createInventoryValuationFilterFields,
@@ -11,7 +12,6 @@ import {
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
 
 export default function InventoryValuationReportPage() {
     const filterFields = createInventoryValuationFilterFields();
@@ -44,7 +44,7 @@ export default function InventoryValuationReportPage() {
 
     return (
         <>
-            <Head title="Inventory Valuation Report" />
+            <Helmet><title>Inventory Valuation Report</title></Helmet>
             <AppLayout
                 breadcrumbs={[
                     { title: 'Reports', href: '#' },

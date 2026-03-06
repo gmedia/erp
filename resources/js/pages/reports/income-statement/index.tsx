@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import AppLayout from '@/layouts/app-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -241,19 +241,17 @@ export default function IncomeStatement({ fiscalYears, selectedYearId, compariso
     const selectedComparisonFiscalYear = comparisonYearId ? fiscalYears.find((fy) => fy.id === comparisonYearId) : undefined;
 
     const handleYearChange = (value: string) => {
-        router.get(
-            '/reports/income-statement',
-            { fiscal_year_id: value, comparison_year_id: comparisonYearId },
-            { preserveState: true, preserveScroll: true },
-        );
+        const params = new URLSearchParams();
+        params.set('fiscal_year_id', value);
+        if (comparisonYearId) params.set('comparison_year_id', String(comparisonYearId));
+        window.location.href = `/reports/income-statement?${params.toString()}`;
     };
 
     const handleComparisonChange = (value: string) => {
-        router.get(
-            '/reports/income-statement',
-            { fiscal_year_id: selectedYearId, comparison_year_id: value === 'none' ? undefined : value },
-            { preserveState: true, preserveScroll: true },
-        );
+        const params = new URLSearchParams();
+        params.set('fiscal_year_id', String(selectedYearId));
+        if (value !== 'none') params.set('comparison_year_id', value);
+        window.location.href = `/reports/income-statement?${params.toString()}`;
     };
 
     const totalRevenue = report.totals?.revenue || 0;
@@ -266,7 +264,7 @@ export default function IncomeStatement({ fiscalYears, selectedYearId, compariso
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Income Statement', href: '/reports/income-statement' }]}>
-            <Head title="Income Statement" />
+            <Helmet><title>Income Statement</title></Helmet>
 
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

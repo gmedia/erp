@@ -29,9 +29,9 @@ import {
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
-import { dashboard, departments, employees, positions } from '@/routes';
-import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
+
+import { type BreadcrumbItem, type NavItem } from '@/types';
+import { Link, useLocation } from 'react-router-dom';
 import {
     BookOpen,
     Folder,
@@ -43,26 +43,27 @@ import {
 } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
+import { useAuth } from '@/contexts/auth-context';
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: dashboard.url(),
+        href: '/dashboard',
         icon: LayoutGrid,
     },
     {
         title: 'Employees',
-        href: employees.url(),
+        href: '/employees',
         icon: Users,
     },
     {
         title: 'Positions',
-        href: positions.url(),
+        href: '/positions',
         icon: IdCard,
     },
     {
         title: 'Departments',
-        href: departments.url(),
+        href: '/departments',
         icon: IdCard,
     },
 ];
@@ -77,8 +78,8 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
-    const page = usePage<SharedData>();
-    const { auth } = page.props;
+    const { user } = useAuth();
+    const location = useLocation();
     const getInitials = useInitials();
     return (
         <>
@@ -112,7 +113,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             {mainNavItems.map((item) => (
                                                 <Link
                                                     key={item.title}
-                                                    href={item.href}
+                                                    to={item.href}
                                                     className="flex items-center space-x-2 font-medium"
                                                 >
                                                     {item.icon && (
@@ -152,8 +153,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     </div>
 
                     <Link
-                        href={dashboard()}
-                        prefetch
+                        to="/dashboard"
                         className="flex items-center space-x-2"
                     >
                         <AppLogo />
@@ -169,10 +169,10 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                         className="relative flex h-full items-center"
                                     >
                                         <Link
-                                            href={item.href}
+                                            to={item.href}
                                             className={cn(
                                                 navigationMenuTriggerStyle(),
-                                                page.url === item.href &&
+                                                location.pathname === item.href &&
                                                     activeItemStyles,
                                                 'h-9 cursor-pointer px-3',
                                             )}
@@ -185,7 +185,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             )}
                                             {item.title}
                                         </Link>
-                                        {page.url === item.href && (
+                                        {location.pathname === item.href && (
                                             <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
                                         )}
                                     </NavigationMenuItem>
@@ -244,17 +244,17 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 >
                                     <Avatar className="size-8 overflow-hidden rounded-full">
                                         <AvatarImage
-                                            src={auth.user.avatar}
-                                            alt={auth.user.name}
+                                            src={user?.avatar}
+                                            alt={user?.name ?? ''}
                                         />
                                         <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                            {getInitials(auth.user.name)}
+                                            {getInitials(user?.name ?? '')}
                                         </AvatarFallback>
                                     </Avatar>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56" align="end">
-                                <UserMenuContent user={auth.user} />
+                                <UserMenuContent user={user as any} />
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

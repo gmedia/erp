@@ -1,6 +1,6 @@
 'use client';
 
-import { Link } from '@inertiajs/react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -43,7 +43,7 @@ export function GenericActions<T>({
                 ))}
                 {viewUrl && (
                     <DropdownMenuItem asChild data-view-url={viewUrl}>
-                        <Link href={viewUrl} className="w-full">
+                        <Link to={viewUrl} className="w-full">
                             View
                         </Link>
                     </DropdownMenuItem>

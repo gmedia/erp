@@ -1,8 +1,8 @@
 'use client';
 
+import { Helmet } from 'react-helmet-async';
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import { Search, Loader2, Download } from 'lucide-react';
 
@@ -168,7 +168,7 @@ export default function AccountIndex() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Chart of Accounts" />
+            <Helmet><title>Chart of Accounts</title></Helmet>
 
             <div className="flex h-full flex-col p-4 space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

@@ -1,10 +1,11 @@
+import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RecentMaintenanceItem } from '../../hooks/useAssetDashboard';
 import { Wrench, Calendar as CalendarIcon, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
-import { Link } from '@inertiajs/react';
 import { Badge } from '@/components/ui/badge';
 
 interface RecentMaintenancesProps {
@@ -81,7 +82,7 @@ export function RecentMaintenances({ data, isLoading }: RecentMaintenancesProps)
                     <span>Upcoming Maintenance</span>
                 </CardTitle>
                 <Link 
-                    href="/asset-maintenances" 
+                    to="/asset-maintenances" 
                     className="text-xs flex items-center text-primary hover:underline font-medium"
                 >
                     View All <ChevronRight className="ml-1 h-3 w-3" />

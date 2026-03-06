@@ -1,7 +1,6 @@
+import { Link } from 'react-router-dom';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { InertiaI18nProvider } from '@/contexts/i18n-context';
-import { home } from '@/routes';
-import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
 interface AuthLayoutProps {
@@ -22,7 +21,7 @@ export default function AuthSimpleLayout({
                     <div className="flex flex-col gap-8">
                         <div className="flex flex-col items-center gap-4">
                             <Link
-                                href={home()}
+                                to="/"
                                 className="flex flex-col items-center gap-2 font-medium"
                             >
                                 <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-md">

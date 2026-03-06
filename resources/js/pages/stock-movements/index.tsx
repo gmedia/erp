@@ -1,12 +1,12 @@
 'use client';
 
+import { Helmet } from 'react-helmet-async';
 import { DataTable } from '@/components/common/DataTableCore';
 import { createStockMovementsColumns, type StockMovementItem } from '@/components/stock-movements/Columns';
 import { createStockMovementsFilterFields } from '@/components/stock-movements/Filters';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
 
 export default function StockMovementsPage() {
     const columns = createStockMovementsColumns();
@@ -41,7 +41,7 @@ export default function StockMovementsPage() {
 
     return (
         <>
-            <Head title="Stock Movements" />
+            <Helmet><title>Stock Movements</title></Helmet>
             <AppLayout
                 breadcrumbs={[
                     { title: 'Inventory', href: '#' },

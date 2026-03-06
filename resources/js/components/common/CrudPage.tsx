@@ -1,6 +1,6 @@
 'use client';
 
-import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import { memo, useMemo } from 'react';
 
 import { DataTableProps as BaseDataTableProps } from '@/components/common/DataTableCore';
@@ -198,7 +198,7 @@ export function CrudPage<
 
     return (
         <>
-            <Head title={config.entityNamePlural} />
+            <Helmet><title>{config.entityNamePlural}</title></Helmet>
 
             <AppLayout breadcrumbs={config.breadcrumbs}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">

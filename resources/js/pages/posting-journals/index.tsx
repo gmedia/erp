@@ -1,7 +1,7 @@
 'use client';
 
+import { Helmet } from 'react-helmet-async';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
 import { usePostingJournal } from '@/hooks/usePostingJournal';
 import { BreadcrumbItem } from '@/types';
 import {
@@ -128,7 +128,7 @@ export default function Index() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Posting Journals" />
+            <Helmet><title>Posting Journals</title></Helmet>
 
             <div className="flex flex-col gap-6 p-6">
                 <Card>

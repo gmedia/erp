@@ -1,6 +1,6 @@
 'use client';
 
-import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import AppLayout from '@/layouts/app-layout';
 import { DataTable } from '@/components/common/DataTableCore';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
@@ -52,7 +52,7 @@ export default function PipelineAuditTrail() {
 
     return (
         <>
-            <Head title="Pipeline Audit Trail" />
+            <Helmet><title>Pipeline Audit Trail</title></Helmet>
             <AppLayout breadcrumbs={[{ title: 'Admin', href: '#' }, { title: 'Pipeline Audit Trail', href: '/pipeline-audit-trail' }]}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                     <div className="rounded-lg bg-white">

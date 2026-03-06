@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { StocktakeItemManager } from '@/components/asset-stocktakes/StocktakeItemManager';
@@ -34,7 +34,7 @@ export default function PerformAssetStocktakePage({ stocktake }: PerformPageProp
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Perform Stocktake ${stocktake.reference}`} />
+            <Helmet><title>{`Perform Stocktake ${stocktake.reference}`}</title></Helmet>
             
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <Card>

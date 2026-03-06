@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Head, usePage } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { usePipelineDashboard } from '@/hooks/usePipelineDashboard';
@@ -46,7 +46,9 @@ export default function PipelineDashboard({ pipelines }: PipelineDashboardProps)
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Pipeline Dashboard" />
+            <Helmet>
+                <title>Pipeline Dashboard - {import.meta.env.VITE_APP_NAME || 'ERP'}</title>
+            </Helmet>
             
             <div className="flex h-full flex-1 flex-col gap-6 p-4 md:p-6 pb-20 max-w-7xl mx-auto w-full">
                 <div className="flex flex-col gap-2">

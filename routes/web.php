@@ -1,61 +1,9 @@
 <?php
 
-use App\Http\Controllers\LocaleController;
-use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    return redirect()->route('dashboard');
-})->name('home');
-
-// Locale switching route
-Route::post('locale/{locale}', [LocaleController::class, 'update'])->name('locale.update');
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-});
-
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
-require __DIR__ . '/employee.php';
-require __DIR__ . '/position.php';
-require __DIR__ . '/department.php';
-require __DIR__ . '/permission.php';
-require __DIR__ . '/user.php';
-require __DIR__ . '/branch.php';
-require __DIR__ . '/warehouse.php';
-require __DIR__ . '/stock_transfer.php';
-require __DIR__ . '/inventory_stocktake.php';
-require __DIR__ . '/stock_adjustment.php';
-require __DIR__ . '/stock_movement.php';
-require __DIR__ . '/stock_monitor.php';
-require __DIR__ . '/customer.php';
-require __DIR__ . '/supplier.php';
-require __DIR__ . '/supplier_category.php';
-require __DIR__ . '/customer_category.php';
-require __DIR__ . '/product_category.php';
-require __DIR__ . '/unit.php';
-require __DIR__ . '/product.php';
-require __DIR__ . '/fiscal_year.php';
-require __DIR__ . '/coa_version.php';
-require __DIR__ . '/account.php';
-require __DIR__ . '/account_mapping.php';
-require __DIR__ . '/journal_entry.php';
-require __DIR__ . '/posting_journal.php';
-require __DIR__ . '/reports.php';
-require __DIR__ . '/asset_category.php';
-require __DIR__ . '/asset_model.php';
-require __DIR__ . '/asset_location.php';
-require __DIR__ . '/asset.php';
-require __DIR__ . '/asset_movement.php';
-require __DIR__ . '/asset_maintenance.php';
-require __DIR__ . '/asset_stocktake.php';
-require __DIR__ . '/asset_depreciation_run.php';
-require __DIR__ . '/pipeline.php';
-require __DIR__ . '/admin_setting.php';
-require __DIR__ . '/approval_flow.php';
-require __DIR__ . '/approval-delegations.php';
-require __DIR__ . '/my_approvals.php';
-require __DIR__ . '/approval_monitoring.php';
-require __DIR__ . '/approval_audit_trail.php';
+// Catch-all route for React Route SPA
+// Excludes '/api' prefix so API routes are handled by routes/api.php
+Route::get('/{any}', function () {
+    return view('app');
+})->where('any', '^(?!api).*$');
