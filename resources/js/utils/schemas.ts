@@ -599,3 +599,29 @@ export const goodsReceiptFormSchema = z.object({
 });
 
 export type GoodsReceiptFormData = z.infer<typeof goodsReceiptFormSchema>;
+
+export const supplierReturnFormSchema = z.object({
+    return_number: z.string().optional(),
+    purchase_order_id: z.string().min(1, { message: 'Purchase order is required.' }),
+    goods_receipt_id: z.string().optional(),
+    supplier_id: z.string().min(1, { message: 'Supplier is required.' }),
+    warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
+    return_date: z.date({ message: 'Return date is required.' }),
+    reason: z.enum(['defective', 'wrong_item', 'excess_quantity', 'damaged', 'other'], {
+        message: 'Reason is required.',
+    }),
+    status: z.enum(['draft', 'confirmed', 'cancelled'], {
+        message: 'Status is required.',
+    }),
+    notes: z.string().optional(),
+    items: z.array(z.object({
+        goods_receipt_item_id: z.string().min(1, { message: 'GR item is required.' }),
+        product_id: z.string().min(1, { message: 'Product is required.' }),
+        unit_id: z.string().optional(),
+        quantity_returned: z.coerce.number().gt(0, { message: 'Quantity returned must be greater than 0.' }),
+        unit_price: z.coerce.number().min(0, { message: 'Unit price must be at least 0.' }),
+        notes: z.string().optional(),
+    })).min(1, { message: 'At least 1 item is required.' }),
+});
+
+export type SupplierReturnFormData = z.infer<typeof supplierReturnFormSchema>;

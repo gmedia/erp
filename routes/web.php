@@ -31,6 +31,7 @@ require __DIR__ . '/stock_adjustment.php';
 require __DIR__ . '/purchase_request.php';
 require __DIR__ . '/purchase_order.php';
 require __DIR__ . '/goods_receipt.php';
+require __DIR__ . '/supplier_return.php';
 require __DIR__ . '/stock_movement.php';
 require __DIR__ . '/stock_monitor.php';
 require __DIR__ . '/customer.php';

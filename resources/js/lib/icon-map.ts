@@ -58,6 +58,7 @@ import {
     ClipboardList,
     FilePlus2,
     PackageCheck,
+    RotateCcw,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -119,6 +120,7 @@ const iconMap: Record<string, LucideIcon> = {
     ClipboardList,
     FilePlus2,
     PackageCheck,
+    RotateCcw,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

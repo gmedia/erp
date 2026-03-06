@@ -39,6 +39,7 @@ export type { ApprovalDelegation, ApprovalDelegationFormData, ApprovalDelegation
 export type { PurchaseRequest, PurchaseRequestFormData, PurchaseRequestFilters } from './purchase-request';
 export type { PurchaseOrder, PurchaseOrderFormData, PurchaseOrderFilters } from './purchase-order';
 export type { GoodsReceipt, GoodsReceiptFormData, GoodsReceiptFilters } from './goods-receipt';
+export type { SupplierReturn, SupplierReturnFormData, SupplierReturnFilters } from './supplier-return';
 
 export interface ApprovalFlowStep {
     id?: number;

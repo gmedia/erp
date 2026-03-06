@@ -129,6 +129,11 @@ import { createGoodsReceiptFilterFields } from '@/components/goods-receipts/Good
 import { GoodsReceiptForm } from '@/components/goods-receipts/GoodsReceiptForm';
 import { GoodsReceiptViewModal } from '@/components/goods-receipts/GoodsReceiptViewModal';
 import { type GoodsReceipt } from '@/types/goods-receipt';
+import { supplierReturnColumns } from '@/components/supplier-returns/SupplierReturnColumns';
+import { createSupplierReturnFilterFields } from '@/components/supplier-returns/SupplierReturnFilters';
+import { SupplierReturnForm } from '@/components/supplier-returns/SupplierReturnForm';
+import { SupplierReturnViewModal } from '@/components/supplier-returns/SupplierReturnViewModal';
+import { type SupplierReturn } from '@/types/supplier-return';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -497,6 +502,34 @@ export const goodsReceiptConfig = createComplexEntityConfig<GoodsReceipt>({
     viewModalComponent: GoodsReceiptViewModal,
     getDeleteMessage: (goodsReceipt: { gr_number?: string | null }) =>
         `This action cannot be undone. This will delete goods receipt ${goodsReceipt.gr_number || ''}.`,
+});
+
+export const supplierReturnConfig = createComplexEntityConfig<SupplierReturn>({
+    entityName: 'Supplier Return',
+    entityNamePlural: 'Supplier Returns',
+    apiEndpoint: '/api/supplier-returns',
+    exportEndpoint: '/api/supplier-returns/export',
+    queryKey: ['supplier-returns'],
+    breadcrumbs: [{ title: 'Supplier Returns', href: '/supplier-returns' }],
+    initialFilters: {
+        search: '',
+        purchase_order_id: '',
+        goods_receipt_id: '',
+        supplier_id: '',
+        warehouse_id: '',
+        reason: '',
+        status: '',
+        return_date_from: '',
+        return_date_to: '',
+    },
+    columns: supplierReturnColumns,
+    filterFields: createSupplierReturnFilterFields(),
+    formComponent: SupplierReturnForm,
+    formType: 'complex',
+    entityNameForSearch: 'supplier return',
+    viewModalComponent: SupplierReturnViewModal,
+    getDeleteMessage: (supplierReturn: { return_number?: string | null }) =>
+        `This action cannot be undone. This will delete supplier return ${supplierReturn.return_number || ''}.`,
 });
 
 export const supplierCategoryConfig = createSimpleEntityConfig({

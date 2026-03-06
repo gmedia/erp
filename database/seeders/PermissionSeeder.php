@@ -160,6 +160,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'supplier_return',
+                'display_name' => 'Supplier Return',
+                'child' => [
+                    [
+                        'name' => 'supplier_return.create',
+                        'display_name' => 'Create Supplier Return',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'supplier_return.edit',
+                        'display_name' => 'Edit Supplier Return',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'supplier_return.delete',
+                        'display_name' => 'Delete Supplier Return',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'stock_transfer',
                 'display_name' => 'Stock Transfer',
                 'child' => [

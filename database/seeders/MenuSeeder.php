@@ -137,7 +137,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'inventory',
                 'display_name' => 'Inventory',
-                'permissions' => ['purchase_request', 'purchase_order', 'goods_receipt', 'stock_transfer', 'inventory_stocktake', 'stock_adjustment', 'stock_movement', 'stock_monitor'],
+                'permissions' => ['purchase_request', 'purchase_order', 'goods_receipt', 'supplier_return', 'stock_transfer', 'inventory_stocktake', 'stock_adjustment', 'stock_movement', 'stock_monitor'],
                 'icon' => 'Box',
                 'url' => null,
                 'child' => [
@@ -163,6 +163,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['goods_receipt', 'goods_receipt.create', 'goods_receipt.edit', 'goods_receipt.delete'],
                         'icon' => 'PackageCheck',
                         'url' => 'goods-receipts',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'supplier_return',
+                        'display_name' => 'Supplier Returns',
+                        'permissions' => ['supplier_return', 'supplier_return.create', 'supplier_return.edit', 'supplier_return.delete'],
+                        'icon' => 'RotateCcw',
+                        'url' => 'supplier-returns',
                         'child' => [],
                     ],
                     [
