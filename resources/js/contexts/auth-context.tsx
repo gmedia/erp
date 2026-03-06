@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         try {
-            const { data } = await axios.get('/api/v1/me');
+            const { data } = await axios.get('/api/me');
             setUser(data.user);
             setEmployee(data.employee);
             setMenus(data.menus || []);
@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const logout = async () => {
         try {
-            await axios.post('/api/v1/logout');
+            await axios.post('/api/logout');
         } catch (e) {
             console.error(e);
         }

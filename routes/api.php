@@ -60,7 +60,7 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')->group(function () {
+// All routes here are automatically prefixed with /api/ by Laravel
     // === AUTH (public) ===
     Route::post('login', [AuthController::class, 'login']);
     Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
@@ -239,4 +239,4 @@ Route::prefix('v1')->group(function () {
         // --- Dashboard ---
         Route::get('dashboard', [DashboardController::class, 'index']);
     });
-});
+

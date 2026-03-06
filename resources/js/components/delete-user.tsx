@@ -30,7 +30,7 @@ export default function DeleteUser() {
         const data = Object.fromEntries(formData.entries());
 
         try {
-            await axios.delete('/api/v1/profile', { data });
+            await axios.delete('/api/profile', { data });
             localStorage.removeItem('api_token');
             window.location.href = '/login';
         } catch (error: any) {

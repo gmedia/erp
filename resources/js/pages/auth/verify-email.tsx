@@ -33,7 +33,7 @@ export default function VerifyEmail({ status: initialStatus }: { status?: string
     const handleLogout = async (e: React.MouseEvent) => {
         e.preventDefault();
         try {
-            await axios.post('/api/v1/logout');
+            await axios.post('/api/logout');
             logout();
             navigate('/login');
         } catch (error) {

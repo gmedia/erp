@@ -25,7 +25,7 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get('/api/v1/dashboard')
+        axios.get('/api/dashboard')
             .then((res) => {
                 setTotals(res.data.data.totals);
             })

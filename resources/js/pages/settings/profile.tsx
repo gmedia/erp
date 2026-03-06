@@ -45,7 +45,7 @@ export default function Profile({
         const data = Object.fromEntries(formData.entries());
 
         try {
-            const response = await axios.patch('/api/v1/profile', data);
+            const response = await axios.patch('/api/profile', data);
             setRecentlySuccessful(true);
             toast.success('Profile updated successfully');
             // Refresh user data by calling me endpoint

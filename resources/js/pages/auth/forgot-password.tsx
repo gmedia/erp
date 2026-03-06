@@ -25,7 +25,7 @@ export default function ForgotPassword() {
         const data = Object.fromEntries(formData.entries());
 
         try {
-            const response = await axios.post('/api/v1/forgot-password', data);
+            const response = await axios.post('/api/forgot-password', data);
             setStatus(response.data.status);
         } catch (error: any) {
             if (error.response?.status === 422) {
