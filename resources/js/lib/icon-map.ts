@@ -57,6 +57,7 @@ import {
     History,
     ClipboardList,
     FilePlus2,
+    PackageCheck,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -117,6 +118,7 @@ const iconMap: Record<string, LucideIcon> = {
     History,
     ClipboardList,
     FilePlus2,
+    PackageCheck,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

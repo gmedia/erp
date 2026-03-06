@@ -190,6 +190,15 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
 
+- slug: goods-receipts
+  route: /goods-receipts
+  api: /api/goods-receipts
+  export_api: /api/goods-receipts/export
+  search_placeholder: "Search GR number, supplier delivery note, or notes..."
+  sortable_columns: [GR Number, PO Number, Warehouse, Receipt Date, Status]
+  view_type: dialog
+  checkbox_header: false
+
 - slug: products
   route: /products
   api: /api/products
@@ -564,7 +573,8 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 19 | Stock Adjustments | `stock-adjustments` | `StockAdjustmentControllerTest`, `StockAdjustmentExportTest` | `StockAdjustmentTest` | — |
 | 20 | Purchase Requests | `purchase-requests` | `PurchaseRequestControllerTest`, `PurchaseRequestExportTest` | `PurchaseRequestTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
 | 21 | Purchase Orders | `purchase-orders` | `PurchaseOrderControllerTest`, `PurchaseOrderExportTest` | `PurchaseOrderTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
-| 22 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
+| 22 | Goods Receipts | `goods-receipts` | `GoodsReceiptControllerTest`, `GoodsReceiptExportTest` | `GoodsReceiptTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
+| 23 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
 
 ---
 

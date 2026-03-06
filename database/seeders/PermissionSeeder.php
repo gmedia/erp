@@ -139,6 +139,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'goods_receipt',
+                'display_name' => 'Goods Receipt',
+                'child' => [
+                    [
+                        'name' => 'goods_receipt.create',
+                        'display_name' => 'Create Goods Receipt',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'goods_receipt.edit',
+                        'display_name' => 'Edit Goods Receipt',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'goods_receipt.delete',
+                        'display_name' => 'Delete Goods Receipt',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'stock_transfer',
                 'display_name' => 'Stock Transfer',
                 'child' => [

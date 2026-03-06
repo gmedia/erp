@@ -574,3 +574,28 @@ export const purchaseOrderFormSchema = z.object({
 });
 
 export type PurchaseOrderFormData = z.infer<typeof purchaseOrderFormSchema>;
+
+export const goodsReceiptFormSchema = z.object({
+    gr_number: z.string().optional(),
+    purchase_order_id: z.string().min(1, { message: 'Purchase order is required.' }),
+    warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
+    receipt_date: z.date({ message: 'Receipt date is required.' }),
+    supplier_delivery_note: z.string().optional(),
+    status: z.enum(['draft', 'confirmed', 'cancelled'], {
+        message: 'Status is required.',
+    }),
+    received_by: z.string().optional(),
+    notes: z.string().optional(),
+    items: z.array(z.object({
+        purchase_order_item_id: z.string().min(1, { message: 'PO Item is required.' }),
+        product_id: z.string().min(1, { message: 'Product is required.' }),
+        unit_id: z.string().min(1, { message: 'Unit is required.' }),
+        quantity_received: z.coerce.number().gt(0, { message: 'Quantity received must be greater than 0.' }),
+        quantity_accepted: z.coerce.number().min(0, { message: 'Quantity accepted must be at least 0.' }),
+        quantity_rejected: z.coerce.number().min(0).optional().default(0),
+        unit_price: z.coerce.number().min(0, { message: 'Unit price must be at least 0.' }),
+        notes: z.string().optional(),
+    })).min(1, { message: 'At least 1 item is required.' }),
+});
+
+export type GoodsReceiptFormData = z.infer<typeof goodsReceiptFormSchema>;

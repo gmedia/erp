@@ -124,6 +124,11 @@ import { createPurchaseOrderFilterFields } from '@/components/purchase-orders/Pu
 import { PurchaseOrderForm } from '@/components/purchase-orders/PurchaseOrderForm';
 import { PurchaseOrderViewModal } from '@/components/purchase-orders/PurchaseOrderViewModal';
 import { type PurchaseOrder } from '@/types/purchase-order';
+import { goodsReceiptColumns } from '@/components/goods-receipts/GoodsReceiptColumns';
+import { createGoodsReceiptFilterFields } from '@/components/goods-receipts/GoodsReceiptFilters';
+import { GoodsReceiptForm } from '@/components/goods-receipts/GoodsReceiptForm';
+import { GoodsReceiptViewModal } from '@/components/goods-receipts/GoodsReceiptViewModal';
+import { type GoodsReceipt } from '@/types/goods-receipt';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -466,6 +471,32 @@ export const purchaseOrderConfig = createComplexEntityConfig<PurchaseOrder>({
     viewModalComponent: PurchaseOrderViewModal,
     getDeleteMessage: (purchaseOrder: { po_number?: string | null }) =>
         `This action cannot be undone. This will delete purchase order ${purchaseOrder.po_number || ''}.`,
+});
+
+export const goodsReceiptConfig = createComplexEntityConfig<GoodsReceipt>({
+    entityName: 'Goods Receipt',
+    entityNamePlural: 'Goods Receipts',
+    apiEndpoint: '/api/goods-receipts',
+    exportEndpoint: '/api/goods-receipts/export',
+    queryKey: ['goods-receipts'],
+    breadcrumbs: [{ title: 'Goods Receipts', href: '/goods-receipts' }],
+    initialFilters: {
+        search: '',
+        purchase_order_id: '',
+        warehouse_id: '',
+        status: '',
+        received_by: '',
+        receipt_date_from: '',
+        receipt_date_to: '',
+    },
+    columns: goodsReceiptColumns,
+    filterFields: createGoodsReceiptFilterFields(),
+    formComponent: GoodsReceiptForm,
+    formType: 'complex',
+    entityNameForSearch: 'goods receipt',
+    viewModalComponent: GoodsReceiptViewModal,
+    getDeleteMessage: (goodsReceipt: { gr_number?: string | null }) =>
+        `This action cannot be undone. This will delete goods receipt ${goodsReceipt.gr_number || ''}.`,
 });
 
 export const supplierCategoryConfig = createSimpleEntityConfig({
