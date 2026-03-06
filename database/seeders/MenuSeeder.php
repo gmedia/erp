@@ -342,6 +342,14 @@ class MenuSeeder extends Seeder
                         'url' => 'reports/purchase-history',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'goods_receipt_report',
+                        'display_name' => 'Goods Receipt Report',
+                        'permissions' => ['goods_receipt_report'],
+                        'icon' => 'PackageCheck',
+                        'url' => 'reports/goods-receipt',
+                        'child' => [],
+                    ],
                 ],
             ],
             [

@@ -509,6 +509,18 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/purchase-history-report/purchase-history-report.spec.ts
 
+- slug: goods-receipt-report
+  route: /reports/goods-receipt
+  api: /reports/goods-receipt (Accepts application/json)
+  export_api: /reports/goods-receipt/export
+  search_placeholder: "Search GR number, PO number, supplier, warehouse, or product..."
+  sortable_columns: [GR Number, PO Number, Supplier, Warehouse, Status, Item Count, Received Qty, Accepted Qty, Rejected Qty, Total Value]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD laporan penerimaan barang per periode, supplier, dan gudang dengan agregasi kuantitas serta nilai penerimaan."
+  tests:
+    - tests/e2e/goods-receipt-report/goods-receipt-report.spec.ts
+
 - slug: stock-monitor
   route: /stock-monitor
   api: /stock-monitor (Accepts application/json)
@@ -621,7 +633,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 3 | Dashboard | `dashboard` | `Feature/Dashboard/DashboardTest.php` | — |
 | 4 | Permissions | `permissions` | `Feature/Permissions/PermissionControllerTest.php` | — |
 | 5 | Users | `users` | `Feature/Users/UserControllerTest.php` | — |
-| 6 | Reports | `reports` | `Feature/Reports/*.php` (7 files) | Ada legacy + new tests |
+| 6 | Reports | `reports` | `Feature/Reports/*.php` (8 files) | Ada legacy + new tests |
 | 7 | Posting Journals | `posting-journals` | `Feature/PostingJournals/PostingJournalTest.php` | — |
 | 8 | Asset Depreciation Runs | `asset-depreciation-runs` | `Feature/AssetDepreciationRuns/*.php` | — |
 | 9 | Asset Reports | `asset-reports` | `Feature/AssetRegisterTest.php` | Laporan Asset Register |
@@ -643,6 +655,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 25 | Stock Adjustment Report | `stock-adjustment-report` | `Feature/Reports/StockAdjustmentReportTest.php` | Laporan penyesuaian stok per tipe/periode/gudang + export |
 | 26 | Purchase Order Status Report | `purchase-order-status-report` | `Feature/Reports/PurchaseOrderStatusReportTest.php` | Laporan monitoring status PO (outstanding, partially received, closed) + export |
 | 27 | Purchase History Report | `purchase-history-report` | `Feature/Reports/PurchaseHistoryReportTest.php` | Laporan riwayat pembelian per supplier/produk/periode + export |
+| 28 | Goods Receipt Report | `goods-receipt-report` | `Feature/Reports/GoodsReceiptReportTest.php` | Laporan penerimaan barang per periode/supplier/gudang + export |
 
 ---
 

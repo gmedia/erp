@@ -4,6 +4,7 @@ use App\Http\Controllers\AssetReportController;
 use App\Http\Controllers\BookValueDepreciationReportController;
 use App\Http\Controllers\InventoryStocktakeVarianceReportController;
 use App\Http\Controllers\InventoryValuationReportController;
+use App\Http\Controllers\GoodsReceiptReportController;
 use App\Http\Controllers\PurchaseHistoryReportController;
 use App\Http\Controllers\PurchaseOrderStatusReportController;
 use App\Http\Controllers\ReportController;
@@ -45,4 +46,7 @@ Route::middleware(['auth', 'verified'])->prefix('reports')->group(function () {
 
     Route::get('purchase-history', [PurchaseHistoryReportController::class, 'index'])->name('reports.purchase-history')->middleware('permission:purchase_history_report');
     Route::post('purchase-history/export', [PurchaseHistoryReportController::class, 'export'])->name('reports.purchase-history.export')->middleware('permission:purchase_history_report');
+
+    Route::get('goods-receipt', [GoodsReceiptReportController::class, 'index'])->name('reports.goods-receipt')->middleware('permission:goods_receipt_report');
+    Route::post('goods-receipt/export', [GoodsReceiptReportController::class, 'export'])->name('reports.goods-receipt.export')->middleware('permission:goods_receipt_report');
 });
