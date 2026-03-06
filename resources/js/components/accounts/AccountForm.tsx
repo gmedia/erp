@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import axios from 'axios';
+import axios from '@/lib/axios';
 
 import EntityForm from '@/components/common/EntityForm';
 import { type Account, type AccountType, type NormalBalance } from '@/types/account';

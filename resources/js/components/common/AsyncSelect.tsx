@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '@/lib/axios';
 import { Check, ChevronsUpDown, Loader2, Search } from 'lucide-react';
 import * as React from 'react';
 

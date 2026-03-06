@@ -3,7 +3,7 @@
 import { Helmet } from 'react-helmet-async';
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '@/lib/axios';
 import { Search, Loader2, Download } from 'lucide-react';
 
 import AppLayout from '@/layouts/app-layout';

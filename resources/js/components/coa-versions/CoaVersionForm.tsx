@@ -10,7 +10,7 @@ import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
 import { coaVersionFormSchema, type CoaVersionFormData } from '@/utils/schemas';
 import { type CoaVersion } from '@/types/coa-version';
-import axios from 'axios';
+import axios from '@/lib/axios';
 
 interface CoaVersionFormProps {
     open: boolean;

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import axios from 'axios';
+import axios from '@/lib/axios';
 import { toast } from 'sonner';
 import { PipelineState } from '@/types/pipeline';
 import { PipelineStateFormData } from '@/utils/schemas';

@@ -14,7 +14,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import axios from '@/lib/axios';
 import { Loader2 } from 'lucide-react';
 import { AssetDepreciationLine } from '@/types/asset-depreciation-run';
 

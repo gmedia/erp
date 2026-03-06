@@ -8,7 +8,7 @@ import { StockMonitorSummaryCards } from '@/components/stock-monitor/SummaryCard
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import AppLayout from '@/layouts/app-layout';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import axios from '@/lib/axios';
 
 type SelectOption = {
     value: string;

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import axios from 'axios';
+import axios from '@/lib/axios';
 import { toast } from 'sonner';
 import { PipelineTransition } from '@/types/pipeline';
 import { PipelineTransitionFormData } from '@/utils/schemas';

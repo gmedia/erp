@@ -1,6 +1,6 @@
 'use client';
 
-import axios from 'axios';
+import axios from '@/lib/axios';
 import { useState } from 'react';
 import { toast } from 'sonner';
 

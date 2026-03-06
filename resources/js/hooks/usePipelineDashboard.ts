@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
 
 export interface PipelineDashboardFilters {

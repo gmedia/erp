@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/table';
 import { format } from 'date-fns';
 import React from 'react';
-import axios from 'axios';
+import axios from '@/lib/axios';
 
 import { type InventoryStocktake } from '@/types/inventory-stocktake';
 import { useTranslation } from '@/contexts/i18n-context';
