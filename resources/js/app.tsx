@@ -25,8 +25,10 @@ root.render(
     <HelmetProvider>
         <QueryClientProvider client={queryClient}>
             <BrowserRouter>
-                <AppRoutes />
-                <Toaster />
+                <AuthProvider>
+                    <AppRoutes />
+                    <Toaster />
+                </AuthProvider>
             </BrowserRouter>
         </QueryClientProvider>
     </HelmetProvider>

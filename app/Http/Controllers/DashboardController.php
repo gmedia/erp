@@ -6,21 +6,21 @@ use App\Models\Asset;
 use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Supplier;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\Http\JsonResponse;
 
 class DashboardController extends Controller
 {
-    public function index(): Response
+    public function index(): JsonResponse
     {
-        return Inertia::render('dashboard', [
-            'totals' => [
-                'customers' => Customer::count(),
-                'employees' => Employee::count(),
-                'suppliers' => Supplier::count(),
-                'assets' => Asset::count(),
+        return response()->json([
+            'data' => [
+                'totals' => [
+                    'customers' => Customer::count(),
+                    'employees' => Employee::count(),
+                    'suppliers' => Supplier::count(),
+                    'assets' => Asset::count(),
+                ],
             ],
         ]);
     }
 }
-

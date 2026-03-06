@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { useEffect, useState } from 'react';
+import axios from '@/lib/axios';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -11,16 +13,28 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-type Props = {
-    totals: {
-        customers: number;
-        employees: number;
-        suppliers: number;
-        assets: number;
-    };
+type Totals = {
+    customers: number;
+    employees: number;
+    suppliers: number;
+    assets: number;
 };
 
-export default function Dashboard({ totals }: Props) {
+export default function Dashboard() {
+    const [totals, setTotals] = useState<Totals | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        axios.get('/api/v1/dashboard')
+            .then((res) => {
+                setTotals(res.data.data.totals);
+            })
+            .catch(() => {
+                setTotals({ customers: 0, employees: 0, suppliers: 0, assets: 0 });
+            })
+            .finally(() => setLoading(false));
+    }, []);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Helmet><title>Dashboard</title></Helmet>
@@ -33,7 +47,7 @@ export default function Dashboard({ totals }: Props) {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-2xl font-semibold tabular-nums">
-                            {totals.customers.toLocaleString()}
+                            {loading ? '—' : totals?.customers.toLocaleString()}
                         </CardContent>
                     </Card>
 
@@ -44,7 +58,7 @@ export default function Dashboard({ totals }: Props) {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-2xl font-semibold tabular-nums">
-                            {totals.employees.toLocaleString()}
+                            {loading ? '—' : totals?.employees.toLocaleString()}
                         </CardContent>
                     </Card>
 
@@ -55,7 +69,7 @@ export default function Dashboard({ totals }: Props) {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-2xl font-semibold tabular-nums">
-                            {totals.suppliers.toLocaleString()}
+                            {loading ? '—' : totals?.suppliers.toLocaleString()}
                         </CardContent>
                     </Card>
 
@@ -66,7 +80,7 @@ export default function Dashboard({ totals }: Props) {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-2xl font-semibold tabular-nums">
-                            {totals.assets.toLocaleString()}
+                            {loading ? '—' : totals?.assets.toLocaleString()}
                         </CardContent>
                     </Card>
                 </div>
