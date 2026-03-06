@@ -9,19 +9,11 @@ import { useCrudFilters } from '@/hooks/useCrudFilters';
 import AppLayout from '@/layouts/app-layout';
 import { useQuery } from '@tanstack/react-query';
 import axios from '@/lib/axios';
+import { useState, useEffect, useMemo } from 'react';
 
 type SelectOption = {
     value: string;
     label: string;
-};
-
-type Props = {
-    filterOptions: {
-        products: SelectOption[];
-        warehouses: SelectOption[];
-        branches: SelectOption[];
-        categories: SelectOption[];
-    };
 };
 
 type StockMonitorSummary = {
@@ -47,9 +39,38 @@ type StockMonitorResponse = {
     summary?: StockMonitorSummary;
 };
 
-export default function StockMonitorPage({ filterOptions }: Props) {
+export default function StockMonitorPage() {
+    const [filterOptions, setFilterOptions] = useState<{
+        products: SelectOption[];
+        warehouses: SelectOption[];
+        branches: SelectOption[];
+        categories: SelectOption[];
+    }>({ products: [], warehouses: [], branches: [], categories: [] });
+
+    useEffect(() => {
+        const fetchOptions = async () => {
+            try {
+                const [products, warehouses, branches, categories] = await Promise.all([
+                    axios.get('/api/products', { params: { per_page: 999 } }),
+                    axios.get('/api/warehouses', { params: { per_page: 999 } }),
+                    axios.get('/api/branches', { params: { per_page: 999 } }),
+                    axios.get('/api/product-categories', { params: { per_page: 999 } }),
+                ]);
+                setFilterOptions({
+                    products: (products.data.data || []).map((p: any) => ({ value: String(p.id), label: p.name })),
+                    warehouses: (warehouses.data.data || []).map((w: any) => ({ value: String(w.id), label: w.name })),
+                    branches: (branches.data.data || []).map((b: any) => ({ value: String(b.id), label: b.name })),
+                    categories: (categories.data.data || []).map((c: any) => ({ value: String(c.id), label: c.name })),
+                });
+            } catch (e) {
+                console.error('Failed to load filter options', e);
+            }
+        };
+        fetchOptions();
+    }, []);
+
     const columns = createStockMonitorColumns();
-    const filterFields = createStockMonitorFilterFields(filterOptions);
+    const filterFields = useMemo(() => createStockMonitorFilterFields(filterOptions), [filterOptions]);
 
     const {
         filters,
@@ -73,7 +94,7 @@ export default function StockMonitorPage({ filterOptions }: Props) {
     const { data: response, isLoading } = useQuery<StockMonitorResponse>({
         queryKey: ['stock-monitor', pagination, filters],
         queryFn: async () => {
-            const response = await axios.get('/stock-monitor', {
+            const response = await axios.get('/api/stock-monitor', {
                 params: {
                     page: pagination.page,
                     per_page: pagination.per_page,
