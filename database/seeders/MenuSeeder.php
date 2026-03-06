@@ -219,7 +219,7 @@ class MenuSeeder extends Seeder
                         'display_name' => 'Stocktake Variance',
                         'permissions' => ['asset_stocktake'],
                         'icon' => 'AlertTriangle',
-                        'url' => 'asset-stocktake-variances',
+                        'url' => 'reports/asset-stocktake-variances',
                         'child' => [],
                     ],
                     [
