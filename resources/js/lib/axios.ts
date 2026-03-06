@@ -19,11 +19,8 @@ axios.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Only redirect to login if we are not already on login
-            if (!window.location.pathname.includes('/login')) {
-                localStorage.removeItem('api_token');
-                window.location.href = '/login';
-            }
+            // Clear stale token; ProtectedRoute will handle the redirect
+            localStorage.removeItem('api_token');
         }
         return Promise.reject(error);
     }
