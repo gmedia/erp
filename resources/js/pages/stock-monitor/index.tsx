@@ -51,10 +51,10 @@ export default function StockMonitorPage() {
         const fetchOptions = async () => {
             try {
                 const [products, warehouses, branches, categories] = await Promise.all([
-                    axios.get('/api/products', { params: { per_page: 999 } }),
-                    axios.get('/api/warehouses', { params: { per_page: 999 } }),
-                    axios.get('/api/branches', { params: { per_page: 999 } }),
-                    axios.get('/api/product-categories', { params: { per_page: 999 } }),
+                    axios.get('/api/products', { params: { per_page: 100 } }),
+                    axios.get('/api/warehouses', { params: { per_page: 100 } }),
+                    axios.get('/api/branches', { params: { per_page: 100 } }),
+                    axios.get('/api/product-categories', { params: { per_page: 100 } }),
                 ]);
                 setFilterOptions({
                     products: (products.data.data || []).map((p: any) => ({ value: String(p.id), label: p.name })),
