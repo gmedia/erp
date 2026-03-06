@@ -37,6 +37,7 @@ export type { AssetLocation, AssetLocationFormData, AssetLocationFilters } from 
 export type { Pipeline } from './pipeline';
 export type { ApprovalDelegation, ApprovalDelegationFormData, ApprovalDelegationFilters } from './approval-delegation';
 export type { PurchaseRequest, PurchaseRequestFormData, PurchaseRequestFilters } from './purchase-request';
+export type { PurchaseOrder, PurchaseOrderFormData, PurchaseOrderFilters } from './purchase-order';
 
 export interface ApprovalFlowStep {
     id?: number;

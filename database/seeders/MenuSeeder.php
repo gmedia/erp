@@ -137,7 +137,7 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'inventory',
                 'display_name' => 'Inventory',
-                'permissions' => ['purchase_request', 'stock_transfer', 'inventory_stocktake', 'stock_adjustment', 'stock_movement', 'stock_monitor'],
+                'permissions' => ['purchase_request', 'purchase_order', 'stock_transfer', 'inventory_stocktake', 'stock_adjustment', 'stock_movement', 'stock_monitor'],
                 'icon' => 'Box',
                 'url' => null,
                 'child' => [
@@ -147,6 +147,14 @@ class MenuSeeder extends Seeder
                         'permissions' => ['purchase_request', 'purchase_request.create', 'purchase_request.edit', 'purchase_request.delete'],
                         'icon' => 'FilePlus2',
                         'url' => 'purchase-requests',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'purchase_order',
+                        'display_name' => 'Purchase Orders',
+                        'permissions' => ['purchase_order', 'purchase_order.create', 'purchase_order.edit', 'purchase_order.delete'],
+                        'icon' => 'ShoppingCart',
+                        'url' => 'purchase-orders',
                         'child' => [],
                     ],
                     [

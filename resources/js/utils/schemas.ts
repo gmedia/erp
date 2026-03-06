@@ -547,3 +547,30 @@ export const purchaseRequestFormSchema = z.object({
 });
 
 export type PurchaseRequestFormData = z.infer<typeof purchaseRequestFormSchema>;
+
+export const purchaseOrderFormSchema = z.object({
+    po_number: z.string().optional(),
+    supplier_id: z.string().min(1, { message: 'Supplier is required.' }),
+    warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
+    order_date: z.date({ message: 'Order date is required.' }),
+    expected_delivery_date: z.date().optional().nullable(),
+    payment_terms: z.string().optional(),
+    currency: z.string().min(3, { message: 'Currency is required.' }).max(3),
+    status: z.enum(['draft', 'pending_approval', 'confirmed', 'rejected', 'partially_received', 'fully_received', 'cancelled', 'closed'], {
+        message: 'Status is required.',
+    }),
+    notes: z.string().optional(),
+    shipping_address: z.string().optional(),
+    items: z.array(z.object({
+        purchase_request_item_id: z.string().optional(),
+        product_id: z.string().min(1, { message: 'Product is required.' }),
+        unit_id: z.string().min(1, { message: 'Unit is required.' }),
+        quantity: z.coerce.number().gt(0, { message: 'Quantity must be greater than 0.' }),
+        unit_price: z.coerce.number().min(0, { message: 'Unit price must be at least 0.' }),
+        discount_percent: z.coerce.number().min(0).max(100).optional().default(0),
+        tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
+        notes: z.string().optional(),
+    })).min(1, { message: 'At least 1 item is required.' }),
+});
+
+export type PurchaseOrderFormData = z.infer<typeof purchaseOrderFormSchema>;

@@ -119,6 +119,11 @@ import { createPurchaseRequestFilterFields } from '@/components/purchase-request
 import { PurchaseRequestForm } from '@/components/purchase-requests/PurchaseRequestForm';
 import { PurchaseRequestViewModal } from '@/components/purchase-requests/PurchaseRequestViewModal';
 import { type PurchaseRequest } from '@/types/purchase-request';
+import { purchaseOrderColumns } from '@/components/purchase-orders/PurchaseOrderColumns';
+import { createPurchaseOrderFilterFields } from '@/components/purchase-orders/PurchaseOrderFilters';
+import { PurchaseOrderForm } from '@/components/purchase-orders/PurchaseOrderForm';
+import { PurchaseOrderViewModal } from '@/components/purchase-orders/PurchaseOrderViewModal';
+import { type PurchaseOrder } from '@/types/purchase-order';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -435,6 +440,32 @@ export const purchaseRequestConfig = createComplexEntityConfig<PurchaseRequest>(
     viewModalComponent: PurchaseRequestViewModal,
     getDeleteMessage: (purchaseRequest: { pr_number?: string | null }) =>
         `This action cannot be undone. This will cancel purchase request ${purchaseRequest.pr_number || ''}.`,
+});
+
+export const purchaseOrderConfig = createComplexEntityConfig<PurchaseOrder>({
+    entityName: 'Purchase Order',
+    entityNamePlural: 'Purchase Orders',
+    apiEndpoint: '/api/purchase-orders',
+    exportEndpoint: '/api/purchase-orders/export',
+    queryKey: ['purchase-orders'],
+    breadcrumbs: [{ title: 'Purchase Orders', href: '/purchase-orders' }],
+    initialFilters: {
+        search: '',
+        supplier_id: '',
+        warehouse_id: '',
+        status: '',
+        currency: '',
+        order_date_from: '',
+        order_date_to: '',
+    },
+    columns: purchaseOrderColumns,
+    filterFields: createPurchaseOrderFilterFields(),
+    formComponent: PurchaseOrderForm,
+    formType: 'complex',
+    entityNameForSearch: 'purchase order',
+    viewModalComponent: PurchaseOrderViewModal,
+    getDeleteMessage: (purchaseOrder: { po_number?: string | null }) =>
+        `This action cannot be undone. This will delete purchase order ${purchaseOrder.po_number || ''}.`,
 });
 
 export const supplierCategoryConfig = createSimpleEntityConfig({

@@ -118,6 +118,27 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'purchase_order',
+                'display_name' => 'Purchase Order',
+                'child' => [
+                    [
+                        'name' => 'purchase_order.create',
+                        'display_name' => 'Create Purchase Order',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'purchase_order.edit',
+                        'display_name' => 'Edit Purchase Order',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'purchase_order.delete',
+                        'display_name' => 'Delete Purchase Order',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'stock_transfer',
                 'display_name' => 'Stock Transfer',
                 'child' => [
