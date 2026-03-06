@@ -39,9 +39,8 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
             // We use token based auth via API
             const response = await axios.post('/api/v1/login', data);
             
-            // Expected response from AuthController:
-            // { data: { user, token, employee, menus, permissions, companyName, companyLogoUrl, locale, translations } }
-            const payload = response.data.data;
+            // AuthController returns: { token: "...", user: {...} }
+            const payload = response.data;
             
             login(payload.token, payload);
             
