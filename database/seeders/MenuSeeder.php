@@ -334,6 +334,14 @@ class MenuSeeder extends Seeder
                         'url' => 'reports/purchase-order-status',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'purchase_history_report',
+                        'display_name' => 'Purchase History Report',
+                        'permissions' => ['purchase_history_report'],
+                        'icon' => 'History',
+                        'url' => 'reports/purchase-history',
+                        'child' => [],
+                    ],
                 ],
             ],
             [
