@@ -54,7 +54,7 @@ class AssetController extends Controller
         return new AssetResource($asset->load(['category', 'model', 'branch', 'location', 'department', 'employee', 'supplier']));
     }
 
-    public function profile(Asset $asset): Response
+    public function profile(Asset $asset): Response|JsonResponse
     {
         $asset->load([
             'category',
@@ -77,6 +77,14 @@ class AssetController extends Controller
             'stocktakeItems.checkedBy',
             'depreciationLines.run.fiscalYear',
         ]);
+
+        if (request()->expectsJson() || request()->wantsJson()) {
+            return response()->json([
+                'asset' => [
+                    'data' => new AssetResource($asset),
+                ],
+            ]);
+        }
 
         return Inertia::render('assets/profile', [
             'asset' => new AssetResource($asset),

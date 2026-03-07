@@ -208,6 +208,7 @@ use Illuminate\Support\Facades\Route;
         // --- Assets ---
         Route::middleware('permission:asset,true')->group(function () {
             Route::apiResource('assets', AssetController::class);
+            Route::get('assets/{asset}/profile', [AssetController::class, 'profile']);
             Route::post('assets/export', [AssetController::class, 'export']);
             Route::post('assets/import', [AssetController::class, 'import']);
             Route::get('asset-dashboard/data', [AssetDashboardController::class, 'getData']);

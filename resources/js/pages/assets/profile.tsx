@@ -24,6 +24,9 @@ import { type Asset } from '@/types/asset';
 import { format } from 'date-fns';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from '@/lib/axios';
 import { toast } from 'sonner';
 import { ApprovalHistoryTimeline } from '@/components/approvals/ApprovalHistoryTimeline';
 import { EntityStateActions } from '@/components/pipeline/EntityStateActions';
@@ -42,6 +45,7 @@ import {
     History,
     Info,
     Layers,
+    Loader2,
     MapPin,
     Package,
     Printer,
@@ -53,26 +57,26 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface Props {
-    asset: {
-        data: Asset & {
-            ulid: string;
-            qrcode_url?: string;
-            maintenances?: any[];
-            stocktake_items?: any[];
-            depreciation_lines?: any[];
-        };
-    };
-}
-
-export default function AssetProfile({ asset }: Props) {
-    const item = asset.data;
+export default function AssetProfile() {
+    const { id } = useParams<{ id: string }>();
     const [timelineKey, setTimelineKey] = useState(Date.now());
+    const queryClient = useQueryClient();
+
+    const { data: assetData, isLoading, error } = useQuery({
+        queryKey: ['asset-profile', id],
+        queryFn: async () => {
+            const res = await axios.get(`/api/assets/${id}/profile`);
+            return res.data;
+        },
+        enabled: !!id,
+    });
+
+    const item = assetData?.asset?.data;
 
     const handleStateChange = useCallback(() => {
         setTimelineKey(Date.now());
-        window.location.reload();
-    }, []);
+        queryClient.invalidateQueries({ queryKey: ['asset-profile', id] });
+    }, [queryClient, id]);
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'N/A';
@@ -86,13 +90,30 @@ export default function AssetProfile({ asset }: Props) {
     const formatCurrency = (value: string | number) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
-            currency: item.currency || 'IDR',
+            currency: item?.currency || 'IDR',
             minimumFractionDigits: 0,
         }).format(Number(value));
     };
 
+    if (isLoading || !item) {
+        return (
+            <AppLayout breadcrumbs={[{ title: 'Assets', href: '/assets' }, { title: 'Loading...', href: '#' }]}>
+                <div className="flex items-center justify-center min-h-[50vh]">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+            </AppLayout>
+        );
+    }
 
-
+    if (error) {
+        return (
+            <AppLayout breadcrumbs={[{ title: 'Assets', href: '/assets' }, { title: 'Error', href: '#' }]}>
+                <div className="flex items-center justify-center min-h-[50vh]">
+                    <p className="text-destructive">Failed to load asset profile.</p>
+                </div>
+            </AppLayout>
+        );
+    }
     const getConditionVariant = (condition: string) => {
         switch (condition) {
             case 'good':
