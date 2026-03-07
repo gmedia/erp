@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
 import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
@@ -651,12 +652,8 @@ interface AdminSettingsResponse {
 }
 
 export default function AdminSettings() {
-    // Determine current group from URL query param
-    const urlParams =
-        typeof window !== 'undefined'
-            ? new URLSearchParams(window.location.search)
-            : new URLSearchParams();
-    const currentGroup = urlParams.get('group') || 'general';
+    const [searchParams] = useSearchParams();
+    const currentGroup = searchParams.get('group') || 'general';
 
     const { data, isLoading, error } = useQuery<AdminSettingsResponse>({
         queryKey: ['admin-settings'],
