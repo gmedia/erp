@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { useState } from 'react';
 import axios from '@/lib/axios';
+import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
@@ -61,7 +62,7 @@ function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axios.post('/admin-settings', formData, {
+            await axios.post('/api/admin-settings', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -234,7 +235,7 @@ function RegionalSettings({
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axios.put('/admin-settings', Object.fromEntries(formData));
+            await axios.put('/api/admin-settings', Object.fromEntries(formData));
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
         } catch (error: any) {
@@ -390,7 +391,7 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axios.put('/admin-settings', Object.fromEntries(formData));
+            await axios.put('/api/admin-settings', Object.fromEntries(formData));
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
         } catch (error: any) {
@@ -418,7 +419,7 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axios.post('/admin-settings/test-smtp', Object.fromEntries(formData));
+            await axios.post('/api/admin-settings/test-smtp', Object.fromEntries(formData));
             setTestRecentlySuccessful(true);
             setTimeout(() => setTestRecentlySuccessful(false), 3000);
         } catch (error: any) {
@@ -645,11 +646,11 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
     );
 }
 
-export default function AdminSettings({
-    settings,
-}: {
+interface AdminSettingsResponse {
     settings: SettingsData;
-}) {
+}
+
+export default function AdminSettings() {
     // Determine current group from URL query param
     const urlParams =
         typeof window !== 'undefined'
@@ -657,19 +658,50 @@ export default function AdminSettings({
             : new URLSearchParams();
     const currentGroup = urlParams.get('group') || 'general';
 
+    const { data, isLoading, error } = useQuery<AdminSettingsResponse>({
+        queryKey: ['admin-settings'],
+        queryFn: async () => {
+            const response = await axios.get('/api/admin-settings');
+            return response.data;
+        },
+    });
+
+    if (isLoading) {
+        return (
+            <AppLayout breadcrumbs={breadcrumbs}>
+                <Helmet><title>Admin Settings</title></Helmet>
+                <div className="flex h-full items-center justify-center p-4">
+                    <Loader2 className="mr-2 h-6 w-6 animate-spin text-muted-foreground" />
+                    <span>Loading settings...</span>
+                </div>
+            </AppLayout>
+        );
+    }
+
+    if (error || !data) {
+        return (
+            <AppLayout breadcrumbs={breadcrumbs}>
+                <Helmet><title>Admin Settings</title></Helmet>
+                <div className="flex h-full items-center justify-center p-4 text-destructive">
+                    Error loading settings.
+                </div>
+            </AppLayout>
+        );
+    }
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Helmet><title>Admin Settings</title></Helmet>
 
             <AdminSettingsLayout currentGroup={currentGroup}>
                 {currentGroup === 'general' && (
-                    <GeneralSettings settings={settings.general} />
+                    <GeneralSettings settings={data.settings.general} />
                 )}
                 {currentGroup === 'regional' && (
-                    <RegionalSettings settings={settings.regional} />
+                    <RegionalSettings settings={data.settings.regional} />
                 )}
                 {currentGroup === 'smtp' && (
-                    <SmtpSettings settings={settings.smtp} />
+                    <SmtpSettings settings={data.settings.smtp} />
                 )}
             </AdminSettingsLayout>
         </AppLayout>

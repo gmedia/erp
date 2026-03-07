@@ -232,6 +232,7 @@ use Illuminate\Support\Facades\Route;
 
         // --- Admin Settings ---
         Route::middleware('permission:admin_setting,true')->group(function () {
+            Route::get('admin-settings', [AdminSettingController::class, 'index']);
             Route::put('admin-settings', [AdminSettingController::class, 'update']);
             Route::post('admin-settings/test-smtp', [AdminSettingController::class, 'testSmtp']);
         });

@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Mail\TestSmtpMail;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Http\JsonResponse;
 
 /**
  * Controller for application-level settings management.
@@ -25,10 +26,14 @@ class AdminSettingController extends Controller
     /**
      * Display the admin settings page.
      */
-    public function index(): Response
+    public function index(Request $request): Response|JsonResponse
     {
         $settings = Setting::getGrouped();
         $settings['general']['company_logo_url'] = $this->getCompanyLogoUrl();
+
+        if ($request->expectsJson() || $request->is('api/*')) {
+            return response()->json(['settings' => $settings]);
+        }
 
         return Inertia::render('admin-settings/index', [
             'settings' => $settings,
@@ -38,7 +43,7 @@ class AdminSettingController extends Controller
     /**
      * Update admin settings.
      */
-    public function update(AdminSettingRequest $request): RedirectResponse
+    public function update(AdminSettingRequest $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validated();
 
@@ -52,6 +57,13 @@ class AdminSettingController extends Controller
         if ($uploadedLogo instanceof UploadedFile) {
             $path = $uploadedLogo->store('branding/logos', config('filesystems.default'));
             Setting::set('company_logo_path', $path);
+        }
+
+        if ($request->expectsJson() || $request->is('api/*')) {
+            return response()->json([
+                'message' => 'Settings updated successfully.',
+                'company_logo_url' => $this->getCompanyLogoUrl()
+            ]);
         }
 
         return back()->with('success', 'Settings updated successfully.');
@@ -71,7 +83,7 @@ class AdminSettingController extends Controller
     /**
      * Send a test SMTP email
      */
-    public function testSmtp(Request $request): RedirectResponse
+    public function testSmtp(Request $request): RedirectResponse|JsonResponse
     {
         $request->validate([
             'test_email' => ['required', 'email', 'max:255'],
@@ -80,8 +92,17 @@ class AdminSettingController extends Controller
         try {
             Mail::to($request->input('test_email'))->send(new TestSmtpMail());
             
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json(['message' => 'Test email sent successfully. Please check your inbox.']);
+            }
             return back()->with('success', 'Test email sent successfully. Please check your inbox.');
         } catch (\Exception $e) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Failed to send email: ' . $e->getMessage(),
+                    'errors' => ['test_email' => ['Failed to send email: ' . $e->getMessage()]]
+                ], 422);
+            }
             return back()->withErrors(['test_email' => 'Failed to send email: ' . $e->getMessage()]);
         }
     }
