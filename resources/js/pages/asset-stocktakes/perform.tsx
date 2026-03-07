@@ -5,57 +5,64 @@ import { StocktakeItemManager } from '@/components/asset-stocktakes/StocktakeIte
 import { useStocktakeItems } from '@/hooks/asset-stocktakes/useStocktakeItems';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import axios from '@/lib/axios';
 
-interface PerformPageProps {
-    stocktake: {
-        id: number;
-        ulid: string;
-        branch_id: number;
-        reference: string;
-        status: string;
-        branch?: {
-            name: string;
-        };
-    };
-}
+export default function PerformAssetStocktakePage() {
+    const { id } = useParams<{ id: string }>();
+    const { data: stocktake, isLoading: isStocktakeLoading } = useQuery({
+        queryKey: ['asset-stocktakes', id],
+        queryFn: async () => {
+            const { data } = await axios.get(`/api/asset-stocktakes/${id}`);
+            return data.data;
+        },
+    });
 
-export default function PerformAssetStocktakePage({ stocktake }: PerformPageProps) {
     const { loading, items, fetchItems, saveItems } = useStocktakeItems();
+
+    useEffect(() => {
+        if (stocktake?.ulid) {
+            fetchItems(stocktake.ulid);
+        }
+    }, [stocktake?.ulid, fetchItems]);
 
     const breadcrumbs = [
         { title: 'Home', href: '/' },
         { title: 'Asset Stocktakes', href: '/asset-stocktakes' },
-        { title: `Perform: ${stocktake.reference}`, href: '#' },
+        { title: stocktake ? `Perform: ${stocktake.reference}` : 'Perform Stocktake', href: '#' },
     ];
-
-    useEffect(() => {
-        fetchItems(stocktake.ulid);
-    }, [stocktake.ulid, fetchItems]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet><title>{`Perform Stocktake ${stocktake.reference}`}</title></Helmet>
+            <Helmet><title>{stocktake ? `Perform Stocktake ${stocktake.reference}` : 'Perform Stocktake'}</title></Helmet>
             
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <Card>
                     <CardHeader>
                         <CardTitle>Perform Asset Stocktake</CardTitle>
-                        <CardDescription>
-                            Branch: <strong>{stocktake.branch?.name}</strong> | Ref: <strong>{stocktake.reference}</strong>
-                        </CardDescription>
+                        {isStocktakeLoading ? (
+                            <div className="h-5 w-48 animate-pulse rounded bg-muted"></div>
+                        ) : stocktake && (
+                            <CardDescription>
+                                Branch: <strong>{stocktake.branch?.name}</strong> | Ref: <strong>{stocktake.reference}</strong>
+                            </CardDescription>
+                        )}
                     </CardHeader>
                     <CardContent>
-                        {loading && items.length === 0 ? (
+                        {isStocktakeLoading || (loading && items.length === 0) ? (
                             <div className="flex h-32 items-center justify-center">
                                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                             </div>
-                        ) : (
+                        ) : stocktake ? (
                             <StocktakeItemManager
                                 stocktakeBranchId={stocktake.branch_id}
                                 items={items}
                                 loading={loading}
                                 onSave={(data) => saveItems(stocktake.ulid, data)}
                             />
+                        ) : (
+                             <div className="text-center text-muted-foreground">Stocktake not found</div>
                         )}
                     </CardContent>
                 </Card>
