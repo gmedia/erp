@@ -58,12 +58,8 @@ test.describe('Asset Import E2E Tests', () => {
         await fileInput.setInputFiles(filePath);
 
         // 5. Submit Import
-        const [response] = await Promise.all([
-            page.waitForResponse(res => res.url().includes('/api/assets/import')),
-            dialog.getByRole('button', { name: 'Import' }).click()
-        ]);
-        
-        const responseBody = await response.json();
+        const submitButton = dialog.getByRole('button', { name: 'Import' });
+        await submitButton.click();
 
         // 6. Verify Success
         try {
