@@ -6,6 +6,9 @@ import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, Table
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { formatCurrency } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
+import axios from '@/lib/axios';
+import { useSearchParams } from 'react-router-dom';
 
 interface FiscalYear {
     id: number;
@@ -27,15 +30,34 @@ interface AccountItem {
     credit: number;
 }
 
-interface Props {
+interface TrialBalanceResponse {
     fiscalYears: FiscalYear[];
     selectedYearId: number;
     report: AccountItem[];
 }
 
-export default function TrialBalance({ fiscalYears, selectedYearId, report }: Props) {
-    const totalDebit = report.reduce((sum, item) => sum + item.debit, 0);
-    const totalCredit = report.reduce((sum, item) => sum + item.credit, 0);
+export default function TrialBalance() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const urlYearId = searchParams.get('fiscal_year_id');
+
+    const { data, isLoading, error } = useQuery<TrialBalanceResponse>({
+        queryKey: ['trial-balance', urlYearId],
+        queryFn: async () => {
+            const params = new URLSearchParams();
+            if (urlYearId) {
+                params.append('fiscal_year_id', urlYearId);
+            }
+            const response = await axios.get(`/api/reports/trial-balance?${params.toString()}`);
+            return response.data;
+        },
+    });
+
+    const fiscalYears = data?.fiscalYears || [];
+    const selectedYearId = data?.selectedYearId || 0;
+    const report = data?.report || [];
+
+    const totalDebit = report.reduce((sum, item) => sum + (item.debit || 0), 0);
+    const totalCredit = report.reduce((sum, item) => sum + (item.credit || 0), 0);
     const difference = Math.abs(totalDebit - totalCredit);
     const isBalanced = Math.abs(totalDebit - totalCredit) < 0.01;
 
@@ -43,8 +65,26 @@ export default function TrialBalance({ fiscalYears, selectedYearId, report }: Pr
     const parentIds = new Set(report.map((item) => item.parent_id).filter((id): id is number => id != null));
 
     const handleYearChange = (value: string) => {
-        window.location.href = `/reports/trial-balance?fiscal_year_id=${value}`;
+        setSearchParams({ fiscal_year_id: value });
     };
+
+    if (isLoading) {
+        return (
+            <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Trial Balance', href: '/reports/trial-balance' }]}>
+                <Helmet><title>Trial Balance</title></Helmet>
+                <div className="flex h-full items-center justify-center p-4">Loading report...</div>
+            </AppLayout>
+        );
+    }
+
+    if (error) {
+        return (
+            <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Trial Balance', href: '/reports/trial-balance' }]}>
+                <Helmet><title>Trial Balance</title></Helmet>
+                <div className="flex h-full items-center justify-center p-4 text-destructive">Error loading report.</div>
+            </AppLayout>
+        );
+    }
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Trial Balance', href: '/reports/trial-balance' }]}>

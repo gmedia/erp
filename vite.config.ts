@@ -15,4 +15,16 @@ export default defineConfig({
     esbuild: {
         jsx: 'automatic',
     },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['react', 'react-dom'],
+                    router: ['react-router', 'react-router-dom'],
+                    query: ['@tanstack/react-query'],
+                    ui: ['lucide-react', 'clsx', 'tailwind-merge', 'date-fns', 'axios'],
+                },
+            },
+        },
+    },
 });

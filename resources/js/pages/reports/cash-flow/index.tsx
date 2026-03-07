@@ -5,6 +5,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils';
 
+import { useQuery } from '@tanstack/react-query';
+import axios from '@/lib/axios';
+import { useSearchParams } from 'react-router-dom';
+
 interface FiscalYear {
     id: number;
     name: string;
@@ -25,23 +29,58 @@ interface CashFlowItem {
     outflow: number;
 }
 
-interface Props {
+interface CashFlowResponse {
     fiscalYears: FiscalYear[];
     selectedYearId: number;
     report: CashFlowItem[];
 }
 
-export default function CashFlow({ fiscalYears, selectedYearId, report }: Props) {
-    const totalInflow = report.reduce((sum, item) => sum + item.inflow, 0);
-    const totalOutflow = report.reduce((sum, item) => sum + item.outflow, 0);
+export default function CashFlow() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const urlYearId = searchParams.get('fiscal_year_id');
+
+    const { data, isLoading, error } = useQuery<CashFlowResponse>({
+        queryKey: ['cash-flow', urlYearId],
+        queryFn: async () => {
+            const params = new URLSearchParams();
+            if (urlYearId) params.append('fiscal_year_id', urlYearId);
+            const response = await axios.get(`/api/reports/cash-flow?${params.toString()}`);
+            return response.data;
+        },
+    });
+
+    const fiscalYears = data?.fiscalYears || [];
+    const selectedYearId = data?.selectedYearId || 0;
+    const report = data?.report || [];
+
+    const totalInflow = report.reduce((sum, item) => sum + (item.inflow || 0), 0);
+    const totalOutflow = report.reduce((sum, item) => sum + (item.outflow || 0), 0);
     const netCashFlow = totalInflow - totalOutflow;
 
     const selectedFiscalYear = fiscalYears.find((fy) => fy.id === selectedYearId);
     const parentIds = new Set(report.map((item) => item.parent_id).filter((id): id is number => id != null));
 
     const handleYearChange = (value: string) => {
-        window.location.href = `/reports/cash-flow?fiscal_year_id=${value}`;
+        setSearchParams({ fiscal_year_id: value });
     };
+
+    if (isLoading) {
+        return (
+            <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Cash Flow', href: '/reports/cash-flow' }]}>
+                <Helmet><title>Cash Flow</title></Helmet>
+                <div className="flex h-full items-center justify-center p-4">Loading report...</div>
+            </AppLayout>
+        );
+    }
+
+    if (error) {
+        return (
+            <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Cash Flow', href: '/reports/cash-flow' }]}>
+                <Helmet><title>Cash Flow</title></Helmet>
+                <div className="flex h-full items-center justify-center p-4 text-destructive">Error loading report.</div>
+            </AppLayout>
+        );
+    }
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Cash Flow', href: '/reports/cash-flow' }]}>

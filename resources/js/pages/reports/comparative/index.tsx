@@ -7,6 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { cn, formatCurrency } from '@/lib/utils';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import axios from '@/lib/axios';
+import { useSearchParams } from 'react-router-dom';
 
 interface FiscalYear {
     id: number;
@@ -28,7 +31,7 @@ interface AccountNode {
     level: number;
 }
 
-interface Props {
+interface ComparativeReportResponse {
     fiscalYears: FiscalYear[];
     selectedYearId: number;
     comparisonYearId?: number;
@@ -212,23 +215,59 @@ function Section({
     );
 }
 
-export default function ComparativeReport({ fiscalYears, selectedYearId, comparisonYearId, report }: Props) {
+export default function ComparativeReport() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const urlYearId = searchParams.get('fiscal_year_id');
+    const urlComparisonId = searchParams.get('comparison_year_id');
+
+    const { data, isLoading, error } = useQuery<ComparativeReportResponse>({
+        queryKey: ['comparative-report', urlYearId, urlComparisonId],
+        queryFn: async () => {
+            const params = new URLSearchParams();
+            if (urlYearId) params.append('fiscal_year_id', urlYearId);
+            if (urlComparisonId) params.append('comparison_year_id', urlComparisonId);
+            const response = await axios.get(`/api/reports/comparative?${params.toString()}`);
+            return response.data;
+        },
+    });
+
+    const fiscalYears = data?.fiscalYears || [];
+    const selectedYearId = data?.selectedYearId || 0;
+    const comparisonYearId = data?.comparisonYearId;
+    const report = data?.report || { assets: [], liabilities: [], equity: [], revenues: [], expenses: [], totals: { assets: 0, liabilities: 0, equity: 0, revenues: 0, expenses: 0 } };
+
     const selectedFiscalYear = fiscalYears.find((fy) => fy.id === selectedYearId);
     const selectedComparisonFiscalYear = comparisonYearId ? fiscalYears.find((fy) => fy.id === comparisonYearId) : undefined;
 
     const handleYearChange = (value: string) => {
-        const params = new URLSearchParams();
-        params.set('fiscal_year_id', value);
-        if (comparisonYearId) params.set('comparison_year_id', String(comparisonYearId));
-        window.location.href = `/reports/comparative?${params.toString()}`;
+        const params: any = { fiscal_year_id: value };
+        if (comparisonYearId) params.comparison_year_id = String(comparisonYearId);
+        setSearchParams(params);
     };
 
     const handleComparisonChange = (value: string) => {
-        const params = new URLSearchParams();
-        params.set('fiscal_year_id', String(selectedYearId));
-        if (value !== 'none') params.set('comparison_year_id', value);
-        window.location.href = `/reports/comparative?${params.toString()}`;
+        const params: any = { fiscal_year_id: String(selectedYearId) };
+        if (value !== 'none') params.comparison_year_id = value;
+        setSearchParams(params);
     };
+
+    if (isLoading) {
+        return (
+            <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Comparative Report', href: '/reports/comparative' }]}>
+                <Helmet><title>Comparative Report</title></Helmet>
+                <div className="flex h-full items-center justify-center p-4">Loading report...</div>
+            </AppLayout>
+        );
+    }
+
+    if (error) {
+        return (
+            <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Comparative Report', href: '/reports/comparative' }]}>
+                <Helmet><title>Comparative Report</title></Helmet>
+                <div className="flex h-full items-center justify-center p-4 text-destructive">Error loading report.</div>
+            </AppLayout>
+        );
+    }
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Comparative Report', href: '/reports/comparative' }]}>
