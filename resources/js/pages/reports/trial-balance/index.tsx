@@ -52,9 +52,9 @@ export default function TrialBalance() {
         },
     });
 
-    const fiscalYears = data?.fiscalYears || [];
+    const fiscalYears = Array.isArray(data?.fiscalYears) ? data.fiscalYears : [];
     const selectedYearId = data?.selectedYearId || 0;
-    const report = data?.report || [];
+    const report = Array.isArray(data?.report) ? data.report : [];
 
     const totalDebit = report.reduce((sum, item) => sum + (item.debit || 0), 0);
     const totalCredit = report.reduce((sum, item) => sum + (item.credit || 0), 0);

@@ -167,7 +167,18 @@ export async function login(
     throw lastError instanceof Error ? lastError : new Error(String(lastError));
   };
 
-  await gotoWithRetry('/dashboard');
+  // Go explicitly to /login. GuestRoute will redirect to /dashboard if already authenticated.
+  await gotoWithRetry('/login');
+
+  // Wait for either the dashboard url OR the login email input to appear
+  try {
+    await Promise.race([
+      page.waitForURL('**/dashboard', { timeout: 15000 }),
+      page.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 15000 })
+    ]);
+  } catch (e) {
+    // Ignore timeout, we'll check states below
+  }
 
   if (page.url().includes('/dashboard')) return;
 

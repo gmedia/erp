@@ -26,7 +26,7 @@ export default function PipelineDashboard() {
         }
     });
 
-    const pipelines = pipelinesResponse?.data || [];
+    const pipelines = Array.isArray(pipelinesResponse?.data) ? pipelinesResponse.data : [];
 
     // If there's only one pipeline, pre-select it
     const defaultPipelineId = pipelines.length === 1 ? pipelines[0].id : undefined;
@@ -63,6 +63,9 @@ export default function PipelineDashboard() {
         handleFilterChange('stale_days', Number(val));
     };
 
+    const summaryData = Array.isArray(data?.summary) ? data.summary : [];
+    const staleEntitiesData = Array.isArray(data?.stale_entities) ? data.stale_entities : [];
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Helmet>
@@ -86,21 +89,21 @@ export default function PipelineDashboard() {
                 />
 
                 <StateSummaryCards 
-                    data={data?.summary || []} 
+                    data={summaryData} 
                     isLoading={isLoading} 
                 />
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 mt-2">
                     <div className="col-span-1 lg:col-span-1">
                         <StateDistributionChart 
-                            data={data?.summary || []} 
+                            data={summaryData} 
                             isLoading={isLoading} 
                         />
                     </div>
                     
                     <div className="col-span-1 md:col-span-1 lg:col-span-3">
                         <StaleEntitiesTable 
-                            data={data?.stale_entities || []} 
+                            data={staleEntitiesData} 
                             isLoading={isLoading}
                             staleDaysThreshold={filters.stale_days || 7}
                         />

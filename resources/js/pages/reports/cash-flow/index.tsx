@@ -49,9 +49,9 @@ export default function CashFlow() {
         },
     });
 
-    const fiscalYears = data?.fiscalYears || [];
+    const fiscalYears = Array.isArray(data?.fiscalYears) ? data.fiscalYears : [];
     const selectedYearId = data?.selectedYearId || 0;
-    const report = data?.report || [];
+    const report = Array.isArray(data?.report) ? data.report : [];
 
     const totalInflow = report.reduce((sum, item) => sum + (item.inflow || 0), 0);
     const totalOutflow = report.reduce((sum, item) => sum + (item.outflow || 0), 0);

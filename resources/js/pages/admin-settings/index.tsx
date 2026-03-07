@@ -692,13 +692,13 @@ export default function AdminSettings() {
 
             <AdminSettingsLayout currentGroup={currentGroup}>
                 {currentGroup === 'general' && (
-                    <GeneralSettings settings={data.settings.general} />
+                    <GeneralSettings settings={data?.settings?.general} />
                 )}
                 {currentGroup === 'regional' && (
-                    <RegionalSettings settings={data.settings.regional} />
+                    <RegionalSettings settings={data?.settings?.regional} />
                 )}
                 {currentGroup === 'smtp' && (
-                    <SmtpSettings settings={data.settings.smtp} />
+                    <SmtpSettings settings={data?.settings?.smtp} />
                 )}
             </AdminSettingsLayout>
         </AppLayout>
