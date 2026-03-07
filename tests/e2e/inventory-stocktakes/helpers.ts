@@ -128,8 +128,16 @@ export async function editInventoryStocktake(
 
     await page.getByRole('menuitem', { name: 'Edit' }).click();
 
+    // Wait for the GET detail request to complete before editing
+    const detailResponse = page.waitForResponse(
+        (r) => r.url().match(/\/api\/inventory-stocktakes\/\d+$/) && r.request().method() === 'GET',
+        { timeout: 15000 },
+    ).catch(() => null);
+
     const dialog = page.getByRole('dialog', { name: /Edit Inventory Stocktake/i });
     await expect(dialog).toBeVisible();
+
+    await detailResponse;
 
     if (updates.stocktake_number) {
         await dialog.locator('input[name="stocktake_number"]').fill(updates.stocktake_number);
