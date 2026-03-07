@@ -8,21 +8,26 @@ import { StateDistributionChart } from '@/components/pipeline-dashboard/StateDis
 import { StaleEntitiesTable } from '@/components/pipeline-dashboard/StaleEntitiesTable';
 import { PipelineFilter } from '@/components/pipeline-dashboard/PipelineFilter';
 
-interface PipelineDashboardProps {
-    pipelines: Array<{
-        id: number;
-        name: string;
-        code: string;
-        entity_type: string;
-    }>;
-}
+import { useQuery } from '@tanstack/react-query';
+import axios from '@/lib/axios';
+import { Loader2 } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Pipelines', href: '/pipelines' },
     { title: 'Dashboard', href: '/pipeline-dashboard' },
 ];
 
-export default function PipelineDashboard({ pipelines }: PipelineDashboardProps) {
+export default function PipelineDashboard() {
+    const { data: pipelinesResponse, isLoading: pipelinesLoading } = useQuery({
+        queryKey: ['pipelines-list'],
+        queryFn: async () => {
+            const res = await axios.get('/api/pipelines?per_page=100');
+            return res.data;
+        }
+    });
+
+    const pipelines = pipelinesResponse?.data || [];
+
     // If there's only one pipeline, pre-select it
     const defaultPipelineId = pipelines.length === 1 ? pipelines[0].id : undefined;
 
@@ -35,6 +40,20 @@ export default function PipelineDashboard({ pipelines }: PipelineDashboardProps)
         pipeline_id: defaultPipelineId,
         stale_days: 7
     });
+
+    if (pipelinesLoading) {
+        return (
+            <AppLayout breadcrumbs={breadcrumbs}>
+                <Helmet>
+                    <title>Pipeline Dashboard - {import.meta.env.VITE_APP_NAME || 'ERP'}</title>
+                </Helmet>
+                <div className="flex h-full items-center justify-center p-4">
+                    <Loader2 className="mr-2 h-6 w-6 animate-spin text-muted-foreground" />
+                    <span>Loading pipelines...</span>
+                </div>
+            </AppLayout>
+        );
+    }
 
     const onPipelineChange = (val: string) => {
         handleFilterChange('pipeline_id', val === 'all' ? undefined : Number(val));
