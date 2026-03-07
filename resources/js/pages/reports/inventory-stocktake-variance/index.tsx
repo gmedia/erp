@@ -39,7 +39,7 @@ export default function InventoryStocktakeVarianceReportPage() {
     });
 
     const { data, isLoading, meta } = useCrudQuery<InventoryStocktakeVarianceReportItem>({
-        endpoint: '/reports/inventory-stocktake-variance',
+        endpoint: '/api/reports/inventory-stocktake-variance',
         queryKey: ['inventory-stocktake-variance-report'],
         entityName: 'Inventory Stocktake Variance Report',
         pagination,
@@ -79,7 +79,7 @@ export default function InventoryStocktakeVarianceReportPage() {
                             onFilterChange={handleFilterChange}
                             onResetFilters={resetFilters}
                             filterFields={filterFields}
-                            exportEndpoint="/reports/inventory-stocktake-variance/export"
+                            exportEndpoint="/api/reports/inventory-stocktake-variance/export"
                             entityName="Inventory Stocktake Variance"
                         />
                     </div>
