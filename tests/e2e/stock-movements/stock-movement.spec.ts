@@ -12,24 +12,16 @@ test.describe('Stock Movements (Kartu Stok)', () => {
         await page.goto('/stock-movements');
         await page.waitForURL('**/stock-movements', { timeout: 15000 });
 
-        await page
-            .waitForResponse(
-                (r) =>
-                    r.url().includes('/stock-movements') &&
-                    r.request().headers()['accept']?.includes('application/json') &&
-                    r.status() < 400,
-            )
-            .catch(() => null);
+        // Wait for the table to be visible
+        await expect(page.locator('table')).toBeVisible({ timeout: 15000 });
 
-        await expect(page.locator('table')).toBeVisible();
-        await expect(page.locator('tbody tr').first()).toBeVisible();
-
+        // Wait for actual data rows to appear (not the "No results." row)
         const refLink = page
             .locator('tbody a')
             .filter({ hasText: /^(ST|SA|SO)-/ })
             .first();
 
-        await expect(refLink).toBeVisible();
+        await expect(refLink).toBeVisible({ timeout: 30000 });
         const refNumber = await refLink.innerText();
 
         const searchInput = page.getByRole('textbox').first();

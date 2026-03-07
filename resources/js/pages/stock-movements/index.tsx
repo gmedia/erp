@@ -32,7 +32,7 @@ export default function StockMovementsPage() {
     });
 
     const { data, isLoading, meta } = useCrudQuery<StockMovementItem>({
-        endpoint: '/stock-movements',
+        endpoint: '/api/stock-movements',
         queryKey: ['stock-movements'],
         entityName: 'Stock Movements',
         pagination,
