@@ -307,6 +307,7 @@ use Illuminate\Support\Facades\Route;
             Route::get('stock-movement', [StockMovementReportController::class, 'index'])->middleware('permission:stock_movement_report');
             Route::post('stock-movement/export', [StockMovementReportController::class, 'export'])->middleware('permission:stock_movement_report');
             Route::get('stock-adjustment', [StockAdjustmentReportController::class, 'index'])->middleware('permission:stock_adjustment_report');
+            Route::post('stock-adjustment/export', [StockAdjustmentReportController::class, 'export'])->middleware('permission:stock_adjustment_report');
             Route::get('inventory-stocktake-variance', [InventoryStocktakeVarianceReportController::class, 'index'])->middleware('permission:inventory_stocktake_variance_report');
             Route::post('inventory-stocktake-variance/export', [InventoryStocktakeVarianceReportController::class, 'export'])->middleware('permission:inventory_stocktake_variance_report');
         });
