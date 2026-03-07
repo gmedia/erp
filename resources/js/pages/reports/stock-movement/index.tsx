@@ -35,7 +35,7 @@ export default function StockMovementReportPage() {
     });
 
     const { data, isLoading, meta } = useCrudQuery<StockMovementReportItem>({
-        endpoint: '/reports/stock-movement',
+        endpoint: '/api/reports/stock-movement',
         queryKey: ['stock-movement-report'],
         entityName: 'Stock Movement Report',
         pagination,
@@ -75,7 +75,7 @@ export default function StockMovementReportPage() {
                             onFilterChange={handleFilterChange}
                             onResetFilters={resetFilters}
                             filterFields={filterFields}
-                            exportEndpoint="/reports/stock-movement/export"
+                            exportEndpoint="/api/reports/stock-movement/export"
                             entityName="Stock Movement Report"
                         />
                     </div>
