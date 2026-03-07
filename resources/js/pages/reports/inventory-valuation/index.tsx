@@ -35,7 +35,7 @@ export default function InventoryValuationReportPage() {
     });
 
     const { data, isLoading, meta } = useCrudQuery<InventoryValuationItem>({
-        endpoint: '/reports/inventory-valuation',
+        endpoint: '/api/reports/inventory-valuation',
         queryKey: ['inventory-valuation-report'],
         entityName: 'Inventory Valuation Report',
         pagination,
@@ -75,7 +75,7 @@ export default function InventoryValuationReportPage() {
                             onFilterChange={handleFilterChange}
                             onResetFilters={resetFilters}
                             filterFields={filterFields}
-                            exportEndpoint="/reports/inventory-valuation/export"
+                            exportEndpoint="/api/reports/inventory-valuation/export"
                             entityName="Inventory Valuation"
                         />
                     </div>

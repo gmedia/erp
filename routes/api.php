@@ -303,6 +303,7 @@ use Illuminate\Support\Facades\Route;
             Route::get('book-value-depreciation', [BookValueDepreciationReportController::class, 'index'])->middleware('permission:asset');
             Route::get('maintenance-cost', [MaintenanceCostReportController::class, 'index'])->middleware('permission:asset');
             Route::get('inventory-valuation', [InventoryValuationReportController::class, 'index'])->middleware('permission:inventory_valuation_report');
+            Route::post('inventory-valuation/export', [InventoryValuationReportController::class, 'export'])->middleware('permission:inventory_valuation_report');
             Route::get('stock-movement', [StockMovementReportController::class, 'index'])->middleware('permission:stock_movement_report');
             Route::get('stock-adjustment', [StockAdjustmentReportController::class, 'index'])->middleware('permission:stock_adjustment_report');
             Route::get('inventory-stocktake-variance', [InventoryStocktakeVarianceReportController::class, 'index'])->middleware('permission:inventory_stocktake_variance_report');
