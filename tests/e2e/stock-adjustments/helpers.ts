@@ -147,8 +147,16 @@ export async function editStockAdjustment(
 
     await page.getByRole('menuitem', { name: 'Edit' }).click();
 
+    // Wait for the GET detail request to complete before editing
+    const detailResponse = page.waitForResponse(
+        (r) => !!r.url().match(/\/api\/stock-adjustments\/\d+$/) && r.request().method() === 'GET',
+        { timeout: 15000 },
+    ).catch(() => null);
+
     const dialog = page.getByRole('dialog', { name: /Edit Stock Adjustment/i });
     await expect(dialog).toBeVisible();
+
+    await detailResponse;
 
     if (updates.adjustment_number) {
         await dialog
