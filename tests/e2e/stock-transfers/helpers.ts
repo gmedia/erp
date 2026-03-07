@@ -133,8 +133,16 @@ export async function editStockTransfer(
 
     await page.getByRole('menuitem', { name: 'Edit' }).click();
 
+    // Wait for the GET detail request
+    const detailResponse = page.waitForResponse(
+        (r) => r.url().match(/\/api\/stock-transfers\/\d+$/) && r.request().method() === 'GET',
+        { timeout: 15000 }
+    ).catch(() => null);
+
     const dialog = page.getByRole('dialog', { name: /Edit Stock Transfer/i });
     await expect(dialog).toBeVisible();
+
+    await detailResponse;
 
     if (updates.transfer_number) {
         await dialog.locator('input[name="transfer_number"]').fill(updates.transfer_number);
