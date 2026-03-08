@@ -3,21 +3,6 @@
 use App\Http\Controllers\PipelineAuditTrailController;
 use App\Http\Controllers\PipelineController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('pipelines', function () {
-        return Inertia::render('pipelines/index');
-    })->name('pipelines')->middleware('permission:pipeline');
-
-    Route::get('pipeline-dashboard', [\App\Http\Controllers\PipelineDashboardController::class, 'index'])
-        ->name('pipeline-dashboard')
-        ->middleware('permission:pipeline_dashboard');
-
-    Route::get('pipeline-audit-trail', [PipelineAuditTrailController::class, 'index'])
-        ->name('pipeline-audit-trail')
-        ->middleware('permission:pipeline_audit_trail');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {    
     Route::get('/pipeline-dashboard/data', [\App\Http\Controllers\PipelineDashboardController::class, 'getData'])

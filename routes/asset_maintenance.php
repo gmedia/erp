@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\AssetMaintenanceController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('asset-maintenances', function () {
-        return Inertia::render('asset-maintenances/index');
-    })->name('asset-maintenances')->middleware('permission:asset_maintenance');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:asset_maintenance,true')->group(function () {

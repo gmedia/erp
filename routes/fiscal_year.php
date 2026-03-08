@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\FiscalYearController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('fiscal-years', function () {
-        return Inertia::render('fiscal-years/index');
-    })->name('fiscal-years')->middleware('permission:fiscal_year');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:fiscal_year,true')->group(function () {

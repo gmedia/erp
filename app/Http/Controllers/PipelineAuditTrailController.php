@@ -8,37 +8,17 @@ use App\Http\Requests\PipelineAuditTrail\ExportPipelineAuditTrailRequest;
 use App\Http\Requests\PipelineAuditTrail\IndexPipelineAuditTrailRequest;
 use App\Http\Resources\PipelineAuditTrail\PipelineAuditTrailCollection;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class PipelineAuditTrailController extends Controller
 {
     /**
      * Display the Pipeline Audit Trail page.
      */
-    public function index(IndexPipelineAuditTrailRequest $request, IndexPipelineAuditTrailAction $action): Response|PipelineAuditTrailCollection
+    public function index(IndexPipelineAuditTrailRequest $request, IndexPipelineAuditTrailAction $action): PipelineAuditTrailCollection
     {
         $logs = $action->execute($request);
 
-        if ($request->wantsJson()) {
-            return new PipelineAuditTrailCollection($logs);
-        }
-
-        return Inertia::render('pipeline-audit-trail/index', [
-            'logs' => new PipelineAuditTrailCollection($logs),
-            'filters' => $request->only([
-                'search',
-                'entity_type',
-                'pipeline_id',
-                'from_state_id',
-                'to_state_id',
-                'performed_by',
-                'start_date',
-                'end_date',
-                'sort_by',
-                'sort_direction',
-            ]),
-        ]);
+        return new PipelineAuditTrailCollection($logs);
     }
 
     /**

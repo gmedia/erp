@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\AccountMappingController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('account-mappings', function () {
-        return Inertia::render('account-mappings/index');
-    })->name('account-mappings')->middleware('permission:account_mapping');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:account_mapping,true')->group(function () {

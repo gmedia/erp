@@ -13,16 +13,9 @@ use App\Http\Resources\AssetDepreciationRuns\AssetDepreciationRunResource;
 use App\Http\Resources\AssetDepreciationRuns\AssetDepreciationLineCollection;
 use App\Models\AssetDepreciationRun;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class AssetDepreciationRunController extends Controller
 {
-    public function index(): Response
-    {
-        return Inertia::render('asset-depreciation-runs/index');
-    }
-
     public function apiIndex(IndexAssetDepreciationRunRequest $request, IndexAssetDepreciationRunsAction $action): JsonResponse
     {
         $runs = $action->execute($request);

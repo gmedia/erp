@@ -6,8 +6,6 @@ use App\Models\FiscalYear;
 use App\Services\FinancialReportService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class ReportController extends Controller
 {
@@ -15,10 +13,9 @@ class ReportController extends Controller
         protected FinancialReportService $reportService
     ) {}
 
-    public function trialBalance(Request $request): Response|JsonResponse
+    public function trialBalance(Request $request): JsonResponse
     {
         $fiscalYears = FiscalYear::orderBy('start_date', 'desc')->get();
-        // Default to latest open fiscal year or just latest
         $currentFiscalYear = $fiscalYears->firstWhere('status', 'open') ?? $fiscalYears->first();
         
         $selectedYearId = $request->input('fiscal_year_id', $currentFiscalYear?->id);
@@ -28,20 +25,14 @@ class ReportController extends Controller
             $report = $this->reportService->getTrialBalance((int) $selectedYearId);
         }
 
-        $data = [
+        return response()->json([
             'fiscalYears' => $fiscalYears,
             'selectedYearId' => (int) $selectedYearId,
             'report' => $report,
-        ];
-
-        if ($request->expectsJson() || $request->is('api/*')) {
-            return response()->json($data);
-        }
-
-        return Inertia::render('reports/trial-balance/index', $data);
+        ]);
     }
 
-    public function balanceSheet(Request $request): Response|JsonResponse
+    public function balanceSheet(Request $request): JsonResponse
     {
         $fiscalYears = FiscalYear::orderBy('start_date', 'desc')->get();
         $currentFiscalYear = $fiscalYears->firstWhere('status', 'open') ?? $fiscalYears->first();
@@ -54,21 +45,15 @@ class ReportController extends Controller
             $report = $this->reportService->getBalanceSheet((int) $selectedYearId, $comparisonYearId ? (int) $comparisonYearId : null);
         }
 
-        $data = [
+        return response()->json([
             'fiscalYears' => $fiscalYears,
             'selectedYearId' => (int) $selectedYearId,
             'comparisonYearId' => $comparisonYearId ? (int) $comparisonYearId : null,
             'report' => $report,
-        ];
-
-        if ($request->expectsJson() || $request->is('api/*')) {
-            return response()->json($data);
-        }
-
-        return Inertia::render('reports/balance-sheet/index', $data);
+        ]);
     }
 
-    public function incomeStatement(Request $request): Response|JsonResponse
+    public function incomeStatement(Request $request): JsonResponse
     {
         $fiscalYears = FiscalYear::orderBy('start_date', 'desc')->get();
         $currentFiscalYear = $fiscalYears->firstWhere('status', 'open') ?? $fiscalYears->first();
@@ -81,21 +66,15 @@ class ReportController extends Controller
             $report = $this->reportService->getIncomeStatement((int) $selectedYearId, $comparisonYearId ? (int) $comparisonYearId : null);
         }
 
-        $data = [
+        return response()->json([
             'fiscalYears' => $fiscalYears,
             'selectedYearId' => (int) $selectedYearId,
             'comparisonYearId' => $comparisonYearId ? (int) $comparisonYearId : null,
             'report' => $report,
-        ];
-
-        if ($request->expectsJson() || $request->is('api/*')) {
-            return response()->json($data);
-        }
-
-        return Inertia::render('reports/income-statement/index', $data);
+        ]);
     }
 
-    public function cashFlow(Request $request): Response|JsonResponse
+    public function cashFlow(Request $request): JsonResponse
     {
         $fiscalYears = FiscalYear::orderBy('start_date', 'desc')->get();
         $currentFiscalYear = $fiscalYears->firstWhere('status', 'open') ?? $fiscalYears->first();
@@ -107,20 +86,14 @@ class ReportController extends Controller
             $report = $this->reportService->getCashFlow((int) $selectedYearId);
         }
 
-        $data = [
+        return response()->json([
             'fiscalYears' => $fiscalYears,
             'selectedYearId' => (int) $selectedYearId,
             'report' => $report,
-        ];
-
-        if ($request->expectsJson() || $request->is('api/*')) {
-            return response()->json($data);
-        }
-
-        return Inertia::render('reports/cash-flow/index', $data);
+        ]);
     }
 
-    public function comparative(Request $request): Response|JsonResponse
+    public function comparative(Request $request): JsonResponse
     {
         $fiscalYears = FiscalYear::orderBy('start_date', 'desc')->get();
         $currentFiscalYear = $fiscalYears->firstWhere('status', 'open') ?? $fiscalYears->first();
@@ -140,17 +113,11 @@ class ReportController extends Controller
             $report = $this->reportService->getComparativeReport($selectedYearId, $comparisonYearId ? (int) $comparisonYearId : null);
         }
 
-        $data = [
+        return response()->json([
             'fiscalYears' => $fiscalYears,
             'selectedYearId' => $selectedYearId,
             'comparisonYearId' => $comparisonYearId ? (int) $comparisonYearId : null,
             'report' => $report,
-        ];
-
-        if ($request->expectsJson() || $request->is('api/*')) {
-            return response()->json($data);
-        }
-
-        return Inertia::render('reports/comparative/index', $data);
+        ]);
     }
 }

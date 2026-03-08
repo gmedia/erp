@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\AssetMovementController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('asset-movements', function () {
-        return Inertia::render('asset-movements/index');
-    })->name('asset-movements')->middleware('permission:asset_movement');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:asset_movement,true')->group(function () {

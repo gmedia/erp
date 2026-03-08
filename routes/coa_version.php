@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\CoaVersionController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('coa-versions', function () {
-        return Inertia::render('coa-versions/index');
-    })->name('coa-versions')->middleware('permission:coa_version');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:coa_version,true')->group(function () {

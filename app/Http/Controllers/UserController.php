@@ -8,8 +8,6 @@ use App\Http\Resources\Users\UserResource;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 
 /**
  * Controller for user management operations.
@@ -18,16 +16,6 @@ use Inertia\Response;
  */
 class UserController extends Controller
 {
-    /**
-     * Display the users management page.
-     *
-     * @return \Inertia\Response
-     */
-    public function index(): Response
-    {
-        return Inertia::render('users/index');
-    }
-
     /**
      * Get users for API dropdowns
      *

@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\ApprovalDelegationController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('approval-delegations', function () {
-        return Inertia::render('approval-delegations/index');
-    })->name('approval-delegations')->middleware('permission:approval_delegation');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:approval_delegation,true')->group(function () {

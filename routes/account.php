@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('accounts', function () {
-        return Inertia::render('accounts/index');
-    })->name('accounts')->middleware('permission:account');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:account,true')->group(function () {

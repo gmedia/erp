@@ -6,7 +6,6 @@ use App\Models\PipelineState;
 use App\Models\PipelineStateLog;
 use App\Models\PipelineTransition;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Inertia\Testing\AssertableInertia as Assert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;

@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\AssetCategoryController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('asset-categories', function () {
-        return Inertia::render('asset-categories/index');
-    })->name('asset-categories')->middleware('permission:asset_category');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:asset_category,true')->group(function () {

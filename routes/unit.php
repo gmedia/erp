@@ -2,15 +2,8 @@
 
 use App\Http\Controllers\UnitController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 // Frontend route
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('units', function () {
-        return Inertia::render('units/index');
-    })->name('units')->middleware('permission:unit');
-});
-
 // API routes
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:unit,true')->group(function () {

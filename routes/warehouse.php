@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('warehouses', function () {
-        return Inertia::render('warehouses/index');
-    })->name('warehouses')->middleware('permission:warehouse');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:warehouse,true')->group(function () {

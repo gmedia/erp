@@ -8,32 +8,17 @@ use App\Http\Requests\Reports\ExportBookValueDepreciationRequest;
 use App\Http\Requests\Reports\IndexBookValueDepreciationRequest;
 use App\Http\Resources\Reports\BookValueDepreciationCollection;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class BookValueDepreciationReportController extends Controller
 {
     /**
      * Display the Book Value & Depreciation report.
      */
-    public function index(IndexBookValueDepreciationRequest $request, IndexBookValueDepreciationReportAction $action): Response|BookValueDepreciationCollection
+    public function index(IndexBookValueDepreciationRequest $request, IndexBookValueDepreciationReportAction $action): BookValueDepreciationCollection
     {
         $assets = $action->execute($request);
 
-        if ($request->wantsJson()) {
-            return new BookValueDepreciationCollection($assets);
-        }
-
-        return Inertia::render('reports/book-value-depreciation/index', [
-            'assets' => new BookValueDepreciationCollection($assets),
-            'filters' => $request->only([
-                'search',
-                'asset_category_id',
-                'branch_id',
-                'sort_by',
-                'sort_direction',
-            ]),
-        ]);
+        return new BookValueDepreciationCollection($assets);
     }
 
     /**

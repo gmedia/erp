@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\AssetModelController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('asset-models', function () {
-        return Inertia::render('asset-models/index');
-    })->name('asset-models')->middleware('permission:asset_model');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:asset_model,true')->group(function () {

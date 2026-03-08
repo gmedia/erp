@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Permission;
-use Inertia\Inertia;
-use Inertia\Response;
 
 /**
  * Controller for permission management operations.
@@ -18,8 +16,6 @@ class PermissionController extends Controller
      *
      * Returns all permissions for the permission management interface.
      * Ordered by name for better readability.
-     *
-     * @return \Inertia\Response
      */
     public function index(): \Illuminate\Http\JsonResponse
     {

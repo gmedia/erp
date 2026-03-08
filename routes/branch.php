@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\BranchController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('branches', function () {
-        return Inertia::render('branches/index');
-    })->name('branches')->middleware('permission:branch');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:branch,true')->group(function () {

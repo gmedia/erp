@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\PositionController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('positions', function () {
-        return Inertia::render('positions/index');
-    })->name('positions')->middleware('permission:position');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:position,true')->group(function () {

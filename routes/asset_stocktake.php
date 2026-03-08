@@ -3,26 +3,7 @@
 use App\Http\Controllers\AssetStocktakeController;
 use App\Http\Controllers\AssetStocktakeItemController;
 use App\Http\Controllers\AssetStocktakeVarianceController;
-use App\Models\AssetStocktake;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('asset-stocktakes', function () {
-        return Inertia::render('asset-stocktakes/index');
-    })->name('asset-stocktakes')->middleware('permission:asset_stocktake');
-
-    Route::get('asset-stocktake-variances', [AssetStocktakeVarianceController::class, 'page'])
-        ->name('asset-stocktake-variances')
-        ->middleware('permission:asset_stocktake');
-
-    Route::get('asset-stocktakes/{asset_stocktake_ulid}/perform', function (AssetStocktake $asset_stocktake_ulid) {
-        $asset_stocktake_ulid->load('branch');
-        return Inertia::render('asset-stocktakes/perform', [
-            'stocktake' => $asset_stocktake_ulid
-        ]);
-    })->name('asset-stocktakes.perform')->middleware('permission:asset_stocktake.edit,true');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:asset_stocktake,true')->group(function () {

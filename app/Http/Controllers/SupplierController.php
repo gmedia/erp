@@ -17,8 +17,6 @@ use App\Http\Resources\Suppliers\SupplierResource;
 use App\Models\Supplier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class SupplierController extends Controller
 {

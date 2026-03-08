@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\AssetLocationController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('asset-locations', function () {
-        return Inertia::render('asset-locations/index');
-    })->name('asset-locations')->middleware('permission:asset_location');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:asset_location,true')->group(function () {

@@ -3,13 +3,6 @@
 use App\Http\Controllers\InventoryStocktakeController;
 use App\Http\Controllers\InventoryStocktakeItemController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('inventory-stocktakes', function () {
-        return Inertia::render('inventory-stocktakes/index');
-    })->name('inventory-stocktakes')->middleware('permission:inventory_stocktake');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:inventory_stocktake,true')->group(function () {

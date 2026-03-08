@@ -15,12 +15,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class AssetMovementController extends Controller
 {
-    public function index(Request $request, AssetMovementFilterService $filterService): Response|AnonymousResourceCollection
+    public function index(Request $request, AssetMovementFilterService $filterService): AnonymousResourceCollection
     {
         $query = AssetMovement::with([
             'asset',
@@ -50,14 +48,7 @@ class AssetMovementController extends Controller
 
         $movements = $query->paginate($request->integer('per_page', 15));
 
-        if ($request->wantsJson()) {
-            return AssetMovementResource::collection($movements);
-        }
-
-        return Inertia::render('asset-movements/index', [
-            'movements' => AssetMovementResource::collection($movements),
-            'filters' => $request->all(),
-        ]);
+        return AssetMovementResource::collection($movements);
     }
 
     public function show(AssetMovement $asset_movement): JsonResponse

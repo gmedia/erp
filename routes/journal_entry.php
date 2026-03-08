@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\JournalEntryController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('journal-entries', function () {
-        return Inertia::render('journal-entries/index');
-    })->name('journal-entries')->middleware('permission:journal_entry');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:journal_entry,true')->group(function () {

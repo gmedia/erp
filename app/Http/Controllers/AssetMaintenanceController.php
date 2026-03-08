@@ -8,38 +8,14 @@ use App\Http\Requests\AssetMaintenances\{ExportAssetMaintenanceRequest, IndexAss
 use App\Http\Resources\AssetMaintenances\{AssetMaintenanceCollection, AssetMaintenanceResource};
 use App\Models\AssetMaintenance;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class AssetMaintenanceController extends Controller
 {
-    public function index(IndexAssetMaintenanceRequest $request, IndexAssetMaintenancesAction $action): Response|AssetMaintenanceCollection
+    public function index(IndexAssetMaintenanceRequest $request, IndexAssetMaintenancesAction $action): AssetMaintenanceCollection
     {
         $maintenances = $action->execute($request);
 
-        if ($request->wantsJson()) {
-            return new AssetMaintenanceCollection($maintenances);
-        }
-
-        return Inertia::render('asset-maintenances/index', [
-            'asset_maintenances' => new AssetMaintenanceCollection($maintenances),
-            'filters' => $request->only([
-                'search',
-                'asset_id',
-                'maintenance_type',
-                'status',
-                'supplier_id',
-                'created_by',
-                'scheduled_from',
-                'scheduled_to',
-                'performed_from',
-                'performed_to',
-                'cost_min',
-                'cost_max',
-                'sort_by',
-                'sort_direction',
-            ]),
-        ]);
+        return new AssetMaintenanceCollection($maintenances);
     }
 
     public function store(StoreAssetMaintenanceRequest $request): JsonResponse

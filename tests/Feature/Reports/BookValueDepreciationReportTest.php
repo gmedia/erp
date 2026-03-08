@@ -5,7 +5,6 @@ use App\Models\AssetCategory;
 use App\Models\Branch;
 use App\Models\User;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Inertia\Testing\AssertableInertia as Assert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;

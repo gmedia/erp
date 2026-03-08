@@ -2,15 +2,8 @@
 
 use App\Http\Controllers\ProductCategoryController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 // Frontend route
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('product-categories', function () {
-        return Inertia::render('product-categories/index');
-    })->name('product-categories')->middleware('permission:product_category');
-});
-
 // API routes
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:product_category,true')->group(function () {

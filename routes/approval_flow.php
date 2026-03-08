@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\ApprovalFlowController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('approval-flows', function () {
-        return Inertia::render('approval-flows/index');
-    })->name('approval-flows')->middleware('permission:approval_flow');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:approval_flow,true')->group(function () {

@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\DepartmentController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('departments', function () {
-        return Inertia::render('departments/index');
-    })->name('departments')->middleware('permission:department');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:department,true')->group(function () {

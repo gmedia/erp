@@ -8,23 +8,14 @@ use App\Http\Resources\Assets\{AssetResource, AssetCollection};
 use App\DTOs\Assets\UpdateAssetData;
 use App\Models\{Asset, AssetMovement};
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class AssetController extends Controller
 {
-    public function index(IndexAssetRequest $request, IndexAssetsAction $action): Response|AssetCollection
+    public function index(IndexAssetRequest $request, IndexAssetsAction $action): AssetCollection
     {
         $assets = $action->execute($request);
 
-        if ($request->wantsJson()) {
-            return new AssetCollection($assets);
-        }
-
-        return Inertia::render('assets/index', [
-            'assets' => new AssetCollection($assets),
-            'filters' => $request->only(['search', 'asset_category_id', 'asset_model_id', 'branch_id', 'asset_location_id', 'department_id', 'employee_id', 'status', 'condition', 'sort_by', 'sort_direction']),
-        ]);
+        return new AssetCollection($assets);
     }
 
     public function store(StoreAssetRequest $request): JsonResponse
@@ -54,7 +45,7 @@ class AssetController extends Controller
         return new AssetResource($asset->load(['category', 'model', 'branch', 'location', 'department', 'employee', 'supplier']));
     }
 
-    public function profile(Asset $asset): Response|JsonResponse
+    public function profile(Asset $asset): JsonResponse
     {
         $asset->load([
             'category',
@@ -78,16 +69,10 @@ class AssetController extends Controller
             'depreciationLines.run.fiscalYear',
         ]);
 
-        if (request()->expectsJson() || request()->wantsJson()) {
-            return response()->json([
-                'asset' => [
-                    'data' => new AssetResource($asset),
-                ],
-            ]);
-        }
-
-        return Inertia::render('assets/profile', [
-            'asset' => new AssetResource($asset),
+        return response()->json([
+            'asset' => [
+                'data' => new AssetResource($asset),
+            ],
         ]);
     }
 

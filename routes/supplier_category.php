@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\SupplierCategoryController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('supplier-categories', function () {
-        return Inertia::render('supplier-categories/index');
-    })->name('supplier-categories')->middleware('permission:supplier_category');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:supplier_category,true')->group(function () {

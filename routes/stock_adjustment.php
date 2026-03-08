@@ -3,13 +3,6 @@
 use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\StockAdjustmentItemController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('stock-adjustments', function () {
-        return Inertia::render('stock-adjustments/index');
-    })->name('stock-adjustments')->middleware('permission:stock_adjustment');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:stock_adjustment,true')->group(function () {

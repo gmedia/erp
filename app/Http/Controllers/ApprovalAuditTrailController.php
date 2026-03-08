@@ -8,35 +8,17 @@ use App\Http\Requests\ApprovalAuditTrail\ExportApprovalAuditTrailRequest;
 use App\Http\Requests\ApprovalAuditTrail\IndexApprovalAuditTrailRequest;
 use App\Http\Resources\ApprovalAuditTrail\ApprovalAuditTrailCollection;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class ApprovalAuditTrailController extends Controller
 {
     /**
      * Display the Approval Audit Trail page.
      */
-    public function index(IndexApprovalAuditTrailRequest $request, IndexApprovalAuditTrailAction $action): Response|ApprovalAuditTrailCollection
+    public function index(IndexApprovalAuditTrailRequest $request, IndexApprovalAuditTrailAction $action): ApprovalAuditTrailCollection
     {
         $logs = $action->execute($request);
 
-        if ($request->wantsJson()) {
-            return new ApprovalAuditTrailCollection($logs);
-        }
-
-        return Inertia::render('approval-audit-trail/index', [
-            'logs' => new ApprovalAuditTrailCollection($logs),
-            'filters' => $request->only([
-                'search',
-                'approvable_type',
-                'event',
-                'actor_user_id',
-                'start_date',
-                'end_date',
-                'sort_by',
-                'sort_direction',
-            ]),
-        ]);
+        return new ApprovalAuditTrailCollection($logs);
     }
 
     /**

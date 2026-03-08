@@ -3,13 +3,6 @@
 use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\StockTransferItemController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('stock-transfers', function () {
-        return Inertia::render('stock-transfers/index');
-    })->name('stock-transfers')->middleware('permission:stock_transfer');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:stock_transfer,true')->group(function () {

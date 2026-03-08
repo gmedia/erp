@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\EmployeeController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('employees', function () {
-        return Inertia::render('employees/index');
-    })->name('employees')->middleware('permission:employee');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:employee,true')->group(function () {

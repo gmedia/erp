@@ -2,13 +2,6 @@
 
 use App\Http\Controllers\CustomerCategoryController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('customer-categories', function () {
-        return Inertia::render('customer-categories/index');
-    })->name('customer-categories')->middleware('permission:customer_category');
-});
 
 Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
     Route::middleware('permission:customer_category,true')->group(function () {

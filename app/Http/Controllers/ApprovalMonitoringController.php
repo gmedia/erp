@@ -5,19 +5,9 @@ namespace App\Http\Controllers;
 use App\Actions\ApprovalMonitoring\GetApprovalMonitoringDataAction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class ApprovalMonitoringController extends Controller
 {
-    /**
-     * Display the Approval Monitoring dashboard.
-     */
-    public function index(): Response
-    {
-        return Inertia::render('approval-monitoring/index');
-    }
-
     /**
      * Get aggregate and overdue data for the dashboard.
      */
