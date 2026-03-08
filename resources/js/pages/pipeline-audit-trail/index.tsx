@@ -43,7 +43,7 @@ export default function PipelineAuditTrail() {
     });
 
     const { data, isLoading, meta } = useCrudQuery<PipelineAuditTrailItem>({
-        endpoint: '/pipeline-audit-trail', // Using the web route, it accepts JSON via wantsJson()
+        endpoint: '/api/pipeline-audit-trail', // Fetching JSON from API
         queryKey: ['pipeline-audit-trail'],
         entityName: 'Pipeline Audit Trail',
         pagination,
