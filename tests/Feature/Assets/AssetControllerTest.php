@@ -19,7 +19,7 @@ uses(RefreshDatabase::class)->group('assets');
 
 beforeEach(function () {
     $user = createTestUserWithPermissions(['asset', 'asset.create', 'asset.edit', 'asset.delete']);
-    actingAs($user);
+    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 });
 
 test('it returns asset index', function () {

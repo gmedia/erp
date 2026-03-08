@@ -13,7 +13,7 @@ uses(RefreshDatabase::class)->group('assets');
 
 beforeEach(function () {
     $user = createTestUserWithPermissions(['asset', 'asset_profile', 'asset_movement']);
-    actingAs($user);
+    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
     
     FiscalYear::factory()->create(['status' => 'open']);
 });
@@ -21,8 +21,8 @@ beforeEach(function () {
 test('asset profile page returns correct data', function () {
     $asset = Asset::factory()->create();
 
-    // The route for profile is /assets/{asset}, not api/assets/{asset}/profile
-    $response = get("/assets/{$asset->ulid}");
+    // The route for profile is /api/assets/{asset}/profile
+    $response = getJson("/api/assets/{$asset->ulid}/profile");
 
     $response->assertStatus(200);
 });

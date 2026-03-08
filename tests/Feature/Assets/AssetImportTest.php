@@ -17,7 +17,7 @@ uses(RefreshDatabase::class)->group('assets');
 beforeEach(function () {
     // Create user with necessary permissions
     $this->user = createTestUserWithPermissions(['asset', 'asset.create']);
-    actingAs($this->user);
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
 
     $this->category = AssetCategory::factory()->create(['name' => 'IT Equipment']);
     $this->model = AssetModel::factory()->create(['model_name' => 'MacBook Pro', 'asset_category_id' => $this->category->id]);
