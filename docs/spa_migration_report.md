@@ -1,6 +1,6 @@
 # Summary Report: Migrasi Laravel + Inertia -> Laravel + React Full SPA
 
-Laporan ini berisi ringkasan perubahan pada branch `main` yang unggul 33 commit dibandingkan `origin/main`. Fokus utama dari perubahan ini adalah transisi arsitektur dari monolith (Laravel + Inertia) menjadi arsitektur *Full Single Page Application* (SPA) menggunakan Laravel API murni di sisi backend dan React SPA di sisi frontend.
+Laporan ini berisi ringkasan perubahan pada branch `main` yang unggul 39 commit dibandingkan `origin/main`. Fokus utama dari perubahan ini adalah transisi arsitektur dari monolith (Laravel + Inertia) menjadi arsitektur *Full Single Page Application* (SPA) menggunakan Laravel API murni di sisi backend dan React SPA di sisi frontend.
 
 ## 1. Perubahan Arsitektur & Teknologi Utama
 - **Penghapusan Inertia.js:** Ketergantungan pada Inertia.js telah dihilangkan sepenuhnya baik dari komponen React maupun controller Laravel.
@@ -22,6 +22,7 @@ Laporan ini berisi ringkasan perubahan pada branch `main` yang unggul 33 commit 
 ## 4. Testing End-to-End (E2E) dan QA
 - **Skenario API Playwright:** Tes E2E telah diselaraskan dengan mekanisme terbaru, yaitu menggunakan inject *Bearer token* ke _local storage_ browser pada proses *beforeEach* alih-alih melakukan manipulasi session XSRF.
 - **Explicit API Waits:** Diperbaruinya berbagai *helpers* Playwright untuk secara eksplisit melakukan *await* terhadap response dari JSON endpoint backend guna mencegah instabilitas tes (contoh pada alur edit/import di `Inventory Stocktake` dan eksekusi filter `Admin Settings`).
+- **Refactoring Feature Test (Backend):** Seluruh pengujian fitur (Pest/PHPUnit) telah diperbarui untuk mensimulasikan otentikasi API menggunakan Laravel Sanctum (`Sanctum::actingAs`), menggantikan basis sesi standar (`actingAs`). Asersi Inertia (`assertInertia`) diganti sepenuhnya dengan asersi JSON API (seperti `assertJson`, `assertJsonStructure`, `assertOk`) untuk memvalidasi API *responses* secara langsung.
 
 ---
 
@@ -29,6 +30,12 @@ Laporan ini berisi ringkasan perubahan pada branch `main` yang unggul 33 commit 
 
 Berikut adalah daftar Commit ID dan Pesan terkait migrasi ini:
 
+- `feb7c9d` feat: Add test output file and update various feature tests, a controller, and a request file.
+- `377dd90` refactor: Update feature tests to use Sanctum for API authentication and JSON assertions instead of Inertia-specific checks.
+- `077148f` Refactor authentication feature tests for SPA migration, updating password reset and email verification tests to use API endpoints and removing several UI-based authentication tests.
+- `b4e179b` refactor: Update asset feature tests to use Sanctum authentication and API routes.
+- `cb248a2` refactor: Update feature tests to use API endpoints with Sanctum authentication and JSON assertions instead of Inertia page assertions.
+- `fe3c78e` feat: Add a comprehensive report detailing the migration from Laravel+Inertia to a Laravel API + React Full SPA architecture.
 - `5061def` refactor: Update E2E tests to use Bearer token authentication instead of XSRF-TOKEN and add an e2e test output file.
 - `8f7842f` feat: Introduce API endpoints for approval audit trail and adjust frontend to use the new API route.
 - `ab44cce` feat: Add API routes for pipeline audit trail and update frontend to fetch data from the new API endpoint.
