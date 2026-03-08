@@ -72,9 +72,10 @@ test('can fetch approval monitoring data', function () {
         'completed_at' => now(),
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*'])
-        ->getJson(route('api.approval-monitoring.data'))
-        ->assertOk()
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $response = getJson('/api/approval-monitoring/data');
+    
+    $response->assertOk()
         ->assertJsonStructure([
             'summary' => [
                 'total_pending',
@@ -100,9 +101,9 @@ test('can fetch approval monitoring data', function () {
         ->assertJsonPath('summary.avg_processing_time_hours', 48); // 2 days diff
         
     // Verify our single overdue request is returned
-    $response = getJson(route('api.approval-monitoring.data'))->json();
-    expect($response['overdue_approvals'])->toHaveCount(1);
-    expect($response['overdue_approvals'][0]['document_type'])->toBe('Asset');
+    $responseJson = getJson('/api/approval-monitoring/data')->json();
+    expect($responseJson['overdue_approvals'])->toHaveCount(1);
+    expect($responseJson['overdue_approvals'][0]['document_type'])->toBe('Asset');
 });
 
 test('can filter overdue approvals by document type', function () {
@@ -146,13 +147,11 @@ test('can filter overdue approvals by document type', function () {
     ]);
     
     // Request without filter
-    $responseAll = getJson(route('api.approval-monitoring.data'))->json();
+    $responseAll = getJson('/api/approval-monitoring/data')->json();
     expect($responseAll['overdue_approvals'])->toHaveCount(2);
     
     // Request with filter for PurchaseRequest
-    $responseFilter = getJson(route('api.approval-monitoring.data', [
-        'document_type' => Asset::class
-    ]))->json();
+    $responseFilter = getJson('/api/approval-monitoring/data?document_type=' . urlencode(Asset::class))->json();
     
     expect($responseFilter['overdue_approvals'])->toHaveCount(1);
     expect($responseFilter['overdue_approvals'][0]['document_type'])->toBe('Asset');

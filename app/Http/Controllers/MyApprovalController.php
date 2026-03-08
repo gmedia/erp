@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\ApprovalAuditLog;
@@ -50,7 +50,7 @@ class MyApprovalController extends Controller
             })
             ->get();
 
-        return Inertia::render('my-approvals/index', [
+        return response()->json([
             'pending' => $pending,
             'approved' => $approvedByMe,
             'rejected' => $rejectedByMe,
@@ -110,7 +110,7 @@ class MyApprovalController extends Controller
             }
         });
 
-        return back()->with('success', 'Request approved successfully.');
+        return response()->json(['message' => 'Request approved successfully.']);
     }
 
     public function reject(Request $request, ApprovalRequest $approvalRequest)
@@ -146,6 +146,6 @@ class MyApprovalController extends Controller
             ]);
         });
 
-        return back()->with('success', 'Request rejected.');
+        return response()->json(['message' => 'Request rejected.']);
     }
 }

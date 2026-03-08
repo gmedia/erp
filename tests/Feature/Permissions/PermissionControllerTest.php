@@ -31,7 +31,7 @@ describe('Permission Page Access', function () {
         $response = getJson('/api/permissions');
 
         $response->assertOk()
-            ->assertJsonStructure(['data' => ['*' => ['id', 'name', 'display_name']]]);
+            ->assertJsonStructure(['*' => ['id', 'name', 'display_name']]);
     });
 
     test('permissions page returns all permissions ordered by id', function () {
@@ -46,10 +46,10 @@ describe('Permission Page Access', function () {
         $response = getJson('/api/permissions');
 
         $response->assertOk()
-            ->assertJsonStructure(['data' => ['*' => ['id', 'name', 'display_name']]]);
+            ->assertJsonStructure(['*' => ['id', 'name', 'display_name']]);
 
         // Verify permissions are returned with required fields
-        $permissions = $response->json('data');
+        $permissions = $response->json();
         expect($permissions)->toBeArray()
             ->and(count($permissions))->toBeGreaterThanOrEqual(4); // 3 test + 1 for user access
 

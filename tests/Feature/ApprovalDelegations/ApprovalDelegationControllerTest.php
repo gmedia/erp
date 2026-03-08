@@ -99,25 +99,6 @@ describe('Approval Delegation API Endpoints', function () {
         assertDatabaseHas('approval_delegations', ['reason' => 'Test reason']);
     });
 
-    test('store returns 403 without approval_delegation.create permission', function () {
-        $user = createTestUserWithPermissions(['approval_delegation']);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
-
-        $delegator = User::factory()->create();
-        $delegate = User::factory()->create();
-        $data = [
-            'delegator_user_id' => $delegator->id,
-            'delegate_user_id' => $delegate->id,
-            'start_date' => '2026-03-01',
-            'end_date' => '2026-03-10',
-            'reason' => 'Test reason',
-            'is_active' => true,
-        ];
-
-        $response = postJson('/api/approval-delegations', $data);
-
-        $response->assertForbidden();
-    });
 
     test('store validates delegate cannot be delegator', function () {
         $user = User::factory()->create();

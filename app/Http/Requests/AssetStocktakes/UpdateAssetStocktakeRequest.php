@@ -22,8 +22,8 @@ class UpdateAssetStocktakeRequest extends FormRequest
                 'string',
                 'max:255',
                 Rule::unique('asset_stocktakes')->where(function ($query) {
-                    return $query->where('branch_id', $this->branch_id ?? $this->route('assetStocktake')->branch_id);
-                })->ignore($this->route('assetStocktake')),
+                    return $query->where('branch_id', $this->branch_id ?? $this->route('asset_stocktake')->branch_id);
+                })->ignore($this->route('asset_stocktake')),
             ],
             'planned_at' => ['sometimes', 'required', 'date'],
             'performed_at' => ['nullable', 'date'],

@@ -18,7 +18,7 @@ test('login endpoint is available', function () {
 test('users can authenticate using the login endpoint', function () {
     $user = User::factory()->create();
 
-    $response = postJson('/api/login', [
+    $response = $this->postJson('/api/login', [
         'email' => $user->email,
         'password' => 'password',
     ]);
@@ -35,7 +35,7 @@ test('users can authenticate using the login endpoint', function () {
 test('users can not authenticate with invalid password', function () {
     $user = User::factory()->create();
 
-    $response = postJson('/api/login', [
+    $response = $this->postJson('/api/login', [
         'email' => $user->email,
         'password' => 'wrong-password',
     ]);

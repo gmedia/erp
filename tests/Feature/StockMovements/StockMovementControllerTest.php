@@ -15,8 +15,8 @@ beforeEach(function () {
 });
 
 test('it requires permission to access stock movements', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->otherUser, ['*'])
-        ->getJson('/api/stock-movements')
+    \Laravel\Sanctum\Sanctum::actingAs($this->otherUser, ['*']);
+    getJson('/api/stock-movements')
         ->assertForbidden();
 });
 
@@ -101,8 +101,8 @@ test('it can sort by product name', function () {
     StockMovement::factory()->create(['product_id' => $pB->id, 'warehouse_id' => $w->id, 'moved_at' => '2026-01-01 00:00:00']);
     StockMovement::factory()->create(['product_id' => $pA->id, 'warehouse_id' => $w->id, 'moved_at' => '2026-01-01 00:00:00']);
 
-    $response = \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*'])
-        ->getJson('/api/stock-movements?sort_by=product_name&sort_direction=asc')
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $response = getJson('/api/stock-movements?sort_by=product_name&sort_direction=asc')
         ->assertOk();
 
     expect($response->json('data.0.product.name'))->toBe('AAA');

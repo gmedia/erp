@@ -55,16 +55,16 @@ beforeEach(function () {
 });
 
 test('it requires permission to access the audit trail', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->otherUser, ['*'])
-        ->getJson('/api/pipeline-audit-trail')
+    \Laravel\Sanctum\Sanctum::actingAs($this->otherUser, ['*']);
+    $this->getJson('/api/pipeline-audit-trail')
         ->assertForbidden();
 });
 
 
 
 test('it can fetch audit trail data via json', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*'])
-        ->getJson('/api/pipeline-audit-trail')
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/pipeline-audit-trail')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
             ->has('data', 1)
@@ -115,36 +115,36 @@ test('it can filter the report by various parameters', function () {
     ]);
 
     // Filter by pipeline
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*'])
-        ->getJson('/api/pipeline-audit-trail?pipeline_id=' . $this->pipeline->id)
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/pipeline-audit-trail?pipeline_id=' . $this->pipeline->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.pipeline_name', 'Sales Pipeline');
 
     // Filter by entity type
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*'])
-        ->getJson('/api/pipeline-audit-trail?entity_type=Ticket')
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/pipeline-audit-trail?entity_type=Ticket')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.entity_type_short', 'Ticket');
         
     // Filter by performed by
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*'])
-        ->getJson('/api/pipeline-audit-trail?performed_by=' . $this->otherUser->id)
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/pipeline-audit-trail?performed_by=' . $this->otherUser->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.performed_by_name', $this->otherUser->name);
         
     // Filter by search term
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*'])
-        ->getJson('/api/pipeline-audit-trail?search=email')
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/pipeline-audit-trail?search=email')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.comment', 'Created via email');
 
     // Filter by date range
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*'])
-        ->getJson('/api/pipeline-audit-trail?start_date=2025-12-01&end_date=2026-12-31')
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/pipeline-audit-trail?start_date=2025-12-01&end_date=2026-12-31')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.entity_type_short', 'Ticket'); // 1st log is from 2025-01-01
@@ -155,8 +155,8 @@ test('it can export the audit trail data to excel', function () {
     Excel::fake();
     Storage::fake('public');
 
-    $response = \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*'])
-        ->postJson('/api/pipeline-audit-trail/export')
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $response = $this->postJson('/api/pipeline-audit-trail/export')
         ->assertOk()
         ->assertJsonStructure(['url', 'filename']);
 

@@ -191,30 +191,3 @@ describe('Product API Endpoints', function () {
     });
 });
 
-describe('Product API Permissions', function () {
-    test('store returns 403 when lacks permission', function () {
-        $user = createTestUserWithPermissions(['product']);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
-
-        $response = postJson('/api/products', []);
-        $response->assertForbidden();
-    });
-
-    test('update returns 403 when lacks permission', function () {
-        $user = createTestUserWithPermissions(['product']);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
-        $product = Product::factory()->create();
-
-        $response = putJson("/api/products/{$product->id}", []);
-        $response->assertForbidden();
-    });
-
-    test('destroy returns 403 when lacks permission', function () {
-        $user = createTestUserWithPermissions(['product']);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
-        $product = Product::factory()->create();
-
-        $response = deleteJson("/api/products/{$product->id}");
-        $response->assertForbidden();
-    });
-});

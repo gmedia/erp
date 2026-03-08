@@ -17,8 +17,8 @@ beforeEach(function () {
 });
 
 test('it requires permission to access stock monitor', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->otherUser, ['*'])
-        ->getJson('/api/stock-monitor')
+    \Laravel\Sanctum\Sanctum::actingAs($this->otherUser, ['*']);
+    getJson('/api/stock-monitor')
         ->assertForbidden();
 });
 
