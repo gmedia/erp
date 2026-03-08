@@ -8,10 +8,11 @@ let assetName: string | null = null;
 async function setupPipelineViaApi(page: Page) {
   const cookies = await page.context().cookies();
   const xsrfTokenCookie = cookies.find(c => c.name === 'XSRF-TOKEN');
-  const xsrfToken = decodeURIComponent(xsrfTokenCookie?.value || '');
+  const apiToken = await page.evaluate(() => localStorage.getItem('api_token'));
   const headers = { 
     'Accept': 'application/json',
-    'X-XSRF-TOKEN': xsrfToken
+    'X-Requested-With': 'XMLHttpRequest',
+    'Authorization': `Bearer ${apiToken}`
   };
 
   // 0. Clean up existing pipelines for Asset to avoid shadowing

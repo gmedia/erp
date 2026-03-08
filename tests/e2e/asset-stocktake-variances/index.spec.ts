@@ -9,7 +9,7 @@ test.describe('Asset Stocktake Variance Report E2E', () => {
 
     test('it can view the variance dashboard and filter data', async ({ page }) => {
         // Go to variance report page
-        await page.goto('/asset-stocktake-variances');
+        await page.goto('/reports/asset-stocktake-variances');
         
         // Ensure page loaded properly
         // Data table should be visible
