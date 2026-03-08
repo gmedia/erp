@@ -19,8 +19,8 @@ test('factory creates a valid employee', function () {
         'department_id' => $employee->department_id,
         'position_id' => $employee->position_id,
         'branch_id' => $employee->branch_id,
-        'salary' => $employee->salary,
-        'hire_date' => $employee->hire_date,
+        'salary' => $employee->getRawOriginal('salary'),
+        'hire_date' => $employee->getRawOriginal('hire_date'),
     ]);
 });
 
