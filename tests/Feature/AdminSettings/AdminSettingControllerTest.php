@@ -13,65 +13,75 @@ beforeEach(function () {
 });
 
 describe('AdminSettingController@index', function () {
-    test('unauthenticated user is redirected to login', function () {
-        $response = $this->get(route('admin-settings.index'));
-        $response->assertRedirect(route('login'));
+    test('unauthenticated user is returned 401', function () {
+        $response = $this->getJson('/api/admin-settings');
+        $response->assertStatus(401);
     });
 
     test('user without permission gets 403', function () {
         $user = createTestUserWithPermissions([]);
 
-        $response = $this->actingAs($user)->get(route('admin-settings.index'));
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->getJson('/api/admin-settings');
         $response->assertStatus(403);
     });
 
     test('user with admin_setting permission can view settings', function () {
         $user = createTestUserWithPermissions(['admin_setting']);
 
-        $response = $this->actingAs($user)->get(route('admin-settings.index'));
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->getJson('/api/admin-settings');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => $page
-            ->component('admin-settings/index')
-            ->has('settings')
-            ->has('settings.general')
-            ->has('settings.regional')
-        );
+        $response->assertJsonStructure([
+            'data' => [
+                'general',
+                'regional'
+            ]
+        ]);
     });
 
     test('index returns grouped settings with correct keys', function () {
         $user = createTestUserWithPermissions(['admin_setting']);
 
-        $response = $this->actingAs($user)->get(route('admin-settings.index'));
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->getJson('/api/admin-settings');
 
-        $response->assertInertia(fn ($page) => $page
-            ->has('settings.general.company_name')
-            ->has('settings.general.company_address')
-            ->has('settings.general.company_phone')
-            ->has('settings.general.company_email')
-            ->has('settings.general.company_logo_path')
-            ->has('settings.general.company_logo_url')
-            ->has('settings.regional.timezone')
-            ->has('settings.regional.currency')
-            ->has('settings.regional.date_format')
-            ->has('settings.regional.number_format_decimal')
-            ->has('settings.regional.number_format_thousand')
-        );
+        $response->assertJsonStructure([
+            'data' => [
+                'general' => [
+                    'company_name',
+                    'company_address',
+                    'company_phone',
+                    'company_email',
+                    'company_logo_path',
+                    'company_logo_url'
+                ],
+                'regional' => [
+                    'timezone',
+                    'currency',
+                    'date_format',
+                    'number_format_decimal',
+                    'number_format_thousand'
+                ]
+            ]
+        ]);
     });
 });
 
 describe('AdminSettingController@update', function () {
-    test('unauthenticated user is redirected to login', function () {
-        $response = $this->put(route('admin-settings.update'), [
+    test('unauthenticated user is returned 401', function () {
+        $response = $this->putJson('/api/admin-settings', [
             'company_name' => 'Test',
         ]);
-        $response->assertRedirect(route('login'));
+        $response->assertStatus(401);
     });
 
     test('user without edit permission gets 403', function () {
         $user = createTestUserWithPermissions(['admin_setting']);
 
-        $response = $this->actingAs($user)->put(route('admin-settings.update'), [
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->putJson('/api/admin-settings', [
             'company_name' => 'Test Company',
         ]);
 
@@ -81,15 +91,15 @@ describe('AdminSettingController@update', function () {
     test('user with edit permission can update general settings', function () {
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        $response = $this->actingAs($user)->put(route('admin-settings.update'), [
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->putJson('/api/admin-settings', [
             'company_name' => 'Acme Corporation',
             'company_address' => '123 Main Street',
             'company_phone' => '+628123456789',
             'company_email' => 'info@acme.com',
         ]);
 
-        $response->assertRedirect();
-        $response->assertSessionHasNoErrors();
+        $response->assertOk();
 
         expect(Setting::get('company_name'))->toBe('Acme Corporation');
         expect(Setting::get('company_address'))->toBe('123 Main Street');
@@ -100,7 +110,8 @@ describe('AdminSettingController@update', function () {
     test('user with edit permission can update regional settings', function () {
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        $response = $this->actingAs($user)->put(route('admin-settings.update'), [
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->putJson('/api/admin-settings', [
             'timezone' => 'Asia/Makassar',
             'currency' => 'USD',
             'date_format' => 'Y-m-d',
@@ -108,8 +119,7 @@ describe('AdminSettingController@update', function () {
             'number_format_thousand' => ',',
         ]);
 
-        $response->assertRedirect();
-        $response->assertSessionHasNoErrors();
+        $response->assertOk();
 
         expect(Setting::get('timezone'))->toBe('Asia/Makassar');
         expect(Setting::get('currency'))->toBe('USD');
@@ -121,31 +131,37 @@ describe('AdminSettingController@update', function () {
     test('update validates email format', function () {
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        $response = $this->actingAs($user)->put(route('admin-settings.update'), [
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->putJson('/api/admin-settings', [
             'company_email' => 'not-an-email',
         ]);
 
-        $response->assertSessionHasErrors('company_email');
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('company_email');
     });
 
     test('update validates timezone', function () {
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        $response = $this->actingAs($user)->put(route('admin-settings.update'), [
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->putJson('/api/admin-settings', [
             'timezone' => 'Invalid/Timezone',
         ]);
 
-        $response->assertSessionHasErrors('timezone');
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('timezone');
     });
 
     test('update validates max length', function () {
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        $response = $this->actingAs($user)->put(route('admin-settings.update'), [
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->putJson('/api/admin-settings', [
             'company_name' => str_repeat('a', 256),
         ]);
 
-        $response->assertSessionHasErrors('company_name');
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('company_name');
     });
 
     test('partial update only changes submitted fields', function () {
@@ -156,11 +172,12 @@ describe('AdminSettingController@update', function () {
         Setting::set('company_phone', '111');
 
         // Update only company_name
-        $response = $this->actingAs($user)->put(route('admin-settings.update'), [
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->putJson('/api/admin-settings', [
             'company_name' => 'Updated Company',
         ]);
 
-        $response->assertRedirect();
+        $response->assertOk();
 
         expect(Setting::get('company_name'))->toBe('Updated Company');
         // company_phone should remain unchanged
@@ -172,12 +189,12 @@ describe('AdminSettingController@update', function () {
 
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        $response = $this->actingAs($user)->put(route('admin-settings.update'), [
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->putJson('/api/admin-settings', [
             'company_logo' => UploadedFile::fake()->create('logo.svg', 10, 'image/svg+xml'),
         ]);
 
-        $response->assertRedirect();
-        $response->assertSessionHasNoErrors();
+        $response->assertOk();
 
         $storedPath = Setting::get('company_logo_path');
         expect($storedPath)->toBeString();
@@ -187,17 +204,18 @@ describe('AdminSettingController@update', function () {
 });
 
 describe('AdminSettingController@testSmtp', function () {
-    test('unauthenticated user is redirected to login', function () {
-        $response = $this->post(route('admin-settings.test-smtp'), [
+    test('unauthenticated user is returned 401', function () {
+        $response = $this->postJson('/api/admin-settings/test-smtp', [
             'test_email' => 'test@example.com',
         ]);
-        $response->assertRedirect(route('login'));
+        $response->assertStatus(401);
     });
 
     test('user without edit permission gets 403', function () {
         $user = createTestUserWithPermissions(['admin_setting']);
 
-        $response = $this->actingAs($user)->post(route('admin-settings.test-smtp'), [
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->postJson('/api/admin-settings/test-smtp', [
             'test_email' => 'test@example.com',
         ]);
 
@@ -209,12 +227,12 @@ describe('AdminSettingController@testSmtp', function () {
 
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        $response = $this->actingAs($user)->post(route('admin-settings.test-smtp'), [
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->postJson('/api/admin-settings/test-smtp', [
             'test_email' => 'test@example.com',
         ]);
 
-        $response->assertRedirect();
-        $response->assertSessionHas('success');
+        $response->assertOk();
 
         \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\TestSmtpMail::class, function ($mail) {
             return $mail->hasTo('test@example.com');
@@ -227,22 +245,25 @@ describe('AdminSettingController@testSmtp', function () {
 
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        $response = $this->actingAs($user)->post(route('admin-settings.test-smtp'), [
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->postJson('/api/admin-settings/test-smtp', [
             'test_email' => 'test@example.com',
         ]);
 
-        $response->assertRedirect();
-        $response->assertSessionHasErrors('test_email');
-        expect(session('errors')->get('test_email')[0])->toContain('Failed to send email: Connection refused');
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('test_email');
+        $response->assertJsonPath('errors.test_email.0', 'Failed to send email: Connection refused');
     });
 
     test('validates email format', function () {
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        $response = $this->actingAs($user)->post(route('admin-settings.test-smtp'), [
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        $response = $this->postJson('/api/admin-settings/test-smtp', [
             'test_email' => 'not-an-email',
         ]);
 
-        $response->assertSessionHasErrors('test_email');
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('test_email');
     });
 });

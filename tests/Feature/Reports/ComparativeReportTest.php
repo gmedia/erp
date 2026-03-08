@@ -43,11 +43,11 @@ beforeEach(function () {
     ]);
 });
 
-test('can view comparative report page', function () {
-    actingAs($this->user)
-        ->get(route('reports.comparative'))
+test('can view comparative report properties via json', function () {
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/comparative')
         ->assertStatus(200)
-        ->assertInertia(fn ($page) => $page->component('reports/comparative/index'));
+        ->assertJsonStructure(['fiscalYears', 'selectedYearId', 'comparisonYearId']);
 });
 
 test('comparative uses archived previous year and mapping split allocated to LCA', function () {
@@ -127,13 +127,10 @@ test('comparative uses archived previous year and mapping split allocated to LCA
         'credit' => 0,
     ]);
 
-    actingAs($this->user)
-        ->get(route('reports.comparative', ['fiscal_year_id' => $this->fyCurr->id, 'comparison_year_id' => $this->fyPrev->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/comparative?fiscal_year_id=' . $this->fyCurr->id . '&comparison_year_id=' . $this->fyPrev->id)
         ->assertStatus(200)
-        ->assertInertia(fn ($page) => $page
-            ->component('reports/comparative/index')
-            ->where('report.totals.assets', 0)
-            ->where('report.totals.comparison_assets', 300)
-            ->where('report.totals.change_assets', -300)
-        );
+        ->assertJsonPath('report.totals.assets', 0)
+        ->assertJsonPath('report.totals.comparison_assets', 300)
+        ->assertJsonPath('report.totals.change_assets', -300);
 });

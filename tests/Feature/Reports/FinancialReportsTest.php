@@ -38,32 +38,7 @@ beforeEach(function () {
     ]);
 });
 
-test('can view trial balance page', function () {
-    actingAs($this->user)
-        ->get(route('reports.trial-balance'))
-        ->assertStatus(200)
-        ->assertInertia(fn ($page) => $page
-            ->component('reports/trial-balance/index')
-        );
-});
 
-test('can view balance sheet page', function () {
-    actingAs($this->user)
-        ->get(route('reports.balance-sheet'))
-        ->assertStatus(200)
-        ->assertInertia(fn ($page) => $page
-            ->component('reports/balance-sheet/index')
-        );
-});
-
-test('can view cash flow page', function () {
-    actingAs($this->user)
-        ->get(route('reports.cash-flow'))
-        ->assertStatus(200)
-        ->assertInertia(fn ($page) => $page
-            ->component('reports/cash-flow/index')
-        );
-});
 
 test('trial balance calculations are correct', function () {
     // Create Accounts
@@ -127,19 +102,16 @@ test('trial balance calculations are correct', function () {
         'credit' => 1000,
     ]);
 
-    actingAs($this->user)
-        ->get(route('reports.trial-balance', ['fiscal_year_id' => $this->fiscalYear->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/trial-balance?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertStatus(200)
-        ->assertInertia(fn ($page) => $page
-            ->component('reports/trial-balance/index')
-            ->has('report', 3) // Check count
-            ->where('report.0.code', '1000') // Parent
-            ->where('report.0.level', 1) 
-            ->where('report.1.code', '1100') // Child
-            ->where('report.1.level', 2)
-            ->where('report.1.parent_id', $parentAccount->id)
-            ->where('report.1.debit', 1000)
-        );
+        ->assertJsonCount(3, 'report')
+        ->assertJsonPath('report.0.code', '1000') // Parent
+        ->assertJsonPath('report.0.level', 1) 
+        ->assertJsonPath('report.1.code', '1100') // Child
+        ->assertJsonPath('report.1.level', 2)
+        ->assertJsonPath('report.1.parent_id', $parentAccount->id)
+        ->assertJsonPath('report.1.debit', 1000);
 });
 
 test('cash flow calculations are correct', function () {
@@ -222,17 +194,14 @@ test('cash flow calculations are correct', function () {
         'credit' => 200,
     ]);
 
-    actingAs($this->user)
-        ->get(route('reports.cash-flow', ['fiscal_year_id' => $this->fiscalYear->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertStatus(200)
-        ->assertInertia(fn ($page) => $page
-            ->component('reports/cash-flow/index')
-            ->has('report', 2)
-            ->where('report.0.code', '4100')
-            ->where('report.0.inflow', 1000)
-            ->where('report.1.code', '5200')
-            ->where('report.1.outflow', 200)
-        );
+        ->assertJsonCount(2, 'report')
+        ->assertJsonPath('report.0.code', '4100')
+        ->assertJsonPath('report.0.inflow', 1000)
+        ->assertJsonPath('report.1.code', '5200')
+        ->assertJsonPath('report.1.outflow', 200);
 });
 
 test('balance sheet accounts include net income in equity', function () {
@@ -274,12 +243,10 @@ test('balance sheet accounts include net income in equity', function () {
         'credit' => 0,
     ]);
 
-    actingAs($this->user)
-        ->get(route('reports.balance-sheet', ['fiscal_year_id' => $this->fiscalYear->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/balance-sheet?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertStatus(200)
-        ->assertInertia(fn ($page) => $page
-            ->where('report.totals.equity', 800) // Assumes no other equity
-        );
+        ->assertJsonPath('report.totals.equity', 800); // Assumes no other equity
 });
 
 test('balance sheet comparison works', function () {
@@ -323,13 +290,11 @@ test('balance sheet comparison works', function () {
     $jePrev = JournalEntry::factory()->create(['fiscal_year_id' => $prevFiscalYear->id, 'status' => 'posted']);
     JournalEntryLine::factory()->create(['journal_entry_id' => $jePrev->id, 'account_id' => $prevAssetAccount->id, 'debit' => 300, 'credit' => 0]);
 
-    actingAs($this->user)
-        ->get(route('reports.balance-sheet', ['fiscal_year_id' => $this->fiscalYear->id, 'comparison_year_id' => $prevFiscalYear->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/balance-sheet?fiscal_year_id=' . $this->fiscalYear->id . '&comparison_year_id=' . $prevFiscalYear->id)
         ->assertStatus(200)
-        ->assertInertia(fn ($page) => $page
-            ->where('report.totals.assets', 500)
-            ->where('report.totals.comparison_assets', 300)
-            ->where('report.totals.change_assets', 200) // 500 - 300
-            ->where('report.totals.change_percentage_assets', 66.66666666666666) // (200/300)*100
-        );
+        ->assertJsonPath('report.totals.assets', 500)
+        ->assertJsonPath('report.totals.comparison_assets', 300)
+        ->assertJsonPath('report.totals.change_assets', 200) // 500 - 300
+        ->assertJsonPath('report.totals.change_percentage_assets', 66.66666666666666); // (200/300)*100
 });

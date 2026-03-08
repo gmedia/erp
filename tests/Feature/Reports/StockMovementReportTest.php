@@ -22,22 +22,12 @@ beforeEach(function () {
 });
 
 test('it requires permission to access stock movement report', function () {
-    actingAs($this->otherUser)
-        ->get(route('reports.stock-movement'))
+    \Laravel\Sanctum\Sanctum::actingAs($this->otherUser, ['*']);
+    $this->getJson('/api/reports/stock-movement')
         ->assertForbidden();
 });
 
-test('it can render stock movement report page', function () {
-    StockMovement::factory()->create();
 
-    actingAs($this->user)
-        ->get(route('reports.stock-movement'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('reports/stock-movement/index')
-            ->has('rows.data')
-        );
-});
 
 test('it can fetch aggregated stock movement report data', function () {
     $branch = Branch::factory()->create(['name' => 'HQ']);
@@ -71,8 +61,8 @@ test('it can fetch aggregated stock movement report data', function () {
         'moved_at' => now(),
     ]);
 
-    actingAs($this->user)
-        ->getJson(route('reports.stock-movement'))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/stock-movement')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
             ->has('data', 1)
@@ -114,32 +104,32 @@ test('it can filter by date and dimensions', function () {
         'moved_at' => '2026-03-10 10:00:00',
     ]);
 
-    actingAs($this->user)
-        ->getJson(route('reports.stock-movement', ['product_id' => $productA->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/stock-movement?product_id=' . $productA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.product.id', $productA->id);
 
-    actingAs($this->user)
-        ->getJson(route('reports.stock-movement', ['warehouse_id' => $warehouseA->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/stock-movement?warehouse_id=' . $warehouseA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.warehouse.id', $warehouseA->id);
 
-    actingAs($this->user)
-        ->getJson(route('reports.stock-movement', ['branch_id' => $branchA->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/stock-movement?branch_id=' . $branchA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.warehouse.branch.id', $branchA->id);
 
-    actingAs($this->user)
-        ->getJson(route('reports.stock-movement', ['category_id' => $categoryA->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/stock-movement?category_id=' . $categoryA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.product.category.id', $categoryA->id);
 
-    actingAs($this->user)
-        ->getJson(route('reports.stock-movement', ['start_date' => '2026-03-05', 'end_date' => '2026-03-31']))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/stock-movement?start_date=2026-03-05&end_date=2026-03-31')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.product.id', $productB->id);
@@ -148,11 +138,8 @@ test('it can filter by date and dimensions', function () {
 test('it accepts category sort alias from datatable', function () {
     StockMovement::factory()->create();
 
-    actingAs($this->user)
-        ->getJson(route('reports.stock-movement', [
-            'sort_by' => 'product_category_name',
-            'sort_direction' => 'asc',
-        ]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/stock-movement?sort_by=product_category_name&sort_direction=asc')
         ->assertOk()
         ->assertJsonStructure(['data', 'meta', 'links']);
 });
@@ -162,8 +149,8 @@ test('it can export stock movement report', function () {
     Excel::fake();
     Storage::fake('public');
 
-    $response = actingAs($this->user)
-        ->postJson(route('reports.stock-movement.export'))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $response = $this->postJson('/api/reports/stock-movement/export')
         ->assertOk()
         ->assertJsonStructure(['url', 'filename']);
 

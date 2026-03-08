@@ -35,19 +35,11 @@ beforeEach(function () {
     ]);
 });
 
-test('it can render the book value & depreciation report page', function () {
-    actingAs($this->user)
-        ->get(route('reports.book-value-depreciation'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('reports/book-value-depreciation/index')
-            ->has('assets.data', 1)
-        );
-})->group('book-value-depreciation-reports');
+
 
 test('it can fetch book value report data via json', function () {
-    actingAs($this->user)
-        ->getJson(route('reports.book-value-depreciation'))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/book-value-depreciation')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
             ->has('data', 1)
@@ -81,15 +73,15 @@ test('it can filter the report by category and branch', function () {
     ]);
 
     // Filter by branch
-    actingAs($this->user)
-        ->getJson(route('reports.book-value-depreciation', ['branch_id' => $this->branch->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/book-value-depreciation?branch_id=' . $this->branch->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'IT-001');
 
     // Filter by category
-    actingAs($this->user)
-        ->getJson(route('reports.book-value-depreciation', ['asset_category_id' => $otherCategory->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/book-value-depreciation?asset_category_id=' . $otherCategory->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'FR-001');
@@ -100,8 +92,8 @@ test('it can export the report data to excel', function () {
     Excel::fake();
     Storage::fake('public');
 
-    $response = actingAs($this->user)
-        ->postJson(route('reports.book-value-depreciation.export'))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $response = $this->postJson('/api/reports/book-value-depreciation/export')
         ->assertOk()
         ->assertJsonStructure(['url', 'filename']);
 

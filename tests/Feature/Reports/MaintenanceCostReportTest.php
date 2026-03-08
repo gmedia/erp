@@ -44,19 +44,11 @@ beforeEach(function () {
     ]);
 });
 
-test('it can render the maintenance cost report page', function () {
-    actingAs($this->user)
-        ->get(route('reports.maintenance-cost'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('reports/maintenance-cost/index')
-            ->has('maintenances.data', 1)
-        );
-});
+
 
 test('it can fetch maintenance cost report data via json', function () {
-    actingAs($this->user)
-        ->getJson(route('reports.maintenance-cost'))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/maintenance-cost')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
             ->has('data', 1)
@@ -109,36 +101,36 @@ test('it can filter the report by various parameters', function () {
     ]);
 
     // Filter by branch
-    actingAs($this->user)
-        ->getJson(route('reports.maintenance-cost', ['branch_id' => $this->branch->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/maintenance-cost?branch_id=' . $this->branch->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'IT-001');
 
     // Filter by category
-    actingAs($this->user)
-        ->getJson(route('reports.maintenance-cost', ['asset_category_id' => $otherCategory->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/maintenance-cost?asset_category_id=' . $otherCategory->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'FR-001');
         
     // Filter by supplier
-    actingAs($this->user)
-        ->getJson(route('reports.maintenance-cost', ['supplier_id' => $otherSupplier->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/maintenance-cost?supplier_id=' . $otherSupplier->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'FR-001');
         
     // Filter by type
-    actingAs($this->user)
-        ->getJson(route('reports.maintenance-cost', ['maintenance_type' => 'preventive']))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/maintenance-cost?maintenance_type=preventive')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'IT-001');
         
     // Filter by date range
-    actingAs($this->user)
-        ->getJson(route('reports.maintenance-cost', ['start_date' => '2025-12-01', 'end_date' => '2026-12-31']))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/maintenance-cost?start_date=2025-12-01&end_date=2026-12-31')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'FR-001'); // IT-001 performed_at is 2025-01-01
@@ -149,8 +141,8 @@ test('it can export the report data to excel', function () {
     Excel::fake();
     Storage::fake('public');
 
-    $response = actingAs($this->user)
-        ->postJson(route('reports.maintenance-cost.export'))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $response = $this->postJson('/api/reports/maintenance-cost/export')
         ->assertOk()
         ->assertJsonStructure(['url', 'filename']);
 

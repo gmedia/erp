@@ -18,18 +18,14 @@ beforeEach(function () {
 });
 
 test('balance sheet memasukkan current year earnings (net income) ke equity', function () {
-    actingAs($this->user)
-        ->get(route('reports.balance-sheet', ['fiscal_year_id' => $this->fiscalYear->id]))
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/balance-sheet?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertStatus(200)
-        ->assertInertia(fn ($page) => $page
-            ->component('reports/balance-sheet/index')
-            ->where('selectedYearId', $this->fiscalYear->id)
-            ->has('fiscalYears')
-            ->where('report.totals.assets', fn ($value) => (float) $value === 8000000.0)
-            ->where('report.totals.liabilities', fn ($value) => (float) $value === 3000000.0)
-            ->where('report.totals.equity', fn ($value) => (float) $value === 5000000.0)
-            ->where('report.equity.1.code', '9999-CYE')
-            ->where('report.equity.1.balance', fn ($value) => (float) $value === 5000000.0)
-        );
+        ->assertJsonPath('selectedYearId', $this->fiscalYear->id)
+        ->assertJsonPath('report.totals.assets', 8000000)
+        ->assertJsonPath('report.totals.liabilities', 3000000)
+        ->assertJsonPath('report.totals.equity', 5000000)
+        ->assertJsonPath('report.equity.1.code', '9999-CYE')
+        ->assertJsonPath('report.equity.1.balance', 5000000);
 });
 
