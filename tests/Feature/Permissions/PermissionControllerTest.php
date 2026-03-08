@@ -4,38 +4,34 @@ namespace Tests\Feature\Permissions;
 
 use App\Models\Permission;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\actingAs;
-use function Pest\Laravel\get;
+use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class)->group('permissions');
 
 describe('Permission Page Access', function () {
-    test('unauthenticated user cannot access permissions page', function () {
-        $response = get('/permissions');
+    test('unauthenticated user cannot access permissions', function () {
+        $response = getJson('/api/permissions');
 
-        $response->assertRedirect('/login');
+        $response->assertUnauthorized();
     });
 
-    test('authenticated user without permission cannot access permissions page', function () {
+    test('authenticated user without permission cannot access permissions', function () {
         $user = createTestUserWithPermissions([]);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
-        $response = get('/permissions');
+        $response = getJson('/api/permissions');
 
         $response->assertForbidden();
     });
 
-    test('authenticated user with permission can access permissions page', function () {
+    test('authenticated user with permission can access permissions', function () {
         $user = createTestUserWithPermissions(['permission']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
-        $response = get('/permissions');
+        $response = getJson('/api/permissions');
 
         $response->assertOk()
-            ->assertInertia(fn ($page) => $page
-                ->component('permissions/index')
-                ->has('permissions')
-            );
+            ->assertJsonStructure(['data' => ['*' => ['id', 'name', 'display_name']]]);
     });
 
     test('permissions page returns all permissions ordered by id', function () {
@@ -45,18 +41,15 @@ describe('Permission Page Access', function () {
         Permission::factory()->create(['name' => 'test.permission.3', 'display_name' => 'Test Permission 3']);
 
         $user = createTestUserWithPermissions(['permission']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
-        $response = get('/permissions');
+        $response = getJson('/api/permissions');
 
         $response->assertOk()
-            ->assertInertia(fn ($page) => $page
-                ->component('permissions/index')
-                ->has('permissions')
-            );
+            ->assertJsonStructure(['data' => ['*' => ['id', 'name', 'display_name']]]);
 
         // Verify permissions are returned with required fields
-        $permissions = $response->original->getData()['page']['props']['permissions'];
+        $permissions = $response->json('data');
         expect($permissions)->toBeArray()
             ->and(count($permissions))->toBeGreaterThanOrEqual(4); // 3 test + 1 for user access
 

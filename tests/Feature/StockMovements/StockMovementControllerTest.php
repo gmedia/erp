@@ -5,9 +5,7 @@ use App\Models\StockMovement;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Inertia\Testing\AssertableInertia as Assert;
-
-use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class)->group('stock-movements');
 
@@ -17,25 +15,9 @@ beforeEach(function () {
 });
 
 test('it requires permission to access stock movements', function () {
-    actingAs($this->otherUser)
-        ->get(route('stock-movements'))
-        ->assertForbidden();
-
-    actingAs($this->otherUser)
+    \Laravel\Sanctum\Sanctum::actingAs($this->otherUser, ['*'])
         ->getJson('/api/stock-movements')
         ->assertForbidden();
-});
-
-test('it can render the stock movements page', function () {
-    StockMovement::factory()->create();
-
-    actingAs($this->user)
-        ->get(route('stock-movements'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('stock-movements/index')
-            ->has('movements.data')
-        );
 });
 
 test('it can fetch stock movements data via json', function () {
@@ -52,8 +34,8 @@ test('it can fetch stock movements data via json', function () {
         'reference_number' => 'SA-2026-000001',
     ]);
 
-    actingAs($this->user)
-        ->getJson('/api/stock-movements?per_page=10')
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    getJson('/api/stock-movements?per_page=10')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
             ->has('data', 1)
@@ -89,26 +71,23 @@ test('it can filter by product, warehouse, movement_type, and date range', funct
         'moved_at' => '2025-01-01 10:00:00',
     ]);
 
-    actingAs($this->user)
-        ->getJson('/api/stock-movements?product_id=' . $p1->id)
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    getJson('/api/stock-movements?product_id=' . $p1->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.product.id', $p1->id);
 
-    actingAs($this->user)
-        ->getJson('/api/stock-movements?warehouse_id=' . $w1->id)
+    getJson('/api/stock-movements?warehouse_id=' . $w1->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.warehouse.id', $w1->id);
 
-    actingAs($this->user)
-        ->getJson('/api/stock-movements?movement_type=transfer_in')
+    getJson('/api/stock-movements?movement_type=transfer_in')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.movement_type', 'transfer_in');
 
-    actingAs($this->user)
-        ->getJson('/api/stock-movements?start_date=2026-01-01&end_date=2026-12-31')
+    getJson('/api/stock-movements?start_date=2026-01-01&end_date=2026-12-31')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.movement_type', 'transfer_in');
@@ -122,7 +101,7 @@ test('it can sort by product name', function () {
     StockMovement::factory()->create(['product_id' => $pB->id, 'warehouse_id' => $w->id, 'moved_at' => '2026-01-01 00:00:00']);
     StockMovement::factory()->create(['product_id' => $pA->id, 'warehouse_id' => $w->id, 'moved_at' => '2026-01-01 00:00:00']);
 
-    $response = actingAs($this->user)
+    $response = \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*'])
         ->getJson('/api/stock-movements?sort_by=product_name&sort_direction=asc')
         ->assertOk();
 

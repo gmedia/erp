@@ -8,15 +8,14 @@ use App\Models\Employee;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\actingAs;
-use function Pest\Laravel\get;
+use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class)->group('dashboard');
 
 describe('Dashboard', function () {
     test('authenticated user can see totals on dashboard', function () {
         $user = User::factory()->create();
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
         Customer::factory()->count(2)->create();
         Employee::factory()->count(3)->create();
@@ -29,14 +28,13 @@ describe('Dashboard', function () {
             ])
             ->create();
 
-        $response = get('/dashboard');
+        $response = getJson('/api/dashboard');
 
-        $response->assertOk()->assertInertia(fn ($page) => $page
-            ->component('dashboard')
-            ->where('totals.customers', 2)
-            ->where('totals.employees', 3)
-            ->where('totals.suppliers', 4)
-            ->where('totals.assets', 5)
-        );
+        $response->assertOk()->assertJsonFragment([
+            'customers' => 2,
+            'employees' => 3,
+            'suppliers' => 4,
+            'assets' => 5
+        ]);
     });
 });

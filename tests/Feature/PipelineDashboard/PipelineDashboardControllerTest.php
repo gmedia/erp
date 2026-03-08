@@ -6,7 +6,7 @@ use App\Models\PipelineEntityState;
 use App\Models\PipelineState;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class)->group('pipeline-dashboard');
 
@@ -46,22 +46,12 @@ beforeEach(function () {
 
 it('requires authentication and permission to access the dashboard', function () {
     // Unauthenticated
-    $this->get('/pipeline-dashboard')->assertRedirect('/login');
+    getJson('/api/pipeline-dashboard/data')->assertUnauthorized();
 
     // Authenticated without permission
     $userWithoutPermission = createTestUserWithPermissions([]);
-    actingAs($userWithoutPermission)
-        ->get('/pipeline-dashboard')
-        ->assertForbidden();
-
-    // Authenticated with permission
-    actingAs($this->user)
-        ->get('/pipeline-dashboard')
-        ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('pipeline-dashboard/index')
-            ->has('pipelines', 1)
-        );
+    \Laravel\Sanctum\Sanctum::actingAs($userWithoutPermission, ['*']);
+    getJson('/api/pipeline-dashboard/data')->assertForbidden();
 });
 
 it('returns correct summary data via API', function () {
@@ -85,7 +75,8 @@ it('returns correct summary data via API', function () {
         'current_state_id' => $this->stateReview->id,
     ]);
 
-    $response = actingAs($this->user)->getJson('/api/pipeline-dashboard/data');
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $response = getJson('/api/pipeline-dashboard/data');
 
     $response->assertOk()
         ->assertJsonStructure([
@@ -136,7 +127,8 @@ it('filters data by pipeline_id', function () {
     ]);
 
     // Request with filter for Pipeline 1
-    $response1 = actingAs($this->user)->getJson("/api/pipeline-dashboard/data?pipeline_id={$this->pipeline->id}");
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $response1 = getJson("/api/pipeline-dashboard/data?pipeline_id={$this->pipeline->id}");
     $data1 = $response1->json();
     
     // Only states from pipeline 1 should be present in summary
@@ -146,7 +138,7 @@ it('filters data by pipeline_id', function () {
     expect($totalCount1)->toBe(1);
 
     // Request with filter for Pipeline 2
-    $response2 = actingAs($this->user)->getJson("/api/pipeline-dashboard/data?pipeline_id={$pipeline2->id}");
+    $response2 = getJson("/api/pipeline-dashboard/data?pipeline_id={$pipeline2->id}");
     $data2 = $response2->json();
     
     expect(count($data2['summary']))->toBe(1); // Pipeline 2 has 1 state
@@ -174,7 +166,8 @@ it('detects stale entities based on threshold', function () {
     ]);
     
     // Default threshold is 7 days
-    $response = actingAs($this->user)->getJson('/api/pipeline-dashboard/data');
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $response = getJson('/api/pipeline-dashboard/data');
     
     $response->assertOk();
     $data = $response->json();

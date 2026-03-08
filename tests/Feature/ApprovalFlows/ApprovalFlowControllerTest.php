@@ -23,7 +23,7 @@ describe('Approval Flow API Endpoints', function () {
             'approval_flow.edit',
             'approval_flow.delete',
         ]);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
     });
 
     test('index returns paginated approval flows with proper meta structure', function () {
@@ -356,7 +356,7 @@ describe('Approval Flow API Endpoints', function () {
 describe('Approval Flow API Permission Tests', function () {
     test('store returns 403 when user lacks approval_flow.create permission', function () {
         $user = createTestUserWithPermissions(['approval_flow']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
         $response = postJson('/api/approval-flows', [
             'name' => 'New Flow',
@@ -372,7 +372,7 @@ describe('Approval Flow API Permission Tests', function () {
 
     test('update returns 403 when user lacks approval_flow.edit permission', function () {
         $user = createTestUserWithPermissions(['approval_flow']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
         $flow = ApprovalFlow::factory()->create();
 
@@ -390,7 +390,7 @@ describe('Approval Flow API Permission Tests', function () {
 
     test('destroy returns 403 when user lacks approval_flow.delete permission', function () {
         $user = createTestUserWithPermissions(['approval_flow']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
         $flow = ApprovalFlow::factory()->create();
 

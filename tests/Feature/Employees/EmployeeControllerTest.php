@@ -21,7 +21,7 @@ describe('Employee API Endpoints', function () {
     beforeEach(function () {
         // Create user with all employee permissions for existing tests
         $user = createTestUserWithPermissions(['employee', 'employee.create', 'employee.edit', 'employee.delete']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
     });
 
     test('index returns paginated employees with proper meta structure', function () {
@@ -69,7 +69,7 @@ describe('Employee API Endpoints', function () {
             'name' => 'Zebra Tester',
             'email' => 'zebra@example.com'
         ]);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
         Employee::factory()->create(['name' => 'John Smith', 'email' => 'john@example.com']);
         Employee::factory()->create(['name' => 'Jane Doe', 'email' => 'jane@example.com']);
@@ -429,7 +429,7 @@ describe('Employee API Endpoints', function () {
 describe('Employee API Permission Tests', function () {
     test('store returns 403 when user lacks employee.create permission', function () {
         $user = createTestUserWithPermissions(['employee']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
         $department = Department::factory()->create();
         $position = Position::factory()->create();
@@ -453,7 +453,7 @@ describe('Employee API Permission Tests', function () {
 
     test('update returns 403 when user lacks employee.edit permission', function () {
         $user = createTestUserWithPermissions(['employee']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
         $employee = Employee::factory()->create();
 
@@ -467,7 +467,7 @@ describe('Employee API Permission Tests', function () {
 
     test('destroy returns 403 when user lacks employee.delete permission', function () {
         $user = createTestUserWithPermissions(['employee']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
         $employee = Employee::factory()->create();
 

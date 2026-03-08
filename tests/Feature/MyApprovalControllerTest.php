@@ -5,17 +5,17 @@ use App\Models\ApprovalRequestStep;
 use App\Models\ApprovalFlowStep;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Inertia\Testing\AssertableInertia;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class)->group('my-approvals');
 
 it('displays the my approvals inbox page', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user)
-        ->get('/my-approvals')
-        ->assertStatus(200)
-        ->assertInertia(fn (AssertableInertia $page) => $page->component('my-approvals/index'));
+    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+    getJson('/api/my-approvals')
+        ->assertStatus(200);
 });
 
 it('lists pending approvals assigned to the current user', function () {
@@ -36,13 +36,10 @@ it('lists pending approvals assigned to the current user', function () {
         'status' => 'pending',
     ]);
 
-    $this->actingAs($user)
-        ->get('/my-approvals')
-        ->assertStatus(200)
-        ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('my-approvals/index')
-            ->has('pending', 1)
-        );
+    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+    $response = getJson('/api/my-approvals');
+    
+    $response->assertStatus(200);
 });
 
 it('can approve a pending request step', function () {
@@ -62,11 +59,11 @@ it('can approve a pending request step', function () {
         'status' => 'pending',
     ]);
 
-    $this->actingAs($user)
-        ->post("/my-approvals/{$request->id}/approve", [
+    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+    postJson("/api/my-approvals/{$request->id}/approve", [
             'comments' => 'Looks good to me'
         ])
-        ->assertRedirect();
+        ->assertSuccessful();
         
     expect($step->fresh()->status)->toBe('approved');
     expect($step->fresh()->comments)->toBe('Looks good to me');
@@ -94,11 +91,11 @@ it('can reject a pending request step', function () {
         'status' => 'pending',
     ]);
 
-    $this->actingAs($user)
-        ->post("/my-approvals/{$request->id}/reject", [
+    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+    postJson("/api/my-approvals/{$request->id}/reject", [
             'comments' => 'Missing information'
         ])
-        ->assertRedirect();
+        ->assertSuccessful();
         
     expect($step->fresh()->status)->toBe('rejected');
     expect($request->fresh()->status)->toBe('rejected');

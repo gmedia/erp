@@ -7,9 +7,7 @@ use App\Models\StockMovement;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Inertia\Testing\AssertableInertia as Assert;
-
-use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class)->group('stock-monitor');
 
@@ -19,30 +17,9 @@ beforeEach(function () {
 });
 
 test('it requires permission to access stock monitor', function () {
-    actingAs($this->otherUser)
-        ->get(route('stock-monitor'))
-        ->assertForbidden();
-
-    actingAs($this->otherUser)
+    \Laravel\Sanctum\Sanctum::actingAs($this->otherUser, ['*'])
         ->getJson('/api/stock-monitor')
         ->assertForbidden();
-});
-
-test('it can render stock monitor page', function () {
-    StockMovement::factory()->create();
-
-    actingAs($this->user)
-        ->get(route('stock-monitor'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('stock-monitor/index')
-            ->has('stocks.data')
-            ->has('stocks.summary')
-            ->has('filterOptions.products')
-            ->has('filterOptions.warehouses')
-            ->has('filterOptions.branches')
-            ->has('filterOptions.categories')
-        );
 });
 
 test('it returns current stock snapshot per product and warehouse', function () {
@@ -75,9 +52,9 @@ test('it returns current stock snapshot per product and warehouse', function () 
         'moved_at' => now(),
     ]);
 
-    actingAs($this->user)
-        ->getJson('/api/stock-monitor?per_page=10')
-        ->assertOk()
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    $response = getJson('/api/stock-monitor?per_page=10');
+    $response->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
             ->has('data', 1)
             ->where('data.0.product.name', 'Kertas A4')
@@ -112,32 +89,28 @@ test('it can filter by branch, warehouse, category, product, and low stock thres
         'balance_after' => 50,
     ]);
 
-    actingAs($this->user)
-        ->getJson('/api/stock-monitor?branch_id=' . $branchA->id)
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    getJson('/api/stock-monitor?branch_id=' . $branchA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.warehouse.branch.id', $branchA->id);
 
-    actingAs($this->user)
-        ->getJson('/api/stock-monitor?warehouse_id=' . $warehouseA->id)
+    getJson('/api/stock-monitor?warehouse_id=' . $warehouseA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.warehouse.id', $warehouseA->id);
 
-    actingAs($this->user)
-        ->getJson('/api/stock-monitor?category_id=' . $categoryA->id)
+    getJson('/api/stock-monitor?category_id=' . $categoryA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.product.category.id', $categoryA->id);
 
-    actingAs($this->user)
-        ->getJson('/api/stock-monitor?product_id=' . $productA->id)
+    getJson('/api/stock-monitor?product_id=' . $productA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.product.id', $productA->id);
 
-    actingAs($this->user)
-        ->getJson('/api/stock-monitor?low_stock_threshold=10')
+    getJson('/api/stock-monitor?low_stock_threshold=10')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.product.id', $productA->id);

@@ -21,7 +21,7 @@ beforeEach(function () {
         'asset_stocktake.edit',
         'asset_stocktake.delete'
     ]);
-    actingAs($this->user);
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
     $this->branch = Branch::factory()->create();
 });
 

@@ -22,8 +22,7 @@ describe('Approval Delegation API Endpoints', function () {
             'approval_delegation.edit',
             'approval_delegation.delete'
         ]);
-
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
     });
 
     test('index returns paginated delegations', function () {
@@ -102,7 +101,7 @@ describe('Approval Delegation API Endpoints', function () {
 
     test('store returns 403 without approval_delegation.create permission', function () {
         $user = createTestUserWithPermissions(['approval_delegation']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
         $delegator = User::factory()->create();
         $delegate = User::factory()->create();

@@ -8,43 +8,18 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTestUserWithPermissions;
-use function Pest\Laravel\actingAs;
-use function Pest\Laravel\get;
+use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class, CreatesTestUserWithPermissions::class)->group('asset-dashboard');
 
-describe('Asset Dashboard View', function () {
-    test('unauthenticated user cannot access asset dashboard', function () {
-        $response = get('/asset-dashboard');
-        $response->assertRedirect('/login');
-    });
-
-    test('authenticated user without permission cannot access asset dashboard', function () {
-        $user = $this->createTestUserWithPermissions(); // Helper creates user with given permission (or none if empty)
-        actingAs($user);
-
-        $response = get('/asset-dashboard');
-        $response->assertForbidden();
-    });
-
-    test('authenticated user with permission can access asset dashboard page', function () {
-        $user = $this->createTestUserWithPermissions(['asset']);
-        actingAs($user);
-
-        $response = get('/asset-dashboard');
-        
-        $response->assertOk()
-            ->assertInertia(fn ($page) => $page->component('asset-dashboard/index'));
-    });
-});
 
 describe('Asset Dashboard Data API', function () {
     beforeEach(function () {
-        actingAs($this->createTestUserWithPermissions(['asset']));
+        \Laravel\Sanctum\Sanctum::actingAs($this->createTestUserWithPermissions(['asset']), ['*']);
     });
 
     test('returns correct JSON structure', function () {
-        $response = get('/api/asset-dashboard/data');
+        $response = getJson('/api/asset-dashboard/data');
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -76,7 +51,7 @@ describe('Asset Dashboard Data API', function () {
             'accumulated_depreciation' => 500000,
         ]);
 
-        $response = get('/api/asset-dashboard/data');
+        $response = getJson('/api/asset-dashboard/data');
 
         $response->assertOk()
             ->assertJsonPath('summary.total_assets', 2)
@@ -90,7 +65,7 @@ describe('Asset Dashboard Data API', function () {
         Asset::factory()->count(2)->create(['status' => 'maintenance']);
         Asset::factory()->count(1)->create(['status' => 'draft']);
 
-        $response = get('/api/asset-dashboard/data');
+        $response = getJson('/api/asset-dashboard/data');
         $statusDistribution = collect($response->json('status_distribution'));
 
         expect($statusDistribution->firstWhere('id', 'active')['count'])->toBe(3)
@@ -106,7 +81,7 @@ describe('Asset Dashboard Data API', function () {
         Asset::factory()->count(4)->create(['asset_category_id' => $cat1->id]);
         Asset::factory()->count(2)->create(['asset_category_id' => $cat2->id]);
 
-        $response = get('/api/asset-dashboard/data');
+        $response = getJson('/api/asset-dashboard/data');
         $categoryDistribution = collect($response->json('category_distribution'));
 
         expect($categoryDistribution->firstWhere('name', 'Laptops')['count'])->toBe(4)
@@ -131,7 +106,7 @@ describe('Asset Dashboard Data API', function () {
             'maintenance_type' => 'preventive',
         ]);
 
-        $response = get('/api/asset-dashboard/data');
+        $response = getJson('/api/asset-dashboard/data');
         
         $response->assertOk()
             ->assertJsonCount(1, 'recent_maintenances')
@@ -158,7 +133,7 @@ describe('Asset Dashboard Data API', function () {
             'warranty_end_date' => Carbon::now()->addDays(10)->toDateString(),
         ]);
 
-        $response = get('/api/asset-dashboard/data');
+        $response = getJson('/api/asset-dashboard/data');
         
         $response->assertOk()
             ->assertJsonCount(1, 'warranty_alerts')

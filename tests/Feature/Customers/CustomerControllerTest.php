@@ -21,7 +21,7 @@ describe('Customer API Endpoints', function () {
     beforeEach(function () {
         // Create user with all customer permissions for existing tests
         $user = createTestUserWithPermissions(['customer', 'customer.create', 'customer.edit', 'customer.delete']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
     });
 
     test('index returns paginated customers with proper meta structure', function () {
@@ -376,7 +376,7 @@ describe('Customer API Endpoints', function () {
 describe('Customer API Permission Tests', function () {
     test('store returns 403 when user lacks customer.create permission', function () {
         $user = createTestUserWithPermissions(['customer']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
         $branch = Branch::factory()->create();
         $category = \App\Models\CustomerCategory::factory()->create();
@@ -396,7 +396,7 @@ describe('Customer API Permission Tests', function () {
 
     test('update returns 403 when user lacks customer.edit permission', function () {
         $user = createTestUserWithPermissions(['customer']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
         $customer = Customer::factory()->create();
         $branch = Branch::factory()->create();
@@ -417,7 +417,7 @@ describe('Customer API Permission Tests', function () {
 
     test('destroy returns 403 when user lacks customer.delete permission', function () {
         $user = createTestUserWithPermissions(['customer']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
         $customer = Customer::factory()->create();
 

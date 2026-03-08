@@ -19,12 +19,7 @@ beforeEach(function () {
     $this->user = createTestUserWithPermissions([
         'asset_stocktake',
     ]);
-    actingAs($this->user);
-});
-
-test('it can view the variance report page', function () {
-    $response = getJson(route('asset-stocktake-variances'));
-    $response->assertOk();
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
 });
 
 test('it can list variance items', function () {

@@ -19,7 +19,7 @@ uses(RefreshDatabase::class)->group('products');
 describe('Product API Endpoints', function () {
     beforeEach(function () {
         $user = createTestUserWithPermissions(['product', 'product.create', 'product.edit', 'product.delete']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
     });
 
     test('index returns paginated products with proper structure', function () {
@@ -194,7 +194,7 @@ describe('Product API Endpoints', function () {
 describe('Product API Permissions', function () {
     test('store returns 403 when lacks permission', function () {
         $user = createTestUserWithPermissions(['product']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
         $response = postJson('/api/products', []);
         $response->assertForbidden();
@@ -202,7 +202,7 @@ describe('Product API Permissions', function () {
 
     test('update returns 403 when lacks permission', function () {
         $user = createTestUserWithPermissions(['product']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
         $product = Product::factory()->create();
 
         $response = putJson("/api/products/{$product->id}", []);
@@ -211,7 +211,7 @@ describe('Product API Permissions', function () {
 
     test('destroy returns 403 when lacks permission', function () {
         $user = createTestUserWithPermissions(['product']);
-        actingAs($user);
+        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
         $product = Product::factory()->create();
 
         $response = deleteJson("/api/products/{$product->id}");

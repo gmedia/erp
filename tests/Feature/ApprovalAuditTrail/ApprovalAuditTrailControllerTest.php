@@ -6,9 +6,8 @@ use App\Models\Asset;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
-use function Pest\Laravel\actingAs;
-use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class)->group('approval-audit-trail');
 
@@ -47,24 +46,24 @@ beforeEach(function () {
 
 describe('index', function () {
     it('requires authentication', function () {
-        get(route('approval-audit-trail.index'))->assertRedirect(route('login'));
+        getJson('/api/approval-audit-trail')->assertUnauthorized();
     });
 
     it('denies access without permission', function () {
-        actingAs($this->noPermissionUser)
-            ->get(route('approval-audit-trail.index'))
+        \Laravel\Sanctum\Sanctum::actingAs($this->noPermissionUser, ['*']);
+        getJson('/api/approval-audit-trail')
             ->assertForbidden();
     });
 
     it('allows access with permission', function () {
-        actingAs($this->user)
-            ->get(route('approval-audit-trail.index'))
+        \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+        getJson('/api/approval-audit-trail')
             ->assertOk();
     });
 
     it('returns json data when requested', function () {
-        actingAs($this->user)
-            ->getJson(route('approval-audit-trail.index'))
+        \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+        getJson('/api/approval-audit-trail')
             ->assertOk()
             ->assertJson(function (AssertableJson $json) {
                 $json->has('data', 2)
@@ -75,8 +74,8 @@ describe('index', function () {
     });
 
     it('can filter by event', function () {
-        actingAs($this->user)
-            ->getJson(route('approval-audit-trail.index', ['event' => 'submitted']))
+        \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+        getJson('/api/approval-audit-trail?event=submitted')
             ->assertOk()
             ->assertJson(function (AssertableJson $json) {
                 $json->has('data', 1)
@@ -86,8 +85,8 @@ describe('index', function () {
     });
 
     it('can filter by actor', function () {
-        actingAs($this->user)
-            ->getJson(route('approval-audit-trail.index', ['actor_user_id' => $this->superAdmin->id]))
+        \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+        getJson('/api/approval-audit-trail?actor_user_id=' . $this->superAdmin->id)
             ->assertOk()
             ->assertJson(function (AssertableJson $json) {
                 $json->has('data', 1)
@@ -99,18 +98,18 @@ describe('index', function () {
 
 describe('export', function () {
     it('requires authentication', function () {
-        $this->postJson(route('api.approval-audit-trail.export'))->assertUnauthorized();
+        postJson('/api/approval-audit-trail/export')->assertUnauthorized();
     });
 
     it('denies access without permission', function () {
-        actingAs($this->noPermissionUser)
-            ->postJson(route('api.approval-audit-trail.export'))
+        \Laravel\Sanctum\Sanctum::actingAs($this->noPermissionUser, ['*']);
+        postJson('/api/approval-audit-trail/export')
             ->assertForbidden();
     });
 
     it('allows access with permission and exports data', function () {
-        $response = actingAs($this->user)
-            ->postJson(route('api.approval-audit-trail.export'))
+        \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+        $response = postJson('/api/approval-audit-trail/export')
             ->assertOk()
             ->assertJsonStructure(['url', 'filename']);
 

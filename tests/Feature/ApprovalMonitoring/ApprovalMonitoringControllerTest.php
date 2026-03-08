@@ -37,14 +37,7 @@ beforeEach(function () {
     ]);
 });
 
-test('can render approval monitoring dashboard', function () {
-    actingAs($this->user)
-        ->get(route('approval-monitoring.index'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('approval-monitoring/index')
-        );
-});
+
 
 test('can fetch approval monitoring data', function () {
     // Create an approval request
@@ -79,7 +72,7 @@ test('can fetch approval monitoring data', function () {
         'completed_at' => now(),
     ]);
 
-    actingAs($this->user)
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*'])
         ->getJson(route('api.approval-monitoring.data'))
         ->assertOk()
         ->assertJsonStructure([
@@ -113,7 +106,7 @@ test('can fetch approval monitoring data', function () {
 });
 
 test('can filter overdue approvals by document type', function () {
-    actingAs($this->user);
+    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
     // Create an approval request for PR
     $prRequest = ApprovalRequest::create([
         'approval_flow_id' => $this->flow->id,
