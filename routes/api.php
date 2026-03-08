@@ -315,9 +315,16 @@ use Illuminate\Support\Facades\Route;
         // --- Users & Permissions ---
         Route::get('users', [UserController::class, 'apiIndex']);
         Route::get('users/{user}', [UserController::class, 'apiShow']);
-        Route::middleware('permission:permission,true')->group(function () {
+        Route::group(['middleware' => ['permission:permission']], function () {
+            Route::get('permissions', [\App\Http\Controllers\PermissionController::class, 'index']);
             Route::get('employees/{employee}/permissions', [EmployeeController::class, 'permissions']);
             Route::post('employees/{employee}/permissions', [EmployeeController::class, 'syncPermissions']);
+        });
+
+        // Employee User Management
+        Route::group(['middleware' => ['permission:user']], function () {
+            Route::get('employees/{employee}/user', [\App\Http\Controllers\UserController::class, 'getUserByEmployee']);
+            Route::post('employees/{employee}/user', [\App\Http\Controllers\UserController::class, 'updateUser']);
         });
 
         // --- Admin Settings ---

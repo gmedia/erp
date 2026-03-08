@@ -12,14 +12,16 @@ import { useEmployeePermissions } from '@/hooks/permissions/useEmployeePermissio
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Permission } from '@/types/permission';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import axios from '@/lib/axios';
 import { FormProvider, useForm } from 'react-hook-form';
 
-interface Props {
-    permissions: Permission[];
-}
+export default function PermissionsIndex() {
+    const [permissions, setPermissions] = useState<Permission[]>([]);
 
-export default function PermissionsIndex({ permissions }: Props) {
+    useEffect(() => {
+        axios.get('/api/permissions').then((res) => setPermissions(res.data)).catch(console.error);
+    }, []);
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',

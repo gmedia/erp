@@ -21,14 +21,12 @@ class PermissionController extends Controller
      *
      * @return \Inertia\Response
      */
-    public function index(): Response
+    public function index(): \Illuminate\Http\JsonResponse
     {
         $permissions = Permission::query()
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('permissions/index', [
-            'permissions' => $permissions,
-        ]);
+        return response()->json($permissions);
     }
 }
