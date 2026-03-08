@@ -6,31 +6,40 @@ use Illuminate\Support\Facades\Notification;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class)->group('auth');
 
-test('reset password link screen can be rendered', function () {
-    $response = $this->get(route('password.request'));
+test('reset password link endpoint is available', function () {
+    $response = $this->postJson('/api/forgot-password', ['email' => 'invalid@example.com']);
 
-    $response->assertStatus(200);
+    $response->assertStatus(422);
 });
 
-test('reset password link can be requested', function () {
+test('reset password link can be requested via api', function () {
     Notification::fake();
 
     $user = User::factory()->create();
 
-    $this->post(route('password.email'), ['email' => $user->email]);
+    $response = $this->postJson('/api/forgot-password', ['email' => $user->email]);
+    $response->assertStatus(200);
 
     Notification::assertSentTo($user, ResetPassword::class);
 });
 
-test('reset password screen can be rendered', function () {
+// Note: Password reset screen rendering is handled by the SPA frontend in the new architecture. 
+// We only need to test the API endpoints for requesting and submitting the reset.
+
+test('password can be reset with valid token via api', function () {
     Notification::fake();
 
     $user = User::factory()->create();
 
-    $this->post(route('password.email'), ['email' => $user->email]);
+    $this->postJson('/api/forgot-password', ['email' => $user->email]);
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-        $response = $this->get(route('password.reset', $notification->token));
+    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
+        $response = $this->postJson('/api/reset-password', [
+            'token' => $notification->token,
+            'email' => $user->email,
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
 
         $response->assertStatus(200);
 
@@ -38,38 +47,16 @@ test('reset password screen can be rendered', function () {
     });
 });
 
-test('password can be reset with valid token', function () {
-    Notification::fake();
-
+test('password cannot be reset with invalid token via api', function () {
     $user = User::factory()->create();
 
-    $this->post(route('password.email'), ['email' => $user->email]);
-
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-        $response = $this->post(route('password.store'), [
-            'token' => $notification->token,
-            'email' => $user->email,
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ]);
-
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect(route('login'));
-
-        return true;
-    });
-});
-
-test('password cannot be reset with invalid token', function () {
-    $user = User::factory()->create();
-
-    $response = $this->post(route('password.store'), [
+    $response = $this->postJson('/api/reset-password', [
         'token' => 'invalid-token',
         'email' => $user->email,
         'password' => 'newpassword123',
         'password_confirmation' => 'newpassword123',
     ]);
 
-    $response->assertSessionHasErrors('email');
+    $response->assertStatus(422)
+             ->assertJsonValidationErrors('email');
 });
