@@ -43,7 +43,7 @@ export default function ApprovalAuditTrail() {
     });
 
     const { data, isLoading, meta } = useCrudQuery<ApprovalAuditTrailItem>({
-        endpoint: '/approval-audit-trail', // Using the web route, it accepts JSON via wantsJson()
+        endpoint: '/api/approval-audit-trail', // Fetch JSON from API
         queryKey: ['approval-audit-trail'],
         entityName: 'Approval Audit Trail',
         pagination,

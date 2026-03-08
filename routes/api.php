@@ -327,6 +327,12 @@ use Illuminate\Support\Facades\Route;
         Route::post('pipeline-audit-trail/export', [\App\Http\Controllers\PipelineAuditTrailController::class, 'export'])
             ->middleware('permission:pipeline_audit_trail');
 
+        // Approval Audit Trail
+        Route::get('approval-audit-trail', [\App\Http\Controllers\ApprovalAuditTrailController::class, 'index'])
+            ->middleware('permission:approval_audit_trail');
+        Route::post('approval-audit-trail/export', [\App\Http\Controllers\ApprovalAuditTrailController::class, 'export'])
+            ->middleware('permission:approval_audit_trail.export');
+
         // Employee User Management
         Route::group(['middleware' => ['permission:user']], function () {
             Route::get('employees/{employee}/user', [\App\Http\Controllers\UserController::class, 'getUserByEmployee']);
