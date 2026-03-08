@@ -95,14 +95,18 @@ test.describe('Admin Settings', () => {
     test('settings page is accessible from Admin menu in sidebar', async ({ page }) => {
         await page.goto('/dashboard');
 
-        // Look for Admin group in sidebar - click to expand
-        const adminMenu = page.locator('button').filter({ hasText: /^Admin$/ });
-        if (await adminMenu.isVisible()) {
+        // Look for Admin group in sidebar - click to expand if not already
+        const adminMenu = page.getByRole('button', { name: 'Admin', exact: true });
+        const isExpanded = (await adminMenu.getAttribute('data-state')) === 'open';
+        
+        if (!isExpanded) {
             await adminMenu.click();
         }
 
-        // Look for Setting link
-        const settingLink = page.getByRole('link', { name: 'Setting' });
+        // Look for Setting link, it should become visible after expansion
+        const settingLink = page.getByRole('link', { name: 'Setting', exact: true });
+        
+        // Ensure it's rendered and visible
         await expect(settingLink).toBeVisible();
         await settingLink.click();
 
