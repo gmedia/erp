@@ -31,7 +31,7 @@ export default function ForgotPassword() {
             if (error.response?.status === 422) {
                 // Laravel returns validation errors uniquely for the password broker
                 const returnedErrors = error.response.data.errors || {};
-                // Flatten the First element if it's an array for typical inertia form error handling
+                // Flatten the First element if it's an array for typical form error handling
                 const formattedErrors: Record<string, string> = {};
                 Object.keys(returnedErrors).forEach(key => {
                     formattedErrors[key] = Array.isArray(returnedErrors[key]) ? returnedErrors[key][0] : returnedErrors[key];

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import AppLogoIcon from '@/components/app-logo-icon';
-import { InertiaI18nProvider } from '@/contexts/i18n-context';
+import { AppI18nProvider } from '@/contexts/i18n-context';
 import { type PropsWithChildren } from 'react';
 
 interface AuthLayoutProps {
@@ -15,7 +15,7 @@ export default function AuthSimpleLayout({
     description,
 }: PropsWithChildren<AuthLayoutProps>) {
     return (
-        <InertiaI18nProvider>
+        <AppI18nProvider>
             <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
                 <div className="w-full max-w-sm">
                     <div className="flex flex-col gap-8">
@@ -41,6 +41,6 @@ export default function AuthSimpleLayout({
                     </div>
                 </div>
             </div>
-        </InertiaI18nProvider>
+        </AppI18nProvider>
     );
 }

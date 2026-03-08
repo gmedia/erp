@@ -292,7 +292,7 @@ interface I18nProviderProps {
 
 /**
  * Base I18nProvider component that accepts translations as props.
- * Use InertiaI18nProvider for automatic Inertia integration.
+ * Use AppI18nProvider for automatic app integration.
  */
 export function I18nProvider({
     children,
@@ -373,10 +373,10 @@ export function I18nProvider({
 }
 
 /**
- * Inertia-aware I18nProvider that reads locale and translations from Inertia shared data.
+ * App-aware I18nProvider that reads locale and translations from auth context.
  * Use this at the app level to wrap the entire application.
  */
-export function InertiaI18nProvider({ children }: { children: ReactNode }) {
+export function AppI18nProvider({ children }: { children: ReactNode }) {
     const { locale, translations } = useAuth();
     
     // We can fetch availableLocales from an environment variable or globally define it

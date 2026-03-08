@@ -2,7 +2,7 @@ import { AppContent } from '@/components/app-content';
 import { AppShell } from '@/components/app-shell';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
-import { InertiaI18nProvider } from '@/contexts/i18n-context';
+import { AppI18nProvider } from '@/contexts/i18n-context';
 import { type BreadcrumbItem } from '@/types';
 import { type PropsWithChildren } from 'react';
 
@@ -11,7 +11,7 @@ export default function AppSidebarLayout({
     breadcrumbs = [],
 }: PropsWithChildren<{ breadcrumbs?: BreadcrumbItem[] }>) {
     return (
-        <InertiaI18nProvider>
+        <AppI18nProvider>
             <AppShell variant="sidebar">
                 <AppSidebar />
                 <AppContent variant="sidebar" className="overflow-x-hidden">
@@ -19,6 +19,6 @@ export default function AppSidebarLayout({
                     {children}
                 </AppContent>
             </AppShell>
-        </InertiaI18nProvider>
+        </AppI18nProvider>
     );
 }
