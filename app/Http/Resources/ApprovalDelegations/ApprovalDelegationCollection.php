@@ -4,6 +4,9 @@ namespace App\Http\Resources\ApprovalDelegations;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
+/**
+ * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ */
 class ApprovalDelegationCollection extends ResourceCollection
 {
     /**

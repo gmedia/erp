@@ -18,11 +18,11 @@ class StockTransferItemController extends Controller
                 'id' => $item->id,
                 'product' => [
                     'id' => $item->product_id,
-                    'name' => $item->product?->name,
+                    'name' => $item->product->name,
                 ],
                 'unit' => [
                     'id' => $item->unit_id,
-                    'name' => $item->unit?->name,
+                    'name' => $item->unit->name,
                 ],
                 'quantity' => (string) $item->quantity,
                 'quantity_received' => (string) $item->quantity_received,
@@ -43,11 +43,11 @@ class StockTransferItemController extends Controller
                 'id' => $item->id,
                 'product' => [
                     'id' => $item->product_id,
-                    'name' => $item->product?->name,
+                    'name' => $item->product->name,
                 ],
                 'unit' => [
                     'id' => $item->unit_id,
-                    'name' => $item->unit?->name,
+                    'name' => $item->unit->name,
                 ],
                 'quantity' => (string) $item->quantity,
                 'quantity_received' => (string) $item->quantity_received,

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -56,12 +57,12 @@ class Supplier extends Model
         'updated_at' => 'datetime',
     ];
 
-    public function branch()
+    public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
     }
 
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(SupplierCategory::class);
     }

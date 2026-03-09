@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -79,22 +81,22 @@ class PipelineTransition extends Model
         'is_active' => 'boolean',
     ];
 
-    public function pipeline()
+    public function pipeline(): BelongsTo
     {
         return $this->belongsTo(Pipeline::class);
     }
 
-    public function fromState()
+    public function fromState(): BelongsTo
     {
         return $this->belongsTo(PipelineState::class, 'from_state_id');
     }
 
-    public function toState()
+    public function toState(): BelongsTo
     {
         return $this->belongsTo(PipelineState::class, 'to_state_id');
     }
 
-    public function actions()
+    public function actions(): HasMany
     {
         return $this->hasMany(PipelineTransitionAction::class)->orderBy('execution_order');
     }

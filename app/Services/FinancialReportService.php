@@ -556,10 +556,13 @@ class FinancialReportService
 
     private function resolveCoaVersionForFiscalYear(FiscalYear $fiscalYear): ?CoaVersion
     {
-        return $fiscalYear->coaVersions()
+        /** @var CoaVersion|null $coaVersion */
+        $coaVersion = $fiscalYear->coaVersions()
             ->orderByRaw("CASE status WHEN 'active' THEN 0 WHEN 'archived' THEN 1 WHEN 'draft' THEN 2 ELSE 3 END")
             ->orderByDesc('id')
             ->first();
+
+        return $coaVersion;
     }
 
     private function computeAccountBalance(string $normalBalance, float|int $debit, float|int $credit): float

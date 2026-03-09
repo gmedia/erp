@@ -50,6 +50,9 @@ class AssetCategoryExport extends SimpleCrudExport
         ];
     }
 
+    /**
+     * @param \App\Models\AssetCategory $model
+     */
     public function map($model): array
     {
         return [

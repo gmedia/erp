@@ -13,7 +13,7 @@ class UpdateStockTransferRequest extends FormRequest
 
     public function rules(): array
     {
-        $transferId = $this->route('stockTransfer')?->id ?? $this->route('id');
+        $transferId = $this->route('stockTransfer')->id ?? $this->route('id');
 
         return [
             'transfer_number' => ['sometimes', 'nullable', 'string', 'max:255', 'unique:stock_transfers,transfer_number,' . $transferId],

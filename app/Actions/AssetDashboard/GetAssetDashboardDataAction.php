@@ -26,8 +26,7 @@ class GetAssetDashboardDataAction
         $statusCounts = Asset::query()
             ->select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
-            ->get()
-            ->keyBy('status');
+            ->pluck('count', 'status');
 
         $statusMapping = [
             'draft' => ['name' => 'Draft', 'color' => '#6B7280'],       // Gray
@@ -43,7 +42,7 @@ class GetAssetDashboardDataAction
                 'id' => $statusCode,
                 'name' => $config['name'],
                 'color' => $config['color'],
-                'count' => $statusCounts->has($statusCode) ? $statusCounts->get($statusCode)->count : 0,
+                'count' => $statusCounts->get($statusCode, 0),
             ];
         }
 
@@ -61,8 +60,7 @@ class GetAssetDashboardDataAction
             ->select('condition', DB::raw('count(*) as count'))
             ->whereNotNull('condition')
             ->groupBy('condition')
-            ->get()
-            ->keyBy('condition');
+            ->pluck('count', 'condition');
 
         $conditionMapping = [
             'good' => ['name' => 'Good', 'color' => '#10B981'],
@@ -76,7 +74,7 @@ class GetAssetDashboardDataAction
                 'id' => $conditionCode,
                 'name' => $config['name'],
                 'color' => $config['color'],
-                'count' => $conditionCounts->has($conditionCode) ? $conditionCounts->get($conditionCode)->count : 0,
+                'count' => $conditionCounts->get($conditionCode, 0),
             ];
         }
 
@@ -91,8 +89,8 @@ class GetAssetDashboardDataAction
             ->map(function ($maintenance) {
                 return [
                     'id' => $maintenance->id,
-                    'asset_name' => $maintenance->asset ? $maintenance->asset->name : 'Unknown',
-                    'asset_code' => $maintenance->asset ? $maintenance->asset->asset_code : 'Unknown',
+                    'asset_name' => $maintenance->asset->name,
+                    'asset_code' => $maintenance->asset->asset_code,
                     'maintenance_type' => $maintenance->maintenance_type,
                     'status' => $maintenance->status,
                     'scheduled_at' => $maintenance->scheduled_at ? $maintenance->scheduled_at->toISOString() : null,

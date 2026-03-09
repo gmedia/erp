@@ -22,8 +22,7 @@ class IndexCoaVersionsAction extends SimpleCrudIndexAction
      */
     public function execute(FormRequest $request): LengthAwarePaginator
     {
-        $modelClass = $this->getModelClass();
-        $query = $modelClass::query()->with('fiscalYear');
+        $query = CoaVersion::query()->with('fiscalYear');
 
         if ($request->filled('search')) {
             $this->filterService->applySearch($query, $request->get('search'), $this->getSearchFields());

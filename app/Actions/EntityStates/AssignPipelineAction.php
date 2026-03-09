@@ -30,7 +30,7 @@ class AssignPipelineAction
 
         // 2. See if the entity is already in a pipeline state
         $existingState = PipelineEntityState::where('entity_type', $entityType)
-            ->where('entity_id', $entity->id)
+            ->where('entity_id', $entity->getKey())
             ->where('pipeline_id', $pipeline->id)
             ->first();
 
@@ -39,6 +39,7 @@ class AssignPipelineAction
         }
 
         // 3. Find the initial state for the configured pipeline
+        /** @var \App\Models\PipelineState|null $initialState */
         $initialState = $pipeline->states()->where('type', 'initial')->first();
 
         if (! $initialState) {
@@ -50,14 +51,16 @@ class AssignPipelineAction
             $entityState = PipelineEntityState::create([
                 'pipeline_id' => $pipeline->id,
                 'entity_type' => $entityType,
-                'entity_id' => $entity->id,
+                'entity_id' => $entity->getKey(),
                 'current_state_id' => $initialState->id,
                 'last_transitioned_by' => auth()->id(),
                 'last_transitioned_at' => now(),
             ]);
 
             // 5. Create the initial log entry
-            $entity->pipelineStateLogs()->create([
+            \App\Models\PipelineStateLog::create([
+                'entity_type' => $entityType,
+                'entity_id' => $entity->getKey(),
                 'pipeline_entity_state_id' => $entityState->id,
                 'to_state_id' => $initialState->id,
                 'performed_by' => auth()->id(),

@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
+/**
+ * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ */
 class ApprovalAuditTrailResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -18,7 +21,7 @@ class ApprovalAuditTrailResource extends JsonResource
             'approvable_id' => $this->approvable_id,
             'event' => $this->event,
             'actor_user_id' => $this->actor_user_id,
-            'actor_user_name' => $this->actor?->name ?? 'System',
+            'actor_user_name' => $this->actor->name ?? 'System',
             'step_order' => $this->step_order,
             'metadata' => $this->metadata,
             'ip_address' => $this->ip_address,

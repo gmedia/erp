@@ -13,6 +13,9 @@ class ApprovalDelegationExport implements FromQuery, WithHeadings, WithMapping
         private readonly Builder $query
     ) {}
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function query()
     {
         return $this->query;
@@ -40,11 +43,11 @@ class ApprovalDelegationExport implements FromQuery, WithHeadings, WithMapping
     {
         return [
             $row->id,
-            $row->delegator?->name,
-            $row->delegate?->name,
+            $row->delegator->name,
+            $row->delegate->name,
             $row->approvable_type,
-            $row->start_date?->format('Y-m-d'),
-            $row->end_date?->format('Y-m-d'),
+            $row->start_date->format('Y-m-d'),
+            $row->end_date->format('Y-m-d'),
             $row->reason,
             $row->is_active ? 'Active' : 'Inactive',
             $row->created_at?->format('Y-m-d H:i:s'),

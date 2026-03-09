@@ -4,6 +4,9 @@ namespace App\Http\Resources\Employees;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
+/**
+ * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ */
 class EmployeeCollection extends ResourceCollection
 {
     /**

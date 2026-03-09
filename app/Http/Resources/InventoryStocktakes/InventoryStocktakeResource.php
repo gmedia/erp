@@ -8,6 +8,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property InventoryStocktake $resource
  */
+/**
+ * @mixin \App\Models\InventoryStocktake
+ */
 class InventoryStocktakeResource extends JsonResource
 {
     public function toArray($request): array

@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /** @property JournalEntry $resource */
+/**
+ * @mixin \App\Models\JournalEntry
+ */
 class JournalEntryResource extends JsonResource
 {
     public function toArray(Request $request): array

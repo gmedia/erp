@@ -24,6 +24,9 @@ class AccountMappingExport extends SimpleCrudExport
         ];
     }
 
+    /**
+     * @param \App\Models\AccountMapping $model
+     */
     public function map($model): array
     {
         $source = $model->sourceAccount;
@@ -32,12 +35,12 @@ class AccountMappingExport extends SimpleCrudExport
         return [
             $model->id,
             $model->type,
-            $source?->coaVersion?->name,
-            $source?->code,
-            $source?->name,
-            $target?->coaVersion?->name,
-            $target?->code,
-            $target?->name,
+            $source->coaVersion->name,
+            $source->code,
+            $source->name,
+            $target->coaVersion->name,
+            $target->code,
+            $target->name,
             $model->notes,
             $model->created_at?->toIso8601String(),
             $model->updated_at?->toIso8601String(),

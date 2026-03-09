@@ -18,6 +18,9 @@ class SupplierExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         $this->filters = $filters;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function query()
     {
         $query = Supplier::query()->with(['branch']);

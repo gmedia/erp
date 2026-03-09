@@ -18,11 +18,11 @@ class StockAdjustmentItemController extends Controller
                 'id' => $item->id,
                 'product' => [
                     'id' => $item->product_id,
-                    'name' => $item->product?->name,
+                    'name' => $item->product->name,
                 ],
                 'unit' => [
                     'id' => $item->unit_id,
-                    'name' => $item->unit?->name,
+                    'name' => $item->unit->name,
                 ],
                 'quantity_before' => (string) $item->quantity_before,
                 'quantity_adjusted' => (string) $item->quantity_adjusted,
@@ -45,11 +45,11 @@ class StockAdjustmentItemController extends Controller
                 'id' => $item->id,
                 'product' => [
                     'id' => $item->product_id,
-                    'name' => $item->product?->name,
+                    'name' => $item->product->name,
                 ],
                 'unit' => [
                     'id' => $item->unit_id,
-                    'name' => $item->unit?->name,
+                    'name' => $item->unit->name,
                 ],
                 'quantity_before' => (string) $item->quantity_before,
                 'quantity_adjusted' => (string) $item->quantity_adjusted,

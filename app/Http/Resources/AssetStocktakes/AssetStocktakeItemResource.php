@@ -6,6 +6,9 @@ use App\Http\Resources\Assets\AssetResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\AssetStocktakeItem
+ */
 class AssetStocktakeItemResource extends JsonResource
 {
     public function toArray(Request $request): array

@@ -6,6 +6,9 @@ use App\Models\AssetModel;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /** @property AssetModel $resource */
+/**
+ * @mixin \App\Models\AssetModel
+ */
 class AssetModelResource extends JsonResource
 {
     public function toArray($request): array

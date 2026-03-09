@@ -18,6 +18,9 @@ class StockTransferExport implements FromQuery, WithHeadings, WithMapping, WithS
         $this->filters = $filters;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function query()
     {
         $query = StockTransfer::query()->with(['fromWarehouse', 'toWarehouse']);

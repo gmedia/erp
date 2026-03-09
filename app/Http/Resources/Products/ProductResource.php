@@ -6,6 +6,9 @@ use App\Models\Product;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /** @property Product $resource */
+/**
+ * @mixin \App\Models\Product
+ */
 class ProductResource extends JsonResource
 {
     public function toArray($request): array

@@ -4,6 +4,9 @@ namespace App\Http\Resources\ApprovalAuditTrail;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
+/**
+ * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ */
 class ApprovalAuditTrailCollection extends ResourceCollection
 {
     /**

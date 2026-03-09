@@ -106,10 +106,7 @@ class GetApprovalMonitoringDataAction
             $request = $step->request;
             $document = $request->approvable;
 
-            $entityName = "ID: {$request->approvable_id}";
-            if ($document) {
-                $entityName = $document->name ?? $document->code ?? $document->title ?? $document->reference ?? $entityName;
-            }
+            $entityName = $document->name ?? $document->code ?? $document->title ?? $document->reference ?? "ID: {$request->approvable_id}";
 
             return [
                 'id' => $step->id,

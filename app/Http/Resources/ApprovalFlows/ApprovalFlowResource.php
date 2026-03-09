@@ -5,6 +5,9 @@ namespace App\Http\Resources\ApprovalFlows;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\ApprovalFlow
+ */
 class ApprovalFlowResource extends JsonResource
 {
     public function toArray(Request $request): array

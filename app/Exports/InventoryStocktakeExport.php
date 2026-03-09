@@ -18,6 +18,9 @@ class InventoryStocktakeExport implements FromQuery, WithHeadings, WithMapping, 
         $this->filters = $filters;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function query()
     {
         $query = InventoryStocktake::query()->with(['warehouse', 'productCategory']);

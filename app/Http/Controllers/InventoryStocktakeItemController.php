@@ -18,11 +18,11 @@ class InventoryStocktakeItemController extends Controller
                 'id' => $item->id,
                 'product' => [
                     'id' => $item->product_id,
-                    'name' => $item->product?->name,
+                    'name' => $item->product->name,
                 ],
                 'unit' => [
                     'id' => $item->unit_id,
-                    'name' => $item->unit?->name,
+                    'name' => $item->unit->name,
                 ],
                 'system_quantity' => (string) $item->system_quantity,
                 'counted_quantity' => $item->counted_quantity === null ? null : (string) $item->counted_quantity,
@@ -49,11 +49,11 @@ class InventoryStocktakeItemController extends Controller
                 'id' => $item->id,
                 'product' => [
                     'id' => $item->product_id,
-                    'name' => $item->product?->name,
+                    'name' => $item->product->name,
                 ],
                 'unit' => [
                     'id' => $item->unit_id,
-                    'name' => $item->unit?->name,
+                    'name' => $item->unit->name,
                 ],
                 'system_quantity' => (string) $item->system_quantity,
                 'counted_quantity' => $item->counted_quantity === null ? null : (string) $item->counted_quantity,

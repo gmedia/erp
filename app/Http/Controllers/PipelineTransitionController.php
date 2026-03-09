@@ -28,6 +28,7 @@ class PipelineTransitionController extends Controller
 
         $transition = DB::transaction(function () use ($validated, $pipeline) {
             $transitionData = collect($validated)->except('actions')->toArray();
+            /** @var \App\Models\PipelineTransition $transition */
             $transition = $pipeline->transitions()->create($transitionData);
 
             if (isset($validated['actions']) && is_array($validated['actions'])) {

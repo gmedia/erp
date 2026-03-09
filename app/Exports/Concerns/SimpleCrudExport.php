@@ -97,7 +97,7 @@ abstract class SimpleCrudExport implements FromQuery, ShouldAutoSize, WithHeadin
     /**
      * Map each model to a row.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  mixed  $model
      * @return array<int, mixed>
      */
     public function map($model): array

@@ -19,7 +19,7 @@ class AssetLocationFilterService
             $query->where('branch_id', $filters['branch_id']);
         }
 
-        if (isset($filters['parent_id'])) {
+        if (array_key_exists('parent_id', $filters)) {
             if ($filters['parent_id'] === null || $filters['parent_id'] === '') {
                 // Allow filtering for root locations (no parent)
             } else {

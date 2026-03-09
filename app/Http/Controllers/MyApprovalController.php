@@ -64,6 +64,7 @@ class MyApprovalController extends Controller
         $userId = Auth::id();
 
         DB::transaction(function () use ($approvalRequest, $userId, $request) {
+            /** @var \App\Models\ApprovalRequestStep $currentStep */
             $currentStep = $approvalRequest->steps()
                 ->where('status', 'pending')
                 ->where('step_order', $approvalRequest->current_step_order)
@@ -88,6 +89,7 @@ class MyApprovalController extends Controller
             ]);
 
             // Check if there are more steps
+            /** @var \App\Models\ApprovalRequestStep|null $nextStep */
             $nextStep = $approvalRequest->steps()
                 ->where('step_order', '>', $currentStep->step_order)
                 ->orderBy('step_order', 'asc')
@@ -119,6 +121,7 @@ class MyApprovalController extends Controller
         $userId = Auth::id();
 
         DB::transaction(function () use ($approvalRequest, $userId, $request) {
+            /** @var \App\Models\ApprovalRequestStep $currentStep */
             $currentStep = $approvalRequest->steps()
                 ->where('status', 'pending')
                 ->where('step_order', $approvalRequest->current_step_order)

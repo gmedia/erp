@@ -18,6 +18,9 @@ class StockAdjustmentExport implements FromQuery, WithHeadings, WithMapping, Wit
         $this->filters = $filters;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function query()
     {
         $query = StockAdjustment::query()->with(['warehouse', 'inventoryStocktake']);

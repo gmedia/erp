@@ -12,6 +12,9 @@ class UnitExport extends SimpleCrudExport
         return ['ID', 'Name', 'Symbol', 'Created At', 'Updated At'];
     }
 
+    /**
+     * @param \App\Models\Unit $item
+     */
     public function map($item): array
     {
         return [

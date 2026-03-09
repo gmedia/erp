@@ -10,7 +10,7 @@ class UpdateWarehouseRequest extends SimpleCrudUpdateRequest
 {
     public function rules(): array
     {
-        $warehouseId = $this->route('warehouse')?->id ?? $this->route('id');
+        $warehouseId = $this->route('warehouse')->id ?? $this->route('id');
         $currentBranchId = $this->route('warehouse')?->branch_id;
 
         return [

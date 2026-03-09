@@ -8,6 +8,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property ApprovalDelegation $resource
  */
+/**
+ * @mixin \App\Models\ApprovalDelegation
+ */
 class ApprovalDelegationResource extends JsonResource
 {
     /**

@@ -56,11 +56,11 @@ class StockMovementsExport implements FromCollection, ShouldAutoSize, WithHeadin
     {
         return [
             $movement->moved_at?->format('Y-m-d H:i:s') ?? '-',
-            $movement->product?->code ?? '-',
-            $movement->product?->name ?? '-',
-            $movement->warehouse?->code ?? '-',
-            $movement->warehouse?->name ?? '-',
-            $movement->warehouse?->branch?->name ?? '-',
+            $movement->product->code ?? '-',
+            $movement->product->name ?? '-',
+            $movement->warehouse->code ?? '-',
+            $movement->warehouse->name ?? '-',
+            $movement->warehouse->branch->name ?? '-',
             $movement->movement_type ?? '-',
             $movement->reference_number ?? '-',
             $movement->quantity_in ?? 0,
@@ -69,7 +69,7 @@ class StockMovementsExport implements FromCollection, ShouldAutoSize, WithHeadin
             $movement->unit_cost ?? '-',
             $movement->average_cost_after ?? '-',
             $movement->notes ?? '-',
-            $movement->createdBy?->name ?? '-',
+            $movement->createdBy->name ?? '-',
         ];
     }
 

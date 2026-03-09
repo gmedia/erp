@@ -53,13 +53,13 @@ class PipelineAuditTrailExport implements FromCollection, ShouldAutoSize, WithHe
     {
         return [
             $log->created_at?->format('Y-m-d H:i:s') ?? '-',
-            $log->pipelineEntityState?->pipeline?->name ?? '-',
+            $log->pipelineEntityState->pipeline->name ?? '-',
             Str::afterLast($log->entity_type, '\\'),
             $log->entity_id,
-            $log->fromState?->name ?? 'Initial',
-            $log->toState?->name ?? '-',
-            $log->transition?->name ?? '-',
-            $log->performedBy?->name ?? 'System',
+            $log->fromState->name ?? 'Initial',
+            $log->toState->name ?? '-',
+            $log->transition->name ?? '-',
+            $log->performedBy->name ?? 'System',
             $log->comment ?? '-',
             $log->ip_address ?? '-',
             $log->user_agent ?? '-',

@@ -17,9 +17,9 @@ class AssetStocktakeResource extends JsonResource
             'reference' => $this->reference,
             'branch' => [
                 'id' => $this->branch_id,
-                'name' => $this->branch?->name,
+                'name' => $this->branch->name,
             ],
-            'planned_at' => $this->planned_at?->toIso8601String(),
+            'planned_at' => $this->planned_at->toIso8601String(),
             'performed_at' => $this->performed_at?->toIso8601String(),
             'status' => $this->status,
             'created_by' => [

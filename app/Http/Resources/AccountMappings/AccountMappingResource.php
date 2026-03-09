@@ -4,6 +4,9 @@ namespace App\Http\Resources\AccountMappings;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\AccountMapping
+ */
 class AccountMappingResource extends JsonResource
 {
     public function toArray($request): array

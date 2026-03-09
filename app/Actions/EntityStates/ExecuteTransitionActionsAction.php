@@ -30,6 +30,7 @@ class ExecuteTransitionActionsAction
         $results = [];
 
         foreach ($actions as $actionDefinition) {
+            /** @var \App\Models\PipelineTransitionAction $actionDefinition */
             $type = $actionDefinition->action_type;
             $params = $actionDefinition->config ?? [];
             $onFailure = $actionDefinition->on_failure ?? 'abort';
@@ -81,7 +82,7 @@ class ExecuteTransitionActionsAction
     private function handleCreateRecord(Model $entity, array $params): bool
     {
         // MVP: Not implemented fully. Log a warning
-        Log::warning("'create_record' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->id})");
+        Log::warning("'create_record' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->getKey()})");
 
         return true;
     }
@@ -89,7 +90,7 @@ class ExecuteTransitionActionsAction
     private function handleSendNotification(Model $entity, array $params): bool
     {
         // MVP: Not implemented fully. Log a warning
-        Log::warning("'send_notification' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->id})");
+        Log::warning("'send_notification' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->getKey()})");
 
         return true;
     }

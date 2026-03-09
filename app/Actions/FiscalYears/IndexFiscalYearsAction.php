@@ -21,8 +21,7 @@ class IndexFiscalYearsAction extends SimpleCrudIndexAction
      */
     public function execute(FormRequest $request): LengthAwarePaginator
     {
-        $modelClass = $this->getModelClass();
-        $query = $modelClass::query();
+        $query = FiscalYear::query();
 
         if ($request->filled('search')) {
             $this->filterService->applySearch($query, $request->get('search'), $this->getSearchFields());

@@ -5,6 +5,9 @@ namespace App\Http\Resources\AssetMaintenances;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\AssetMaintenance
+ */
 class AssetMaintenanceResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -14,8 +17,8 @@ class AssetMaintenanceResource extends JsonResource
             'asset_id' => $this->asset_id,
             'asset' => [
                 'id' => $this->asset_id,
-                'name' => $this->asset?->name,
-                'asset_code' => $this->asset?->asset_code,
+                'name' => $this->asset->name,
+                'asset_code' => $this->asset->asset_code,
             ],
             'maintenance_type' => $this->maintenance_type,
             'status' => $this->status,

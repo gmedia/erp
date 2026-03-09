@@ -5,6 +5,9 @@ namespace App\Http\Resources\Reports;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ */
 class StockAdjustmentReportResource extends JsonResource
 {
     public function toArray(Request $request): array

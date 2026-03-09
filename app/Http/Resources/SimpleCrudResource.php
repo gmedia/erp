@@ -4,6 +4,9 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ */
 class SimpleCrudResource extends JsonResource
 {
     /**

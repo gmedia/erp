@@ -13,7 +13,7 @@ class UpdateInventoryStocktakeRequest extends FormRequest
 
     public function rules(): array
     {
-        $stocktakeId = $this->route('inventoryStocktake')?->id ?? $this->route('id');
+        $stocktakeId = $this->route('inventoryStocktake')->id ?? $this->route('id');
 
         return [
             'stocktake_number' => ['sometimes', 'nullable', 'string', 'max:255', 'unique:inventory_stocktakes,stocktake_number,' . $stocktakeId],

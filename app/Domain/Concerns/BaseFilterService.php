@@ -13,16 +13,28 @@ use Illuminate\Database\Eloquent\Builder;
 trait BaseFilterService
 {
     /**
-     * Apply search filters to query across multiple fields.
+     * Apply search filters to query across multiple fields and optionally relationships.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
      * @param  array<int, string>  $searchFields
+     * @param  array<string, array<int, string>>  $relationSearchFields
      */
-    public function applySearch(Builder $query, string $search, array $searchFields): void
+    public function applySearch(Builder $query, string $search, array $searchFields, array $relationSearchFields = []): void
     {
-        $query->where(function ($q) use ($search, $searchFields) {
+        $query->where(function ($q) use ($search, $searchFields, $relationSearchFields) {
             foreach ($searchFields as $field) {
                 $q->orWhere($field, 'like', "%{$search}%");
+            }
+
+            foreach ($relationSearchFields as $relation => $fields) {
+                $q->orWhereHas($relation, function ($relationQuery) use ($search, $fields) {
+                    $relationQuery->where(function ($rq) use ($search, $fields) {
+                        foreach ($fields as $field) {
+                            $rq->orWhere($field, 'like', "%{$search}%");
+                        }
+                    });
+                });
             }
         });
     }
@@ -30,7 +42,8 @@ trait BaseFilterService
     /**
      * Apply sorting to query with validation against allowed columns.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
      * @param  array<int, string>  $allowedSorts
      */
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void

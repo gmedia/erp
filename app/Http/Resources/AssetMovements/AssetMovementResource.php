@@ -5,6 +5,9 @@ namespace App\Http\Resources\AssetMovements;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\AssetMovement
+ */
 class AssetMovementResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -14,11 +17,11 @@ class AssetMovementResource extends JsonResource
             'asset_id' => $this->asset_id,
             'asset' => [
                 'id' => $this->asset_id,
-                'name' => $this->asset?->name,
-                'asset_code' => $this->asset?->asset_code,
+                'name' => $this->asset->name,
+                'asset_code' => $this->asset->asset_code,
             ],
             'movement_type' => $this->movement_type,
-            'moved_at' => $this->moved_at?->toIso8601String(),
+            'moved_at' => $this->moved_at->toIso8601String(),
             'from_branch_id' => $this->from_branch_id,
             'to_branch_id' => $this->to_branch_id,
             'from_location_id' => $this->from_location_id,

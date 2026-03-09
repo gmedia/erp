@@ -8,6 +8,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property Employee $resource
  */
+/**
+ * @mixin \App\Models\Employee
+ */
 class EmployeeResource extends JsonResource
 {
     /**

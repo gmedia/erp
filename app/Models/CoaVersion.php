@@ -39,12 +39,12 @@ class CoaVersion extends Model
         'status',
     ];
 
-    public function fiscalYear()
+    public function fiscalYear(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(FiscalYear::class);
     }
 
-    public function accounts()
+    public function accounts(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Account::class);
     }

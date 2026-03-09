@@ -26,4 +26,11 @@ abstract class SimpleCrudStoreRequest extends FormRequest
             'name' => ['required', 'string', 'max:255', 'unique:' . $model->getTable() . ',name'],
         ];
     }
+
+    /**
+     * Get the target model class.
+     *
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     */
+    abstract protected function getModelClass(): string;
 }

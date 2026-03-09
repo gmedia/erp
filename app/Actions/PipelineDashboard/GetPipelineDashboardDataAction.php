@@ -60,11 +60,11 @@ class GetPipelineDashboardDataAction
             $query->where('entity_type', $entityType);
         }
 
-        $aggregatedStateCounts = $query->groupBy('current_state_id')->get();
+        $aggregatedStateCounts = $query->groupBy('current_state_id')->pluck('count', 'current_state_id');
 
-        foreach ($aggregatedStateCounts as $row) {
-            if (isset($summaryData[$row->current_state_id])) {
-                $summaryData[$row->current_state_id]['count'] = $row->count;
+        foreach ($aggregatedStateCounts as $stateId => $count) {
+            if (isset($summaryData[$stateId])) {
+                $summaryData[$stateId]['count'] = $count;
             }
         }
 
@@ -118,12 +118,14 @@ class GetPipelineDashboardDataAction
                 ],
                 'days_in_state' => Carbon::parse($state->last_transitioned_at)->diffInDays(Carbon::now()),
                 'last_transitioned_at' => $state->last_transitioned_at->toISOString(),
-                'last_transitioned_by' => $state->lastTransitionedBy?->name ?? 'System',
+                'last_transitioned_by' => $state->lastTransitionedBy->name ?? 'System',
             ];
         });
 
+        $summaryValues = array_values($summaryData);
+
         return [
-            'summary' => array_values($summaryData),
+            'summary' => $summaryValues,
             'stale_entities' => $staleEntities,
         ];
     }

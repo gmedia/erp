@@ -29,7 +29,7 @@ class BookValueDepreciationExport implements FromCollection, ShouldAutoSize, Wit
         $request = new IndexBookValueDepreciationRequest;
         $request->merge($this->filters);
 
-        return $action->execute($request);
+        return collect($action->execute($request)->items());
     }
 
     public function headings(): array
@@ -48,14 +48,17 @@ class BookValueDepreciationExport implements FromCollection, ShouldAutoSize, Wit
         ];
     }
 
+    /**
+     * @param \App\Models\Asset $asset
+     */
     public function map($asset): array
     {
         return [
             $asset->asset_code,
             $asset->name,
-            $asset->category?->name ?? '-',
-            $asset->branch?->name ?? '-',
-            $asset->purchase_date?->format('Y-m-d') ?? '-',
+            $asset->category->name ?? '-',
+            $asset->branch->name ?? '-',
+            $asset->purchase_date->format('Y-m-d'),
             $asset->purchase_cost,
             $asset->salvage_value,
             $asset->useful_life_months,

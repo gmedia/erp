@@ -37,7 +37,7 @@ class ExecuteTransitionAction
         }
 
         // 2. Validate current state matches transition from_state
-        if ($transition->from_state_id !== $entityState->current_state_id && $transition->from_state_id !== null) {
+        if ($transition->from_state_id !== $entityState->current_state_id) {
             throw ValidationException::withMessages([
                 'transition_id' => 'Current state does not allow this transition.',
             ]);
@@ -75,7 +75,9 @@ class ExecuteTransitionAction
             $logMetadata = array_merge($metadata, ['action_results' => $actionResults]);
 
             // 7. Create State Log
-            $entity->pipelineStateLogs()->create([
+            \App\Models\PipelineStateLog::create([
+                'entity_type' => $entity->getMorphClass(),
+                'entity_id' => $entity->getKey(),
                 'pipeline_entity_state_id' => $entityState->id,
                 'from_state_id' => $fromStateId,
                 'to_state_id' => $transition->to_state_id,

@@ -5,6 +5,9 @@ namespace App\Http\Resources\EntityStates;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ */
 class EntityStateResource extends JsonResource
 {
     public function toArray(Request $request): array

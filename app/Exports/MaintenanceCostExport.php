@@ -51,15 +51,15 @@ class MaintenanceCostExport implements FromCollection, ShouldAutoSize, WithHeadi
     public function map($maintenance): array
     {
         return [
-            $maintenance->asset?->asset_code ?? '-',
-            $maintenance->asset?->name ?? '-',
-            $maintenance->asset?->category?->name ?? '-',
-            $maintenance->asset?->branch?->name ?? '-',
+            $maintenance->asset->asset_code ?? '-',
+            $maintenance->asset->name ?? '-',
+            $maintenance->asset->category->name ?? '-',
+            $maintenance->asset->branch->name ?? '-',
             ucfirst($maintenance->maintenance_type),
             ucfirst($maintenance->status),
             $maintenance->scheduled_at?->format('Y-m-d H:i') ?? '-',
             $maintenance->performed_at?->format('Y-m-d H:i') ?? '-',
-            $maintenance->supplier?->name ?? '-',
+            $maintenance->supplier->name ?? '-',
             $maintenance->cost,
             $maintenance->notes ?? '-',
         ];

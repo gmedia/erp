@@ -101,7 +101,7 @@ class ExportAssetStocktakeVariancesAction
             'Checked By',
         ];
 
-        foreach (array_values($headers) as $index => $header) {
+        foreach ($headers as $index => $header) {
             $column = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($index + 1);
             $sheet->setCellValue($column . '1', $header);
             $sheet->getStyle($column . '1')->getFont()->setBold(true);
@@ -112,17 +112,17 @@ class ExportAssetStocktakeVariancesAction
         $query->chunk(100, function ($items) use ($sheet, &$row, &$no) {
             foreach ($items as $item) {
                 $sheet->setCellValue('A' . $row, $no++);
-                $sheet->setCellValue('B' . $row, $item->stocktake?->reference ?? '-');
-                $sheet->setCellValue('C' . $row, $item->asset?->asset_code ?? '-');
-                $sheet->setCellValue('D' . $row, $item->asset?->name ?? '-');
-                $sheet->setCellValue('E' . $row, $item->expectedBranch?->name ?? '-');
-                $sheet->setCellValue('F' . $row, $item->expectedLocation?->name ?? '-');
-                $sheet->setCellValue('G' . $row, $item->foundBranch?->name ?? '-');
-                $sheet->setCellValue('H' . $row, $item->foundLocation?->name ?? '-');
+                $sheet->setCellValue('B' . $row, $item->stocktake->reference);
+                $sheet->setCellValue('C' . $row, $item->asset->asset_code);
+                $sheet->setCellValue('D' . $row, $item->asset->name);
+                $sheet->setCellValue('E' . $row, $item->expectedBranch->name ?? '-');
+                $sheet->setCellValue('F' . $row, $item->expectedLocation->name ?? '-');
+                $sheet->setCellValue('G' . $row, $item->foundBranch->name ?? '-');
+                $sheet->setCellValue('H' . $row, $item->foundLocation->name ?? '-');
                 $sheet->setCellValue('I' . $row, ucfirst($item->result));
                 $sheet->setCellValue('J' . $row, $item->notes ?? '-');
                 $sheet->setCellValue('K' . $row, $item->checked_at ? $item->checked_at->format('Y-m-d H:i:s') : '-');
-                $sheet->setCellValue('L' . $row, $item->checkedBy?->name ?? '-');
+                $sheet->setCellValue('L' . $row, $item->checkedBy->name ?? '-');
                 $row++;
             }
         });

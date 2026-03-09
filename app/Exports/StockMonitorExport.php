@@ -47,12 +47,12 @@ class StockMonitorExport implements FromCollection, ShouldAutoSize, WithHeadings
     public function map($stock): array
     {
         return [
-            $stock->product?->code ?? '-',
-            $stock->product?->name ?? '-',
-            $stock->product?->category?->name ?? '-',
-            $stock->warehouse?->code ?? '-',
-            $stock->warehouse?->name ?? '-',
-            $stock->warehouse?->branch?->name ?? '-',
+            $stock->product->code ?? '-',
+            $stock->product->name ?? '-',
+            $stock->product->category->name ?? '-',
+            $stock->warehouse->code ?? '-',
+            $stock->warehouse->name ?? '-',
+            $stock->warehouse->branch->name ?? '-',
             $stock->quantity_on_hand ?? 0,
             $stock->average_cost ?? 0,
             $stock->stock_value ?? 0,

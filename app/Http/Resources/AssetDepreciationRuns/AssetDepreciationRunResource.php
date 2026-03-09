@@ -5,6 +5,9 @@ namespace App\Http\Resources\AssetDepreciationRuns;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\AssetDepreciationRun
+ */
 class AssetDepreciationRunResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -15,8 +18,8 @@ class AssetDepreciationRunResource extends JsonResource
             'fiscal_year' => $this->whenLoaded('fiscalYear', function () {
                 return ['id' => $this->fiscalYear->id, 'name' => $this->fiscalYear->name];
             }),
-            'period_start' => $this->period_start?->format('Y-m-d'),
-            'period_end' => $this->period_end?->format('Y-m-d'),
+            'period_start' => $this->period_start->format('Y-m-d'),
+            'period_end' => $this->period_end->format('Y-m-d'),
             'status' => $this->status,
             'journal_entry_id' => $this->journal_entry_id,
             'journal_entry' => $this->whenLoaded('journalEntry', function () {

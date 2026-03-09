@@ -5,6 +5,9 @@ namespace App\Http\Resources\EntityStates;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\PipelineStateLog
+ */
 class StateTimelineResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -16,11 +19,11 @@ class StateTimelineResource extends JsonResource
                 'color' => $this->fromState->color,
                 'icon' => $this->fromState->icon,
             ] : null,
-            'to_state' => $this->toState ? [
+            'to_state' => [
                 'name' => $this->toState->name,
                 'color' => $this->toState->color,
                 'icon' => $this->toState->icon,
-            ] : null,
+            ],
             'transition' => $this->transition ? [
                 'name' => $this->transition->name,
             ] : null,

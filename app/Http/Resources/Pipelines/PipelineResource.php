@@ -6,6 +6,9 @@ use App\Models\Pipeline;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /** @property Pipeline $resource */
+/**
+ * @mixin \App\Models\Pipeline
+ */
 class PipelineResource extends JsonResource
 {
     public function toArray($request): array

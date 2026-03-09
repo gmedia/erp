@@ -111,7 +111,7 @@ class IndexStockMonitorAction
                 'total_quantity' => (string) $summaryRows->sum('quantity_on_hand'),
                 'total_stock_value' => (string) $summaryRows->sum('stock_value'),
                 'low_stock_items' => (int) $summaryRows->filter(
-                    fn (StockMovement $movement) => (float) $movement->quantity_on_hand <= (float) $request->float('low_stock_threshold', 10)
+                    fn (StockMovement $movement) => (float) $movement->getAttribute('quantity_on_hand') <= (float) $request->float('low_stock_threshold', 10)
                 )->count(),
                 'by_warehouse' => $this->buildWarehouseSummary($summaryRows),
                 'by_category' => $this->buildCategorySummary($summaryRows),
@@ -125,7 +125,7 @@ class IndexStockMonitorAction
         return $stocks
             ->groupBy('warehouse.name')
             ->map(fn ($items, $warehouseName) => [
-                'name' => $warehouseName ?? '-',
+                'name' => $warehouseName ?: '-',
                 'quantity' => (string) $items->sum('quantity_on_hand'),
                 'value' => (string) $items->sum('stock_value'),
             ])
@@ -138,7 +138,7 @@ class IndexStockMonitorAction
         return $stocks
             ->groupBy('product.category.name')
             ->map(fn ($items, $categoryName) => [
-                'name' => $categoryName ?? '-',
+                'name' => $categoryName ?: '-',
                 'quantity' => (string) $items->sum('quantity_on_hand'),
                 'value' => (string) $items->sum('stock_value'),
             ])
@@ -151,7 +151,7 @@ class IndexStockMonitorAction
         return $stocks
             ->groupBy('warehouse.branch.name')
             ->map(fn ($items, $branchName) => [
-                'name' => $branchName ?? '-',
+                'name' => $branchName ?: '-',
                 'quantity' => (string) $items->sum('quantity_on_hand'),
                 'value' => (string) $items->sum('stock_value'),
             ])

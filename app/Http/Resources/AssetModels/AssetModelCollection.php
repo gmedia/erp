@@ -4,6 +4,9 @@ namespace App\Http\Resources\AssetModels;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
+/**
+ * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ */
 class AssetModelCollection extends ResourceCollection
 {
     public $collects = AssetModelResource::class;

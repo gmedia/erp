@@ -47,14 +47,17 @@ class ApprovalAuditTrailExport implements FromCollection, ShouldAutoSize, WithHe
         ];
     }
 
+    /**
+     * @param \App\Models\ApprovalAuditLog $log
+     */
     public function map($log): array
     {
         return [
-            $log->created_at?->format('Y-m-d H:i:s') ?? '-',
+            $log->created_at->format('Y-m-d H:i:s'),
             Str::afterLast($log->approvable_type, '\\'),
             $log->approvable_id,
             ucfirst(str_replace('_', ' ', $log->event ?? '-')),
-            $log->actor?->name ?? 'System',
+            $log->actor->name ?? 'System',
             $log->step_order ?? '-',
             is_array($log->metadata) ? json_encode($log->metadata) : ($log->metadata ?? '-'),
             $log->ip_address ?? '-',

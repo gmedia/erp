@@ -13,7 +13,7 @@ class UpdateStockAdjustmentRequest extends FormRequest
 
     public function rules(): array
     {
-        $adjustmentId = $this->route('stockAdjustment')?->id ?? $this->route('id');
+        $adjustmentId = $this->route('stockAdjustment')->id ?? $this->route('id');
 
         return [
             'adjustment_number' => ['sometimes', 'nullable', 'string', 'max:255', 'unique:stock_adjustments,adjustment_number,' . $adjustmentId],
