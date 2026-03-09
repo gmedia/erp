@@ -185,3 +185,64 @@ describe('AdminSettingController@update', function () {
         Storage::disk(config('filesystems.default'))->assertExists($storedPath);
     });
 });
+
+describe('AdminSettingController@testSmtp', function () {
+    test('unauthenticated user is redirected to login', function () {
+        $response = $this->post(route('admin-settings.test-smtp'), [
+            'test_email' => 'test@example.com',
+        ]);
+        $response->assertRedirect(route('login'));
+    });
+
+    test('user without edit permission gets 403', function () {
+        $user = createTestUserWithPermissions(['admin_setting']);
+
+        $response = $this->actingAs($user)->post(route('admin-settings.test-smtp'), [
+            'test_email' => 'test@example.com',
+        ]);
+
+        $response->assertStatus(403);
+    });
+
+    test('user with edit permission can send test email successfully', function () {
+        \Illuminate\Support\Facades\Mail::fake();
+
+        $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
+
+        $response = $this->actingAs($user)->post(route('admin-settings.test-smtp'), [
+            'test_email' => 'test@example.com',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\TestSmtpMail::class, function ($mail) {
+            return $mail->hasTo('test@example.com');
+        });
+    });
+
+    test('fails gracefully when sending test email results in exception', function () {
+        // Mock the mailer to throw an exception
+        \Illuminate\Support\Facades\Mail::shouldReceive('to->send')->andThrow(new \Exception('Connection refused'));
+
+        $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
+
+        $response = $this->actingAs($user)->post(route('admin-settings.test-smtp'), [
+            'test_email' => 'test@example.com',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('test_email');
+        expect(session('errors')->get('test_email')[0])->toContain('Failed to send email: Connection refused');
+    });
+
+    test('validates email format', function () {
+        $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
+
+        $response = $this->actingAs($user)->post(route('admin-settings.test-smtp'), [
+            'test_email' => 'not-an-email',
+        ]);
+
+        $response->assertSessionHasErrors('test_email');
+    });
+});

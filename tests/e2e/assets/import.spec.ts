@@ -64,19 +64,14 @@ test.describe('Asset Import E2E Tests', () => {
         ]);
         
         const responseBody = await response.json();
-        console.log('Import Response:', JSON.stringify(responseBody, null, 2));
 
         // 6. Verify Success
         try {
             await expect(page.getByText('Import Completed')).toBeVisible({ timeout: 10000 });
             await expect(page.getByText('Successfully imported 1 rows.')).toBeVisible();
         } catch (e) {
-            console.log("Success toast not found within timeout. Checking for data existence...");
              // Check if error toast appeared instead
             const errorToast = await page.getByText('Import Failed').isVisible();
-            if (errorToast) {
-                console.log("Error toast detected!");
-            }
         }
 
         // Close dialog manually if it's still open

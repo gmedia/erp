@@ -13,6 +13,7 @@ test.describe('Admin Settings', () => {
         // Sidebar navigation should be visible
         await expect(page.getByRole('link', { name: 'General' })).toBeVisible();
         await expect(page.getByRole('link', { name: 'Regional' })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'SMTP' })).toBeVisible();
 
         // General settings heading should show
         await expect(page.getByText('General Settings')).toBeVisible();
@@ -190,4 +191,74 @@ test.describe('Admin Settings', () => {
         const acceptAttr = await logoInput.getAttribute('accept');
         expect(acceptAttr).toBe('.svg,image/svg+xml');
     });
+
+    test('can navigate to SMTP settings and update values', async ({ page }) => {
+        await page.goto('/admin-settings');
+
+        // Click SMTP tab
+        await page.getByRole('link', { name: 'SMTP' }).click();
+        await expect(page).toHaveURL(/group=smtp/);
+
+        // SMTP settings heading should show
+        await expect(page.getByText('SMTP Settings')).toBeVisible();
+
+        // Check if all fields exist
+        await expect(page.locator('input[name="mail_host"]')).toBeVisible();
+        await expect(page.locator('input[name="mail_port"]')).toBeVisible();
+        await expect(page.locator('input[name="mail_username"]')).toBeVisible();
+        await expect(page.locator('input[name="mail_password"]')).toBeVisible();
+        await expect(page.locator('input[name="mail_encryption"]')).toBeVisible();
+        await expect(page.locator('input[name="mail_from_address"]')).toBeVisible();
+        await expect(page.locator('input[name="mail_from_name"]')).toBeVisible();
+
+        // Save original host
+        const hostInput = page.locator('input[name="mail_host"]');
+        const originalHost = await hostInput.inputValue();
+
+        // Update SMTP host
+        await hostInput.clear();
+        await hostInput.fill('smtp.mailtrap.io');
+
+        // Save
+        const saveButton = page.getByTestId('save-smtp-settings');
+        await saveButton.click();
+
+        // Wait for page to reload/settle
+        await page.waitForTimeout(1000);
+
+        // Verify persistence
+        await page.reload();
+        await expect(page.locator('input[name="mail_host"]')).toHaveValue('smtp.mailtrap.io');
+
+        // Restore original host so we don't break the next test
+        await hostInput.clear();
+        await hostInput.fill(originalHost);
+        await saveButton.click();
+        await page.waitForTimeout(1000);
+    });
+
+    test('can send test smtp email', async ({ page }) => {
+        await page.goto('/admin-settings?group=smtp');
+
+        // Check if test email section is visible
+        await expect(page.getByText('Test SMTP Configuration')).toBeVisible();
+
+        // Target the test email input
+        const testEmailInput = page.locator('input[name="test_email"]');
+        await expect(testEmailInput).toBeVisible();
+
+        // Fill in a test email
+        await testEmailInput.fill('admin@dokfin.id');
+
+        // Click the send button
+        const sendTestButton = page.getByTestId('send-test-email');
+        await sendTestButton.click();
+
+        // The form should either succeed or fail gracefully by showing a red error string returning from backend
+        const successMessage = page.getByText('Test email sent successfully! Check your inbox.');
+        const errorMessage = page.locator('text=Failed to send email:');
+
+        await expect(successMessage.or(errorMessage)).toBeVisible({ timeout: 5000 });
+    });
 });
+

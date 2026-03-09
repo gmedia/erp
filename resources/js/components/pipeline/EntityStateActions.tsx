@@ -111,7 +111,7 @@ export function EntityStateActions({ entityType, entityId, onStateChange }: Prop
             </Badge>
 
             {available_transitions && available_transitions.length > 0 && (
-                <div className="flex items-center gap-2 border-l pl-3 ml-1">
+                <div className="flex flex-wrap items-center gap-2 border-l pl-3 ml-1">
                     <TooltipProvider>
                         {available_transitions.map((transition) => (
                             <Tooltip key={transition.id}>

@@ -533,6 +533,16 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/stock-monitor/stock-monitor.spec.ts
 
+- slug: approval-audit-trail
+  route: /approval-audit-trail
+  api: /api/approval-audit-trail
+  export_api: /api/approval-audit-trail/export
+  search_placeholder: "Search IP, Document ID, user..."
+  sortable_columns: [Date, Document Type, Document ID, Event, Actor, Step]
+  view_type: dialog
+  checkbox_header: false
+  note: "Non-CRUD feature for viewing and exporting approval audit trail logs. Read-only Data Table with Detail modal."
+
 - modul: Asset Dashboard
   group: asset-dashboard
   tests:
@@ -642,6 +652,18 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 12 | Entity State Actions | `entity-state-actions` | `Feature/EntityStates/EntityStateControllerTest.php` | Pipeline actions engine per entitas |
 | 13 | Entity State Timeline | `entity-state-timeline` | `Feature/EntityStates/EntityStateTimelineTest.php` | Timeline history component per entitas |
 | 14 | Pipeline Audit Trail | `pipeline-audit-trail` | `Feature/PipelineAuditTrail/PipelineAuditTrailControllerTest.php` | Log seluruh transisi state pipeline |
+| 15 | Approval Audit Trail | `approval-audit-trail` | `Feature/ApprovalAuditTrail/ApprovalAuditTrailControllerTest.php` | Log seluruh histori approval |
+| 16 | Asset Dashboard | `asset-dashboard` | `Feature/AssetDashboard/AssetDashboardControllerTest.php` | Dashboard Visualisasi Aset |
+| 17 | Admin Settings | `admin-settings` | `Feature/AdminSettings/AdminSettingControllerTest.php`, `Unit/Models/SettingTest.php` | Non-CRUD settings page (General, Regional) |
+| 18 | My Approvals | `my-approvals` | `Feature/MyApprovalControllerTest.php` | Inbox for user to approve/reject documents |
+| 19 | Approval History | `approval-history` | `Feature/EntityApprovalHistoryControllerTest.php` | Component showing timeline history of approvals per entity |
+| 20 | Approval Monitoring | `approval-monitoring` | `Feature/ApprovalMonitoring/ApprovalMonitoringControllerTest.php` | Monitoring dashboard connecting to GetApprovalMonitoringDataAction |
+| 21 | Stock Movements | `stock-movements` | `Feature/StockMovements/*.php` (2 files) | Kartu stok (read-only) + export |
+| 22 | Stock Monitor | `stock-monitor` | `Feature/StockMonitor/StockMonitorControllerTest.php` | Dashboard stok per produk & gudang dengan low stock threshold |
+| 23 | Inventory Valuation Report | `inventory-valuation-report` | `Feature/Reports/InventoryValuationReportTest.php` | Laporan nilai persediaan per produk per gudang + export |
+| 24 | Stock Movement Report | `stock-movement-report` | `Feature/Reports/StockMovementReportTest.php` | Laporan pergerakan stok per periode + export |
+| 25 | Inventory Stocktake Variance Report | `inventory-stocktake-variance-report` | `Feature/Reports/InventoryStocktakeVarianceReportTest.php` | Laporan variance stock opname inventory + export |
+| 26 | Stock Adjustment Report | `stock-adjustment-report` | `Feature/Reports/StockAdjustmentReportTest.php` | Laporan penyesuaian stok per tipe/periode/gudang + export |
 | 15 | Asset Dashboard | `asset-dashboard` | `Feature/AssetDashboard/AssetDashboardControllerTest.php` | Dashboard Visualisasi Aset |
 | 16 | Admin Settings | `admin-settings` | `Feature/AdminSettings/AdminSettingControllerTest.php`, `Unit/Models/SettingTest.php` | Non-CRUD settings page (General, Regional) |
 | 17 | My Approvals | `my-approvals` | `Feature/MyApprovalControllerTest.php` | Inbox for user to approve/reject documents |

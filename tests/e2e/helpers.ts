@@ -135,8 +135,16 @@ export async function login(
   
   // Listen for console errors
   page.on('console', msg => {
-    if (msg.type() === 'error')
-      console.error(`Console Error text: "${msg.text()}"`);
+    if (msg.type() === 'error') {
+      const text = msg.text();
+      // Ignore known expected errors to keep test output clean
+      if (text.includes('Failed to send logs: TypeError: Failed to fetch')) return; // Laravel Boost logger
+      if (text.includes('the server responded with a status of 422')) return; // Expected validation error
+      if (text.includes('AxiosError')) return; // Expected validation error
+      if (text.includes('Download the React DevTools')) return;
+
+      console.error(`Console Error text: "${text}"`);
+    }
   });
 
   const gotoWithRetry = async (url: string): Promise<void> => {

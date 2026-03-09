@@ -52,7 +52,7 @@ test.describe('Asset Depreciation Runs', () => {
             await expect(page.getByText('Depreciation successfully posted to journal.')).toBeVisible({ timeout: 10000 });
         } else {
             // Alternatively, intercept the API to provide mock data if no real data is there
-            console.log('No calculated runs found to post in E2E test.');
+            // console.log('No calculated runs found to post in E2E test.');
         }
     });
 });

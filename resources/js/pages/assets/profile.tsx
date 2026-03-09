@@ -266,8 +266,7 @@ export default function AssetProfile({ asset }: Props) {
                 </div>
 
                 <Tabs defaultValue="summary" className="w-full">
-                    <div className="overflow-x-auto no-scrollbar">
-                        <TabsList className="inline-flex h-auto w-full min-w-max md:grid md:grid-cols-7 bg-muted/50">
+                    <TabsList className="grid !h-auto w-full grid-cols-2 gap-2 bg-muted/50 p-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-4">
                         <TabsTrigger value="summary" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
                             <Info className="mr-2 h-4 w-4" />
                             Summary
@@ -297,7 +296,6 @@ export default function AssetProfile({ asset }: Props) {
                             Approvals
                         </TabsTrigger>
                     </TabsList>
-                </div>
 
                     {/* Summary Tab */}
                     <TabsContent value="summary" className="space-y-6 mt-6">

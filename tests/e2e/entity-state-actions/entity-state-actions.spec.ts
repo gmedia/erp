@@ -39,7 +39,7 @@ async function setupPipelineViaApi(page: Page) {
   });
   if (!pipelineRes.ok()) {
       const err = await pipelineRes.json();
-      console.log('API Error:', err.message || err);
+      // console.log('API Error:', err.message || err);
   }
   expect(pipelineRes.ok()).toBeTruthy();
   const pipeline = (await pipelineRes.json()).data;
@@ -57,7 +57,7 @@ async function setupPipelineViaApi(page: Page) {
   });
   if (!draftRes.ok()) {
       const err = await draftRes.json();
-      console.log('API Error State Draft:', err.message || err);
+      // console.log('API Error State Draft:', err.message || err);
   }
   expect(draftRes.ok()).toBeTruthy();
   const stateDraft = (await draftRes.json()).data;
@@ -74,7 +74,7 @@ async function setupPipelineViaApi(page: Page) {
   });
   if (!reviewRes.ok()) {
       const err = await reviewRes.json();
-      console.log('API Error State Review:', err.message || err);
+      // console.log('API Error State Review:', err.message || err);
   }
   expect(reviewRes.ok()).toBeTruthy();
   const stateReview = (await reviewRes.json()).data;
@@ -95,7 +95,7 @@ async function setupPipelineViaApi(page: Page) {
   });
   if (!submitRes.ok()) {
       const err = await submitRes.json();
-      console.log('API Error Transition Sub:', err.message || err);
+      // console.log('API Error Transition Sub:', err.message || err);
   }
   expect(submitRes.ok()).toBeTruthy();
 }

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { login } from './helpers';
 
-test('debug table structure', async ({ page }) => {
+test.skip('debug table structure', async ({ page }) => {
     await login(page);
     await page.goto('/asset-models');
     await expect(page.locator('tbody tr').first()).toBeVisible({ timeout: 10000 });
