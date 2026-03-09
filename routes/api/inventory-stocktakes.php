@@ -15,7 +15,7 @@ Route::middleware('permission:inventory_stocktake,true')->group(function () {
 
     Route::delete('inventory-stocktakes/{inventory_stocktake}', [InventoryStocktakeController::class, 'destroy'])->middleware('permission:inventory_stocktake.delete,true');
     Route::post('inventory-stocktakes/export', [InventoryStocktakeController::class, 'export']);
-    Route::post('inventory-stocktakes/import', [InventoryStocktakeController::class, 'import']);
+    Route::post('inventory-stocktakes/import', [InventoryStocktakeController::class, 'import'])->middleware('permission:inventory_stocktake.create,true');
     Route::get('inventory-stocktakes/{inventoryStocktake}/items', [InventoryStocktakeItemController::class, 'getItems']);
     Route::post('inventory-stocktakes/{inventoryStocktake}/items', [InventoryStocktakeItemController::class, 'syncItems']);
 });

@@ -14,5 +14,5 @@ Route::middleware('permission:customer_category,true')->group(function () {
 
     Route::delete('customer-categories/{customer_category}', [CustomerCategoryController::class, 'destroy'])->middleware('permission:customer_category.delete,true');
     Route::post('customer-categories/export', [CustomerCategoryController::class, 'export']);
-    Route::post('customer-categories/import', [CustomerCategoryController::class, 'import']);
+    Route::post('customer-categories/import', [CustomerCategoryController::class, 'import'])->middleware('permission:customer_category.create,true');
 });

@@ -14,5 +14,5 @@ Route::middleware('permission:product,true')->group(function () {
 
     Route::delete('products/{product}', [ProductController::class, 'destroy'])->middleware('permission:product.delete,true');
     Route::post('products/export', [ProductController::class, 'export']);
-    Route::post('products/import', [ProductController::class, 'import']);
+    Route::post('products/import', [ProductController::class, 'import'])->middleware('permission:product.create,true');
 });

@@ -16,7 +16,7 @@ Route::middleware('permission:asset_stocktake,true')->group(function () {
 
     Route::delete('asset-stocktakes/{asset_stocktake}', [AssetStocktakeController::class, 'destroy'])->middleware('permission:asset_stocktake.delete,true');
     Route::post('asset-stocktakes/export', [AssetStocktakeController::class, 'export']);
-    Route::post('asset-stocktakes/import', [AssetStocktakeController::class, 'import']);
+    Route::post('asset-stocktakes/import', [AssetStocktakeController::class, 'import'])->middleware('permission:asset_stocktake.create,true');
     Route::get('asset-stocktakes/{assetStocktake}/items', [AssetStocktakeItemController::class, 'getItems']);
     Route::post('asset-stocktakes/{assetStocktake}/items', [AssetStocktakeItemController::class, 'syncItems']);
     Route::get('asset-stocktake-variances', [AssetStocktakeVarianceController::class, 'index']);

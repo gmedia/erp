@@ -14,5 +14,5 @@ Route::middleware('permission:branch,true')->group(function () {
 
     Route::delete('branches/{branch}', [BranchController::class, 'destroy'])->middleware('permission:branch.delete,true');
     Route::post('branches/export', [BranchController::class, 'export']);
-    Route::post('branches/import', [BranchController::class, 'import']);
+    Route::post('branches/import', [BranchController::class, 'import'])->middleware('permission:branch.create,true');
 });

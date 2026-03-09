@@ -14,5 +14,5 @@ Route::middleware('permission:approval_flow,true')->group(function () {
 
     Route::delete('approval-flows/{approval_flow}', [ApprovalFlowController::class, 'destroy'])->middleware('permission:approval_flow.delete,true');
     Route::post('approval-flows/export', [ApprovalFlowController::class, 'export']);
-    Route::post('approval-flows/import', [ApprovalFlowController::class, 'import']);
+    Route::post('approval-flows/import', [ApprovalFlowController::class, 'import'])->middleware('permission:approval_flow.create,true');
 });

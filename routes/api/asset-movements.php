@@ -14,5 +14,5 @@ Route::middleware('permission:asset_movement,true')->group(function () {
 
     Route::delete('asset-movements/{asset_movement}', [AssetMovementController::class, 'destroy'])->middleware('permission:asset_movement.delete,true');
     Route::post('asset-movements/export', [AssetMovementController::class, 'export']);
-    Route::post('asset-movements/import', [AssetMovementController::class, 'import']);
+    Route::post('asset-movements/import', [AssetMovementController::class, 'import'])->middleware('permission:asset_movement.create,true');
 });

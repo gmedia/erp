@@ -14,5 +14,5 @@ Route::middleware('permission:approval_delegation,true')->group(function () {
 
     Route::delete('approval-delegations/{approval_delegation}', [ApprovalDelegationController::class, 'destroy'])->middleware('permission:approval_delegation.delete,true');
     Route::post('approval-delegations/export', [ApprovalDelegationController::class, 'export']);
-    Route::post('approval-delegations/import', [ApprovalDelegationController::class, 'import']);
+    Route::post('approval-delegations/import', [ApprovalDelegationController::class, 'import'])->middleware('permission:approval_delegation.create,true');
 });

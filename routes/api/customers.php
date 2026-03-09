@@ -14,5 +14,5 @@ Route::middleware('permission:customer,true')->group(function () {
 
     Route::delete('customers/{customer}', [CustomerController::class, 'destroy'])->middleware('permission:customer.delete,true');
     Route::post('customers/export', [CustomerController::class, 'export']);
-    Route::post('customers/import', [CustomerController::class, 'import']);
+    Route::post('customers/import', [CustomerController::class, 'import'])->middleware('permission:customer.create,true');
 });

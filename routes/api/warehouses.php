@@ -13,5 +13,5 @@ Route::middleware('permission:warehouse,true')->group(function () {
 
     Route::delete('warehouses/{warehouse}', [\App\Http\Controllers\WarehouseController::class, 'destroy'])->middleware('permission:warehouse.delete,true');
     Route::post('warehouses/export', [\App\Http\Controllers\WarehouseController::class, 'export']);
-    Route::post('warehouses/import', [\App\Http\Controllers\WarehouseController::class, 'import']);
+    Route::post('warehouses/import', [\App\Http\Controllers\WarehouseController::class, 'import'])->middleware('permission:warehouse.create,true');
 });

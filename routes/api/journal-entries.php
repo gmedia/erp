@@ -14,5 +14,5 @@ Route::middleware('permission:journal_entry,true')->group(function () {
 
     Route::delete('journal-entries/{journal_entry}', [JournalEntryController::class, 'destroy'])->middleware('permission:journal_entry.delete,true');
     Route::post('journal-entries/export', [JournalEntryController::class, 'export']);
-    Route::post('journal-entries/import', [JournalEntryController::class, 'import']);
+    Route::post('journal-entries/import', [JournalEntryController::class, 'import'])->middleware('permission:journal_entry.create,true');
 });

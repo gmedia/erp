@@ -14,5 +14,5 @@ Route::middleware('permission:position,true')->group(function () {
 
     Route::delete('positions/{position}', [PositionController::class, 'destroy'])->middleware('permission:position.delete,true');
     Route::post('positions/export', [PositionController::class, 'export']);
-    Route::post('positions/import', [PositionController::class, 'import']);
+    Route::post('positions/import', [PositionController::class, 'import'])->middleware('permission:position.create,true');
 });

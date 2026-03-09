@@ -14,5 +14,5 @@ Route::middleware('permission:unit,true')->group(function () {
 
     Route::delete('units/{unit}', [UnitController::class, 'destroy'])->middleware('permission:unit.delete,true');
     Route::post('units/export', [UnitController::class, 'export']);
-    Route::post('units/import', [UnitController::class, 'import']);
+    Route::post('units/import', [UnitController::class, 'import'])->middleware('permission:unit.create,true');
 });

@@ -14,5 +14,5 @@ Route::middleware('permission:fiscal_year,true')->group(function () {
 
     Route::delete('fiscal-years/{fiscal_year}', [FiscalYearController::class, 'destroy'])->middleware('permission:fiscal_year.delete,true');
     Route::post('fiscal-years/export', [FiscalYearController::class, 'export']);
-    Route::post('fiscal-years/import', [FiscalYearController::class, 'import']);
+    Route::post('fiscal-years/import', [FiscalYearController::class, 'import'])->middleware('permission:fiscal_year.create,true');
 });

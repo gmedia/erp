@@ -14,5 +14,5 @@ Route::middleware('permission:asset_maintenance,true')->group(function () {
 
     Route::delete('asset-maintenances/{asset_maintenance}', [AssetMaintenanceController::class, 'destroy'])->middleware('permission:asset_maintenance.delete,true');
     Route::post('asset-maintenances/export', [AssetMaintenanceController::class, 'export']);
-    Route::post('asset-maintenances/import', [AssetMaintenanceController::class, 'import']);
+    Route::post('asset-maintenances/import', [AssetMaintenanceController::class, 'import'])->middleware('permission:asset_maintenance.create,true');
 });

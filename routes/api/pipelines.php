@@ -18,7 +18,7 @@ Route::middleware('permission:pipeline,true')->group(function () {
 
     Route::delete('pipelines/{pipeline}', [PipelineController::class, 'destroy'])->middleware('permission:pipeline.delete,true');
     Route::post('pipelines/export', [PipelineController::class, 'export']);
-    Route::post('pipelines/import', [PipelineController::class, 'import']);
+    Route::post('pipelines/import', [PipelineController::class, 'import'])->middleware('permission:pipeline.create,true');
     Route::apiResource('pipelines.states', PipelineStateController::class)->scoped(['state' => 'id'])->except(['show']);
     Route::apiResource('pipelines.transitions', PipelineTransitionController::class)->scoped(['transition' => 'id'])->except(['show']);
     Route::get('entity-states/{entityType}/{entityId}', [EntityStateController::class, 'getState']);

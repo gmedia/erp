@@ -14,5 +14,5 @@ Route::middleware('permission:asset_model,true')->group(function () {
 
     Route::delete('asset-models/{asset_model}', [AssetModelController::class, 'destroy'])->middleware('permission:asset_model.delete,true');
     Route::post('asset-models/export', [AssetModelController::class, 'export']);
-    Route::post('asset-models/import', [AssetModelController::class, 'import']);
+    Route::post('asset-models/import', [AssetModelController::class, 'import'])->middleware('permission:asset_model.create,true');
 });

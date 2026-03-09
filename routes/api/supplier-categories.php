@@ -14,5 +14,5 @@ Route::middleware('permission:supplier_category,true')->group(function () {
 
     Route::delete('supplier-categories/{supplier_category}', [SupplierCategoryController::class, 'destroy'])->middleware('permission:supplier_category.delete,true');
     Route::post('supplier-categories/export', [SupplierCategoryController::class, 'export']);
-    Route::post('supplier-categories/import', [SupplierCategoryController::class, 'import']);
+    Route::post('supplier-categories/import', [SupplierCategoryController::class, 'import'])->middleware('permission:supplier_category.create,true');
 });

@@ -14,5 +14,5 @@ Route::middleware('permission:asset_category,true')->group(function () {
 
     Route::delete('asset-categories/{asset_category}', [AssetCategoryController::class, 'destroy'])->middleware('permission:asset_category.delete,true');
     Route::post('asset-categories/export', [AssetCategoryController::class, 'export']);
-    Route::post('asset-categories/import', [AssetCategoryController::class, 'import']);
+    Route::post('asset-categories/import', [AssetCategoryController::class, 'import'])->middleware('permission:asset_category.create,true');
 });

@@ -14,5 +14,5 @@ Route::middleware('permission:account_mapping,true')->group(function () {
 
     Route::delete('account-mappings/{account_mapping}', [AccountMappingController::class, 'destroy'])->middleware('permission:account_mapping.delete,true');
     Route::post('account-mappings/export', [AccountMappingController::class, 'export']);
-    Route::post('account-mappings/import', [AccountMappingController::class, 'import']);
+    Route::post('account-mappings/import', [AccountMappingController::class, 'import'])->middleware('permission:account_mapping.create,true');
 });

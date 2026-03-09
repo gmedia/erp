@@ -14,5 +14,5 @@ Route::middleware('permission:account,true')->group(function () {
 
     Route::delete('accounts/{account}', [AccountController::class, 'destroy'])->middleware('permission:account.delete,true');
     Route::post('accounts/export', [AccountController::class, 'export']);
-    Route::post('accounts/import', [AccountController::class, 'import']);
+    Route::post('accounts/import', [AccountController::class, 'import'])->middleware('permission:account.create,true');
 });

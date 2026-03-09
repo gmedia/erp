@@ -14,5 +14,5 @@ Route::middleware('permission:product_category,true')->group(function () {
 
     Route::delete('product-categories/{product_category}', [ProductCategoryController::class, 'destroy'])->middleware('permission:product_category.delete,true');
     Route::post('product-categories/export', [ProductCategoryController::class, 'export']);
-    Route::post('product-categories/import', [ProductCategoryController::class, 'import']);
+    Route::post('product-categories/import', [ProductCategoryController::class, 'import'])->middleware('permission:product_category.create,true');
 });

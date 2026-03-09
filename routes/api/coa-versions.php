@@ -14,5 +14,5 @@ Route::middleware('permission:coa_version,true')->group(function () {
 
     Route::delete('coa-versions/{coa_version}', [CoaVersionController::class, 'destroy'])->middleware('permission:coa_version.delete,true');
     Route::post('coa-versions/export', [CoaVersionController::class, 'export']);
-    Route::post('coa-versions/import', [CoaVersionController::class, 'import']);
+    Route::post('coa-versions/import', [CoaVersionController::class, 'import'])->middleware('permission:coa_version.create,true');
 });

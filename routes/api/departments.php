@@ -14,5 +14,5 @@ Route::middleware('permission:department,true')->group(function () {
 
     Route::delete('departments/{department}', [DepartmentController::class, 'destroy'])->middleware('permission:department.delete,true');
     Route::post('departments/export', [DepartmentController::class, 'export']);
-    Route::post('departments/import', [DepartmentController::class, 'import']);
+    Route::post('departments/import', [DepartmentController::class, 'import'])->middleware('permission:department.create,true');
 });

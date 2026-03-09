@@ -15,7 +15,7 @@ Route::middleware('permission:employee,true')->group(function () {
 
     Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->middleware('permission:employee.delete,true');
     Route::post('employees/export', [EmployeeController::class, 'export']);
-    Route::post('employees/import', [EmployeeController::class, 'import']);
+    Route::post('employees/import', [EmployeeController::class, 'import'])->middleware('permission:employee.create,true');
 });
 
 Route::middleware('permission:user,true')->group(function () {
