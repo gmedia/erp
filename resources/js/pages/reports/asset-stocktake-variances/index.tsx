@@ -1,12 +1,15 @@
 'use client';
 
-import { Helmet } from 'react-helmet-async';
-import AppLayout from '@/layouts/app-layout';
 import { DataTable } from '@/components/common/DataTableCore';
+import {
+    AssetStocktakeVarianceItem,
+    varianceColumns,
+} from '@/components/reports/asset-stocktake-variances/Columns';
+import { createVarianceFilterFields } from '@/components/reports/asset-stocktake-variances/Filters';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
-import { varianceColumns, AssetStocktakeVarianceItem } from '@/components/reports/asset-stocktake-variances/Columns';
-import { createVarianceFilterFields } from '@/components/reports/asset-stocktake-variances/Filters';
+import AppLayout from '@/layouts/app-layout';
+import { Helmet } from 'react-helmet-async';
 
 export default function StocktakeVarianceReport() {
     const filterFields = createVarianceFilterFields();
@@ -38,8 +41,18 @@ export default function StocktakeVarianceReport() {
 
     return (
         <>
-            <Helmet><title>Stocktake Variance Report</title></Helmet>
-            <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Stocktake Variance', href: '/asset-stocktake-variances' }]}>
+            <Helmet>
+                <title>Stocktake Variance Report</title>
+            </Helmet>
+            <AppLayout
+                breadcrumbs={[
+                    { title: 'Reports', href: '#' },
+                    {
+                        title: 'Stocktake Variance',
+                        href: '/asset-stocktake-variances',
+                    },
+                ]}
+            >
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                     <div className="rounded-lg bg-white">
                         <DataTable
@@ -54,7 +67,9 @@ export default function StocktakeVarianceReport() {
                                 to: meta.to ?? 0,
                             }}
                             onPageChange={handlePageChange}
-                            onPageSizeChange={(per_page) => handlePageSizeChange(per_page)}
+                            onPageSizeChange={(per_page) =>
+                                handlePageSizeChange(per_page)
+                            }
                             onSearchChange={handleSearchChange}
                             isLoading={isLoading}
                             filterValue={filters.search}

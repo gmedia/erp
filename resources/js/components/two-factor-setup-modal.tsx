@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet-async';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,10 +14,10 @@ import {
 } from '@/components/ui/input-otp';
 import { useClipboard } from '@/hooks/use-clipboard';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
+import axios from '@/lib/axios';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { Check, Copy, Loader2, ScanLine } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import axios from '@/lib/axios';
 import AlertError from './alert-error';
 
 function GridScanIcon() {
@@ -152,15 +151,22 @@ function TwoFactorVerificationStep({
         setError('');
 
         try {
-            await axios.post('/user/confirmed-two-factor-authentication', { code });
+            await axios.post('/user/confirmed-two-factor-authentication', {
+                code,
+            });
             onClose();
             // Optional: hard reload or update context block to reflect changes
             window.location.reload();
         } catch (err: any) {
             if (err.response?.status === 422) {
                 const returnedErrors = err.response.data.errors || {};
-                const firstError = Object.values(returnedErrors).flat()[0] as string;
-                setError(firstError || 'The provided two factor authentication code was invalid.');
+                const firstError = Object.values(
+                    returnedErrors,
+                ).flat()[0] as string;
+                setError(
+                    firstError ||
+                        'The provided two factor authentication code was invalid.',
+                );
             } else {
                 setError('Failed to confirm two-factor authentication.');
             }
@@ -188,17 +194,12 @@ function TwoFactorVerificationStep({
                             {Array.from(
                                 { length: OTP_MAX_LENGTH },
                                 (_, index) => (
-                                    <InputOTPSlot
-                                        key={index}
-                                        index={index}
-                                    />
+                                    <InputOTPSlot key={index} index={index} />
                                 ),
                             )}
                         </InputOTPGroup>
                     </InputOTP>
-                    <InputError
-                        message={error}
-                    />
+                    <InputError message={error} />
                 </div>
 
                 <div className="flex w-full space-x-5">
@@ -214,11 +215,11 @@ function TwoFactorVerificationStep({
                     <Button
                         type="submit"
                         className="flex-1"
-                        disabled={
-                            processing || code.length < OTP_MAX_LENGTH
-                        }
+                        disabled={processing || code.length < OTP_MAX_LENGTH}
                     >
-                        {processing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {processing && (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
                         Confirm
                     </Button>
                 </div>

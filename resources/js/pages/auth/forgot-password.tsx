@@ -1,7 +1,7 @@
-import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
 import axios from '@/lib/axios';
 import { LoaderCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -33,12 +33,16 @@ export default function ForgotPassword() {
                 const returnedErrors = error.response.data.errors || {};
                 // Flatten the First element if it's an array for typical form error handling
                 const formattedErrors: Record<string, string> = {};
-                Object.keys(returnedErrors).forEach(key => {
-                    formattedErrors[key] = Array.isArray(returnedErrors[key]) ? returnedErrors[key][0] : returnedErrors[key];
+                Object.keys(returnedErrors).forEach((key) => {
+                    formattedErrors[key] = Array.isArray(returnedErrors[key])
+                        ? returnedErrors[key][0]
+                        : returnedErrors[key];
                 });
                 setErrors(formattedErrors);
             } else {
-                setErrors({ email: 'An error occurred. Please try again later.' });
+                setErrors({
+                    email: 'An error occurred. Please try again later.',
+                });
             }
         } finally {
             setProcessing(false);
@@ -50,7 +54,11 @@ export default function ForgotPassword() {
             title="Forgot password"
             description="Enter your email to receive a password reset link"
         >
-            <Helmet><title>Forgot password - {import.meta.env.VITE_APP_NAME || 'ERP'}</title></Helmet>
+            <Helmet>
+                <title>
+                    Forgot password - {import.meta.env.VITE_APP_NAME || 'ERP'}
+                </title>
+            </Helmet>
 
             {status && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
@@ -82,7 +90,7 @@ export default function ForgotPassword() {
                             data-test="email-password-reset-link-button"
                         >
                             {processing && (
-                                <LoaderCircle className="h-4 w-4 mr-2 animate-spin" />
+                                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
                             )}
                             Email password reset link
                         </Button>

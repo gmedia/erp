@@ -1,17 +1,14 @@
 'use client';
 
-import * as React from 'react';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import axios from '@/lib/axios';
 
 import EntityForm from '@/components/common/EntityForm';
-import { type Account, type AccountType, type NormalBalance } from '@/types/account';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
     Select,
     SelectContent,
@@ -20,6 +17,11 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import {
+    type Account,
+    type AccountType,
+    type NormalBalance,
+} from '@/types/account';
 
 const accountSchema = z.object({
     coa_version_id: z.number(),
@@ -133,36 +135,51 @@ export function AccountForm({
             <div className="grid gap-4 py-4">
                 {parentAccount && (
                     <div className="rounded-md bg-muted p-2 text-sm">
-                        Parent: <strong>{parentAccount.code} - {parentAccount.name}</strong>
+                        Parent:{' '}
+                        <strong>
+                            {parentAccount.code} - {parentAccount.name}
+                        </strong>
                     </div>
                 )}
-                
+
                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="code" className="text-right">Code</Label>
+                    <Label htmlFor="code" className="text-right">
+                        Code
+                    </Label>
                     <div className="col-span-3">
                         <Input id="code" {...form.register('code')} />
                         {form.formState.errors.code && (
-                            <p className="mt-1 text-xs text-destructive">{form.formState.errors.code.message}</p>
+                            <p className="mt-1 text-xs text-destructive">
+                                {form.formState.errors.code.message}
+                            </p>
                         )}
                     </div>
                 </div>
 
                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">Name</Label>
+                    <Label htmlFor="name" className="text-right">
+                        Name
+                    </Label>
                     <div className="col-span-3">
                         <Input id="name" {...form.register('name')} />
                         {form.formState.errors.name && (
-                            <p className="mt-1 text-xs text-destructive">{form.formState.errors.name.message}</p>
+                            <p className="mt-1 text-xs text-destructive">
+                                {form.formState.errors.name.message}
+                            </p>
                         )}
                     </div>
                 </div>
 
                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="type" className="text-right">Type</Label>
+                    <Label htmlFor="type" className="text-right">
+                        Type
+                    </Label>
                     <div className="col-span-3">
-                        <Select 
-                            value={form.watch('type')} 
-                            onValueChange={(val) => form.setValue('type', val as AccountType)}
+                        <Select
+                            value={form.watch('type')}
+                            onValueChange={(val) =>
+                                form.setValue('type', val as AccountType)
+                            }
                             disabled={!!parentAccount}
                         >
                             <SelectTrigger>
@@ -170,7 +187,9 @@ export function AccountForm({
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="asset">Asset</SelectItem>
-                                <SelectItem value="liability">Liability</SelectItem>
+                                <SelectItem value="liability">
+                                    Liability
+                                </SelectItem>
                                 <SelectItem value="equity">Equity</SelectItem>
                                 <SelectItem value="revenue">Revenue</SelectItem>
                                 <SelectItem value="expense">Expense</SelectItem>
@@ -180,11 +199,18 @@ export function AccountForm({
                 </div>
 
                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="normal_balance" className="text-right">Normal Balance</Label>
+                    <Label htmlFor="normal_balance" className="text-right">
+                        Normal Balance
+                    </Label>
                     <div className="col-span-3">
-                        <Select 
-                            value={form.watch('normal_balance')} 
-                            onValueChange={(val) => form.setValue('normal_balance', val as NormalBalance)}
+                        <Select
+                            value={form.watch('normal_balance')}
+                            onValueChange={(val) =>
+                                form.setValue(
+                                    'normal_balance',
+                                    val as NormalBalance,
+                                )
+                            }
                         >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select normal balance" />
@@ -198,33 +224,57 @@ export function AccountForm({
                 </div>
 
                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="is_active" className="text-right">Active</Label>
+                    <Label htmlFor="is_active" className="text-right">
+                        Active
+                    </Label>
                     <div className="col-span-3 flex items-center space-x-2">
-                        <Checkbox 
-                            id="is_active" 
+                        <Checkbox
+                            id="is_active"
                             checked={form.watch('is_active')}
-                            onCheckedChange={(checked) => form.setValue('is_active', !!checked)}
+                            onCheckedChange={(checked) =>
+                                form.setValue('is_active', !!checked)
+                            }
                         />
-                        <Label htmlFor="is_active" className="text-sm font-normal">Account is available for transactions</Label>
+                        <Label
+                            htmlFor="is_active"
+                            className="text-sm font-normal"
+                        >
+                            Account is available for transactions
+                        </Label>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="is_cash_flow" className="text-right">Cash Flow</Label>
+                    <Label htmlFor="is_cash_flow" className="text-right">
+                        Cash Flow
+                    </Label>
                     <div className="col-span-3 flex items-center space-x-2">
-                        <Checkbox 
-                            id="is_cash_flow" 
+                        <Checkbox
+                            id="is_cash_flow"
                             checked={form.watch('is_cash_flow')}
-                            onCheckedChange={(checked) => form.setValue('is_cash_flow', !!checked)}
+                            onCheckedChange={(checked) =>
+                                form.setValue('is_cash_flow', !!checked)
+                            }
                         />
-                        <Label htmlFor="is_cash_flow" className="text-sm font-normal">Include in Cash Flow report</Label>
+                        <Label
+                            htmlFor="is_cash_flow"
+                            className="text-sm font-normal"
+                        >
+                            Include in Cash Flow report
+                        </Label>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-4 items-start gap-4">
-                    <Label htmlFor="description" className="text-right mt-2">Description</Label>
+                    <Label htmlFor="description" className="mt-2 text-right">
+                        Description
+                    </Label>
                     <div className="col-span-3">
-                        <Textarea id="description" {...form.register('description')} rows={3} />
+                        <Textarea
+                            id="description"
+                            {...form.register('description')}
+                            rows={3}
+                        />
                     </div>
                 </div>
             </div>

@@ -1,10 +1,17 @@
 'use client';
 
-import { Helmet } from 'react-helmet-async';
-import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem } from '@/types';
-import { useAssetDepreciationRuns } from '@/hooks/useAssetDepreciationRuns';
-import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
+import { CalculateFormModal } from '@/components/asset-depreciation-runs/CalculateFormModal';
+import { RunLinesModal } from '@/components/asset-depreciation-runs/RunLinesModal';
+import { DataTablePagination } from '@/components/common/DataTablePagination';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import {
     Table,
     TableBody,
@@ -13,27 +20,14 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-} from '@/components/ui/card';
-import { DataTablePagination } from '@/components/common/DataTablePagination';
-import {
-    Loader2,
-    Calculator,
-    CheckCircle2,
-    Eye,
-    Plus,
-} from 'lucide-react';
+import { useAssetDepreciationRuns } from '@/hooks/useAssetDepreciationRuns';
+import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
+import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
 import { format } from 'date-fns';
+import { Calculator, CheckCircle2, Eye, Loader2, Plus } from 'lucide-react';
 import { useState } from 'react';
-import { CalculateFormModal } from '@/components/asset-depreciation-runs/CalculateFormModal';
-import { RunLinesModal } from '@/components/asset-depreciation-runs/RunLinesModal';
+import { Helmet } from 'react-helmet-async';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -43,10 +37,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 function getStatusBadgeVariant(status: AssetDepreciationRun['status']) {
     switch (status) {
-        case 'calculated': return 'default';
-        case 'posted': return 'secondary';
-        case 'void': return 'destructive';
-        default: return 'outline';
+        case 'calculated':
+            return 'default';
+        case 'posted':
+            return 'secondary';
+        case 'void':
+            return 'destructive';
+        default:
+            return 'outline';
     }
 }
 
@@ -72,7 +70,9 @@ export default function Index() {
         (meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1);
     const to =
         meta.to ??
-        (meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + data.length);
+        (meta.total === 0
+            ? 0
+            : (meta.current_page - 1) * meta.per_page + data.length);
 
     const paginationView = {
         page: meta.current_page,
@@ -93,7 +93,9 @@ export default function Index() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet><title>Asset Depreciation Runs</title></Helmet>
+            <Helmet>
+                <title>Asset Depreciation Runs</title>
+            </Helmet>
 
             <div className="flex flex-col gap-6 p-6">
                 <Card>
@@ -103,7 +105,9 @@ export default function Index() {
                                 Depreciation Runs
                             </CardTitle>
                             <CardDescription className="mt-1">
-                                Calculate and review asset depreciation. Once verified, post the calculated amounts to the general ledger.
+                                Calculate and review asset depreciation. Once
+                                verified, post the calculated amounts to the
+                                general ledger.
                             </CardDescription>
                         </div>
                         <div className="flex items-center gap-2">
@@ -125,90 +129,157 @@ export default function Index() {
                                         <TableHead>Status</TableHead>
                                         <TableHead>Journal</TableHead>
                                         <TableHead>Created By</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                        <TableHead className="text-right">
+                                            Actions
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
 
                                 <TableBody>
                                     {isLoading ? (
                                         <TableRow>
-                                            <TableCell colSpan={7} className="h-56 text-center">
+                                            <TableCell
+                                                colSpan={7}
+                                                className="h-56 text-center"
+                                            >
                                                 <div className="flex flex-col items-center justify-center gap-2">
                                                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                                    <p className="text-muted-foreground">Loading runs...</p>
+                                                    <p className="text-muted-foreground">
+                                                        Loading runs...
+                                                    </p>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
                                     ) : data.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={7} className="h-56 text-center">
+                                            <TableCell
+                                                colSpan={7}
+                                                className="h-56 text-center"
+                                            >
                                                 <div className="flex flex-col items-center justify-center gap-2 opacity-70">
                                                     <Calculator className="h-10 w-10 text-muted-foreground" />
-                                                    <p className="text-lg font-medium">No runs found</p>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        Start by running a new calculation.
+                                                    <p className="text-lg font-medium">
+                                                        No runs found
                                                     </p>
-                                                    <Button variant="outline" className="mt-4" onClick={() => setIsCalcOpen(true)}>
-                                                        <Plus className="mr-2 h-4 w-4" /> Calculate Now
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Start by running a new
+                                                        calculation.
+                                                    </p>
+                                                    <Button
+                                                        variant="outline"
+                                                        className="mt-4"
+                                                        onClick={() =>
+                                                            setIsCalcOpen(true)
+                                                        }
+                                                    >
+                                                        <Plus className="mr-2 h-4 w-4" />{' '}
+                                                        Calculate Now
                                                     </Button>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
                                     ) : (
                                         data.map((item) => (
-                                            <TableRow key={item.id} className="hover:bg-muted/50">
+                                            <TableRow
+                                                key={item.id}
+                                                className="hover:bg-muted/50"
+                                            >
                                                 <TableCell className="font-medium">
-                                                    {item.fiscal_year?.name || '-'}
+                                                    {item.fiscal_year?.name ||
+                                                        '-'}
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="flex flex-col gap-1">
                                                         <span className="text-sm">
-                                                            {format(new Date(item.period_start), 'dd MMM yyyy')}
+                                                            {format(
+                                                                new Date(
+                                                                    item.period_start,
+                                                                ),
+                                                                'dd MMM yyyy',
+                                                            )}
                                                         </span>
                                                         <span className="text-xs text-muted-foreground">
-                                                            to {format(new Date(item.period_end), 'dd MMM yyyy')}
+                                                            to{' '}
+                                                            {format(
+                                                                new Date(
+                                                                    item.period_end,
+                                                                ),
+                                                                'dd MMM yyyy',
+                                                            )}
                                                         </span>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Badge variant="outline">{item.lines_count || 0} Assets</Badge>
+                                                    <Badge variant="outline">
+                                                        {item.lines_count || 0}{' '}
+                                                        Assets
+                                                    </Badge>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Badge variant={getStatusBadgeVariant(item.status)} className="capitalize">
+                                                    <Badge
+                                                        variant={getStatusBadgeVariant(
+                                                            item.status,
+                                                        )}
+                                                        className="capitalize"
+                                                    >
                                                         {item.status}
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell>
                                                     {item.journal_entry ? (
-                                                        <span className="font-mono text-sm">{item.journal_entry.entry_number}</span>
-                                                    ) : '-'}
+                                                        <span className="font-mono text-sm">
+                                                            {
+                                                                item
+                                                                    .journal_entry
+                                                                    .entry_number
+                                                            }
+                                                        </span>
+                                                    ) : (
+                                                        '-'
+                                                    )}
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="text-sm">{item.created_by_user?.name || '-'}</span>
+                                                    <span className="text-sm">
+                                                        {item.created_by_user
+                                                            ?.name || '-'}
+                                                    </span>
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    <div className="flex justify-end items-center gap-2">
+                                                    <div className="flex items-center justify-end gap-2">
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
                                                             title="View Lines"
-                                                            onClick={() => setViewRunId(item.id)}
+                                                            onClick={() =>
+                                                                setViewRunId(
+                                                                    item.id,
+                                                                )
+                                                            }
                                                         >
                                                             <Eye className="h-4 w-4" />
                                                         </Button>
 
-                                                        {item.status === 'calculated' && (
+                                                        {item.status ===
+                                                            'calculated' && (
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
                                                                 className="h-8 px-2"
-                                                                disabled={isPosting === item.id}
-                                                                onClick={() => postToJournal(item.id)}
+                                                                disabled={
+                                                                    isPosting ===
+                                                                    item.id
+                                                                }
+                                                                onClick={() =>
+                                                                    postToJournal(
+                                                                        item.id,
+                                                                    )
+                                                                }
                                                             >
-                                                                {isPosting === item.id ? (
-                                                                    <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                                                                {isPosting ===
+                                                                item.id ? (
+                                                                    <Loader2 className="mr-1 h-4 w-4 animate-spin" />
                                                                 ) : (
-                                                                    <CheckCircle2 className="h-4 w-4 mr-1 text-green-600" />
+                                                                    <CheckCircle2 className="mr-1 h-4 w-4 text-green-600" />
                                                                 )}
                                                                 Post
                                                             </Button>

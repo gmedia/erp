@@ -2,20 +2,20 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
-import * as z from 'zod';
+import { useFieldArray, useForm } from 'react-hook-form';
 
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
+import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
-import NameField from '@/components/common/NameField';
-import { Button } from '@/components/ui/button';
-import { type ApprovalFlow } from '@/types/entity';
-import { ApprovalFlowStepManager } from './ApprovalFlowStepManager';
-import { approvalFlowFormSchema, type ApprovalFlowFormData } from '@/utils/schemas';
 import { APPROVABLE_TYPE_OPTIONS } from '@/constants/model-options';
-import AsyncSelectField from '../common/AsyncSelectField';
+import { type ApprovalFlow } from '@/types/entity';
+import {
+    approvalFlowFormSchema,
+    type ApprovalFlowFormData,
+} from '@/utils/schemas';
+import { ApprovalFlowStepManager } from './ApprovalFlowStepManager';
 
 interface ApprovalFlowFormProps {
     open: boolean;
@@ -46,108 +46,127 @@ const getFormDefaults = (item?: ApprovalFlow | null): any => {
         approvable_type: item.approvable_type,
         description: item.description || '',
         is_active: item.is_active ? 'true' : 'false',
-        conditions: typeof item.conditions === 'string' ? item.conditions : (item.conditions ? JSON.stringify(item.conditions) : ''),
-        steps: item.steps?.length ? item.steps.map((step) => ({
-            id: step.id,
-            name: step.name,
-            approver_type: step.approver_type,
-            approver_user_id: step.approver_user_id,
-            approver_role_id: step.approver_role_id,
-            approver_department_id: step.approver_department_id,
-            required_action: step.required_action,
-            auto_approve_after_hours: step.auto_approve_after_hours,
-            escalate_after_hours: step.escalate_after_hours,
-            escalation_user_id: step.escalation_user_id,
-            can_reject: step.can_reject ? 'true' : 'false',
-        })) : [],
+        conditions:
+            typeof item.conditions === 'string'
+                ? item.conditions
+                : item.conditions
+                  ? JSON.stringify(item.conditions)
+                  : '',
+        steps: item.steps?.length
+            ? item.steps.map((step) => ({
+                  id: step.id,
+                  name: step.name,
+                  approver_type: step.approver_type,
+                  approver_user_id: step.approver_user_id,
+                  approver_role_id: step.approver_role_id,
+                  approver_department_id: step.approver_department_id,
+                  required_action: step.required_action,
+                  auto_approve_after_hours: step.auto_approve_after_hours,
+                  escalate_after_hours: step.escalate_after_hours,
+                  escalation_user_id: step.escalation_user_id,
+                  can_reject: step.can_reject ? 'true' : 'false',
+              }))
+            : [],
     };
 };
 
-export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(function ApprovalFlowForm({
-    open,
-    onOpenChange,
-    item,
-    onSubmit,
-    isLoading = false,
-}) {
-    const defaultValues = useMemo(() => getFormDefaults(item), [item]);
+export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
+    function ApprovalFlowForm({
+        open,
+        onOpenChange,
+        item,
+        onSubmit,
+        isLoading = false,
+    }) {
+        const defaultValues = useMemo(() => getFormDefaults(item), [item]);
 
-    const form = useForm<ApprovalFlowFormData>({
-        resolver: zodResolver(approvalFlowFormSchema) as any,
-        defaultValues,
-    });
+        const form = useForm<ApprovalFlowFormData>({
+            resolver: zodResolver(approvalFlowFormSchema) as any,
+            defaultValues,
+        });
 
-    const fieldArrayProps = useFieldArray({
-        control: form.control,
-        name: 'steps',
-    });
+        const fieldArrayProps = useFieldArray({
+            control: form.control,
+            name: 'steps',
+        });
 
-    useEffect(() => {
-        form.reset(defaultValues);
-    }, [form, defaultValues]);
+        useEffect(() => {
+            form.reset(defaultValues);
+        }, [form, defaultValues]);
 
-    const handleSubmit = (data: ApprovalFlowFormData) => {
-        // Parse conditions if it is valid JSON
-        if (data.conditions && typeof data.conditions === 'string') {
-            try {
-                data.conditions = JSON.parse(data.conditions);
-            } catch (e) {
-                // Ignore parse error, backend might reject or save it as string
+        const handleSubmit = (data: ApprovalFlowFormData) => {
+            // Parse conditions if it is valid JSON
+            if (data.conditions && typeof data.conditions === 'string') {
+                try {
+                    data.conditions = JSON.parse(data.conditions);
+                } catch (e) {
+                    // Ignore parse error, backend might reject or save it as string
+                }
             }
-        }
-        onSubmit(data);
-    };
+            onSubmit(data);
+        };
 
-    return (
-        <EntityForm<ApprovalFlowFormData>
-            form={form as any}
-            open={open}
-            onOpenChange={onOpenChange}
-            title={item ? 'Edit Approval Flow' : 'Add New Approval Flow'}
-            onSubmit={handleSubmit}
-            isLoading={isLoading}
-            className="max-w-4xl"
-        >
-            <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <NameField name="name" label="Flow Name" placeholder="e.g. Standard PR Flow" />
-                    <InputField name="code" label="Code" placeholder="e.g. std_pr_flow" />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                    <SelectField
-                        name="approvable_type"
-                        label="Approvable Type"
-                        options={[...APPROVABLE_TYPE_OPTIONS]}
+        return (
+            <EntityForm<ApprovalFlowFormData>
+                form={form as any}
+                open={open}
+                onOpenChange={onOpenChange}
+                title={item ? 'Edit Approval Flow' : 'Add New Approval Flow'}
+                onSubmit={handleSubmit}
+                isLoading={isLoading}
+                className="max-w-4xl"
+            >
+                <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <NameField
+                            name="name"
+                            label="Flow Name"
+                            placeholder="e.g. Standard PR Flow"
+                        />
+                        <InputField
+                            name="code"
+                            label="Code"
+                            placeholder="e.g. std_pr_flow"
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <SelectField
+                            name="approvable_type"
+                            label="Approvable Type"
+                            options={[...APPROVABLE_TYPE_OPTIONS]}
+                        />
+                        <SelectField
+                            name="is_active"
+                            label="Status"
+                            options={[
+                                { value: 'true', label: 'Active' },
+                                { value: 'false', label: 'Inactive' },
+                            ]}
+                        />
+                    </div>
+
+                    <TextareaField
+                        name="description"
+                        label="Description"
+                        placeholder="Enter flow description"
+                        rows={2}
                     />
-                    <SelectField
-                        name="is_active"
-                        label="Status"
-                        options={[
-                            { value: 'true', label: 'Active' },
-                            { value: 'false', label: 'Inactive' },
-                        ]}
+
+                    <TextareaField
+                        name="conditions"
+                        label="Conditions (JSON)"
+                        placeholder='e.g. {"field": "amount", "operator": ">", "value": 1000}'
+                        rows={2}
                     />
+
+                    {item && (
+                        <ApprovalFlowStepManager
+                            fieldArrayProps={fieldArrayProps}
+                        />
+                    )}
                 </div>
-
-                <TextareaField
-                    name="description"
-                    label="Description"
-                    placeholder="Enter flow description"
-                    rows={2}
-                />
-                
-                <TextareaField
-                    name="conditions"
-                    label="Conditions (JSON)"
-                    placeholder='e.g. {"field": "amount", "operator": ">", "value": 1000}'
-                    rows={2}
-                />
-
-                {item && (
-                    <ApprovalFlowStepManager fieldArrayProps={fieldArrayProps} />
-                )}
-            </div>
-        </EntityForm>
-    );
-});
+            </EntityForm>
+        );
+    },
+);

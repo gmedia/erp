@@ -6,14 +6,12 @@ import type { ColumnDef } from '@tanstack/react-table';
 export type StockMovementItem = {
     id: number;
     product: { id: number; code: string | null; name: string } | null;
-    warehouse:
-        | {
-              id: number;
-              code: string | null;
-              name: string;
-              branch: { id: number; name: string } | null;
-          }
-        | null;
+    warehouse: {
+        id: number;
+        code: string | null;
+        name: string;
+        branch: { id: number; name: string } | null;
+    } | null;
     movement_type: string;
     quantity_in: string;
     quantity_out: string;
@@ -65,7 +63,9 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
             id: 'moved_at',
             accessorFn: (row) => row.moved_at,
             ...createSortingHeader('Moved At'),
-            cell: ({ row }) => <div>{formatDateTime(row.original.moved_at)}</div>,
+            cell: ({ row }) => (
+                <div>{formatDateTime(row.original.moved_at)}</div>
+            ),
         },
         {
             id: 'product_name',
@@ -156,8 +156,9 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
         {
             id: 'created_by',
             header: 'Created By',
-            cell: ({ row }) => <div>{row.original.created_by?.name ?? '-'}</div>,
+            cell: ({ row }) => (
+                <div>{row.original.created_by?.name ?? '-'}</div>
+            ),
         },
     ];
 }
-

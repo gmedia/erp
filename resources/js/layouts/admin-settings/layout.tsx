@@ -1,11 +1,10 @@
-import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { type NavItem } from '@/types';
 import { type PropsWithChildren } from 'react';
+import { Link } from 'react-router-dom';
 
 interface AdminSettingsLayoutProps extends PropsWithChildren {
     currentGroup?: string;

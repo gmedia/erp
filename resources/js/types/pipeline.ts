@@ -25,7 +25,14 @@ export interface PipelineState extends BaseEntity {
 
 export interface PipelineTransitionAction extends BaseEntity {
     pipeline_transition_id?: number;
-    action_type: 'update_field' | 'create_record' | 'send_notification' | 'dispatch_job' | 'trigger_approval' | 'webhook' | 'custom';
+    action_type:
+        | 'update_field'
+        | 'create_record'
+        | 'send_notification'
+        | 'dispatch_job'
+        | 'trigger_approval'
+        | 'webhook'
+        | 'custom';
     execution_order: number;
     config: Record<string, any>;
     is_async: boolean;

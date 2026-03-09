@@ -9,7 +9,12 @@ import {
 export function createAssetStocktakeFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField('search', 'Search', 'Search by reference...'),
-        createAsyncSelectFilterField('branch_id', 'Branch', '/api/branches', 'All Branches'),
+        createAsyncSelectFilterField(
+            'branch_id',
+            'Branch',
+            '/api/branches',
+            'All Branches',
+        ),
         createSelectFilterField(
             'status',
             'Status',

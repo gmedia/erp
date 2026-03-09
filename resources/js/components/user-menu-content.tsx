@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -6,10 +5,11 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
+import { useAuth } from '@/contexts/auth-context';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { type User } from '@/types';
 import { LogOut, Settings } from 'lucide-react';
-import { useAuth } from '@/contexts/auth-context';
+import { Link } from 'react-router-dom';
 
 interface UserMenuContentProps {
     user: User;

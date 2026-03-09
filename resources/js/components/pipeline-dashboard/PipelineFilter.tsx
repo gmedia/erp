@@ -1,7 +1,12 @@
-import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
 interface PipelineFilterProps {
     pipelines: Array<{ id: number; name: string }>;
@@ -11,31 +16,39 @@ interface PipelineFilterProps {
     onStaleDaysChange: (days: string) => void;
 }
 
-export function PipelineFilter({ 
-    pipelines, 
-    selectedPipelineId, 
+export function PipelineFilter({
+    pipelines,
+    selectedPipelineId,
     onChange,
     staleDays,
-    onStaleDaysChange
+    onStaleDaysChange,
 }: PipelineFilterProps) {
     return (
         <Card className="shadow-sm">
-            <CardContent className="flex flex-col sm:flex-row gap-6 p-4 items-end">
-                <div className="space-y-2 w-full sm:w-64">
-                    <Label htmlFor="pipeline-filter" className="text-xs font-semibold uppercase text-muted-foreground">
+            <CardContent className="flex flex-col items-end gap-6 p-4 sm:flex-row">
+                <div className="w-full space-y-2 sm:w-64">
+                    <Label
+                        htmlFor="pipeline-filter"
+                        className="text-xs font-semibold text-muted-foreground uppercase"
+                    >
                         Select Pipeline
                     </Label>
-                    <Select 
-                        value={selectedPipelineId?.toString() || 'all'} 
+                    <Select
+                        value={selectedPipelineId?.toString() || 'all'}
                         onValueChange={onChange}
                     >
                         <SelectTrigger id="pipeline-filter">
                             <SelectValue placeholder="All Active Pipelines" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Active Pipelines</SelectItem>
-                            {pipelines.map(pipeline => (
-                                <SelectItem key={pipeline.id} value={pipeline.id.toString()}>
+                            <SelectItem value="all">
+                                All Active Pipelines
+                            </SelectItem>
+                            {pipelines.map((pipeline) => (
+                                <SelectItem
+                                    key={pipeline.id}
+                                    value={pipeline.id.toString()}
+                                >
                                     {pipeline.name}
                                 </SelectItem>
                             ))}
@@ -43,12 +56,15 @@ export function PipelineFilter({
                     </Select>
                 </div>
 
-                <div className="space-y-2 w-full sm:w-48">
-                    <Label htmlFor="stale-days" className="text-xs font-semibold uppercase text-muted-foreground">
+                <div className="w-full space-y-2 sm:w-48">
+                    <Label
+                        htmlFor="stale-days"
+                        className="text-xs font-semibold text-muted-foreground uppercase"
+                    >
                         Stale Threshold
                     </Label>
-                    <Select 
-                        value={staleDays.toString()} 
+                    <Select
+                        value={staleDays.toString()}
                         onValueChange={onStaleDaysChange}
                     >
                         <SelectTrigger id="stale-days">

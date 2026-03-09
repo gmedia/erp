@@ -1,15 +1,18 @@
 'use client';
 
-import { Helmet } from 'react-helmet-async';
 import { DataTable } from '@/components/common/DataTableCore';
-import { createStockMonitorColumns, type StockMonitorItem } from '@/components/stock-monitor/Columns';
+import {
+    createStockMonitorColumns,
+    type StockMonitorItem,
+} from '@/components/stock-monitor/Columns';
 import { createStockMonitorFilterFields } from '@/components/stock-monitor/Filters';
 import { StockMonitorSummaryCards } from '@/components/stock-monitor/SummaryCards';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import AppLayout from '@/layouts/app-layout';
-import { useQuery } from '@tanstack/react-query';
 import axios from '@/lib/axios';
-import { useState, useEffect, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 type SelectOption = {
     value: string;
@@ -50,17 +53,38 @@ export default function StockMonitorPage() {
     useEffect(() => {
         const fetchOptions = async () => {
             try {
-                const [products, warehouses, branches, categories] = await Promise.all([
-                    axios.get('/api/products', { params: { per_page: 100 } }),
-                    axios.get('/api/warehouses', { params: { per_page: 100 } }),
-                    axios.get('/api/branches', { params: { per_page: 100 } }),
-                    axios.get('/api/product-categories', { params: { per_page: 100 } }),
-                ]);
+                const [products, warehouses, branches, categories] =
+                    await Promise.all([
+                        axios.get('/api/products', {
+                            params: { per_page: 100 },
+                        }),
+                        axios.get('/api/warehouses', {
+                            params: { per_page: 100 },
+                        }),
+                        axios.get('/api/branches', {
+                            params: { per_page: 100 },
+                        }),
+                        axios.get('/api/product-categories', {
+                            params: { per_page: 100 },
+                        }),
+                    ]);
                 setFilterOptions({
-                    products: (products.data.data || []).map((p: any) => ({ value: String(p.id), label: p.name })),
-                    warehouses: (warehouses.data.data || []).map((w: any) => ({ value: String(w.id), label: w.name })),
-                    branches: (branches.data.data || []).map((b: any) => ({ value: String(b.id), label: b.name })),
-                    categories: (categories.data.data || []).map((c: any) => ({ value: String(c.id), label: c.name })),
+                    products: (products.data.data || []).map((p: any) => ({
+                        value: String(p.id),
+                        label: p.name,
+                    })),
+                    warehouses: (warehouses.data.data || []).map((w: any) => ({
+                        value: String(w.id),
+                        label: w.name,
+                    })),
+                    branches: (branches.data.data || []).map((b: any) => ({
+                        value: String(b.id),
+                        label: b.name,
+                    })),
+                    categories: (categories.data.data || []).map((c: any) => ({
+                        value: String(c.id),
+                        label: c.name,
+                    })),
                 });
             } catch (e) {
                 console.error('Failed to load filter options', e);
@@ -70,7 +94,10 @@ export default function StockMonitorPage() {
     }, []);
 
     const columns = createStockMonitorColumns();
-    const filterFields = useMemo(() => createStockMonitorFilterFields(filterOptions), [filterOptions]);
+    const filterFields = useMemo(
+        () => createStockMonitorFilterFields(filterOptions),
+        [filterOptions],
+    );
 
     const {
         filters,
@@ -115,7 +142,9 @@ export default function StockMonitorPage() {
 
     return (
         <>
-            <Helmet><title>Stock Monitor</title></Helmet>
+            <Helmet>
+                <title>Stock Monitor</title>
+            </Helmet>
             <AppLayout
                 breadcrumbs={[
                     { title: 'Inventory', href: '#' },

@@ -39,4 +39,3 @@ export interface InventoryStocktakeFilters {
     product_category_id?: string;
     status?: string;
 }
-

@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet-async';
 import { EmployeeSelector } from '@/components/permissions/EmployeeSelector'; // Reuse EmployeeSelector
 import {
     Card,
@@ -12,6 +11,7 @@ import { useEmployeeUser } from '@/hooks/users/useEmployeeUser';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { FormProvider, useForm } from 'react-hook-form';
 
 interface UserFormData {
@@ -56,7 +56,9 @@ export default function UsersIndex() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet><title>Users</title></Helmet>
+            <Helmet>
+                <title>Users</title>
+            </Helmet>
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-1">
                     <Card>

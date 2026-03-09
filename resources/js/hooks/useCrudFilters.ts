@@ -66,11 +66,19 @@ export function useCrudFilters<T extends FilterState = FilterState>({
         const perPageParam = params.get('per_page');
 
         const page = pageParam ? Number(pageParam) : initialPagination.page;
-        const per_page = perPageParam ? Number(perPageParam) : initialPagination.per_page;
+        const per_page = perPageParam
+            ? Number(perPageParam)
+            : initialPagination.per_page;
 
         return {
-            page: Number.isFinite(page) && page > 0 ? page : initialPagination.page,
-            per_page: Number.isFinite(per_page) && per_page > 0 ? per_page : initialPagination.per_page,
+            page:
+                Number.isFinite(page) && page > 0
+                    ? page
+                    : initialPagination.page,
+            per_page:
+                Number.isFinite(per_page) && per_page > 0
+                    ? per_page
+                    : initialPagination.per_page,
         };
     });
 

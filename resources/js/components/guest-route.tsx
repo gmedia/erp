@@ -1,12 +1,16 @@
-import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
 import { LoaderCircle } from 'lucide-react';
+import { Navigate } from 'react-router-dom';
 
 /**
  * Prevents authenticated users from accessing guest-only pages (login, register, etc.).
  * Shows spinner while auth is loading, then redirects to /dashboard if already logged in.
  */
-export default function GuestRoute({ children }: { children: React.ReactNode }) {
+export default function GuestRoute({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
     const { user, isLoading } = useAuth();
 
     if (isLoading) {

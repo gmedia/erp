@@ -1,16 +1,16 @@
-import { Helmet } from 'react-helmet-async';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useState } from 'react';
-import axios from '@/lib/axios';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
-import { LoaderCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
+import AuthLayout from '@/layouts/auth-layout';
+import axios from '@/lib/axios';
+import { LoaderCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface LoginProps {
     status?: string;
@@ -21,7 +21,7 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
     const { login } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
-    
+
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -33,17 +33,18 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
         const formData = new FormData(e.currentTarget);
         const data = Object.fromEntries(formData.entries());
         // Handle checkbox which might not be boolean in FormData
-        data.remember = formData.get('remember') === 'on' ? true : false as any;
+        data.remember =
+            formData.get('remember') === 'on' ? true : (false as any);
 
         try {
             // We use token based auth via API
             const response = await axios.post('/api/login', data);
-            
+
             // AuthController returns: { token: "...", user: {...} }
             const payload = response.data;
-            
+
             login(payload.token, payload);
-            
+
             // Redirect to intended location or dashboard
             const from = location.state?.from?.pathname || '/dashboard';
             navigate(from, { replace: true });
@@ -51,9 +52,13 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
             if (error.response?.status === 422) {
                 setErrors(error.response.data.errors || {});
             } else if (error.response?.status === 401) {
-                setErrors({ email: 'These credentials do not match our records.' });
+                setErrors({
+                    email: 'These credentials do not match our records.',
+                });
             } else {
-                setErrors({ email: 'An error occurred during login. Please try again.' });
+                setErrors({
+                    email: 'An error occurred during login. Please try again.',
+                });
             }
         } finally {
             setProcessing(false);
@@ -65,7 +70,9 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
             title="Log in to your account"
             description="Enter your email and password below to log in"
         >
-            <Helmet><title>Log in - {import.meta.env.VITE_APP_NAME || 'ERP'}</title></Helmet>
+            <Helmet>
+                <title>Log in - {import.meta.env.VITE_APP_NAME || 'ERP'}</title>
+            </Helmet>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 <div className="grid gap-6">
@@ -110,11 +117,7 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        <Checkbox
-                            id="remember"
-                            name="remember"
-                            tabIndex={3}
-                        />
+                        <Checkbox id="remember" name="remember" tabIndex={3} />
                         <Label htmlFor="remember">Remember me</Label>
                     </div>
 
@@ -126,7 +129,7 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                         data-test="login-button"
                     >
                         {processing && (
-                            <LoaderCircle className="h-4 w-4 mr-2 animate-spin" />
+                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
                         )}
                         Log in
                     </Button>

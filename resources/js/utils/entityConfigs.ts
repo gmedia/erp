@@ -51,69 +51,72 @@ export type EntityConfig<
     FilterType extends FilterState = FilterState,
 > = CustomEntityConfig<T, FormData, FilterType>;
 
-import { SimpleEntityForm } from '@/components/common/EntityForm';
-import { createSimpleEntityFilterFields } from '@/components/common/filters';
-import { SimpleEntityViewModal } from '@/components/common/SimpleEntityViewModal';
-import { employeeColumns } from '@/components/employees/EmployeeColumns';
-import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
-import { EmployeeForm } from '@/components/employees/EmployeeForm';
-import { EmployeeViewModal } from '@/components/employees/EmployeeViewModal';
-import { customerColumns } from '@/components/customers/CustomerColumns';
-import { createCustomerFilterFields } from '@/components/customers/CustomerFilters';
-import { CustomerForm } from '@/components/customers/CustomerForm';
-import { CustomerViewModal } from '@/components/customers/CustomerViewModal';
-import { supplierColumns } from '@/components/suppliers/SupplierColumns';
-import { createSupplierFilterFields } from '@/components/suppliers/SupplierFilters';
-import { SupplierForm } from '@/components/suppliers/SupplierForm';
-import { createSimpleEntityColumns } from '@/utils/columns';
-import { SupplierViewModal } from '@/components/suppliers/SupplierViewModal';
-import { warehouseColumns } from '@/components/warehouses/WarehouseColumns';
-import { createWarehouseFilterFields } from '@/components/warehouses/WarehouseFilters';
-import { WarehouseForm } from '@/components/warehouses/WarehouseForm';
-import { WarehouseViewModal } from '@/components/warehouses/WarehouseViewModal';
-import { productColumns } from '@/components/products/ProductColumns';
-import { createProductFilterFields } from '@/components/products/ProductFilters';
-import { ProductForm } from '@/components/products/ProductForm';
-import { ProductViewModal } from '@/components/products/ProductViewModal';
-import { productCategoryColumns, type ProductCategory } from '@/components/product-categories/ProductCategoryColumns';
-import { ProductCategoryForm } from '@/components/product-categories/ProductCategoryForm';
-import { ProductCategoryViewModal } from '@/components/product-categories/ProductCategoryViewModal';
-import { unitColumns, type Unit } from '@/components/units/UnitColumns';
-import { UnitForm } from '@/components/units/UnitForm';
-import { UnitViewModal } from '@/components/units/UnitViewModal';
 import { assetCategoryColumns } from '@/components/asset-categories/AssetCategoryColumns';
 import { AssetCategoryForm } from '@/components/asset-categories/AssetCategoryForm';
 import { AssetCategoryViewModal } from '@/components/asset-categories/AssetCategoryViewModal';
-import { type AssetCategory } from '@/types/asset-category';
-import { assetColumns } from '@/components/assets/AssetColumns';
-import { createAssetFilterFields } from '@/components/assets/AssetFilters';
-import { AssetForm } from '@/components/assets/AssetForm';
-import { AssetViewModal } from '@/components/assets/AssetViewModal';
-import { type Asset } from '@/types/asset';
-import { assetMovementColumns } from '@/components/asset-movements/AssetMovementColumns';
-import { createAssetMovementFilterFields } from '@/components/asset-movements/AssetMovementFilters';
-import { AssetMovementForm } from '@/components/asset-movements/AssetMovementForm';
-import { AssetMovementViewModal } from '@/components/asset-movements/AssetMovementViewModal';
 import { assetMaintenanceColumns } from '@/components/asset-maintenances/AssetMaintenanceColumns';
 import { createAssetMaintenanceFilterFields } from '@/components/asset-maintenances/AssetMaintenanceFilters';
 import { AssetMaintenanceForm } from '@/components/asset-maintenances/AssetMaintenanceForm';
 import { AssetMaintenanceViewModal } from '@/components/asset-maintenances/AssetMaintenanceViewModal';
-import { type AssetMaintenance } from '@/types/asset-maintenance';
-import { stockTransferColumns } from '@/components/stock-transfers/StockTransferColumns';
-import { createStockTransferFilterFields } from '@/components/stock-transfers/StockTransferFilters';
-import { StockTransferForm } from '@/components/stock-transfers/StockTransferForm';
-import { StockTransferViewModal } from '@/components/stock-transfers/StockTransferViewModal';
-import { type StockTransfer } from '@/types/stock-transfer';
+import { assetMovementColumns } from '@/components/asset-movements/AssetMovementColumns';
+import { createAssetMovementFilterFields } from '@/components/asset-movements/AssetMovementFilters';
+import { AssetMovementForm } from '@/components/asset-movements/AssetMovementForm';
+import { AssetMovementViewModal } from '@/components/asset-movements/AssetMovementViewModal';
+import { assetColumns } from '@/components/assets/AssetColumns';
+import { createAssetFilterFields } from '@/components/assets/AssetFilters';
+import { AssetForm } from '@/components/assets/AssetForm';
+import { AssetViewModal } from '@/components/assets/AssetViewModal';
+import { SimpleEntityForm } from '@/components/common/EntityForm';
+import { createSimpleEntityFilterFields } from '@/components/common/filters';
+import { SimpleEntityViewModal } from '@/components/common/SimpleEntityViewModal';
+import { customerColumns } from '@/components/customers/CustomerColumns';
+import { createCustomerFilterFields } from '@/components/customers/CustomerFilters';
+import { CustomerForm } from '@/components/customers/CustomerForm';
+import { CustomerViewModal } from '@/components/customers/CustomerViewModal';
+import { employeeColumns } from '@/components/employees/EmployeeColumns';
+import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
+import { EmployeeForm } from '@/components/employees/EmployeeForm';
+import { EmployeeViewModal } from '@/components/employees/EmployeeViewModal';
 import { inventoryStocktakeColumns } from '@/components/inventory-stocktakes/InventoryStocktakeColumns';
 import { createInventoryStocktakeFilterFields } from '@/components/inventory-stocktakes/InventoryStocktakeFilters';
 import { InventoryStocktakeForm } from '@/components/inventory-stocktakes/InventoryStocktakeForm';
 import { InventoryStocktakeViewModal } from '@/components/inventory-stocktakes/InventoryStocktakeViewModal';
-import { type InventoryStocktake } from '@/types/inventory-stocktake';
+import {
+    productCategoryColumns,
+    type ProductCategory,
+} from '@/components/product-categories/ProductCategoryColumns';
+import { ProductCategoryForm } from '@/components/product-categories/ProductCategoryForm';
+import { ProductCategoryViewModal } from '@/components/product-categories/ProductCategoryViewModal';
+import { productColumns } from '@/components/products/ProductColumns';
+import { createProductFilterFields } from '@/components/products/ProductFilters';
+import { ProductForm } from '@/components/products/ProductForm';
+import { ProductViewModal } from '@/components/products/ProductViewModal';
 import { stockAdjustmentColumns } from '@/components/stock-adjustments/StockAdjustmentColumns';
 import { createStockAdjustmentFilterFields } from '@/components/stock-adjustments/StockAdjustmentFilters';
 import { StockAdjustmentForm } from '@/components/stock-adjustments/StockAdjustmentForm';
 import { StockAdjustmentViewModal } from '@/components/stock-adjustments/StockAdjustmentViewModal';
+import { stockTransferColumns } from '@/components/stock-transfers/StockTransferColumns';
+import { createStockTransferFilterFields } from '@/components/stock-transfers/StockTransferFilters';
+import { StockTransferForm } from '@/components/stock-transfers/StockTransferForm';
+import { StockTransferViewModal } from '@/components/stock-transfers/StockTransferViewModal';
+import { supplierColumns } from '@/components/suppliers/SupplierColumns';
+import { createSupplierFilterFields } from '@/components/suppliers/SupplierFilters';
+import { SupplierForm } from '@/components/suppliers/SupplierForm';
+import { SupplierViewModal } from '@/components/suppliers/SupplierViewModal';
+import { unitColumns, type Unit } from '@/components/units/UnitColumns';
+import { UnitForm } from '@/components/units/UnitForm';
+import { UnitViewModal } from '@/components/units/UnitViewModal';
+import { warehouseColumns } from '@/components/warehouses/WarehouseColumns';
+import { createWarehouseFilterFields } from '@/components/warehouses/WarehouseFilters';
+import { WarehouseForm } from '@/components/warehouses/WarehouseForm';
+import { WarehouseViewModal } from '@/components/warehouses/WarehouseViewModal';
+import { type Asset } from '@/types/asset';
+import { type AssetCategory } from '@/types/asset-category';
+import { type AssetMaintenance } from '@/types/asset-maintenance';
+import { type InventoryStocktake } from '@/types/inventory-stocktake';
 import { type StockAdjustment } from '@/types/stock-adjustment';
+import { type StockTransfer } from '@/types/stock-transfer';
+import { createSimpleEntityColumns } from '@/utils/columns';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
@@ -359,51 +362,58 @@ export const stockTransferConfig = createComplexEntityConfig<StockTransfer>({
         `This action cannot be undone. This will cancel stock transfer ${transfer.transfer_number || ''}.`,
 });
 
-export const inventoryStocktakeConfig = createComplexEntityConfig<InventoryStocktake>({
-    entityName: 'Inventory Stocktake',
-    entityNamePlural: 'Inventory Stocktakes',
-    apiEndpoint: '/api/inventory-stocktakes',
-    exportEndpoint: '/api/inventory-stocktakes/export',
-    queryKey: ['inventory-stocktakes'],
-    breadcrumbs: [{ title: 'Inventory Stocktakes', href: '/inventory-stocktakes' }],
-    initialFilters: {
-        search: '',
-        warehouse_id: '',
-        product_category_id: '',
-        status: '',
-    },
-    columns: inventoryStocktakeColumns,
-    filterFields: createInventoryStocktakeFilterFields(),
-    formComponent: InventoryStocktakeForm,
-    formType: 'complex',
-    entityNameForSearch: 'inventory stocktake',
-    viewModalComponent: InventoryStocktakeViewModal,
-    getDeleteMessage: (stocktake: { stocktake_number?: string | null }) =>
-        `This action cannot be undone. This will cancel inventory stocktake ${stocktake.stocktake_number || ''}.`,
-});
+export const inventoryStocktakeConfig =
+    createComplexEntityConfig<InventoryStocktake>({
+        entityName: 'Inventory Stocktake',
+        entityNamePlural: 'Inventory Stocktakes',
+        apiEndpoint: '/api/inventory-stocktakes',
+        exportEndpoint: '/api/inventory-stocktakes/export',
+        queryKey: ['inventory-stocktakes'],
+        breadcrumbs: [
+            { title: 'Inventory Stocktakes', href: '/inventory-stocktakes' },
+        ],
+        initialFilters: {
+            search: '',
+            warehouse_id: '',
+            product_category_id: '',
+            status: '',
+        },
+        columns: inventoryStocktakeColumns,
+        filterFields: createInventoryStocktakeFilterFields(),
+        formComponent: InventoryStocktakeForm,
+        formType: 'complex',
+        entityNameForSearch: 'inventory stocktake',
+        viewModalComponent: InventoryStocktakeViewModal,
+        getDeleteMessage: (stocktake: { stocktake_number?: string | null }) =>
+            `This action cannot be undone. This will cancel inventory stocktake ${stocktake.stocktake_number || ''}.`,
+    });
 
-export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>({
-    entityName: 'Stock Adjustment',
-    entityNamePlural: 'Stock Adjustments',
-    apiEndpoint: '/api/stock-adjustments',
-    exportEndpoint: '/api/stock-adjustments/export',
-    queryKey: ['stock-adjustments'],
-    breadcrumbs: [{ title: 'Stock Adjustments', href: '/stock-adjustments' }],
-    initialFilters: {
-        search: '',
-        warehouse_id: '',
-        status: '',
-        adjustment_type: '',
+export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
+    {
+        entityName: 'Stock Adjustment',
+        entityNamePlural: 'Stock Adjustments',
+        apiEndpoint: '/api/stock-adjustments',
+        exportEndpoint: '/api/stock-adjustments/export',
+        queryKey: ['stock-adjustments'],
+        breadcrumbs: [
+            { title: 'Stock Adjustments', href: '/stock-adjustments' },
+        ],
+        initialFilters: {
+            search: '',
+            warehouse_id: '',
+            status: '',
+            adjustment_type: '',
+        },
+        columns: stockAdjustmentColumns,
+        filterFields: createStockAdjustmentFilterFields(),
+        formComponent: StockAdjustmentForm,
+        formType: 'complex',
+        entityNameForSearch: 'stock adjustment',
+        viewModalComponent: StockAdjustmentViewModal,
+        getDeleteMessage: (adjustment: { adjustment_number?: string | null }) =>
+            `This action cannot be undone. This will cancel stock adjustment ${adjustment.adjustment_number || ''}.`,
     },
-    columns: stockAdjustmentColumns,
-    filterFields: createStockAdjustmentFilterFields(),
-    formComponent: StockAdjustmentForm,
-    formType: 'complex',
-    entityNameForSearch: 'stock adjustment',
-    viewModalComponent: StockAdjustmentViewModal,
-    getDeleteMessage: (adjustment: { adjustment_number?: string | null }) =>
-        `This action cannot be undone. This will cancel stock adjustment ${adjustment.adjustment_number || ''}.`,
-});
+);
 
 export const supplierCategoryConfig = createSimpleEntityConfig({
     entityName: 'Supplier Category',
@@ -436,22 +446,28 @@ export const assetCategoryConfig = createComplexEntityConfig<AssetCategory>({
     getDeleteMessage: createGenericDeleteMessage('Asset Category'),
 });
 
-export const productCategoryConfig = createComplexEntityConfig<ProductCategory>({
-    entityName: 'Product Category',
-    entityNamePlural: 'Product Categories',
-    apiEndpoint: '/api/product-categories',
-    exportEndpoint: '/api/product-categories/export',
-    queryKey: ['product-categories'],
-    breadcrumbs: [{ title: 'Product Categories', href: '/product-categories' }],
-    initialFilters: { search: '' },
-    columns: productCategoryColumns,
-    filterFields: createSimpleEntityFilterFields('Search product categories...'),
-    formComponent: ProductCategoryForm,
-    formType: 'complex',
-    entityNameForSearch: 'product category',
-    viewModalComponent: ProductCategoryViewModal,
-    getDeleteMessage: createGenericDeleteMessage('Product Category'),
-});
+export const productCategoryConfig = createComplexEntityConfig<ProductCategory>(
+    {
+        entityName: 'Product Category',
+        entityNamePlural: 'Product Categories',
+        apiEndpoint: '/api/product-categories',
+        exportEndpoint: '/api/product-categories/export',
+        queryKey: ['product-categories'],
+        breadcrumbs: [
+            { title: 'Product Categories', href: '/product-categories' },
+        ],
+        initialFilters: { search: '' },
+        columns: productCategoryColumns,
+        filterFields: createSimpleEntityFilterFields(
+            'Search product categories...',
+        ),
+        formComponent: ProductCategoryForm,
+        formType: 'complex',
+        entityNameForSearch: 'product category',
+        viewModalComponent: ProductCategoryViewModal,
+        getDeleteMessage: createGenericDeleteMessage('Product Category'),
+    },
+);
 
 export const unitConfig = createComplexEntityConfig<Unit>({
     entityName: 'Unit',
@@ -575,7 +591,6 @@ import { createJournalEntryFilterFields } from '@/components/journal-entries/Jou
 import { JournalEntryForm } from '@/components/journal-entries/JournalEntryForm';
 import { JournalEntryViewModal } from '@/components/journal-entries/JournalEntryViewModal';
 import { type JournalEntry } from '@/types/journal-entry';
-import { JournalEntryFormData } from '@/utils/schemas';
 
 export const journalEntryConfig = createComplexEntityConfig<JournalEntry>({
     entityName: 'Journal Entry',
@@ -690,37 +705,42 @@ export const assetMovementConfig = createComplexEntityConfig({
     formType: 'complex',
     entityNameForSearch: 'movement',
     viewModalComponent: AssetMovementViewModal as any,
-    getDeleteMessage: () => 'This action cannot be undone. This will permanently delete this movement record.',
+    getDeleteMessage: () =>
+        'This action cannot be undone. This will permanently delete this movement record.',
 });
 
-export const assetMaintenanceConfig = createComplexEntityConfig<AssetMaintenance>({
-    entityName: 'Asset Maintenance',
-    entityNamePlural: 'Asset Maintenances',
-    apiEndpoint: '/api/asset-maintenances',
-    exportEndpoint: '/api/asset-maintenances/export',
-    queryKey: ['asset-maintenances'],
-    breadcrumbs: [{ title: 'Asset Maintenances', href: '/asset-maintenances' }],
-    initialFilters: {
-        search: '',
-        asset_id: '',
-        maintenance_type: '',
-        status: '',
-        supplier_id: '',
-        scheduled_from: '',
-        scheduled_to: '',
-        performed_from: '',
-        performed_to: '',
-        cost_min: '',
-        cost_max: '',
-    },
-    columns: assetMaintenanceColumns,
-    filterFields: createAssetMaintenanceFilterFields(),
-    formComponent: AssetMaintenanceForm,
-    formType: 'complex',
-    entityNameForSearch: 'maintenance',
-    viewModalComponent: AssetMaintenanceViewModal,
-    getDeleteMessage: () => 'This action cannot be undone. This will permanently delete this maintenance record.',
-});
+export const assetMaintenanceConfig =
+    createComplexEntityConfig<AssetMaintenance>({
+        entityName: 'Asset Maintenance',
+        entityNamePlural: 'Asset Maintenances',
+        apiEndpoint: '/api/asset-maintenances',
+        exportEndpoint: '/api/asset-maintenances/export',
+        queryKey: ['asset-maintenances'],
+        breadcrumbs: [
+            { title: 'Asset Maintenances', href: '/asset-maintenances' },
+        ],
+        initialFilters: {
+            search: '',
+            asset_id: '',
+            maintenance_type: '',
+            status: '',
+            supplier_id: '',
+            scheduled_from: '',
+            scheduled_to: '',
+            performed_from: '',
+            performed_to: '',
+            cost_min: '',
+            cost_max: '',
+        },
+        columns: assetMaintenanceColumns,
+        filterFields: createAssetMaintenanceFilterFields(),
+        formComponent: AssetMaintenanceForm,
+        formType: 'complex',
+        entityNameForSearch: 'maintenance',
+        viewModalComponent: AssetMaintenanceViewModal,
+        getDeleteMessage: () =>
+            'This action cannot be undone. This will permanently delete this maintenance record.',
+    });
 
 import { assetStocktakeColumns } from '@/components/asset-stocktakes/AssetStocktakeColumns';
 import { createAssetStocktakeFilterFields } from '@/components/asset-stocktakes/AssetStocktakeFilters';
@@ -811,8 +831,17 @@ export const approvalDelegationConfig = createComplexEntityConfig<any>({
     apiEndpoint: '/api/approval-delegations',
     exportEndpoint: '/api/approval-delegations/export',
     queryKey: ['approval-delegations'],
-    breadcrumbs: [{ title: 'Approval Delegations', href: '/approval-delegations' }],
-    initialFilters: { search: '', delegator_user_id: '', delegate_user_id: '', is_active: '', start_date_from: '', start_date_to: '' },
+    breadcrumbs: [
+        { title: 'Approval Delegations', href: '/approval-delegations' },
+    ],
+    initialFilters: {
+        search: '',
+        delegator_user_id: '',
+        delegate_user_id: '',
+        is_active: '',
+        start_date_from: '',
+        start_date_to: '',
+    },
     columns: approvalDelegationColumns as any,
     filterFields: createApprovalDelegationFilterFields(),
     formComponent: ApprovalDelegationForm,

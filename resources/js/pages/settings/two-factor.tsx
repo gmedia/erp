@@ -1,6 +1,6 @@
-import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
 import axios from '@/lib/axios';
+import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { toast } from 'sonner';
 
 import HeadingSmall from '@/components/heading-small';
@@ -40,7 +40,7 @@ export default function TwoFactor({
         fetchRecoveryCodes,
         errors,
     } = useTwoFactorAuth();
-    
+
     const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
     const [enabling, setEnabling] = useState(false);
     const [disabling, setDisabling] = useState(false);
@@ -72,7 +72,12 @@ export default function TwoFactor({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet><title>Two-Factor Authentication - {import.meta.env.VITE_APP_NAME || 'ERP'}</title></Helmet>
+            <Helmet>
+                <title>
+                    Two-Factor Authentication -{' '}
+                    {import.meta.env.VITE_APP_NAME || 'ERP'}
+                </title>
+            </Helmet>
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
@@ -101,7 +106,8 @@ export default function TwoFactor({
                                     onClick={disableTwoFactor}
                                     disabled={disabling}
                                 >
-                                    <ShieldBan className="mr-2 h-4 w-4" /> Disable 2FA
+                                    <ShieldBan className="mr-2 h-4 w-4" />{' '}
+                                    Disable 2FA
                                 </Button>
                             </div>
                         </div>

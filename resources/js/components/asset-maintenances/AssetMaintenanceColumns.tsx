@@ -2,7 +2,11 @@
 
 import { Badge } from '@/components/ui/badge';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
-import { createActionsColumn, createSelectColumn, createSortingHeader } from '@/utils/columns';
+import {
+    createActionsColumn,
+    createSelectColumn,
+    createSortingHeader,
+} from '@/utils/columns';
 import { type ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 
@@ -17,7 +21,7 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
             return (
                 <div className="flex flex-col">
                     <span className="font-medium">{asset.name || '-'}</span>
-                    <span className="text-xs text-muted-foreground font-mono">
+                    <span className="font-mono text-xs text-muted-foreground">
                         {asset.asset_code || '-'}
                     </span>
                 </div>
@@ -38,11 +42,12 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
         ...createSortingHeader('Status'),
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
-            const variant = status === 'completed'
-                ? 'default'
-                : status === 'cancelled'
-                    ? 'destructive'
-                    : 'secondary';
+            const variant =
+                status === 'completed'
+                    ? 'default'
+                    : status === 'cancelled'
+                      ? 'destructive'
+                      : 'secondary';
 
             return (
                 <Badge variant={variant} className="capitalize">

@@ -1,14 +1,23 @@
 'use client';
 
-import { createActionsColumn, createBadgeColumn, createDateColumn, createSelectColumn, createSortingHeader, createTextColumn } from '@/utils/columns';
-import { ColumnDef } from '@tanstack/react-table';
 import { type AccountMapping } from '@/types/account-mapping';
+import {
+    createActionsColumn,
+    createBadgeColumn,
+    createDateColumn,
+    createSelectColumn,
+    createSortingHeader,
+    createTextColumn,
+} from '@/utils/columns';
+import { ColumnDef } from '@tanstack/react-table';
 
-function formatAccountLabel(account?: {
-    coa_version?: { name: string } | null;
-    code: string;
-    name: string;
-} | null): string {
+function formatAccountLabel(
+    account?: {
+        coa_version?: { name: string } | null;
+        code: string;
+        name: string;
+    } | null,
+): string {
     if (!account) return '-';
     const version = account.coa_version?.name;
     const base = `${account.code} - ${account.name}`;
@@ -41,6 +50,9 @@ export const accountMappingColumns: ColumnDef<AccountMapping>[] = [
         },
     }),
     createTextColumn<AccountMapping>({ accessorKey: 'notes', label: 'Notes' }),
-    createDateColumn<AccountMapping>({ accessorKey: 'created_at', label: 'Created At' }),
+    createDateColumn<AccountMapping>({
+        accessorKey: 'created_at',
+        label: 'Created At',
+    }),
     createActionsColumn<AccountMapping>(),
 ];

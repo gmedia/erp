@@ -12,8 +12,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { formatDate } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
+import { formatDate } from '@/lib/utils';
 import { type ProductCategory } from './ProductCategoryColumns';
 
 interface ProductCategoryViewModalProps {
@@ -42,9 +42,9 @@ export const ProductCategoryViewModal = memo<ProductCategoryViewModalProps>(
 
                     <div className="space-y-4 py-4">
                         <ViewField label="Name" value={item.name} />
-                        <ViewField 
-                            label="Description" 
-                            value={item.description || '-'} 
+                        <ViewField
+                            label="Description"
+                            value={item.description || '-'}
                             className="whitespace-pre-wrap"
                         />
                         <ViewField

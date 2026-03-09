@@ -41,7 +41,7 @@ const renderBasicInfoSection = () => (
 
 const renderDetailsSection = () => (
     <>
-         <AsyncSelectField
+        <AsyncSelectField
             name="branch_id"
             label="Branch"
             url="/api/branches"
@@ -53,7 +53,7 @@ const renderDetailsSection = () => (
             url="/api/supplier-categories"
             placeholder="Select a category"
         />
-         <SelectField
+        <SelectField
             name="status"
             label="Status"
             options={[

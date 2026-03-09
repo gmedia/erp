@@ -10,7 +10,7 @@ import {
     type AccountMappingFormData,
 } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 
 interface AccountMappingFormProps {
@@ -114,7 +114,9 @@ export function AccountMappingForm({
         <EntityForm<AccountMappingFormData>
             open={open}
             onOpenChange={onOpenChange}
-            title={activeEntity ? 'Edit Account Mapping' : 'Create Account Mapping'}
+            title={
+                activeEntity ? 'Edit Account Mapping' : 'Create Account Mapping'
+            }
             form={form}
             onSubmit={onSubmit}
             isLoading={isLoading}

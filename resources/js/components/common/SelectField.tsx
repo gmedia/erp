@@ -13,7 +13,6 @@ import {
     SelectItem,
     SelectTrigger,
 } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
 import { type ReactNode } from 'react';
 
 export interface Option {
@@ -52,14 +51,26 @@ export default function SelectField({
                     <FormControl>
                         <Select
                             onValueChange={field.onChange}
-                            value={field.value !== undefined && field.value !== null ? String(field.value) : undefined}
+                            value={
+                                field.value !== undefined &&
+                                field.value !== null
+                                    ? String(field.value)
+                                    : undefined
+                            }
                             disabled={disabled}
                         >
-                            <SelectTrigger className="w-full overflow-hidden min-w-0" aria-label={label}>
-                                <span className="truncate text-left flex-1">
-                                    {(field.value !== undefined && field.value !== null && field.value !== '')
+                            <SelectTrigger
+                                className="w-full min-w-0 overflow-hidden"
+                                aria-label={label}
+                            >
+                                <span className="flex-1 truncate text-left">
+                                    {field.value !== undefined &&
+                                    field.value !== null &&
+                                    field.value !== ''
                                         ? options.find(
-                                              (o) => String(o.value) === String(field.value),
+                                              (o) =>
+                                                  String(o.value) ===
+                                                  String(field.value),
                                           )?.label
                                         : placeholder}
                                 </span>

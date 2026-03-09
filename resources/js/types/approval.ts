@@ -75,7 +75,17 @@ export interface ApprovalAuditLog {
     approval_request_id: number | null;
     approvable_type: string;
     approvable_id: number;
-    event: 'submitted' | 'step_approved' | 'step_rejected' | 'step_skipped' | 'auto_approved' | 'escalated' | 'delegated' | 'cancelled' | 'resubmitted' | 'completed';
+    event:
+        | 'submitted'
+        | 'step_approved'
+        | 'step_rejected'
+        | 'step_skipped'
+        | 'auto_approved'
+        | 'escalated'
+        | 'delegated'
+        | 'cancelled'
+        | 'resubmitted'
+        | 'completed';
     actor_user_id: number | null;
     step_order: number | null;
     metadata: any | null;

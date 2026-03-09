@@ -1,9 +1,7 @@
 'use client';
 
-import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
-import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
+import { Asset } from '@/types/asset';
 import {
     createActionsColumn,
     createCurrencyColumn,
@@ -12,16 +10,28 @@ import {
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
-import { Asset } from '@/types/asset';
+import { ColumnDef } from '@tanstack/react-table';
+import { Link } from 'react-router-dom';
 
-const renderRelationCell = (key: keyof Asset) => ({ row }: { row: { original: Asset } }) => {
-    const val = row.original[key];
-    return <div>{typeof val === 'object' && val !== null ? (val as any).name : val}</div>;
-};
+const renderRelationCell =
+    (key: keyof Asset) =>
+    ({ row }: { row: { original: Asset } }) => {
+        const val = row.original[key];
+        return (
+            <div>
+                {typeof val === 'object' && val !== null
+                    ? (val as any).name
+                    : val}
+            </div>
+        );
+    };
 
 const renderStatusCell = ({ row }: { row: { original: Asset } }) => {
     const status = row.original.status;
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+    const variants: Record<
+        string,
+        'default' | 'secondary' | 'destructive' | 'outline'
+    > = {
         draft: 'outline',
         active: 'default',
         maintenance: 'secondary',

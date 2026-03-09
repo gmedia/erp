@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
 import axios from '@/lib/axios';
+import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 
 export interface PipelineState {
@@ -44,7 +44,10 @@ export interface TimelineEntry {
     created_at: string;
 }
 
-export function useEntityPipeline(entityType: string, entityId: string | number) {
+export function useEntityPipeline(
+    entityType: string,
+    entityId: string | number,
+) {
     const [stateData, setStateData] = useState<EntityStateData | null>(null);
     const [timeline, setTimeline] = useState<TimelineEntry[]>([]);
     const [loading, setLoading] = useState(false);
@@ -55,11 +58,16 @@ export function useEntityPipeline(entityType: string, entityId: string | number)
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get<{ data: EntityStateData }>(`/api/entity-states/${entityType}/${entityId}`);
+            const response = await axios.get<{ data: EntityStateData }>(
+                `/api/entity-states/${entityType}/${entityId}`,
+            );
             setStateData(response.data.data);
         } catch (err: any) {
             if (err.response?.status !== 404 && err.response?.status !== 400) {
-                setError(err.response?.data?.message || 'Failed to fetch entity state');
+                setError(
+                    err.response?.data?.message ||
+                        'Failed to fetch entity state',
+                );
                 toast.error('Failed to fetch entity state');
             }
         } finally {
@@ -67,24 +75,38 @@ export function useEntityPipeline(entityType: string, entityId: string | number)
         }
     }, [entityType, entityId]);
 
-    const fetchTimeline = useCallback(async (page = 1) => {
-        setTimelineLoading(true);
-        try {
-            const response = await axios.get<{ data: TimelineEntry[] }>(`/api/entity-states/${entityType}/${entityId}/timeline?page=${page}`);
-            setTimeline(response.data.data);
-        } catch (err: any) {
-             if (err.response?.status !== 404 && err.response?.status !== 400) {
-                toast.error('Failed to fetch timeline');
-             }
-        } finally {
-            setTimelineLoading(false);
-        }
-    }, [entityType, entityId]);
+    const fetchTimeline = useCallback(
+        async (page = 1) => {
+            setTimelineLoading(true);
+            try {
+                const response = await axios.get<{ data: TimelineEntry[] }>(
+                    `/api/entity-states/${entityType}/${entityId}/timeline?page=${page}`,
+                );
+                setTimeline(response.data.data);
+            } catch (err: any) {
+                if (
+                    err.response?.status !== 404 &&
+                    err.response?.status !== 400
+                ) {
+                    toast.error('Failed to fetch timeline');
+                }
+            } finally {
+                setTimelineLoading(false);
+            }
+        },
+        [entityType, entityId],
+    );
 
-    const executeTransition = async (transitionId: number, comment?: string) => {
+    const executeTransition = async (
+        transitionId: number,
+        comment?: string,
+    ) => {
         setLoading(true);
         try {
-            const response = await axios.post<{ data: EntityStateData, message: string }>(`/api/entity-states/${entityType}/${entityId}/transition`, {
+            const response = await axios.post<{
+                data: EntityStateData;
+                message: string;
+            }>(`/api/entity-states/${entityType}/${entityId}/transition`, {
                 transition_id: transitionId,
                 comment,
             });
@@ -93,7 +115,10 @@ export function useEntityPipeline(entityType: string, entityId: string | number)
             fetchTimeline(1); // Refresh timeline after transition
             return true;
         } catch (err: any) {
-            const message = err.response?.data?.message || err.response?.data?.errors?.guards?.[0] || 'Transition failed';
+            const message =
+                err.response?.data?.message ||
+                err.response?.data?.errors?.guards?.[0] ||
+                'Transition failed';
             toast.error(message);
             return false;
         } finally {

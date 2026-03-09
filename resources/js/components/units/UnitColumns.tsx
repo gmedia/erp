@@ -1,6 +1,11 @@
 'use client';
 
-import { createActionsColumn, createDateColumn, createSelectColumn, createTextColumn } from '@/utils/columns';
+import {
+    createActionsColumn,
+    createDateColumn,
+    createSelectColumn,
+    createTextColumn,
+} from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
 
 export interface Unit {

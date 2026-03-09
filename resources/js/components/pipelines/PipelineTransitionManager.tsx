@@ -1,6 +1,3 @@
-import React, { useEffect, useState } from 'react';
-import { usePipelineTransition } from '@/hooks/usePipelineTransition';
-import { usePipelineState } from '@/hooks/usePipelineState';
 import { Button } from '@/components/ui/button';
 import {
     Table,
@@ -10,22 +7,29 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Plus, Trash, Edit } from 'lucide-react';
+import { usePipelineState } from '@/hooks/usePipelineState';
+import { usePipelineTransition } from '@/hooks/usePipelineTransition';
 import { PipelineTransition } from '@/types/pipeline';
+import { Edit, Plus, Trash } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { PipelineTransitionFormDialog } from './PipelineTransitionFormDialog';
 
 interface PipelineTransitionManagerProps {
     pipelineId: number;
 }
 
-export function PipelineTransitionManager({ pipelineId }: PipelineTransitionManagerProps) {
-    const { transitions, loading, fetchTransitions, deleteTransition } = usePipelineTransition(pipelineId);
-    
+export function PipelineTransitionManager({
+    pipelineId,
+}: PipelineTransitionManagerProps) {
+    const { transitions, loading, fetchTransitions, deleteTransition } =
+        usePipelineTransition(pipelineId);
+
     // We also need states to show state names
     const { states, fetchStates } = usePipelineState(pipelineId);
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [editingTransition, setEditingTransition] = useState<PipelineTransition | null>(null);
+    const [editingTransition, setEditingTransition] =
+        useState<PipelineTransition | null>(null);
 
     useEffect(() => {
         fetchTransitions();
@@ -43,7 +47,9 @@ export function PipelineTransitionManager({ pipelineId }: PipelineTransitionMana
     };
 
     const handleDelete = async (transitionId: number) => {
-        if (window.confirm('Are you sure you want to delete this transition?')) {
+        if (
+            window.confirm('Are you sure you want to delete this transition?')
+        ) {
             await deleteTransition(transitionId);
         }
     };
@@ -51,17 +57,33 @@ export function PipelineTransitionManager({ pipelineId }: PipelineTransitionMana
     const renderRow = (transition: PipelineTransition) => {
         return (
             <TableRow key={transition.id}>
-                <TableCell>{transition.from_state?.name || transition.from_state_id}</TableCell>
-                <TableCell>{transition.to_state?.name || transition.to_state_id}</TableCell>
+                <TableCell>
+                    {transition.from_state?.name || transition.from_state_id}
+                </TableCell>
+                <TableCell>
+                    {transition.to_state?.name || transition.to_state_id}
+                </TableCell>
                 <TableCell>{transition.name}</TableCell>
                 <TableCell>{transition.code}</TableCell>
                 <TableCell>{transition.actions?.length || 0} Actions</TableCell>
                 <TableCell className="text-right">
-                    <Button type="button" variant="ghost" size="icon" onClick={() => handleEdit(transition)} title="Edit transition">
-                        <Edit className="w-4 h-4" />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(transition)}
+                        title="Edit transition"
+                    >
+                        <Edit className="h-4 w-4" />
                     </Button>
-                    <Button type="button" variant="ghost" size="icon" onClick={() => handleDelete(transition.id)} title="Delete transition">
-                        <Trash className="w-4 h-4" />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(transition.id)}
+                        title="Delete transition"
+                    >
+                        <Trash className="h-4 w-4" />
                     </Button>
                 </TableCell>
             </TableRow>
@@ -69,8 +91,8 @@ export function PipelineTransitionManager({ pipelineId }: PipelineTransitionMana
     };
 
     return (
-        <div className="mt-8 pt-6 border-t border-border">
-            <div className="flex justify-between items-center mb-4">
+        <div className="mt-8 border-t border-border pt-6">
+            <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-lg font-medium">Pipeline Transitions</h3>
                 <Button
                     type="button"
@@ -78,12 +100,12 @@ export function PipelineTransitionManager({ pipelineId }: PipelineTransitionMana
                     size="sm"
                     onClick={handleCreateNew}
                 >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="mr-2 h-4 w-4" />
                     Add Transition
                 </Button>
             </div>
 
-            <div className="rounded-md border border-border overflow-hidden">
+            <div className="overflow-hidden rounded-md border border-border">
                 <Table>
                     <TableHeader className="bg-muted/50">
                         <TableRow>
@@ -99,14 +121,21 @@ export function PipelineTransitionManager({ pipelineId }: PipelineTransitionMana
                         {transitions.map(renderRow)}
                         {!transitions.length && !loading && (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
-                                    No transitions defined. Add one to enable state movement.
+                                <TableCell
+                                    colSpan={6}
+                                    className="py-6 text-center text-muted-foreground"
+                                >
+                                    No transitions defined. Add one to enable
+                                    state movement.
                                 </TableCell>
                             </TableRow>
                         )}
                         {loading && (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-6">
+                                <TableCell
+                                    colSpan={6}
+                                    className="py-6 text-center"
+                                >
                                     Loading...
                                 </TableCell>
                             </TableRow>

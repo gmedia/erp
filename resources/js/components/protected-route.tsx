@@ -1,12 +1,16 @@
-import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
 import { LoaderCircle } from 'lucide-react';
+import { Navigate, useLocation } from 'react-router-dom';
 
 /**
  * Shows a full-screen loading spinner while auth state is being determined,
  * then either renders children (if authenticated) or redirects to /login.
  */
-export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
+export default function ProtectedRoute({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
     const { user, isLoading } = useAuth();
     const location = useLocation();
 

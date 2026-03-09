@@ -321,7 +321,13 @@ export function createUrlColumn<T extends Record<string, unknown>>(
 export function createActionsColumn<T = Record<string, unknown>>(
     options: ActionsColumnOptions<T> = {},
 ): ColumnDef<T> {
-    const { onEdit, onDelete, onView, viewPath, enableHiding = false } = options;
+    const {
+        onEdit,
+        onDelete,
+        onView,
+        viewPath,
+        enableHiding = false,
+    } = options;
 
     return {
         id: 'actions',

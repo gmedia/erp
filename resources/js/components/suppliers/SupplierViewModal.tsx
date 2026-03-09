@@ -1,19 +1,18 @@
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
-    DialogHeader,
-    DialogTitle,
     DialogDescription,
     DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import React from 'react';
 
-import { Supplier } from '@/types/entity';
 import { useTranslation } from '@/contexts/i18n-context';
-
+import { Supplier } from '@/types/entity';
 
 interface SupplierViewModalProps {
     open: boolean;
@@ -21,7 +20,13 @@ interface SupplierViewModalProps {
     item: Supplier | null;
 }
 
-const ViewField = ({ label, value }: { label: string; value: React.ReactNode }) => (
+const ViewField = ({
+    label,
+    value,
+}: {
+    label: string;
+    value: React.ReactNode;
+}) => (
     <div className="space-y-1">
         <h4 className="text-sm font-medium text-muted-foreground">{label}</h4>
         <div className="text-sm font-medium">{value || '-'}</div>
@@ -48,39 +53,38 @@ export const SupplierViewModal = React.memo(
                         <ViewField label="Email" value={item.email} />
                         <ViewField label="Phone" value={item.phone} />
                         <ViewField label="Address" value={item.address} />
-                        
-                        <ViewField 
-                            label="Branch" 
-                            value={item.branch?.name} 
-                        />
-                        
-                        <ViewField 
-                            label="Category" 
+
+                        <ViewField label="Branch" value={item.branch?.name} />
+
+                        <ViewField
+                            label="Category"
                             value={
                                 <Badge variant="outline">
                                     {item.category?.name || '-'}
                                 </Badge>
-                            } 
+                            }
                         />
-                        
-                        <ViewField 
-                            label="Status" 
+
+                        <ViewField
+                            label="Status"
                             value={
-                                <Badge 
+                                <Badge
                                     variant={
-                                        item.status === 'active' 
-                                            ? 'default' 
+                                        item.status === 'active'
+                                            ? 'default'
                                             : 'destructive'
                                     }
                                 >
-                                    {item.status === 'active' ? 'Active' : 'Inactive'}
+                                    {item.status === 'active'
+                                        ? 'Active'
+                                        : 'Inactive'}
                                 </Badge>
-                            } 
+                            }
                         />
 
-                        <ViewField 
-                            label="Created At" 
-                            value={format(new Date(item.created_at), 'PPP p')} 
+                        <ViewField
+                            label="Created At"
+                            value={format(new Date(item.created_at), 'PPP p')}
                         />
                     </div>
 

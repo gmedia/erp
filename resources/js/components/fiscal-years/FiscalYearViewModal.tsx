@@ -1,7 +1,7 @@
 'use client';
 
-import * as React from 'react';
-import { memo } from 'react';
+import { ViewField } from '@/components/common/ViewField';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -10,11 +10,10 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { ViewField } from '@/components/common/ViewField';
-import { formatDate } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
+import { formatDate } from '@/lib/utils';
 import { type FiscalYear } from '@/types/entity';
+import { memo } from 'react';
 
 interface FiscalYearViewModalProps {
     open: boolean;
@@ -47,7 +46,10 @@ export const FiscalYearViewModal = memo<FiscalYearViewModalProps>(
                             label="End Date"
                             value={formatDate(item.end_date)}
                         />
-                        <ViewField label="Status" value={item.status.toUpperCase()} />
+                        <ViewField
+                            label="Status"
+                            value={item.status.toUpperCase()}
+                        />
                         <ViewField
                             label="Created At"
                             value={formatDate(item.created_at)}

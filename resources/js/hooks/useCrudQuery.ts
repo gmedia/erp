@@ -1,8 +1,8 @@
 'use client';
 
+import axios from '@/lib/axios';
 import { handleApiError } from '@/utils/errorHandling';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
-import axios from '@/lib/axios';
 
 export interface PaginationState {
     page: number;

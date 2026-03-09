@@ -1,7 +1,7 @@
-import { ColumnDef } from '@tanstack/react-table';
-import { createSortingHeader } from '@/utils/columns';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { createSortingHeader } from '@/utils/columns';
+import { ColumnDef } from '@tanstack/react-table';
 import { Eye } from 'lucide-react';
 
 export interface ApprovalAuditTrailItem {
@@ -24,7 +24,9 @@ interface ColumnsProps {
     onViewDetail: (item: ApprovalAuditTrailItem) => void;
 }
 
-export const createApprovalAuditTrailColumns = ({ onViewDetail }: ColumnsProps): ColumnDef<ApprovalAuditTrailItem>[] => [
+export const createApprovalAuditTrailColumns = ({
+    onViewDetail,
+}: ColumnsProps): ColumnDef<ApprovalAuditTrailItem>[] => [
     {
         accessorKey: 'created_at',
         ...createSortingHeader('Date'),
@@ -48,14 +50,20 @@ export const createApprovalAuditTrailColumns = ({ onViewDetail }: ColumnsProps):
         ...createSortingHeader('Event'),
         cell: ({ row }) => {
             const eventStr = row.getValue('event') as string;
-            const formatted = eventStr ? eventStr.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : '-';
-            let variant: "default" | "secondary" | "destructive" | "outline" = "outline";
-            
+            const formatted = eventStr
+                ? eventStr
+                      .replace('_', ' ')
+                      .replace(/\b\w/g, (l) => l.toUpperCase())
+                : '-';
+            let variant: 'default' | 'secondary' | 'destructive' | 'outline' =
+                'outline';
+
             if (eventStr.includes('approved')) variant = 'default';
             if (eventStr === 'step_rejected') variant = 'destructive';
             if (eventStr === 'submitted') variant = 'secondary';
             if (eventStr === 'auto_approved') variant = 'default';
-            if (eventStr === 'delegated' || eventStr === 'escalated') variant = 'secondary';
+            if (eventStr === 'delegated' || eventStr === 'escalated')
+                variant = 'secondary';
 
             return <Badge variant={variant}>{formatted}</Badge>;
         },

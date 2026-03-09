@@ -1,7 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { usePipelineState } from '@/hooks/usePipelineState';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {
     Table,
     TableBody,
@@ -10,23 +15,27 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Plus, Trash, Edit, Check, X } from 'lucide-react';
+import { usePipelineState } from '@/hooks/usePipelineState';
 import { PipelineState } from '@/types/pipeline';
 import { PipelineStateFormData } from '@/utils/schemas';
+import { Check, Edit, Plus, Trash, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface PipelineStateManagerProps {
     pipelineId: number;
 }
 
-export function PipelineStateManager({ pipelineId }: PipelineStateManagerProps) {
-    const { states, loading, fetchStates, createState, updateState, deleteState } = usePipelineState(pipelineId);
+export function PipelineStateManager({
+    pipelineId,
+}: PipelineStateManagerProps) {
+    const {
+        states,
+        loading,
+        fetchStates,
+        createState,
+        updateState,
+        deleteState,
+    } = usePipelineState(pipelineId);
 
     const [isCreating, setIsCreating] = useState(false);
     const [editingStateId, setEditingStateId] = useState<number | null>(null);
@@ -55,7 +64,9 @@ export function PipelineStateManager({ pipelineId }: PipelineStateManagerProps) 
             color: '',
             icon: '',
             description: '',
-            sort_order: states.length ? Math.max(...states.map(s => s.sort_order)) + 10 : 0,
+            sort_order: states.length
+                ? Math.max(...states.map((s) => s.sort_order)) + 10
+                : 0,
         });
     };
 
@@ -109,20 +120,34 @@ export function PipelineStateManager({ pipelineId }: PipelineStateManagerProps) 
                     <div className="flex gap-2">
                         {state.color && (
                             <div
-                                className="w-6 h-6 rounded border border-gray-200"
+                                className="h-6 w-6 rounded border border-gray-200"
                                 style={{ backgroundColor: state.color }}
                                 title={state.color}
                             />
                         )}
-                        {state.icon && <span className="text-gray-500">{state.icon}</span>}
+                        {state.icon && (
+                            <span className="text-gray-500">{state.icon}</span>
+                        )}
                     </div>
                 </TableCell>
                 <TableCell className="text-right">
-                    <Button type="button" variant="ghost" size="icon" onClick={() => handleEdit(state)} title="Edit state">
-                        <Edit className="w-4 h-4" />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(state)}
+                        title="Edit state"
+                    >
+                        <Edit className="h-4 w-4" />
                     </Button>
-                    <Button type="button" variant="ghost" size="icon" onClick={() => handleDelete(state.id)} title="Delete state">
-                        <Trash className="w-4 h-4" />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(state.id)}
+                        title="Delete state"
+                    >
+                        <Trash className="h-4 w-4" />
                     </Button>
                 </TableCell>
             </TableRow>
@@ -135,7 +160,9 @@ export function PipelineStateManager({ pipelineId }: PipelineStateManagerProps) 
                 <TableCell>
                     <Input
                         value={formData.code}
-                        onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                        onChange={(e) =>
+                            setFormData({ ...formData, code: e.target.value })
+                        }
                         placeholder="Code"
                         className="w-full"
                     />
@@ -143,7 +170,9 @@ export function PipelineStateManager({ pipelineId }: PipelineStateManagerProps) 
                 <TableCell>
                     <Input
                         value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        onChange={(e) =>
+                            setFormData({ ...formData, name: e.target.value })
+                        }
                         placeholder="Name"
                         className="w-full"
                     />
@@ -151,14 +180,18 @@ export function PipelineStateManager({ pipelineId }: PipelineStateManagerProps) 
                 <TableCell>
                     <Select
                         value={formData.type}
-                        onValueChange={(val: any) => setFormData({ ...formData, type: val })}
+                        onValueChange={(val: any) =>
+                            setFormData({ ...formData, type: val })
+                        }
                     >
                         <SelectTrigger>
                             <SelectValue placeholder="Type" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="initial">Initial</SelectItem>
-                            <SelectItem value="intermediate">Intermediate</SelectItem>
+                            <SelectItem value="intermediate">
+                                Intermediate
+                            </SelectItem>
                             <SelectItem value="final">Final</SelectItem>
                         </SelectContent>
                     </Select>
@@ -167,7 +200,12 @@ export function PipelineStateManager({ pipelineId }: PipelineStateManagerProps) 
                     <Input
                         type="number"
                         value={formData.sort_order}
-                        onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                sort_order: parseInt(e.target.value) || 0,
+                            })
+                        }
                         className="w-20"
                     />
                 </TableCell>
@@ -175,24 +213,46 @@ export function PipelineStateManager({ pipelineId }: PipelineStateManagerProps) 
                     <div className="flex gap-2">
                         <Input
                             value={formData.color || ''}
-                            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    color: e.target.value,
+                                })
+                            }
                             placeholder="#HEX"
                             className="w-24"
                         />
                         <Input
                             value={formData.icon || ''}
-                            onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    icon: e.target.value,
+                                })
+                            }
                             placeholder="Icon"
                             className="w-24"
                         />
                     </div>
                 </TableCell>
                 <TableCell className="text-right">
-                    <Button type="button" variant="ghost" size="icon" onClick={handleSave} title="Save state">
-                        <Check className="w-4 h-4 text-green-600" />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleSave}
+                        title="Save state"
+                    >
+                        <Check className="h-4 w-4 text-green-600" />
                     </Button>
-                    <Button type="button" variant="ghost" size="icon" onClick={handleCancel} title="Cancel edit">
-                        <X className="w-4 h-4 text-red-600" />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleCancel}
+                        title="Cancel edit"
+                    >
+                        <X className="h-4 w-4 text-red-600" />
                     </Button>
                 </TableCell>
             </TableRow>
@@ -200,8 +260,8 @@ export function PipelineStateManager({ pipelineId }: PipelineStateManagerProps) 
     };
 
     return (
-        <div className="mt-8 pt-6 border-t border-border">
-            <div className="flex justify-between items-center mb-4">
+        <div className="mt-8 border-t border-border pt-6">
+            <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-lg font-medium">Pipeline States</h3>
                 <Button
                     type="button"
@@ -210,12 +270,12 @@ export function PipelineStateManager({ pipelineId }: PipelineStateManagerProps) 
                     onClick={handleCreateNew}
                     disabled={isCreating || editingStateId !== null}
                 >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="mr-2 h-4 w-4" />
                     Add State
                 </Button>
             </div>
 
-            <div className="rounded-md border border-border overflow-hidden">
+            <div className="overflow-hidden rounded-md border border-border">
                 <Table>
                     <TableHeader className="bg-muted/50">
                         <TableRow>
@@ -224,7 +284,9 @@ export function PipelineStateManager({ pipelineId }: PipelineStateManagerProps) 
                             <TableHead>Type</TableHead>
                             <TableHead className="w-24">Order</TableHead>
                             <TableHead>UI (Color/Icon)</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead className="text-right">
+                                Actions
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -232,14 +294,21 @@ export function PipelineStateManager({ pipelineId }: PipelineStateManagerProps) 
                         {isCreating && renderEditRow()}
                         {!states.length && !isCreating && !loading && (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
-                                    No states added yet. Define the lifecycle stages here.
+                                <TableCell
+                                    colSpan={6}
+                                    className="py-6 text-center text-muted-foreground"
+                                >
+                                    No states added yet. Define the lifecycle
+                                    stages here.
                                 </TableCell>
                             </TableRow>
                         )}
                         {loading && (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-6">
+                                <TableCell
+                                    colSpan={6}
+                                    className="py-6 text-center"
+                                >
                                     Loading...
                                 </TableCell>
                             </TableRow>

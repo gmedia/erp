@@ -23,17 +23,25 @@ export const stockAdjustmentColumns: ColumnDef<StockAdjustment>[] = [
         ...createSortingHeader('Warehouse'),
         cell: ({ row }) => row.original.warehouse?.name || '-',
     },
-    createDateColumn<StockAdjustment>({ accessorKey: 'adjustment_date', label: 'Adjustment Date' }),
+    createDateColumn<StockAdjustment>({
+        accessorKey: 'adjustment_date',
+        label: 'Adjustment Date',
+    }),
     createBadgeColumn<StockAdjustment>({
         accessorKey: 'adjustment_type',
         label: 'Adjustment Type',
         colorMap: {
             damage: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-            expired: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-            shrinkage: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-            correction: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100',
-            stocktake_result: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
-            initial_stock: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+            expired:
+                'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+            shrinkage:
+                'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+            correction:
+                'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100',
+            stocktake_result:
+                'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
+            initial_stock:
+                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
             other: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300',
         },
     }),
@@ -42,9 +50,12 @@ export const stockAdjustmentColumns: ColumnDef<StockAdjustment>[] = [
         label: 'Status',
         colorMap: {
             draft: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100',
-            pending_approval: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-            approved: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-            cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+            pending_approval:
+                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+            approved:
+                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+            cancelled:
+                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
         },
     }),
     {

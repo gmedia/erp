@@ -1,7 +1,10 @@
 'use client';
 
-import { Helmet } from 'react-helmet-async';
+import { ApprovalHistoryTimeline } from '@/components/approvals/ApprovalHistoryTimeline';
+import { EntityStateActions } from '@/components/pipeline/EntityStateActions';
+import { EntityStateTimeline } from '@/components/pipeline/EntityStateTimeline';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
@@ -13,24 +16,11 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { type Asset } from '@/types/asset';
-import { format } from 'date-fns';
-import { QRCodeSVG } from 'qrcode.react';
-import { useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from '@/lib/axios';
-import { toast } from 'sonner';
-import { ApprovalHistoryTimeline } from '@/components/approvals/ApprovalHistoryTimeline';
-import { EntityStateActions } from '@/components/pipeline/EntityStateActions';
-import { EntityStateTimeline } from '@/components/pipeline/EntityStateTimeline';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import {
     Activity,
     AlertCircle,
@@ -55,14 +45,21 @@ import {
     User,
     Wrench,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { QRCodeSVG } from 'qrcode.react';
+import { useCallback, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useParams } from 'react-router-dom';
 
 export default function AssetProfile() {
     const { id } = useParams<{ id: string }>();
     const [timelineKey, setTimelineKey] = useState(Date.now());
     const queryClient = useQueryClient();
 
-    const { data: assetData, isLoading, error } = useQuery({
+    const {
+        data: assetData,
+        isLoading,
+        error,
+    } = useQuery({
         queryKey: ['asset-profile', id],
         queryFn: async () => {
             const res = await axios.get(`/api/assets/${id}/profile`);
@@ -97,8 +94,13 @@ export default function AssetProfile() {
 
     if (isLoading || !item) {
         return (
-            <AppLayout breadcrumbs={[{ title: 'Assets', href: '/assets' }, { title: 'Loading...', href: '#' }]}>
-                <div className="flex items-center justify-center min-h-[50vh]">
+            <AppLayout
+                breadcrumbs={[
+                    { title: 'Assets', href: '/assets' },
+                    { title: 'Loading...', href: '#' },
+                ]}
+            >
+                <div className="flex min-h-[50vh] items-center justify-center">
                     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                 </div>
             </AppLayout>
@@ -107,9 +109,16 @@ export default function AssetProfile() {
 
     if (error) {
         return (
-            <AppLayout breadcrumbs={[{ title: 'Assets', href: '/assets' }, { title: 'Error', href: '#' }]}>
-                <div className="flex items-center justify-center min-h-[50vh]">
-                    <p className="text-destructive">Failed to load asset profile.</p>
+            <AppLayout
+                breadcrumbs={[
+                    { title: 'Assets', href: '/assets' },
+                    { title: 'Error', href: '#' },
+                ]}
+            >
+                <div className="flex min-h-[50vh] items-center justify-center">
+                    <p className="text-destructive">
+                        Failed to load asset profile.
+                    </p>
                 </div>
             </AppLayout>
         );
@@ -211,15 +220,17 @@ export default function AssetProfile() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet><title>{`Asset Profile - ${item.asset_code}`}</title></Helmet>
+            <Helmet>
+                <title>{`Asset Profile - ${item.asset_code}`}</title>
+            </Helmet>
 
             <div className="flex flex-col gap-6 p-6">
                 {/* Header Section - Enhanced */}
                 <div className="relative overflow-hidden rounded-xl border bg-gradient-to-r from-primary/5 via-primary/10 to-transparent p-6">
-                    <div className="absolute right-0 top-0 -z-10 h-64 w-64 opacity-20">
+                    <div className="absolute top-0 right-0 -z-10 h-64 w-64 opacity-20">
                         <Package className="h-full w-full text-primary/30" />
                     </div>
-                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                    <div className="flex flex-col justify-between gap-6 md:flex-row md:items-start">
                         <div className="flex items-start gap-4">
                             {/* Icon Box */}
                             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-sm">
@@ -227,8 +238,13 @@ export default function AssetProfile() {
                             </div>
                             <div className="space-y-2">
                                 <div className="flex flex-wrap items-center gap-2">
-                                    <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{item.name}</h1>
-                                    <Badge variant="outline" className="font-mono text-sm px-3 py-1">
+                                    <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+                                        {item.name}
+                                    </h1>
+                                    <Badge
+                                        variant="outline"
+                                        className="px-3 py-1 font-mono text-sm"
+                                    >
                                         {item.asset_code}
                                     </Badge>
                                 </div>
@@ -240,12 +256,17 @@ export default function AssetProfile() {
                                     <span className="hidden sm:inline">•</span>
                                     <span className="flex items-center gap-1">
                                         <Settings className="h-4 w-4" />
-                                        {item.model?.model_name || 'Generic Model'}
+                                        {item.model?.model_name ||
+                                            'Generic Model'}
                                     </span>
                                     {item.model?.manufacturer && (
                                         <>
-                                            <span className="hidden sm:inline">•</span>
-                                            <span>{item.model.manufacturer}</span>
+                                            <span className="hidden sm:inline">
+                                                •
+                                            </span>
+                                            <span>
+                                                {item.model.manufacturer}
+                                            </span>
                                         </>
                                     )}
                                 </div>
@@ -255,19 +276,19 @@ export default function AssetProfile() {
                         <div className="flex flex-wrap items-center gap-4">
                             {item.qrcode_url && (
                                 <div className="flex flex-col items-center gap-2">
-                                    <div className="rounded-lg bg-white p-2 shadow-sm border border-primary/10">
+                                    <div className="rounded-lg border border-primary/10 bg-white p-2 shadow-sm">
                                         <QRCodeSVG
                                             value={item.qrcode_url}
                                             size={80}
                                             level="H"
                                             includeMargin={false}
-                                            className="h-20 w-20 qr-code-svg"
+                                            className="qr-code-svg h-20 w-20"
                                         />
                                     </div>
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="h-8 gap-2 text-xs text-primary hover:text-primary hover:bg-primary/5"
+                                        className="h-8 gap-2 text-xs text-primary hover:bg-primary/5 hover:text-primary"
                                         onClick={handlePrint}
                                     >
                                         <Printer className="h-3.5 w-3.5" />
@@ -276,10 +297,10 @@ export default function AssetProfile() {
                                 </div>
                             )}
                             <div className="flex flex-col gap-2">
-                                <EntityStateActions 
-                                    entityType="asset" 
-                                    entityId={item.ulid} 
-                                    onStateChange={handleStateChange} 
+                                <EntityStateActions
+                                    entityType="asset"
+                                    entityId={item.ulid}
+                                    onStateChange={handleStateChange}
                                 />
                             </div>
                         </div>
@@ -287,44 +308,68 @@ export default function AssetProfile() {
                 </div>
 
                 <Tabs defaultValue="summary" className="w-full">
-                    <TabsList className="grid !h-auto w-full grid-cols-2 gap-2 bg-muted/50 p-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 mb-4">
-                        <TabsTrigger value="summary" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <TabsList className="mb-4 grid !h-auto w-full grid-cols-2 gap-2 bg-muted/50 p-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+                        <TabsTrigger
+                            value="summary"
+                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                        >
                             <Info className="mr-2 h-4 w-4" />
                             Summary
                         </TabsTrigger>
-                        <TabsTrigger value="movements" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                        <TabsTrigger
+                            value="movements"
+                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                        >
                             <History className="mr-2 h-4 w-4" />
                             Movements
                         </TabsTrigger>
-                        <TabsTrigger value="maintenance" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                        <TabsTrigger
+                            value="maintenance"
+                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                        >
                             <Wrench className="mr-2 h-4 w-4" />
                             Maintenance
                         </TabsTrigger>
-                        <TabsTrigger value="stocktake" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                        <TabsTrigger
+                            value="stocktake"
+                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                        >
                             <ClipboardCheck className="mr-2 h-4 w-4" />
                             Stocktake
                         </TabsTrigger>
-                        <TabsTrigger value="depreciation" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                        <TabsTrigger
+                            value="depreciation"
+                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                        >
                             <TrendingDown className="mr-2 h-4 w-4" />
                             Depreciation
                         </TabsTrigger>
-                        <TabsTrigger value="timeline" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                        <TabsTrigger
+                            value="timeline"
+                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                        >
                             <History className="mr-2 h-4 w-4" />
                             Timeline
                         </TabsTrigger>
-                        <TabsTrigger value="approvals" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                        <TabsTrigger
+                            value="approvals"
+                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                        >
                             <History className="mr-2 h-4 w-4" />
                             Approvals
                         </TabsTrigger>
                     </TabsList>
 
                     {/* Summary Tab */}
-                    <TabsContent value="summary" className="space-y-6 mt-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <TabsContent value="summary" className="mt-6 space-y-6">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {/* General Information */}
-                            <Card className="group hover:shadow-md transition-all duration-200 hover:border-primary/30" data-testid="summary-general-info">
+                            <Card
+                                className="group transition-all duration-200 hover:border-primary/30 hover:shadow-md"
+                                data-testid="summary-general-info"
+                            >
                                 <CardHeader className="pb-3">
-                                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                    <CardTitle className="flex items-center gap-2 text-sm font-medium">
                                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
                                             <Info className="h-4 w-4" />
                                         </div>
@@ -337,7 +382,9 @@ export default function AssetProfile() {
                                             <Hash className="h-3.5 w-3.5" />
                                             Serial Number
                                         </span>
-                                        <span className="font-mono font-medium">{item.serial_number || '-'}</span>
+                                        <span className="font-mono font-medium">
+                                            {item.serial_number || '-'}
+                                        </span>
                                     </div>
                                     <Separator />
                                     <div className="flex items-center justify-between text-sm">
@@ -345,7 +392,9 @@ export default function AssetProfile() {
                                             <Barcode className="h-3.5 w-3.5" />
                                             Barcode
                                         </span>
-                                        <span className="font-mono font-medium">{item.barcode || '-'}</span>
+                                        <span className="font-mono font-medium">
+                                            {item.barcode || '-'}
+                                        </span>
                                     </div>
                                     <Separator />
                                     <div className="flex items-center justify-between text-sm">
@@ -353,7 +402,9 @@ export default function AssetProfile() {
                                             <CalendarDays className="h-3.5 w-3.5" />
                                             Purchase Date
                                         </span>
-                                        <span className="font-medium">{formatDate(item.purchase_date)}</span>
+                                        <span className="font-medium">
+                                            {formatDate(item.purchase_date)}
+                                        </span>
                                     </div>
                                     <Separator />
                                     <div className="flex items-center justify-between text-sm">
@@ -361,15 +412,20 @@ export default function AssetProfile() {
                                             <ShieldCheck className="h-3.5 w-3.5" />
                                             Warranty Until
                                         </span>
-                                        <span className="font-medium">{formatDate(item.warranty_end_date)}</span>
+                                        <span className="font-medium">
+                                            {formatDate(item.warranty_end_date)}
+                                        </span>
                                     </div>
                                 </CardContent>
                             </Card>
 
                             {/* Location & Assignment */}
-                            <Card className="group hover:shadow-md transition-all duration-200 hover:border-primary/30" data-testid="summary-location-info">
+                            <Card
+                                className="group transition-all duration-200 hover:border-primary/30 hover:shadow-md"
+                                data-testid="summary-location-info"
+                            >
                                 <CardHeader className="pb-3">
-                                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                    <CardTitle className="flex items-center gap-2 text-sm font-medium">
                                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
                                             <MapPin className="h-4 w-4" />
                                         </div>
@@ -382,7 +438,12 @@ export default function AssetProfile() {
                                             <Building2 className="h-3.5 w-3.5" />
                                             Branch
                                         </span>
-                                        <span className="font-medium" data-testid="asset-branch">{item.branch?.name || '-'}</span>
+                                        <span
+                                            className="font-medium"
+                                            data-testid="asset-branch"
+                                        >
+                                            {item.branch?.name || '-'}
+                                        </span>
                                     </div>
                                     <Separator />
                                     <div className="flex items-center justify-between text-sm">
@@ -390,7 +451,12 @@ export default function AssetProfile() {
                                             <MapPin className="h-3.5 w-3.5" />
                                             Location
                                         </span>
-                                        <span className="font-medium" data-testid="asset-location">{item.location?.name || '-'}</span>
+                                        <span
+                                            className="font-medium"
+                                            data-testid="asset-location"
+                                        >
+                                            {item.location?.name || '-'}
+                                        </span>
                                     </div>
                                     <Separator />
                                     <div className="flex items-center justify-between text-sm">
@@ -398,7 +464,12 @@ export default function AssetProfile() {
                                             <Activity className="h-3.5 w-3.5" />
                                             Department
                                         </span>
-                                        <span className="font-medium" data-testid="asset-department">{item.department?.name || '-'}</span>
+                                        <span
+                                            className="font-medium"
+                                            data-testid="asset-department"
+                                        >
+                                            {item.department?.name || '-'}
+                                        </span>
                                     </div>
                                     <Separator />
                                     <div className="flex items-center justify-between text-sm">
@@ -406,17 +477,25 @@ export default function AssetProfile() {
                                             <User className="h-3.5 w-3.5" />
                                             Person in Charge
                                         </span>
-                                        <Badge variant="outline" className="font-medium" data-testid="asset-employee">
-                                            {item.employee?.name || 'Unassigned'}
+                                        <Badge
+                                            variant="outline"
+                                            className="font-medium"
+                                            data-testid="asset-employee"
+                                        >
+                                            {item.employee?.name ||
+                                                'Unassigned'}
                                         </Badge>
                                     </div>
                                 </CardContent>
                             </Card>
 
                             {/* Financial Summary - Enhanced */}
-                            <Card className="group hover:shadow-md transition-all duration-200 hover:border-primary/30" data-testid="summary-financial-info">
+                            <Card
+                                className="group transition-all duration-200 hover:border-primary/30 hover:shadow-md"
+                                data-testid="summary-financial-info"
+                            >
                                 <CardHeader className="pb-3">
-                                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                    <CardTitle className="flex items-center gap-2 text-sm font-medium">
                                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
                                             <CircleDollarSign className="h-4 w-4" />
                                         </div>
@@ -425,31 +504,60 @@ export default function AssetProfile() {
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="flex items-center justify-between text-sm">
-                                        <span className="text-muted-foreground">Purchase Cost</span>
-                                        <span className="font-semibold">{formatCurrency(item.purchase_cost)}</span>
+                                        <span className="text-muted-foreground">
+                                            Purchase Cost
+                                        </span>
+                                        <span className="font-semibold">
+                                            {formatCurrency(item.purchase_cost)}
+                                        </span>
                                     </div>
                                     <div className="flex items-center justify-between text-sm">
-                                        <span className="text-muted-foreground">Useful Life</span>
-                                        <span className="font-medium">{item.useful_life_months} Months</span>
+                                        <span className="text-muted-foreground">
+                                            Useful Life
+                                        </span>
+                                        <span className="font-medium">
+                                            {item.useful_life_months} Months
+                                        </span>
                                     </div>
                                     <Separator />
                                     {/* Depreciation Progress */}
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between text-xs">
-                                            <span className="text-muted-foreground">Depreciation Progress</span>
-                                            <span className="font-medium">{getDepreciationProgress().toFixed(1)}%</span>
+                                            <span className="text-muted-foreground">
+                                                Depreciation Progress
+                                            </span>
+                                            <span className="font-medium">
+                                                {getDepreciationProgress().toFixed(
+                                                    1,
+                                                )}
+                                                %
+                                            </span>
                                         </div>
-                                        <Progress value={getDepreciationProgress()} className="h-2" />
+                                        <Progress
+                                            value={getDepreciationProgress()}
+                                            className="h-2"
+                                        />
                                         <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                            <span>Accumulated: {formatCurrency(item.accumulated_depreciation)}</span>
+                                            <span>
+                                                Accumulated:{' '}
+                                                {formatCurrency(
+                                                    item.accumulated_depreciation,
+                                                )}
+                                            </span>
                                         </div>
                                     </div>
                                     <Separator />
                                     {/* Book Value Highlight */}
                                     <div className="rounded-lg bg-primary/5 p-3">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-sm font-medium text-muted-foreground">Current Book Value</span>
-                                            <span className="text-lg font-bold text-primary">{formatCurrency(item.book_value)}</span>
+                                            <span className="text-sm font-medium text-muted-foreground">
+                                                Current Book Value
+                                            </span>
+                                            <span className="text-lg font-bold text-primary">
+                                                {formatCurrency(
+                                                    item.book_value,
+                                                )}
+                                            </span>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -457,9 +565,9 @@ export default function AssetProfile() {
                         </div>
 
                         {item.notes && (
-                            <Card className="hover:shadow-md transition-all duration-200">
+                            <Card className="transition-all duration-200 hover:shadow-md">
                                 <CardHeader className="pb-3">
-                                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                    <CardTitle className="flex items-center gap-2 text-sm font-medium">
                                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
                                             <Info className="h-4 w-4" />
                                         </div>
@@ -467,7 +575,9 @@ export default function AssetProfile() {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{item.notes}</p>
+                                    <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground">
+                                        {item.notes}
+                                    </p>
                                 </CardContent>
                             </Card>
                         )}
@@ -484,47 +594,98 @@ export default function AssetProfile() {
                                                 <TableHead>Type</TableHead>
                                                 <TableHead>Date</TableHead>
                                                 <TableHead>Origin</TableHead>
-                                                <TableHead>Destination</TableHead>
+                                                <TableHead>
+                                                    Destination
+                                                </TableHead>
                                                 <TableHead>Ref/Notes</TableHead>
                                                 <TableHead>PIC</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {item.movements.map((m) => (
-                                                <TableRow key={m.id} className="hover:bg-muted/30">
+                                                <TableRow
+                                                    key={m.id}
+                                                    className="hover:bg-muted/30"
+                                                >
                                                     <TableCell>
-                                                        <Badge variant="outline" className="capitalize font-medium">
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="font-medium capitalize"
+                                                        >
                                                             {m.movement_type}
                                                         </Badge>
                                                     </TableCell>
-                                                    <TableCell className="whitespace-nowrap text-sm">{formatDate(m.moved_at)}</TableCell>
-                                                    <TableCell className="text-xs">
-                                                        {m.from_branch && <div className="font-medium">{m.from_branch}</div>}
-                                                        {m.from_location && <div className="text-muted-foreground">{m.from_location}</div>}
-                                                        {m.from_employee && <div className="text-primary">{m.from_employee}</div>}
+                                                    <TableCell className="text-sm whitespace-nowrap">
+                                                        {formatDate(m.moved_at)}
                                                     </TableCell>
                                                     <TableCell className="text-xs">
-                                                        {m.to_branch && <div className="font-medium">{m.to_branch}</div>}
-                                                        {m.to_location && <div className="text-muted-foreground">{m.to_location}</div>}
-                                                        {m.to_employee && <div className="text-primary">{m.to_employee}</div>}
+                                                        {m.from_branch && (
+                                                            <div className="font-medium">
+                                                                {m.from_branch}
+                                                            </div>
+                                                        )}
+                                                        {m.from_location && (
+                                                            <div className="text-muted-foreground">
+                                                                {
+                                                                    m.from_location
+                                                                }
+                                                            </div>
+                                                        )}
+                                                        {m.from_employee && (
+                                                            <div className="text-primary">
+                                                                {
+                                                                    m.from_employee
+                                                                }
+                                                            </div>
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell className="text-xs">
+                                                        {m.to_branch && (
+                                                            <div className="font-medium">
+                                                                {m.to_branch}
+                                                            </div>
+                                                        )}
+                                                        {m.to_location && (
+                                                            <div className="text-muted-foreground">
+                                                                {m.to_location}
+                                                            </div>
+                                                        )}
+                                                        {m.to_employee && (
+                                                            <div className="text-primary">
+                                                                {m.to_employee}
+                                                            </div>
+                                                        )}
                                                     </TableCell>
                                                     <TableCell className="max-w-[200px]">
-                                                        {m.reference && <div className="text-xs font-semibold">{m.reference}</div>}
-                                                        {m.notes && <div className="text-xs text-muted-foreground truncate">{m.notes}</div>}
+                                                        {m.reference && (
+                                                            <div className="text-xs font-semibold">
+                                                                {m.reference}
+                                                            </div>
+                                                        )}
+                                                        {m.notes && (
+                                                            <div className="truncate text-xs text-muted-foreground">
+                                                                {m.notes}
+                                                            </div>
+                                                        )}
                                                     </TableCell>
-                                                    <TableCell className="text-xs whitespace-nowrap">{m.created_by}</TableCell>
+                                                    <TableCell className="text-xs whitespace-nowrap">
+                                                        {m.created_by}
+                                                    </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
                                     </Table>
                                 ) : (
                                     <div className="flex flex-col items-center justify-center py-16 text-center">
-                                        <div className="rounded-full bg-muted p-4 mb-4">
+                                        <div className="mb-4 rounded-full bg-muted p-4">
                                             <History className="h-8 w-8 text-muted-foreground" />
                                         </div>
-                                        <h3 className="text-lg font-medium mb-1">No Movement History</h3>
-                                        <p className="text-sm text-muted-foreground max-w-sm">
-                                            This asset has not been transferred or reassigned yet.
+                                        <h3 className="mb-1 text-lg font-medium">
+                                            No Movement History
+                                        </h3>
+                                        <p className="max-w-sm text-sm text-muted-foreground">
+                                            This asset has not been transferred
+                                            or reassigned yet.
                                         </p>
                                     </div>
                                 )}
@@ -544,38 +705,62 @@ export default function AssetProfile() {
                                                 <TableHead>Status</TableHead>
                                                 <TableHead>Date</TableHead>
                                                 <TableHead>Supplier</TableHead>
-                                                <TableHead className="text-right">Cost</TableHead>
+                                                <TableHead className="text-right">
+                                                    Cost
+                                                </TableHead>
                                                 <TableHead>Notes</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {item.maintenances.map((m) => (
-                                                <TableRow key={m.id} className="hover:bg-muted/30">
+                                                <TableRow
+                                                    key={m.id}
+                                                    className="hover:bg-muted/30"
+                                                >
                                                     <TableCell>
-                                                        <Badge variant="outline" className="capitalize font-medium">
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="font-medium capitalize"
+                                                        >
                                                             {m.maintenance_type}
                                                         </Badge>
                                                     </TableCell>
                                                     <TableCell>
-                                                        <Badge variant={m.status === 'completed' ? 'default' : 'secondary'} className="capitalize">
+                                                        <Badge
+                                                            variant={
+                                                                m.status ===
+                                                                'completed'
+                                                                    ? 'default'
+                                                                    : 'secondary'
+                                                            }
+                                                            className="capitalize"
+                                                        >
                                                             {m.status}
                                                         </Badge>
                                                     </TableCell>
                                                     <TableCell className="text-xs whitespace-nowrap">
                                                         <div className="flex items-center gap-1">
                                                             <Calendar className="h-3 w-3 text-muted-foreground" />
-                                                            {formatDate(m.scheduled_at)}
+                                                            {formatDate(
+                                                                m.scheduled_at,
+                                                            )}
                                                         </div>
                                                         {m.performed_at && (
-                                                            <div className="flex items-center gap-1 text-muted-foreground mt-1">
+                                                            <div className="mt-1 flex items-center gap-1 text-muted-foreground">
                                                                 <Clock className="h-3 w-3" />
-                                                                {formatDate(m.performed_at)}
+                                                                {formatDate(
+                                                                    m.performed_at,
+                                                                )}
                                                             </div>
                                                         )}
                                                     </TableCell>
-                                                    <TableCell className="text-sm">{m.supplier || '-'}</TableCell>
-                                                    <TableCell className="text-right font-medium">{formatCurrency(m.cost)}</TableCell>
-                                                    <TableCell className="max-w-[200px] text-xs text-muted-foreground truncate">
+                                                    <TableCell className="text-sm">
+                                                        {m.supplier || '-'}
+                                                    </TableCell>
+                                                    <TableCell className="text-right font-medium">
+                                                        {formatCurrency(m.cost)}
+                                                    </TableCell>
+                                                    <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground">
                                                         {m.notes}
                                                     </TableCell>
                                                 </TableRow>
@@ -584,12 +769,15 @@ export default function AssetProfile() {
                                     </Table>
                                 ) : (
                                     <div className="flex flex-col items-center justify-center py-16 text-center">
-                                        <div className="rounded-full bg-muted p-4 mb-4">
+                                        <div className="mb-4 rounded-full bg-muted p-4">
                                             <Wrench className="h-8 w-8 text-muted-foreground" />
                                         </div>
-                                        <h3 className="text-lg font-medium mb-1">No Maintenance Records</h3>
-                                        <p className="text-sm text-muted-foreground max-w-sm">
-                                            This asset has no scheduled or completed maintenance tasks.
+                                        <h3 className="mb-1 text-lg font-medium">
+                                            No Maintenance Records
+                                        </h3>
+                                        <p className="max-w-sm text-sm text-muted-foreground">
+                                            This asset has no scheduled or
+                                            completed maintenance tasks.
                                         </p>
                                     </div>
                                 )}
@@ -608,33 +796,54 @@ export default function AssetProfile() {
                                                 <TableHead>Reference</TableHead>
                                                 <TableHead>Date</TableHead>
                                                 <TableHead>Branch</TableHead>
-                                                <TableHead>Expect/Found</TableHead>
+                                                <TableHead>
+                                                    Expect/Found
+                                                </TableHead>
                                                 <TableHead>Result</TableHead>
                                                 <TableHead>Notes</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {item.stocktake_items.map((s) => (
-                                                <TableRow key={s.id} className="hover:bg-muted/30">
-                                                    <TableCell className="font-mono font-medium">{s.stocktake_reference}</TableCell>
-                                                    <TableCell className="whitespace-nowrap text-sm">{s.stocktake_date}</TableCell>
-                                                    <TableCell>{s.branch}</TableCell>
+                                                <TableRow
+                                                    key={s.id}
+                                                    className="hover:bg-muted/30"
+                                                >
+                                                    <TableCell className="font-mono font-medium">
+                                                        {s.stocktake_reference}
+                                                    </TableCell>
+                                                    <TableCell className="text-sm whitespace-nowrap">
+                                                        {s.stocktake_date}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {s.branch}
+                                                    </TableCell>
                                                     <TableCell className="text-xs">
                                                         <div className="flex items-center gap-1 text-muted-foreground">
                                                             <AlertCircle className="h-3 w-3" />
-                                                            {s.expected_location}
+                                                            {
+                                                                s.expected_location
+                                                            }
                                                         </div>
-                                                        <div className="flex items-center gap-1 font-medium text-primary mt-1">
+                                                        <div className="mt-1 flex items-center gap-1 font-medium text-primary">
                                                             <MapPin className="h-3 w-3" />
                                                             {s.found_location}
                                                         </div>
                                                     </TableCell>
                                                     <TableCell>
-                                                        <Badge variant={s.result === 'found' ? 'default' : 'destructive'} className="capitalize">
+                                                        <Badge
+                                                            variant={
+                                                                s.result ===
+                                                                'found'
+                                                                    ? 'default'
+                                                                    : 'destructive'
+                                                            }
+                                                            className="capitalize"
+                                                        >
                                                             {s.result}
                                                         </Badge>
                                                     </TableCell>
-                                                    <TableCell className="max-w-[200px] text-xs text-muted-foreground truncate">
+                                                    <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground">
                                                         {s.notes}
                                                     </TableCell>
                                                 </TableRow>
@@ -643,12 +852,15 @@ export default function AssetProfile() {
                                     </Table>
                                 ) : (
                                     <div className="flex flex-col items-center justify-center py-16 text-center">
-                                        <div className="rounded-full bg-muted p-4 mb-4">
+                                        <div className="mb-4 rounded-full bg-muted p-4">
                                             <ClipboardCheck className="h-8 w-8 text-muted-foreground" />
                                         </div>
-                                        <h3 className="text-lg font-medium mb-1">No Stocktake Records</h3>
-                                        <p className="text-sm text-muted-foreground max-w-sm">
-                                            This asset has not been included in any stocktake yet.
+                                        <h3 className="mb-1 text-lg font-medium">
+                                            No Stocktake Records
+                                        </h3>
+                                        <p className="max-w-sm text-sm text-muted-foreground">
+                                            This asset has not been included in
+                                            any stocktake yet.
                                         </p>
                                     </div>
                                 )}
@@ -666,44 +878,75 @@ export default function AssetProfile() {
                                             <TableRow className="bg-muted/50">
                                                 <TableHead>Period</TableHead>
                                                 <TableHead>FY</TableHead>
-                                                <TableHead className="text-right">Amount</TableHead>
-                                                <TableHead className="text-right">Accum. (After)</TableHead>
-                                                <TableHead className="text-right">Book Value</TableHead>
+                                                <TableHead className="text-right">
+                                                    Amount
+                                                </TableHead>
+                                                <TableHead className="text-right">
+                                                    Accum. (After)
+                                                </TableHead>
+                                                <TableHead className="text-right">
+                                                    Book Value
+                                                </TableHead>
                                                 <TableHead>Status</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {item.depreciation_lines.map((d) => (
-                                                <TableRow key={d.id} className="hover:bg-muted/30">
-                                                    <TableCell className="font-mono text-sm">{d.period}</TableCell>
-                                                    <TableCell className="text-sm">{d.fiscal_year}</TableCell>
-                                                    <TableCell className="text-right font-medium">{formatCurrency(d.amount)}</TableCell>
-                                                    <TableCell className="text-right text-sm text-muted-foreground">
-                                                        {formatCurrency(d.accumulated_after)}
-                                                    </TableCell>
-                                                    <TableCell className="text-right font-semibold text-primary">
-                                                        {formatCurrency(d.book_value_after)}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Badge
-                                                            variant={d.status === 'posted' ? 'default' : 'outline'}
-                                                            className="capitalize text-xs"
-                                                        >
-                                                            {d.status}
-                                                        </Badge>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
+                                            {item.depreciation_lines.map(
+                                                (d) => (
+                                                    <TableRow
+                                                        key={d.id}
+                                                        className="hover:bg-muted/30"
+                                                    >
+                                                        <TableCell className="font-mono text-sm">
+                                                            {d.period}
+                                                        </TableCell>
+                                                        <TableCell className="text-sm">
+                                                            {d.fiscal_year}
+                                                        </TableCell>
+                                                        <TableCell className="text-right font-medium">
+                                                            {formatCurrency(
+                                                                d.amount,
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell className="text-right text-sm text-muted-foreground">
+                                                            {formatCurrency(
+                                                                d.accumulated_after,
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell className="text-right font-semibold text-primary">
+                                                            {formatCurrency(
+                                                                d.book_value_after,
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Badge
+                                                                variant={
+                                                                    d.status ===
+                                                                    'posted'
+                                                                        ? 'default'
+                                                                        : 'outline'
+                                                                }
+                                                                className="text-xs capitalize"
+                                                            >
+                                                                {d.status}
+                                                            </Badge>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ),
+                                            )}
                                         </TableBody>
                                     </Table>
                                 ) : (
                                     <div className="flex flex-col items-center justify-center py-16 text-center">
-                                        <div className="rounded-full bg-muted p-4 mb-4">
+                                        <div className="mb-4 rounded-full bg-muted p-4">
                                             <TrendingDown className="h-8 w-8 text-muted-foreground" />
                                         </div>
-                                        <h3 className="text-lg font-medium mb-1">No Depreciation History</h3>
-                                        <p className="text-sm text-muted-foreground max-w-sm">
-                                            No depreciation has been calculated for this asset yet.
+                                        <h3 className="mb-1 text-lg font-medium">
+                                            No Depreciation History
+                                        </h3>
+                                        <p className="max-w-sm text-sm text-muted-foreground">
+                                            No depreciation has been calculated
+                                            for this asset yet.
                                         </p>
                                     </div>
                                 )}
@@ -713,12 +956,19 @@ export default function AssetProfile() {
 
                     {/* Timeline Tab */}
                     <TabsContent value="timeline" className="mt-6">
-                        <EntityStateTimeline key={timelineKey} entityType="asset" entityId={item.ulid} />
+                        <EntityStateTimeline
+                            key={timelineKey}
+                            entityType="asset"
+                            entityId={item.ulid}
+                        />
                     </TabsContent>
 
                     {/* Approvals Tab */}
                     <TabsContent value="approvals" className="mt-6">
-                        <ApprovalHistoryTimeline entityType="asset" entityId={item.ulid} />
+                        <ApprovalHistoryTimeline
+                            entityType="asset"
+                            entityId={item.ulid}
+                        />
                     </TabsContent>
                 </Tabs>
             </div>

@@ -6,16 +6,16 @@ import { useForm } from 'react-hook-form';
 
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
+import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
-import NameField from '@/components/common/NameField';
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { APPROVABLE_TYPE_OPTIONS } from '@/constants/model-options';
 import { Pipeline } from '@/types/entity';
 import { PipelineFormData, pipelineFormSchema } from '@/utils/schemas';
-import { APPROVABLE_TYPE_OPTIONS } from '@/constants/model-options';
 import { PipelineStateManager } from './PipelineStateManager';
 import { PipelineTransitionManager } from './PipelineTransitionManager';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface PipelineFormProps {
     open: boolean;
@@ -27,14 +27,27 @@ interface PipelineFormProps {
 
 const renderBasicInfoSection = () => (
     <>
-        <NameField name="name" label="Pipeline Name" placeholder="e.g. Asset Lifecycle" />
-        <InputField name="code" label="Code" placeholder="e.g. asset_lifecycle" />
+        <NameField
+            name="name"
+            label="Pipeline Name"
+            placeholder="e.g. Asset Lifecycle"
+        />
+        <InputField
+            name="code"
+            label="Code"
+            placeholder="e.g. asset_lifecycle"
+        />
         <SelectField
             name="entity_type"
             label="Entity Type"
             options={[...APPROVABLE_TYPE_OPTIONS]}
         />
-        <InputField name="version" label="Version" type="number" placeholder="1" />
+        <InputField
+            name="version"
+            label="Version"
+            type="number"
+            placeholder="1"
+        />
     </>
 );
 
@@ -63,7 +76,9 @@ const renderDetailsSection = () => (
     </>
 );
 
-const getPipelineFormDefaults = (pipeline?: Pipeline | null): PipelineFormData => {
+const getPipelineFormDefaults = (
+    pipeline?: Pipeline | null,
+): PipelineFormData => {
     if (!pipeline) {
         return {
             name: '',
@@ -131,18 +146,20 @@ export const PipelineForm = memo<PipelineFormProps>(function PipelineForm({
                     <TabsList className="mb-4">
                         <TabsTrigger value="details">Details</TabsTrigger>
                         <TabsTrigger value="states">States</TabsTrigger>
-                        <TabsTrigger value="transitions">Transitions</TabsTrigger>
+                        <TabsTrigger value="transitions">
+                            Transitions
+                        </TabsTrigger>
                     </TabsList>
-                    
+
                     <TabsContent value="details" className="space-y-4">
                         {renderBasicInfoSection()}
                         {renderDetailsSection()}
                     </TabsContent>
-                    
+
                     <TabsContent value="states" className="space-y-4">
                         <PipelineStateManager pipelineId={pipeline.id} />
                     </TabsContent>
-                    
+
                     <TabsContent value="transitions" className="space-y-4">
                         <PipelineTransitionManager pipelineId={pipeline.id} />
                     </TabsContent>

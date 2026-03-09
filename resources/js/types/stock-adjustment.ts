@@ -33,7 +33,10 @@ export interface StockAdjustment extends BaseEntity {
     adjustment_date: string;
     adjustment_type: StockAdjustmentType;
     status: StockAdjustmentStatus;
-    inventory_stocktake?: { id: number; stocktake_number: string | null } | null;
+    inventory_stocktake?: {
+        id: number;
+        stocktake_number: string | null;
+    } | null;
     notes?: string | null;
     items?: StockAdjustmentItem[];
 }

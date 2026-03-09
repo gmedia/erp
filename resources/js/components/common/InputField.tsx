@@ -11,7 +11,8 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { type ReactNode } from 'react';
 
-interface InputFieldProps extends Omit<React.ComponentProps<'input'>, 'name' | 'prefix'> {
+interface InputFieldProps
+    extends Omit<React.ComponentProps<'input'>, 'name' | 'prefix'> {
     name: string;
     label: string;
     placeholder?: string;
@@ -40,7 +41,7 @@ export function InputField({
                     <FormLabel>{label}</FormLabel>
                     <div className="relative flex items-center">
                         {prefix && (
-                            <div className="absolute left-3 flex items-center pointer-events-none text-muted-foreground select-none">
+                            <div className="pointer-events-none absolute left-3 flex items-center text-muted-foreground select-none">
                                 {prefix}
                             </div>
                         )}
@@ -48,7 +49,10 @@ export function InputField({
                             <Input
                                 type={type}
                                 placeholder={placeholder}
-                                className={cn(prefix && "pl-10", suffix && "pr-10")}
+                                className={cn(
+                                    prefix && 'pl-10',
+                                    suffix && 'pr-10',
+                                )}
                                 value={
                                     field.value as
                                         | string
@@ -64,7 +68,7 @@ export function InputField({
                             />
                         </FormControl>
                         {suffix && (
-                            <div className="absolute right-3 flex items-center pointer-events-none text-muted-foreground select-none">
+                            <div className="pointer-events-none absolute right-3 flex items-center text-muted-foreground select-none">
                                 {suffix}
                             </div>
                         )}

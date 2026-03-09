@@ -23,7 +23,7 @@ axios.interceptors.response.use(
             localStorage.removeItem('api_token');
         }
         return Promise.reject(error);
-    }
+    },
 );
 
 export default axios;

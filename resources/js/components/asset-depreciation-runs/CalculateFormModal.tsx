@@ -1,3 +1,5 @@
+import AsyncSelectField from '@/components/common/AsyncSelectField';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -6,14 +8,12 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { Loader2 } from 'lucide-react';
-import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { FiscalYear } from '@/types/fiscal-year';
+import { Loader2 } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 
 interface CalculateFormModalProps {
     open: boolean;
@@ -71,7 +71,8 @@ export function CalculateFormModal({
                         <DialogHeader>
                             <DialogTitle>Calculate Depreciation</DialogTitle>
                             <DialogDescription>
-                                Select the fiscal year and period to calculate asset depreciation.
+                                Select the fiscal year and period to calculate
+                                asset depreciation.
                             </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
@@ -84,35 +85,65 @@ export function CalculateFormModal({
                                 valueFn={(fy: FiscalYear) => fy.id.toString()}
                             />
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="period_start" className={errors.period_start ? 'text-destructive' : ''}>
-                                    Period Start
-                                </Label>
-                                <Input
-                                    id="period_start"
-                                    type="date"
-                                    {...register('period_start', { required: 'Start date is required' })}
-                                    className={errors.period_start ? 'border-destructive' : ''}
-                                />
-                                {errors.period_start && (
-                                    <p className="text-sm text-destructive">{errors.period_start.message}</p>
-                                )}
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="period_end" className={errors.period_end ? 'text-destructive' : ''}>
-                                    Period End
-                                </Label>
-                                <Input
-                                    id="period_end"
-                                    type="date"
-                                    {...register('period_end', { required: 'End date is required' })}
-                                    className={errors.period_end ? 'border-destructive' : ''}
-                                />
-                                {errors.period_end && (
-                                    <p className="text-sm text-destructive">{errors.period_end.message}</p>
-                                )}
-                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label
+                                        htmlFor="period_start"
+                                        className={
+                                            errors.period_start
+                                                ? 'text-destructive'
+                                                : ''
+                                        }
+                                    >
+                                        Period Start
+                                    </Label>
+                                    <Input
+                                        id="period_start"
+                                        type="date"
+                                        {...register('period_start', {
+                                            required: 'Start date is required',
+                                        })}
+                                        className={
+                                            errors.period_start
+                                                ? 'border-destructive'
+                                                : ''
+                                        }
+                                    />
+                                    {errors.period_start && (
+                                        <p className="text-sm text-destructive">
+                                            {errors.period_start.message}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label
+                                        htmlFor="period_end"
+                                        className={
+                                            errors.period_end
+                                                ? 'text-destructive'
+                                                : ''
+                                        }
+                                    >
+                                        Period End
+                                    </Label>
+                                    <Input
+                                        id="period_end"
+                                        type="date"
+                                        {...register('period_end', {
+                                            required: 'End date is required',
+                                        })}
+                                        className={
+                                            errors.period_end
+                                                ? 'border-destructive'
+                                                : ''
+                                        }
+                                    />
+                                    {errors.period_end && (
+                                        <p className="text-sm text-destructive">
+                                            {errors.period_end.message}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         </div>
                         <DialogFooter>
@@ -125,7 +156,9 @@ export function CalculateFormModal({
                                 Cancel
                             </Button>
                             <Button type="submit" disabled={loading}>
-                                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                {loading && (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                )}
                                 Calculate
                             </Button>
                         </DialogFooter>

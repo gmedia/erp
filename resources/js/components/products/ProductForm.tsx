@@ -1,15 +1,14 @@
 'use client';
 
-import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
+import CheckboxField from '@/components/common/CheckboxField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
-import CheckboxField from '@/components/common/CheckboxField';
 import { TextareaField } from '@/components/common/TextareaField';
 
 import { Product, ProductFormData } from '@/types/entity';
@@ -24,11 +23,15 @@ interface ProductFormProps {
 }
 
 const renderGeneralInfoSection = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <InputField name="code" label="Code" placeholder="PROD-001" />
         <InputField name="name" label="Name" placeholder="Product Name" />
         <div className="md:col-span-2">
-            <TextareaField name="description" label="Description" placeholder="Product description..." />
+            <TextareaField
+                name="description"
+                label="Description"
+                placeholder="Product description..."
+            />
         </div>
         <AsyncSelectField
             name="category_id"
@@ -64,15 +67,32 @@ const renderGeneralInfoSection = () => (
 );
 
 const renderPricingSection = () => (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t pt-4 mt-2">
-        <InputField name="cost" label="Cost" type="number" placeholder="0.00" prefix="Rp" />
-        <InputField name="selling_price" label="Selling Price" type="number" placeholder="0.00" prefix="Rp" />
-        <InputField name="markup_percentage" label="Markup %" type="number" placeholder="0.00" />
+    <div className="mt-2 grid grid-cols-1 gap-4 border-t pt-4 md:grid-cols-3">
+        <InputField
+            name="cost"
+            label="Cost"
+            type="number"
+            placeholder="0.00"
+            prefix="Rp"
+        />
+        <InputField
+            name="selling_price"
+            label="Selling Price"
+            type="number"
+            placeholder="0.00"
+            prefix="Rp"
+        />
+        <InputField
+            name="markup_percentage"
+            label="Markup %"
+            type="number"
+            placeholder="0.00"
+        />
     </div>
 );
 
 const renderConfigSection = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4 mt-2">
+    <div className="mt-2 grid grid-cols-1 gap-4 border-t pt-4 md:grid-cols-2">
         <SelectField
             name="billing_model"
             label="Billing Model"
@@ -83,10 +103,18 @@ const renderConfigSection = () => (
             ]}
             placeholder="Select model"
         />
-        <InputField name="trial_period_days" label="Trial Period (Days)" type="number" placeholder="0" />
-        <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-4 py-2">
+        <InputField
+            name="trial_period_days"
+            label="Trial Period (Days)"
+            type="number"
+            placeholder="0"
+        />
+        <div className="grid grid-cols-2 gap-4 py-2 md:col-span-2 md:grid-cols-3">
             <CheckboxField name="is_recurring" label="Is Recurring" />
-            <CheckboxField name="allow_one_time_purchase" label="Allow One-Time Purchase" />
+            <CheckboxField
+                name="allow_one_time_purchase"
+                label="Allow One-Time Purchase"
+            />
             <CheckboxField name="is_manufactured" label="Is Manufactured" />
             <CheckboxField name="is_purchasable" label="Is Purchasable" />
             <CheckboxField name="is_sellable" label="Is Sellable" />
@@ -96,7 +124,7 @@ const renderConfigSection = () => (
 );
 
 const renderOtherSection = () => (
-    <div className="grid grid-cols-1 gap-4 border-t pt-4 mt-2">
+    <div className="mt-2 grid grid-cols-1 gap-4 border-t pt-4">
         <SelectField
             name="status"
             label="Status"
@@ -107,7 +135,11 @@ const renderOtherSection = () => (
             ]}
             placeholder="Select status"
         />
-        <TextareaField name="notes" label="Notes" placeholder="Additional notes..." />
+        <TextareaField
+            name="notes"
+            label="Notes"
+            placeholder="Additional notes..."
+        />
     </div>
 );
 
@@ -147,10 +179,14 @@ const getProductFormDefaults = (product?: Product | null): ProductFormData => {
         branch_id: product.branch ? String(product.branch.id) : '',
         cost: String(product.cost),
         selling_price: String(product.selling_price),
-        markup_percentage: product.markup_percentage ? String(product.markup_percentage) : '',
+        markup_percentage: product.markup_percentage
+            ? String(product.markup_percentage)
+            : '',
         billing_model: product.billing_model,
         is_recurring: product.is_recurring,
-        trial_period_days: product.trial_period_days ? String(product.trial_period_days) : '',
+        trial_period_days: product.trial_period_days
+            ? String(product.trial_period_days)
+            : '',
         allow_one_time_purchase: product.allow_one_time_purchase,
         is_manufactured: product.is_manufactured,
         is_purchasable: product.is_purchasable,
@@ -168,7 +204,10 @@ export const ProductForm = memo<ProductFormProps>(function ProductForm({
     onSubmit,
     isLoading = false,
 }) {
-    const defaultValues = useMemo(() => getProductFormDefaults(product), [product]);
+    const defaultValues = useMemo(
+        () => getProductFormDefaults(product),
+        [product],
+    );
 
     const form = useForm<any>({
         resolver: zodResolver(productFormSchema),

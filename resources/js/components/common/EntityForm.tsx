@@ -14,9 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form, FormMessage } from '@/components/ui/form';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
+import { cn } from '@/lib/utils';
 import { simpleEntitySchema } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FieldValues, useForm, UseFormReturn } from 'react-hook-form';
@@ -88,7 +87,12 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className={cn("sm:max-w-[600px] max-h-[90vh] p-0 overflow-hidden flex flex-col", className)}>
+            <DialogContent
+                className={cn(
+                    'flex max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-[600px]',
+                    className,
+                )}
+            >
                 <div className="shrink-0 p-6 pb-2">
                     <DialogHeader>
                         <DialogTitle>{title}</DialogTitle>
@@ -100,7 +104,7 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(handleSubmit)}
-                        className="flex-1 flex flex-col min-h-0"
+                        className="flex min-h-0 flex-1 flex-col"
                     >
                         <div className="flex-1 overflow-y-auto px-6">
                             <div className="space-y-4 py-1 pr-6">
@@ -108,7 +112,7 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
                             </div>
                         </div>
                         <div className="shrink-0 p-6 pt-2">
-                            <DialogFooter className="pt-4 border-t">
+                            <DialogFooter className="border-t pt-4">
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -117,7 +121,10 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
                                 >
                                     {t('common.cancel')}
                                 </Button>
-                                <Button type="submit" disabled={isLoading || submitDisabled}>
+                                <Button
+                                    type="submit"
+                                    disabled={isLoading || submitDisabled}
+                                >
                                     {submitButtonText}
                                 </Button>
                             </DialogFooter>

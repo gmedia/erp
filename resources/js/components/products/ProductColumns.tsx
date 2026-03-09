@@ -1,6 +1,5 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import {
     createActionsColumn,
@@ -9,6 +8,7 @@ import {
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
+import { ColumnDef } from '@tanstack/react-table';
 
 import { Product } from '@/types/entity';
 
@@ -32,7 +32,7 @@ const renderTypeCell = ({ row }: { row: { original: Product } }) => {
         purchased_good: 'Purchased Good',
         service: 'Service',
     };
-    
+
     return <Badge variant="secondary">{labels[type] || type}</Badge>;
 };
 
@@ -41,12 +41,15 @@ const renderTypeCell = ({ row }: { row: { original: Product } }) => {
  */
 const renderStatusCell = ({ row }: { row: { original: Product } }) => {
     const status = row.original.status;
-    const variants: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
+    const variants: Record<
+        string,
+        'default' | 'secondary' | 'outline' | 'destructive'
+    > = {
         active: 'default',
         inactive: 'secondary',
         discontinued: 'destructive',
     };
-    
+
     return (
         <Badge variant={variants[status] || 'outline'}>
             {status.charAt(0).toUpperCase() + status.slice(1)}

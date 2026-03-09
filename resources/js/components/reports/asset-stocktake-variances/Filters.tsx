@@ -7,7 +7,11 @@ import {
 
 export function createVarianceFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search code, name, notes...'),
+        createTextFilterField(
+            'search',
+            'Search',
+            'Search code, name, notes...',
+        ),
         createAsyncSelectFilterField(
             'asset_stocktake_id',
             'Stocktake',
@@ -28,7 +32,7 @@ export function createVarianceFilterFields(): FieldDescriptor[] {
                 { value: 'missing', label: 'Missing' },
                 { value: 'moved', label: 'Moved' },
             ],
-            'Select result'
+            'Select result',
         ),
     ];
 }

@@ -58,9 +58,10 @@ const getWarehouseFormDefaults = (
     return {
         code: entity.code,
         name: entity.name,
-        branch_id: typeof entity.branch === 'object' && entity.branch
-            ? String(entity.branch.id)
-            : String(entity.branch_id || ''),
+        branch_id:
+            typeof entity.branch === 'object' && entity.branch
+                ? String(entity.branch.id)
+                : String(entity.branch_id || ''),
     };
 };
 
@@ -99,4 +100,3 @@ export const WarehouseForm = memo<WarehouseFormProps>(function WarehouseForm({
         </EntityForm>
     );
 });
-

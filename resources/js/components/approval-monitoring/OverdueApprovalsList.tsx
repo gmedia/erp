@@ -16,7 +16,10 @@ interface OverdueApprovalsListProps {
     isLoading: boolean;
 }
 
-export function OverdueApprovalsList({ data, isLoading }: OverdueApprovalsListProps) {
+export function OverdueApprovalsList({
+    data,
+    isLoading,
+}: OverdueApprovalsListProps) {
     if (isLoading) {
         return (
             <Card>
@@ -43,8 +46,12 @@ export function OverdueApprovalsList({ data, isLoading }: OverdueApprovalsListPr
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900">
                             <AlertCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                         </div>
-                        <h3 className="font-semibold text-emerald-700 dark:text-emerald-400">All caught up!</h3>
-                        <p className="text-sm text-muted-foreground">No approvals are currently overdue.</p>
+                        <h3 className="font-semibold text-emerald-700 dark:text-emerald-400">
+                            All caught up!
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                            No approvals are currently overdue.
+                        </p>
                     </div>
                 </CardContent>
             </Card>
@@ -69,23 +76,37 @@ export function OverdueApprovalsList({ data, isLoading }: OverdueApprovalsListPr
                                 <TableHead>Submitter</TableHead>
                                 <TableHead>Pending Step</TableHead>
                                 <TableHead>Due Date</TableHead>
-                                <TableHead className="text-right">Hours Overdue</TableHead>
+                                <TableHead className="text-right">
+                                    Hours Overdue
+                                </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {data.map((item) => (
                                 <TableRow key={item.id}>
-                                    <TableCell className="font-medium">{item.document_type}</TableCell>
+                                    <TableCell className="font-medium">
+                                        {item.document_type}
+                                    </TableCell>
                                     <TableCell>{item.document_name}</TableCell>
                                     <TableCell>{item.submitter_name}</TableCell>
                                     <TableCell>{item.step_name}</TableCell>
                                     <TableCell>
                                         <div className="flex flex-col">
-                                            <span>{format(new Date(item.due_at), 'MMM dd, yyyy')}</span>
-                                            <span className="text-xs text-muted-foreground">{format(new Date(item.due_at), 'HH:mm')}</span>
+                                            <span>
+                                                {format(
+                                                    new Date(item.due_at),
+                                                    'MMM dd, yyyy',
+                                                )}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground">
+                                                {format(
+                                                    new Date(item.due_at),
+                                                    'HH:mm',
+                                                )}
+                                            </span>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-right text-rose-600 font-medium">
+                                    <TableCell className="text-right font-medium text-rose-600">
                                         {Math.floor(item.hours_overdue)}h
                                     </TableCell>
                                 </TableRow>

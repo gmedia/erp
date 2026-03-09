@@ -1,7 +1,11 @@
 import { Badge } from '@/components/ui/badge';
+import {
+    createActionsColumn,
+    createSelectColumn,
+    createSortingHeader,
+} from '@/utils/columns';
 import { type ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { createSortingHeader, createSelectColumn, createActionsColumn } from '@/utils/columns';
 
 import { type ApprovalFlow } from '@/types/entity';
 
@@ -42,7 +46,9 @@ export const approvalFlowColumns: ColumnDef<ApprovalFlow>[] = [
         ...createSortingHeader('Created At'),
         cell: ({ row }) => {
             const dateStr = row.getValue('created_at') as string;
-            return dateStr ? format(new Date(dateStr), 'dd MMM yyyy HH:mm') : '';
+            return dateStr
+                ? format(new Date(dateStr), 'dd MMM yyyy HH:mm')
+                : '';
         },
     },
     createActionsColumn<ApprovalFlow>(),

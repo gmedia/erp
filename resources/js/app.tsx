@@ -2,11 +2,11 @@ import '../css/app.css';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
-import { initializeTheme } from './hooks/use-appearance';
-import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
+import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './app-routes';
 import { AuthProvider } from './contexts/auth-context';
+import { initializeTheme } from './hooks/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 const queryClient = new QueryClient();
@@ -31,5 +31,5 @@ root.render(
                 </AuthProvider>
             </BrowserRouter>
         </QueryClientProvider>
-    </HelmetProvider>
+    </HelmetProvider>,
 );

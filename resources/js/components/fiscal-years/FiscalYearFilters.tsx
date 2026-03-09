@@ -1,6 +1,10 @@
 'use client';
 
-import { createSelectFilterField, createTextFilterField, FieldDescriptor } from '@/components/common/filters';
+import {
+    createSelectFilterField,
+    createTextFilterField,
+    FieldDescriptor,
+} from '@/components/common/filters';
 
 export function createFiscalYearFilterFields(): FieldDescriptor[] {
     return [
@@ -13,7 +17,7 @@ export function createFiscalYearFilterFields(): FieldDescriptor[] {
                 { label: 'Closed', value: 'closed' },
                 { label: 'Locked', value: 'locked' },
             ],
-            'All Statuses'
+            'All Statuses',
         ),
     ];
 }

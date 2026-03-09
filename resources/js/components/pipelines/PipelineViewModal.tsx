@@ -1,4 +1,10 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { type Pipeline } from '@/types/entity';
 
 interface PipelineViewModalProps {
@@ -7,7 +13,11 @@ interface PipelineViewModalProps {
     item: Pipeline | null;
 }
 
-export function PipelineViewModal({ open, onClose, item }: PipelineViewModalProps) {
+export function PipelineViewModal({
+    open,
+    onClose,
+    item,
+}: PipelineViewModalProps) {
     if (!item) return null;
 
     return (
@@ -16,48 +26,75 @@ export function PipelineViewModal({ open, onClose, item }: PipelineViewModalProp
                 <DialogHeader>
                     <DialogTitle>{item.name}</DialogTitle>
                     <DialogDescription>
-                        View complete pipeline information for the selected item.
+                        View complete pipeline information for the selected
+                        item.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <span className="font-semibold block text-gray-500 text-sm">Code</span>
+                            <span className="block text-sm font-semibold text-gray-500">
+                                Code
+                            </span>
                             <span>{item.code}</span>
                         </div>
                         <div>
-                            <span className="font-semibold block text-gray-500 text-sm">Entity Type</span>
+                            <span className="block text-sm font-semibold text-gray-500">
+                                Entity Type
+                            </span>
                             <span>{item.entity_type}</span>
                         </div>
                         <div>
-                            <span className="font-semibold block text-gray-500 text-sm">Version</span>
+                            <span className="block text-sm font-semibold text-gray-500">
+                                Version
+                            </span>
                             <span>{item.version}</span>
                         </div>
                         <div>
-                            <span className="font-semibold block text-gray-500 text-sm">Status</span>
-                            <span className={item.is_active ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
+                            <span className="block text-sm font-semibold text-gray-500">
+                                Status
+                            </span>
+                            <span
+                                className={
+                                    item.is_active
+                                        ? 'font-medium text-green-600'
+                                        : 'font-medium text-red-600'
+                                }
+                            >
                                 {item.is_active ? 'Active' : 'Inactive'}
                             </span>
                         </div>
                         <div>
-                            <span className="font-semibold block text-gray-500 text-sm">Created By</span>
+                            <span className="block text-sm font-semibold text-gray-500">
+                                Created By
+                            </span>
                             <span>{item.created_by?.name || 'System'}</span>
                         </div>
                         <div>
-                            <span className="font-semibold block text-gray-500 text-sm">Created At</span>
-                            <span>{new Date(item.created_at).toLocaleDateString()}</span>
+                            <span className="block text-sm font-semibold text-gray-500">
+                                Created At
+                            </span>
+                            <span>
+                                {new Date(item.created_at).toLocaleDateString()}
+                            </span>
                         </div>
                     </div>
                     {item.description && (
                         <div>
-                            <span className="font-semibold block text-gray-500 text-sm">Description</span>
-                            <p className="whitespace-pre-wrap mt-1">{item.description}</p>
+                            <span className="block text-sm font-semibold text-gray-500">
+                                Description
+                            </span>
+                            <p className="mt-1 whitespace-pre-wrap">
+                                {item.description}
+                            </p>
                         </div>
                     )}
                     {item.conditions && (
                         <div>
-                            <span className="font-semibold block text-gray-500 text-sm">Conditions (JSON)</span>
-                            <pre className="bg-gray-100 p-3 rounded-md mt-1 text-sm overflow-x-auto whitespace-pre-wrap">
+                            <span className="block text-sm font-semibold text-gray-500">
+                                Conditions (JSON)
+                            </span>
+                            <pre className="mt-1 overflow-x-auto rounded-md bg-gray-100 p-3 text-sm whitespace-pre-wrap">
                                 {item.conditions}
                             </pre>
                         </div>

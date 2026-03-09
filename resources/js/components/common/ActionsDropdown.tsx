@@ -1,6 +1,5 @@
 'use client';
 
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -11,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 
 type GenericActionsProps<T> = {
     item: T;

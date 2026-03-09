@@ -1,15 +1,27 @@
-import { Helmet } from 'react-helmet-async';
-import AppLayout from '@/layouts/app-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import AppLayout from '@/layouts/app-layout';
+import axios from '@/lib/axios';
 import { cn, formatCurrency } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import axios from '@/lib/axios';
+import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 
 interface FiscalYear {
@@ -73,12 +85,12 @@ const AccountRow = ({
         <div className="flex flex-col">
             <div
                 className={cn(
-                    'flex items-center gap-2 py-2 px-2 text-sm border-b border-border/40 hover:bg-muted/40',
+                    'flex items-center gap-2 border-b border-border/40 px-2 py-2 text-sm hover:bg-muted/40',
                     hasChildren && 'bg-muted/20 font-semibold',
                 )}
             >
                 <div
-                    className="flex items-center flex-1 gap-2 cursor-pointer"
+                    className="flex flex-1 cursor-pointer items-center gap-2"
                     onClick={() => hasChildren && setExpanded(!expanded)}
                     style={{ paddingLeft: `${(node.level - 1) * 1.5}rem` }}
                 >
@@ -91,11 +103,15 @@ const AccountRow = ({
                     ) : (
                         <div className="w-4" />
                     )}
-                    <span className="font-mono text-muted-foreground text-xs">{node.code}</span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                        {node.code}
+                    </span>
                     <span className="truncate">{node.name}</span>
                 </div>
                 <div className="flex gap-4 text-right tabular-nums">
-                    <div className="w-32 font-mono">{formatCurrency(node.balance)}</div>
+                    <div className="w-32 font-mono">
+                        {formatCurrency(node.balance)}
+                    </div>
                     {showComparison && (
                         <>
                             <div className="w-32 font-mono text-muted-foreground">
@@ -132,7 +148,11 @@ const AccountRow = ({
             {hasChildren && expanded && (
                 <div>
                     {node.children!.map((child) => (
-                        <AccountRow key={child.id} node={child} showComparison={showComparison} />
+                        <AccountRow
+                            key={child.id}
+                            node={child}
+                            showComparison={showComparison}
+                        />
                     ))}
                 </div>
             )}
@@ -173,16 +193,28 @@ function Section({
                     <div className="flex flex-wrap items-center gap-2">
                         <CardTitle className="text-lg">{title}</CardTitle>
                         <div className="flex items-center gap-2">
-                            <Button size="sm" variant="outline" onClick={() => setExpanded(true)} disabled={expandAll}>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setExpanded(true)}
+                                disabled={expandAll}
+                            >
                                 Expand all
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => setExpanded(false)} disabled={!expandAll}>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setExpanded(false)}
+                                disabled={!expandAll}
+                            >
                                 Collapse all
                             </Button>
                         </div>
                     </div>
                     <div className="flex gap-4 text-right tabular-nums">
-                        <span className="w-32 text-lg font-bold">{formatCurrency(total)}</span>
+                        <span className="w-32 text-lg font-bold">
+                            {formatCurrency(total)}
+                        </span>
                         {showComparison && (
                             <>
                                 <span className="w-32 text-lg font-bold text-muted-foreground">
@@ -191,7 +223,11 @@ function Section({
                                 <span
                                     className={cn(
                                         'w-28 text-lg font-bold',
-                                        changeValue < 0 ? 'text-red-500' : changeValue > 0 ? 'text-green-600' : 'text-muted-foreground',
+                                        changeValue < 0
+                                            ? 'text-red-500'
+                                            : changeValue > 0
+                                              ? 'text-green-600'
+                                              : 'text-muted-foreground',
                                     )}
                                 >
                                     {formatCurrency(changeValue)}
@@ -199,7 +235,11 @@ function Section({
                                 <span
                                     className={cn(
                                         'w-16 text-lg font-bold',
-                                        changeValue < 0 ? 'text-red-500' : changeValue > 0 ? 'text-green-600' : 'text-muted-foreground',
+                                        changeValue < 0
+                                            ? 'text-red-500'
+                                            : changeValue > 0
+                                              ? 'text-green-600'
+                                              : 'text-muted-foreground',
                                     )}
                                 >
                                     {(changePercentage || 0).toFixed(1)}%
@@ -211,17 +251,21 @@ function Section({
             </CardHeader>
             <CardContent>
                 {nodes.length === 0 ? (
-                    <div className="py-4 text-center text-muted-foreground italic">No accounts found</div>
+                    <div className="py-4 text-center text-muted-foreground italic">
+                        No accounts found
+                    </div>
                 ) : (
-                    <div className="rounded-md border overflow-hidden">
+                    <div className="overflow-hidden rounded-md border">
                         <div className="max-h-[60vh] overflow-auto">
-                            <div className="sticky top-0 z-10 flex items-center py-2 px-2 text-xs font-medium text-muted-foreground uppercase border-b bg-background">
+                            <div className="sticky top-0 z-10 flex items-center border-b bg-background px-2 py-2 text-xs font-medium text-muted-foreground uppercase">
                                 <div className="flex-1">Account</div>
                                 <div className="flex gap-4 text-right tabular-nums">
                                     <div className="w-32">Current</div>
                                     {showComparison && (
                                         <>
-                                            <div className="w-32">Comparison</div>
+                                            <div className="w-32">
+                                                Comparison
+                                            </div>
                                             <div className="w-28">Change</div>
                                             <div className="w-16">%</div>
                                         </>
@@ -229,7 +273,12 @@ function Section({
                                 </div>
                             </div>
                             {nodes.map((node) => (
-                                <AccountRow key={`${expandKey}-${node.id}`} node={node} isExpanded={expandAll} showComparison={showComparison} />
+                                <AccountRow
+                                    key={`${expandKey}-${node.id}`}
+                                    node={node}
+                                    isExpanded={expandAll}
+                                    showComparison={showComparison}
+                                />
                             ))}
                         </div>
                     </div>
@@ -249,8 +298,11 @@ export default function IncomeStatement() {
         queryFn: async () => {
             const params = new URLSearchParams();
             if (urlYearId) params.append('fiscal_year_id', urlYearId);
-            if (urlComparisonId) params.append('comparison_year_id', urlComparisonId);
-            const response = await axios.get(`/api/reports/income-statement?${params.toString()}`);
+            if (urlComparisonId)
+                params.append('comparison_year_id', urlComparisonId);
+            const response = await axios.get(
+                `/api/reports/income-statement?${params.toString()}`,
+            );
             return response.data;
         },
     });
@@ -258,14 +310,23 @@ export default function IncomeStatement() {
     const fiscalYears = data?.fiscalYears || [];
     const selectedYearId = data?.selectedYearId || 0;
     const comparisonYearId = data?.comparisonYearId;
-    const report = data?.report || { revenues: [], expenses: [], totals: { revenue: 0, expense: 0, net_income: 0 } };
+    const report = data?.report || {
+        revenues: [],
+        expenses: [],
+        totals: { revenue: 0, expense: 0, net_income: 0 },
+    };
 
-    const selectedFiscalYear = fiscalYears.find((fy) => fy.id === selectedYearId);
-    const selectedComparisonFiscalYear = comparisonYearId ? fiscalYears.find((fy) => fy.id === comparisonYearId) : undefined;
+    const selectedFiscalYear = fiscalYears.find(
+        (fy) => fy.id === selectedYearId,
+    );
+    const selectedComparisonFiscalYear = comparisonYearId
+        ? fiscalYears.find((fy) => fy.id === comparisonYearId)
+        : undefined;
 
     const handleYearChange = (value: string) => {
         const params: any = { fiscal_year_id: value };
-        if (comparisonYearId) params.comparison_year_id = String(comparisonYearId);
+        if (comparisonYearId)
+            params.comparison_year_id = String(comparisonYearId);
         setSearchParams(params);
     };
 
@@ -285,42 +346,84 @@ export default function IncomeStatement() {
 
     if (isLoading) {
         return (
-            <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Income Statement', href: '/reports/income-statement' }]}>
-                <Helmet><title>Income Statement</title></Helmet>
-                <div className="flex h-full items-center justify-center p-4">Loading report...</div>
+            <AppLayout
+                breadcrumbs={[
+                    { title: 'Reports', href: '#' },
+                    {
+                        title: 'Income Statement',
+                        href: '/reports/income-statement',
+                    },
+                ]}
+            >
+                <Helmet>
+                    <title>Income Statement</title>
+                </Helmet>
+                <div className="flex h-full items-center justify-center p-4">
+                    Loading report...
+                </div>
             </AppLayout>
         );
     }
 
     if (error) {
         return (
-            <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Income Statement', href: '/reports/income-statement' }]}>
-                <Helmet><title>Income Statement</title></Helmet>
-                <div className="flex h-full items-center justify-center p-4 text-destructive">Error loading report.</div>
+            <AppLayout
+                breadcrumbs={[
+                    { title: 'Reports', href: '#' },
+                    {
+                        title: 'Income Statement',
+                        href: '/reports/income-statement',
+                    },
+                ]}
+            >
+                <Helmet>
+                    <title>Income Statement</title>
+                </Helmet>
+                <div className="flex h-full items-center justify-center p-4 text-destructive">
+                    Error loading report.
+                </div>
             </AppLayout>
         );
     }
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Income Statement', href: '/reports/income-statement' }]}>
-            <Helmet><title>Income Statement</title></Helmet>
+        <AppLayout
+            breadcrumbs={[
+                { title: 'Reports', href: '#' },
+                {
+                    title: 'Income Statement',
+                    href: '/reports/income-statement',
+                },
+            ]}
+        >
+            <Helmet>
+                <title>Income Statement</title>
+            </Helmet>
 
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-bold tracking-tight">Income Statement</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">
+                            Income Statement
+                        </h1>
                         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                             {selectedFiscalYear && (
                                 <span>
-                                    {selectedFiscalYear.name} • {selectedFiscalYear.status}
+                                    {selectedFiscalYear.name} •{' '}
+                                    {selectedFiscalYear.status}
                                 </span>
                             )}
                             <Badge variant="outline">
-                                {selectedComparisonFiscalYear ? `Compare: ${selectedComparisonFiscalYear.name}` : 'Compare: None'}
+                                {selectedComparisonFiscalYear
+                                    ? `Compare: ${selectedComparisonFiscalYear.name}`
+                                    : 'Compare: None'}
                             </Badge>
                             <Badge
                                 variant={isProfit ? 'secondary' : 'destructive'}
-                                className={cn(isProfit && 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300')}
+                                className={cn(
+                                    isProfit &&
+                                        'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+                                )}
                             >
                                 {isProfit ? 'Profit' : 'Loss'}
                             </Badge>
@@ -328,13 +431,19 @@ export default function IncomeStatement() {
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
                         <div className="w-full sm:w-[220px]">
-                            <Select value={String(selectedYearId)} onValueChange={handleYearChange}>
+                            <Select
+                                value={String(selectedYearId)}
+                                onValueChange={handleYearChange}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Fiscal Year" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {fiscalYears.map((fy) => (
-                                        <SelectItem key={fy.id} value={String(fy.id)}>
+                                        <SelectItem
+                                            key={fy.id}
+                                            value={String(fy.id)}
+                                        >
                                             {fy.name}
                                         </SelectItem>
                                     ))}
@@ -342,16 +451,28 @@ export default function IncomeStatement() {
                             </Select>
                         </div>
                         <div className="w-full sm:w-[220px]">
-                            <Select value={comparisonYearId ? String(comparisonYearId) : 'none'} onValueChange={handleComparisonChange}>
+                            <Select
+                                value={
+                                    comparisonYearId
+                                        ? String(comparisonYearId)
+                                        : 'none'
+                                }
+                                onValueChange={handleComparisonChange}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Compare With..." />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">None</SelectItem>
                                     {fiscalYears
-                                        .filter((fy) => fy.id !== selectedYearId)
+                                        .filter(
+                                            (fy) => fy.id !== selectedYearId,
+                                        )
                                         .map((fy) => (
-                                            <SelectItem key={fy.id} value={String(fy.id)}>
+                                            <SelectItem
+                                                key={fy.id}
+                                                value={String(fy.id)}
+                                            >
                                                 {fy.name}
                                             </SelectItem>
                                         ))}
@@ -368,7 +489,9 @@ export default function IncomeStatement() {
                         total={report.totals?.revenue || 0}
                         comparisonTotal={report.totals?.comparison_revenue}
                         change={report.totals?.change_revenue}
-                        changePercentage={report.totals?.change_percentage_revenue}
+                        changePercentage={
+                            report.totals?.change_percentage_revenue
+                        }
                         showComparison={!!comparisonYearId}
                     />
 
@@ -378,20 +501,39 @@ export default function IncomeStatement() {
                         total={report.totals?.expense || 0}
                         comparisonTotal={report.totals?.comparison_expense}
                         change={report.totals?.change_expense}
-                        changePercentage={report.totals?.change_percentage_expense}
+                        changePercentage={
+                            report.totals?.change_percentage_expense
+                        }
                         showComparison={!!comparisonYearId}
                     />
 
-                    <Card className={cn('overflow-hidden border-t-4', isProfit ? 'border-emerald-500' : 'border-destructive')}>
+                    <Card
+                        className={cn(
+                            'overflow-hidden border-t-4',
+                            isProfit
+                                ? 'border-emerald-500'
+                                : 'border-destructive',
+                        )}
+                    >
                         <CardHeader className="bg-muted/15">
                             <div className="flex items-start justify-between gap-3">
                                 <div className="space-y-1">
-                                    <CardTitle className="text-base">Summary</CardTitle>
-                                    <CardDescription className="text-xs">Net Income = Total Revenue - Total Expense.</CardDescription>
+                                    <CardTitle className="text-base">
+                                        Summary
+                                    </CardTitle>
+                                    <CardDescription className="text-xs">
+                                        Net Income = Total Revenue - Total
+                                        Expense.
+                                    </CardDescription>
                                 </div>
                                 <Badge
-                                    variant={isProfit ? 'secondary' : 'destructive'}
-                                    className={cn(isProfit && 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300')}
+                                    variant={
+                                        isProfit ? 'secondary' : 'destructive'
+                                    }
+                                    className={cn(
+                                        isProfit &&
+                                            'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+                                    )}
                                 >
                                     {isProfit ? 'Profit' : 'Loss'}
                                 </Badge>
@@ -400,18 +542,35 @@ export default function IncomeStatement() {
                         <CardContent className="grid gap-4">
                             <div className="grid gap-3 rounded-lg border bg-background p-4">
                                 <div className="flex items-center justify-between gap-4">
-                                    <span className="text-sm text-muted-foreground">Total Revenue</span>
-                                    <span className="text-sm font-semibold tabular-nums">{formatCurrency(totalRevenue)}</span>
+                                    <span className="text-sm text-muted-foreground">
+                                        Total Revenue
+                                    </span>
+                                    <span className="text-sm font-semibold tabular-nums">
+                                        {formatCurrency(totalRevenue)}
+                                    </span>
                                 </div>
                                 <Separator />
                                 <div className="flex items-center justify-between gap-4">
-                                    <span className="text-sm text-muted-foreground">Total Expense</span>
-                                    <span className="text-sm font-semibold tabular-nums">{formatCurrency(totalExpense)}</span>
+                                    <span className="text-sm text-muted-foreground">
+                                        Total Expense
+                                    </span>
+                                    <span className="text-sm font-semibold tabular-nums">
+                                        {formatCurrency(totalExpense)}
+                                    </span>
                                 </div>
                                 <Separator />
                                 <div className="flex items-center justify-between gap-4">
-                                    <span className="text-sm text-muted-foreground">Net Income</span>
-                                    <span className={cn('text-sm font-semibold tabular-nums', isProfit ? 'text-emerald-700 dark:text-emerald-300' : 'text-destructive')}>
+                                    <span className="text-sm text-muted-foreground">
+                                        Net Income
+                                    </span>
+                                    <span
+                                        className={cn(
+                                            'text-sm font-semibold tabular-nums',
+                                            isProfit
+                                                ? 'text-emerald-700 dark:text-emerald-300'
+                                                : 'text-destructive',
+                                        )}
+                                    >
                                         {formatCurrency(netIncome)}
                                     </span>
                                 </div>
@@ -419,14 +578,20 @@ export default function IncomeStatement() {
                                     <>
                                         <Separator />
                                         <div className="flex items-center justify-between gap-4">
-                                            <span className="text-sm text-muted-foreground">Net Income (Comparison)</span>
-                                            <span className="text-sm font-semibold tabular-nums text-muted-foreground">
-                                                {formatCurrency(netIncomeComparison)}
+                                            <span className="text-sm text-muted-foreground">
+                                                Net Income (Comparison)
+                                            </span>
+                                            <span className="text-sm font-semibold text-muted-foreground tabular-nums">
+                                                {formatCurrency(
+                                                    netIncomeComparison,
+                                                )}
                                             </span>
                                         </div>
                                         <Separator />
                                         <div className="flex items-center justify-between gap-4">
-                                            <span className="text-sm text-muted-foreground">Net Income Change</span>
+                                            <span className="text-sm text-muted-foreground">
+                                                Net Income Change
+                                            </span>
                                             <span
                                                 className={cn(
                                                     'text-sm font-semibold tabular-nums',
@@ -437,7 +602,11 @@ export default function IncomeStatement() {
                                                           : 'text-muted-foreground',
                                                 )}
                                             >
-                                                {formatCurrency(netIncomeChange)} ({netIncomeChangePct.toFixed(1)}%)
+                                                {formatCurrency(
+                                                    netIncomeChange,
+                                                )}{' '}
+                                                ({netIncomeChangePct.toFixed(1)}
+                                                %)
                                             </span>
                                         </div>
                                     </>
@@ -450,4 +619,3 @@ export default function IncomeStatement() {
         </AppLayout>
     );
 }
-

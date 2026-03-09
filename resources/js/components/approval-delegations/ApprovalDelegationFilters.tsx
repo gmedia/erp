@@ -1,18 +1,20 @@
-import { UseFormReturn } from 'react-hook-form';
-import { ApprovalDelegationFilters as FilterType } from '@/types/approval-delegation';
-import { InputField } from '@/components/common/InputField';
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
+import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
+import { ApprovalDelegationFilters as FilterType } from '@/types/approval-delegation';
+import { UseFormReturn } from 'react-hook-form';
 
 interface ApprovalDelegationFiltersProps {
     form: UseFormReturn<FilterType>;
 }
 
-export function ApprovalDelegationFilters({ form }: ApprovalDelegationFiltersProps) {
+export function ApprovalDelegationFilters({
+    form,
+}: ApprovalDelegationFiltersProps) {
     return (
         <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <InputField
                     name="search"
                     label="Search..."
@@ -42,10 +44,7 @@ export function ApprovalDelegationFilters({ form }: ApprovalDelegationFiltersPro
                     name="start_date_from"
                     label="Start Date From"
                 />
-                <DatePickerField
-                    name="start_date_to"
-                    label="Start Date To"
-                />
+                <DatePickerField name="start_date_to" label="Start Date To" />
             </div>
         </>
     );
@@ -53,8 +52,8 @@ export function ApprovalDelegationFilters({ form }: ApprovalDelegationFiltersPro
 
 import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
-    createSelectFilterField,
     createAsyncSelectFilterField,
+    createSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
@@ -62,9 +61,27 @@ import {
 export function createApprovalDelegationFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField('search', 'Search', 'Search reason...'),
-        createAsyncSelectFilterField('delegator_user_id', 'Delegator', '/api/users', 'Select delegator'),
-        createAsyncSelectFilterField('delegate_user_id', 'Delegate', '/api/users', 'Select delegate'),
-        createSelectFilterField('is_active', 'Status', [{ value: 'true', label: 'Active' }, { value: 'false', label: 'Inactive' }], 'Select status'),
+        createAsyncSelectFilterField(
+            'delegator_user_id',
+            'Delegator',
+            '/api/users',
+            'Select delegator',
+        ),
+        createAsyncSelectFilterField(
+            'delegate_user_id',
+            'Delegate',
+            '/api/users',
+            'Select delegate',
+        ),
+        createSelectFilterField(
+            'is_active',
+            'Status',
+            [
+                { value: 'true', label: 'Active' },
+                { value: 'false', label: 'Inactive' },
+            ],
+            'Select status',
+        ),
         {
             name: 'start_date_from',
             label: 'Start Date From',

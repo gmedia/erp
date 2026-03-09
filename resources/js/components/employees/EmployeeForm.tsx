@@ -104,9 +104,7 @@ const renderEmployeeHireDateSection = () => (
                 name="termination_date"
                 label="Termination Date (Optional)"
                 placeholder="Pick a date"
-                disabled={(date: Date) =>
-                    date < new Date('1900-01-01')
-                }
+                disabled={(date: Date) => date < new Date('1900-01-01')}
             />
         </div>
     </div>
@@ -154,7 +152,9 @@ const getEmployeeFormDefaults = (
         salary: employee.salary || '',
         hire_date: new Date(employee.hire_date),
         employment_status: employee.employment_status || 'regular',
-        termination_date: employee.termination_date ? new Date(employee.termination_date) : null,
+        termination_date: employee.termination_date
+            ? new Date(employee.termination_date)
+            : null,
     };
 };
 
@@ -184,7 +184,9 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
         onSubmit({
             ...data,
             hire_date: format(data.hire_date, 'yyyy-MM-dd') as any,
-            termination_date: data.termination_date ? format(data.termination_date, 'yyyy-MM-dd') as any : null,
+            termination_date: data.termination_date
+                ? (format(data.termination_date, 'yyyy-MM-dd') as any)
+                : null,
         });
     };
 

@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import {
     Dialog,
     DialogContent,
@@ -8,8 +7,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { AssetCategory } from '@/types/asset-category';
 import { formatDate } from '@/lib/utils';
+import { AssetCategory } from '@/types/asset-category';
 
 interface AssetCategoryViewModalProps {
     open: boolean;
@@ -44,15 +43,21 @@ export function AssetCategoryViewModal({
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <span className="font-bold">Useful Life:</span>
-                        <span className="col-span-3">{item.useful_life_months_default} months</span>
+                        <span className="col-span-3">
+                            {item.useful_life_months_default} months
+                        </span>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <span className="font-bold">Created At:</span>
-                        <span className="col-span-3">{formatDate(item.created_at)}</span>
+                        <span className="col-span-3">
+                            {formatDate(item.created_at)}
+                        </span>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <span className="font-bold">Updated At:</span>
-                        <span className="col-span-3">{formatDate(item.updated_at)}</span>
+                        <span className="col-span-3">
+                            {formatDate(item.updated_at)}
+                        </span>
                     </div>
                 </div>
             </DialogContent>

@@ -1,15 +1,15 @@
 'use client';
 
-import { Helmet } from 'react-helmet-async';
-import AppLayout from '@/layouts/app-layout';
-import { DataTable } from '@/components/common/DataTableCore';
-import { useCrudFilters } from '@/hooks/useCrudFilters';
-import { useCrudQuery } from '@/hooks/useCrudQuery';
 import { assetColumns } from '@/components/assets/AssetColumns';
 import { createAssetFilterFields } from '@/components/assets/AssetFilters';
 import { AssetViewModal } from '@/components/assets/AssetViewModal';
-import { useState } from 'react';
+import { DataTable } from '@/components/common/DataTableCore';
+import { useCrudFilters } from '@/hooks/useCrudFilters';
+import { useCrudQuery } from '@/hooks/useCrudQuery';
+import AppLayout from '@/layouts/app-layout';
 import { Asset } from '@/types/asset';
+import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 export default function AssetRegisterReport() {
     // Generate filters
@@ -55,8 +55,18 @@ export default function AssetRegisterReport() {
 
     return (
         <>
-            <Helmet><title>Asset Register Report</title></Helmet>
-            <AppLayout breadcrumbs={[{ title: 'Reports', href: '#' }, { title: 'Asset Register', href: '/reports/assets/register' }]}>
+            <Helmet>
+                <title>Asset Register Report</title>
+            </Helmet>
+            <AppLayout
+                breadcrumbs={[
+                    { title: 'Reports', href: '#' },
+                    {
+                        title: 'Asset Register',
+                        href: '/reports/assets/register',
+                    },
+                ]}
+            >
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                     <div className="rounded-lg bg-white">
                         <DataTable
@@ -71,7 +81,9 @@ export default function AssetRegisterReport() {
                                 to: meta.to ?? 0,
                             }}
                             onPageChange={handlePageChange}
-                            onPageSizeChange={(per_page) => handlePageSizeChange(per_page)}
+                            onPageSizeChange={(per_page) =>
+                                handlePageSizeChange(per_page)
+                            }
                             onSearchChange={handleSearchChange}
                             isLoading={isLoading}
                             filterValue={filters.search}

@@ -1,15 +1,14 @@
 'use client';
 
-import * as React from 'react';
+import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
-    DialogDescription,
 } from '@/components/ui/dialog';
 import { type Account } from '@/types/account';
-import { Badge } from '@/components/ui/badge';
 
 interface AccountViewModalProps {
     open: boolean;
@@ -28,7 +27,9 @@ export function AccountViewModal({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>{account.code} - {account.name}</DialogTitle>
+                    <DialogTitle>
+                        {account.code} - {account.name}
+                    </DialogTitle>
                     <DialogDescription>
                         Account details for {account.code}
                     </DialogDescription>
@@ -36,27 +37,43 @@ export function AccountViewModal({
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                         <span className="text-sm font-semibold">Type:</span>
-                        <span className="col-span-3 capitalize">{account.type}</span>
+                        <span className="col-span-3 capitalize">
+                            {account.type}
+                        </span>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <span className="text-sm font-semibold">Balance:</span>
-                        <Badge variant="secondary" className="col-span-3 capitalize w-fit">
+                        <Badge
+                            variant="secondary"
+                            className="col-span-3 w-fit capitalize"
+                        >
                             {account.normal_balance}
                         </Badge>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <span className="text-sm font-semibold">Status:</span>
-                        <Badge variant={account.is_active ? 'default' : 'destructive'} className="col-span-3 w-fit">
+                        <Badge
+                            variant={
+                                account.is_active ? 'default' : 'destructive'
+                            }
+                            className="col-span-3 w-fit"
+                        >
                             {account.is_active ? 'Active' : 'Inactive'}
                         </Badge>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <span className="text-sm font-semibold">Cash Flow:</span>
-                        <span className="col-span-3">{account.is_cash_flow ? 'Yes' : 'No'}</span>
+                        <span className="text-sm font-semibold">
+                            Cash Flow:
+                        </span>
+                        <span className="col-span-3">
+                            {account.is_cash_flow ? 'Yes' : 'No'}
+                        </span>
                     </div>
                     {account.description && (
                         <div className="grid grid-cols-4 items-start gap-4">
-                            <span className="text-sm font-semibold">Description:</span>
+                            <span className="text-sm font-semibold">
+                                Description:
+                            </span>
                             <p className="col-span-3 text-sm text-muted-foreground">
                                 {account.description}
                             </p>

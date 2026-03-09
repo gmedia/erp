@@ -378,7 +378,7 @@ export function I18nProvider({
  */
 export function AppI18nProvider({ children }: { children: ReactNode }) {
     const { locale, translations } = useAuth();
-    
+
     // We can fetch availableLocales from an environment variable or globally define it
     const availableLocales = ['en', 'id'];
 
@@ -386,7 +386,7 @@ export function AppI18nProvider({ children }: { children: ReactNode }) {
         <I18nProvider
             locale={locale || 'en'}
             availableLocales={availableLocales}
-            translations={translations as any || defaultTranslations}
+            translations={(translations as any) || defaultTranslations}
         >
             {children}
         </I18nProvider>

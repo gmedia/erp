@@ -11,8 +11,8 @@ import {
     createTextColumn,
 } from '@/utils/columns';
 
-import { Supplier } from '@/types/entity';
 import { Badge } from '@/components/ui/badge';
+import { Supplier } from '@/types/entity';
 
 /**
  * Cell renderer for branch column

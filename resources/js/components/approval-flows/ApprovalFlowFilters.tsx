@@ -15,7 +15,17 @@ const statusOptions = [
 export function createApprovalFlowFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField('search', 'Search', 'Search by Code or Name...'),
-        createSelectFilterField('approvable_type', 'Approvable Type', [...APPROVABLE_TYPE_OPTIONS], 'All Types'),
-        createSelectFilterField('is_active', 'Status', statusOptions, 'All Statuses'),
+        createSelectFilterField(
+            'approvable_type',
+            'Approvable Type',
+            [...APPROVABLE_TYPE_OPTIONS],
+            'All Types',
+        ),
+        createSelectFilterField(
+            'is_active',
+            'Status',
+            statusOptions,
+            'All Statuses',
+        ),
     ];
 }

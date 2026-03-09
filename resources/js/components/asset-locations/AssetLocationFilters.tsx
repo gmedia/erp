@@ -6,11 +6,7 @@ import {
 
 export function createAssetLocationFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search asset locations...',
-        ),
+        createTextFilterField('search', 'Search', 'Search asset locations...'),
         createAsyncSelectFilterField(
             'branch_id',
             'Branch',

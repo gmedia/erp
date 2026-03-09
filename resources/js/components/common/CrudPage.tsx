@@ -1,7 +1,7 @@
 'use client';
 
-import { Helmet } from 'react-helmet-async';
 import { memo, useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 import { DataTableProps as BaseDataTableProps } from '@/components/common/DataTableCore';
 import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
@@ -198,7 +198,9 @@ export function CrudPage<
 
     return (
         <>
-            <Helmet><title>{config.entityNamePlural}</title></Helmet>
+            <Helmet>
+                <title>{config.entityNamePlural}</title>
+            </Helmet>
 
             <AppLayout breadcrumbs={config.breadcrumbs}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">

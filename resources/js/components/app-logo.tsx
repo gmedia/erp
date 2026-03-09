@@ -1,9 +1,9 @@
-import AppLogoIcon from './app-logo-icon';
 import { useAuth } from '@/contexts/auth-context';
+import AppLogoIcon from './app-logo-icon';
 
 export default function AppLogo() {
     const { companyName } = useAuth();
-    
+
     return (
         <>
             <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-transparent text-sidebar-primary-foreground">

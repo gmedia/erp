@@ -1,16 +1,15 @@
 'use client';
 
-import * as React from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 
 import EntityForm from '@/components/common/EntityForm';
 import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
-import { coaVersionFormSchema, type CoaVersionFormData } from '@/utils/schemas';
-import { type CoaVersion } from '@/types/coa-version';
 import axios from '@/lib/axios';
+import { type CoaVersion } from '@/types/coa-version';
+import { coaVersionFormSchema, type CoaVersionFormData } from '@/utils/schemas';
 
 interface CoaVersionFormProps {
     open: boolean;
@@ -30,7 +29,9 @@ export function CoaVersionForm({
     isLoading = false,
 }: CoaVersionFormProps) {
     const activeEntity = coaVersion || entity;
-    const [fiscalYears, setFiscalYears] = useState<{ label: string; value: string }[]>([]);
+    const [fiscalYears, setFiscalYears] = useState<
+        { label: string; value: string }[]
+    >([]);
 
     const form = useForm<CoaVersionFormData>({
         resolver: zodResolver(coaVersionFormSchema) as any,
@@ -44,7 +45,9 @@ export function CoaVersionForm({
     useEffect(() => {
         const fetchFiscalYears = async () => {
             try {
-                const response = await axios.get('/api/fiscal-years?per_page=100');
+                const response = await axios.get(
+                    '/api/fiscal-years?per_page=100',
+                );
                 const data = response.data.data.map((fy: any) => ({
                     label: fy.name,
                     value: fy.id.toString(),
@@ -59,7 +62,8 @@ export function CoaVersionForm({
             fetchFiscalYears();
             form.reset({
                 name: activeEntity?.name || '',
-                fiscal_year_id: (activeEntity?.fiscal_year_id as any) || undefined,
+                fiscal_year_id:
+                    (activeEntity?.fiscal_year_id as any) || undefined,
                 status: activeEntity?.status || 'draft',
             });
         }
@@ -79,7 +83,7 @@ export function CoaVersionForm({
             isLoading={isLoading}
         >
             <NameField name="name" />
-            
+
             <SelectField
                 name="fiscal_year_id"
                 label="Fiscal Year"

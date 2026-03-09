@@ -1,9 +1,8 @@
-import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
-import { useState } from 'react';
-import axios from '@/lib/axios';
-import { toast } from 'sonner';
 import { useAuth } from '@/contexts/auth-context';
+import axios from '@/lib/axios';
+import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { toast } from 'sonner';
 
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
@@ -13,8 +12,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { Transition } from '@headlessui/react';
 import { type BreadcrumbItem } from '@/types';
+import { Transition } from '@headlessui/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -67,7 +66,9 @@ export default function Profile({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Helmet>
-                <title>Profile settings - {import.meta.env.VITE_APP_NAME || 'ERP'}</title>
+                <title>
+                    Profile settings - {import.meta.env.VITE_APP_NAME || 'ERP'}
+                </title>
             </Helmet>
 
             <SettingsLayout>
@@ -77,10 +78,7 @@ export default function Profile({
                         description="Update your name and email address"
                     />
 
-                    <form
-                        onSubmit={handleSubmit}
-                        className="space-y-6"
-                    >
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid gap-2">
                             <Label htmlFor="name">Name</Label>
 
@@ -124,11 +122,20 @@ export default function Profile({
                             user?.email_verified_at === null && (
                                 <div>
                                     <p className="-mt-4 text-sm text-muted-foreground">
-                                        Your email address is
-                                        unverified.{' '}
+                                        Your email address is unverified.{' '}
                                         <button
                                             type="button"
-                                            onClick={() => axios.post('/email/verification-notification').then(() => toast.success('Verification link sent'))}
+                                            onClick={() =>
+                                                axios
+                                                    .post(
+                                                        '/email/verification-notification',
+                                                    )
+                                                    .then(() =>
+                                                        toast.success(
+                                                            'Verification link sent',
+                                                        ),
+                                                    )
+                                            }
                                             className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                                         >
                                             Click here to resend the
@@ -136,12 +143,10 @@ export default function Profile({
                                         </button>
                                     </p>
 
-                                    {status ===
-                                        'verification-link-sent' && (
+                                    {status === 'verification-link-sent' && (
                                         <div className="mt-2 text-sm font-medium text-green-600">
-                                            A new verification link has
-                                            been sent to your email
-                                            address.
+                                            A new verification link has been
+                                            sent to your email address.
                                         </div>
                                     )}
                                 </div>

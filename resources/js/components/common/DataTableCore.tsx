@@ -193,7 +193,7 @@ export function DataTable<T>({
         if (!onEdit && !onDelete && !onView && !extraActionItems) {
             return columns;
         }
-                return columns.map((col) => {
+        return columns.map((col) => {
             if (col.id === 'actions') {
                 const viewPath = (col.meta as any)?.viewPath;
                 return {

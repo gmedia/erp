@@ -1,17 +1,16 @@
 'use client';
 
-import * as React from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 
+import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import NameField from '@/components/common/NameField';
-import { format } from 'date-fns';
-import { DatePickerField } from '@/components/common/DatePickerField';
 import SelectField from '@/components/common/SelectField';
-import { fiscalYearFormSchema, type FiscalYearFormData } from '@/utils/schemas';
 import { type FiscalYear } from '@/types/entity';
+import { fiscalYearFormSchema, type FiscalYearFormData } from '@/utils/schemas';
+import { format } from 'date-fns';
 
 interface FiscalYearFormProps {
     open: boolean;
@@ -36,8 +35,12 @@ export function FiscalYearForm({
         resolver: zodResolver(fiscalYearFormSchema),
         defaultValues: {
             name: activeEntity?.name || '',
-            start_date: activeEntity?.start_date ? new Date(activeEntity.start_date) : undefined as any,
-            end_date: activeEntity?.end_date ? new Date(activeEntity.end_date) : undefined as any,
+            start_date: activeEntity?.start_date
+                ? new Date(activeEntity.start_date)
+                : (undefined as any),
+            end_date: activeEntity?.end_date
+                ? new Date(activeEntity.end_date)
+                : (undefined as any),
             status: activeEntity?.status || 'open',
         },
     });
@@ -46,8 +49,12 @@ export function FiscalYearForm({
         if (open) {
             form.reset({
                 name: activeEntity?.name || '',
-                start_date: activeEntity?.start_date ? new Date(activeEntity.start_date) : undefined as any,
-                end_date: activeEntity?.end_date ? new Date(activeEntity.end_date) : undefined as any,
+                start_date: activeEntity?.start_date
+                    ? new Date(activeEntity.start_date)
+                    : (undefined as any),
+                end_date: activeEntity?.end_date
+                    ? new Date(activeEntity.end_date)
+                    : (undefined as any),
                 status: activeEntity?.status || 'open',
             });
         }
@@ -70,21 +77,11 @@ export function FiscalYearForm({
             onSubmit={handleFormSubmit}
             isLoading={isLoading}
         >
-            <NameField
-                name="name"
-                label="Name"
-                placeholder="e.g., 2026"
-            />
+            <NameField name="name" label="Name" placeholder="e.g., 2026" />
 
             <div className="grid grid-cols-2 gap-4">
-                <DatePickerField
-                    name="start_date"
-                    label="Start Date"
-                />
-                <DatePickerField
-                    name="end_date"
-                    label="End Date"
-                />
+                <DatePickerField name="start_date" label="Start Date" />
+                <DatePickerField name="end_date" label="End Date" />
             </div>
 
             <SelectField

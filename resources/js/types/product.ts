@@ -4,7 +4,12 @@ export interface Product extends BaseEntity {
     code: string;
     name: string;
     description: string | null;
-    type: 'raw_material' | 'work_in_progress' | 'finished_good' | 'purchased_good' | 'service';
+    type:
+        | 'raw_material'
+        | 'work_in_progress'
+        | 'finished_good'
+        | 'purchased_good'
+        | 'service';
     category: {
         id: number;
         name: string;
@@ -37,7 +42,12 @@ export interface ProductFormData {
     code: string;
     name: string;
     description?: string;
-    type: 'raw_material' | 'work_in_progress' | 'finished_good' | 'purchased_good' | 'service';
+    type:
+        | 'raw_material'
+        | 'work_in_progress'
+        | 'finished_good'
+        | 'purchased_good'
+        | 'service';
     category_id: string;
     unit_id: string;
     branch_id?: string;

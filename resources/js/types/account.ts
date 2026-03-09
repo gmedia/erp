@@ -1,6 +1,11 @@
 import { type EntityWithId } from './entity';
 
-export type AccountType = 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
+export type AccountType =
+    | 'asset'
+    | 'liability'
+    | 'equity'
+    | 'revenue'
+    | 'expense';
 export type NormalBalance = 'debit' | 'credit';
 
 export interface Account extends EntityWithId {

@@ -1,7 +1,7 @@
-import { ColumnDef } from '@tanstack/react-table';
-import { createSortingHeader } from '@/utils/columns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { createSortingHeader } from '@/utils/columns';
+import { ColumnDef } from '@tanstack/react-table';
 import { Eye } from 'lucide-react';
 
 export interface PipelineAuditTrailItem {
@@ -32,7 +32,9 @@ interface ColumnsProps {
     onViewDetail: (item: PipelineAuditTrailItem) => void;
 }
 
-export const createPipelineAuditTrailColumns = ({ onViewDetail }: ColumnsProps): ColumnDef<PipelineAuditTrailItem>[] => [
+export const createPipelineAuditTrailColumns = ({
+    onViewDetail,
+}: ColumnsProps): ColumnDef<PipelineAuditTrailItem>[] => [
     {
         accessorKey: 'created_at',
         ...createSortingHeader('Date'),
@@ -44,7 +46,11 @@ export const createPipelineAuditTrailColumns = ({ onViewDetail }: ColumnsProps):
     {
         accessorKey: 'pipeline_name',
         header: 'Pipeline',
-        cell: ({ row }) => <div className="font-medium">{row.getValue('pipeline_name') || '-'}</div>,
+        cell: ({ row }) => (
+            <div className="font-medium">
+                {row.getValue('pipeline_name') || '-'}
+            </div>
+        ),
         enableSorting: false,
     },
     {
@@ -67,7 +73,15 @@ export const createPipelineAuditTrailColumns = ({ onViewDetail }: ColumnsProps):
             if (!name) return <Badge variant="outline">Initial</Badge>;
             return (
                 <Badge
-                    style={color ? { backgroundColor: color, color: '#fff', borderColor: color } : undefined}
+                    style={
+                        color
+                            ? {
+                                  backgroundColor: color,
+                                  color: '#fff',
+                                  borderColor: color,
+                              }
+                            : undefined
+                    }
                     variant="outline"
                 >
                     {name}
@@ -85,7 +99,15 @@ export const createPipelineAuditTrailColumns = ({ onViewDetail }: ColumnsProps):
             if (!name) return '-';
             return (
                 <Badge
-                    style={color ? { backgroundColor: color, color: '#fff', borderColor: color } : undefined}
+                    style={
+                        color
+                            ? {
+                                  backgroundColor: color,
+                                  color: '#fff',
+                                  borderColor: color,
+                              }
+                            : undefined
+                    }
                     variant="outline"
                 >
                     {name}

@@ -1,21 +1,31 @@
 import * as z from 'zod';
 
 // Schema for approval delegations
-export const approvalDelegationFormSchema = z.object({
-    delegator_user_id: z.string().min(1, { message: 'Delegator is required.' }),
-    delegate_user_id: z.string().min(1, { message: 'Delegate is required.' }),
-    approvable_type: z.string().optional(),
-    start_date: z.date({ message: 'Start date is required.' }),
-    end_date: z.date({ message: 'End date is required.' }),
-    reason: z.string().optional(),
-    is_active: z.union([z.boolean(), z.string()]).default(true).transform((val) => val === true || val === 'true' || val === '1'),
-}).refine(data => data.delegator_user_id !== data.delegate_user_id, {
-    message: 'Delegator and Delegate cannot be the same user.',
-    path: ['delegate_user_id'],
-}).refine(data => data.end_date >= data.start_date, {
-    message: 'End date must be after or equal to start date.',
-    path: ['end_date'],
-});
+export const approvalDelegationFormSchema = z
+    .object({
+        delegator_user_id: z
+            .string()
+            .min(1, { message: 'Delegator is required.' }),
+        delegate_user_id: z
+            .string()
+            .min(1, { message: 'Delegate is required.' }),
+        approvable_type: z.string().optional(),
+        start_date: z.date({ message: 'Start date is required.' }),
+        end_date: z.date({ message: 'End date is required.' }),
+        reason: z.string().optional(),
+        is_active: z
+            .union([z.boolean(), z.string()])
+            .default(true)
+            .transform((val) => val === true || val === 'true' || val === '1'),
+    })
+    .refine((data) => data.delegator_user_id !== data.delegate_user_id, {
+        message: 'Delegator and Delegate cannot be the same user.',
+        path: ['delegate_user_id'],
+    })
+    .refine((data) => data.end_date >= data.start_date, {
+        message: 'End date must be after or equal to start date.',
+        path: ['end_date'],
+    });
 
 // Schema for simple entities (departments, positions)
 export const simpleEntitySchema = z.object({
@@ -39,7 +49,11 @@ export type ProductCategoryFormData = z.infer<typeof productCategoryFormSchema>;
  */
 export const unitFormSchema = z.object({
     name: z.string().min(1, { message: 'Name is required' }),
-    symbol: z.string().max(10, { message: 'Symbol cannot exceed 10 characters' }).optional().nullable(),
+    symbol: z
+        .string()
+        .max(10, { message: 'Symbol cannot exceed 10 characters' })
+        .optional()
+        .nullable(),
 });
 
 export type UnitFormData = z.infer<typeof unitFormSchema>;
@@ -71,7 +85,7 @@ export const employeeFormSchema = z.object({
                     message:
                         'Please enter a valid salary amount (e.g., 50000 or 50000.00).',
                 }),
-            ])
+            ]),
         ),
     hire_date: z.date({ message: 'Hire date is required.' }),
     employment_status: z.enum(['regular', 'intern'], {
@@ -93,7 +107,9 @@ export const customerFormSchema = z.object({
             message: 'Please enter a valid phone number.',
         })
         .or(z.literal('')),
-    address: z.string().min(5, { message: 'Address must be at least 5 characters.' }),
+    address: z
+        .string()
+        .min(5, { message: 'Address must be at least 5 characters.' }),
     branch_id: z.string().min(1, { message: 'Branch is required.' }),
     category_id: z.string().min(1, { message: 'Category is required.' }),
     status: z.enum(['active', 'inactive'], {
@@ -107,7 +123,11 @@ export type CustomerFormData = z.infer<typeof customerFormSchema>;
 // Schema for supplier form data
 export const supplierFormSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    email: z.string().email({ message: 'Please enter a valid email address.' }).or(z.literal('')).optional(),
+    email: z
+        .string()
+        .email({ message: 'Please enter a valid email address.' })
+        .or(z.literal(''))
+        .optional(),
     phone: z
         .string()
         .min(10, { message: 'Phone number must be at least 10 digits.' })
@@ -130,9 +150,18 @@ export const productFormSchema = z.object({
     code: z.string().min(2, { message: 'Code must be at least 2 characters.' }),
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
     description: z.string().optional(),
-    type: z.enum(['raw_material', 'work_in_progress', 'finished_good', 'purchased_good', 'service'], {
-        message: 'Product type is required.',
-    }),
+    type: z.enum(
+        [
+            'raw_material',
+            'work_in_progress',
+            'finished_good',
+            'purchased_good',
+            'service',
+        ],
+        {
+            message: 'Product type is required.',
+        },
+    ),
     category_id: z.string().min(1, { message: 'Category is required.' }),
     unit_id: z.string().min(1, { message: 'Unit is required.' }),
     branch_id: z.string().optional(),
@@ -186,17 +215,35 @@ export const journalEntryFormSchema = z.object({
     entry_date: z.date({ message: 'Date is required.' }),
     reference: z.string().optional(),
     description: z.string().min(1, { message: 'Description is required.' }),
-    lines: z.array(z.object({
-        account_id: z.string().min(1, { message: 'Account is required.' }),
-        debit: z.coerce.number().min(0),
-        credit: z.coerce.number().min(0),
-        memo: z.string().optional(),
-    })).min(2, { message: 'At least 2 lines are required.' })
-    .refine((lines) => {
-        const totalDebit = lines.reduce((sum, line) => sum + (line.debit || 0), 0);
-        const totalCredit = lines.reduce((sum, line) => sum + (line.credit || 0), 0);
-        return Math.abs(totalDebit - totalCredit) < 0.01;
-    }, { message: 'Total Debit and Total Credit must be equal.', path: ['root'] }),
+    lines: z
+        .array(
+            z.object({
+                account_id: z
+                    .string()
+                    .min(1, { message: 'Account is required.' }),
+                debit: z.coerce.number().min(0),
+                credit: z.coerce.number().min(0),
+                memo: z.string().optional(),
+            }),
+        )
+        .min(2, { message: 'At least 2 lines are required.' })
+        .refine(
+            (lines) => {
+                const totalDebit = lines.reduce(
+                    (sum, line) => sum + (line.debit || 0),
+                    0,
+                );
+                const totalCredit = lines.reduce(
+                    (sum, line) => sum + (line.credit || 0),
+                    0,
+                );
+                return Math.abs(totalDebit - totalCredit) < 0.01;
+            },
+            {
+                message: 'Total Debit and Total Credit must be equal.',
+                path: ['root'],
+            },
+        ),
 });
 
 export type JournalEntryFormData = z.infer<typeof journalEntryFormSchema>;
@@ -207,7 +254,9 @@ export type JournalEntryFormData = z.infer<typeof journalEntryFormSchema>;
 export const assetCategoryFormSchema = z.object({
     code: z.string().min(2, { message: 'Code must be at least 2 characters.' }),
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    useful_life_months_default: z.coerce.number().min(1, { message: 'Useful life must be at least 1 month.' }),
+    useful_life_months_default: z.coerce
+        .number()
+        .min(1, { message: 'Useful life must be at least 1 month.' }),
 });
 
 export type AssetCategoryFormData = z.infer<typeof assetCategoryFormSchema>;
@@ -216,34 +265,55 @@ export type AssetCategoryFormData = z.infer<typeof assetCategoryFormSchema>;
  * Asset model form schema.
  */
 export const assetModelFormSchema = z.object({
-    model_name: z.string().min(2, { message: 'Model name must be at least 2 characters.' }),
+    model_name: z
+        .string()
+        .min(2, { message: 'Model name must be at least 2 characters.' }),
     manufacturer: z.string().optional(),
     asset_category_id: z.string().min(1, { message: 'Category is required.' }),
-    specs: z.string().optional().refine((val) => {
-        if (!val || val.trim() === '') return true;
-        try {
-            JSON.parse(val);
-            return true;
-        } catch {
-            return false;
-        }
-    }, { message: 'Specs must be valid JSON.' }),
+    specs: z
+        .string()
+        .optional()
+        .refine(
+            (val) => {
+                if (!val || val.trim() === '') return true;
+                try {
+                    JSON.parse(val);
+                    return true;
+                } catch {
+                    return false;
+                }
+            },
+            { message: 'Specs must be valid JSON.' },
+        ),
 });
 
 export type AssetModelFormData = z.infer<typeof assetModelFormSchema>;
 
 export const accountMappingFormSchema = z
     .object({
-        source_coa_version_id: z.string().min(1, { message: 'Source COA Version is required.' }),
-        target_coa_version_id: z.string().min(1, { message: 'Target COA Version is required.' }),
-        source_account_id: z.string().min(1, { message: 'Source account is required.' }),
-        target_account_id: z.string().min(1, { message: 'Target account is required.' }),
-        type: z.enum(['merge', 'split', 'rename'], { message: 'Type is required.' }),
+        source_coa_version_id: z
+            .string()
+            .min(1, { message: 'Source COA Version is required.' }),
+        target_coa_version_id: z
+            .string()
+            .min(1, { message: 'Target COA Version is required.' }),
+        source_account_id: z
+            .string()
+            .min(1, { message: 'Source account is required.' }),
+        target_account_id: z
+            .string()
+            .min(1, { message: 'Target account is required.' }),
+        type: z.enum(['merge', 'split', 'rename'], {
+            message: 'Type is required.',
+        }),
         notes: z.string().optional(),
     })
     .refine(
         (data) => data.source_coa_version_id !== data.target_coa_version_id,
-        { message: 'Source and target COA versions must be different.', path: ['target_coa_version_id'] },
+        {
+            message: 'Source and target COA versions must be different.',
+            path: ['target_coa_version_id'],
+        },
     );
 
 export type AccountMappingFormData = z.infer<typeof accountMappingFormSchema>;
@@ -272,7 +342,9 @@ export type WarehouseFormData = z.infer<typeof warehouseFormSchema>;
  * Asset form schema.
  */
 export const assetFormSchema = z.object({
-    asset_code: z.string().min(2, { message: 'Asset code must be at least 2 characters.' }),
+    asset_code: z
+        .string()
+        .min(2, { message: 'Asset code must be at least 2 characters.' }),
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
     asset_category_id: z.string().min(1, { message: 'Category is required.' }),
     asset_model_id: z.string().default(''),
@@ -290,9 +362,14 @@ export const assetFormSchema = z.object({
     status: z.enum(['draft', 'active', 'maintenance', 'disposed', 'lost'], {
         message: 'Status is required.',
     }),
-    condition: z.enum(['good', 'needs_repair', 'damaged']).optional().nullable(),
+    condition: z
+        .enum(['good', 'needs_repair', 'damaged'])
+        .optional()
+        .nullable(),
     notes: z.string().default(''),
-    depreciation_method: z.enum(['straight_line', 'declining_balance']).default('straight_line'),
+    depreciation_method: z
+        .enum(['straight_line', 'declining_balance'])
+        .default('straight_line'),
     depreciation_start_date: z.date().optional().nullable(),
     useful_life_months: z.string().default(''),
     salvage_value: z.string().default(''),
@@ -307,9 +384,12 @@ export type AssetFormData = z.infer<typeof assetFormSchema>;
  */
 export const assetMovementFormSchema = z.object({
     asset_id: z.string().min(1, { message: 'Asset is required.' }),
-    movement_type: z.enum(['transfer', 'assign', 'return', 'dispose', 'adjustment'], {
-        message: 'Movement type is required.',
-    }),
+    movement_type: z.enum(
+        ['transfer', 'assign', 'return', 'dispose', 'adjustment'],
+        {
+            message: 'Movement type is required.',
+        },
+    ),
     moved_at: z.date({ message: 'Movement date is required.' }),
     to_branch_id: z.string().optional(),
     to_location_id: z.string().optional(),
@@ -323,9 +403,12 @@ export type AssetMovementFormData = z.infer<typeof assetMovementFormSchema>;
 
 export const assetMaintenanceFormSchema = z.object({
     asset_id: z.string().min(1, { message: 'Asset is required.' }),
-    maintenance_type: z.enum(['preventive', 'corrective', 'calibration', 'other'], {
-        message: 'Maintenance type is required.',
-    }),
+    maintenance_type: z.enum(
+        ['preventive', 'corrective', 'calibration', 'other'],
+        {
+            message: 'Maintenance type is required.',
+        },
+    ),
     status: z.enum(['scheduled', 'in_progress', 'completed', 'cancelled'], {
         message: 'Status is required.',
     }),
@@ -336,7 +419,9 @@ export const assetMaintenanceFormSchema = z.object({
     notes: z.string().default(''),
 });
 
-export type AssetMaintenanceFormData = z.infer<typeof assetMaintenanceFormSchema>;
+export type AssetMaintenanceFormData = z.infer<
+    typeof assetMaintenanceFormSchema
+>;
 
 export const assetStocktakeFormSchema = z.object({
     branch_id: z.string().min(1, { message: 'Branch is required.' }),
@@ -357,15 +442,21 @@ export const pipelineFormSchema = z.object({
     description: z.string().optional(),
     version: z.string().optional(),
     is_active: z.union([z.boolean(), z.string()]).default(true),
-    conditions: z.string().optional().refine((val) => {
-        if (!val || val.trim() === '') return true;
-        try {
-            JSON.parse(val);
-            return true;
-        } catch {
-            return false;
-        }
-    }, { message: 'Conditions must be valid JSON.' }),
+    conditions: z
+        .string()
+        .optional()
+        .refine(
+            (val) => {
+                if (!val || val.trim() === '') return true;
+                try {
+                    JSON.parse(val);
+                    return true;
+                } catch {
+                    return false;
+                }
+            },
+            { message: 'Conditions must be valid JSON.' },
+        ),
 });
 
 export type PipelineFormData = z.infer<typeof pipelineFormSchema>;
@@ -377,30 +468,58 @@ export const pipelineStateFormSchema = z.object({
     color: z.string().nullable().optional(),
     icon: z.string().nullable().optional(),
     description: z.string().nullable().optional(),
-    sort_order: z.union([z.number(), z.string()]).transform((val) => Number(val)),
+    sort_order: z
+        .union([z.number(), z.string()])
+        .transform((val) => Number(val)),
 });
 
 export type PipelineStateFormData = z.infer<typeof pipelineStateFormSchema>;
 
 export const pipelineTransitionActionFormSchema = z.object({
     id: z.number().optional().nullable(),
-    action_type: z.enum(['update_field', 'create_record', 'send_notification', 'dispatch_job', 'trigger_approval', 'webhook', 'custom']),
-    execution_order: z.union([z.number(), z.string()]).transform((val) => Number(val)),
-    config: z.string().optional().refine((val) => {
-        if (!val || val.trim() === '') return true;
-        try {
-            JSON.parse(val);
-            return true;
-        } catch {
-            return false;
-        }
-    }, { message: 'Config must be valid JSON.' }),
-    is_async: z.union([z.boolean(), z.string()]).default(false).transform((val) => val === 'true' || val === true),
-    on_failure: z.enum(['abort', 'continue', 'log_and_continue']).default('abort'),
-    is_active: z.union([z.boolean(), z.string()]).default(true).transform((val) => val === 'true' || val === true),
+    action_type: z.enum([
+        'update_field',
+        'create_record',
+        'send_notification',
+        'dispatch_job',
+        'trigger_approval',
+        'webhook',
+        'custom',
+    ]),
+    execution_order: z
+        .union([z.number(), z.string()])
+        .transform((val) => Number(val)),
+    config: z
+        .string()
+        .optional()
+        .refine(
+            (val) => {
+                if (!val || val.trim() === '') return true;
+                try {
+                    JSON.parse(val);
+                    return true;
+                } catch {
+                    return false;
+                }
+            },
+            { message: 'Config must be valid JSON.' },
+        ),
+    is_async: z
+        .union([z.boolean(), z.string()])
+        .default(false)
+        .transform((val) => val === 'true' || val === true),
+    on_failure: z
+        .enum(['abort', 'continue', 'log_and_continue'])
+        .default('abort'),
+    is_active: z
+        .union([z.boolean(), z.string()])
+        .default(true)
+        .transform((val) => val === 'true' || val === true),
 });
 
-export type PipelineTransitionActionFormData = z.infer<typeof pipelineTransitionActionFormSchema>;
+export type PipelineTransitionActionFormData = z.infer<
+    typeof pipelineTransitionActionFormSchema
+>;
 
 export const pipelineTransitionFormSchema = z.object({
     from_state_id: z.number().or(z.string().transform(Number)),
@@ -409,70 +528,142 @@ export const pipelineTransitionFormSchema = z.object({
     code: z.string().min(1, 'Code is required'),
     description: z.string().nullable().optional(),
     required_permission: z.string().nullable().optional(),
-    guard_conditions: z.string().optional().refine((val) => {
-        if (!val || val.trim() === '') return true;
-        try {
-            JSON.parse(val);
-            return true;
-        } catch {
-            return false;
-        }
-    }, { message: 'Guard conditions must be valid JSON.' }),
-    requires_confirmation: z.union([z.boolean(), z.string()]).default(false).transform((val) => val === 'true' || val === true),
-    requires_comment: z.union([z.boolean(), z.string()]).default(false).transform((val) => val === 'true' || val === true),
-    requires_approval: z.union([z.boolean(), z.string()]).default(false).transform((val) => val === 'true' || val === true),
-    sort_order: z.union([z.number(), z.string()]).transform((val) => Number(val)),
-    is_active: z.union([z.boolean(), z.string()]).default(true).transform((val) => val === 'true' || val === true),
+    guard_conditions: z
+        .string()
+        .optional()
+        .refine(
+            (val) => {
+                if (!val || val.trim() === '') return true;
+                try {
+                    JSON.parse(val);
+                    return true;
+                } catch {
+                    return false;
+                }
+            },
+            { message: 'Guard conditions must be valid JSON.' },
+        ),
+    requires_confirmation: z
+        .union([z.boolean(), z.string()])
+        .default(false)
+        .transform((val) => val === 'true' || val === true),
+    requires_comment: z
+        .union([z.boolean(), z.string()])
+        .default(false)
+        .transform((val) => val === 'true' || val === true),
+    requires_approval: z
+        .union([z.boolean(), z.string()])
+        .default(false)
+        .transform((val) => val === 'true' || val === true),
+    sort_order: z
+        .union([z.number(), z.string()])
+        .transform((val) => Number(val)),
+    is_active: z
+        .union([z.boolean(), z.string()])
+        .default(true)
+        .transform((val) => val === 'true' || val === true),
     actions: z.array(pipelineTransitionActionFormSchema).optional(),
 });
 
-export type PipelineTransitionFormData = z.infer<typeof pipelineTransitionFormSchema>;
+export type PipelineTransitionFormData = z.infer<
+    typeof pipelineTransitionFormSchema
+>;
 
 export const approvalFlowFormSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     code: z.string().min(1, 'Code is required'),
     approvable_type: z.string().min(1, 'Approvable Type is required'),
     description: z.string().nullable().optional(),
-    is_active: z.union([z.boolean(), z.string()]).transform((val) => val === true || val === 'true'),
+    is_active: z
+        .union([z.boolean(), z.string()])
+        .transform((val) => val === true || val === 'true'),
     conditions: z.string().nullable().optional(),
-    steps: z.array(
-        z.object({
-            id: z.number().optional(),
-            name: z.string().min(1, 'Step name is required'),
-            approver_type: z.enum(['user', 'role', 'department_head']),
-            approver_user_id: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
-            approver_role_id: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
-            approver_department_id: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
-            required_action: z.enum(['approve', 'review', 'acknowledge']),
-            auto_approve_after_hours: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
-            escalate_after_hours: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
-            escalation_user_id: z.preprocess((val) => (val === '' || val === null ? null : Number(val)), z.number().nullable().optional()),
-            can_reject: z.union([z.boolean(), z.string()]).transform((val) => val === true || val === 'true'),
-        })
-    ).optional(),
+    steps: z
+        .array(
+            z.object({
+                id: z.number().optional(),
+                name: z.string().min(1, 'Step name is required'),
+                approver_type: z.enum(['user', 'role', 'department_head']),
+                approver_user_id: z.preprocess(
+                    (val) => (val === '' || val === null ? null : Number(val)),
+                    z.number().nullable().optional(),
+                ),
+                approver_role_id: z.preprocess(
+                    (val) => (val === '' || val === null ? null : Number(val)),
+                    z.number().nullable().optional(),
+                ),
+                approver_department_id: z.preprocess(
+                    (val) => (val === '' || val === null ? null : Number(val)),
+                    z.number().nullable().optional(),
+                ),
+                required_action: z.enum(['approve', 'review', 'acknowledge']),
+                auto_approve_after_hours: z.preprocess(
+                    (val) => (val === '' || val === null ? null : Number(val)),
+                    z.number().nullable().optional(),
+                ),
+                escalate_after_hours: z.preprocess(
+                    (val) => (val === '' || val === null ? null : Number(val)),
+                    z.number().nullable().optional(),
+                ),
+                escalation_user_id: z.preprocess(
+                    (val) => (val === '' || val === null ? null : Number(val)),
+                    z.number().nullable().optional(),
+                ),
+                can_reject: z
+                    .union([z.boolean(), z.string()])
+                    .transform((val) => val === true || val === 'true'),
+            }),
+        )
+        .optional(),
 });
 
 export type ApprovalFlowFormData = z.infer<typeof approvalFlowFormSchema>;
 
 export const stockTransferFormSchema = z.object({
     transfer_number: z.string().optional(),
-    from_warehouse_id: z.string().min(1, { message: 'From warehouse is required.' }),
-    to_warehouse_id: z.string().min(1, { message: 'To warehouse is required.' }),
+    from_warehouse_id: z
+        .string()
+        .min(1, { message: 'From warehouse is required.' }),
+    to_warehouse_id: z
+        .string()
+        .min(1, { message: 'To warehouse is required.' }),
     transfer_date: z.date({ message: 'Transfer date is required.' }),
     expected_arrival_date: z.date().optional().nullable(),
-    status: z.enum(['draft', 'pending_approval', 'approved', 'in_transit', 'received', 'cancelled'], {
-        message: 'Status is required.',
-    }),
+    status: z.enum(
+        [
+            'draft',
+            'pending_approval',
+            'approved',
+            'in_transit',
+            'received',
+            'cancelled',
+        ],
+        {
+            message: 'Status is required.',
+        },
+    ),
     notes: z.string().optional(),
     requested_by: z.string().optional(),
-    items: z.array(z.object({
-        product_id: z.string().min(1, { message: 'Product is required.' }),
-        unit_id: z.string().min(1, { message: 'Unit is required.' }),
-        quantity: z.coerce.number().gt(0, { message: 'Quantity must be greater than 0.' }),
-        quantity_received: z.coerce.number().min(0).optional().default(0),
-        unit_cost: z.coerce.number().min(0).optional().default(0),
-        notes: z.string().optional(),
-    })).min(1, { message: 'At least 1 item is required.' }),
+    items: z
+        .array(
+            z.object({
+                product_id: z
+                    .string()
+                    .min(1, { message: 'Product is required.' }),
+                unit_id: z.string().min(1, { message: 'Unit is required.' }),
+                quantity: z.coerce
+                    .number()
+                    .gt(0, { message: 'Quantity must be greater than 0.' }),
+                quantity_received: z.coerce
+                    .number()
+                    .min(0)
+                    .optional()
+                    .default(0),
+                unit_cost: z.coerce.number().min(0).optional().default(0),
+                notes: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least 1 item is required.' }),
 });
 
 export type StockTransferFormData = z.infer<typeof stockTransferFormSchema>;
@@ -486,37 +677,80 @@ export const inventoryStocktakeFormSchema = z.object({
     }),
     product_category_id: z.string().optional(),
     notes: z.string().optional(),
-    items: z.array(z.object({
-        product_id: z.string().min(1, { message: 'Product is required.' }),
-        unit_id: z.string().min(1, { message: 'Unit is required.' }),
-        system_quantity: z.coerce.number().min(0, { message: 'System quantity must be at least 0.' }),
-        counted_quantity: z.coerce.number().min(0, { message: 'Counted quantity must be at least 0.' }).optional().default(0),
-        notes: z.string().optional(),
-    })).min(1, { message: 'At least 1 item is required.' }),
+    items: z
+        .array(
+            z.object({
+                product_id: z
+                    .string()
+                    .min(1, { message: 'Product is required.' }),
+                unit_id: z.string().min(1, { message: 'Unit is required.' }),
+                system_quantity: z.coerce
+                    .number()
+                    .min(0, { message: 'System quantity must be at least 0.' }),
+                counted_quantity: z.coerce
+                    .number()
+                    .min(0, { message: 'Counted quantity must be at least 0.' })
+                    .optional()
+                    .default(0),
+                notes: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least 1 item is required.' }),
 });
 
-export type InventoryStocktakeFormData = z.infer<typeof inventoryStocktakeFormSchema>;
+export type InventoryStocktakeFormData = z.infer<
+    typeof inventoryStocktakeFormSchema
+>;
 
 export const stockAdjustmentFormSchema = z.object({
     adjustment_number: z.string().optional(),
     warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
     adjustment_date: z.date({ message: 'Adjustment date is required.' }),
-    adjustment_type: z.enum(['damage', 'expired', 'shrinkage', 'correction', 'stocktake_result', 'initial_stock', 'other'], {
-        message: 'Adjustment type is required.',
-    }),
+    adjustment_type: z.enum(
+        [
+            'damage',
+            'expired',
+            'shrinkage',
+            'correction',
+            'stocktake_result',
+            'initial_stock',
+            'other',
+        ],
+        {
+            message: 'Adjustment type is required.',
+        },
+    ),
     status: z.enum(['draft', 'pending_approval', 'approved', 'cancelled'], {
         message: 'Status is required.',
     }),
     inventory_stocktake_id: z.string().optional(),
     notes: z.string().optional(),
-    items: z.array(z.object({
-        product_id: z.string().min(1, { message: 'Product is required.' }),
-        unit_id: z.string().min(1, { message: 'Unit is required.' }),
-        quantity_before: z.coerce.number().min(0, { message: 'Quantity before must be at least 0.' }).optional().default(0),
-        quantity_adjusted: z.coerce.number().refine((n) => n !== 0, { message: 'Quantity adjusted cannot be 0.' }),
-        unit_cost: z.coerce.number().min(0, { message: 'Unit cost must be at least 0.' }).optional().default(0),
-        reason: z.string().optional(),
-    })).min(1, { message: 'At least 1 item is required.' }),
+    items: z
+        .array(
+            z.object({
+                product_id: z
+                    .string()
+                    .min(1, { message: 'Product is required.' }),
+                unit_id: z.string().min(1, { message: 'Unit is required.' }),
+                quantity_before: z.coerce
+                    .number()
+                    .min(0, { message: 'Quantity before must be at least 0.' })
+                    .optional()
+                    .default(0),
+                quantity_adjusted: z.coerce
+                    .number()
+                    .refine((n) => n !== 0, {
+                        message: 'Quantity adjusted cannot be 0.',
+                    }),
+                unit_cost: z.coerce
+                    .number()
+                    .min(0, { message: 'Unit cost must be at least 0.' })
+                    .optional()
+                    .default(0),
+                reason: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least 1 item is required.' }),
 });
 
 export type StockAdjustmentFormData = z.infer<typeof stockAdjustmentFormSchema>;

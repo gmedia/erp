@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -7,9 +6,15 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Eye, EyeOff, LockKeyhole, RefreshCw, LoaderCircle } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import axios from '@/lib/axios';
+import {
+    Eye,
+    EyeOff,
+    LoaderCircle,
+    LockKeyhole,
+    RefreshCw,
+} from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import AlertError from './alert-error';
 
@@ -89,7 +94,7 @@ export default function TwoFactorRecoveryCodes({
                         aria-controls="recovery-codes-section"
                     >
                         <RecoveryCodeIconComponent
-                            className="size-4 mr-2"
+                            className="mr-2 size-4"
                             aria-hidden="true"
                         />
                         {codesAreVisible ? 'Hide' : 'View'} Recovery Codes

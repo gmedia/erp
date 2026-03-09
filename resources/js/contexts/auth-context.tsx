@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from '@/lib/axios';
 import { type User } from '@/types/user';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface Employee {
     id: number;
@@ -49,15 +49,20 @@ const AuthContext = createContext<AuthContextType>({
     refreshAuth: async () => {},
 });
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+    children,
+}) => {
     const [user, setUser] = useState<User | null>(null);
     const [employee, setEmployee] = useState<Employee | null>(null);
     const [menus, setMenus] = useState<MenuItem[]>([]);
     const [companyName, setCompanyName] = useState<string>('Laravel');
     const [companyLogoUrl, setCompanyLogoUrl] = useState<string | null>(null);
-    const [translations, setTranslations] = useState<Record<string, string>>({});
+    const [translations, setTranslations] = useState<Record<string, string>>(
+        {},
+    );
     const [locale, setLocale] = useState<string>('en');
-    const [pendingApprovalsCount, setPendingApprovalsCount] = useState<number>(0);
+    const [pendingApprovalsCount, setPendingApprovalsCount] =
+        useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const refreshAuth = async () => {
@@ -124,7 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 isLoading,
                 login,
                 logout,
-                refreshAuth
+                refreshAuth,
             }}
         >
             {children}

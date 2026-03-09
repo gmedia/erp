@@ -1,6 +1,11 @@
 'use client';
 
-import { createActionsColumn, createDateColumn, createSelectColumn, createTextColumn } from '@/utils/columns';
+import {
+    createActionsColumn,
+    createDateColumn,
+    createSelectColumn,
+    createTextColumn,
+} from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
 
 export interface ProductCategory {
@@ -19,7 +24,13 @@ export const productCategoryColumns: ColumnDef<ProductCategory>[] = [
         label: 'Description',
         enableSorting: false,
     }),
-    createDateColumn<ProductCategory>({ accessorKey: 'created_at', label: 'Created At' }),
-    createDateColumn<ProductCategory>({ accessorKey: 'updated_at', label: 'Updated At' }),
+    createDateColumn<ProductCategory>({
+        accessorKey: 'created_at',
+        label: 'Created At',
+    }),
+    createDateColumn<ProductCategory>({
+        accessorKey: 'updated_at',
+        label: 'Updated At',
+    }),
     createActionsColumn<ProductCategory>(),
 ];

@@ -1,8 +1,8 @@
-import { Helmet } from 'react-helmet-async';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from '@/lib/axios';
 import { LoaderCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import InputError from '@/components/input-error';
@@ -34,14 +34,18 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
 
         try {
             const response = await axios.post('/api/reset-password', data);
-            toast.success(response.data.status || 'Password has been successfully reset.');
+            toast.success(
+                response.data.status || 'Password has been successfully reset.',
+            );
             navigate('/login', { replace: true });
         } catch (error: any) {
             if (error.response?.status === 422) {
                 const returnedErrors = error.response.data.errors || {};
                 const formattedErrors: Record<string, string> = {};
-                Object.keys(returnedErrors).forEach(key => {
-                    formattedErrors[key] = Array.isArray(returnedErrors[key]) ? returnedErrors[key][0] : returnedErrors[key];
+                Object.keys(returnedErrors).forEach((key) => {
+                    formattedErrors[key] = Array.isArray(returnedErrors[key])
+                        ? returnedErrors[key][0]
+                        : returnedErrors[key];
                 });
                 setErrors(formattedErrors);
             } else {
@@ -57,7 +61,11 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
             title="Reset password"
             description="Please enter your new password below"
         >
-            <Helmet><title>Reset password - {import.meta.env.VITE_APP_NAME || 'ERP'}</title></Helmet>
+            <Helmet>
+                <title>
+                    Reset password - {import.meta.env.VITE_APP_NAME || 'ERP'}
+                </title>
+            </Helmet>
 
             <form onSubmit={handleSubmit} className="grid gap-6">
                 <div className="grid gap-2">
@@ -71,10 +79,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         className="mt-1 block w-full"
                         readOnly
                     />
-                    <InputError
-                        message={errors.email}
-                        className="mt-2"
-                    />
+                    <InputError message={errors.email} className="mt-2" />
                 </div>
 
                 <div className="grid gap-2">
@@ -118,7 +123,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                     data-test="reset-password-button"
                 >
                     {processing && (
-                        <LoaderCircle className="h-4 w-4 mr-2 animate-spin" />
+                        <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Reset password
                 </Button>

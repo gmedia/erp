@@ -54,7 +54,9 @@ const renderParentSection = (entity?: AssetLocation | null) => (
     />
 );
 
-const getAssetLocationFormDefaults = (entity?: AssetLocation | null): AssetLocationFormData => {
+const getAssetLocationFormDefaults = (
+    entity?: AssetLocation | null,
+): AssetLocationFormData => {
     if (!entity) {
         return {
             code: '',
@@ -67,56 +69,62 @@ const getAssetLocationFormDefaults = (entity?: AssetLocation | null): AssetLocat
     return {
         code: entity.code,
         name: entity.name,
-        branch_id: typeof entity.branch === 'object' && entity.branch
-            ? String(entity.branch.id)
-            : String(entity.branch_id || ''),
-        parent_id: typeof entity.parent === 'object' && entity.parent
-            ? String(entity.parent.id)
-            : String(entity.parent_id || ''),
+        branch_id:
+            typeof entity.branch === 'object' && entity.branch
+                ? String(entity.branch.id)
+                : String(entity.branch_id || ''),
+        parent_id:
+            typeof entity.parent === 'object' && entity.parent
+                ? String(entity.parent.id)
+                : String(entity.parent_id || ''),
     };
 };
 
-export const AssetLocationForm = memo<AssetLocationFormProps>(function AssetLocationForm({
-    open,
-    onOpenChange,
-    entity,
-    onSubmit,
-    isLoading = false,
-}) {
-    const defaultValues = useMemo(
-        () => getAssetLocationFormDefaults(entity),
-        [entity],
-    );
+export const AssetLocationForm = memo<AssetLocationFormProps>(
+    function AssetLocationForm({
+        open,
+        onOpenChange,
+        entity,
+        onSubmit,
+        isLoading = false,
+    }) {
+        const defaultValues = useMemo(
+            () => getAssetLocationFormDefaults(entity),
+            [entity],
+        );
 
-    const form = useForm<AssetLocationFormData>({
-        resolver: zodResolver(assetLocationFormSchema),
-        defaultValues,
-    });
+        const form = useForm<AssetLocationFormData>({
+            resolver: zodResolver(assetLocationFormSchema),
+            defaultValues,
+        });
 
-    useEffect(() => {
-        form.reset(defaultValues);
-    }, [form, defaultValues]);
+        useEffect(() => {
+            form.reset(defaultValues);
+        }, [form, defaultValues]);
 
-    const handleSubmit = (data: AssetLocationFormData) => {
-        const submitData = {
-            ...data,
-            parent_id: data.parent_id || null,
+        const handleSubmit = (data: AssetLocationFormData) => {
+            const submitData = {
+                ...data,
+                parent_id: data.parent_id || null,
+            };
+            onSubmit(submitData as unknown as AssetLocationFormData);
         };
-        onSubmit(submitData as unknown as AssetLocationFormData);
-    };
 
-    return (
-        <EntityForm<AssetLocationFormData>
-            form={form}
-            open={open}
-            onOpenChange={onOpenChange}
-            title={entity ? 'Edit Asset Location' : 'Add New Asset Location'}
-            onSubmit={handleSubmit}
-            isLoading={isLoading}
-        >
-            {renderBasicInfoSection()}
-            {renderBranchSection(entity)}
-            {renderParentSection(entity)}
-        </EntityForm>
-    );
-});
+        return (
+            <EntityForm<AssetLocationFormData>
+                form={form}
+                open={open}
+                onOpenChange={onOpenChange}
+                title={
+                    entity ? 'Edit Asset Location' : 'Add New Asset Location'
+                }
+                onSubmit={handleSubmit}
+                isLoading={isLoading}
+            >
+                {renderBasicInfoSection()}
+                {renderBranchSection(entity)}
+                {renderParentSection(entity)}
+            </EntityForm>
+        );
+    },
+);

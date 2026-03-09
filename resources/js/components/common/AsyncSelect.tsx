@@ -40,7 +40,9 @@ export function AsyncSelect({
     const [search, setSearch] = React.useState('');
     const [items, setItems] = React.useState<any[]>([]);
     const [loading, setLoading] = React.useState(false);
-    const [selectedLabel, setSelectedLabel] = React.useState<string>(initialLabel || '');
+    const [selectedLabel, setSelectedLabel] = React.useState<string>(
+        initialLabel || '',
+    );
     const [initialLoadDone, setInitialLoadDone] = React.useState(false);
 
     const debouncedSearch = useDebounce(search, 300);
@@ -70,7 +72,14 @@ export function AsyncSelect({
     // Initial fetch to get label if value is provided and initialLabel is not present
     React.useEffect(() => {
         const fetchInitialLabel = async () => {
-            if (value && value !== 'null' && value !== 'undefined' && !selectedLabel && !initialLoadDone && !initialLabel) {
+            if (
+                value &&
+                value !== 'null' &&
+                value !== 'undefined' &&
+                !selectedLabel &&
+                !initialLoadDone &&
+                !initialLabel
+            ) {
                 try {
                     // Try to fetch specific item by ID
                     const [baseUrl] = url.split('?');
@@ -113,7 +122,8 @@ export function AsyncSelect({
 
     // Clear label if value is cleared or invalid
     React.useEffect(() => {
-        if (!value || value === 'null' || value === 'undefined') setSelectedLabel('');
+        if (!value || value === 'null' || value === 'undefined')
+            setSelectedLabel('');
     }, [value]);
 
     return (
@@ -125,12 +135,12 @@ export function AsyncSelect({
                     aria-label={label}
                     aria-expanded={open}
                     className={cn(
-                        'w-full justify-between font-normal overflow-hidden min-w-0',
+                        'w-full min-w-0 justify-between overflow-hidden font-normal',
                         !value && 'text-muted-foreground',
                         className,
                     )}
                 >
-                    <span className="truncate text-left flex-1">
+                    <span className="flex-1 truncate text-left">
                         {selectedLabel || placeholder}
                     </span>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

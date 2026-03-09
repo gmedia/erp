@@ -1,5 +1,6 @@
 'use client';
 
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     FormControl,
     FormField,
@@ -7,7 +8,6 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 
 interface CheckboxFieldProps {
@@ -30,7 +30,7 @@ export default function CheckboxField({
                 <FormItem
                     className={cn(
                         'flex flex-row items-start gap-4 space-y-0 rounded-lg border p-4 shadow-sm transition-all hover:bg-accent/50 has-[[data-state=checked]]:border-primary/50 has-[[data-state=checked]]:bg-primary/5',
-                        className
+                        className,
                     )}
                 >
                     <FormControl>

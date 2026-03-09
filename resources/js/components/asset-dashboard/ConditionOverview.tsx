@@ -1,8 +1,7 @@
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ConditionOverviewItem } from '../../hooks/useAssetDashboard';
 import { ClipboardCheck } from 'lucide-react';
+import { ConditionOverviewItem } from '../../hooks/useAssetDashboard';
 
 interface ConditionOverviewProps {
     data?: ConditionOverviewItem[];
@@ -12,7 +11,7 @@ interface ConditionOverviewProps {
 export function ConditionOverview({ data, isLoading }: ConditionOverviewProps) {
     if (isLoading) {
         return (
-            <Card className="flex flex-col h-full min-h-[300px]">
+            <Card className="flex h-full min-h-[300px] flex-col">
                 <CardHeader className="pb-2">
                     <CardTitle className="flex items-center space-x-2">
                         <Skeleton className="h-5 w-5 rounded-full" />
@@ -22,7 +21,10 @@ export function ConditionOverview({ data, isLoading }: ConditionOverviewProps) {
                 <CardContent className="flex-1">
                     <div className="flex flex-col space-y-4 pt-4">
                         {[...Array(3)].map((_, i) => (
-                            <div key={i} className="flex justify-between items-center">
+                            <div
+                                key={i}
+                                className="flex items-center justify-between"
+                            >
                                 <div className="flex items-center space-x-3">
                                     <Skeleton className="h-3 w-3 rounded-full" />
                                     <Skeleton className="h-4 w-24" />
@@ -38,7 +40,7 @@ export function ConditionOverview({ data, isLoading }: ConditionOverviewProps) {
 
     if (!data || data.length === 0) {
         return (
-            <Card className="flex flex-col h-full min-h-[300px]">
+            <Card className="flex h-full min-h-[300px] flex-col">
                 <CardHeader className="pb-2">
                     <CardTitle className="flex items-center space-x-2">
                         <ClipboardCheck className="h-5 w-5 text-muted-foreground" />
@@ -55,7 +57,7 @@ export function ConditionOverview({ data, isLoading }: ConditionOverviewProps) {
     const totalCount = data.reduce((sum, item) => sum + item.count, 0);
 
     return (
-        <Card className="flex flex-col h-full min-h-[300px]">
+        <Card className="flex h-full min-h-[300px] flex-col">
             <CardHeader className="pb-2">
                 <CardTitle className="flex items-center space-x-2">
                     <ClipboardCheck className="h-5 w-5 text-muted-foreground" />
@@ -65,33 +67,46 @@ export function ConditionOverview({ data, isLoading }: ConditionOverviewProps) {
             <CardContent className="flex-1">
                 <div className="flex flex-col space-y-5 pt-4">
                     {data.map((condition) => {
-                        const percentage = totalCount > 0 ? Math.round((condition.count / totalCount) * 100) : 0;
-                        
+                        const percentage =
+                            totalCount > 0
+                                ? Math.round(
+                                      (condition.count / totalCount) * 100,
+                                  )
+                                : 0;
+
                         return (
-                            <div key={condition.id} className="flex flex-col space-y-2">
-                                <div className="flex justify-between items-center">
+                            <div
+                                key={condition.id}
+                                className="flex flex-col space-y-2"
+                            >
+                                <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-2">
-                                        <div 
-                                            className="h-3 w-3 rounded-full flex-shrink-0" 
-                                            style={{ backgroundColor: condition.color }}
+                                        <div
+                                            className="h-3 w-3 flex-shrink-0 rounded-full"
+                                            style={{
+                                                backgroundColor:
+                                                    condition.color,
+                                            }}
                                         />
                                         <span className="text-sm font-medium text-foreground">
                                             {condition.name}
                                         </span>
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <span className="text-sm font-bold">{condition.count}</span>
-                                        <span className="text-xs text-muted-foreground w-8 text-right">
+                                        <span className="text-sm font-bold">
+                                            {condition.count}
+                                        </span>
+                                        <span className="w-8 text-right text-xs text-muted-foreground">
                                             {percentage}%
                                         </span>
                                     </div>
                                 </div>
-                                <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                                    <div 
-                                        className="h-full rounded-full transition-all duration-500 ease-in-out" 
-                                        style={{ 
+                                <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+                                    <div
+                                        className="h-full rounded-full transition-all duration-500 ease-in-out"
+                                        style={{
                                             width: `${percentage}%`,
-                                            backgroundColor: condition.color 
+                                            backgroundColor: condition.color,
                                         }}
                                     />
                                 </div>

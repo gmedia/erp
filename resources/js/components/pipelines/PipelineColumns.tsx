@@ -1,4 +1,4 @@
-import { ColumnDef } from '@tanstack/react-table';
+import { Badge } from '@/components/ui/badge';
 import { type Pipeline } from '@/types/entity';
 import {
     createActionsColumn,
@@ -6,7 +6,7 @@ import {
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
-import { Badge } from '@/components/ui/badge';
+import { ColumnDef } from '@tanstack/react-table';
 
 const renderStatusCell = ({ row }: { row: { original: Pipeline } }) => {
     const is_active = row.original.is_active;
@@ -27,7 +27,7 @@ export const pipelineColumns: ColumnDef<Pipeline>[] = [
         cell: ({ row }: { row: { original: Pipeline } }) => {
             const parts = row.original.entity_type.split('\\');
             return parts[parts.length - 1];
-        }
+        },
     },
     {
         accessorKey: 'version',
@@ -36,7 +36,8 @@ export const pipelineColumns: ColumnDef<Pipeline>[] = [
     {
         accessorKey: 'created_by',
         ...createSortingHeader('Creator'),
-        cell: ({ row }: { row: { original: Pipeline } }) => row.original.created_by?.name || 'System',
+        cell: ({ row }: { row: { original: Pipeline } }) =>
+            row.original.created_by?.name || 'System',
     },
     {
         accessorKey: 'is_active',

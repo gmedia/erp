@@ -1,7 +1,7 @@
-import { ColumnDef } from '@tanstack/react-table';
+import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
 import { createSortingHeader } from '@/utils/columns';
-import { Badge } from '@/components/ui/badge';
+import { ColumnDef } from '@tanstack/react-table';
 
 export interface MaintenanceCostReportItem {
     id: number;
@@ -22,7 +22,11 @@ export const maintenanceCostColumns: ColumnDef<MaintenanceCostReportItem>[] = [
     {
         accessorKey: 'asset_code',
         ...createSortingHeader('Asset Code'),
-        cell: ({ row }) => <div className="font-medium">{row.getValue('asset_code') || '-'}</div>,
+        cell: ({ row }) => (
+            <div className="font-medium">
+                {row.getValue('asset_code') || '-'}
+            </div>
+        ),
     },
     {
         accessorKey: 'asset_name',
@@ -44,7 +48,11 @@ export const maintenanceCostColumns: ColumnDef<MaintenanceCostReportItem>[] = [
     {
         accessorKey: 'maintenance_type',
         ...createSortingHeader('Type'),
-        cell: ({ row }) => <Badge variant="outline" className="capitalize">{(row.getValue('maintenance_type') as string).replace('_', ' ')}</Badge>,
+        cell: ({ row }) => (
+            <Badge variant="outline" className="capitalize">
+                {(row.getValue('maintenance_type') as string).replace('_', ' ')}
+            </Badge>
+        ),
     },
     {
         accessorKey: 'status',
@@ -59,7 +67,9 @@ export const maintenanceCostColumns: ColumnDef<MaintenanceCostReportItem>[] = [
         ...createSortingHeader('Scheduled At'),
         cell: ({ row }) => {
             const date = row.getValue('scheduled_at') as string;
-            return <div>{date ? new Date(date).toLocaleDateString() : '-'}</div>;
+            return (
+                <div>{date ? new Date(date).toLocaleDateString() : '-'}</div>
+            );
         },
     },
     {
@@ -67,7 +77,9 @@ export const maintenanceCostColumns: ColumnDef<MaintenanceCostReportItem>[] = [
         ...createSortingHeader('Performed At'),
         cell: ({ row }) => {
             const date = row.getValue('performed_at') as string;
-            return <div>{date ? new Date(date).toLocaleDateString() : '-'}</div>;
+            return (
+                <div>{date ? new Date(date).toLocaleDateString() : '-'}</div>
+            );
         },
     },
     {
@@ -78,6 +90,10 @@ export const maintenanceCostColumns: ColumnDef<MaintenanceCostReportItem>[] = [
     {
         accessorKey: 'cost',
         ...createSortingHeader('Cost'),
-        cell: ({ row }) => <div className="text-right">{formatCurrency(row.getValue('cost'))}</div>,
+        cell: ({ row }) => (
+            <div className="text-right">
+                {formatCurrency(row.getValue('cost'))}
+            </div>
+        ),
     },
 ];

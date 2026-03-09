@@ -8,7 +8,11 @@ import {
 
 export function createMaintenanceCostReportFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search code, name, notes...'),
+        createTextFilterField(
+            'search',
+            'Search',
+            'Search code, name, notes...',
+        ),
         createAsyncSelectFilterField(
             'asset_category_id',
             'Category',
@@ -36,7 +40,7 @@ export function createMaintenanceCostReportFilterFields(): FieldDescriptor[] {
                 { value: 'calibration', label: 'Calibration' },
                 { value: 'other', label: 'Other' },
             ],
-            'Select type'
+            'Select type',
         ),
         createSelectFilterField(
             'status',
@@ -47,7 +51,7 @@ export function createMaintenanceCostReportFilterFields(): FieldDescriptor[] {
                 { value: 'completed', label: 'Completed' },
                 { value: 'cancelled', label: 'Cancelled' },
             ],
-            'Select status'
+            'Select status',
         ),
         {
             name: 'start_date',

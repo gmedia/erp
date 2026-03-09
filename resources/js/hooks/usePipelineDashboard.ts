@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 export interface PipelineDashboardFilters {
     pipeline_id?: number | string;
@@ -35,30 +35,42 @@ export interface PipelineDashboardData {
     stale_entities: StaleEntity[];
 }
 
-export function usePipelineDashboard(initialFilters?: PipelineDashboardFilters) {
-    const [filters, setFilters] = useState<PipelineDashboardFilters>(initialFilters || { stale_days: 7 });
+export function usePipelineDashboard(
+    initialFilters?: PipelineDashboardFilters,
+) {
+    const [filters, setFilters] = useState<PipelineDashboardFilters>(
+        initialFilters || { stale_days: 7 },
+    );
 
     const fetchDashboardData = async (): Promise<PipelineDashboardData> => {
         const params = new URLSearchParams();
-        
-        if (filters.pipeline_id) params.append('pipeline_id', String(filters.pipeline_id));
-        if (filters.entity_type) params.append('entity_type', filters.entity_type);
-        if (filters.stale_days) params.append('stale_days', String(filters.stale_days));
 
-        const response = await axios.get(`/api/pipeline-dashboard/data?${params.toString()}`);
+        if (filters.pipeline_id)
+            params.append('pipeline_id', String(filters.pipeline_id));
+        if (filters.entity_type)
+            params.append('entity_type', filters.entity_type);
+        if (filters.stale_days)
+            params.append('stale_days', String(filters.stale_days));
+
+        const response = await axios.get(
+            `/api/pipeline-dashboard/data?${params.toString()}`,
+        );
         return response.data;
     };
 
     const query = useQuery({
         queryKey: ['pipeline-dashboard', filters],
         queryFn: fetchDashboardData,
-        staleTime: 60000, 
+        staleTime: 60000,
     });
 
-    const handleFilterChange = (key: keyof PipelineDashboardFilters, value: string | number | undefined) => {
+    const handleFilterChange = (
+        key: keyof PipelineDashboardFilters,
+        value: string | number | undefined,
+    ) => {
         setFilters((prev) => ({
             ...prev,
-            [key]: value
+            [key]: value,
         }));
     };
 

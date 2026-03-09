@@ -12,8 +12,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { formatDate } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
+import { formatDate } from '@/lib/utils';
 
 interface SimpleEntity {
     id: number;

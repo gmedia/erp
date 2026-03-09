@@ -16,4 +16,3 @@ export const formatCurrency = (value: number) =>
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     }).format(value);
-

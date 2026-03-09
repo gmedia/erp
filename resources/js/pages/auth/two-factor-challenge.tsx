@@ -1,10 +1,10 @@
-import { Helmet } from 'react-helmet-async';
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from '@/lib/axios';
-import { LoaderCircle } from 'lucide-react';
-import { toast } from 'sonner';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
+import { LoaderCircle } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -66,17 +66,20 @@ export default function TwoFactorChallenge() {
 
         try {
             await axios.post('/two-factor-challenge', data);
-            
+
             // Re-fetch user to get the latest employee/permissions loaded and redirect
             navigate('/dashboard', { replace: true });
-            
         } catch (error: any) {
             if (error.response?.status === 422) {
                 setErrors(error.response.data.errors || {});
                 if (!showRecoveryInput) {
                     setCode('');
                 } else {
-                    (document.querySelector('input[name="recovery_code"]') as HTMLInputElement).value = '';
+                    (
+                        document.querySelector(
+                            'input[name="recovery_code"]',
+                        ) as HTMLInputElement
+                    ).value = '';
                 }
             } else {
                 toast.error('An error occurred. Please try again.');
@@ -91,7 +94,12 @@ export default function TwoFactorChallenge() {
             title={authConfigContent.title}
             description={authConfigContent.description}
         >
-            <Helmet><title>Two-Factor Authentication - {import.meta.env.VITE_APP_NAME || 'ERP'}</title></Helmet>
+            <Helmet>
+                <title>
+                    Two-Factor Authentication -{' '}
+                    {import.meta.env.VITE_APP_NAME || 'ERP'}
+                </title>
+            </Helmet>
 
             <div className="space-y-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -104,9 +112,7 @@ export default function TwoFactorChallenge() {
                                 autoFocus={showRecoveryInput}
                                 required
                             />
-                            <InputError
-                                message={errors.recovery_code}
-                            />
+                            <InputError message={errors.recovery_code} />
                         </>
                     ) : (
                         <div className="flex flex-col items-center justify-center space-y-3 text-center">
@@ -142,7 +148,7 @@ export default function TwoFactorChallenge() {
                         disabled={processing}
                     >
                         {processing && (
-                            <LoaderCircle className="h-4 w-4 mr-2 animate-spin" />
+                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
                         )}
                         Continue
                     </Button>

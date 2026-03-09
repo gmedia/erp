@@ -9,7 +9,12 @@ import { Input } from '@/components/ui/input';
 
 export const createAssetMaintenanceFilterFields = (): FieldDescriptor[] => [
     createTextFilterField('search', 'Search', 'Search maintenances...'),
-    createAsyncSelectFilterField('asset_id', 'Asset', '/api/assets', 'Filter by asset'),
+    createAsyncSelectFilterField(
+        'asset_id',
+        'Asset',
+        '/api/assets',
+        'Filter by asset',
+    ),
     createSelectFilterField(
         'maintenance_type',
         'Type',
@@ -32,7 +37,12 @@ export const createAssetMaintenanceFilterFields = (): FieldDescriptor[] => [
         ],
         'Filter by status',
     ),
-    createAsyncSelectFilterField('supplier_id', 'Supplier', '/api/suppliers', 'Filter by supplier'),
+    createAsyncSelectFilterField(
+        'supplier_id',
+        'Supplier',
+        '/api/suppliers',
+        'Filter by supplier',
+    ),
     {
         name: 'scheduled_from',
         label: 'Scheduled From',

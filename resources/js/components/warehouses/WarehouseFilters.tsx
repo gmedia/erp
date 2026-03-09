@@ -6,11 +6,7 @@ import {
 
 export function createWarehouseFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search warehouses...',
-        ),
+        createTextFilterField('search', 'Search', 'Search warehouses...'),
         createAsyncSelectFilterField(
             'branch_id',
             'Branch',
@@ -19,4 +15,3 @@ export function createWarehouseFilterFields(): FieldDescriptor[] {
         ),
     ];
 }
-

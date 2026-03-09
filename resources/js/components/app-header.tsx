@@ -30,20 +30,12 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 
+import { useAuth } from '@/contexts/auth-context';
 import { type BreadcrumbItem, type NavItem } from '@/types';
+import { IdCard, LayoutGrid, Menu, Search, Users } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-    BookOpen,
-    Folder,
-    IdCard,
-    LayoutGrid,
-    Menu,
-    Search,
-    Users,
-} from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
-import { useAuth } from '@/contexts/auth-context';
 
 const mainNavItems: NavItem[] = [
     {
@@ -172,7 +164,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             to={item.href}
                                             className={cn(
                                                 navigationMenuTriggerStyle(),
-                                                location.pathname === item.href &&
+                                                location.pathname ===
+                                                    item.href &&
                                                     activeItemStyles,
                                                 'h-9 cursor-pointer px-3',
                                             )}

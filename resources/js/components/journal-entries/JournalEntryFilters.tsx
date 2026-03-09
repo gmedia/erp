@@ -15,7 +15,12 @@ export function createJournalEntryFilterFields(): FieldDescriptor[] {
 
     return [
         createTextFilterField('search', 'Search', 'Search entry...'),
-        createSelectFilterField('status', 'Status', statusOptions, 'Select status'),
+        createSelectFilterField(
+            'status',
+            'Status',
+            statusOptions,
+            'Select status',
+        ),
         {
             name: 'start_date',
             label: 'Start Date',

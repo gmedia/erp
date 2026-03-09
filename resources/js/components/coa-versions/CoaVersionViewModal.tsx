@@ -1,7 +1,6 @@
 'use client';
 
-import * as React from 'react';
-import { memo } from 'react';
+import { ViewField } from '@/components/common/ViewField';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -11,10 +10,10 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { ViewField } from '@/components/common/ViewField';
-import { formatDate } from '@/lib/utils';
 import { useTranslation } from '@/contexts/i18n-context';
+import { formatDate } from '@/lib/utils';
 import { type CoaVersion } from '@/types/coa-version';
+import { memo } from 'react';
 
 interface CoaVersionViewModalProps {
     open: boolean;
@@ -39,8 +38,14 @@ export const CoaVersionViewModal = memo<CoaVersionViewModalProps>(
 
                     <div className="space-y-4 py-4">
                         <ViewField label="Name" value={item.name} />
-                        <ViewField label="Fiscal Year" value={item.fiscal_year?.name || '-'} />
-                        <ViewField label="Status" value={item.status.toUpperCase()} />
+                        <ViewField
+                            label="Fiscal Year"
+                            value={item.fiscal_year?.name || '-'}
+                        />
+                        <ViewField
+                            label="Status"
+                            value={item.status.toUpperCase()}
+                        />
                         <ViewField
                             label="Created At"
                             value={formatDate(item.created_at)}

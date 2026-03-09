@@ -15,8 +15,8 @@ import {
 import { formatDate } from '@/lib/utils';
 import { formatRupiah } from '@/utils/formatters';
 
-import { Employee } from '@/types/entity';
 import { useTranslation } from '@/contexts/i18n-context';
+import { Employee } from '@/types/entity';
 
 interface EmployeeViewModalProps {
     open: boolean;
@@ -44,9 +44,7 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
                 : item.position;
 
         const branchName =
-            typeof item.branch === 'object'
-                ? item.branch.name
-                : item.branch;
+            typeof item.branch === 'object' ? item.branch.name : item.branch;
 
         return (
             <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -90,7 +88,9 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
                         {item.termination_date && (
                             <ViewField
                                 label="Termination Date"
-                                value={formatDate(item.termination_date as string)}
+                                value={formatDate(
+                                    item.termination_date as string,
+                                )}
                             />
                         )}
                     </div>

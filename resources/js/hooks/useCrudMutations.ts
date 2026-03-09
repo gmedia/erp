@@ -1,8 +1,8 @@
 'use client';
 
+import axios from '@/lib/axios';
 import { handleApiError, type ApiError } from '@/utils/errorHandling';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from '@/lib/axios';
 import { toast } from 'sonner';
 
 export interface UseCrudMutationsOptions {
@@ -17,9 +17,15 @@ export interface UseCrudMutationsOptions {
 export interface UseCrudMutationsResult<Entity, FormData> {
     createMutation: ReturnType<typeof useMutation<Entity, Error, FormData>>;
     updateMutation: ReturnType<
-        typeof useMutation<Entity, Error, { id: string | number; data: FormData }>
+        typeof useMutation<
+            Entity,
+            Error,
+            { id: string | number; data: FormData }
+        >
     >;
-    deleteMutation: ReturnType<typeof useMutation<void, Error, string | number>>;
+    deleteMutation: ReturnType<
+        typeof useMutation<void, Error, string | number>
+    >;
 }
 
 export function useCrudMutations<Entity, FormData>({

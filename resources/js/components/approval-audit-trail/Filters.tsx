@@ -1,10 +1,23 @@
 import { FilterDatePicker } from '@/components/common/FilterDatePicker';
-import { createAsyncSelectFilterField, createTextFilterField, createSelectFilterField, type FieldDescriptor } from '@/components/common/filters';
+import {
+    createAsyncSelectFilterField,
+    createSelectFilterField,
+    createTextFilterField,
+    type FieldDescriptor,
+} from '@/components/common/filters';
 
 export function createApprovalAuditTrailFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search IP, Document ID, user...'),
-        createTextFilterField('approvable_type', 'Document Type', 'e.g. PurchaseRequest'),
+        createTextFilterField(
+            'search',
+            'Search',
+            'Search IP, Document ID, user...',
+        ),
+        createTextFilterField(
+            'approvable_type',
+            'Document Type',
+            'e.g. PurchaseRequest',
+        ),
         createSelectFilterField(
             'event',
             'Event',
@@ -20,7 +33,7 @@ export function createApprovalAuditTrailFilterFields(): FieldDescriptor[] {
                 { value: 'resubmitted', label: 'Resubmitted' },
                 { value: 'completed', label: 'Completed' },
             ],
-            'Select Event'
+            'Select Event',
         ),
         createAsyncSelectFilterField(
             'actor_user_id',

@@ -7,7 +7,6 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { cn } from '@/lib/utils';
 import { type ReactNode } from 'react';
 import { AsyncSelect } from './AsyncSelect';
 
@@ -42,7 +41,9 @@ export default function AsyncSelectField({
                     {label && <FormLabel>{label}</FormLabel>}
                     <FormControl>
                         <AsyncSelect
-                            value={field.value ? String(field.value) : undefined}
+                            value={
+                                field.value ? String(field.value) : undefined
+                            }
                             onValueChange={field.onChange}
                             url={url}
                             placeholder={placeholder}

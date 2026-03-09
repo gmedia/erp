@@ -1,11 +1,11 @@
 'use client';
 
-import { JournalEntry } from '@/types/journal-entry';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
-import { useEffect, useMemo, useState } from 'react';
 import axios from '@/lib/axios';
-import { toast } from 'sonner';
+import { JournalEntry } from '@/types/journal-entry';
 import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 type CheckboxCheckedState = boolean | 'indeterminate';
 
@@ -13,7 +13,9 @@ export function usePostingJournal() {
     const queryClient = useQueryClient();
 
     const [pagination, setPagination] = useState({ page: 1, per_page: 25 });
-    const [filters, setFilters] = useState<Record<string, string | undefined>>({});
+    const [filters, setFilters] = useState<Record<string, string | undefined>>(
+        {},
+    );
     const [searchQuery, setSearchQuery] = useState('');
 
     const [selectedIds, setSelectedIds] = useState<number[]>([]);

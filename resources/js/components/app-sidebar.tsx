@@ -13,16 +13,15 @@ import {
 import { useTranslation } from '@/contexts/i18n-context';
 import { getIcon } from '@/lib/icon-map';
 
-import { type MenuItem, type NavItem } from '@/types';
-import { Link } from 'react-router-dom';
-import { BookOpen, Folder } from 'lucide-react';
-import AppLogo from './app-logo';
 import { useAuth } from '@/contexts/auth-context';
+import { type NavItem } from '@/types';
+import { Link } from 'react-router-dom';
+import AppLogo from './app-logo';
 
 export function AppSidebar() {
     const { t } = useTranslation();
     const { menus } = useAuth();
-    
+
     const mainNavItems: NavItem[] = menus.map((menu) => ({
         title: menu.display_name,
         href: menu.url ?? '#',

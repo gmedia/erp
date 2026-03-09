@@ -1,19 +1,23 @@
 'use client';
 
-import { Helmet } from 'react-helmet-async';
-import AppLayout from '@/layouts/app-layout';
 import { DataTable } from '@/components/common/DataTableCore';
+import {
+    createPipelineAuditTrailColumns,
+    PipelineAuditTrailItem,
+} from '@/components/pipeline-audit-trail/Columns';
+import { DetailModal } from '@/components/pipeline-audit-trail/DetailModal';
+import { createPipelineAuditTrailFilterFields } from '@/components/pipeline-audit-trail/Filters';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
-import { createPipelineAuditTrailColumns, PipelineAuditTrailItem } from '@/components/pipeline-audit-trail/Columns';
-import { createPipelineAuditTrailFilterFields } from '@/components/pipeline-audit-trail/Filters';
-import { DetailModal } from '@/components/pipeline-audit-trail/DetailModal';
+import AppLayout from '@/layouts/app-layout';
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 export default function PipelineAuditTrail() {
     const filterFields = createPipelineAuditTrailFilterFields();
-    
-    const [selectedItem, setSelectedItem] = useState<PipelineAuditTrailItem | null>(null);
+
+    const [selectedItem, setSelectedItem] =
+        useState<PipelineAuditTrailItem | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
     const handleViewDetail = (item: PipelineAuditTrailItem) => {
@@ -21,7 +25,9 @@ export default function PipelineAuditTrail() {
         setIsDetailModalOpen(true);
     };
 
-    const columns = createPipelineAuditTrailColumns({ onViewDetail: handleViewDetail });
+    const columns = createPipelineAuditTrailColumns({
+        onViewDetail: handleViewDetail,
+    });
 
     const {
         filters,
@@ -52,8 +58,18 @@ export default function PipelineAuditTrail() {
 
     return (
         <>
-            <Helmet><title>Pipeline Audit Trail</title></Helmet>
-            <AppLayout breadcrumbs={[{ title: 'Admin', href: '#' }, { title: 'Pipeline Audit Trail', href: '/pipeline-audit-trail' }]}>
+            <Helmet>
+                <title>Pipeline Audit Trail</title>
+            </Helmet>
+            <AppLayout
+                breadcrumbs={[
+                    { title: 'Admin', href: '#' },
+                    {
+                        title: 'Pipeline Audit Trail',
+                        href: '/pipeline-audit-trail',
+                    },
+                ]}
+            >
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                     <div className="rounded-lg bg-white">
                         <DataTable
@@ -68,7 +84,9 @@ export default function PipelineAuditTrail() {
                                 to: meta.to ?? 0,
                             }}
                             onPageChange={handlePageChange}
-                            onPageSizeChange={(per_page) => handlePageSizeChange(per_page)}
+                            onPageSizeChange={(per_page) =>
+                                handlePageSizeChange(per_page)
+                            }
                             onSearchChange={handleSearchChange}
                             isLoading={isLoading}
                             filterValue={filters.search}
@@ -82,7 +100,7 @@ export default function PipelineAuditTrail() {
                     </div>
                 </div>
 
-                <DetailModal 
+                <DetailModal
                     item={selectedItem}
                     open={isDetailModalOpen}
                     onOpenChange={setIsDetailModalOpen}

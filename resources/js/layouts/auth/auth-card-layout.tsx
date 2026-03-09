@@ -1,5 +1,3 @@
-import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
 import AppLogoIcon from '@/components/app-logo-icon';
 import {
     Card,
@@ -9,6 +7,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { type PropsWithChildren } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function AuthCardLayout({
     children,

@@ -1,9 +1,8 @@
 'use client';
 
-import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
+import { GenericActions } from '@/components/common/ActionsDropdown';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { AssetStocktake } from '@/types/asset-stocktake';
-import { ColumnDef } from '@tanstack/react-table';
 import {
     createBadgeColumn,
     createDateColumn,
@@ -11,28 +10,40 @@ import {
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
-import { GenericActions } from '@/components/common/ActionsDropdown';
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { ColumnDef } from '@tanstack/react-table';
+import { Link } from 'react-router-dom';
 
 export const assetStocktakeColumns: ColumnDef<AssetStocktake>[] = [
     createSelectColumn<AssetStocktake>(),
-    createTextColumn<AssetStocktake>({ accessorKey: 'reference', label: 'Reference' }),
+    createTextColumn<AssetStocktake>({
+        accessorKey: 'reference',
+        label: 'Reference',
+    }),
     {
         id: 'branch',
         accessorFn: (row) => row.branch?.name ?? '',
         ...createSortingHeader('Branch'),
         cell: ({ row }) => row.original.branch?.name || '-',
     },
-    createDateColumn<AssetStocktake>({ accessorKey: 'planned_at', label: 'Planned Date' }),
-    createDateColumn<AssetStocktake>({ accessorKey: 'performed_at', label: 'Performed Date' }),
+    createDateColumn<AssetStocktake>({
+        accessorKey: 'planned_at',
+        label: 'Planned Date',
+    }),
+    createDateColumn<AssetStocktake>({
+        accessorKey: 'performed_at',
+        label: 'Performed Date',
+    }),
     createBadgeColumn<AssetStocktake>({
         accessorKey: 'status',
         label: 'Status',
         colorMap: {
             draft: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100',
-            in_progress: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-            completed: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-            cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+            in_progress:
+                'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+            completed:
+                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+            cancelled:
+                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
         },
     }),
     {
@@ -55,10 +66,13 @@ export const assetStocktakeColumns: ColumnDef<AssetStocktake>[] = [
                     onDelete={meta?.onDelete}
                     extraItems={[
                         <DropdownMenuItem key="perform" asChild>
-                            <Link to={`/asset-stocktakes/${item.ulid}/perform`} className="w-full">
+                            <Link
+                                to={`/asset-stocktakes/${item.ulid}/perform`}
+                                className="w-full"
+                            >
                                 Perform
                             </Link>
-                        </DropdownMenuItem>
+                        </DropdownMenuItem>,
                     ]}
                 />
             );

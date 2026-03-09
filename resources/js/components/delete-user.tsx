@@ -12,8 +12,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useRef, useState } from 'react';
 import axios from '@/lib/axios';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function DeleteUser() {
@@ -88,10 +88,7 @@ export default function DeleteUser() {
 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid gap-2">
-                                <Label
-                                    htmlFor="password"
-                                    className="sr-only"
-                                >
+                                <Label htmlFor="password" className="sr-only">
                                     Password
                                 </Label>
 

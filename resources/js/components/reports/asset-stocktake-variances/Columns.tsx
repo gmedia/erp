@@ -1,6 +1,6 @@
-import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { createSortingHeader } from '@/utils/columns';
+import { ColumnDef } from '@tanstack/react-table';
 
 export interface AssetStocktakeVarianceItem {
     id: number;
@@ -28,7 +28,11 @@ export const varianceColumns: ColumnDef<AssetStocktakeVarianceItem>[] = [
     {
         accessorKey: 'stocktake_reference',
         ...createSortingHeader('Stocktake Ref'),
-        cell: ({ row }) => <div className="font-medium">{row.getValue('stocktake_reference') || '-'}</div>,
+        cell: ({ row }) => (
+            <div className="font-medium">
+                {row.getValue('stocktake_reference') || '-'}
+            </div>
+        ),
     },
     {
         accessorKey: 'asset_code',
@@ -50,7 +54,9 @@ export const varianceColumns: ColumnDef<AssetStocktakeVarianceItem>[] = [
         accessorKey: 'expected_location_name',
         id: 'expected_location',
         ...createSortingHeader('Expected Location'),
-        cell: ({ row }) => <div>{row.getValue('expected_location') || '-'}</div>,
+        cell: ({ row }) => (
+            <div>{row.getValue('expected_location') || '-'}</div>
+        ),
     },
     {
         accessorKey: 'found_branch_name',
@@ -69,11 +75,12 @@ export const varianceColumns: ColumnDef<AssetStocktakeVarianceItem>[] = [
         ...createSortingHeader('Result'),
         cell: ({ row }) => {
             const val = (row.getValue('result') as string)?.toLowerCase();
-            let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'default';
+            let variant: 'default' | 'secondary' | 'destructive' | 'outline' =
+                'default';
             if (val === 'damaged') variant = 'destructive';
             if (val === 'missing') variant = 'destructive';
             if (val === 'moved') variant = 'secondary';
-            
+
             return <Badge variant={variant}>{val?.toUpperCase() || '-'}</Badge>;
         },
     },

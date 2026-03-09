@@ -1,17 +1,15 @@
 'use client';
 
-import { Helmet } from 'react-helmet-async';
 import { DataTable } from '@/components/common/DataTableCore';
-import {
-    createInventoryValuationFilterFields,
-} from '@/components/reports/inventory-valuation/Filters';
 import {
     inventoryValuationColumns,
     type InventoryValuationItem,
 } from '@/components/reports/inventory-valuation/Columns';
+import { createInventoryValuationFilterFields } from '@/components/reports/inventory-valuation/Filters';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import AppLayout from '@/layouts/app-layout';
+import { Helmet } from 'react-helmet-async';
 
 export default function InventoryValuationReportPage() {
     const filterFields = createInventoryValuationFilterFields();
@@ -44,11 +42,16 @@ export default function InventoryValuationReportPage() {
 
     return (
         <>
-            <Helmet><title>Inventory Valuation Report</title></Helmet>
+            <Helmet>
+                <title>Inventory Valuation Report</title>
+            </Helmet>
             <AppLayout
                 breadcrumbs={[
                     { title: 'Reports', href: '#' },
-                    { title: 'Inventory Valuation', href: '/reports/inventory-valuation' },
+                    {
+                        title: 'Inventory Valuation',
+                        href: '/reports/inventory-valuation',
+                    },
                 ]}
             >
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">

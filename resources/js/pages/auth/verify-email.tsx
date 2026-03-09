@@ -1,15 +1,19 @@
-import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useAuth } from '@/contexts/auth-context';
 import axios from '@/lib/axios';
 import { LoaderCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useAuth } from '@/contexts/auth-context';
 
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
 
-export default function VerifyEmail({ status: initialStatus }: { status?: string }) {
+export default function VerifyEmail({
+    status: initialStatus,
+}: {
+    status?: string;
+}) {
     const { logout } = useAuth();
     const navigate = useNavigate();
     const [status, setStatus] = useState(initialStatus);
@@ -46,7 +50,12 @@ export default function VerifyEmail({ status: initialStatus }: { status?: string
             title="Verify email"
             description="Please verify your email address by clicking on the link we just emailed to you."
         >
-            <Helmet><title>Email verification - {import.meta.env.VITE_APP_NAME || 'ERP'}</title></Helmet>
+            <Helmet>
+                <title>
+                    Email verification -{' '}
+                    {import.meta.env.VITE_APP_NAME || 'ERP'}
+                </title>
+            </Helmet>
 
             {status === 'verification-link-sent' && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">
@@ -58,7 +67,7 @@ export default function VerifyEmail({ status: initialStatus }: { status?: string
             <form onSubmit={handleResend} className="space-y-6 text-center">
                 <Button type="submit" disabled={processing} variant="secondary">
                     {processing && (
-                        <LoaderCircle className="h-4 w-4 mr-2 animate-spin" />
+                        <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Resend verification email
                 </Button>

@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { ViewField } from '@/components/common/ViewField';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,9 +9,10 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTranslation } from '@/contexts/i18n-context';
 import { type ApprovalFlow } from '@/types/entity';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { memo } from 'react';
 
 interface ApprovalFlowViewModalProps {
     open: boolean;
@@ -27,7 +27,7 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
 
         return (
             <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-                <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
+                <DialogContent className="flex max-h-[90vh] max-w-3xl flex-col">
                     <DialogHeader>
                         <DialogTitle>View Approval Flow</DialogTitle>
                         <DialogDescription>
@@ -41,13 +41,18 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
                             <div className="grid grid-cols-2 gap-4">
                                 <ViewField label="Code" value={item.code} />
                                 <ViewField label="Name" value={item.name} />
-                                <ViewField label="Approvable Type" value={item.approvable_type} />
+                                <ViewField
+                                    label="Approvable Type"
+                                    value={item.approvable_type}
+                                />
                                 <ViewField
                                     label="Created By"
                                     value={item.creator?.name || 'System'}
                                 />
                                 <div className="flex flex-col">
-                                    <span className="text-sm font-semibold text-muted-foreground mb-1">Status</span>
+                                    <span className="mb-1 text-sm font-semibold text-muted-foreground">
+                                        Status
+                                    </span>
                                     <div>
                                         <Badge
                                             variant={
@@ -56,7 +61,9 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
                                                     : 'secondary'
                                             }
                                         >
-                                            {item.is_active ? 'Active' : 'Inactive'}
+                                            {item.is_active
+                                                ? 'Active'
+                                                : 'Inactive'}
                                         </Badge>
                                     </div>
                                 </div>
@@ -64,44 +71,131 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
 
                             {/* Details Section */}
                             {item.description && (
-                                <ViewField label="Description" value={item.description} />
+                                <ViewField
+                                    label="Description"
+                                    value={item.description}
+                                />
                             )}
 
                             {item.conditions && (
                                 <div>
-                                    <span className="font-semibold block text-muted-foreground text-sm">Conditions</span>
-                                    <pre className="bg-muted p-3 rounded-md mt-1 text-sm overflow-x-auto whitespace-pre-wrap text-foreground">
+                                    <span className="block text-sm font-semibold text-muted-foreground">
+                                        Conditions
+                                    </span>
+                                    <pre className="mt-1 overflow-x-auto rounded-md bg-muted p-3 text-sm whitespace-pre-wrap text-foreground">
                                         {typeof item.conditions === 'string'
                                             ? item.conditions
-                                            : JSON.stringify(item.conditions, null, 2)}
+                                            : JSON.stringify(
+                                                  item.conditions,
+                                                  null,
+                                                  2,
+                                              )}
                                     </pre>
                                 </div>
                             )}
 
                             {/* Steps Section */}
                             <div>
-                                <span className="font-semibold block text-muted-foreground text-sm mb-2">Steps</span>
+                                <span className="mb-2 block text-sm font-semibold text-muted-foreground">
+                                    Steps
+                                </span>
                                 <div className="space-y-3">
                                     {item.steps?.map((step) => (
-                                        <div key={step.id || step.step_order} className="border p-4 rounded-md shadow-sm bg-card">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <span className="font-medium">Step {step.step_order}: {step.name}</span>
-                                                <Badge variant="outline">{step.required_action.toUpperCase()}</Badge>
+                                        <div
+                                            key={step.id || step.step_order}
+                                            className="rounded-md border bg-card p-4 shadow-sm"
+                                        >
+                                            <div className="mb-2 flex items-center justify-between">
+                                                <span className="font-medium">
+                                                    Step {step.step_order}:{' '}
+                                                    {step.name}
+                                                </span>
+                                                <Badge variant="outline">
+                                                    {step.required_action.toUpperCase()}
+                                                </Badge>
                                             </div>
                                             <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-                                                <div>Approver Type: <span className="font-medium text-foreground capitalize">{step.approver_type.replace('_', ' ')}</span></div>
-                                                {step.approver_type === 'user' && <div>User: <span className="font-medium text-foreground">{step.user?.name || `ID: ${step.approver_user_id}`}</span></div>}
-                                                {step.approver_type === 'department_head' && <div>Dept: <span className="font-medium text-foreground">{step.department?.name || `ID: ${step.approver_department_id}`}</span></div>}
-                                                {step.approver_type === 'role' && <div>Role ID: <span className="font-medium text-foreground">{step.approver_role_id}</span></div>}
-                                                
-                                                {step.auto_approve_after_hours && <div>Auto Approve: <span className="font-medium text-foreground">{step.auto_approve_after_hours}h</span></div>}
-                                                {step.escalate_after_hours && <div>Escalate After: <span className="font-medium text-foreground">{step.escalate_after_hours}h</span></div>}
-                                                <div>Can Reject: <span className="font-medium text-foreground">{step.can_reject ? 'Yes' : 'No'}</span></div>
+                                                <div>
+                                                    Approver Type:{' '}
+                                                    <span className="font-medium text-foreground capitalize">
+                                                        {step.approver_type.replace(
+                                                            '_',
+                                                            ' ',
+                                                        )}
+                                                    </span>
+                                                </div>
+                                                {step.approver_type ===
+                                                    'user' && (
+                                                    <div>
+                                                        User:{' '}
+                                                        <span className="font-medium text-foreground">
+                                                            {step.user?.name ||
+                                                                `ID: ${step.approver_user_id}`}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                {step.approver_type ===
+                                                    'department_head' && (
+                                                    <div>
+                                                        Dept:{' '}
+                                                        <span className="font-medium text-foreground">
+                                                            {step.department
+                                                                ?.name ||
+                                                                `ID: ${step.approver_department_id}`}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                {step.approver_type ===
+                                                    'role' && (
+                                                    <div>
+                                                        Role ID:{' '}
+                                                        <span className="font-medium text-foreground">
+                                                            {
+                                                                step.approver_role_id
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                )}
+
+                                                {step.auto_approve_after_hours && (
+                                                    <div>
+                                                        Auto Approve:{' '}
+                                                        <span className="font-medium text-foreground">
+                                                            {
+                                                                step.auto_approve_after_hours
+                                                            }
+                                                            h
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                {step.escalate_after_hours && (
+                                                    <div>
+                                                        Escalate After:{' '}
+                                                        <span className="font-medium text-foreground">
+                                                            {
+                                                                step.escalate_after_hours
+                                                            }
+                                                            h
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    Can Reject:{' '}
+                                                    <span className="font-medium text-foreground">
+                                                        {step.can_reject
+                                                            ? 'Yes'
+                                                            : 'No'}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
-                                    {(!item.steps || item.steps.length === 0) && (
-                                        <p className="text-muted-foreground italic">No steps defined for this approval flow.</p>
+                                    {(!item.steps ||
+                                        item.steps.length === 0) && (
+                                        <p className="text-muted-foreground italic">
+                                            No steps defined for this approval
+                                            flow.
+                                        </p>
                                     )}
                                 </div>
                             </div>
@@ -116,5 +210,5 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
                 </DialogContent>
             </Dialog>
         );
-    }
+    },
 );

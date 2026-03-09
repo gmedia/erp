@@ -1,7 +1,7 @@
-import { Helmet } from 'react-helmet-async';
 import AppearanceTabs from '@/components/appearance-tabs';
 import HeadingSmall from '@/components/heading-small';
 import { type BreadcrumbItem } from '@/types';
+import { Helmet } from 'react-helmet-async';
 
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
@@ -16,7 +16,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Appearance() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet><title>Appearance settings - {import.meta.env.VITE_APP_NAME || 'ERP'}</title></Helmet>
+            <Helmet>
+                <title>
+                    Appearance settings -{' '}
+                    {import.meta.env.VITE_APP_NAME || 'ERP'}
+                </title>
+            </Helmet>
 
             <SettingsLayout>
                 <div className="space-y-6">

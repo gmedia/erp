@@ -1,6 +1,5 @@
 'use client';
 
-import { Helmet } from 'react-helmet-async';
 import { DataTable } from '@/components/common/DataTableCore';
 import {
     stockAdjustmentReportColumns,
@@ -10,6 +9,7 @@ import { createStockAdjustmentReportFilterFields } from '@/components/reports/st
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import AppLayout from '@/layouts/app-layout';
+import { Helmet } from 'react-helmet-async';
 
 export default function StockAdjustmentReportPage() {
     const filterFields = createStockAdjustmentReportFilterFields();
@@ -44,11 +44,16 @@ export default function StockAdjustmentReportPage() {
 
     return (
         <>
-            <Helmet><title>Stock Adjustment Report</title></Helmet>
+            <Helmet>
+                <title>Stock Adjustment Report</title>
+            </Helmet>
             <AppLayout
                 breadcrumbs={[
                     { title: 'Reports', href: '#' },
-                    { title: 'Stock Adjustment', href: '/reports/stock-adjustment' },
+                    {
+                        title: 'Stock Adjustment',
+                        href: '/reports/stock-adjustment',
+                    },
                 ]}
             >
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">

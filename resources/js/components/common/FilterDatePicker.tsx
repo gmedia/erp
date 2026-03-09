@@ -25,7 +25,8 @@ export function FilterDatePicker({
     className,
 }: FilterDatePickerProps) {
     // Safely parse date
-    const date = value && !isNaN(Date.parse(value)) ? new Date(value) : undefined;
+    const date =
+        value && !isNaN(Date.parse(value)) ? new Date(value) : undefined;
 
     const handleSelect = (newDate: Date | undefined) => {
         if (onChange) {

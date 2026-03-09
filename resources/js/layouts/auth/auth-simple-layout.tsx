@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { AppI18nProvider } from '@/contexts/i18n-context';
 import { type PropsWithChildren } from 'react';
+import { Link } from 'react-router-dom';
 
 interface AuthLayoutProps {
     name?: string;

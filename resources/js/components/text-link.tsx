@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { ComponentProps } from 'react';
+import { Link } from 'react-router-dom';
 
 type LinkProps = ComponentProps<typeof Link>;
 

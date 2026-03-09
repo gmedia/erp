@@ -73,7 +73,9 @@ export const CustomerViewModal = memo<CustomerViewModalProps>(
                                         : 'destructive'
                                 }
                             >
-                                {item.status === 'active' ? 'Active' : 'Inactive'}
+                                {item.status === 'active'
+                                    ? 'Active'
+                                    : 'Inactive'}
                             </Badge>
                         </div>
 

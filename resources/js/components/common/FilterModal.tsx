@@ -10,7 +10,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Select } from '@/components/ui/select';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import * as React from 'react';
 import type { FieldDescriptor } from './filters';
 
@@ -42,7 +41,7 @@ export function FilterModal({
 }: FilterModalProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="border-border bg-background text-foreground sm:max-w-[425px] max-h-[90vh] p-0 overflow-hidden flex flex-col">
+            <DialogContent className="flex max-h-[90vh] flex-col overflow-hidden border-border bg-background p-0 text-foreground sm:max-w-[425px]">
                 <div className="shrink-0 p-6 pb-2">
                     <DialogHeader>
                         <DialogTitle>Filters</DialogTitle>
@@ -53,60 +52,65 @@ export function FilterModal({
                 </div>
                 <div className="flex-1 overflow-y-auto px-6">
                     <div className="grid gap-4 py-4 pr-6">
-                    {filterFields.map((field) => {
-                        const element = React.isValidElement(field.component)
-                            ? field.component
-                            : null;
-                        const isSelect =
-                            element &&
-                            (element.type === Select ||
-                                (element.type as { displayName?: string })
-                                    ?.displayName === 'Select' ||
-                                (element.type as { displayName?: string })
-                                    ?.displayName === 'AsyncSelect');
+                        {filterFields.map((field) => {
+                            const element = React.isValidElement(
+                                field.component,
+                            )
+                                ? field.component
+                                : null;
+                            const isSelect =
+                                element &&
+                                (element.type === Select ||
+                                    (element.type as { displayName?: string })
+                                        ?.displayName === 'Select' ||
+                                    (element.type as { displayName?: string })
+                                        ?.displayName === 'AsyncSelect');
 
-                        const commonProps = {
-                            name: field.name,
-                            value: tempFilters[field.name] ?? '', // Always pass a defined string to prevent uncontrolled-to-controlled warning
-                            label: field.label,
-                        };
+                            const commonProps = {
+                                name: field.name,
+                                value: tempFilters[field.name] ?? '', // Always pass a defined string to prevent uncontrolled-to-controlled warning
+                                label: field.label,
+                            };
 
-                        const onChangeHandler = (
-                            e: React.ChangeEvent<HTMLInputElement>,
-                        ) => {
-                            onTempFiltersChange({
-                                ...tempFilters,
-                                [field.name]: e.target.value,
-                            });
-                        };
+                            const onChangeHandler = (
+                                e: React.ChangeEvent<HTMLInputElement>,
+                            ) => {
+                                onTempFiltersChange({
+                                    ...tempFilters,
+                                    [field.name]: e.target.value,
+                                });
+                            };
 
-                        const onValueChangeHandler = (value: string) => {
-                            onTempFiltersChange({
-                                ...tempFilters,
-                                [field.name]: value,
-                            });
-                        };
+                            const onValueChangeHandler = (value: string) => {
+                                onTempFiltersChange({
+                                    ...tempFilters,
+                                    [field.name]: value,
+                                });
+                            };
 
-                        const componentWithProps = element
-                            ? React.cloneElement(element, {
-                                  ...commonProps,
-                                  ...(isSelect
-                                      ? { onValueChange: onValueChangeHandler }
-                                      : { onChange: onChangeHandler }),
-                              })
-                            : null;
+                            const componentWithProps = element
+                                ? React.cloneElement(element, {
+                                      ...commonProps,
+                                      ...(isSelect
+                                          ? {
+                                                onValueChange:
+                                                    onValueChangeHandler,
+                                            }
+                                          : { onChange: onChangeHandler }),
+                                  })
+                                : null;
 
-                        return (
-                            <div key={field.name}>
-                                <label className="mb-2 block text-sm font-medium">
-                                    {field.label}
-                                </label>
-                                {componentWithProps}
-                            </div>
-                        );
-                    })}
+                            return (
+                                <div key={field.name}>
+                                    <label className="mb-2 block text-sm font-medium">
+                                        {field.label}
+                                    </label>
+                                    {componentWithProps}
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
                 <div className="shrink-0 p-6 pt-2">
                     <DialogFooter>
                         <Button variant="outline" onClick={onReset}>

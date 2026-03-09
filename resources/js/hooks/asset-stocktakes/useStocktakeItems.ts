@@ -39,7 +39,10 @@ export const useStocktakeItems = () => {
     }, []);
 
     const saveItems = useCallback(
-        async (identifier: string | number, data: { items: StocktakeItem[] }) => {
+        async (
+            identifier: string | number,
+            data: { items: StocktakeItem[] },
+        ) => {
             setLoading(true);
             try {
                 await axios.post(

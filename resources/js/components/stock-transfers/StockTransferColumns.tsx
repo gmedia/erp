@@ -29,18 +29,29 @@ export const stockTransferColumns: ColumnDef<StockTransfer>[] = [
         ...createSortingHeader('To Warehouse'),
         cell: ({ row }) => row.original.to_warehouse?.name || '-',
     },
-    createDateColumn<StockTransfer>({ accessorKey: 'transfer_date', label: 'Transfer Date' }),
-    createDateColumn<StockTransfer>({ accessorKey: 'expected_arrival_date', label: 'Expected Arrival' }),
+    createDateColumn<StockTransfer>({
+        accessorKey: 'transfer_date',
+        label: 'Transfer Date',
+    }),
+    createDateColumn<StockTransfer>({
+        accessorKey: 'expected_arrival_date',
+        label: 'Expected Arrival',
+    }),
     createBadgeColumn<StockTransfer>({
         accessorKey: 'status',
         label: 'Status',
         colorMap: {
             draft: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100',
-            pending_approval: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-            approved: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-            in_transit: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
-            received: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-            cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+            pending_approval:
+                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+            approved:
+                'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+            in_transit:
+                'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
+            received:
+                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+            cancelled:
+                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
         },
     }),
     {

@@ -1,7 +1,7 @@
-import { Helmet } from 'react-helmet-async';
-import { useState, useRef } from 'react';
 import axios from '@/lib/axios';
 import { LoaderCircle } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { toast } from 'sonner';
 
 import InputError from '@/components/input-error';
@@ -41,22 +41,27 @@ export default function Password() {
         try {
             await axios.put('/user/password', data);
             setRecentlySuccessful(true);
-            
+
             // Clear passwords
-            if (currentPasswordInput.current) currentPasswordInput.current.value = '';
+            if (currentPasswordInput.current)
+                currentPasswordInput.current.value = '';
             if (passwordInput.current) passwordInput.current.value = '';
-            const confirmInput = document.getElementById('password_confirmation') as HTMLInputElement;
+            const confirmInput = document.getElementById(
+                'password_confirmation',
+            ) as HTMLInputElement;
             if (confirmInput) confirmInput.value = '';
-            
+
             toast.success('Password updated successfully');
-            
+
             setTimeout(() => setRecentlySuccessful(false), 2000);
         } catch (error: any) {
             if (error.response?.status === 422) {
                 const returnedErrors = error.response.data.errors || {};
                 const formattedErrors: Record<string, string> = {};
-                Object.keys(returnedErrors).forEach(key => {
-                    formattedErrors[key] = Array.isArray(returnedErrors[key]) ? returnedErrors[key][0] : returnedErrors[key];
+                Object.keys(returnedErrors).forEach((key) => {
+                    formattedErrors[key] = Array.isArray(returnedErrors[key])
+                        ? returnedErrors[key][0]
+                        : returnedErrors[key];
                 });
                 setErrors(formattedErrors);
 
@@ -75,7 +80,11 @@ export default function Password() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet><title>Password settings - {import.meta.env.VITE_APP_NAME || 'ERP'}</title></Helmet>
+            <Helmet>
+                <title>
+                    Password settings - {import.meta.env.VITE_APP_NAME || 'ERP'}
+                </title>
+            </Helmet>
 
             <SettingsLayout>
                 <div className="space-y-6">
@@ -101,15 +110,11 @@ export default function Password() {
                                 required
                             />
 
-                            <InputError
-                                message={errors.current_password}
-                            />
+                            <InputError message={errors.current_password} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password">
-                                New password
-                            </Label>
+                            <Label htmlFor="password">New password</Label>
 
                             <Input
                                 id="password"
@@ -152,7 +157,7 @@ export default function Password() {
                                 data-test="update-password-button"
                             >
                                 {processing && (
-                                    <LoaderCircle className="h-4 w-4 mr-2 animate-spin" />
+                                    <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
                                 )}
                                 Save password
                             </Button>

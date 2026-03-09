@@ -1,7 +1,7 @@
-import { EntityWithId } from './entity';
 import { AssetCategory } from './asset-category';
-import { AssetModel } from './asset-model';
 import { AssetLocation } from './asset-location';
+import { AssetModel } from './asset-model';
+import { EntityWithId } from './entity';
 
 export interface Asset extends EntityWithId {
     ulid: string;
@@ -31,7 +31,7 @@ export interface Asset extends EntityWithId {
     book_value: string;
     depreciation_expense_account_id: number | null;
     accumulated_depr_account_id: number | null;
-    
+
     // Relations
     category?: AssetCategory;
     model?: AssetModel;

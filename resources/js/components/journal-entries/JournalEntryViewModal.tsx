@@ -1,3 +1,5 @@
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -10,14 +12,12 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
-    TableFooter,
 } from '@/components/ui/table';
 import { JournalEntry } from '@/types/journal-entry';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 
 interface JournalEntryViewModalProps {
@@ -35,7 +35,7 @@ export function JournalEntryViewModal({
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-[95vw] sm:max-w-7xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-h-[90vh] max-w-[95vw] overflow-y-auto sm:max-w-7xl">
                 <DialogHeader>
                     <DialogTitle>Journal Entry Details</DialogTitle>
                     <DialogDescription>
@@ -43,23 +43,33 @@ export function JournalEntryViewModal({
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="mb-6 grid grid-cols-2 gap-4">
                     <div>
-                        <p className="text-sm font-medium text-gray-500">Entry Number</p>
+                        <p className="text-sm font-medium text-gray-500">
+                            Entry Number
+                        </p>
                         <p>{item.entry_number}</p>
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-gray-500">Date</p>
-                        <p>{format(new Date(item.entry_date), 'dd MMMM yyyy')}</p>
+                        <p className="text-sm font-medium text-gray-500">
+                            Date
+                        </p>
+                        <p>
+                            {format(new Date(item.entry_date), 'dd MMMM yyyy')}
+                        </p>
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-gray-500">Reference</p>
+                        <p className="text-sm font-medium text-gray-500">
+                            Reference
+                        </p>
                         <p>{item.reference || '-'}</p>
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-gray-500">Status</p>
+                        <p className="text-sm font-medium text-gray-500">
+                            Status
+                        </p>
                         <Badge
-                             variant={
+                            variant={
                                 item.status === 'posted'
                                     ? 'default'
                                     : item.status === 'draft'
@@ -71,18 +81,24 @@ export function JournalEntryViewModal({
                         </Badge>
                     </div>
                     <div className="col-span-2">
-                        <p className="text-sm font-medium text-gray-500">Description</p>
+                        <p className="text-sm font-medium text-gray-500">
+                            Description
+                        </p>
                         <p>{item.description}</p>
                     </div>
                 </div>
 
-                <div className="border rounded-md overflow-x-auto">
+                <div className="overflow-x-auto rounded-md border">
                     <Table>
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Account</TableHead>
-                                <TableHead className="text-right">Debit</TableHead>
-                                <TableHead className="text-right">Credit</TableHead>
+                                <TableHead className="text-right">
+                                    Debit
+                                </TableHead>
+                                <TableHead className="text-right">
+                                    Credit
+                                </TableHead>
                                 <TableHead>Memo</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -91,13 +107,21 @@ export function JournalEntryViewModal({
                                 <TableRow key={line.id}>
                                     <TableCell>
                                         <div>{line.account_code}</div>
-                                        <div className="text-sm text-gray-500">{line.account_name}</div>
+                                        <div className="text-sm text-gray-500">
+                                            {line.account_name}
+                                        </div>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(line.debit)}
+                                        {new Intl.NumberFormat('id-ID', {
+                                            style: 'currency',
+                                            currency: 'IDR',
+                                        }).format(line.debit)}
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(line.credit)}
+                                        {new Intl.NumberFormat('id-ID', {
+                                            style: 'currency',
+                                            currency: 'IDR',
+                                        }).format(line.credit)}
                                     </TableCell>
                                     <TableCell>{line.memo}</TableCell>
                                 </TableRow>
@@ -105,12 +129,20 @@ export function JournalEntryViewModal({
                         </TableBody>
                         <TableFooter>
                             <TableRow>
-                                <TableCell className="font-bold">Total</TableCell>
-                                <TableCell className="text-right font-bold">
-                                     {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.total_debit)}
+                                <TableCell className="font-bold">
+                                    Total
                                 </TableCell>
                                 <TableCell className="text-right font-bold">
-                                     {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(item.total_credit)}
+                                    {new Intl.NumberFormat('id-ID', {
+                                        style: 'currency',
+                                        currency: 'IDR',
+                                    }).format(item.total_debit)}
+                                </TableCell>
+                                <TableCell className="text-right font-bold">
+                                    {new Intl.NumberFormat('id-ID', {
+                                        style: 'currency',
+                                        currency: 'IDR',
+                                    }).format(item.total_credit)}
                                 </TableCell>
                                 <TableCell></TableCell>
                             </TableRow>

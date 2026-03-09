@@ -1,5 +1,10 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { StateSummary } from '@/hooks/usePipelineDashboard';
 
 interface StateDistributionChartProps {
@@ -7,15 +12,20 @@ interface StateDistributionChartProps {
     isLoading: boolean;
 }
 
-export function StateDistributionChart({ data, isLoading }: StateDistributionChartProps) {
+export function StateDistributionChart({
+    data,
+    isLoading,
+}: StateDistributionChartProps) {
     if (isLoading) {
         return (
             <Card className="h-[350px] animate-pulse">
                 <CardHeader>
-                    <CardTitle className="text-transparent bg-muted rounded w-48">Loading Chart</CardTitle>
+                    <CardTitle className="w-48 rounded bg-muted text-transparent">
+                        Loading Chart
+                    </CardTitle>
                 </CardHeader>
-                <CardContent className="flex items-center justify-center h-48">
-                    <div className="h-32 w-32 rounded-full border-8 border-muted border-t-muted-foreground/30 animate-spin" />
+                <CardContent className="flex h-48 items-center justify-center">
+                    <div className="h-32 w-32 animate-spin rounded-full border-8 border-muted border-t-muted-foreground/30" />
                 </CardContent>
             </Card>
         );
@@ -28,9 +38,11 @@ export function StateDistributionChart({ data, isLoading }: StateDistributionCha
             <Card className="h-full">
                 <CardHeader>
                     <CardTitle>State Distribution</CardTitle>
-                    <CardDescription>Entities mapped by pipeline state</CardDescription>
+                    <CardDescription>
+                        Entities mapped by pipeline state
+                    </CardDescription>
                 </CardHeader>
-                <CardContent className="flex items-center justify-center h-[200px]">
+                <CardContent className="flex h-[200px] items-center justify-center">
                     <p className="text-muted-foreground">No entities found.</p>
                 </CardContent>
             </Card>
@@ -40,8 +52,8 @@ export function StateDistributionChart({ data, isLoading }: StateDistributionCha
     // Generate conic gradient string for the donut chart
     let currentPercentage = 0;
     const gradientStops = data
-        .filter(item => item.count > 0)
-        .map(item => {
+        .filter((item) => item.count > 0)
+        .map((item) => {
             const percentage = (item.count / total) * 100;
             const stop = `${item.color} ${currentPercentage}% ${currentPercentage + percentage}%`;
             currentPercentage += percentage;
@@ -50,41 +62,57 @@ export function StateDistributionChart({ data, isLoading }: StateDistributionCha
         .join(', ');
 
     return (
-        <Card className="h-full flex flex-col overflow-hidden">
+        <Card className="flex h-full flex-col overflow-hidden">
             <CardHeader className="pb-2">
                 <CardTitle>State Distribution</CardTitle>
-                <CardDescription>Visual breakdown of {total} entities</CardDescription>
+                <CardDescription>
+                    Visual breakdown of {total} entities
+                </CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col items-center gap-6 py-4">
+            <CardContent className="flex flex-1 flex-col items-center gap-6 py-4">
                 {/* CSS Donut Chart */}
-                <div className="relative w-36 h-36 flex-shrink-0 drop-shadow-md">
-                    <div 
-                        className="w-full h-full rounded-full transition-all duration-500 ease-in-out"
-                        style={{ background: `conic-gradient(${gradientStops})` }}
+                <div className="relative h-36 w-36 flex-shrink-0 drop-shadow-md">
+                    <div
+                        className="h-full w-full rounded-full transition-all duration-500 ease-in-out"
+                        style={{
+                            background: `conic-gradient(${gradientStops})`,
+                        }}
                     />
                     {/* Inner circle for donut hole */}
-                    <div className="absolute inset-0 m-auto w-24 h-24 bg-card rounded-full shadow-inner z-10 flex items-center justify-center flex-col">
+                    <div className="absolute inset-0 z-10 m-auto flex h-24 w-24 flex-col items-center justify-center rounded-full bg-card shadow-inner">
                         <span className="text-2xl font-bold">{total}</span>
-                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</span>
+                        <span className="text-[10px] tracking-wider text-muted-foreground uppercase">
+                            Total
+                        </span>
                     </div>
                 </div>
 
                 {/* Legend */}
-                <div className="flex flex-col gap-1.5 w-full max-h-40 overflow-y-auto">
-                    {data.filter(item => item.count > 0).map((item) => (
-                        <div key={item.state_id} className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-2 min-w-0">
-                                <span 
-                                    className="w-2.5 h-2.5 rounded-full flex-shrink-0 ring-1 ring-border" 
-                                    style={{ backgroundColor: item.color }} 
-                                />
-                                <span className="font-medium truncate" title={item.name}>{item.name}</span>
+                <div className="flex max-h-40 w-full flex-col gap-1.5 overflow-y-auto">
+                    {data
+                        .filter((item) => item.count > 0)
+                        .map((item) => (
+                            <div
+                                key={item.state_id}
+                                className="flex items-center justify-between text-xs"
+                            >
+                                <div className="flex min-w-0 items-center gap-2">
+                                    <span
+                                        className="h-2.5 w-2.5 flex-shrink-0 rounded-full ring-1 ring-border"
+                                        style={{ backgroundColor: item.color }}
+                                    />
+                                    <span
+                                        className="truncate font-medium"
+                                        title={item.name}
+                                    >
+                                        {item.name}
+                                    </span>
+                                </div>
+                                <span className="ml-3 flex-shrink-0 text-muted-foreground tabular-nums">
+                                    {Math.round((item.count / total) * 100)}%
+                                </span>
                             </div>
-                            <span className="text-muted-foreground ml-3 tabular-nums flex-shrink-0">
-                                {Math.round((item.count / total) * 100)}%
-                            </span>
-                        </div>
-                    ))}
+                        ))}
                 </div>
             </CardContent>
         </Card>

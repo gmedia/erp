@@ -35,15 +35,21 @@ export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [
         header: 'Product',
         cell: ({ row }) => (
             <div className="space-y-0.5">
-                <div className="font-medium">{row.original.product?.name ?? '-'}</div>
-                <div className="text-xs text-muted-foreground">{row.original.product?.code ?? '-'}</div>
+                <div className="font-medium">
+                    {row.original.product?.name ?? '-'}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                    {row.original.product?.code ?? '-'}
+                </div>
             </div>
         ),
     },
     {
         id: 'category_name',
         header: 'Category',
-        cell: ({ row }) => <div>{row.original.product?.category?.name ?? '-'}</div>,
+        cell: ({ row }) => (
+            <div>{row.original.product?.category?.name ?? '-'}</div>
+        ),
     },
     {
         id: 'unit_name',
@@ -55,10 +61,14 @@ export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [
         header: 'Warehouse',
         cell: ({ row }) => (
             <div className="space-y-0.5">
-                <div className="font-medium">{row.original.warehouse?.name ?? '-'}</div>
+                <div className="font-medium">
+                    {row.original.warehouse?.name ?? '-'}
+                </div>
                 <div className="text-xs text-muted-foreground">
                     {(row.original.warehouse?.code ?? '-') +
-                        (row.original.warehouse?.branch?.name ? ` • ${row.original.warehouse.branch.name}` : '')}
+                        (row.original.warehouse?.branch?.name
+                            ? ` • ${row.original.warehouse.branch.name}`
+                            : '')}
                 </div>
             </div>
         ),

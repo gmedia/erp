@@ -1,8 +1,12 @@
-import { ColumnDef } from '@tanstack/react-table';
-import { ApprovalDelegation } from '@/types/approval-delegation';
 import { Badge } from '@/components/ui/badge';
+import { ApprovalDelegation } from '@/types/approval-delegation';
+import {
+    createActionsColumn,
+    createSelectColumn,
+    createSortingHeader,
+} from '@/utils/columns';
+import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { createSortingHeader, createSelectColumn, createActionsColumn } from '@/utils/columns';
 
 const formatDate = (dateString?: string | null) => {
     if (!dateString) return '-';
@@ -33,7 +37,7 @@ export const approvalDelegationColumns: ColumnDef<ApprovalDelegation>[] = [
         cell: ({ row }) => {
             const type = row.original.approvable_type;
             if (!type) return <span className="text-muted-foreground">-</span>;
-            
+
             // Format App\Models\PurchaseOrder -> PurchaseOrder
             const parts = type.split('\\');
             return <span>{parts[parts.length - 1]}</span>;
@@ -57,7 +61,11 @@ export const approvalDelegationColumns: ColumnDef<ApprovalDelegation>[] = [
         accessorKey: 'reason',
         ...createSortingHeader('Reason'),
         cell: ({ row }) => {
-            return <span className="truncate max-w-[200px] block">{row.original.reason || '-'}</span>;
+            return (
+                <span className="block max-w-[200px] truncate">
+                    {row.original.reason || '-'}
+                </span>
+            );
         },
     },
     {

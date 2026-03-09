@@ -13,11 +13,11 @@ import {
     SidebarMenuSubButton,
     SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
+import { useAuth } from '@/contexts/auth-context';
 import { useTranslation } from '@/contexts/i18n-context';
 import { type NavItem } from '@/types';
-import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import { useAuth } from '@/contexts/auth-context';
+import { Link, useLocation } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
 
@@ -63,20 +63,26 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                                         subItem.href,
                                                     )}
                                                 >
-                                                    <Link
-                                                        to={subItem.href}
-                                                    >
+                                                    <Link to={subItem.href}>
                                                         {subItem.icon && (
                                                             <subItem.icon />
                                                         )}
                                                         <span>
                                                             {subItem.title}
                                                         </span>
-                                                        {subItem.href === '/my-approvals' && pendingCount > 0 && (
-                                                            <Badge variant="destructive" className="ml-auto flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-[10px]">
-                                                                {pendingCount}
-                                                            </Badge>
-                                                        )}
+                                                        {subItem.href ===
+                                                            '/my-approvals' &&
+                                                            pendingCount >
+                                                                0 && (
+                                                                <Badge
+                                                                    variant="destructive"
+                                                                    className="ml-auto flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-[10px]"
+                                                                >
+                                                                    {
+                                                                        pendingCount
+                                                                    }
+                                                                </Badge>
+                                                            )}
                                                     </Link>
                                                 </SidebarMenuSubButton>
                                             </SidebarMenuSubItem>
@@ -89,17 +95,23 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 asChild
-                                isActive={location.pathname.startsWith(item.href)}
+                                isActive={location.pathname.startsWith(
+                                    item.href,
+                                )}
                                 tooltip={{ children: item.title }}
                             >
                                 <Link to={item.href}>
                                     {item.icon && <item.icon />}
                                     <span>{item.title}</span>
-                                    {item.href === '/my-approvals' && pendingCount > 0 && (
-                                        <Badge variant="destructive" className="ml-auto flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-[10px]">
-                                            {pendingCount}
-                                        </Badge>
-                                    )}
+                                    {item.href === '/my-approvals' &&
+                                        pendingCount > 0 && (
+                                            <Badge
+                                                variant="destructive"
+                                                className="ml-auto flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-[10px]"
+                                            >
+                                                {pendingCount}
+                                            </Badge>
+                                        )}
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>

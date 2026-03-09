@@ -1,7 +1,7 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
+import { ColumnDef } from '@tanstack/react-table';
 
 import {
     createActionsColumn,
@@ -25,7 +25,11 @@ const renderBranchCell = ({ row }: { row: { original: AssetLocation } }) => {
  */
 const renderParentCell = ({ row }: { row: { original: AssetLocation } }) => {
     const parent = row.original.parent;
-    return parent?.name ? <Badge variant="secondary">{parent.name}</Badge> : <span className="text-muted-foreground">-</span>;
+    return parent?.name ? (
+        <Badge variant="secondary">{parent.name}</Badge>
+    ) : (
+        <span className="text-muted-foreground">-</span>
+    );
 };
 
 export const assetLocationColumns: ColumnDef<AssetLocation>[] = [

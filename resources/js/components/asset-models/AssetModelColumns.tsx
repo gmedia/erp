@@ -1,7 +1,7 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
+import { ColumnDef } from '@tanstack/react-table';
 
 import {
     createActionsColumn,
@@ -35,8 +35,14 @@ const renderSpecsCell = ({ row }: { row: { original: AssetModel } }) => {
 
 export const assetModelColumns: ColumnDef<AssetModel>[] = [
     createSelectColumn<AssetModel>(),
-    createTextColumn<AssetModel>({ accessorKey: 'model_name', label: 'Model Name' }),
-    createTextColumn<AssetModel>({ accessorKey: 'manufacturer', label: 'Manufacturer' }),
+    createTextColumn<AssetModel>({
+        accessorKey: 'model_name',
+        label: 'Model Name',
+    }),
+    createTextColumn<AssetModel>({
+        accessorKey: 'manufacturer',
+        label: 'Manufacturer',
+    }),
     {
         accessorKey: 'category',
         ...createSortingHeader('Category'),

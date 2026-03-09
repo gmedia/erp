@@ -9,7 +9,11 @@ import {
 
 export function createInventoryStocktakeFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search inventory stocktakes...'),
+        createTextFilterField(
+            'search',
+            'Search',
+            'Search inventory stocktakes...',
+        ),
         createAsyncSelectFilterField(
             'warehouse_id',
             'Warehouse',
@@ -35,4 +39,3 @@ export function createInventoryStocktakeFilterFields(): FieldDescriptor[] {
         ),
     ];
 }
-

@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { useEffect } from 'react';
 
 import EntityForm from '@/components/common/EntityForm';
@@ -13,7 +12,10 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import { productCategoryFormSchema, type ProductCategoryFormData } from '@/utils/schemas';
+import {
+    productCategoryFormSchema,
+    type ProductCategoryFormData,
+} from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -58,15 +60,13 @@ export function ProductCategoryForm({
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={entity ? 'Edit Product Category' : 'Add New Product Category'}
+            title={
+                entity ? 'Edit Product Category' : 'Add New Product Category'
+            }
             onSubmit={onSubmit}
             isLoading={isLoading}
         >
-            <NameField
-                name="name"
-                label="Name"
-                placeholder="e.g., Electronics"
-            >
+            <NameField name="name" label="Name" placeholder="e.g., Electronics">
                 <FormMessage />
             </NameField>
 

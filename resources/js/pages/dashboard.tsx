@@ -1,10 +1,10 @@
-import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
+import axios from '@/lib/axios';
 import { type BreadcrumbItem } from '@/types';
 import { useEffect, useState } from 'react';
-import axios from '@/lib/axios';
+import { Helmet } from 'react-helmet-async';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,19 +25,27 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get('/api/dashboard')
+        axios
+            .get('/api/dashboard')
             .then((res) => {
                 setTotals(res.data.data.totals);
             })
             .catch(() => {
-                setTotals({ customers: 0, employees: 0, suppliers: 0, assets: 0 });
+                setTotals({
+                    customers: 0,
+                    employees: 0,
+                    suppliers: 0,
+                    assets: 0,
+                });
             })
             .finally(() => setLoading(false));
     }, []);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet><title>Dashboard</title></Helmet>
+            <Helmet>
+                <title>Dashboard</title>
+            </Helmet>
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <Card>

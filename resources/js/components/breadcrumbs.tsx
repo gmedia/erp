@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -9,6 +8,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { Fragment } from 'react';
+import { Link } from 'react-router-dom';
 
 export function Breadcrumbs({
     breadcrumbs,

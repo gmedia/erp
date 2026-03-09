@@ -1,11 +1,10 @@
 'use client';
 
-import * as React from 'react';
 import { useEffect } from 'react';
 
 import EntityForm from '@/components/common/EntityForm';
-import NameField from '@/components/common/NameField';
 import { InputField } from '@/components/common/InputField';
+import NameField from '@/components/common/NameField';
 import { unitFormSchema, type UnitFormData } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -60,17 +59,9 @@ export function UnitForm({
             onSubmit={onSubmit}
             isLoading={isLoading}
         >
-            <NameField
-                name="name"
-                label="Name"
-                placeholder="e.g., Kilogram"
-            />
+            <NameField name="name" label="Name" placeholder="e.g., Kilogram" />
 
-            <InputField
-                name="symbol"
-                label="Symbol"
-                placeholder="e.g., kg"
-            />
+            <InputField name="symbol" label="Symbol" placeholder="e.g., kg" />
         </EntityForm>
     );
 }

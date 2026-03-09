@@ -16,7 +16,11 @@ interface AssetStocktakeViewModalProps {
     item: AssetStocktake | null;
 }
 
-export function AssetStocktakeViewModal({ open, onClose, item }: AssetStocktakeViewModalProps) {
+export function AssetStocktakeViewModal({
+    open,
+    onClose,
+    item,
+}: AssetStocktakeViewModalProps) {
     if (!item) return null;
 
     return (
@@ -25,34 +29,55 @@ export function AssetStocktakeViewModal({ open, onClose, item }: AssetStocktakeV
                 <DialogHeader>
                     <DialogTitle>Stocktake Details</DialogTitle>
                     <DialogDescription>
-                        View complete stocktake information for the selected record.
+                        View complete stocktake information for the selected
+                        record.
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4 py-2">
                     <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                            <span className="text-muted-foreground block text-xs">Reference</span>
-                            <span className="font-medium">{item.reference}</span>
+                            <span className="block text-xs text-muted-foreground">
+                                Reference
+                            </span>
+                            <span className="font-medium">
+                                {item.reference}
+                            </span>
                         </div>
                         <div>
-                            <span className="text-muted-foreground block text-xs">Branch</span>
-                            <span className="font-medium">{item.branch?.name || '-'}</span>
+                            <span className="block text-xs text-muted-foreground">
+                                Branch
+                            </span>
+                            <span className="font-medium">
+                                {item.branch?.name || '-'}
+                            </span>
                         </div>
                         <div>
-                            <span className="text-muted-foreground block text-xs">Planned Date</span>
+                            <span className="block text-xs text-muted-foreground">
+                                Planned Date
+                            </span>
                             <span>{formatDate(item.planned_at)}</span>
                         </div>
                         <div>
-                            <span className="text-muted-foreground block text-xs">Performed Date</span>
-                            <span>{item.performed_at ? formatDate(item.performed_at) : '-'}</span>
+                            <span className="block text-xs text-muted-foreground">
+                                Performed Date
+                            </span>
+                            <span>
+                                {item.performed_at
+                                    ? formatDate(item.performed_at)
+                                    : '-'}
+                            </span>
                         </div>
                         <div>
-                            <span className="text-muted-foreground block text-xs">Status</span>
+                            <span className="block text-xs text-muted-foreground">
+                                Status
+                            </span>
                             <span className="capitalize">{item.status}</span>
                         </div>
                         <div>
-                            <span className="text-muted-foreground block text-xs">Created By</span>
+                            <span className="block text-xs text-muted-foreground">
+                                Created By
+                            </span>
                             <span>{item.created_by?.name || '-'}</span>
                         </div>
                     </div>

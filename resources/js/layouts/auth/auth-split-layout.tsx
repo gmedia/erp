@@ -1,6 +1,6 @@
 import AppLogoIcon from '@/components/app-logo-icon';
-import { Link } from 'react-router-dom';
 import { type PropsWithChildren } from 'react';
+import { Link } from 'react-router-dom';
 
 interface AuthLayoutProps {
     title?: string;
@@ -12,7 +12,7 @@ export default function AuthSplitLayout({
     title,
     description,
 }: PropsWithChildren<AuthLayoutProps>) {
-    const quote = { message: "Welcome back!", author: "" };
+    const quote = { message: 'Welcome back!', author: '' };
     const name = import.meta.env.VITE_APP_NAME || 'ERP';
 
     return (

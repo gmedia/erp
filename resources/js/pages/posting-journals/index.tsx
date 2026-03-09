@@ -1,9 +1,19 @@
 'use client';
 
-import { Helmet } from 'react-helmet-async';
-import AppLayout from '@/layouts/app-layout';
-import { usePostingJournal } from '@/hooks/usePostingJournal';
-import { BreadcrumbItem } from '@/types';
+import { DataTablePagination } from '@/components/common/DataTablePagination';
+import { JournalEntryViewModal } from '@/components/journal-entries/JournalEntryViewModal';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import {
     Table,
     TableBody,
@@ -12,31 +22,21 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
+import { usePostingJournal } from '@/hooks/usePostingJournal';
+import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
+import { JournalEntry } from '@/types/journal-entry';
+import { format } from 'date-fns';
 import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { DataTablePagination } from '@/components/common/DataTablePagination';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { JournalEntryViewModal } from '@/components/journal-entries/JournalEntryViewModal';
-import {
-    Loader2,
-    CheckCircle2,
     AlertCircle,
-    Search,
+    CheckCircle2,
     Eye,
+    Loader2,
+    Search,
     X,
 } from 'lucide-react';
-import { format } from 'date-fns';
 import { useMemo, useState } from 'react';
-import { JournalEntry } from '@/types/journal-entry';
+import { Helmet } from 'react-helmet-async';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -76,7 +76,11 @@ export default function Index() {
     const [viewOpen, setViewOpen] = useState(false);
 
     const idr = useMemo(
-        () => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }),
+        () =>
+            new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+            }),
         [],
     );
 
@@ -108,9 +112,7 @@ export default function Index() {
 
     const from =
         meta.from ??
-        (meta.total === 0
-            ? 0
-            : (meta.current_page - 1) * meta.per_page + 1);
+        (meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1);
     const to =
         meta.to ??
         (meta.total === 0
@@ -128,7 +130,9 @@ export default function Index() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet><title>Posting Journals</title></Helmet>
+            <Helmet>
+                <title>Posting Journals</title>
+            </Helmet>
 
             <div className="flex flex-col gap-6 p-6">
                 <Card>
@@ -138,18 +142,21 @@ export default function Index() {
                                 Posting Journals
                             </CardTitle>
                             <CardDescription className="mt-1">
-                                Review draft journal entries and post them to the general ledger.
+                                Review draft journal entries and post them to
+                                the general ledger.
                             </CardDescription>
                         </div>
 
                         <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
                             <div className="relative sm:w-80">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
                                     value={searchQuery}
                                     placeholder="Search journals..."
                                     className="pl-9"
-                                    onChange={(e) => handleSearch(e.target.value)}
+                                    onChange={(e) =>
+                                        handleSearch(e.target.value)
+                                    }
                                 />
                             </div>
 
@@ -157,14 +164,18 @@ export default function Index() {
                                 <Button
                                     variant="outline"
                                     onClick={clearSelection}
-                                    disabled={selectedIds.length === 0 || isPosting}
+                                    disabled={
+                                        selectedIds.length === 0 || isPosting
+                                    }
                                 >
                                     <X className="mr-2 h-4 w-4" />
                                     Clear
                                 </Button>
                                 <Button
                                     onClick={postSelected}
-                                    disabled={selectedIds.length === 0 || isPosting}
+                                    disabled={
+                                        selectedIds.length === 0 || isPosting
+                                    }
                                 >
                                     {isPosting ? (
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -183,36 +194,54 @@ export default function Index() {
                         <div className="flex flex-col gap-3 rounded-md border bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
                                 <div>
-                                    <span className="text-muted-foreground">Draft journals</span>{' '}
+                                    <span className="text-muted-foreground">
+                                        Draft journals
+                                    </span>{' '}
                                     <span className="font-medium text-foreground">
                                         {meta.total.toLocaleString()}
                                     </span>
                                 </div>
                                 <div>
-                                    <span className="text-muted-foreground">Showing</span>{' '}
+                                    <span className="text-muted-foreground">
+                                        Showing
+                                    </span>{' '}
                                     <span className="font-medium text-foreground">
-                                        {from.toLocaleString()}–{to.toLocaleString()}
+                                        {from.toLocaleString()}–
+                                        {to.toLocaleString()}
                                     </span>
                                 </div>
                                 <div>
-                                    <span className="text-muted-foreground">Page totals</span>{' '}
+                                    <span className="text-muted-foreground">
+                                        Page totals
+                                    </span>{' '}
                                     <span className="font-medium text-foreground">
-                                        {idr.format(pageTotals.totals.debit)} / {idr.format(pageTotals.totals.credit)}
+                                        {idr.format(pageTotals.totals.debit)} /{' '}
+                                        {idr.format(pageTotals.totals.credit)}
                                     </span>
                                 </div>
                             </div>
 
                             <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
                                 <div>
-                                    <span className="text-muted-foreground">Selected</span>{' '}
+                                    <span className="text-muted-foreground">
+                                        Selected
+                                    </span>{' '}
                                     <span className="font-medium text-foreground">
                                         {selectedIds.length.toLocaleString()}
                                     </span>
                                 </div>
                                 <div>
-                                    <span className="text-muted-foreground">Selected totals</span>{' '}
+                                    <span className="text-muted-foreground">
+                                        Selected totals
+                                    </span>{' '}
                                     <span className="font-medium text-foreground">
-                                        {idr.format(pageTotals.selectedTotals.debit)} / {idr.format(pageTotals.selectedTotals.credit)}
+                                        {idr.format(
+                                            pageTotals.selectedTotals.debit,
+                                        )}{' '}
+                                        /{' '}
+                                        {idr.format(
+                                            pageTotals.selectedTotals.credit,
+                                        )}
                                     </span>
                                 </div>
                             </div>
@@ -222,7 +251,8 @@ export default function Index() {
                             <Alert>
                                 <AlertTitle>Selection active</AlertTitle>
                                 <AlertDescription>
-                                    {selectedIds.length.toLocaleString()} draft journal(s) selected in this page.
+                                    {selectedIds.length.toLocaleString()} draft
+                                    journal(s) selected in this page.
                                 </AlertDescription>
                             </Alert>
                         )}
@@ -239,10 +269,18 @@ export default function Index() {
                                             />
                                         </TableHead>
                                         <TableHead>Journal</TableHead>
-                                        <TableHead className="w-[220px]">Lines</TableHead>
-                                        <TableHead className="text-right">Debit</TableHead>
-                                        <TableHead className="text-right">Credit</TableHead>
-                                        <TableHead className="text-center">Status</TableHead>
+                                        <TableHead className="w-[220px]">
+                                            Lines
+                                        </TableHead>
+                                        <TableHead className="text-right">
+                                            Debit
+                                        </TableHead>
+                                        <TableHead className="text-right">
+                                            Credit
+                                        </TableHead>
+                                        <TableHead className="text-center">
+                                            Status
+                                        </TableHead>
                                         <TableHead className="w-[60px]"></TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -250,21 +288,33 @@ export default function Index() {
                                 <TableBody>
                                     {isLoading ? (
                                         <TableRow>
-                                            <TableCell colSpan={7} className="h-56 text-center">
+                                            <TableCell
+                                                colSpan={7}
+                                                className="h-56 text-center"
+                                            >
                                                 <div className="flex flex-col items-center justify-center gap-2">
                                                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                                    <p className="text-muted-foreground">Loading journals...</p>
+                                                    <p className="text-muted-foreground">
+                                                        Loading journals...
+                                                    </p>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
                                     ) : data.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={7} className="h-56 text-center">
+                                            <TableCell
+                                                colSpan={7}
+                                                className="h-56 text-center"
+                                            >
                                                 <div className="flex flex-col items-center justify-center gap-2 opacity-70">
                                                     <AlertCircle className="h-10 w-10 text-muted-foreground" />
-                                                    <p className="text-lg font-medium">No draft journals found</p>
+                                                    <p className="text-lg font-medium">
+                                                        No draft journals found
+                                                    </p>
                                                     <p className="text-sm text-muted-foreground">
-                                                        All journal entries are already posted or voided.
+                                                        All journal entries are
+                                                        already posted or
+                                                        voided.
                                                     </p>
                                                 </div>
                                             </TableCell>
@@ -273,7 +323,12 @@ export default function Index() {
                                         data.map((item) => {
                                             const preview = item.lines
                                                 .slice(0, 2)
-                                                .map((l) => l.account_name || l.account_code || 'Line')
+                                                .map(
+                                                    (l) =>
+                                                        l.account_name ||
+                                                        l.account_code ||
+                                                        'Line',
+                                                )
                                                 .filter(Boolean)
                                                 .join(' • ');
 
@@ -282,11 +337,15 @@ export default function Index() {
                                                     key={item.id}
                                                     className="hover:bg-muted/50"
                                                 >
-                                                    <TableCell className="align-top pt-4">
+                                                    <TableCell className="pt-4 align-top">
                                                         <Checkbox
-                                                            checked={selectedIds.includes(item.id)}
+                                                            checked={selectedIds.includes(
+                                                                item.id,
+                                                            )}
                                                             onCheckedChange={() =>
-                                                                toggleSelection(item.id)
+                                                                toggleSelection(
+                                                                    item.id,
+                                                                )
                                                             }
                                                             aria-label={`Select ${item.entry_number}`}
                                                         />
@@ -296,7 +355,9 @@ export default function Index() {
                                                         <div className="flex flex-col gap-1">
                                                             <div className="flex flex-wrap items-center gap-2">
                                                                 <span className="font-mono font-semibold text-primary">
-                                                                    {item.entry_number}
+                                                                    {
+                                                                        item.entry_number
+                                                                    }
                                                                 </span>
                                                                 <span className="text-xs text-muted-foreground">
                                                                     {format(
@@ -307,33 +368,41 @@ export default function Index() {
                                                                     )}
                                                                 </span>
                                                             </div>
-                                                            <div className="text-sm text-muted-foreground line-clamp-2">
-                                                                {item.description}
+                                                            <div className="line-clamp-2 text-sm text-muted-foreground">
+                                                                {
+                                                                    item.description
+                                                                }
                                                             </div>
                                                         </div>
                                                     </TableCell>
 
-                                                    <TableCell className="align-top pt-4">
+                                                    <TableCell className="pt-4 align-top">
                                                         <div className="flex flex-col gap-1">
                                                             <div className="text-sm font-medium">
-                                                                {item.lines.length.toLocaleString()} line(s)
+                                                                {item.lines.length.toLocaleString()}{' '}
+                                                                line(s)
                                                             </div>
-                                                            {preview.length > 0 && (
-                                                                <div className="text-xs text-muted-foreground line-clamp-2">
+                                                            {preview.length >
+                                                                0 && (
+                                                                <div className="line-clamp-2 text-xs text-muted-foreground">
                                                                     {preview}
                                                                 </div>
                                                             )}
                                                         </div>
                                                     </TableCell>
 
-                                                    <TableCell className="text-right align-top pt-4 font-mono">
-                                                        {idr.format(item.total_debit)}
+                                                    <TableCell className="pt-4 text-right align-top font-mono">
+                                                        {idr.format(
+                                                            item.total_debit,
+                                                        )}
                                                     </TableCell>
-                                                    <TableCell className="text-right align-top pt-4 font-mono">
-                                                        {idr.format(item.total_credit)}
+                                                    <TableCell className="pt-4 text-right align-top font-mono">
+                                                        {idr.format(
+                                                            item.total_credit,
+                                                        )}
                                                     </TableCell>
 
-                                                    <TableCell className="text-center align-top pt-4">
+                                                    <TableCell className="pt-4 text-center align-top">
                                                         <Badge
                                                             variant={getStatusBadgeVariant(
                                                                 item.status,
@@ -344,13 +413,17 @@ export default function Index() {
                                                         </Badge>
                                                     </TableCell>
 
-                                                    <TableCell className="text-right align-top pt-3">
+                                                    <TableCell className="pt-3 text-right align-top">
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
                                                             onClick={() => {
-                                                                setViewItem(item);
-                                                                setViewOpen(true);
+                                                                setViewItem(
+                                                                    item,
+                                                                );
+                                                                setViewOpen(
+                                                                    true,
+                                                                );
                                                             }}
                                                             aria-label={`View ${item.entry_number}`}
                                                         >

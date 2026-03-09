@@ -53,7 +53,9 @@ const renderSpecsSection = () => (
     />
 );
 
-const getAssetModelFormDefaults = (entity?: AssetModel | null): AssetModelFormData => {
+const getAssetModelFormDefaults = (
+    entity?: AssetModel | null,
+): AssetModelFormData => {
     if (!entity) {
         return {
             model_name: '',
@@ -66,54 +68,57 @@ const getAssetModelFormDefaults = (entity?: AssetModel | null): AssetModelFormDa
     return {
         model_name: entity.model_name,
         manufacturer: entity.manufacturer || '',
-        asset_category_id: typeof entity.category === 'object'
-            ? String(entity.category.id)
-            : String(entity.asset_category_id || ''),
+        asset_category_id:
+            typeof entity.category === 'object'
+                ? String(entity.category.id)
+                : String(entity.asset_category_id || ''),
         specs: entity.specs ? JSON.stringify(entity.specs) : '',
     };
 };
 
-export const AssetModelForm = memo<AssetModelFormProps>(function AssetModelForm({
-    open,
-    onOpenChange,
-    entity,
-    onSubmit,
-    isLoading = false,
-}) {
-    const defaultValues = useMemo(
-        () => getAssetModelFormDefaults(entity),
-        [entity],
-    );
+export const AssetModelForm = memo<AssetModelFormProps>(
+    function AssetModelForm({
+        open,
+        onOpenChange,
+        entity,
+        onSubmit,
+        isLoading = false,
+    }) {
+        const defaultValues = useMemo(
+            () => getAssetModelFormDefaults(entity),
+            [entity],
+        );
 
-    const form = useForm<AssetModelFormData>({
-        resolver: zodResolver(assetModelFormSchema),
-        defaultValues,
-    });
+        const form = useForm<AssetModelFormData>({
+            resolver: zodResolver(assetModelFormSchema),
+            defaultValues,
+        });
 
-    useEffect(() => {
-        form.reset(defaultValues);
-    }, [form, defaultValues]);
+        useEffect(() => {
+            form.reset(defaultValues);
+        }, [form, defaultValues]);
 
-    const handleSubmit = (data: AssetModelFormData) => {
-        const submitData = {
-            ...data,
-            specs: data.specs ? JSON.parse(data.specs) : null,
+        const handleSubmit = (data: AssetModelFormData) => {
+            const submitData = {
+                ...data,
+                specs: data.specs ? JSON.parse(data.specs) : null,
+            };
+            onSubmit(submitData as unknown as AssetModelFormData);
         };
-        onSubmit(submitData as unknown as AssetModelFormData);
-    };
 
-    return (
-        <EntityForm<AssetModelFormData>
-            form={form}
-            open={open}
-            onOpenChange={onOpenChange}
-            title={entity ? 'Edit Asset Model' : 'Add New Asset Model'}
-            onSubmit={handleSubmit}
-            isLoading={isLoading}
-        >
-            {renderBasicInfoSection()}
-            {renderCategorySection()}
-            {renderSpecsSection()}
-        </EntityForm>
-    );
-});
+        return (
+            <EntityForm<AssetModelFormData>
+                form={form}
+                open={open}
+                onOpenChange={onOpenChange}
+                title={entity ? 'Edit Asset Model' : 'Add New Asset Model'}
+                onSubmit={handleSubmit}
+                isLoading={isLoading}
+            >
+                {renderBasicInfoSection()}
+                {renderCategorySection()}
+                {renderSpecsSection()}
+            </EntityForm>
+        );
+    },
+);

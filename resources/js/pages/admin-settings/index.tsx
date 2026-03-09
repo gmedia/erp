@@ -1,18 +1,18 @@
-import { Helmet } from 'react-helmet-async';
-import { useSearchParams } from 'react-router-dom';
-import { useState } from 'react';
-import axios from '@/lib/axios';
-import { useQuery } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
-import AppLayout from '@/layouts/app-layout';
+import { Separator } from '@/components/ui/separator';
 import AdminSettingsLayout from '@/layouts/admin-settings/layout';
+import AppLayout from '@/layouts/app-layout';
+import axios from '@/lib/axios';
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
+import { useQuery } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useSearchParams } from 'react-router-dom';
 interface SettingsData {
     general?: {
         company_name?: string;
@@ -69,7 +69,7 @@ function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
                 },
                 params: {
                     _method: 'PUT', // Laravel needs _method=PUT for file uploads when using PUT
-                }
+                },
             });
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
@@ -116,9 +116,7 @@ function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="company_address">
-                        Company Address
-                    </Label>
+                    <Label htmlFor="company_address">Company Address</Label>
                     <Input
                         id="company_address"
                         name="company_address"
@@ -183,7 +181,8 @@ function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
                         className="mt-1 block w-full"
                     />
                     <p className="text-sm text-muted-foreground">
-                        Upload file SVG. Jika kosong, aplikasi tetap menggunakan logo default.
+                        Upload file SVG. Jika kosong, aplikasi tetap menggunakan
+                        logo default.
                     </p>
                     {errors.company_logo && (
                         <p className="text-sm text-destructive">
@@ -198,7 +197,9 @@ function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
                         className="min-w-24"
                         data-testid="save-general-settings"
                     >
-                        {processing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {processing ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : null}
                         Save
                     </Button>
 
@@ -209,9 +210,7 @@ function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
                         leave="transition ease-in-out duration-300"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-green-600">
-                            Saved
-                        </p>
+                        <p className="text-sm text-green-600">Saved</p>
                     </Transition>
                 </div>
             </form>
@@ -236,7 +235,10 @@ function RegionalSettings({
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axios.put('/api/admin-settings', Object.fromEntries(formData));
+            await axios.put(
+                '/api/admin-settings',
+                Object.fromEntries(formData),
+            );
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
         } catch (error: any) {
@@ -319,9 +321,7 @@ function RegionalSettings({
                     <Input
                         id="number_format_decimal"
                         name="number_format_decimal"
-                        defaultValue={
-                            settings?.number_format_decimal ?? ','
-                        }
+                        defaultValue={settings?.number_format_decimal ?? ','}
                         placeholder="e.g. ,"
                         className="mt-1 block w-full"
                     />
@@ -339,9 +339,7 @@ function RegionalSettings({
                     <Input
                         id="number_format_thousand"
                         name="number_format_thousand"
-                        defaultValue={
-                            settings?.number_format_thousand ?? '.'
-                        }
+                        defaultValue={settings?.number_format_thousand ?? '.'}
                         placeholder="e.g. ."
                         className="mt-1 block w-full"
                     />
@@ -358,7 +356,9 @@ function RegionalSettings({
                         className="min-w-24"
                         data-testid="save-regional-settings"
                     >
-                        {processing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {processing ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : null}
                         Save
                     </Button>
 
@@ -369,9 +369,7 @@ function RegionalSettings({
                         leave="transition ease-in-out duration-300"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-green-600">
-                            Saved
-                        </p>
+                        <p className="text-sm text-green-600">Saved</p>
                     </Transition>
                 </div>
             </form>
@@ -392,7 +390,10 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axios.put('/api/admin-settings', Object.fromEntries(formData));
+            await axios.put(
+                '/api/admin-settings',
+                Object.fromEntries(formData),
+            );
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
         } catch (error: any) {
@@ -420,7 +421,10 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axios.post('/api/admin-settings/test-smtp', Object.fromEntries(formData));
+            await axios.post(
+                '/api/admin-settings/test-smtp',
+                Object.fromEntries(formData),
+            );
             setTestRecentlySuccessful(true);
             setTimeout(() => setTestRecentlySuccessful(false), 3000);
         } catch (error: any) {
@@ -570,7 +574,9 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
                         className="min-w-24"
                         data-testid="save-smtp-settings"
                     >
-                        {processing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {processing ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : null}
                         Save
                     </Button>
 
@@ -581,9 +587,7 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
                         leave="transition ease-in-out duration-300"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-green-600">
-                            Saved
-                        </p>
+                        <p className="text-sm text-green-600">Saved</p>
                     </Transition>
                 </div>
             </form>
@@ -604,7 +608,9 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
                     <div className="flex-1 space-y-2">
                         <div className="flex w-full items-center gap-4">
                             <div className="flex-1">
-                                <Label htmlFor="test_email" className="sr-only">Test Email</Label>
+                                <Label htmlFor="test_email" className="sr-only">
+                                    Test Email
+                                </Label>
                                 <Input
                                     id="test_email"
                                     name="test_email"
@@ -618,8 +624,12 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
                                 className="min-w-32"
                                 data-testid="send-test-email"
                             >
-                                {testProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                {testProcessing ? 'Sending...' : 'Send Test Email'}
+                                {testProcessing ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : null}
+                                {testProcessing
+                                    ? 'Sending...'
+                                    : 'Send Test Email'}
                             </Button>
                         </div>
 
@@ -666,7 +676,9 @@ export default function AdminSettings() {
     if (isLoading) {
         return (
             <AppLayout breadcrumbs={breadcrumbs}>
-                <Helmet><title>Admin Settings</title></Helmet>
+                <Helmet>
+                    <title>Admin Settings</title>
+                </Helmet>
                 <div className="flex h-full items-center justify-center p-4">
                     <Loader2 className="mr-2 h-6 w-6 animate-spin text-muted-foreground" />
                     <span>Loading settings...</span>
@@ -678,7 +690,9 @@ export default function AdminSettings() {
     if (error || !data) {
         return (
             <AppLayout breadcrumbs={breadcrumbs}>
-                <Helmet><title>Admin Settings</title></Helmet>
+                <Helmet>
+                    <title>Admin Settings</title>
+                </Helmet>
                 <div className="flex h-full items-center justify-center p-4 text-destructive">
                     Error loading settings.
                 </div>
@@ -688,7 +702,9 @@ export default function AdminSettings() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet><title>Admin Settings</title></Helmet>
+            <Helmet>
+                <title>Admin Settings</title>
+            </Helmet>
 
             <AdminSettingsLayout currentGroup={currentGroup}>
                 {currentGroup === 'general' && (

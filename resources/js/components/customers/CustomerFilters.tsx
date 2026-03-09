@@ -28,6 +28,11 @@ export function createCustomerFilterFields(): FieldDescriptor[] {
             '/api/customer-categories',
             'Select Category',
         ),
-        createSelectFilterField('status', 'Status', statusOptions, 'All statuses'),
+        createSelectFilterField(
+            'status',
+            'Status',
+            statusOptions,
+            'All statuses',
+        ),
     ];
 }

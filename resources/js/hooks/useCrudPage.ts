@@ -170,7 +170,10 @@ export function useCrudPage<
             const identifierKey = config.identifierKey || 'id';
             if (selectedItem) {
                 updateMutation.mutate(
-                    { id: selectedItem[identifierKey] as string | number, data },
+                    {
+                        id: selectedItem[identifierKey] as string | number,
+                        data,
+                    },
                     {
                         onSuccess: () => {
                             setIsFormOpen(false);
@@ -195,12 +198,15 @@ export function useCrudPage<
     const handleDeleteConfirm = useCallback(() => {
         const identifierKey = config.identifierKey || 'id';
         if (itemToDelete) {
-            deleteMutation.mutate(itemToDelete[identifierKey] as string | number, {
-                onSuccess: () => {
-                    setItemToDelete(null);
-                    config.onDeleteSuccess?.();
+            deleteMutation.mutate(
+                itemToDelete[identifierKey] as string | number,
+                {
+                    onSuccess: () => {
+                        setItemToDelete(null);
+                        config.onDeleteSuccess?.();
+                    },
                 },
-            });
+            );
         }
     }, [itemToDelete, deleteMutation, config]);
 

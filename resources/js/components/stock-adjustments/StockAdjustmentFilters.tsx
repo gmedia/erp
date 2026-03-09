@@ -9,7 +9,11 @@ import {
 
 export function createStockAdjustmentFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search stock adjustments...'),
+        createTextFilterField(
+            'search',
+            'Search',
+            'Search stock adjustments...',
+        ),
         createAsyncSelectFilterField(
             'warehouse_id',
             'Warehouse',
