@@ -1,6 +1,6 @@
 # Summary Report: Migrasi Laravel + Inertia -> Laravel + React Full SPA
 
-Laporan ini berisi ringkasan perubahan pada branch `main` yang unggul 39 commit dibandingkan `origin/main`. Fokus utama dari perubahan ini adalah transisi arsitektur dari monolith (Laravel + Inertia) menjadi arsitektur *Full Single Page Application* (SPA) menggunakan Laravel API murni di sisi backend dan React SPA di sisi frontend.
+Laporan ini berisi ringkasan perubahan pada branch `main` yang unggul 44 commit dibandingkan `origin/main`. Fokus utama dari perubahan ini adalah transisi arsitektur dari monolith (Laravel + Inertia) menjadi arsitektur *Full Single Page Application* (SPA) menggunakan Laravel API murni di sisi backend dan React SPA di sisi frontend.
 
 ## 1. Perubahan Arsitektur & Teknologi Utama
 - **Penghapusan Inertia.js:** Ketergantungan pada Inertia.js telah dihilangkan sepenuhnya baik dari komponen React maupun controller Laravel.
@@ -30,6 +30,11 @@ Laporan ini berisi ringkasan perubahan pada branch `main` yang unggul 39 commit 
 
 Berikut adalah daftar Commit ID dan Pesan terkait migrasi ini:
 
+- `aeffd17` update route
+- `677c93e` chore: Add test run output and modify the Employee model unit test.
+- `51b8149` feat: Remove Inertia.js dependency and related views, controllers, and middleware.
+- `12b26f1` refactor: Rename `AppI18nProvider` and update its data source, alongside removing the `build:ssr` script.
+- `ccbfe43` docs: Update SPA migration report with new commit count and details on backend feature test refactoring.
 - `feb7c9d` feat: Add test output file and update various feature tests, a controller, and a request file.
 - `377dd90` refactor: Update feature tests to use Sanctum for API authentication and JSON assertions instead of Inertia-specific checks.
 - `077148f` Refactor authentication feature tests for SPA migration, updating password reset and email verification tests to use API endpoints and removing several UI-based authentication tests.
