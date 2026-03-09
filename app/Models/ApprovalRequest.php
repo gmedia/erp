@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property \Illuminate\Support\Carbon|null $completed_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read Model|Eloquent $approvable
+ * @property-read Model|\Eloquent $approvable
  * @property-read \App\Models\ApprovalFlow $flow
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApprovalRequestStep> $steps
  * @property-read int|null $steps_count
