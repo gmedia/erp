@@ -10,7 +10,15 @@ use Illuminate\Support\Facades\Route;
 
 // --- Pipeline / Workflow ---
 Route::middleware('permission:pipeline,true')->group(function () {
-    Route::apiResource('pipelines', PipelineController::class);
+    Route::get('pipelines', [PipelineController::class, 'index']);
+
+    Route::get('pipelines/{pipeline}', [PipelineController::class, 'show']);
+
+    Route::post('pipelines', [PipelineController::class, 'store'])->middleware('permission:pipeline.create,true');
+
+    Route::put('pipelines/{pipeline}', [PipelineController::class, 'update'])->middleware('permission:pipeline.edit,true');
+
+    Route::delete('pipelines/{pipeline}', [PipelineController::class, 'destroy'])->middleware('permission:pipeline.delete,true');
     Route::post('pipelines/export', [PipelineController::class, 'export']);
     Route::post('pipelines/import', [PipelineController::class, 'import']);
     Route::apiResource('pipelines.states', PipelineStateController::class)->scoped(['state' => 'id'])->except(['show']);
