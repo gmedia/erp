@@ -48,7 +48,7 @@ class ApprovalAuditTrailExport implements FromCollection, ShouldAutoSize, WithHe
     }
 
     /**
-     * @param \App\Models\ApprovalAuditLog $log
+     * @param  \App\Models\ApprovalAuditLog  $log
      */
     public function map($log): array
     {

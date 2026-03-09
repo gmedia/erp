@@ -16,6 +16,7 @@ trait BaseFilterService
      * Apply search filters to query across multiple fields and optionally relationships.
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
      * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
      * @param  array<int, string>  $searchFields
      * @param  array<string, array<int, string>>  $relationSearchFields
@@ -43,6 +44,7 @@ trait BaseFilterService
      * Apply sorting to query with validation against allowed columns.
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
      * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
      * @param  array<int, string>  $allowedSorts
      */

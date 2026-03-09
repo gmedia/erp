@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @mixin \App\Models\StockMovement
+ *
  * @property int $product_entity_id
  * @property string $product_code
  * @property string $product_name

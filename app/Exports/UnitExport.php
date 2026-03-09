@@ -13,7 +13,7 @@ class UnitExport extends SimpleCrudExport
     }
 
     /**
-     * @param \App\Models\Unit $item
+     * @param  \App\Models\Unit  $item
      */
     public function map($item): array
     {

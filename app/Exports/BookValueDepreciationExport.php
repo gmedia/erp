@@ -49,7 +49,7 @@ class BookValueDepreciationExport implements FromCollection, ShouldAutoSize, Wit
     }
 
     /**
-     * @param \App\Models\Asset $asset
+     * @param  \App\Models\Asset  $asset
      */
     public function map($asset): array
     {

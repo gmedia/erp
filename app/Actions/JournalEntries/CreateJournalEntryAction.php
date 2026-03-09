@@ -53,7 +53,7 @@ class CreateJournalEntryAction
                         $count = 1;
                     }
 
-                    $entryNumber = 'JV-' . $fiscalYear->name . '-' . str_pad((string)$count, 5, '0', STR_PAD_LEFT);
+                    $entryNumber = 'JV-' . $fiscalYear->name . '-' . str_pad((string) $count, 5, '0', STR_PAD_LEFT);
 
                     $journalEntry = JournalEntry::create([
                         'fiscal_year_id' => $fiscalYear->id,
