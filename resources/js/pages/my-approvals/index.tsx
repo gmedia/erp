@@ -14,6 +14,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
+import {
+    ApprovalRequest,
+    ApprovalRequestStep,
+} from '@/types/approval';
 import { formatDistanceToNow } from 'date-fns';
 import { Check, Clock, Eye, X } from 'lucide-react';
 import { useState } from 'react';
@@ -21,16 +25,23 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
+interface MyApprovalsProps {
+    pending: ApprovalRequestStep[];
+    approved: ApprovalRequestStep[];
+    rejected: ApprovalRequestStep[];
+    all: ApprovalRequestStep[];
+}
+
 export default function MyApprovalsPage({
     pending,
     approved,
     rejected,
     all,
-}: any) {
+}: MyApprovalsProps) {
     const [actionDialog, setActionDialog] = useState<{
         open: boolean;
         type: 'approve' | 'reject' | null;
-        requestStep: any;
+        requestStep: ApprovalRequestStep | null;
     }>({
         open: false,
         type: null,
@@ -39,7 +50,10 @@ export default function MyApprovalsPage({
     const [comments, setComments] = useState('');
     const [processing, setProcessing] = useState(false);
 
-    const openActionDialog = (type: 'approve' | 'reject', step: any) => {
+    const openActionDialog = (
+        type: 'approve' | 'reject',
+        step: ApprovalRequestStep,
+    ) => {
         setActionDialog({ open: true, type, requestStep: step });
         setComments('');
     };
@@ -66,7 +80,7 @@ export default function MyApprovalsPage({
             });
     };
 
-    const getDocUrl = (request: any) => {
+    const getDocUrl = (request: ApprovalRequest) => {
         const type = request.approvable_type.split('\\').pop();
         const id = request.approvable_id;
         const ulid = request.approvable?.ulid;
@@ -107,7 +121,10 @@ export default function MyApprovalsPage({
         }
     };
 
-    const renderList = (items: any[], isPendingTab: boolean = false) => {
+    const renderList = (
+        items: ApprovalRequestStep[],
+        isPendingTab: boolean = false,
+    ) => {
         if (!items || items.length === 0) {
             return (
                 <div className="mt-4 flex flex-col items-center justify-center rounded-lg border border-dashed bg-muted/20 p-8 text-center">
@@ -122,7 +139,7 @@ export default function MyApprovalsPage({
 
         return (
             <div className="mt-4 space-y-4">
-                {items.map((step: any) => (
+                {items.map((step: ApprovalRequestStep) => (
                     <Card
                         key={step.id}
                         className="transition-all hover:shadow-md"

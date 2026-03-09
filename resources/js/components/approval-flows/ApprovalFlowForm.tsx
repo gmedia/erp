@@ -2,7 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, type UseFormReturn } from 'react-hook-form';
+import * as z from 'zod';
 
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
@@ -27,7 +28,9 @@ interface ApprovalFlowFormProps {
     isLoading?: boolean;
 }
 
-const getFormDefaults = (item?: ApprovalFlow | null): any => {
+const getFormDefaults = (
+    item?: ApprovalFlow | null,
+): ApprovalFlowFormData => {
     if (!item) {
         return {
             name: '',
@@ -45,7 +48,7 @@ const getFormDefaults = (item?: ApprovalFlow | null): any => {
         code: item.code,
         approvable_type: item.approvable_type,
         description: item.description || '',
-        is_active: item.is_active ? 'true' : 'false',
+        is_active: !!item.is_active,
         conditions:
             typeof item.conditions === 'string'
                 ? item.conditions
@@ -64,7 +67,7 @@ const getFormDefaults = (item?: ApprovalFlow | null): any => {
                   auto_approve_after_hours: step.auto_approve_after_hours,
                   escalate_after_hours: step.escalate_after_hours,
                   escalation_user_id: step.escalation_user_id,
-                  can_reject: step.can_reject ? 'true' : 'false',
+                  can_reject: !!step.can_reject,
               }))
             : [],
     };
@@ -80,8 +83,8 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
     }) {
         const defaultValues = useMemo(() => getFormDefaults(item), [item]);
 
-        const form = useForm<ApprovalFlowFormData>({
-            resolver: zodResolver(approvalFlowFormSchema) as any,
+        const form = useForm<z.input<typeof approvalFlowFormSchema>>({
+            resolver: zodResolver(approvalFlowFormSchema),
             defaultValues,
         });
 
@@ -99,7 +102,7 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
             if (data.conditions && typeof data.conditions === 'string') {
                 try {
                     data.conditions = JSON.parse(data.conditions);
-                } catch (e) {
+                } catch {
                     // Ignore parse error, backend might reject or save it as string
                 }
             }
@@ -108,7 +111,13 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
 
         return (
             <EntityForm<ApprovalFlowFormData>
-                form={form as any}
+            form={
+                form as unknown as UseFormReturn<
+                    ApprovalFlowFormData,
+                    unknown,
+                    ApprovalFlowFormData
+                >
+            }
                 open={open}
                 onOpenChange={onOpenChange}
                 title={item ? 'Edit Approval Flow' : 'Add New Approval Flow'}

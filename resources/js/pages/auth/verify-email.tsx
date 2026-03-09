@@ -27,7 +27,7 @@ export default function VerifyEmail({
             await axios.post('/email/verification-notification');
             setStatus('verification-link-sent');
             toast.success('Verification link sent');
-        } catch (error) {
+        } catch {
             toast.error('Failed to send verification link.');
         } finally {
             setProcessing(false);
@@ -40,7 +40,7 @@ export default function VerifyEmail({
             await axios.post('/api/logout');
             logout();
             navigate('/login');
-        } catch (error) {
+        } catch {
             toast.error('Failed to log out.');
         }
     };

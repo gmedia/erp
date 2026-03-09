@@ -1,7 +1,8 @@
 'use client';
 
 import { useCrudQuery } from '@/hooks/useCrudQuery';
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import { JournalEntry } from '@/types/journal-entry';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
@@ -81,7 +82,7 @@ export function usePostingJournal() {
 
         setIsPosting(true);
         try {
-            const response = await axios.post('/api/posting-journals/post', {
+            const response = await axiosInstance.post('/api/posting-journals/post', {
                 ids: selectedIds,
             });
 
@@ -89,10 +90,14 @@ export function usePostingJournal() {
             setSelectedIds([]);
             queryClient.invalidateQueries({ queryKey: ['posting-journals'] });
             refetch();
-        } catch (error: any) {
-            const message =
-                error.response?.data?.message || 'Failed to post journals';
-            toast.error(message);
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                const message =
+                    error.response?.data?.message || 'Failed to post journals';
+                toast.error(message);
+            } else {
+                toast.error('An unexpected error occurred');
+            }
         } finally {
             setIsPosting(false);
         }

@@ -22,7 +22,8 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, type UseFormReturn } from 'react-hook-form';
+import * as z from 'zod';
 
 interface PipelineTransitionFormDialogProps {
     open: boolean;
@@ -91,8 +92,8 @@ export function PipelineTransitionFormDialog({
         };
     }, [transition, states]);
 
-    const form = useForm<PipelineTransitionFormData>({
-        resolver: zodResolver(pipelineTransitionFormSchema) as any,
+    const form = useForm<z.input<typeof pipelineTransitionFormSchema>>({
+        resolver: zodResolver(pipelineTransitionFormSchema),
         defaultValues,
     });
 
@@ -116,7 +117,7 @@ export function PipelineTransitionFormDialog({
         label: s.name,
     }));
 
-    const onSubmit = async (data: PipelineTransitionFormData) => {
+    const onSubmit = async (data: z.input<typeof pipelineTransitionFormSchema>) => {
         const payload = {
             ...data,
             guard_conditions: data.guard_conditions
@@ -130,8 +131,8 @@ export function PipelineTransitionFormDialog({
         };
 
         const success = transition
-            ? await updateTransition(transition.id, payload as any)
-            : await createTransition(payload as any);
+            ? await updateTransition(transition.id, payload as unknown as PipelineTransitionFormData)
+            : await createTransition(payload as unknown as PipelineTransitionFormData);
 
         if (success) {
             onSuccess();
@@ -151,11 +152,11 @@ export function PipelineTransitionFormDialog({
                     </DialogDescription>
                 </DialogHeader>
 
-                <Form {...(form as any)}>
+                <Form {...(form as unknown as UseFormReturn<PipelineTransitionFormData, unknown, PipelineTransitionFormData>)}>
                     <form
                         onSubmit={(e) => {
                             e.stopPropagation();
-                            form.handleSubmit(onSubmit as any)(e);
+                            form.handleSubmit(onSubmit)(e);
                         }}
                         className="space-y-6"
                     >

@@ -19,7 +19,7 @@ import { Link } from 'react-router-dom';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
-    const { t } = useTranslation();
+    useTranslation();
     const { menus } = useAuth();
 
     const mainNavItems: NavItem[] = menus.map((menu) => ({

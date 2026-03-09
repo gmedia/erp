@@ -44,15 +44,15 @@ export default function Profile({
         const data = Object.fromEntries(formData.entries());
 
         try {
-            const response = await axios.patch('/api/profile', data);
+            await axios.patch('/api/profile', data);
             setRecentlySuccessful(true);
             toast.success('Profile updated successfully');
             // Refresh user data by calling me endpoint
             // Refresh user data
             await refreshAuth();
             setTimeout(() => setRecentlySuccessful(false), 3000);
-        } catch (error: any) {
-            if (error.response?.status === 422) {
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
                 setErrors(error.response.data.errors || {});
                 toast.error('Please check the form for errors');
             } else {

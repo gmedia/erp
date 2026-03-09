@@ -24,7 +24,7 @@ export function AssetViewModal({ open, onClose, item }: AssetViewModalProps) {
         if (!dateString) return 'N/A';
         try {
             return format(new Date(dateString), 'PPP');
-        } catch (e) {
+        } catch {
             return dateString;
         }
     };

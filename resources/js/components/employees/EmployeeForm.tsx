@@ -2,7 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
+import * as z from 'zod';
 
 import { format } from 'date-fns';
 
@@ -170,7 +171,7 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
         [employee],
     );
 
-    const form = useForm<EmployeeFormData>({
+    const form = useForm<z.input<typeof employeeFormSchema>>({
         resolver: zodResolver(employeeFormSchema),
         defaultValues,
     });
@@ -180,19 +181,29 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
         form.reset(defaultValues);
     }, [form, defaultValues]);
 
-    const handleFormSubmit = (data: EmployeeFormData) => {
-        onSubmit({
+    const handleFormSubmit = (data: z.input<typeof employeeFormSchema>) => {
+        const payload = {
             ...data,
-            hire_date: format(data.hire_date, 'yyyy-MM-dd') as any,
+            hire_date: format(data.hire_date, 'yyyy-MM-dd') as unknown as Date,
             termination_date: data.termination_date
-                ? (format(data.termination_date, 'yyyy-MM-dd') as any)
+                ? (format(
+                      data.termination_date,
+                      'yyyy-MM-dd',
+                  ) as unknown as Date)
                 : null,
-        });
+        } as EmployeeFormData;
+        onSubmit(payload);
     };
 
     return (
         <EntityForm<EmployeeFormData>
-            form={form}
+            form={
+                form as unknown as UseFormReturn<
+                    EmployeeFormData,
+                    unknown,
+                    EmployeeFormData
+                >
+            }
             open={open}
             onOpenChange={onOpenChange}
             title={employee ? 'Edit Employee' : 'Add New Employee'}

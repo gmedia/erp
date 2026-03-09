@@ -337,14 +337,16 @@ export default function ComparativeReport() {
         : undefined;
 
     const handleYearChange = (value: string) => {
-        const params: any = { fiscal_year_id: value };
+        const params: Record<string, string> = { fiscal_year_id: value };
         if (comparisonYearId)
             params.comparison_year_id = String(comparisonYearId);
         setSearchParams(params);
     };
 
     const handleComparisonChange = (value: string) => {
-        const params: any = { fiscal_year_id: String(selectedYearId) };
+        const params: Record<string, string> = {
+            fiscal_year_id: String(selectedYearId),
+        };
         if (value !== 'none') params.comparison_year_id = value;
         setSearchParams(params);
     };

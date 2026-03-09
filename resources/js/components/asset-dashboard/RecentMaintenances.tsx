@@ -66,12 +66,14 @@ export function RecentMaintenances({
         );
     }
 
-    const getStatusColor = (status: string) => {
+    const getStatusColor = (
+        status: string,
+    ): 'default' | 'secondary' | 'outline' => {
         switch (status) {
             case 'scheduled':
                 return 'default';
             case 'in_progress':
-                return 'warning';
+                return 'secondary';
             default:
                 return 'outline';
         }
@@ -118,11 +120,9 @@ export function RecentMaintenances({
                                         {maintenance.asset_name}
                                     </p>
                                     <Badge
-                                        variant={
-                                            getStatusColor(
-                                                maintenance.status,
-                                            ) as any
-                                        }
+                                        variant={getStatusColor(
+                                            maintenance.status,
+                                        )}
                                         className="px-1.5 py-0 text-[10px]"
                                     >
                                         {getStatusLabel(maintenance.status)}

@@ -3,7 +3,6 @@ import {
   createAssetLocation,
   searchAssetLocation,
   editAssetLocation,
-  deleteAssetLocation,
 } from './helpers';
 
 generateModuleTests({

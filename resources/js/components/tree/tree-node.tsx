@@ -32,7 +32,7 @@ export function TreeNode({
         setIsExpanded(!isExpanded);
     };
 
-    const handleCheckChange = (checked: boolean) => {
+    const handleCheckChange = () => {
         onToggle(node.id);
     };
 
@@ -43,7 +43,7 @@ export function TreeNode({
                     'flex cursor-pointer items-center rounded-sm px-2 py-1 hover:bg-muted/50',
                 )}
                 style={{ paddingLeft: `${level * 20 + 8}px` }}
-                onClick={() => handleCheckChange(!isSelected)}
+                onClick={handleCheckChange}
             >
                 <div className="mr-2 flex h-4 w-4 items-center justify-center">
                     {hasChildren && (

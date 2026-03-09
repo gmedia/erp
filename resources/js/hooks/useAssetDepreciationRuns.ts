@@ -1,5 +1,6 @@
 import { useCrudQuery } from '@/hooks/useCrudQuery';
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -45,7 +46,7 @@ export function useAssetDepreciationRuns() {
     }) => {
         setIsCalculating(true);
         try {
-            const response = await axios.post(
+            const response = await axiosInstance.post(
                 '/api/asset-depreciation-runs/calculate',
                 formData,
             );
@@ -55,15 +56,19 @@ export function useAssetDepreciationRuns() {
             });
             refetch();
             return true;
-        } catch (error: any) {
-            const message =
-                error.response?.data?.message ||
-                'Failed to calculate depreciation';
-            if (error.response?.data?.errors) {
-                // Return errors to be handled by form
-                return { errors: error.response.data.errors };
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                const message =
+                    error.response?.data?.message ||
+                    'Failed to calculate depreciation';
+                if (error.response?.data?.errors) {
+                    // Return errors to be handled by form
+                    return { errors: error.response.data.errors };
+                }
+                toast.error(message);
+            } else {
+                toast.error('An unexpected error occurred');
             }
-            toast.error(message);
             return false;
         } finally {
             setIsCalculating(false);
@@ -73,7 +78,7 @@ export function useAssetDepreciationRuns() {
     const postToJournal = async (id: number) => {
         setIsPosting(id);
         try {
-            const response = await axios.post(
+            const response = await axiosInstance.post(
                 `/api/asset-depreciation-runs/${id}/post`,
             );
             toast.success(response.data.message);
@@ -81,10 +86,14 @@ export function useAssetDepreciationRuns() {
                 queryKey: ['asset-depreciation-runs'],
             });
             refetch();
-        } catch (error: any) {
-            const message =
-                error.response?.data?.message || 'Failed to post to journal';
-            toast.error(message);
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                const message =
+                    error.response?.data?.message || 'Failed to post to journal';
+                toast.error(message);
+            } else {
+                toast.error('An unexpected error occurred');
+            }
         } finally {
             setIsPosting(null);
         }

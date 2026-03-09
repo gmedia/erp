@@ -2,7 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
+import * as z from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import EntityForm from '@/components/common/EntityForm';
@@ -111,8 +112,8 @@ export const SupplierForm = memo<SupplierFormProps>(function SupplierForm({
         [supplier],
     );
 
-    const form = useForm<SupplierFormData>({
-        resolver: zodResolver(supplierFormSchema as any),
+    const form = useForm<z.input<typeof supplierFormSchema>>({
+        resolver: zodResolver(supplierFormSchema),
         defaultValues,
     });
 
@@ -123,11 +124,11 @@ export const SupplierForm = memo<SupplierFormProps>(function SupplierForm({
 
     return (
         <EntityForm<SupplierFormData>
-            form={form as any}
+            form={form as unknown as UseFormReturn<SupplierFormData, unknown, SupplierFormData>}
             open={open}
             onOpenChange={onOpenChange}
             title={supplier ? 'Edit Supplier' : 'Add New Supplier'}
-            onSubmit={onSubmit}
+            onSubmit={onSubmit as unknown as (data: z.input<typeof supplierFormSchema>) => void}
             isLoading={isLoading}
         >
             {renderBasicInfoSection()}

@@ -11,14 +11,17 @@ import {
 import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FiscalYear } from '@/types/fiscal-year';
 import { Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { type AssetDepreciationCalculationFormData } from '@/utils/schemas';
+import { type FiscalYear } from '@/types/fiscal-year';
 
 interface CalculateFormModalProps {
     open: boolean;
     onClose: () => void;
-    onSubmit: (data: any) => Promise<any>;
+    onSubmit: (
+        data: AssetDepreciationCalculationFormData,
+    ) => Promise<{ success: boolean; errors?: Record<string, string[]> }>;
     loading: boolean;
 }
 
@@ -28,7 +31,7 @@ export function CalculateFormModal({
     onSubmit,
     loading,
 }: CalculateFormModalProps) {
-    const form = useForm({
+    const form = useForm<AssetDepreciationCalculationFormData>({
         defaultValues: {
             fiscal_year_id: '',
             period_start: '',
@@ -44,18 +47,21 @@ export function CalculateFormModal({
         reset,
     } = form;
 
-    const handleFormSubmit = async (data: any) => {
-        const result = await onSubmit({
-            ...data,
-            fiscal_year_id: parseInt(data.fiscal_year_id),
-        });
+    const handleFormSubmit = async (
+        data: AssetDepreciationCalculationFormData,
+    ) => {
+        const result = await onSubmit(data);
 
         if (result && result.errors) {
-            Object.keys(result.errors).forEach((key) => {
-                setError(key as any, {
-                    type: 'server',
-                    message: result.errors[key][0],
-                });
+            const errors = result.errors;
+            Object.keys(errors).forEach((key) => {
+                setError(
+                    key as keyof AssetDepreciationCalculationFormData,
+                    {
+                        type: 'server',
+                        message: errors[key][0],
+                    },
+                );
             });
         } else if (result) {
             reset();
@@ -76,7 +82,7 @@ export function CalculateFormModal({
                             </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
-                            <AsyncSelectField
+                            <AsyncSelectField<FiscalYear>
                                 name="fiscal_year_id"
                                 label="Fiscal Year"
                                 url="/api/fiscal-years"

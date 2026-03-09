@@ -11,7 +11,11 @@ import {
 } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useMemo, useRef } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
+import * as z from 'zod';
+import { type Account } from '@/types/account';
+import { type CoaVersion } from '@/types/coa-version';
+import { type FieldValues } from 'react-hook-form';
 
 interface AccountMappingFormProps {
     open: boolean;
@@ -23,10 +27,10 @@ interface AccountMappingFormProps {
     isLoading?: boolean;
 }
 
-const coaVersionLabel = (v: any) =>
+const coaVersionLabel = (v: CoaVersion) =>
     v?.status ? `${v.name} (${v.status})` : v?.name;
 
-const accountLabel = (a: any) => (a?.code ? `${a.code} - ${a.name}` : a?.name);
+const accountLabel = (a: Account) => (a?.code ? `${a.code} - ${a.name}` : a?.name);
 
 export function AccountMappingForm({
     open,
@@ -59,8 +63,8 @@ export function AccountMappingForm({
         [activeEntity],
     );
 
-    const form = useForm<AccountMappingFormData>({
-        resolver: zodResolver(accountMappingFormSchema) as any,
+    const form = useForm<z.input<typeof accountMappingFormSchema>>({
+        resolver: zodResolver(accountMappingFormSchema),
         defaultValues,
     });
 
@@ -117,11 +121,17 @@ export function AccountMappingForm({
             title={
                 activeEntity ? 'Edit Account Mapping' : 'Create Account Mapping'
             }
-            form={form}
-            onSubmit={onSubmit}
+            form={
+                form as unknown as UseFormReturn<
+                    AccountMappingFormData,
+                    unknown,
+                    AccountMappingFormData
+                >
+            }
+            onSubmit={onSubmit as unknown as (values: FieldValues) => void}
             isLoading={isLoading}
         >
-            <AsyncSelectField
+            <AsyncSelectField<CoaVersion>
                 name="source_coa_version_id"
                 label="Source COA Version"
                 url="/api/coa-versions"
@@ -129,7 +139,7 @@ export function AccountMappingForm({
                 labelFn={coaVersionLabel}
             />
 
-            <AsyncSelectField
+            <AsyncSelectField<Account>
                 name="source_account_id"
                 label="Source Account"
                 url={sourceAccountsUrl}
@@ -137,7 +147,7 @@ export function AccountMappingForm({
                 labelFn={accountLabel}
             />
 
-            <AsyncSelectField
+            <AsyncSelectField<CoaVersion>
                 name="target_coa_version_id"
                 label="Target COA Version"
                 url="/api/coa-versions"
@@ -145,7 +155,7 @@ export function AccountMappingForm({
                 labelFn={coaVersionLabel}
             />
 
-            <AsyncSelectField
+            <AsyncSelectField<Account>
                 name="target_account_id"
                 label="Target Account"
                 url={targetAccountsUrl}

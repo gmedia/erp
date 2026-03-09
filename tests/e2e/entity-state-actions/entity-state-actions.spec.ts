@@ -6,8 +6,6 @@ let pipelineId: number | null = null;
 let assetName: string | null = null;
 
 async function setupPipelineViaApi(page: Page) {
-  const cookies = await page.context().cookies();
-  const xsrfTokenCookie = cookies.find(c => c.name === 'XSRF-TOKEN');
   const apiToken = await page.evaluate(() => localStorage.getItem('api_token'));
   const headers = { 
     'Accept': 'application/json',
@@ -39,7 +37,7 @@ async function setupPipelineViaApi(page: Page) {
     }
   });
   if (!pipelineRes.ok()) {
-      const err = await pipelineRes.json();
+      // const err = await pipelineRes.json();
       // console.log('API Error:', err.message || err);
   }
   expect(pipelineRes.ok()).toBeTruthy();
@@ -57,7 +55,7 @@ async function setupPipelineViaApi(page: Page) {
     }
   });
   if (!draftRes.ok()) {
-      const err = await draftRes.json();
+      // const err = await draftRes.json();
       // console.log('API Error State Draft:', err.message || err);
   }
   expect(draftRes.ok()).toBeTruthy();
@@ -74,7 +72,7 @@ async function setupPipelineViaApi(page: Page) {
     }
   });
   if (!reviewRes.ok()) {
-      const err = await reviewRes.json();
+      // const err = await reviewRes.json();
       // console.log('API Error State Review:', err.message || err);
   }
   expect(reviewRes.ok()).toBeTruthy();
@@ -95,7 +93,7 @@ async function setupPipelineViaApi(page: Page) {
     }
   });
   if (!submitRes.ok()) {
-      const err = await submitRes.json();
+      // const err = await submitRes.json();
       // console.log('API Error Transition Sub:', err.message || err);
   }
   expect(submitRes.ok()).toBeTruthy();

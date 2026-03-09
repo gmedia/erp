@@ -1,4 +1,5 @@
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -26,13 +27,13 @@ export default function ConfirmPassword() {
         const data = Object.fromEntries(formData.entries());
 
         try {
-            await axios.post('/user/confirm-password', data);
+            await axiosInstance.post('/user/confirm-password', data);
 
             // Redirect to intended location after confirming password
             const from = location.state?.from?.pathname || '/dashboard';
             navigate(from, { replace: true });
-        } catch (error: any) {
-            if (error.response?.status === 422) {
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
                 setErrors(error.response.data.errors || {});
                 // Clear password input
                 (

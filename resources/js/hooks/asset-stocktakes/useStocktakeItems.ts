@@ -1,4 +1,5 @@
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -21,11 +22,11 @@ export const useStocktakeItems = () => {
     const fetchItems = useCallback(async (identifier: string | number) => {
         setLoading(true);
         try {
-            const response = await axios.get(
+            const response = await axiosInstance.get(
                 `/api/asset-stocktakes/${identifier}/items`,
             );
             // Map the data so 'result' is initialized properly for form
-            const mappedItems = response.data.data.map((item: any) => ({
+            const mappedItems = (response.data.data as StocktakeItem[]).map((item) => ({
                 ...item,
                 result: item.result || '',
             }));
@@ -45,16 +46,20 @@ export const useStocktakeItems = () => {
         ) => {
             setLoading(true);
             try {
-                await axios.post(
+                await axiosInstance.post(
                     `/api/asset-stocktakes/${identifier}/items`,
                     data,
                 );
                 toast.success('Stocktake items saved successfully.');
-            } catch (error: any) {
+            } catch (error: unknown) {
                 console.error('Failed to save items', error);
-                const msg =
-                    error.response?.data?.message || 'Failed to save items.';
-                toast.error(msg);
+                if (axios.isAxiosError(error)) {
+                    const msg =
+                        error.response?.data?.message || 'Failed to save items.';
+                    toast.error(msg);
+                } else {
+                    toast.error('An unexpected error occurred');
+                }
                 throw error;
             } finally {
                 setLoading(false);

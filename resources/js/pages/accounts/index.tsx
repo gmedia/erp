@@ -1,8 +1,8 @@
 'use client';
 
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
 import { Download, Loader2, Search } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 import { AccountForm } from '@/components/accounts/AccountForm';
@@ -29,8 +29,10 @@ import {
 import { useExport } from '@/hooks/useExport';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { type AccountFormData } from '@/components/accounts/AccountForm';
 import { type Account } from '@/types/account';
 import { type CoaVersion } from '@/types/coa-version';
+import axios from 'axios';
 import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -66,19 +68,9 @@ export default function AccountIndex() {
         null,
     );
 
-    useEffect(() => {
-        fetchCoaVersions();
-    }, []);
-
-    useEffect(() => {
-        if (selectedVersionId) {
-            fetchAccounts();
-        }
-    }, [selectedVersionId]);
-
-    const fetchCoaVersions = async () => {
+    const fetchCoaVersions = useCallback(async () => {
         try {
-            const response = await axios.get('/api/coa-versions?per_page=100');
+            const response = await axiosInstance.get('/api/coa-versions?per_page=100');
             const data = response.data.data;
             setCoaVersions(data);
             if (data.length > 0 && !selectedVersionId) {
@@ -88,28 +80,38 @@ export default function AccountIndex() {
                 );
                 setSelectedVersionId((activeVersion || data[0]).id.toString());
             }
-        } catch (error) {
+        } catch {
             toast.error('Failed to fetch COA versions');
         }
-    };
+    }, [selectedVersionId]);
 
-    const fetchAccounts = async (searchTerm = search) => {
+    const fetchAccounts = useCallback(async (searchTerm = search) => {
         if (!selectedVersionId) return;
         setIsLoading(true);
         try {
-            const response = await axios.get('/api/accounts', {
+            const response = await axiosInstance.get('/api/accounts', {
                 params: {
                     coa_version_id: selectedVersionId,
                     search: searchTerm,
                 },
             });
             setAccounts(response.data.data);
-        } catch (error) {
+        } catch {
             toast.error('Failed to fetch accounts');
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [selectedVersionId, search]);
+
+    useEffect(() => {
+        fetchCoaVersions();
+    }, [fetchCoaVersions]);
+
+    useEffect(() => {
+        if (selectedVersionId) {
+            fetchAccounts();
+        }
+    }, [selectedVersionId, fetchAccounts]);
 
     const handleAddRoot = () => {
         setSelectedAccount(null);
@@ -134,22 +136,26 @@ export default function AccountIndex() {
         setIsDeleteDialogOpen(true);
     };
 
-    const handleSubmit = async (data: any) => {
+    const handleSubmit = async (data: AccountFormData) => {
         setIsActionLoading(true);
         try {
             if (selectedAccount) {
-                await axios.put(`/api/accounts/${selectedAccount.id}`, data);
+                await axiosInstance.put(`/api/accounts/${selectedAccount.id}`, data);
                 toast.success('Account updated successfully');
             } else {
-                await axios.post('/api/accounts', data);
+                await axiosInstance.post('/api/accounts', data);
                 toast.success('Account created successfully');
             }
             setIsFormOpen(false);
             fetchAccounts();
-        } catch (error: any) {
-            toast.error(
-                error.response?.data?.message || 'Failed to save account',
-            );
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                toast.error(
+                    error.response?.data?.message || 'Failed to save account',
+                );
+            } else {
+                toast.error('An unexpected error occurred');
+            }
         } finally {
             setIsActionLoading(false);
         }
@@ -159,14 +165,18 @@ export default function AccountIndex() {
         if (!accountToDelete) return;
         setIsActionLoading(true);
         try {
-            await axios.delete(`/api/accounts/${accountToDelete.id}`);
+            await axiosInstance.delete(`/api/accounts/${accountToDelete.id}`);
             toast.success('Account deleted successfully');
             setIsDeleteDialogOpen(false);
             fetchAccounts();
-        } catch (error: any) {
-            toast.error(
-                error.response?.data?.message || 'Failed to delete account',
-            );
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                toast.error(
+                    error.response?.data?.message || 'Failed to delete account',
+                );
+            } else {
+                toast.error('An unexpected error occurred');
+            }
         } finally {
             setIsActionLoading(false);
         }

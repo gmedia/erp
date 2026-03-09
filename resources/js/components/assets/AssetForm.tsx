@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { memo, useEffect, useMemo, useRef } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
@@ -131,7 +131,7 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
 
     type AssetFormInput = z.input<typeof assetFormSchema>;
 
-    const form = useForm<AssetFormInput, any, AssetFormData>({
+    const form = useForm<AssetFormInput, unknown, AssetFormData>({
         resolver: zodResolver(assetFormSchema),
         defaultValues,
     });
@@ -186,19 +186,34 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
     const handleFormSubmit = (data: AssetFormData) => {
         onSubmit({
             ...data,
-            purchase_date: format(data.purchase_date, 'yyyy-MM-dd') as any,
+            purchase_date: format(
+                data.purchase_date,
+                'yyyy-MM-dd',
+            ) as unknown as Date,
             warranty_end_date: data.warranty_end_date
-                ? (format(data.warranty_end_date, 'yyyy-MM-dd') as any)
+                ? (format(
+                      data.warranty_end_date,
+                      'yyyy-MM-dd',
+                  ) as unknown as Date)
                 : null,
             depreciation_start_date: data.depreciation_start_date
-                ? (format(data.depreciation_start_date, 'yyyy-MM-dd') as any)
+                ? (format(
+                      data.depreciation_start_date,
+                      'yyyy-MM-dd',
+                  ) as unknown as Date)
                 : null,
         });
     };
 
     return (
         <EntityForm<AssetFormData>
-            form={form}
+            form={
+                form as unknown as UseFormReturn<
+                    AssetFormData,
+                    unknown,
+                    AssetFormData
+                >
+            }
             open={open}
             onOpenChange={onOpenChange}
             title={asset ? 'Edit Asset' : 'Add New Asset'}

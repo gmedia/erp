@@ -22,6 +22,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table';
+import { CustomTableMeta } from '@/utils/columns';
 
 import { useExport } from '@/hooks/useExport';
 import * as React from 'react';
@@ -195,7 +196,8 @@ export function DataTable<T>({
         }
         return columns.map((col) => {
             if (col.id === 'actions') {
-                const viewPath = (col.meta as any)?.viewPath;
+                const viewPath = (col.meta as CustomTableMeta<T> | undefined)
+                    ?.viewPath;
                 return {
                     ...col,
                     cell: ({ row }: { row: { original: T } }) => (

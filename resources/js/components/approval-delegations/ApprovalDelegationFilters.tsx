@@ -2,16 +2,11 @@ import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
-import { ApprovalDelegationFilters as FilterType } from '@/types/approval-delegation';
-import { UseFormReturn } from 'react-hook-form';
 
-interface ApprovalDelegationFiltersProps {
-    form: UseFormReturn<FilterType>;
-}
 
-export function ApprovalDelegationFilters({
-    form,
-}: ApprovalDelegationFiltersProps) {
+
+
+export function ApprovalDelegationFilters() {
     return (
         <>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

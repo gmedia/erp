@@ -22,10 +22,6 @@ interface CustomerFormProps {
     isLoading?: boolean;
 }
 
-const customerTypeOptions = [
-    { value: 'individual', label: 'Individual' },
-    { value: 'company', label: 'Company' },
-];
 
 // Status options
 const statusOptions = [

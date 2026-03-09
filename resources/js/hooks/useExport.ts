@@ -43,7 +43,7 @@ export function useExport({
                 if (urlObj.hostname === window.location.hostname) {
                     downloadUrl = urlObj.pathname + urlObj.search;
                 }
-            } catch (e) {
+            } catch {
                 // Ignore if it's already a relative URL or parse fails
             }
 

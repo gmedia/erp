@@ -2,8 +2,7 @@ import { generateModuleTests } from '../shared-test-factories';
 import { 
   createAssetCategory, 
   searchAssetCategory, 
-  editAssetCategory, 
-  deleteAssetCategory 
+  editAssetCategory
 } from './helpers';
 
 generateModuleTests({

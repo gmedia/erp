@@ -9,6 +9,7 @@ import {
     createSelectColumn,
     createSortingHeader,
     createTextColumn,
+    type CustomTableMeta,
 } from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
 import { Link } from 'react-router-dom';
@@ -57,7 +58,7 @@ export const assetStocktakeColumns: ColumnDef<AssetStocktake>[] = [
         enableHiding: false,
         cell: ({ row, table }) => {
             const item = row.original;
-            const meta = table.options.meta as any;
+            const meta = table.options.meta as CustomTableMeta<AssetStocktake> | undefined;
             return (
                 <GenericActions
                     item={item}

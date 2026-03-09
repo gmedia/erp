@@ -1,4 +1,5 @@
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -40,7 +41,7 @@ export interface TimelineEntry {
     transition: { name: string } | null;
     performed_by: { name: string } | null;
     comment: string | null;
-    metadata: any;
+    metadata: Record<string, unknown> | null;
     created_at: string;
 }
 
@@ -58,17 +59,22 @@ export function useEntityPipeline(
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get<{ data: EntityStateData }>(
+            const response = await axiosInstance.get<{ data: EntityStateData }>(
                 `/api/entity-states/${entityType}/${entityId}`,
             );
             setStateData(response.data.data);
-        } catch (err: any) {
-            if (err.response?.status !== 404 && err.response?.status !== 400) {
-                setError(
-                    err.response?.data?.message ||
-                        'Failed to fetch entity state',
-                );
-                toast.error('Failed to fetch entity state');
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                if (err.response?.status !== 404 && err.response?.status !== 400) {
+                    setError(
+                        err.response?.data?.message ||
+                            'Failed to fetch entity state',
+                    );
+                    toast.error('Failed to fetch entity state');
+                }
+            } else {
+                setError('An unexpected error occurred');
+                toast.error('An unexpected error occurred');
             }
         } finally {
             setLoading(false);
@@ -79,16 +85,18 @@ export function useEntityPipeline(
         async (page = 1) => {
             setTimelineLoading(true);
             try {
-                const response = await axios.get<{ data: TimelineEntry[] }>(
+                const response = await axiosInstance.get<{ data: TimelineEntry[] }>(
                     `/api/entity-states/${entityType}/${entityId}/timeline?page=${page}`,
                 );
                 setTimeline(response.data.data);
-            } catch (err: any) {
-                if (
-                    err.response?.status !== 404 &&
-                    err.response?.status !== 400
-                ) {
-                    toast.error('Failed to fetch timeline');
+            } catch (err: unknown) {
+                if (axios.isAxiosError(err)) {
+                    if (
+                        err.response?.status !== 404 &&
+                        err.response?.status !== 400
+                    ) {
+                        toast.error('Failed to fetch timeline');
+                    }
                 }
             } finally {
                 setTimelineLoading(false);
@@ -103,7 +111,7 @@ export function useEntityPipeline(
     ) => {
         setLoading(true);
         try {
-            const response = await axios.post<{
+            const response = await axiosInstance.post<{
                 data: EntityStateData;
                 message: string;
             }>(`/api/entity-states/${entityType}/${entityId}/transition`, {
@@ -114,12 +122,16 @@ export function useEntityPipeline(
             toast.success(response.data.message || 'Transition successful');
             fetchTimeline(1); // Refresh timeline after transition
             return true;
-        } catch (err: any) {
-            const message =
-                err.response?.data?.message ||
-                err.response?.data?.errors?.guards?.[0] ||
-                'Transition failed';
-            toast.error(message);
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                const message =
+                    err.response?.data?.message ||
+                    err.response?.data?.errors?.guards?.[0] ||
+                    'Transition failed';
+                toast.error(message);
+            } else {
+                toast.error('An unexpected error occurred');
+            }
             return false;
         } finally {
             setLoading(false);

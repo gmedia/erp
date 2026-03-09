@@ -10,6 +10,7 @@ import {
     createTextColumn,
 } from '@/utils/columns';
 import { type ColumnDef } from '@tanstack/react-table';
+import { type CustomTableMeta } from '@/utils/columns';
 
 export const inventoryStocktakeColumns: ColumnDef<InventoryStocktake>[] = [
     createSelectColumn<InventoryStocktake>(),
@@ -51,7 +52,7 @@ export const inventoryStocktakeColumns: ColumnDef<InventoryStocktake>[] = [
         enableHiding: false,
         cell: ({ row, table }) => {
             const item = row.original;
-            const meta = table.options.meta as any;
+            const meta = table.options.meta as CustomTableMeta<InventoryStocktake>;
             return (
                 <GenericActions
                     item={item}

@@ -9,7 +9,13 @@ import {
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
-import { type ColumnDef } from '@tanstack/react-table';
+import { type ColumnDef, type TableMeta } from '@tanstack/react-table';
+
+interface CustomTableMeta<T> extends TableMeta<T> {
+    onView?: (item: T) => void;
+    onEdit?: (item: T) => void;
+    onDelete?: (item: T) => void;
+}
 
 export const stockTransferColumns: ColumnDef<StockTransfer>[] = [
     createSelectColumn<StockTransfer>(),
@@ -59,7 +65,7 @@ export const stockTransferColumns: ColumnDef<StockTransfer>[] = [
         enableHiding: false,
         cell: ({ row, table }) => {
             const item = row.original;
-            const meta = table.options.meta as any;
+            const meta = table.options.meta as CustomTableMeta<StockTransfer>;
             return (
                 <GenericActions
                     item={item}

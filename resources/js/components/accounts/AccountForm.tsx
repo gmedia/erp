@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
 import * as z from 'zod';
 
 import EntityForm from '@/components/common/EntityForm';
@@ -37,7 +37,7 @@ const accountSchema = z.object({
     description: z.string().optional().nullable(),
 });
 
-type AccountFormData = z.infer<typeof accountSchema>;
+export type AccountFormData = z.infer<typeof accountSchema>;
 
 interface AccountFormProps {
     open: boolean;
@@ -58,8 +58,8 @@ export function AccountForm({
     onSubmit,
     isLoading = false,
 }: AccountFormProps) {
-    const form = useForm<AccountFormData>({
-        resolver: zodResolver(accountSchema) as any,
+    const form = useForm<z.input<typeof accountSchema>>({
+        resolver: zodResolver(accountSchema),
         defaultValues: {
             coa_version_id: coaVersionId,
             parent_id: null,
@@ -128,8 +128,8 @@ export function AccountForm({
             open={open}
             onOpenChange={onOpenChange}
             title={account ? 'Edit Account' : 'Create Account'}
-            form={form}
-            onSubmit={onSubmit}
+            form={form as unknown as UseFormReturn<AccountFormData, unknown, AccountFormData>}
+            onSubmit={onSubmit as unknown as (data: z.input<typeof accountSchema>) => void}
             isLoading={isLoading}
         >
             <div className="grid gap-4 py-4">

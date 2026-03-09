@@ -81,8 +81,8 @@ const stepSchema = z
 interface ApprovalFlowStepFormDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    step: any | null; // The existing step payload
-    onSave: (data: any) => void;
+    step: z.infer<typeof stepSchema> | null; // The existing step payload
+    onSave: (data: z.infer<typeof stepSchema>) => void;
 }
 
 export function ApprovalFlowStepFormDialog({
@@ -122,8 +122,8 @@ export function ApprovalFlowStepFormDialog({
         };
     }, [step]);
 
-    const form = useForm({
-        resolver: zodResolver(stepSchema) as any,
+    const form = useForm<z.input<typeof stepSchema>>({
+        resolver: zodResolver(stepSchema),
         defaultValues,
     });
 
@@ -196,8 +196,12 @@ export function ApprovalFlowStepFormDialog({
                                     name="approver_user_id"
                                     label="Select User"
                                     url="/api/users"
-                                    labelFn={(user) => user.name}
-                                    valueFn={(user) => String(user.id)}
+                                    labelFn={(user: Record<string, unknown>) =>
+                                        user.name as string
+                                    }
+                                    valueFn={(user: Record<string, unknown>) =>
+                                        String(user.id)
+                                    }
                                     placeholder="Select user..."
                                 />
                             )}
@@ -206,8 +210,12 @@ export function ApprovalFlowStepFormDialog({
                                     name="approver_department_id"
                                     label="Select Department"
                                     url="/api/departments"
-                                    labelFn={(dept) => dept.name}
-                                    valueFn={(dept) => String(dept.id)}
+                                    labelFn={(dept: Record<string, unknown>) =>
+                                        dept.name as string
+                                    }
+                                    valueFn={(dept: Record<string, unknown>) =>
+                                        String(dept.id)
+                                    }
                                     placeholder="Select department..."
                                 />
                             )}
@@ -238,8 +246,12 @@ export function ApprovalFlowStepFormDialog({
                                 name="escalation_user_id"
                                 label="Escalate To User"
                                 url="/api/users"
-                                labelFn={(user) => user.name}
-                                valueFn={(user) => String(user.id)}
+                                labelFn={(user: Record<string, unknown>) =>
+                                    user.name as string
+                                }
+                                valueFn={(user: Record<string, unknown>) =>
+                                    String(user.id)
+                                }
                                 placeholder="Select user..."
                             />
                             <SelectField

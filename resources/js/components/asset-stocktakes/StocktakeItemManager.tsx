@@ -79,7 +79,7 @@ export function StocktakeItemManager({
     };
 
     return (
-        <FormProvider {...(form as any)}>
+        <FormProvider {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="rounded-md border">
                     <Table>
@@ -179,10 +179,10 @@ export function StocktakeItemManager({
                                                                 placeholder="Search location..."
                                                                 url={`/api/asset-locations?branch_id=${stocktakeBranchId}`}
                                                                 labelFn={(
-                                                                    item,
-                                                                ) => item.name}
+                                                                    item: Record<string, unknown>,
+                                                                ) => item.name as string}
                                                                 valueFn={(
-                                                                    item,
+                                                                    item: Record<string, unknown>,
                                                                 ) =>
                                                                     String(
                                                                         item.id,

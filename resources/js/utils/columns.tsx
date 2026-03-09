@@ -15,6 +15,14 @@ export type ColumnBuilderOptions<T = Record<string, unknown>> = {
     className?: string;
 };
 
+export interface CustomTableMeta<T> {
+    onView?: (item: T) => void;
+    onEdit?: (item: T) => void;
+    onDelete?: (item: T) => void;
+    viewPath?: (item: T) => string;
+    [key: string]: unknown;
+}
+
 export type DateColumnOptions<T = Record<string, unknown>> =
     ColumnBuilderOptions<T> & {
         dateFormat?: string;

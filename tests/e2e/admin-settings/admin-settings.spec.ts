@@ -132,7 +132,7 @@ test.describe('Admin Settings', () => {
 
         // Check if there's already a logo displayed
         const existingLogo = page.locator('img[alt="Current company logo"]');
-        const hadExistingLogo = await existingLogo.isVisible().catch(() => false);
+        await existingLogo.isVisible().catch(() => false);
 
         // Upload a new logo
         const logoInput = page.locator('input[name="company_logo"]');

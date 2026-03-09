@@ -14,7 +14,8 @@ import {
 } from '@/components/ui/input-otp';
 import { useClipboard } from '@/hooks/use-clipboard';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
-import axios from '@/lib/axios';
+import axios from 'axios';
+import axiosInstance from '@/lib/axios';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { Check, Copy, Loader2, ScanLine } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -151,24 +152,31 @@ function TwoFactorVerificationStep({
         setError('');
 
         try {
-            await axios.post('/user/confirmed-two-factor-authentication', {
+            await axiosInstance.post('/user/confirmed-two-factor-authentication', {
                 code,
             });
             onClose();
             // Optional: hard reload or update context block to reflect changes
             window.location.reload();
-        } catch (err: any) {
-            if (err.response?.status === 422) {
-                const returnedErrors = err.response.data.errors || {};
-                const firstError = Object.values(
-                    returnedErrors,
-                ).flat()[0] as string;
-                setError(
-                    firstError ||
-                        'The provided two factor authentication code was invalid.',
-                );
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                if (err.response?.status === 422) {
+                    const errorData = err.response.data as {
+                        errors?: Record<string, string[]>;
+                    };
+                    const returnedErrors = errorData.errors || {};
+                    const firstError = Object.values(
+                        returnedErrors,
+                    ).flat()[0] as string;
+                    setError(
+                        firstError ||
+                            'The provided two factor authentication code was invalid.',
+                    );
+                } else {
+                    setError('Failed to confirm two-factor authentication.');
+                }
             } else {
-                setError('Failed to confirm two-factor authentication.');
+                setError('An unexpected error occurred.');
             }
         } finally {
             setProcessing(false);

@@ -2,7 +2,7 @@ import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { useFormContext } from 'react-hook-form';
 
 export function EmployeeSelector() {
-    const { control } = useFormContext(); // Just to ensure context exists, though AsyncSelectField manages its own connection via name
+    useFormContext(); // Just to ensure context exists, though AsyncSelectField manages its own connection via name
 
     return (
         <AsyncSelectField

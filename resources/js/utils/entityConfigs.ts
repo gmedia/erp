@@ -8,6 +8,7 @@ import * as React from 'react';
 
 // Base configuration interface for all entities with improved typing
 export interface BaseEntityConfig<
+    T = unknown,
     FilterType extends FilterState = FilterState,
 > {
     readonly entityName: string;
@@ -17,7 +18,7 @@ export interface BaseEntityConfig<
     readonly queryKey: readonly string[];
     readonly identifierKey?: string;
     readonly breadcrumbs: readonly BreadcrumbItem[];
-    readonly getDeleteMessage: (item: Record<string, unknown>) => string;
+    readonly getDeleteMessage: (item: T) => string;
     readonly initialFilters?: FilterType;
 }
 
@@ -27,7 +28,7 @@ export interface CustomEntityConfig<
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     FormData = Record<string, unknown>,
     FilterType extends FilterState = FilterState,
-> extends BaseEntityConfig<FilterType> {
+> extends BaseEntityConfig<T, FilterType> {
     // Column definitions for the data table
     readonly columns: ColumnDef<T>[];
     // Filter field descriptors
@@ -124,13 +125,14 @@ const createGenericDeleteMessage =
         `This action cannot be undone. This will permanently delete ${item.name || `this ${entityName.toLowerCase()}`}'s ${entityName.toLowerCase()} record.`;
 
 // Configuration builder options
-export interface SimpleEntityConfigOptions {
+export interface SimpleEntityConfigOptions<T = unknown> {
     entityName: string;
     entityNamePlural: string;
     apiBase: string;
     filterPlaceholder: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     viewModalComponent?: React.ComponentType<any>;
+    getDeleteMessage?: (item: T) => string;
 }
 
 export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
@@ -148,7 +150,7 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     formComponent: React.ComponentType<any>;
     formType: FormComponentType;
     entityNameForSearch?: string;
-    getDeleteMessage: (item: Record<string, unknown>) => string;
+    getDeleteMessage: (item: T) => string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     viewModalComponent?: React.ComponentType<any>;
 }
@@ -606,7 +608,7 @@ export const journalEntryConfig = createComplexEntityConfig<JournalEntry>({
     formType: 'complex',
     entityNameForSearch: 'journal entry',
     viewModalComponent: JournalEntryViewModal,
-    getDeleteMessage: (item: any) =>
+    getDeleteMessage: (item: JournalEntry) =>
         `This action cannot be undone. This will permanently delete Journal Entry ${item.entry_number}.`,
 });
 
@@ -699,12 +701,12 @@ export const assetMovementConfig = createComplexEntityConfig({
         asset_id: '',
         movement_type: '',
     },
-    columns: assetMovementColumns as any,
+    columns: assetMovementColumns,
     filterFields: createAssetMovementFilterFields(),
     formComponent: AssetMovementForm,
     formType: 'complex',
     entityNameForSearch: 'movement',
-    viewModalComponent: AssetMovementViewModal as any,
+    viewModalComponent: AssetMovementViewModal,
     getDeleteMessage: () =>
         'This action cannot be undone. This will permanently delete this movement record.',
 });
@@ -802,7 +804,9 @@ import { createApprovalFlowFilterFields } from '@/components/approval-flows/Appr
 import { ApprovalFlowForm } from '@/components/approval-flows/ApprovalFlowForm';
 import { ApprovalFlowViewModal } from '@/components/approval-flows/ApprovalFlowViewModal';
 
-export const approvalFlowConfig = createComplexEntityConfig<any>({
+import { type ApprovalFlow } from '@/types/approval';
+ 
+export const approvalFlowConfig = createComplexEntityConfig<ApprovalFlow>({
     entityName: 'Approval Flow',
     entityNamePlural: 'Approval Flows',
     apiEndpoint: '/api/approval-flows',
@@ -810,7 +814,7 @@ export const approvalFlowConfig = createComplexEntityConfig<any>({
     queryKey: ['approval-flows'],
     breadcrumbs: [{ title: 'Approval Flows', href: '/approval-flows' }],
     initialFilters: { search: '', approvable_type: '', is_active: '' },
-    columns: approvalFlowColumns as any,
+    columns: approvalFlowColumns,
     filterFields: createApprovalFlowFilterFields(),
     formComponent: ApprovalFlowForm,
     formType: 'complex',
@@ -825,7 +829,9 @@ import { createApprovalDelegationFilterFields } from '@/components/approval-dele
 import { ApprovalDelegationForm } from '@/components/approval-delegations/ApprovalDelegationForm';
 import { ApprovalDelegationViewModal } from '@/components/approval-delegations/ApprovalDelegationViewModal';
 
-export const approvalDelegationConfig = createComplexEntityConfig<any>({
+import { type ApprovalDelegation } from '@/types/approval-delegation';
+ 
+export const approvalDelegationConfig = createComplexEntityConfig<ApprovalDelegation>({
     entityName: 'Approval Delegation',
     entityNamePlural: 'Approval Delegations',
     apiEndpoint: '/api/approval-delegations',
@@ -842,7 +848,7 @@ export const approvalDelegationConfig = createComplexEntityConfig<any>({
         start_date_from: '',
         start_date_to: '',
     },
-    columns: approvalDelegationColumns as any,
+    columns: approvalDelegationColumns,
     filterFields: createApprovalDelegationFilterFields(),
     formComponent: ApprovalDelegationForm,
     formType: 'complex',

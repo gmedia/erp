@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
 import { createAsset, deleteAsset, searchAsset } from '../assets/helpers';
 
 test.describe('Approval History', () => {

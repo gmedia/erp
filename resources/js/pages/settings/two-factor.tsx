@@ -50,7 +50,7 @@ export default function TwoFactor({
         try {
             await axios.post('/user/two-factor-authentication');
             setShowSetupModal(true);
-        } catch (error) {
+        } catch {
             toast.error('Failed to enable two-factor authentication.');
         } finally {
             setEnabling(false);
@@ -63,7 +63,7 @@ export default function TwoFactor({
             await axios.delete('/user/two-factor-authentication');
             // Hard reload to reflect changes or manually update state
             window.location.reload();
-        } catch (error) {
+        } catch {
             toast.error('Failed to disable two-factor authentication.');
         } finally {
             setDisabling(false);

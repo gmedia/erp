@@ -1,8 +1,15 @@
 import { useMemo } from 'react';
 import { TreeNode, TreeNodeData } from './tree-node';
 
+interface TreeItem {
+    id: number;
+    parent_id: number | null;
+    name: string;
+    display_name?: string;
+}
+
 interface TreeViewProps {
-    data: any[]; // Raw flat data from backend
+    data: TreeItem[]; // Raw flat data from backend
     selectedIds: number[];
     onSelectionChange: (ids: number[]) => void;
 }
@@ -14,7 +21,7 @@ export function TreeView({
 }: TreeViewProps) {
     const treeData = useMemo(() => {
         const buildTree = (
-            items: any[],
+            items: TreeItem[],
             parentId: number | null = null,
         ): TreeNodeData[] => {
             return items

@@ -1,4 +1,5 @@
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import { useCallback, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -38,7 +39,7 @@ export const useEmployeeUser = (form: UseFormReturn<UserFormData>) => {
             setLoading(true);
             setErrors({});
             try {
-                const response = await axios.get(
+                const response = await axiosInstance.get(
                     `/api/employees/${employeeId}/user`,
                 );
                 const { user, employee } = response.data;
@@ -64,25 +65,29 @@ export const useEmployeeUser = (form: UseFormReturn<UserFormData>) => {
             setLoading(true);
             setErrors({});
             try {
-                await axios.post(`/api/employees/${employeeId}/user`, {
+                await axiosInstance.post(`/api/employees/${employeeId}/user`, {
                     name: data.name,
                     email: data.email,
                     password: data.password || undefined,
                 });
                 toast.success('User saved successfully.');
                 setUserExists(true);
-            } catch (error: any) {
+            } catch (error: unknown) {
                 console.error('Failed to save user', error);
-                if (
-                    error.response?.status === 422 &&
-                    error.response?.data?.errors
-                ) {
-                    setErrors(error.response.data.errors);
-                    toast.error('Please fix the validation errors.');
-                } else if (error.response?.data?.message) {
-                    toast.error(error.response.data.message);
+                if (axios.isAxiosError(error)) {
+                    if (
+                        error.response?.status === 422 &&
+                        error.response?.data?.errors
+                    ) {
+                        setErrors(error.response.data.errors);
+                        toast.error('Please fix the validation errors.');
+                    } else if (error.response?.data?.message) {
+                        toast.error(error.response.data.message);
+                    } else {
+                        toast.error('Failed to save user.');
+                    }
                 } else {
-                    toast.error('Failed to save user.');
+                    toast.error('An unexpected error occurred');
                 }
             } finally {
                 setLoading(false);

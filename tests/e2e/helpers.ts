@@ -176,7 +176,7 @@ export async function login(
       page.waitForURL('**/dashboard', { timeout: 15000 }),
       page.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 15000 })
     ]);
-  } catch (e) {
+  } catch {
     // Ignore timeout, we'll check states below
   }
 

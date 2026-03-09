@@ -5,7 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import AdminSettingsLayout from '@/layouts/admin-settings/layout';
 import AppLayout from '@/layouts/app-layout';
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { useQuery } from '@tanstack/react-query';
@@ -63,7 +64,7 @@ function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axios.post('/api/admin-settings', formData, {
+            await axiosInstance.post('/api/admin-settings', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -73,11 +74,12 @@ function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
             });
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
-        } catch (error: any) {
-            if (error.response?.status === 422) {
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
                 const newErrors: Record<string, string> = {};
-                Object.keys(error.response.data.errors).forEach((key) => {
-                    newErrors[key] = error.response.data.errors[key][0];
+                const serverErrors = error.response.data.errors as Record<string, string[]>;
+                Object.keys(serverErrors).forEach((key) => {
+                    newErrors[key] = serverErrors[key][0];
                 });
                 setErrors(newErrors);
             }
@@ -235,17 +237,18 @@ function RegionalSettings({
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axios.put(
+            await axiosInstance.put(
                 '/api/admin-settings',
                 Object.fromEntries(formData),
             );
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
-        } catch (error: any) {
-            if (error.response?.status === 422) {
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
                 const newErrors: Record<string, string> = {};
-                Object.keys(error.response.data.errors).forEach((key) => {
-                    newErrors[key] = error.response.data.errors[key][0];
+                const serverErrors = error.response.data.errors as Record<string, string[]>;
+                Object.keys(serverErrors).forEach((key) => {
+                    newErrors[key] = serverErrors[key][0];
                 });
                 setErrors(newErrors);
             }
@@ -390,17 +393,18 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axios.put(
+            await axiosInstance.put(
                 '/api/admin-settings',
                 Object.fromEntries(formData),
             );
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
-        } catch (error: any) {
-            if (error.response?.status === 422) {
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
                 const newErrors: Record<string, string> = {};
-                Object.keys(error.response.data.errors).forEach((key) => {
-                    newErrors[key] = error.response.data.errors[key][0];
+                const serverErrors = error.response.data.errors as Record<string, string[]>;
+                Object.keys(serverErrors).forEach((key) => {
+                    newErrors[key] = serverErrors[key][0];
                 });
                 setErrors(newErrors);
             }
@@ -421,21 +425,24 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axios.post(
+            await axiosInstance.post(
                 '/api/admin-settings/test-smtp',
                 Object.fromEntries(formData),
             );
             setTestRecentlySuccessful(true);
             setTimeout(() => setTestRecentlySuccessful(false), 3000);
-        } catch (error: any) {
-            if (error.response?.status === 422) {
-                const newErrors: Record<string, string> = {};
-                Object.keys(error.response.data.errors).forEach((key) => {
-                    newErrors[key] = error.response.data.errors[key][0];
-                });
-                setTestErrors(newErrors);
-            } else if (error.response?.data?.message) {
-                setTestErrors({ test_email: error.response.data.message });
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status === 422) {
+                    const newErrors: Record<string, string> = {};
+                    const serverErrors = error.response.data.errors as Record<string, string[]>;
+                    Object.keys(serverErrors).forEach((key) => {
+                        newErrors[key] = serverErrors[key][0];
+                    });
+                    setTestErrors(newErrors);
+                } else if (error.response?.data?.message) {
+                    setTestErrors({ test_email: error.response.data.message });
+                }
             }
         } finally {
             setTestProcessing(false);
@@ -668,7 +675,7 @@ export default function AdminSettings() {
     const { data, isLoading, error } = useQuery<AdminSettingsResponse>({
         queryKey: ['admin-settings'],
         queryFn: async () => {
-            const response = await axios.get('/api/admin-settings');
+            const response = await axiosInstance.get('/api/admin-settings');
             return response.data;
         },
     });

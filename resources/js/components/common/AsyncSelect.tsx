@@ -12,33 +12,34 @@ import {
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
 
-export interface AsyncSelectProps {
+export interface AsyncSelectProps<T extends object = Record<string, unknown>> {
     value?: string;
     /** Handler for value changes. Optional when used in filter descriptors (injected by FilterModal). */
     onValueChange?: (value: string) => void;
     url: string;
     placeholder?: string;
     className?: string;
-    labelFn?: (item: any) => string; // To extract label from item
-    valueFn?: (item: any) => string; // To extract value from item
+    labelFn?: (item: T) => string; // To extract label from item
+    valueFn?: (item: T) => string; // To extract value from item
     initialLabel?: string; // Optional initial label to avoid extra fetch
     label?: string; // For accessibility and E2E testing
 }
 
-export function AsyncSelect({
+export function AsyncSelect<T extends object = Record<string, unknown>>({
     value,
     onValueChange,
     url,
     placeholder = 'Select...',
     className,
-    labelFn = (item) => item.name,
-    valueFn = (item) => item.id.toString(),
+    labelFn = (item: T) => (item as unknown as { name: string }).name,
+    valueFn = (item: T) =>
+        (item as unknown as { id: number | string }).id.toString(),
     initialLabel,
     label,
-}: AsyncSelectProps) {
+}: AsyncSelectProps<T>) {
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState('');
-    const [items, setItems] = React.useState<any[]>([]);
+    const [items, setItems] = React.useState<T[]>([]);
     const [loading, setLoading] = React.useState(false);
     const [selectedLabel, setSelectedLabel] = React.useState<string>(
         initialLabel || '',
@@ -88,7 +89,7 @@ export function AsyncSelect({
                     if (data) {
                         setSelectedLabel(labelFn(data));
                     }
-                } catch (e) {
+                } catch {
                     // If fetch by ID fails, fallback to list fetch?
                     // Or maybe the value is invalid.
                 } finally {

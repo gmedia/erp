@@ -32,7 +32,6 @@ export function useCrudMutations<Entity, FormData>({
     endpoint,
     queryKey,
     entityName,
-    identifierKey = 'id',
     onSuccess,
     onError,
 }: UseCrudMutationsOptions): UseCrudMutationsResult<Entity, FormData> {

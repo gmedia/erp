@@ -39,7 +39,7 @@ test.describe('Pipeline Audit Trail', () => {
         await filtersButton.click();
         await page.waitForTimeout(500); // Wait for transition
         
-        const filterDialog = page.getByRole('dialog').or(page.locator('.filter-container').first());
+        page.getByRole('dialog').or(page.locator('.filter-container').first());
         await expect(page.getByText('Entity Type').last()).toBeVisible();
         await expect(page.getByText('Pipeline').last()).toBeVisible();
         await expect(page.getByText('Performed By').last()).toBeVisible();

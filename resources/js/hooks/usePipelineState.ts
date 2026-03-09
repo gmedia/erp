@@ -1,4 +1,5 @@
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import { PipelineState } from '@/types/pipeline';
 import { PipelineStateFormData } from '@/utils/schemas';
 import { useCallback, useState } from 'react';
@@ -13,7 +14,7 @@ export function usePipelineState(pipelineId?: number) {
 
         setLoading(true);
         try {
-            const response = await axios.get<{ data: PipelineState[] }>(
+            const response = await axiosInstance.get<{ data: PipelineState[] }>(
                 `/api/pipelines/${pipelineId}/states`,
             );
             setStates(response.data.data);
@@ -29,15 +30,19 @@ export function usePipelineState(pipelineId?: number) {
         if (!pipelineId) return false;
 
         try {
-            await axios.post(`/api/pipelines/${pipelineId}/states`, data);
+            await axiosInstance.post(`/api/pipelines/${pipelineId}/states`, data);
             toast.success('Pipeline state created successfully.');
             await fetchStates();
             return true;
-        } catch (error: any) {
-            toast.error(
-                error.response?.data?.message ||
-                    'Failed to create pipeline state.',
-            );
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                toast.error(
+                    error.response?.data?.message ||
+                        'Failed to create pipeline state.',
+                );
+            } else {
+                toast.error('An unexpected error occurred');
+            }
             return false;
         }
     };
@@ -49,18 +54,22 @@ export function usePipelineState(pipelineId?: number) {
         if (!pipelineId) return false;
 
         try {
-            await axios.put(
+            await axiosInstance.put(
                 `/api/pipelines/${pipelineId}/states/${stateId}`,
                 data,
             );
             toast.success('Pipeline state updated successfully.');
             await fetchStates();
             return true;
-        } catch (error: any) {
-            toast.error(
-                error.response?.data?.message ||
-                    'Failed to update pipeline state.',
-            );
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                toast.error(
+                    error.response?.data?.message ||
+                        'Failed to update pipeline state.',
+                );
+            } else {
+                toast.error('An unexpected error occurred');
+            }
             return false;
         }
     };
@@ -69,17 +78,21 @@ export function usePipelineState(pipelineId?: number) {
         if (!pipelineId) return false;
 
         try {
-            await axios.delete(
+            await axiosInstance.delete(
                 `/api/pipelines/${pipelineId}/states/${stateId}`,
             );
             toast.success('Pipeline state deleted successfully.');
             await fetchStates();
             return true;
-        } catch (error: any) {
-            toast.error(
-                error.response?.data?.message ||
-                    'Failed to delete pipeline state.',
-            );
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                toast.error(
+                    error.response?.data?.message ||
+                        'Failed to delete pipeline state.',
+                );
+            } else {
+                toast.error('An unexpected error occurred');
+            }
             return false;
         }
     };

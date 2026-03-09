@@ -180,7 +180,7 @@ export function PipelineStateManager({
                 <TableCell>
                     <Select
                         value={formData.type}
-                        onValueChange={(val: any) =>
+                        onValueChange={(val: PipelineStateFormData['type']) =>
                             setFormData({ ...formData, type: val })
                         }
                     >

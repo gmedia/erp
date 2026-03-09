@@ -11,6 +11,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import axios from '@/lib/axios';
+import rawAxios from 'axios';
 import {
     AlertCircle,
     CheckCircle2,
@@ -27,7 +28,7 @@ interface ImportDialogProps {
     trigger?: React.ReactNode;
     importRoute: string;
     templateHeaders: string[];
-    sampleData?: any[];
+    sampleData?: Record<string, unknown>[];
     onSuccess?: () => void;
 }
 
@@ -105,9 +106,13 @@ export default function ImportDialog({
                     description: 'No data was imported.',
                 });
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             setLoading(false);
-            if (error.response && error.response.status === 422) {
+            if (
+                rawAxios.isAxiosError(error) &&
+                error.response &&
+                error.response.status === 422
+            ) {
                 toast.error('Validation Error', {
                     description: error.response.data.message || 'Invalid file.',
                 });

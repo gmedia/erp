@@ -14,7 +14,7 @@ export interface ApprovalAuditTrailItem {
     actor_user_id: number | null;
     actor_user_name: string;
     step_order: number | null;
-    metadata: any;
+    metadata: Record<string, unknown> | null;
     ip_address: string | null;
     user_agent: string | null;
     created_at: string;

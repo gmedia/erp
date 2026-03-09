@@ -10,19 +10,19 @@ import {
 import { type ReactNode } from 'react';
 import { AsyncSelect } from './AsyncSelect';
 
-interface AsyncSelectFieldProps {
+interface AsyncSelectFieldProps<T extends object = Record<string, unknown>> {
     name: string;
     label?: string;
     url: string; // API URL
     placeholder?: string;
     className?: string;
     children?: ReactNode;
-    labelFn?: (item: any) => string;
-    valueFn?: (item: any) => string;
+    labelFn?: (item: T) => string;
+    valueFn?: (item: T) => string;
     initialLabel?: string;
 }
 
-export default function AsyncSelectField({
+export default function AsyncSelectField<T extends object = Record<string, unknown>>({
     name,
     label,
     url,
@@ -32,7 +32,7 @@ export default function AsyncSelectField({
     labelFn,
     valueFn,
     initialLabel,
-}: AsyncSelectFieldProps) {
+}: AsyncSelectFieldProps<T>) {
     return (
         <FormField
             name={name}
@@ -40,7 +40,7 @@ export default function AsyncSelectField({
                 <FormItem className={className}>
                     {label && <FormLabel>{label}</FormLabel>}
                     <FormControl>
-                        <AsyncSelect
+                        <AsyncSelect<T>
                             value={
                                 field.value ? String(field.value) : undefined
                             }

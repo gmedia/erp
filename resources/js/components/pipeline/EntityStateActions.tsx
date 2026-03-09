@@ -98,9 +98,12 @@ export function EntityStateActions({
     const { current_state, available_transitions } = stateData;
 
     // Dynamically render the icon
-    const IconComponent = current_state.icon
-        ? (LucideIcons as any)[current_state.icon]
-        : null;
+    const IconComponent =
+        current_state.icon && current_state.icon in LucideIcons
+            ? (LucideIcons as unknown as Record<string, LucideIcons.LucideIcon>)[
+                  current_state.icon
+              ]
+            : null;
 
     return (
         <div className="flex flex-wrap items-center gap-3">

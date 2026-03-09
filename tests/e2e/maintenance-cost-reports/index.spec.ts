@@ -39,7 +39,7 @@ test.describe('Maintenance Cost Report', () => {
     });
 
     test('should be able to open type filter', async ({ page }) => {
-        const typeFilter = page.getByRole('combobox').nth(3); // Type is the 4th filter after Search, Category, Branch, Vendor (Wait, Search is input, so AsyncSelect x3, Select x2).
+        page.getByRole('combobox').nth(3); // Type is the 4th filter after Search, Category, Branch, Vendor (Wait, Search is input, so AsyncSelect x3, Select x2).
         // Let's just use text 'Select type'
         const selectBtn = page.getByRole('combobox').filter({ hasText: 'Select type' });
         if (await selectBtn.isVisible()) {

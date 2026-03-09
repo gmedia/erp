@@ -4,7 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { Plus, Trash } from 'lucide-react';
 import { memo, useEffect, useMemo } from 'react';
-import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch, type UseFormReturn } from 'react-hook-form';
+import * as z from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -82,9 +83,8 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
             [data],
         );
 
-        const form = useForm<JournalEntryFormData>({
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            resolver: zodResolver(journalEntryFormSchema) as any,
+        const form = useForm<z.input<typeof journalEntryFormSchema>>({
+            resolver: zodResolver(journalEntryFormSchema),
             defaultValues,
         });
 
@@ -113,16 +113,17 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
             0;
         const difference = totalDebit - totalCredit;
 
-        const handleFormSubmit = (data: JournalEntryFormData) => {
-            onSubmit({
+        const handleFormSubmit = (data: z.input<typeof journalEntryFormSchema>) => {
+            const payload = {
                 ...data,
-                entry_date: format(data.entry_date, 'yyyy-MM-dd') as any, // Format for API
-            });
+                entry_date: format(data.entry_date, 'yyyy-MM-dd') as unknown as Date, // Format for API, cast to satisfy schema if needed
+            } as JournalEntryFormData;
+            onSubmit(payload);
         };
 
         return (
             <EntityForm<JournalEntryFormData>
-                form={form}
+                form={form as unknown as UseFormReturn<JournalEntryFormData, unknown, JournalEntryFormData>}
                 open={open}
                 onOpenChange={onOpenChange}
                 title={isEdit ? 'Edit Journal Entry' : 'Add New Journal Entry'}

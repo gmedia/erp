@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { login, createEntity, EntityConfig } from '../helpers';
+import { createEntity, EntityConfig } from '../helpers';
 
 /**
  * Create a new employee via the UI.

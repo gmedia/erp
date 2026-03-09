@@ -6,8 +6,6 @@ let pipelineId: number | null = null;
 let assetName: string | null = null;
 
 async function setupPipelineViaApi(page: Page) {
-  const cookies = await page.context().cookies();
-  const xsrfTokenCookie = cookies.find(c => c.name === 'XSRF-TOKEN');
   const apiToken = await page.evaluate(() => localStorage.getItem('api_token'));
   const headers = { 
     'Accept': 'application/json',

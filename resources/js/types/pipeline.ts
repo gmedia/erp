@@ -34,7 +34,7 @@ export interface PipelineTransitionAction extends BaseEntity {
         | 'webhook'
         | 'custom';
     execution_order: number;
-    config: Record<string, any>;
+    config: Record<string, unknown>;
     is_async: boolean;
     on_failure: 'abort' | 'continue' | 'log_and_continue';
     is_active: boolean;
@@ -48,7 +48,7 @@ export interface PipelineTransition extends BaseEntity {
     code: string;
     description: string | null;
     required_permission: string | null;
-    guard_conditions: Record<string, any> | null;
+    guard_conditions: Record<string, unknown> | null;
     requires_confirmation: boolean;
     requires_comment: boolean;
     requires_approval: boolean;

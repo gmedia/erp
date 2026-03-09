@@ -1,5 +1,5 @@
 import { generateModuleTests } from '../shared-test-factories';
-import { createAssetMovement, searchAssetMovement, deleteAssetMovement } from './helpers';
+import { createAssetMovement, searchAssetMovement } from './helpers';
 
 generateModuleTests({
   entityName: 'Asset Movement',

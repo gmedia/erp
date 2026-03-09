@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { memo, useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
@@ -16,17 +16,18 @@ import {
     AssetMaintenanceFormData,
     assetMaintenanceFormSchema,
 } from '@/utils/schemas';
+import { type AssetMaintenance } from '@/types/asset-maintenance';
 
 interface AssetMaintenanceFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    item?: any | null;
+    item?: AssetMaintenance | null;
     onSubmit: (data: AssetMaintenanceFormData) => void;
     isLoading?: boolean;
 }
 
 const getAssetMaintenanceFormDefaults = (
-    item?: any | null,
+    item?: AssetMaintenance | null,
 ): AssetMaintenanceFormData => {
     if (!item) {
         return {
@@ -74,7 +75,7 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
 
         const form = useForm<
             AssetMaintenanceFormInput,
-            any,
+            unknown,
             AssetMaintenanceFormData
         >({
             resolver: zodResolver(assetMaintenanceFormSchema),
@@ -93,10 +94,16 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
             onSubmit({
                 ...data,
                 scheduled_at: data.scheduled_at
-                    ? (format(data.scheduled_at, 'yyyy-MM-dd HH:mm:ss') as any)
-                    : null,
+                    ? (format(
+                          data.scheduled_at,
+                          'yyyy-MM-dd HH:mm:ss',
+                      ) as unknown as Date)
+                    : (null as unknown as Date),
                 performed_at: data.performed_at
-                    ? (format(data.performed_at, 'yyyy-MM-dd HH:mm:ss') as any)
+                    ? (format(
+                          data.performed_at,
+                          'yyyy-MM-dd HH:mm:ss',
+                      ) as unknown as Date)
                     : null,
             });
         };
@@ -107,7 +114,13 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
 
         return (
             <EntityForm<AssetMaintenanceFormData>
-                form={form}
+                form={
+                    form as unknown as UseFormReturn<
+                        AssetMaintenanceFormData,
+                        unknown,
+                        AssetMaintenanceFormData
+                    >
+                }
                 open={open}
                 onOpenChange={onOpenChange}
                 title={
@@ -127,8 +140,8 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
                         url="/api/assets"
                         placeholder="Select asset"
                         initialLabel={initialAssetLabel}
-                        labelFn={(a) =>
-                            `${a.asset_code || ''} ${a.name || ''}`.trim()
+                        labelFn={(a: Record<string, unknown>) =>
+                            `${(a.asset_code as string) || ''} ${(a.name as string) || ''}`.trim()
                         }
                     />
 

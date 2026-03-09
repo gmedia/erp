@@ -434,6 +434,16 @@ export const assetStocktakeFormSchema = z.object({
 });
 
 export type AssetStocktakeFormData = z.infer<typeof assetStocktakeFormSchema>;
+ 
+export const assetDepreciationCalculationFormSchema = z.object({
+    fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
+    period_start: z.string().min(1, { message: 'Start period is required.' }),
+    period_end: z.string().min(1, { message: 'End period is required.' }),
+});
+ 
+export type AssetDepreciationCalculationFormData = z.infer<
+    typeof assetDepreciationCalculationFormSchema
+>;
 
 export const pipelineFormSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),

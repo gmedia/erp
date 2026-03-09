@@ -1,7 +1,53 @@
 import { AssetCategory } from './asset-category';
 import { AssetLocation } from './asset-location';
+import { AssetMaintenance } from './asset-maintenance';
 import { AssetModel } from './asset-model';
 import { EntityWithId } from './entity';
+
+
+export interface AssetMovement extends EntityWithId {
+    movement_type: string;
+    movement_date: string;
+    moved_at?: string;
+    origin?: string | null;
+    destination?: string | null;
+    from_branch_id?: number | null;
+    from_branch?: { id: number; name: string } | null;
+    from_location_id?: number | null;
+    from_location?: { id: number; name: string } | null;
+    from_employee_id?: number | null;
+    from_employee?: { id: number; name: string } | null;
+    to_branch_id?: number | null;
+    to_location_id?: number | null;
+    to_branch?: { id: number; name: string } | null;
+    to_location?: { id: number; name: string } | null;
+    to_employee_id?: number | null;
+    to_employee?: { id: number; name: string } | null;
+    reference: string | null;
+    notes: string | null;
+    pic: string | null;
+}
+
+export interface AssetStocktakeItem extends EntityWithId {
+    stocktake_reference: string;
+    stocktake_date: string;
+    branch: string;
+    expected_condition: string;
+    found_condition: string;
+    status: string;
+    notes: string | null;
+}
+
+export interface AssetDepreciationLine extends EntityWithId {
+    period: string;
+    fiscal_year: string;
+    amount: string;
+    accumulated_depreciation: string;
+    accumulated_after?: string;
+    book_value: string;
+    book_value_after?: string;
+    status: string;
+}
 
 export interface Asset extends EntityWithId {
     ulid: string;
@@ -31,6 +77,7 @@ export interface Asset extends EntityWithId {
     book_value: string;
     depreciation_expense_account_id: number | null;
     accumulated_depr_account_id: number | null;
+    qrcode_url?: string;
 
     // Relations
     category?: AssetCategory;
@@ -40,5 +87,8 @@ export interface Asset extends EntityWithId {
     department?: { id: number; name: string };
     employee?: { id: number; name: string };
     supplier?: { id: number; name: string };
-    movements?: any[];
+    movements?: AssetMovement[];
+    maintenances?: AssetMaintenance[];
+    stocktake_items?: AssetStocktakeItem[];
+    depreciation_lines?: AssetDepreciationLine[];
 }

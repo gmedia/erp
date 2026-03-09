@@ -65,9 +65,9 @@ test.describe('Asset Import E2E Tests', () => {
         try {
             await expect(page.getByText('Import Completed')).toBeVisible({ timeout: 10000 });
             await expect(page.getByText('Successfully imported 1 rows.')).toBeVisible();
-        } catch (e) {
+        } catch {
              // Check if error toast appeared instead
-            const errorToast = await page.getByText('Import Failed').isVisible();
+            await page.getByText('Import Failed').isVisible();
         }
 
         // Close dialog manually if it's still open

@@ -22,6 +22,13 @@ import axios from '@/lib/axios';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import {
+    Asset,
+    AssetMovement,
+    AssetStocktakeItem,
+    AssetDepreciationLine,
+} from '@/types/asset';
+import { type AssetMaintenance } from '@/types/asset-maintenance';
+import {
     Activity,
     AlertCircle,
     Barcode,
@@ -68,7 +75,7 @@ export default function AssetProfile() {
         enabled: !!id,
     });
 
-    const item = assetData?.asset?.data;
+    const item: Asset = assetData?.asset?.data;
 
     const handleStateChange = useCallback(() => {
         setTimelineKey(Date.now());
@@ -79,7 +86,7 @@ export default function AssetProfile() {
         if (!dateString) return 'N/A';
         try {
             return format(new Date(dateString), 'PPP');
-        } catch (e) {
+        } catch {
             return dateString;
         }
     };
@@ -123,18 +130,6 @@ export default function AssetProfile() {
             </AppLayout>
         );
     }
-    const getConditionVariant = (condition: string) => {
-        switch (condition) {
-            case 'good':
-                return 'default';
-            case 'needs_repair':
-                return 'secondary';
-            case 'damaged':
-                return 'destructive';
-            default:
-                return 'outline';
-        }
-    };
 
     const getDepreciationProgress = () => {
         const purchaseCost = Number(item.purchase_cost) || 0;
@@ -278,7 +273,7 @@ export default function AssetProfile() {
                                 <div className="flex flex-col items-center gap-2">
                                     <div className="rounded-lg border border-primary/10 bg-white p-2 shadow-sm">
                                         <QRCodeSVG
-                                            value={item.qrcode_url}
+                                            value={item.qrcode_url || ''}
                                             size={80}
                                             level="H"
                                             includeMargin={false}
@@ -602,7 +597,7 @@ export default function AssetProfile() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {item.movements.map((m) => (
+                                            {item.movements?.map((m: AssetMovement) => (
                                                 <TableRow
                                                     key={m.id}
                                                     className="hover:bg-muted/30"
@@ -616,43 +611,39 @@ export default function AssetProfile() {
                                                         </Badge>
                                                     </TableCell>
                                                     <TableCell className="text-sm whitespace-nowrap">
-                                                        {formatDate(m.moved_at)}
+                                                        {formatDate(m.moved_at || null)}
                                                     </TableCell>
                                                     <TableCell className="text-xs">
                                                         {m.from_branch && (
                                                             <div className="font-medium">
-                                                                {m.from_branch}
+                                                                {m.from_branch.name}
                                                             </div>
                                                         )}
                                                         {m.from_location && (
                                                             <div className="text-muted-foreground">
-                                                                {
-                                                                    m.from_location
-                                                                }
+                                                                {m.from_location.name}
                                                             </div>
                                                         )}
                                                         {m.from_employee && (
                                                             <div className="text-primary">
-                                                                {
-                                                                    m.from_employee
-                                                                }
+                                                                {m.from_employee.name}
                                                             </div>
                                                         )}
                                                     </TableCell>
                                                     <TableCell className="text-xs">
                                                         {m.to_branch && (
                                                             <div className="font-medium">
-                                                                {m.to_branch}
+                                                                {m.to_branch.name}
                                                             </div>
                                                         )}
                                                         {m.to_location && (
                                                             <div className="text-muted-foreground">
-                                                                {m.to_location}
+                                                                {m.to_location.name}
                                                             </div>
                                                         )}
                                                         {m.to_employee && (
                                                             <div className="text-primary">
-                                                                {m.to_employee}
+                                                                {m.to_employee.name}
                                                             </div>
                                                         )}
                                                     </TableCell>
@@ -712,7 +703,7 @@ export default function AssetProfile() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {item.maintenances.map((m) => (
+                                            {item.maintenances?.map((m: AssetMaintenance) => (
                                                 <TableRow
                                                     key={m.id}
                                                     className="hover:bg-muted/30"
@@ -804,7 +795,7 @@ export default function AssetProfile() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {item.stocktake_items.map((s) => (
+                                            {item.stocktake_items?.map((s: AssetStocktakeItem) => (
                                                 <TableRow
                                                     key={s.id}
                                                     className="hover:bg-muted/30"
@@ -891,8 +882,8 @@ export default function AssetProfile() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {item.depreciation_lines.map(
-                                                (d) => (
+                                            {item.depreciation_lines?.map(
+                                                (d: AssetDepreciationLine) => (
                                                     <TableRow
                                                         key={d.id}
                                                         className="hover:bg-muted/30"
@@ -905,17 +896,17 @@ export default function AssetProfile() {
                                                         </TableCell>
                                                         <TableCell className="text-right font-medium">
                                                             {formatCurrency(
-                                                                d.amount,
+                                                                d.amount || 0,
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="text-right text-sm text-muted-foreground">
                                                             {formatCurrency(
-                                                                d.accumulated_after,
+                                                                d.accumulated_after || 0,
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="text-right font-semibold text-primary">
                                                             {formatCurrency(
-                                                                d.book_value_after,
+                                                                d.book_value_after || 0,
                                                             )}
                                                         </TableCell>
                                                         <TableCell>

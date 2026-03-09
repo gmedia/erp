@@ -50,7 +50,7 @@ export async function createAsset(
       const categoryOption = page.getByRole('option', { name: new RegExp(`^${categoryName}`, 'i') }).first();
       await expect(categoryOption).toBeVisible({ timeout: 2000 });
       await categoryOption.click();
-  } catch (e) {
+  } catch {
       // Fallback
       await page.getByRole('option').first().click();
   }
@@ -67,7 +67,7 @@ export async function createAsset(
     const branchOption = page.getByRole('option', { name: new RegExp(`^${branchName}`, 'i') }).first();
     await expect(branchOption).toBeVisible({ timeout: 2000 });
     await branchOption.click();
-  } catch(e) {
+  } catch {
      await page.getByRole('option').first().click();
   }
 
@@ -138,7 +138,7 @@ export async function deleteAsset(page: Page, identifier: string): Promise<void>
     await expect(row).toBeVisible();
 
     // Click Actions dropdown
-    const actionsBtn = row.locator('button').filter({ hasText: /Actions/i }); // Usually "Actions" or the ellipsis icon
+    row.locator('button').filter({ hasText: /Actions/i }); // Usually "Actions" or the ellipsis icon
     // If it's the standard createActionsColumn, it renders a button with sr-only "Open menu" or visible text?
     // Looking at other modules, it's often the ellipsis `...` which might have aria-label "Open menu" or similar.
     // Or it might be explicit text.

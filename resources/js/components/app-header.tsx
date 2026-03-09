@@ -32,6 +32,7 @@ import { cn } from '@/lib/utils';
 
 import { useAuth } from '@/contexts/auth-context';
 import { type BreadcrumbItem, type NavItem } from '@/types';
+import { type User } from '@/types/user';
 import { IdCard, LayoutGrid, Menu, Search, Users } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import AppLogo from './app-logo';
@@ -247,7 +248,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56" align="end">
-                                <UserMenuContent user={user as any} />
+                                <UserMenuContent user={user as User} />
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

@@ -33,7 +33,7 @@ interface EntityFormProps<T extends FieldValues = FieldValues> {
     children: React.ReactNode;
     isLoading?: boolean;
     /** The form object returned by react‑hook‑form's useForm */
-    form: UseFormReturn<any, any, T>;
+    form: UseFormReturn<T, unknown, T>;
     /** Optional – disable the submit button manually (e.g. for custom validation) */
     submitDisabled?: boolean;
     /** Optional – custom class name for the DialogContent (e.g. for wider forms) */
@@ -83,7 +83,7 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
         if (lowerTitle.includes('create') || lowerTitle.includes('buat'))
             return t('common.create');
         return t('common.submit');
-    }, [title, isLoading, t]);
+    }, [title, isLoading, t, submitLabel]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>

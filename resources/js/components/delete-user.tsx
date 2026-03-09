@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import axios from '@/lib/axios';
+import rawAxios from 'axios';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -33,14 +34,19 @@ export default function DeleteUser() {
             await axios.delete('/api/profile', { data });
             localStorage.removeItem('api_token');
             window.location.href = '/login';
-        } catch (error: any) {
-            if (error.response?.status === 422) {
-                const serverErrors = error.response.data.errors || {};
+        } catch (error: unknown) {
+            if (rawAxios.isAxiosError(error) && error.response?.status === 422) {
+                const serverErrors =
+                    (
+                        error.response.data as {
+                            errors?: Record<string, string | string[]>;
+                        }
+                    ).errors || {};
                 const flatErrors: Record<string, string> = {};
                 for (const key of Object.keys(serverErrors)) {
                     flatErrors[key] = Array.isArray(serverErrors[key])
                         ? serverErrors[key][0]
-                        : serverErrors[key];
+                        : (serverErrors[key] as string);
                 }
                 setErrors(flatErrors);
                 passwordInput.current?.focus();

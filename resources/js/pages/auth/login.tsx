@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/auth-context';
 import AuthLayout from '@/layouts/auth-layout';
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -34,11 +35,11 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
         const data = Object.fromEntries(formData.entries());
         // Handle checkbox which might not be boolean in FormData
         data.remember =
-            formData.get('remember') === 'on' ? true : (false as any);
+            formData.get('remember') === 'on' ? true : false;
 
         try {
             // We use token based auth via API
-            const response = await axios.post('/api/login', data);
+            const response = await axiosInstance.post('/api/login', data);
 
             // AuthController returns: { token: "...", user: {...} }
             const payload = response.data;
@@ -48,16 +49,22 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
             // Redirect to intended location or dashboard
             const from = location.state?.from?.pathname || '/dashboard';
             navigate(from, { replace: true });
-        } catch (error: any) {
-            if (error.response?.status === 422) {
-                setErrors(error.response.data.errors || {});
-            } else if (error.response?.status === 401) {
-                setErrors({
-                    email: 'These credentials do not match our records.',
-                });
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status === 422) {
+                    setErrors(error.response.data.errors || {});
+                } else if (error.response?.status === 401) {
+                    setErrors({
+                        email: 'These credentials do not match our records.',
+                    });
+                } else {
+                    setErrors({
+                        email: 'An error occurred during login. Please try again.',
+                    });
+                }
             } else {
                 setErrors({
-                    email: 'An error occurred during login. Please try again.',
+                    email: 'An unexpected error occurred.',
                 });
             }
         } finally {

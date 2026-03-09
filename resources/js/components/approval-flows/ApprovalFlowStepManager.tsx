@@ -41,7 +41,10 @@ export function ApprovalFlowStepManager({
         }
     };
 
-    const renderRow = (step: any, index: number) => {
+    const renderRow = (
+        step: NonNullable<ApprovalFlowFormData['steps']>[number],
+        index: number,
+    ) => {
         let approverLabel = '-';
         if (step.approver_type === 'user') {
             approverLabel = `User ID: ${step.approver_user_id || '-'}`;
@@ -135,7 +138,11 @@ export function ApprovalFlowStepManager({
                 <ApprovalFlowStepFormDialog
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
-                    step={editingIndex !== null ? fields[editingIndex] : null}
+                    step={
+                        editingIndex !== null && fields[editingIndex]
+                            ? fields[editingIndex]
+                            : null
+                    }
                     onSave={(data) => {
                         if (editingIndex !== null) {
                             update(editingIndex, data);

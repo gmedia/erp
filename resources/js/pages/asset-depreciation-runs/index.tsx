@@ -24,6 +24,7 @@ import { useAssetDepreciationRuns } from '@/hooks/useAssetDepreciationRuns';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
+import { type AssetDepreciationCalculationFormData } from '@/utils/schemas';
 import { format } from 'date-fns';
 import { Calculator, CheckCircle2, Eye, Loader2, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -53,7 +54,6 @@ export default function Index() {
         data,
         meta,
         isLoading,
-        pagination,
         isCalculating,
         isPosting,
         setPage,
@@ -83,12 +83,24 @@ export default function Index() {
         to,
     };
 
-    const handleCalculateSubmit = async (formData: any) => {
-        const result = await calculateDepreciation(formData);
+    const handleCalculateSubmit = async (
+        formData: AssetDepreciationCalculationFormData,
+    ): Promise<{ success: boolean; errors?: Record<string, string[]> }> => {
+        const result = await calculateDepreciation({
+            ...formData,
+            fiscal_year_id: parseInt(formData.fiscal_year_id),
+        });
+
         if (result === true) {
             setIsCalcOpen(false);
+            return { success: true };
         }
-        return result;
+
+        if (typeof result === 'object' && result.errors) {
+            return { success: false, errors: result.errors };
+        }
+
+        return { success: false };
     };
 
     return (

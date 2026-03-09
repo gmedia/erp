@@ -2,7 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
+import * as z from 'zod';
 
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
@@ -31,16 +32,16 @@ export function FiscalYearForm({
 }: FiscalYearFormProps) {
     const activeEntity = fiscalYear || entity;
 
-    const form = useForm<FiscalYearFormData>({
+    const form = useForm<z.input<typeof fiscalYearFormSchema>>({
         resolver: zodResolver(fiscalYearFormSchema),
         defaultValues: {
             name: activeEntity?.name || '',
             start_date: activeEntity?.start_date
                 ? new Date(activeEntity.start_date)
-                : (undefined as any),
+                : (undefined as unknown as Date),
             end_date: activeEntity?.end_date
                 ? new Date(activeEntity.end_date)
-                : (undefined as any),
+                : (undefined as unknown as Date),
             status: activeEntity?.status || 'open',
         },
     });
@@ -51,26 +52,33 @@ export function FiscalYearForm({
                 name: activeEntity?.name || '',
                 start_date: activeEntity?.start_date
                     ? new Date(activeEntity.start_date)
-                    : (undefined as any),
+                    : (undefined as unknown as Date),
                 end_date: activeEntity?.end_date
                     ? new Date(activeEntity.end_date)
-                    : (undefined as any),
+                    : (undefined as unknown as Date),
                 status: activeEntity?.status || 'open',
             });
         }
     }, [form, activeEntity, open]);
 
-    const handleFormSubmit = (data: FiscalYearFormData) => {
-        onSubmit({
+    const handleFormSubmit = (data: z.input<typeof fiscalYearFormSchema>) => {
+        const payload = {
             ...data,
-            start_date: format(data.start_date, 'yyyy-MM-dd') as any,
-            end_date: format(data.end_date, 'yyyy-MM-dd') as any,
-        });
+            start_date: format(data.start_date, 'yyyy-MM-dd') as unknown as Date,
+            end_date: format(data.end_date, 'yyyy-MM-dd') as unknown as Date,
+        } as FiscalYearFormData;
+        onSubmit(payload);
     };
 
     return (
-        <EntityForm
-            form={form}
+        <EntityForm<FiscalYearFormData>
+            form={
+                form as unknown as UseFormReturn<
+                    FiscalYearFormData,
+                    unknown,
+                    FiscalYearFormData
+                >
+            }
             open={open}
             onOpenChange={onOpenChange}
             title={activeEntity ? 'Edit Fiscal Year' : 'Add New Fiscal Year'}

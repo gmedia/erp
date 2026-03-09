@@ -54,8 +54,8 @@ export default function Password() {
             toast.success('Password updated successfully');
 
             setTimeout(() => setRecentlySuccessful(false), 2000);
-        } catch (error: any) {
-            if (error.response?.status === 422) {
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
                 const returnedErrors = error.response.data.errors || {};
                 const formattedErrors: Record<string, string> = {};
                 Object.keys(returnedErrors).forEach((key) => {

@@ -40,7 +40,7 @@ test.describe('Approval Audit Trail', () => {
         await filtersButton.click();
         await page.waitForTimeout(500); // Wait for transition
         
-        const filterDialog = page.getByRole('dialog').or(page.locator('.filter-container').first());
+        await page.getByRole('dialog').or(page.locator('.filter-container').first());
         await expect(page.getByText('Document Type').last()).toBeVisible();
         await expect(page.getByText('Event').last()).toBeVisible();
         await expect(page.getByText('Actor').last()).toBeVisible();

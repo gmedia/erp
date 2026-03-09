@@ -20,7 +20,7 @@ const renderRelationCell =
         return (
             <div>
                 {typeof val === 'object' && val !== null
-                    ? (val as any).name
+                    ? (val as { name: string }).name
                     : val}
             </div>
         );

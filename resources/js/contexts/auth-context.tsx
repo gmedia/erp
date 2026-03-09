@@ -1,11 +1,14 @@
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
+import { type Permission } from '@/types/permission';
+import { type Translations } from '@/types/i18n';
 import { type User } from '@/types/user';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface Employee {
     id: number;
     name: string;
-    permissions?: any[];
+    permissions?: Permission[];
+    email?: string;
 }
 
 interface MenuItem {
@@ -25,11 +28,11 @@ interface AuthContextType {
     menus: MenuItem[];
     companyName: string;
     companyLogoUrl: string | null;
-    translations: Record<string, string>;
+    translations: Translations | Record<string, never>;
     locale: string;
     pendingApprovalsCount: number;
     isLoading: boolean;
-    login: (token: string, userData: any) => void;
+    login: (token: string, userData: { user: User; employee: Employee }) => void;
     logout: () => Promise<void>;
     refreshAuth: () => Promise<void>;
 }
@@ -57,9 +60,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const [menus, setMenus] = useState<MenuItem[]>([]);
     const [companyName, setCompanyName] = useState<string>('Laravel');
     const [companyLogoUrl, setCompanyLogoUrl] = useState<string | null>(null);
-    const [translations, setTranslations] = useState<Record<string, string>>(
-        {},
-    );
+    const [translations, setTranslations] = useState<
+        Translations | Record<string, never>
+    >({});
     const [locale, setLocale] = useState<string>('en');
     const [pendingApprovalsCount, setPendingApprovalsCount] =
         useState<number>(0);
@@ -73,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
 
         try {
-            const { data } = await axios.get('/api/me');
+            const { data } = await axiosInstance.get('/api/me');
             setUser(data.user);
             setEmployee(data.employee);
             setMenus(data.menus || []);
@@ -84,7 +87,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             setPendingApprovalsCount(data.pendingApprovalsCount || 0);
 
             // Make translations available globally if needed by unhandled context cases
-            (window as any).__APP_COMPANY_NAME__ = data.companyName;
+            (window as unknown as { __APP_COMPANY_NAME__: string }).__APP_COMPANY_NAME__ =
+                data.companyName;
         } catch (error) {
             console.error('Failed to fetch auth state', error);
             localStorage.removeItem('api_token');
@@ -98,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         refreshAuth();
     }, []);
 
-    const login = (token: string, data: any) => {
+    const login = (token: string, data: { user: User; employee: Employee }) => {
         localStorage.setItem('api_token', token);
         if (data.user) setUser(data.user);
         refreshAuth();
@@ -106,7 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const logout = async () => {
         try {
-            await axios.post('/api/logout');
+            await axiosInstance.post('/api/logout');
         } catch (e) {
             console.error(e);
         }

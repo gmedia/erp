@@ -2,7 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
+import * as z from 'zod';
 
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
@@ -114,8 +115,8 @@ export const PipelineForm = memo<PipelineFormProps>(function PipelineForm({
         [pipeline],
     );
 
-    const form = useForm<PipelineFormData>({
-        resolver: zodResolver(pipelineFormSchema) as any,
+    const form = useForm<z.input<typeof pipelineFormSchema>>({
+        resolver: zodResolver(pipelineFormSchema),
         defaultValues,
     });
 
@@ -124,17 +125,17 @@ export const PipelineForm = memo<PipelineFormProps>(function PipelineForm({
     }, [form, defaultValues]);
 
     // Convert boolean string back to actual boolean on submit
-    const handleSubmit = (data: any) => {
+    const handleSubmit = (data: z.input<typeof pipelineFormSchema>) => {
         const payload = {
             ...data,
             is_active: data.is_active === 'true' || data.is_active === true,
-        };
+        } as PipelineFormData;
         onSubmit(payload);
     };
 
     return (
         <EntityForm<PipelineFormData>
-            form={form as any}
+            form={form as unknown as UseFormReturn<PipelineFormData, unknown, PipelineFormData>}
             open={open}
             onOpenChange={onOpenChange}
             title={pipeline ? 'Edit Pipeline' : 'Add New Pipeline'}

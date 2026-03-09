@@ -1,5 +1,5 @@
 import { generateModuleTests } from '../shared-test-factories';
-import { createJournalEntry, searchJournalEntry, editJournalEntry, viewJournalEntry, deleteJournalEntry } from './helpers';
+import { createJournalEntry, searchJournalEntry, editJournalEntry } from './helpers';
 
 generateModuleTests({
   entityName: 'Journal Entry',

@@ -83,7 +83,7 @@ export interface ApprovalFlow {
     approvable_type: string;
     description: string | null;
     is_active: boolean;
-    conditions: any | null;
+    conditions: Record<string, unknown> | null;
     created_at: string;
     updated_at: string;
     creator?: { id: number; name: string };

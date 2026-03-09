@@ -9,7 +9,7 @@ import {
 } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 
 interface AssetCategoryFormProps {
@@ -30,11 +30,7 @@ export const AssetCategoryForm = memo<AssetCategoryFormProps>(
     }) {
         type AssetCategoryFormInput = z.input<typeof assetCategoryFormSchema>;
 
-        const form = useForm<
-            AssetCategoryFormInput,
-            any,
-            AssetCategoryFormData
-        >({
+        const form = useForm<AssetCategoryFormInput>({
             resolver: zodResolver(assetCategoryFormSchema),
             defaultValues: {
                 code: '',
@@ -62,7 +58,13 @@ export const AssetCategoryForm = memo<AssetCategoryFormProps>(
 
         return (
             <EntityForm<AssetCategoryFormData>
-                form={form}
+            form={
+                form as unknown as UseFormReturn<
+                    AssetCategoryFormData,
+                    unknown,
+                    AssetCategoryFormData
+                >
+            }
                 open={open}
                 onOpenChange={onOpenChange}
                 title={

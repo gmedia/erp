@@ -66,9 +66,14 @@ export function EntityStateTimeline({ entityType, entityId }: Props) {
                     <div className="relative ml-3 space-y-8 border-l-2 border-muted pl-6">
                         {timeline.map((entry, idx) => {
                             const isInitial = idx === timeline.length - 1;
-                            const IconComponent = entry.to_state?.icon
-                                ? (LucideIcons as any)[entry.to_state.icon]
-                                : LucideIcons.Activity;
+                            const IconComponent =
+                                entry.to_state?.icon &&
+                                entry.to_state.icon in LucideIcons
+                                    ? (LucideIcons as unknown as Record<
+                                          string,
+                                          LucideIcons.LucideIcon
+                                      >)[entry.to_state.icon]
+                                    : LucideIcons.Activity;
 
                             return (
                                 <div key={entry.id} className="relative">
@@ -132,7 +137,23 @@ export function EntityStateTimeline({ entityType, entityId }: Props) {
 
                                         {entry.comment && (
                                             <div className="mt-1 flex items-start gap-2 rounded-md border border-border/50 bg-muted/30 p-3 text-sm text-muted-foreground">
-                                                <LucideIcons.MessageCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                                                {(() => {
+                                                    const iconName = 'MessageCircle';
+                                                    if (iconName in LucideIcons) {
+                                                        const Icon = (
+                                                            LucideIcons as unknown as Record<
+                                                                string,
+                                                                LucideIcons.LucideIcon
+                                                            >
+                                                        )[iconName];
+                                                        return (
+                                                            <Icon className="mt-0.5 h-4 w-4 shrink-0" />
+                                                        );
+                                                    }
+                                                    return (
+                                                        <LucideIcons.Activity className="mt-0.5 h-4 w-4 shrink-0" />
+                                                    );
+                                                })()}
                                                 <span className="italic">
                                                     "{entry.comment}"
                                                 </span>

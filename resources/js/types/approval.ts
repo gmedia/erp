@@ -5,7 +5,7 @@ export interface ApprovalFlow {
     approvable_type: string;
     description: string | null;
     is_active: boolean;
-    conditions: any | null;
+    conditions: Record<string, unknown> | null;
     created_at: string;
     updated_at: string;
 }
@@ -40,6 +40,7 @@ export interface ApprovalRequest {
     completed_at: string | null;
     created_at: string;
     updated_at: string;
+    approvable?: Record<string, unknown>;
     submitter?: {
         id: number;
         name: string;
@@ -68,6 +69,8 @@ export interface ApprovalRequestStep {
         email: string;
     };
     flow_step?: ApprovalFlowStep;
+    flowStep?: ApprovalFlowStep; // Alias for backward compatibility or components
+    request: ApprovalRequest;
 }
 
 export interface ApprovalAuditLog {
@@ -88,7 +91,7 @@ export interface ApprovalAuditLog {
         | 'completed';
     actor_user_id: number | null;
     step_order: number | null;
-    metadata: any | null;
+    metadata: Record<string, unknown> | null;
     ip_address: string | null;
     user_agent: string | null;
     created_at: string;

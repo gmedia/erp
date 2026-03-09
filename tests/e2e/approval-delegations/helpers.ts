@@ -25,8 +25,6 @@ export async function createApprovalDelegation(
   const delegator = overrides.delegator_user_id ?? 'Admin User';
   const delegate = overrides.delegate_user_id ?? 'Test User';
   const type = overrides.approvable_type ?? 'Expense';
-  const startDate = overrides.start_date ?? '2026-06-01';
-  const endDate = overrides.end_date ?? '2026-06-15';
   const reason = overrides.reason ?? `Test Reason ${timestamp}`;
   const status = overrides.is_active ?? 'Active';
 

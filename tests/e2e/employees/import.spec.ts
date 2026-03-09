@@ -44,7 +44,7 @@ test.describe('Employee Import E2E Tests', () => {
         try {
             await expect(page.getByText('Import Completed')).toBeVisible({ timeout: 10000 });
             await expect(page.getByText('Successfully imported 1 rows.')).toBeVisible();
-        } catch (e) {
+        } catch {
             console.log("Success toast not found within timeout. Checking for data existence...");
              // Check if error toast appeared instead
             const errorToast = await page.getByText('Import Failed').isVisible();

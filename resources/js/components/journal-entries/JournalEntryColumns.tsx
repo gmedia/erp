@@ -10,6 +10,7 @@ import {
 } from '@/utils/columns';
 import { type ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
+import { type CustomTableMeta } from '@/utils/columns';
 
 export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
     createSelectColumn<JournalEntry>(),
@@ -76,7 +77,7 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
     {
         id: 'row-actions',
         cell: ({ row, table }) => {
-            const meta = table.options.meta as any;
+            const meta = table.options.meta as CustomTableMeta<JournalEntry>;
             return (
                 <div className="flex items-center gap-2">
                     <Button

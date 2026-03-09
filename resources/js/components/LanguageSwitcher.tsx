@@ -17,7 +17,7 @@ const localeLabels: Record<string, { label: string; flag: string }> = {
 
 export function LanguageSwitcher() {
     const { locale, availableLocales, setLocale } = useLocale();
-    const { t } = useTranslation();
+    useTranslation();
 
     const currentLocale = localeLabels[locale] || localeLabels.en;
 

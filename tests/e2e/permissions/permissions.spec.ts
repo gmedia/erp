@@ -11,7 +11,7 @@ test.describe('Employee Permissions', () => {
         // 1. Create a new employee with a unique name
         const timestamp = Date.now();
         const uniqueName = `Test Employee ${timestamp}`;
-        const employeeEmail = await createEmployee(page, { name: uniqueName });
+        await createEmployee(page, { name: uniqueName });
         
         // 2. Navigate to Permissions page
         await page.goto('/permissions');

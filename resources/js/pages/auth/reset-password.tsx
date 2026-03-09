@@ -1,4 +1,5 @@
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -33,13 +34,13 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
         data.email = email;
 
         try {
-            const response = await axios.post('/api/reset-password', data);
+            const response = await axiosInstance.post('/api/reset-password', data);
             toast.success(
                 response.data.status || 'Password has been successfully reset.',
             );
             navigate('/login', { replace: true });
-        } catch (error: any) {
-            if (error.response?.status === 422) {
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
                 const returnedErrors = error.response.data.errors || {};
                 const formattedErrors: Record<string, string> = {};
                 Object.keys(returnedErrors).forEach((key) => {

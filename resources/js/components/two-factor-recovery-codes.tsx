@@ -64,7 +64,7 @@ export default function TwoFactorRecoveryCodes({
             await axios.post('/user/two-factor-recovery-codes');
             await fetchRecoveryCodes();
             toast.success('Recovery codes regenerated successfully.');
-        } catch (error) {
+        } catch {
             toast.error('Failed to regenerate recovery codes.');
         } finally {
             setProcessing(false);

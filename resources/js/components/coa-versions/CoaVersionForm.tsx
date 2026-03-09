@@ -2,7 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
+import * as z from 'zod';
 
 import EntityForm from '@/components/common/EntityForm';
 import NameField from '@/components/common/NameField';
@@ -33,8 +34,8 @@ export function CoaVersionForm({
         { label: string; value: string }[]
     >([]);
 
-    const form = useForm<CoaVersionFormData>({
-        resolver: zodResolver(coaVersionFormSchema) as any,
+    const form = useForm<z.input<typeof coaVersionFormSchema>>({
+        resolver: zodResolver(coaVersionFormSchema),
         defaultValues: {
             name: activeEntity?.name || '',
             fiscal_year_id: activeEntity?.fiscal_year_id || undefined,
@@ -48,10 +49,12 @@ export function CoaVersionForm({
                 const response = await axios.get(
                     '/api/fiscal-years?per_page=100',
                 );
-                const data = response.data.data.map((fy: any) => ({
-                    label: fy.name,
-                    value: fy.id.toString(),
-                }));
+                const data = response.data.data.map(
+                    (fy: { name: string; id: number }) => ({
+                        label: fy.name,
+                        value: fy.id.toString(),
+                    }),
+                );
                 setFiscalYears(data);
             } catch (error) {
                 console.error('Failed to fetch fiscal years', error);
@@ -62,8 +65,7 @@ export function CoaVersionForm({
             fetchFiscalYears();
             form.reset({
                 name: activeEntity?.name || '',
-                fiscal_year_id:
-                    (activeEntity?.fiscal_year_id as any) || undefined,
+                fiscal_year_id: activeEntity?.fiscal_year_id || undefined,
                 status: activeEntity?.status || 'draft',
             });
         }
@@ -78,7 +80,13 @@ export function CoaVersionForm({
             open={open}
             onOpenChange={onOpenChange}
             title={activeEntity ? 'Edit COA Version' : 'Create COA Version'}
-            form={form}
+            form={
+                form as unknown as UseFormReturn<
+                    CoaVersionFormData,
+                    unknown,
+                    CoaVersionFormData
+                >
+            }
             onSubmit={handleFormSubmit}
             isLoading={isLoading}
         >

@@ -1,4 +1,5 @@
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -25,10 +26,10 @@ export default function ForgotPassword() {
         const data = Object.fromEntries(formData.entries());
 
         try {
-            const response = await axios.post('/api/forgot-password', data);
+            const response = await axiosInstance.post('/api/forgot-password', data);
             setStatus(response.data.status);
-        } catch (error: any) {
-            if (error.response?.status === 422) {
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
                 // Laravel returns validation errors uniquely for the password broker
                 const returnedErrors = error.response.data.errors || {};
                 // Flatten the First element if it's an array for typical form error handling

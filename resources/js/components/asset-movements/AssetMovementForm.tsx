@@ -3,7 +3,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { memo, useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
+import * as z from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -11,6 +12,7 @@ import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { Asset, AssetMovement } from '@/types/asset';
 
 import {
     AssetMovementFormData,
@@ -20,15 +22,15 @@ import {
 interface AssetMovementFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    item?: any | null; // For editing
-    asset?: any | null; // For creating from profile
+    item?: AssetMovement | null; // For editing
+    asset?: Asset | null; // For creating from profile
     onSubmit: (data: AssetMovementFormData) => void;
     isLoading?: boolean;
 }
 
 const getAssetMovementFormDefaults = (
-    item?: any | null,
-    asset?: any | null,
+    item?: AssetMovement | null,
+    asset?: Asset | null,
 ): AssetMovementFormData => {
     if (item) {
         return {
@@ -77,7 +79,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
             [item, asset],
         );
 
-        const form = useForm<AssetMovementFormData>({
+        const form = useForm<z.input<typeof assetMovementFormSchema>>({
             resolver: zodResolver(assetMovementFormSchema),
             defaultValues,
         });
@@ -94,7 +96,10 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
         const handleFormSubmit = (data: AssetMovementFormData) => {
             onSubmit({
                 ...data,
-                moved_at: format(data.moved_at, 'yyyy-MM-dd HH:mm:ss') as any,
+                moved_at: format(
+                    data.moved_at,
+                    'yyyy-MM-dd HH:mm:ss',
+                ) as unknown as Date,
             });
         };
 
@@ -102,7 +107,13 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
 
         return (
             <EntityForm<AssetMovementFormData>
-                form={form}
+                form={
+                    form as unknown as UseFormReturn<
+                        AssetMovementFormData,
+                        unknown,
+                        AssetMovementFormData
+                    >
+                }
                 open={open}
                 onOpenChange={onOpenChange}
                 title={

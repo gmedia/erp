@@ -22,7 +22,7 @@ export interface PipelineAuditTrailItem {
     performed_by: number | null;
     performed_by_name: string;
     comment: string | null;
-    metadata: any;
+    metadata: Record<string, unknown> | null;
     ip_address: string | null;
     user_agent: string | null;
     created_at: string;

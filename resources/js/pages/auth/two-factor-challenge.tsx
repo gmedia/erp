@@ -1,4 +1,5 @@
-import axios from '@/lib/axios';
+import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { LoaderCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -65,12 +66,12 @@ export default function TwoFactorChallenge() {
         }
 
         try {
-            await axios.post('/two-factor-challenge', data);
+            await axiosInstance.post('/two-factor-challenge', data);
 
             // Re-fetch user to get the latest employee/permissions loaded and redirect
             navigate('/dashboard', { replace: true });
-        } catch (error: any) {
-            if (error.response?.status === 422) {
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
                 setErrors(error.response.data.errors || {});
                 if (!showRecoveryInput) {
                     setCode('');

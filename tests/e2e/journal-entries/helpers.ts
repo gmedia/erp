@@ -88,7 +88,7 @@ export async function createJournalEntry(
     try {
         await expect(option.first()).toBeVisible({ timeout: 2000 });
         await option.first().click();
-    } catch (e) {
+    } catch {
         // console.log(`Match not found for ${line.account}, selecting first option.`);
         const firstOption = page.getByRole('option').first();
         await expect(firstOption).toBeVisible();
