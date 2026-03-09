@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string|null $ip_address
  * @property string|null $user_agent
  * @property \Illuminate\Support\Carbon $created_at
- * @property-read Model|\Eloquent $entity
+ * @property-read Model $entity
  * @property-read \App\Models\PipelineState|null $fromState
  * @property-read \App\Models\User|null $performedBy
  * @property-read \App\Models\PipelineEntityState $pipelineEntityState

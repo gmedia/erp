@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string|null $user_agent
  * @property \Illuminate\Support\Carbon $created_at
  * @property-read User|null $actor
- * @property-read Model|\Eloquent $approvable
+ * @property-read Model $approvable
  * @property-read ApprovalRequest|null $request
  *
  * @method static \Database\Factories\ApprovalAuditLogFactory factory($count = null, $state = [])

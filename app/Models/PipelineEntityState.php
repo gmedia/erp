@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\PipelineState $currentState
- * @property-read Model|\Eloquent $entity
+ * @property-read Model $entity
  * @property-read \App\Models\User|null $lastTransitionedBy
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PipelineStateLog> $logs
  * @property-read int|null $logs_count
