@@ -30,18 +30,18 @@ Laporan ini berisi ringkasan perubahan pada branch `main` yang unggul 44 commit 
 
 Berikut adalah daftar Commit ID dan Pesan terkait migrasi ini:
 
-- `aeffd17` update route
-- `677c93e` chore: Add test run output and modify the Employee model unit test.
+- `aeffd17` Update route
+- `677c93e` Modify the Employee model unit test.
 - `51b8149` feat: Remove Inertia.js dependency and related views, controllers, and middleware.
 - `12b26f1` refactor: Rename `AppI18nProvider` and update its data source, alongside removing the `build:ssr` script.
 - `ccbfe43` docs: Update SPA migration report with new commit count and details on backend feature test refactoring.
-- `feb7c9d` feat: Add test output file and update various feature tests, a controller, and a request file.
+- `feb7c9d` feat: Update various feature tests, a controller, and a request file.
 - `377dd90` refactor: Update feature tests to use Sanctum for API authentication and JSON assertions instead of Inertia-specific checks.
 - `077148f` Refactor authentication feature tests for SPA migration, updating password reset and email verification tests to use API endpoints and removing several UI-based authentication tests.
 - `b4e179b` refactor: Update asset feature tests to use Sanctum authentication and API routes.
 - `cb248a2` refactor: Update feature tests to use API endpoints with Sanctum authentication and JSON assertions instead of Inertia page assertions.
 - `fe3c78e` feat: Add a comprehensive report detailing the migration from Laravel+Inertia to a Laravel API + React Full SPA architecture.
-- `5061def` refactor: Update E2E tests to use Bearer token authentication instead of XSRF-TOKEN and add an e2e test output file.
+- `5061def` refactor: Update E2E tests to use Bearer token authentication instead of XSRF-TOKEN
 - `8f7842f` feat: Introduce API endpoints for approval audit trail and adjust frontend to use the new API route.
 - `ab44cce` feat: Add API routes for pipeline audit trail and update frontend to fetch data from the new API endpoint.
 - `4e42c73` feat: Implement client-side data fetching for the permissions index page via a new API endpoint and add new API routes for employee user management.
