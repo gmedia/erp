@@ -22,7 +22,7 @@ class StockAdjustmentExport implements FromQuery, WithHeadings, WithMapping, Wit
     {
         $query = StockAdjustment::query()->with(['warehouse', 'inventoryStocktake']);
 
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('adjustment_number', 'like', "%{$search}%")
@@ -30,27 +30,27 @@ class StockAdjustmentExport implements FromQuery, WithHeadings, WithMapping, Wit
             });
         }
 
-        if (!empty($this->filters['warehouse_id'])) {
+        if (! empty($this->filters['warehouse_id'])) {
             $query->where('warehouse_id', $this->filters['warehouse_id']);
         }
 
-        if (!empty($this->filters['status'])) {
+        if (! empty($this->filters['status'])) {
             $query->where('status', $this->filters['status']);
         }
 
-        if (!empty($this->filters['adjustment_type'])) {
+        if (! empty($this->filters['adjustment_type'])) {
             $query->where('adjustment_type', $this->filters['adjustment_type']);
         }
 
-        if (!empty($this->filters['inventory_stocktake_id'])) {
+        if (! empty($this->filters['inventory_stocktake_id'])) {
             $query->where('inventory_stocktake_id', $this->filters['inventory_stocktake_id']);
         }
 
-        if (!empty($this->filters['adjustment_date_from'])) {
+        if (! empty($this->filters['adjustment_date_from'])) {
             $query->whereDate('adjustment_date', '>=', $this->filters['adjustment_date_from']);
         }
 
-        if (!empty($this->filters['adjustment_date_to'])) {
+        if (! empty($this->filters['adjustment_date_to'])) {
             $query->whereDate('adjustment_date', '<=', $this->filters['adjustment_date_to']);
         }
 

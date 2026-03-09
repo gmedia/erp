@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class)->group('dashboard');
@@ -34,7 +35,7 @@ describe('Dashboard', function () {
             'customers' => 2,
             'employees' => 3,
             'suppliers' => 4,
-            'assets' => 5
+            'assets' => 5,
         ]);
     });
 });

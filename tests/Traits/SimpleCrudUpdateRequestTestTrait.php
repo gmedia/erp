@@ -2,11 +2,9 @@
 
 namespace Tests\Traits;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
 /**
  * Trait for testing Simple CRUD Update Request classes.
- * 
+ *
  * Requires the consumer to define:
  * - getRequestClass(): string - The request class to test
  * - getModelClass(): string - The model class for factory
@@ -14,45 +12,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
  */
 trait SimpleCrudUpdateRequestTestTrait
 {
-    /**
-     * Get the request class to test.
-     * 
-     * @return class-string
-     */
-    abstract protected function getRequestClass(): string;
-
-    /**
-     * Get the model class for factory.
-     * 
-     * @return class-string
-     */
-    abstract protected function getModelClass(): string;
-
-    /**
-     * Get the route parameter name.
-     */
-    abstract protected function getRouteParameterName(): string;
-
-    protected function createUpdateRequest($model): object
-    {
-        $requestClass = $this->getRequestClass();
-        $request = new $requestClass();
-        $request->setRouteResolver(function () use ($model) {
-            return new class($model) {
-                private $model;
-                public function __construct($model) { $this->model = $model; }
-                public function parameter($name) { return $this->model; }
-            };
-        });
-        return $request;
-    }
-
     public function test_authorize_returns_true(): void
     {
         $modelClass = $this->getModelClass();
         $model = $modelClass::factory()->create();
         $request = $this->createUpdateRequest($model);
-        
+
         $this->assertTrue($request->authorize());
     }
 
@@ -131,5 +96,48 @@ trait SimpleCrudUpdateRequestTestTrait
 
         $this->assertTrue($validator->fails());
         $this->assertTrue($validator->errors()->has('name'));
+    }
+
+    /**
+     * Get the request class to test.
+     *
+     * @return class-string
+     */
+    abstract protected function getRequestClass(): string;
+
+    /**
+     * Get the model class for factory.
+     *
+     * @return class-string
+     */
+    abstract protected function getModelClass(): string;
+
+    /**
+     * Get the route parameter name.
+     */
+    abstract protected function getRouteParameterName(): string;
+
+    protected function createUpdateRequest($model): object
+    {
+        $requestClass = $this->getRequestClass();
+        $request = new $requestClass;
+        $request->setRouteResolver(function () use ($model) {
+            return new class($model)
+            {
+                private $model;
+
+                public function __construct($model)
+                {
+                    $this->model = $model;
+                }
+
+                public function parameter($name)
+                {
+                    return $this->model;
+                }
+            };
+        });
+
+        return $request;
     }
 }

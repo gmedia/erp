@@ -6,6 +6,48 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $asset_stocktake_id
+ * @property int $asset_id
+ * @property int|null $expected_branch_id
+ * @property int|null $expected_location_id
+ * @property int|null $found_branch_id
+ * @property int|null $found_location_id
+ * @property string $result
+ * @property string|null $notes
+ * @property \Illuminate\Support\Carbon|null $checked_at
+ * @property int|null $checked_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Asset $asset
+ * @property-read \App\Models\User|null $checkedBy
+ * @property-read \App\Models\Branch|null $expectedBranch
+ * @property-read \App\Models\AssetLocation|null $expectedLocation
+ * @property-read \App\Models\Branch|null $foundBranch
+ * @property-read \App\Models\AssetLocation|null $foundLocation
+ * @property-read \App\Models\AssetStocktake $stocktake
+ *
+ * @method static \Database\Factories\AssetStocktakeItemFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereAssetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereAssetStocktakeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereCheckedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereCheckedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereExpectedBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereExpectedLocationId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereFoundBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereFoundLocationId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereResult($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereUpdatedAt($value)
+ *
+ * @mixin \Eloquent
+ */
 class AssetStocktakeItem extends Model
 {
     use HasFactory;

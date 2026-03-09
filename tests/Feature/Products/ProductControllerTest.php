@@ -1,12 +1,11 @@
 <?php
 
+use App\Models\Branch;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Unit;
-use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
@@ -31,10 +30,10 @@ describe('Product API Endpoints', function () {
             ->assertJsonStructure([
                 'data' => [
                     '*' => [
-                        'id', 'code', 'name', 'type', 'category', 'unit', 'branch', 'cost', 'selling_price', 'status'
-                    ]
+                        'id', 'code', 'name', 'type', 'category', 'unit', 'branch', 'cost', 'selling_price', 'status',
+                    ],
                 ],
-                'meta' => ['total', 'per_page']
+                'meta' => ['total', 'per_page'],
             ]);
 
         expect($response->json('meta.total'))->toBe(15)
@@ -69,7 +68,7 @@ describe('Product API Endpoints', function () {
         Product::factory()->create(['type' => 'finished_good']);
         Product::factory()->create(['type' => 'raw_material']);
 
-        $response = getJson("/api/products?type=finished_good");
+        $response = getJson('/api/products?type=finished_good');
 
         $response->assertOk();
         expect($response->json('data'))->toHaveCount(1)
@@ -80,7 +79,7 @@ describe('Product API Endpoints', function () {
         Product::factory()->create(['status' => 'active']);
         Product::factory()->create(['status' => 'inactive']);
 
-        $response = getJson("/api/products?status=active");
+        $response = getJson('/api/products?status=active');
 
         $response->assertOk();
         expect($response->json('data'))->toHaveCount(1)
@@ -91,7 +90,7 @@ describe('Product API Endpoints', function () {
         Product::factory()->create(['name' => 'Searchable Product']);
         Product::factory()->create(['name' => 'Other Product']);
 
-        $response = getJson("/api/products?search=Searchable");
+        $response = getJson('/api/products?search=Searchable');
 
         $response->assertOk();
         expect($response->json('data'))->toHaveCount(1)
@@ -165,7 +164,7 @@ describe('Product API Endpoints', function () {
         $product = Product::factory()->create(['name' => 'Old Name']);
 
         $response = putJson("/api/products/{$product->id}", [
-            'name' => 'New Name'
+            'name' => 'New Name',
         ]);
 
         $response->assertOk();
@@ -190,4 +189,3 @@ describe('Product API Endpoints', function () {
             ->assertJsonStructure(['url', 'filename']);
     });
 });
-

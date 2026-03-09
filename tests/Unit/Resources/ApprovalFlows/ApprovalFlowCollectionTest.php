@@ -24,9 +24,9 @@ test('collection transforms paginated approval flows correctly', function () {
 
     expect(collect($data))->toBeIterable()
         ->and(collect($data))->toHaveCount(3);
-        
+
     $firstItem = collect($data)->first();
-    
+
     expect($firstItem)
         ->toBeInstanceOf(\App\Http\Resources\ApprovalFlows\ApprovalFlowResource::class);
 });

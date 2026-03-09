@@ -12,9 +12,9 @@ use App\Models\Asset;
 use App\Models\AssetMovement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AssetMovementController extends Controller
 {
@@ -30,7 +30,7 @@ class AssetMovementController extends Controller
             'toDepartment',
             'fromEmployee',
             'toEmployee',
-            'createdBy'
+            'createdBy',
         ]);
 
         if ($request->filled('search')) {
@@ -49,16 +49,6 @@ class AssetMovementController extends Controller
         $movements = $query->paginate($request->integer('per_page', 15));
 
         return AssetMovementResource::collection($movements);
-    }
-
-    public function show(AssetMovement $asset_movement): JsonResponse
-    {
-        return response()->json([
-            'data' => new AssetMovementResource($asset_movement->load([
-                'asset', 'fromBranch', 'toBranch', 'fromLocation', 'toLocation',
-                'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy'
-            ])),
-        ]);
     }
 
     public function store(StoreAssetMovementRequest $request): JsonResponse
@@ -87,10 +77,20 @@ class AssetMovementController extends Controller
                 'message' => 'Movement recorded successfully',
                 'data' => new AssetMovementResource($movement->load([
                     'fromBranch', 'toBranch', 'fromLocation', 'toLocation',
-                    'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy'
+                    'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy',
                 ])),
             ], 201);
         });
+    }
+
+    public function show(AssetMovement $asset_movement): JsonResponse
+    {
+        return response()->json([
+            'data' => new AssetMovementResource($asset_movement->load([
+                'asset', 'fromBranch', 'toBranch', 'fromLocation', 'toLocation',
+                'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy',
+            ])),
+        ]);
     }
 
     public function update(UpdateAssetMovementRequest $request, AssetMovement $asset_movement): JsonResponse
@@ -101,7 +101,7 @@ class AssetMovementController extends Controller
             'message' => 'Movement updated successfully',
             'data' => new AssetMovementResource($asset_movement->load([
                 'asset', 'fromBranch', 'toBranch', 'fromLocation', 'toLocation',
-                'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy'
+                'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy',
             ])),
         ]);
     }

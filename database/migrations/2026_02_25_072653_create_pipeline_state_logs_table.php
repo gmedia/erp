@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('pipeline_state_logs', function (Blueprint $table) {
@@ -25,15 +22,12 @@ return new class extends Migration
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->timestamp('created_at')->useCurrent();
-            
+
             $table->index(['entity_type', 'entity_id']);
             $table->index('performed_by');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('pipeline_state_logs');

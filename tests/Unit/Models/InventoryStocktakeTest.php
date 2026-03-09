@@ -18,4 +18,3 @@ test('relationships are defined', function () {
 
     expect($stocktake->warehouse)->not->toBeNull();
 });
-

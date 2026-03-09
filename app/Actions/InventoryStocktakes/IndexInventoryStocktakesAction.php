@@ -11,8 +11,7 @@ class IndexInventoryStocktakesAction
 {
     public function __construct(
         private InventoryStocktakeFilterService $filterService
-    ) {
-    }
+    ) {}
 
     public function execute(IndexInventoryStocktakeRequest $request): LengthAwarePaginator
     {
@@ -24,7 +23,7 @@ class IndexInventoryStocktakesAction
             $this->filterService->applySearch($query, $request->get('search'), ['stocktake_number', 'notes']);
         }
 
-        if (!$request->filled('status')) {
+        if (! $request->filled('status')) {
             $query->where('status', '!=', 'cancelled');
         }
 
@@ -54,4 +53,3 @@ class IndexInventoryStocktakesAction
         ];
     }
 }
-

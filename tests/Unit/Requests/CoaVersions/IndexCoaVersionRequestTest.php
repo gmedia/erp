@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Validator;
 uses(RefreshDatabase::class)->group('coa-versions');
 
 test('IndexCoaVersionRequest → authorize returns true', function () {
-    $request = new IndexCoaVersionRequest();
+    $request = new IndexCoaVersionRequest;
     expect($request->authorize())->toBeTrue();
 });
 
@@ -22,7 +22,7 @@ test('IndexCoaVersionRequest → rules allow optional filters', function () {
         'per_page' => 20,
     ];
 
-    $request = new IndexCoaVersionRequest();
+    $request = new IndexCoaVersionRequest;
     $validator = Validator::make($data, $request->rules());
 
     expect($validator->passes())->toBeTrue();
@@ -31,7 +31,7 @@ test('IndexCoaVersionRequest → rules allow optional filters', function () {
 test('IndexCoaVersionRequest → rules fail with invalid per_page', function () {
     $data = ['per_page' => 'invalid'];
 
-    $request = new IndexCoaVersionRequest();
+    $request = new IndexCoaVersionRequest;
     $validator = Validator::make($data, $request->rules());
 
     expect($validator->fails())->toBeTrue()

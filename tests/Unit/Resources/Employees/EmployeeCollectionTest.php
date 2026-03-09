@@ -28,7 +28,7 @@ test('collection transforms multiple employees correctly', function () {
     foreach ($result as $index => $item) {
         expect($item)->toHaveKeys([
             'id', 'name', 'email', 'phone', 'department',
-            'position', 'salary', 'hire_date', 'created_at', 'updated_at'
+            'position', 'salary', 'hire_date', 'created_at', 'updated_at',
         ])
             ->and($item['id'])->toBe($employees[$index]->id)
             ->and($item['name'])->toBe($employees[$index]->name)

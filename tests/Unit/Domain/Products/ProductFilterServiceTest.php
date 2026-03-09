@@ -1,18 +1,18 @@
 <?php
 
 use App\Domain\Products\ProductFilterService;
+use App\Models\Branch;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Unit;
-use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('products');
 
 test('applyAdvancedFilters applies category filter', function () {
-    $service = new ProductFilterService();
+    $service = new ProductFilterService;
     $cat = ProductCategory::factory()->create();
-    
+
     Product::factory()->create(['category_id' => $cat->id]);
     Product::factory()->create();
 
@@ -23,9 +23,9 @@ test('applyAdvancedFilters applies category filter', function () {
 });
 
 test('applyAdvancedFilters applies unit filter', function () {
-    $service = new ProductFilterService();
+    $service = new ProductFilterService;
     $unit = Unit::factory()->create();
-    
+
     Product::factory()->create(['unit_id' => $unit->id]);
     Product::factory()->create();
 
@@ -36,9 +36,9 @@ test('applyAdvancedFilters applies unit filter', function () {
 });
 
 test('applyAdvancedFilters applies branch filter', function () {
-    $service = new ProductFilterService();
+    $service = new ProductFilterService;
     $branch = Branch::factory()->create();
-    
+
     Product::factory()->create(['branch_id' => $branch->id]);
     Product::factory()->create();
 
@@ -49,8 +49,8 @@ test('applyAdvancedFilters applies branch filter', function () {
 });
 
 test('applyAdvancedFilters applies type filter', function () {
-    $service = new ProductFilterService();
-    
+    $service = new ProductFilterService;
+
     Product::factory()->create(['type' => 'finished_good']);
     Product::factory()->create(['type' => 'raw_material']);
 
@@ -61,8 +61,8 @@ test('applyAdvancedFilters applies type filter', function () {
 });
 
 test('applyAdvancedFilters applies status filter', function () {
-    $service = new ProductFilterService();
-    
+    $service = new ProductFilterService;
+
     Product::factory()->create(['status' => 'active']);
     Product::factory()->create(['status' => 'inactive']);
 
@@ -73,8 +73,8 @@ test('applyAdvancedFilters applies status filter', function () {
 });
 
 test('applyAdvancedFilters applies flag filters', function () {
-    $service = new ProductFilterService();
-    
+    $service = new ProductFilterService;
+
     Product::factory()->create(['is_manufactured' => true]);
     Product::factory()->create(['is_manufactured' => false]);
 

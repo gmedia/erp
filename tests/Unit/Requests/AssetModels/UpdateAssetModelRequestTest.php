@@ -1,19 +1,19 @@
 <?php
 
 use App\Http\Requests\AssetModels\UpdateAssetModelRequest;
-use App\Models\AssetModel;
 use App\Models\AssetCategory;
+use App\Models\AssetModel;
 use Illuminate\Support\Facades\Validator;
 
 uses()->group('asset-models');
 
 test('update request validation rules', function () {
     $assetModel = AssetModel::factory()->create();
-    $request = new UpdateAssetModelRequest();
-    
+    $request = new UpdateAssetModelRequest;
+
     // Set route parameter for unique validation if applicable
     $request->setRouteResolver(function () use ($assetModel) {
-        return (object) ['parameter' => fn() => $assetModel->id];
+        return (object) ['parameter' => fn () => $assetModel->id];
     });
 
     $rules = $request->rules();
@@ -27,16 +27,16 @@ test('update request validation rules', function () {
 test('update request validation passes with valid data', function () {
     $assetModel = AssetModel::factory()->create();
     $category = AssetCategory::factory()->create();
-    
+
     $data = [
         'asset_category_id' => $category->id,
         'model_name' => 'Updated Model Name',
     ];
 
-    $request = new UpdateAssetModelRequest();
+    $request = new UpdateAssetModelRequest;
     $rules = $request->rules();
-    
+
     $validator = Validator::make($data, $rules);
-    
+
     expect($validator->passes())->toBeTrue();
 });

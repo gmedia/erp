@@ -10,16 +10,6 @@ use App\Models\FiscalYear;
  */
 class FiscalYearExport extends SimpleCrudExport
 {
-    protected function getModelClass(): string
-    {
-        return FiscalYear::class;
-    }
-
-    protected function getSortableFields(): array
-    {
-        return ['id', 'name', 'start_date', 'end_date', 'status', 'created_at', 'updated_at'];
-    }
-
     public function headings(): array
     {
         return [
@@ -44,5 +34,15 @@ class FiscalYearExport extends SimpleCrudExport
             $model->created_at?->toIso8601String(),
             $model->updated_at?->toIso8601String(),
         ];
+    }
+
+    protected function getModelClass(): string
+    {
+        return FiscalYear::class;
+    }
+
+    protected function getSortableFields(): array
+    {
+        return ['id', 'name', 'start_date', 'end_date', 'status', 'created_at', 'updated_at'];
     }
 }

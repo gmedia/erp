@@ -13,5 +13,4 @@ class BookValueDepreciationCollection extends ResourceCollection
      */
     public $collects = BookValueDepreciationResource::class;
 
-
 }

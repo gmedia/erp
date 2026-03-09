@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('assets');
 
 test('export asset request validation rules', function () {
-    $request = new ExportAssetRequest();
+    $request = new ExportAssetRequest;
     $rules = $request->rules();
 
     expect($rules)->toBeArray();

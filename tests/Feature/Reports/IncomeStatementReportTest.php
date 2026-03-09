@@ -4,8 +4,7 @@ namespace Tests\Feature\Reports;
 
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\actingAs;
-use function Pest\Laravel\get;
+
 use function Pest\Laravel\seed;
 
 uses(RefreshDatabase::class)->group('reports');
@@ -29,4 +28,3 @@ test('income statement menampilkan laporan sesuai seed (posted saja)', function 
         ->assertJsonPath('report.revenues.0.children.0.code', '41000')
         ->assertJsonPath('report.revenues.0.children.0.balance', 5000000);
 });
-

@@ -34,7 +34,7 @@ class ApprovalDelegationExport implements FromQuery, WithHeadings, WithMapping
     }
 
     /**
-     * @param \App\Models\ApprovalDelegation $row
+     * @param  \App\Models\ApprovalDelegation  $row
      */
     public function map($row): array
     {

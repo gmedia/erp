@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Actions\ApprovalFlows\ExportApprovalFlowsAction;
+use App\Actions\ApprovalFlows\IndexApprovalFlowsAction;
+use App\Http\Requests\ApprovalFlows\ExportApprovalFlowRequest;
 use App\Http\Requests\ApprovalFlows\IndexApprovalFlowRequest;
 use App\Http\Requests\ApprovalFlows\StoreApprovalFlowRequest;
 use App\Http\Requests\ApprovalFlows\UpdateApprovalFlowRequest;
-use App\Http\Requests\ApprovalFlows\ExportApprovalFlowRequest;
-use App\Http\Resources\ApprovalFlows\ApprovalFlowResource;
 use App\Http\Resources\ApprovalFlows\ApprovalFlowCollection;
-use App\Actions\ApprovalFlows\IndexApprovalFlowsAction;
-use App\Actions\ApprovalFlows\ExportApprovalFlowsAction;
+use App\Http\Resources\ApprovalFlows\ApprovalFlowResource;
+
 class ApprovalFlowController extends Controller
 {
     public function index(IndexApprovalFlowRequest $request, IndexApprovalFlowsAction $action): ApprovalFlowCollection
@@ -22,7 +22,7 @@ class ApprovalFlowController extends Controller
     {
         $flow = \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
             $validated = $request->validated();
-            
+
             $flow = \App\Models\ApprovalFlow::create([
                 'name' => $validated['name'],
                 'code' => $validated['code'],
@@ -33,7 +33,7 @@ class ApprovalFlowController extends Controller
                 'created_by' => auth()->id(),
             ]);
 
-            if (!empty($validated['steps'])) {
+            if (! empty($validated['steps'])) {
                 foreach ($validated['steps'] as $index => $stepData) {
                     $flow->steps()->create([
                         'step_order' => $index + 1,
@@ -67,7 +67,7 @@ class ApprovalFlowController extends Controller
         $flow = \Illuminate\Support\Facades\DB::transaction(function () use ($request, $approvalFlow) {
             $validated = $request->validated();
             $dto = \App\DTOs\ApprovalFlows\UpdateApprovalFlowData::fromArray($validated);
-            
+
             $approvalFlow->update($dto->toArray());
 
             if (isset($validated['steps'])) {
@@ -99,6 +99,7 @@ class ApprovalFlowController extends Controller
     public function destroy(\App\Models\ApprovalFlow $approvalFlow): \Illuminate\Http\JsonResponse
     {
         $approvalFlow->delete();
+
         return response()->json(null, 204);
     }
 

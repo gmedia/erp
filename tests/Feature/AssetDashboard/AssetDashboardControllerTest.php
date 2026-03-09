@@ -3,15 +3,13 @@
 use App\Models\Asset;
 use App\Models\AssetCategory;
 use App\Models\AssetMaintenance;
-use App\Models\Permission;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Traits\CreatesTestUserWithPermissions;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class, CreatesTestUserWithPermissions::class)->group('asset-dashboard');
-
 
 describe('Asset Dashboard Data API', function () {
     beforeEach(function () {
@@ -44,7 +42,7 @@ describe('Asset Dashboard Data API', function () {
             'book_value' => 800000,
             'accumulated_depreciation' => 200000,
         ]);
-        
+
         Asset::factory()->create([
             'purchase_cost' => 2500000,
             'book_value' => 2000000,
@@ -90,7 +88,7 @@ describe('Asset Dashboard Data API', function () {
 
     test('returns recent maintenances', function () {
         $asset = Asset::factory()->create();
-        
+
         // Old maintenance (completed)
         AssetMaintenance::factory()->create([
             'asset_id' => $asset->id,
@@ -107,7 +105,7 @@ describe('Asset Dashboard Data API', function () {
         ]);
 
         $response = getJson('/api/asset-dashboard/data');
-        
+
         $response->assertOk()
             ->assertJsonCount(1, 'recent_maintenances')
             ->assertJsonPath('recent_maintenances.0.id', $futureMaintenance->id)
@@ -120,7 +118,7 @@ describe('Asset Dashboard Data API', function () {
             'status' => 'active',
             'warranty_end_date' => Carbon::now()->subDays(5)->toDateString(),
         ]);
-        
+
         // Valid but far away (should not appear)
         Asset::factory()->create([
             'status' => 'active',
@@ -134,7 +132,7 @@ describe('Asset Dashboard Data API', function () {
         ]);
 
         $response = getJson('/api/asset-dashboard/data');
-        
+
         $response->assertOk()
             ->assertJsonCount(1, 'warranty_alerts')
             ->assertJsonPath('warranty_alerts.0.id', $targetAsset->id)

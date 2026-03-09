@@ -34,10 +34,10 @@ describe('Fiscal Year API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'name', 'start_date', 'end_date', 'status', 'created_at', 'updated_at']
+                    '*' => ['id', 'name', 'start_date', 'end_date', 'status', 'created_at', 'updated_at'],
                 ],
                 'links',
-                'meta'
+                'meta',
             ])
             ->assertJsonCount(10, 'data')
             ->assertJsonPath('meta.total', 25);
@@ -51,7 +51,7 @@ describe('Fiscal Year API Endpoints', function () {
             'end_date' => '2026-12-31',
             'status' => 'open',
         ];
-        
+
         $response = postJson('/api/fiscal-years', $data);
 
         $response->assertCreated()
@@ -72,7 +72,7 @@ describe('Fiscal Year API Endpoints', function () {
             'name' => 'Invalid Dates',
             'start_date' => '2026-12-31',
             'end_date' => '2026-01-01',
-            'status' => 'open'
+            'status' => 'open',
         ]);
         $response->assertUnprocessable()
             ->assertJsonValidationErrors(['end_date']);
@@ -142,7 +142,7 @@ describe('Fiscal Year API Endpoints', function () {
 
         $response->assertOk()
             ->assertJsonStructure(['url', 'filename']);
-        
+
         expect($response->json('filename'))->toContain('fiscal_years_export');
     });
 

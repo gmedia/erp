@@ -5,12 +5,12 @@ use App\Http\Requests\InventoryStocktakes\IndexInventoryStocktakeRequest;
 uses()->group('inventory-stocktakes');
 
 test('authorize returns true', function () {
-    $request = new IndexInventoryStocktakeRequest();
+    $request = new IndexInventoryStocktakeRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules contains filter and sorting keys', function () {
-    $request = new IndexInventoryStocktakeRequest();
+    $request = new IndexInventoryStocktakeRequest;
     $rules = $request->rules();
 
     expect($rules)->toHaveKeys([
@@ -28,7 +28,7 @@ test('rules contains filter and sorting keys', function () {
 test('rules validation passes with product_category_id sort_by', function () {
     $data = ['sort_by' => 'product_category_id'];
 
-    $validator = validator($data, (new IndexInventoryStocktakeRequest())->rules());
+    $validator = validator($data, (new IndexInventoryStocktakeRequest)->rules());
 
-    expect(!$validator->fails())->toBeTrue();
+    expect(! $validator->fails())->toBeTrue();
 });

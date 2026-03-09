@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Assets\{IndexAssetsAction, ExportAssetsAction, ImportAssetsAction};
-use App\Http\Requests\Assets\{IndexAssetRequest, StoreAssetRequest, UpdateAssetRequest, ExportAssetRequest, ImportAssetRequest};
-use App\Http\Resources\Assets\{AssetResource, AssetCollection};
+use App\Actions\Assets\ExportAssetsAction;
+use App\Actions\Assets\ImportAssetsAction;
+use App\Actions\Assets\IndexAssetsAction;
 use App\DTOs\Assets\UpdateAssetData;
-use App\Models\{Asset, AssetMovement};
+use App\Http\Requests\Assets\ExportAssetRequest;
+use App\Http\Requests\Assets\ImportAssetRequest;
+use App\Http\Requests\Assets\IndexAssetRequest;
+use App\Http\Requests\Assets\StoreAssetRequest;
+use App\Http\Requests\Assets\UpdateAssetRequest;
+use App\Http\Resources\Assets\AssetCollection;
+use App\Http\Resources\Assets\AssetResource;
+use App\Models\Asset;
+use App\Models\AssetMovement;
 use Illuminate\Http\JsonResponse;
 
 class AssetController extends Controller
@@ -43,37 +51,6 @@ class AssetController extends Controller
     public function show(Asset $asset): AssetResource
     {
         return new AssetResource($asset->load(['category', 'model', 'branch', 'location', 'department', 'employee', 'supplier']));
-    }
-
-    public function profile(Asset $asset): JsonResponse
-    {
-        $asset->load([
-            'category',
-            'model',
-            'branch',
-            'location',
-            'department',
-            'employee',
-            'supplier',
-            'movements.fromBranch',
-            'movements.toBranch',
-            'movements.fromLocation',
-            'movements.toLocation',
-            'movements.fromEmployee',
-            'movements.toEmployee',
-            'movements.createdBy',
-            'maintenances.supplier',
-            'maintenances.createdBy',
-            'stocktakeItems.stocktake.branch',
-            'stocktakeItems.checkedBy',
-            'depreciationLines.run.fiscalYear',
-        ]);
-
-        return response()->json([
-            'asset' => [
-                'data' => new AssetResource($asset),
-            ],
-        ]);
     }
 
     public function update(UpdateAssetRequest $request, Asset $asset): JsonResponse
@@ -114,6 +91,37 @@ class AssetController extends Controller
         ]);
     }
 
+    public function profile(Asset $asset): JsonResponse
+    {
+        $asset->load([
+            'category',
+            'model',
+            'branch',
+            'location',
+            'department',
+            'employee',
+            'supplier',
+            'movements.fromBranch',
+            'movements.toBranch',
+            'movements.fromLocation',
+            'movements.toLocation',
+            'movements.fromEmployee',
+            'movements.toEmployee',
+            'movements.createdBy',
+            'maintenances.supplier',
+            'maintenances.createdBy',
+            'stocktakeItems.stocktake.branch',
+            'stocktakeItems.checkedBy',
+            'depreciationLines.run.fiscalYear',
+        ]);
+
+        return response()->json([
+            'asset' => [
+                'data' => new AssetResource($asset),
+            ],
+        ]);
+    }
+
     public function export(ExportAssetRequest $request, ExportAssetsAction $action): JsonResponse
     {
         return $action->execute($request);
@@ -123,9 +131,9 @@ class AssetController extends Controller
     {
         /** @var \Illuminate\Http\UploadedFile $file */
         $file = $request->file('file');
-        
+
         $summary = $action->execute($file);
-        
+
         return response()->json($summary);
     }
 }

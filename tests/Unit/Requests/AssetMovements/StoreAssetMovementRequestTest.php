@@ -9,14 +9,14 @@ use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\TestCase;
 
 uses(RefreshDatabase::class)->group('asset-movements');
 
 function createStoreRequest(array $data = []): StoreAssetMovementRequest
 {
-    $request = new StoreAssetMovementRequest();
+    $request = new StoreAssetMovementRequest;
     $request->merge($data);
+
     return $request;
 }
 
@@ -30,9 +30,9 @@ function assertStoreValidationFails($data, $expectedErrors = [])
 {
     $validator = validator($data, createStoreRequest($data)->rules());
     expect($validator->fails())->toBeTrue('Validation should have failed but passed.');
-    
+
     foreach ($expectedErrors as $error) {
-        expect($validator->errors()->has($error))->toBeTrue("Validation should have error for key: $error");
+        expect($validator->errors()->has($error))->toBeTrue("Validation should have error for key: {$error}");
     }
 }
 
@@ -62,7 +62,7 @@ test('it validates basic rules', function () {
 
 test('it validates conditional transfer rules', function () {
     $asset = Asset::factory()->create();
-    
+
     // Transfer requires to_branch_id and to_location_id
     $data = [
         'asset_id' => $asset->id,
@@ -85,7 +85,7 @@ test('it validates conditional transfer rules', function () {
 
 test('it validates conditional assign rules', function () {
     $asset = Asset::factory()->create();
-    
+
     // Assign requires to_department_id and to_employee_id
     $data = [
         'asset_id' => $asset->id,

@@ -12,8 +12,8 @@ uses(RefreshDatabase::class)->group('stock-adjustments');
 test('execute returns paginated results', function () {
     StockAdjustment::factory()->count(3)->create(['status' => 'draft']);
 
-    $action = new IndexStockAdjustmentsAction(new StockAdjustmentFilterService());
-    $request = new IndexStockAdjustmentRequest();
+    $action = new IndexStockAdjustmentsAction(new StockAdjustmentFilterService);
+    $request = new IndexStockAdjustmentRequest;
 
     $result = $action->execute($request);
 
@@ -25,7 +25,7 @@ test('execute filters by search term', function () {
     StockAdjustment::factory()->create(['adjustment_number' => 'SA-ABC-001', 'status' => 'draft']);
     StockAdjustment::factory()->create(['adjustment_number' => 'SA-XYZ-001', 'status' => 'draft']);
 
-    $action = new IndexStockAdjustmentsAction(new StockAdjustmentFilterService());
+    $action = new IndexStockAdjustmentsAction(new StockAdjustmentFilterService);
     $request = new IndexStockAdjustmentRequest(['search' => 'SA-ABC']);
 
     $result = $action->execute($request);
@@ -38,8 +38,8 @@ test('execute excludes cancelled by default', function () {
     StockAdjustment::factory()->create(['status' => 'cancelled']);
     StockAdjustment::factory()->create(['status' => 'draft']);
 
-    $action = new IndexStockAdjustmentsAction(new StockAdjustmentFilterService());
-    $request = new IndexStockAdjustmentRequest();
+    $action = new IndexStockAdjustmentsAction(new StockAdjustmentFilterService);
+    $request = new IndexStockAdjustmentRequest;
 
     $result = $action->execute($request);
 
@@ -50,7 +50,7 @@ test('execute excludes cancelled by default', function () {
 test('execute can include cancelled when status filter set', function () {
     StockAdjustment::factory()->create(['status' => 'cancelled']);
 
-    $action = new IndexStockAdjustmentsAction(new StockAdjustmentFilterService());
+    $action = new IndexStockAdjustmentsAction(new StockAdjustmentFilterService);
     $request = new IndexStockAdjustmentRequest(['status' => 'cancelled']);
 
     $result = $action->execute($request);

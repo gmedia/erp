@@ -10,7 +10,7 @@ class BranchSeeder extends Seeder
     public function run(): void
     {
         $branches = [
-            'Head Office', 'Branch 1', 'Branch 2', 'Branch 3'
+            'Head Office', 'Branch 1', 'Branch 2', 'Branch 3',
         ];
 
         foreach ($branches as $name) {

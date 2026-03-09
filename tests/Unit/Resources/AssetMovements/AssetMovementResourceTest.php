@@ -6,7 +6,6 @@ use App\Http\Resources\AssetMovements\AssetMovementResource;
 use App\Models\Asset;
 use App\Models\AssetMovement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\TestCase;
 
 uses(RefreshDatabase::class)->group('asset-movements');
 
@@ -28,12 +27,12 @@ test('it transforms the resource correctly', function () {
     expect($data)->toHaveKey('notes', 'Test Notes');
     expect($data)->toHaveKey('movement_type', $assetMovement->movement_type);
     expect($data)->toHaveKey('moved_at'); // Might need formatting check
-    
+
     // Check relationships if loaded
     $assetMovement->load('asset');
     $resourceLoaded = new AssetMovementResource($assetMovement);
     $dataLoaded = $resourceLoaded->resolve();
-    
+
     expect($dataLoaded)->toHaveKey('asset');
     expect($dataLoaded['asset'])->toHaveKey('id', $asset->id);
 });

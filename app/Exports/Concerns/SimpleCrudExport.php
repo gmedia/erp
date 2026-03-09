@@ -35,29 +35,11 @@ abstract class SimpleCrudExport implements FromQuery, ShouldAutoSize, WithHeadin
      * Create a new export instance.
      *
      * @param  array<string, mixed>  $filters
-     * @param  Builder|null  $query
      */
     public function __construct(array $filters = [], ?Builder $query = null)
     {
         $this->filters = $filters;
         $this->query = $query;
-    }
-
-    /**
-     * Get the model class for the entity.
-     *
-     * @return class-string<\Illuminate\Database\Eloquent\Model>
-     */
-    abstract protected function getModelClass(): string;
-
-    /**
-     * Get the sortable fields for this entity.
-     *
-     * @return array<int, string>
-     */
-    protected function getSortableFields(): array
-    {
-        return ['id', 'name', 'created_at', 'updated_at'];
     }
 
     /**
@@ -73,13 +55,13 @@ abstract class SimpleCrudExport implements FromQuery, ShouldAutoSize, WithHeadin
         $query = $modelClass::query();
 
         // Apply search filter if provided (used by frontend)
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where('name', 'like', "%{$search}%");
         }
 
         // Apply name filter if provided (fallback for direct API calls)
-        if (!empty($this->filters['name'])) {
+        if (! empty($this->filters['name'])) {
             $name = $this->filters['name'];
             $query->where('name', 'like', "%{$name}%");
         }
@@ -139,5 +121,22 @@ abstract class SimpleCrudExport implements FromQuery, ShouldAutoSize, WithHeadin
             // Bold the header row
             1 => ['font' => ['bold' => true]],
         ];
+    }
+
+    /**
+     * Get the model class for the entity.
+     *
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     */
+    abstract protected function getModelClass(): string;
+
+    /**
+     * Get the sortable fields for this entity.
+     *
+     * @return array<int, string>
+     */
+    protected function getSortableFields(): array
+    {
+        return ['id', 'name', 'created_at', 'updated_at'];
     }
 }

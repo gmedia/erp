@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Suppliers\ExportSuppliersAction;
+use App\Actions\Suppliers\ImportSuppliersAction;
 use App\Actions\Suppliers\IndexSuppliersAction;
 use App\Domain\Suppliers\SupplierFilterService;
-use App\Http\Controllers\Controller;
-use App\Actions\Suppliers\ImportSuppliersAction;
 use App\Http\Requests\Suppliers\ExportSupplierRequest;
 use App\Http\Requests\Suppliers\ImportSupplierRequest;
 use App\Http\Requests\Suppliers\IndexSupplierRequest;
@@ -16,7 +15,6 @@ use App\Http\Resources\Suppliers\SupplierCollection;
 use App\Http\Resources\Suppliers\SupplierResource;
 use App\Models\Supplier;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class SupplierController extends Controller
 {
@@ -28,18 +26,6 @@ class SupplierController extends Controller
         $suppliers = (new IndexSuppliersAction(app(SupplierFilterService::class)))->execute($request);
 
         return (new SupplierCollection($suppliers))->response();
-    }
-
-    /**
-     * Export suppliers to Excel.
-     *
-     * @param  \App\Http\Requests\Suppliers\ExportSupplierRequest  $request
-     * @param  \App\Actions\Suppliers\ExportSuppliersAction  $action
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function export(ExportSupplierRequest $request, ExportSuppliersAction $action): JsonResponse
-    {
-        return $action->execute($request);
     }
 
     /**
@@ -80,6 +66,14 @@ class SupplierController extends Controller
         $supplier->delete();
 
         return response()->noContent();
+    }
+
+    /**
+     * Export suppliers to Excel.
+     */
+    public function export(ExportSupplierRequest $request, ExportSuppliersAction $action): JsonResponse
+    {
+        return $action->execute($request);
     }
 
     /**

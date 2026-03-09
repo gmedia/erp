@@ -3,6 +3,7 @@
 use App\Models\ApprovalRequest;
 use App\Models\Asset;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
 
@@ -32,7 +33,7 @@ test('returns 400 for unsupported entity type', function () {
         ->getJson("/api/entity-states/unsupported/{$asset->id}/approvals")
         ->assertStatus(400)
         ->assertJson([
-            'message' => 'Entity type not supported for approvals.'
+            'message' => 'Entity type not supported for approvals.',
         ]);
 });
 

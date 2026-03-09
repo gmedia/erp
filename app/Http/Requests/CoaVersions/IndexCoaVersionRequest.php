@@ -7,11 +7,6 @@ use App\Models\CoaVersion;
 
 class IndexCoaVersionRequest extends SimpleCrudIndexRequest
 {
-    protected function getModelClass(): string
-    {
-        return CoaVersion::class;
-    }
-
     public function rules(): array
     {
         $rules = parent::rules();
@@ -25,5 +20,10 @@ class IndexCoaVersionRequest extends SimpleCrudIndexRequest
             'status' => ['nullable', 'string', 'in:draft,active,archived'],
             'fiscal_year_id' => ['nullable', 'integer', 'exists:fiscal_years,id'],
         ]);
+    }
+
+    protected function getModelClass(): string
+    {
+        return CoaVersion::class;
     }
 }

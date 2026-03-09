@@ -13,7 +13,7 @@ test('it can filter by search on notes', function () {
     AssetMaintenance::factory()->create(['notes' => 'FIND-ME']);
     AssetMaintenance::factory()->create(['notes' => 'OTHER']);
 
-    $service = new AssetMaintenanceFilterService();
+    $service = new AssetMaintenanceFilterService;
     $query = AssetMaintenance::query();
 
     $service->applySearch($query, 'FIND-ME', ['notes']);
@@ -27,7 +27,7 @@ test('it can filter by search on related asset_code', function () {
     AssetMaintenance::factory()->create(['asset_id' => $asset->id]);
     AssetMaintenance::factory()->create();
 
-    $service = new AssetMaintenanceFilterService();
+    $service = new AssetMaintenanceFilterService;
     $query = AssetMaintenance::query();
 
     $service->applySearch($query, 'FA-SEARCH', ['asset_code']);
@@ -40,7 +40,7 @@ test('it can filter by status', function () {
     AssetMaintenance::factory()->create(['status' => 'scheduled']);
     AssetMaintenance::factory()->create(['status' => 'completed']);
 
-    $service = new AssetMaintenanceFilterService();
+    $service = new AssetMaintenanceFilterService;
     $query = AssetMaintenance::query();
 
     $service->applyAdvancedFilters($query, ['status' => 'completed']);
@@ -53,7 +53,7 @@ test('it can sort by cost', function () {
     $m1 = AssetMaintenance::factory()->create(['cost' => 100]);
     $m2 = AssetMaintenance::factory()->create(['cost' => 200]);
 
-    $service = new AssetMaintenanceFilterService();
+    $service = new AssetMaintenanceFilterService;
     $query = AssetMaintenance::query();
 
     $service->applySorting($query, 'cost', 'desc', ['cost']);

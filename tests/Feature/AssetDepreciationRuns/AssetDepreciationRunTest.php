@@ -6,9 +6,9 @@ use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\actingAs;
+use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
-use function Pest\Laravel\get;
 
 uses(RefreshDatabase::class)->group('asset-depreciation-runs');
 
@@ -19,7 +19,7 @@ beforeEach(function () {
     $this->fiscalYear = FiscalYear::factory()->create([
         'start_date' => '2024-01-01',
         'end_date' => '2024-12-31',
-        'status' => 'open'
+        'status' => 'open',
     ]);
 });
 
@@ -65,7 +65,7 @@ test('user can calculate depreciation', function () {
 test('user can view depreciation run lines', function () {
     $run = AssetDepreciationRun::factory()->create([
         'fiscal_year_id' => $this->fiscalYear->id,
-        'status' => 'calculated'
+        'status' => 'calculated',
     ]);
 
     $response = getJson("/api/asset-depreciation-runs/{$run->id}/lines");
@@ -74,7 +74,7 @@ test('user can view depreciation run lines', function () {
 
 test('user can post depreciation run to journal', function () {
     $account = \App\Models\Account::factory()->create();
-    
+
     $asset = Asset::factory()->create([
         'purchase_cost' => 12000000,
         'salvage_value' => 0,
@@ -92,7 +92,7 @@ test('user can post depreciation run to journal', function () {
         'fiscal_year_id' => $this->fiscalYear->id,
         'period_start' => '2024-01-01',
         'period_end' => '2024-01-31',
-        'status' => 'calculated'
+        'status' => 'calculated',
     ]);
 
     \App\Models\AssetDepreciationLine::factory()->create([
@@ -105,7 +105,7 @@ test('user can post depreciation run to journal', function () {
     ]);
 
     $response = postJson("/api/asset-depreciation-runs/{$run->id}/post");
-    
+
     $response->assertStatus(200);
     $response->assertJsonPath('message', 'Depreciation successfully posted to journal.');
 

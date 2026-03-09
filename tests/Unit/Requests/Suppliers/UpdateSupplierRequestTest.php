@@ -16,14 +16,17 @@ test('rules returns correct validation rules', function () {
 
     $request = new UpdateSupplierRequest;
     $request->setRouteResolver(function () use ($supplier) {
-        return new class($supplier) {
+        return new class($supplier)
+        {
             public function __construct(public $supplier) {}
-            public function parameter($key, $default = null) {
+
+            public function parameter($key, $default = null)
+            {
                 return $this->supplier;
             }
         };
     });
- 
+
     expect($request->rules())->toEqual([
         'name' => 'sometimes|required|string|max:255',
         'email' => [

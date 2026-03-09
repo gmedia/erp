@@ -26,7 +26,7 @@ class ApprovalAuditTrailExport implements FromCollection, ShouldAutoSize, WithHe
     {
         $action = app(IndexApprovalAuditTrailAction::class);
 
-        $request = new IndexApprovalAuditTrailRequest();
+        $request = new IndexApprovalAuditTrailRequest;
         $request->merge($this->filters);
 
         return $action->execute($request);

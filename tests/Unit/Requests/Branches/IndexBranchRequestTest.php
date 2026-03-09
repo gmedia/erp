@@ -5,12 +5,12 @@ use App\Http\Requests\Branches\IndexBranchRequest;
 uses()->group('branches');
 
 test('authorize returns true', function () {
-    $request = new IndexBranchRequest();
+    $request = new IndexBranchRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new IndexBranchRequest();
+    $request = new IndexBranchRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

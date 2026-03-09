@@ -19,7 +19,7 @@ test('it returns export response', function () {
 
     expect($response)->toBeInstanceOf(JsonResponse::class);
     $data = $response->getData(true);
-    
+
     expect($data)->toHaveKeys(['url', 'filename']);
     expect($data['filename'])->toContain('journal_entries_export');
 });

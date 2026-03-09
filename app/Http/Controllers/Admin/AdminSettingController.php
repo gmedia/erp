@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminSettingRequest;
-use App\Models\Setting;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Http\Request;
 use App\Mail\TestSmtpMail;
+use App\Models\Setting;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Controller for application-level settings management.
@@ -53,19 +53,8 @@ class AdminSettingController extends Controller
 
         return response()->json([
             'message' => 'Settings updated successfully.',
-            'company_logo_url' => $this->getCompanyLogoUrl()
+            'company_logo_url' => $this->getCompanyLogoUrl(),
         ]);
-    }
-
-    protected function getCompanyLogoUrl(): ?string
-    {
-        $logoPath = Setting::get('company_logo_path');
-
-        if (! is_string($logoPath) || $logoPath === '') {
-            return null;
-        }
-
-        return Storage::disk(config('filesystems.default'))->url($logoPath);
     }
 
     /**
@@ -78,14 +67,25 @@ class AdminSettingController extends Controller
         ]);
 
         try {
-            Mail::to($request->input('test_email'))->send(new TestSmtpMail());
-            
+            Mail::to($request->input('test_email'))->send(new TestSmtpMail);
+
             return response()->json(['message' => 'Test email sent successfully. Please check your inbox.']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to send email: ' . $e->getMessage(),
-                'errors' => ['test_email' => ['Failed to send email: ' . $e->getMessage()]]
+                'errors' => ['test_email' => ['Failed to send email: ' . $e->getMessage()]],
             ], 422);
         }
+    }
+
+    protected function getCompanyLogoUrl(): ?string
+    {
+        $logoPath = Setting::get('company_logo_path');
+
+        if (! is_string($logoPath) || $logoPath === '') {
+            return null;
+        }
+
+        return Storage::disk(config('filesystems.default'))->url($logoPath);
     }
 }

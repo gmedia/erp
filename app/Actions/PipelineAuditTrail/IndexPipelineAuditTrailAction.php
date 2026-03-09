@@ -17,7 +17,7 @@ class IndexPipelineAuditTrailAction
                 'fromState',
                 'toState',
                 'transition',
-                'performedBy'
+                'performedBy',
             ]);
 
         if ($request->filled('start_date')) {
@@ -53,13 +53,13 @@ class IndexPipelineAuditTrailAction
         if ($request->filled('search')) {
             $query->where(function (Builder $q) use ($request) {
                 $q->where('entity_id', 'like', '%' . $request->search . '%')
-                  ->orWhere('comment', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('performedBy', function (Builder $sq) use ($request) {
-                      $sq->where('name', 'like', '%' . $request->search . '%');
-                  })
-                  ->orWhereHas('transition', function (Builder $sq) use ($request) {
-                      $sq->where('name', 'like', '%' . $request->search . '%');
-                  });
+                    ->orWhere('comment', 'like', '%' . $request->search . '%')
+                    ->orWhereHas('performedBy', function (Builder $sq) use ($request) {
+                        $sq->where('name', 'like', '%' . $request->search . '%');
+                    })
+                    ->orWhereHas('transition', function (Builder $sq) use ($request) {
+                        $sq->where('name', 'like', '%' . $request->search . '%');
+                    });
             });
         }
 
@@ -68,18 +68,18 @@ class IndexPipelineAuditTrailAction
 
         if ($sortBy === 'performed_by') {
             $query->leftJoin('users', 'pipeline_state_logs.performed_by', '=', 'users.id')
-                  ->orderBy('users.name', $sortDirection)
-                  ->select('pipeline_state_logs.*');
+                ->orderBy('users.name', $sortDirection)
+                ->select('pipeline_state_logs.*');
         } else {
             $query->orderBy('pipeline_state_logs.' . $sortBy, $sortDirection);
         }
 
         if ($request->boolean('export')) {
-             return $query->get();
+            return $query->get();
         }
 
         $perPage = $request->get('per_page', 15);
-        
+
         return $query->paginate($perPage)->withQueryString();
     }
 }

@@ -36,7 +36,7 @@ describe('DepartmentExport', function () {
 
     test('headings returns correct columns', function () {
         $export = new DepartmentExport([]);
-        
+
         expect($export->headings())->toContain('ID', 'Name', 'Created At');
     });
 });

@@ -21,7 +21,7 @@ class SupplierFilterService
 
         $sortBy = $filters['sort_by'] ?? 'created_at';
         // Map frontend sort keys to backend columns
-        $sortBy = match($sortBy) {
+        $sortBy = match ($sortBy) {
             'branch' => 'branch_id',
             'category' => 'category_id',
             default => $sortBy

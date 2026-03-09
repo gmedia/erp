@@ -24,5 +24,3 @@ test('fillable attributes are defined correctly', function () {
         'name',
     ]);
 });
-
-

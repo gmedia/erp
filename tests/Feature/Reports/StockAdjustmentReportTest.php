@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Maatwebsite\Excel\Facades\Excel;
 
-use function Pest\Laravel\actingAs;
-
 uses(RefreshDatabase::class)->group('stock-adjustment-report');
 
 beforeEach(function () {
@@ -24,8 +22,6 @@ test('it requires permission to access stock adjustment report', function () {
     $this->getJson('/api/reports/stock-adjustment')
         ->assertForbidden();
 });
-
-
 
 test('it can fetch stock adjustment report data via json', function () {
     $branch = Branch::factory()->create(['name' => 'HQ']);

@@ -27,7 +27,7 @@ class PositionController extends Controller
      */
     public function index(IndexPositionRequest $request): JsonResponse
     {
-        $positions = (new IndexPositionsAction())->execute($request);
+        $positions = (new IndexPositionsAction)->execute($request);
 
         return (new PositionCollection($positions))->response();
     }
@@ -77,6 +77,6 @@ class PositionController extends Controller
      */
     public function export(ExportPositionRequest $request): JsonResponse
     {
-        return (new ExportPositionsAction())->execute($request);
+        return (new ExportPositionsAction)->execute($request);
     }
 }

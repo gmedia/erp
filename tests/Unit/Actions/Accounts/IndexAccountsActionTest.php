@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('accounts');
 
 beforeEach(function () {
-    $this->filterService = new AccountFilterService();
+    $this->filterService = new AccountFilterService;
     $this->action = new IndexAccountsAction($this->filterService);
 });
 
@@ -21,7 +21,7 @@ test('it can index accounts by version', function () {
     Account::factory()->count(3)->create(); // Other versions
 
     $request = new IndexAccountRequest(['coa_version_id' => $coaVersion->id]);
-    
+
     $result = $this->action->execute($request);
 
     expect($result)->toBeInstanceOf(Collection::class)
@@ -34,9 +34,9 @@ test('it can paginate accounts', function () {
 
     $request = new IndexAccountRequest([
         'coa_version_id' => $coaVersion->id,
-        'per_page' => 10
+        'per_page' => 10,
     ]);
-    
+
     $result = $this->action->execute($request);
 
     expect($result)->toBeInstanceOf(\Illuminate\Contracts\Pagination\LengthAwarePaginator::class)

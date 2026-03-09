@@ -4,25 +4,12 @@ namespace Tests\Traits;
 
 /**
  * Trait for testing Simple CRUD Export Request classes.
- * 
+ *
  * Requires the consumer to define:
  * - getRequestClass(): string - The request class to test
  */
 trait SimpleCrudExportRequestTestTrait
 {
-    /**
-     * Get the request class to test.
-     * 
-     * @return class-string
-     */
-    abstract protected function getRequestClass(): string;
-
-    protected function createExportRequest(): object
-    {
-        $requestClass = $this->getRequestClass();
-        return new $requestClass();
-    }
-
     public function test_authorize_returns_true(): void
     {
         $request = $this->createExportRequest();
@@ -102,5 +89,19 @@ trait SimpleCrudExportRequestTestTrait
             $validator = validator($data, $this->createExportRequest()->rules());
             $this->assertFalse($validator->fails());
         }
+    }
+
+    /**
+     * Get the request class to test.
+     *
+     * @return class-string
+     */
+    abstract protected function getRequestClass(): string;
+
+    protected function createExportRequest(): object
+    {
+        $requestClass = $this->getRequestClass();
+
+        return new $requestClass;
     }
 }

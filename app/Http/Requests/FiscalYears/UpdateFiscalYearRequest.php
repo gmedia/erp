@@ -7,11 +7,6 @@ use App\Models\FiscalYear;
 
 class UpdateFiscalYearRequest extends SimpleCrudUpdateRequest
 {
-    protected function getModelClass(): string
-    {
-        return FiscalYear::class;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      */
@@ -26,5 +21,10 @@ class UpdateFiscalYearRequest extends SimpleCrudUpdateRequest
             'end_date' => ['sometimes', 'required', 'date', 'after:start_date'],
             'status' => ['sometimes', 'required', 'in:open,closed,locked'],
         ];
+    }
+
+    protected function getModelClass(): string
+    {
+        return FiscalYear::class;
     }
 }

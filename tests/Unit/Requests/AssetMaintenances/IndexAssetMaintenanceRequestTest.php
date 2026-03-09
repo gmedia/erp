@@ -8,7 +8,7 @@ uses()->group('asset-maintenances');
 
 function createIndexRequest(): IndexAssetMaintenanceRequest
 {
-    return new IndexAssetMaintenanceRequest();
+    return new IndexAssetMaintenanceRequest;
 }
 
 test('it authorizes request', function () {

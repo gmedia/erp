@@ -3,9 +3,9 @@
 use App\Actions\ApprovalFlows\IndexApprovalFlowsAction;
 use App\Domain\ApprovalFlows\ApprovalFlowFilterService;
 use App\Http\Requests\ApprovalFlows\IndexApprovalFlowRequest;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('approval-flows');
 
@@ -18,7 +18,7 @@ test('execute calls filter service with correct parameters', function () {
     $request->shouldReceive('get')->with('page', 1)->andReturn(1);
     $request->shouldReceive('filled')->with('search')->andReturn(true);
     $request->shouldReceive('get')->with('search')->andReturn('test');
-    
+
     // Advanced filters
     $request->shouldReceive('get')->with('approvable_type')->andReturn('App\\Models\\AssetMovement');
     $request->shouldReceive('get')->with('is_active')->andReturn(1);
@@ -40,7 +40,7 @@ test('execute calls filter service with correct parameters', function () {
 
     $filterService->shouldReceive('applySorting')
         ->once()
-        ->with(Mockery::type(Builder::class), 'created_at', 'desc', 
+        ->with(Mockery::type(Builder::class), 'created_at', 'desc',
             ['id', 'name', 'code', 'approvable_type', 'is_active', 'created_at', 'updated_at']);
 
     $result = $action->execute($request);

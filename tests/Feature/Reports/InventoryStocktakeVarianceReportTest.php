@@ -13,8 +13,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Maatwebsite\Excel\Facades\Excel;
 
-use function Pest\Laravel\actingAs;
-
 uses(RefreshDatabase::class)->group('inventory-stocktake-variance-report');
 
 beforeEach(function () {
@@ -27,8 +25,6 @@ test('it requires permission to access inventory stocktake variance report', fun
     $this->getJson('/api/reports/inventory-stocktake-variance')
         ->assertForbidden();
 });
-
-
 
 test('it can fetch inventory stocktake variance report data via json', function () {
     $branch = Branch::factory()->create(['name' => 'HQ']);

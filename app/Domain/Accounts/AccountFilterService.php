@@ -27,7 +27,7 @@ class AccountFilterService
         if (isset($filters['is_active'])) {
             $query->where('is_active', (bool) $filters['is_active']);
         }
-        
+
         if (! empty($filters['coa_version_id'])) {
             $query->where('coa_version_id', $filters['coa_version_id']);
         }

@@ -4,25 +4,12 @@ namespace Tests\Traits;
 
 /**
  * Trait for testing Simple CRUD Index Request classes.
- * 
+ *
  * Requires the consumer to define:
  * - getRequestClass(): string - The request class to test
  */
 trait SimpleCrudIndexRequestTestTrait
 {
-    /**
-     * Get the request class to test.
-     * 
-     * @return class-string
-     */
-    abstract protected function getRequestClass(): string;
-
-    protected function createRequest(): object
-    {
-        $requestClass = $this->getRequestClass();
-        return new $requestClass();
-    }
-
     public function test_authorize_returns_true(): void
     {
         $request = $this->createRequest();
@@ -135,5 +122,19 @@ trait SimpleCrudIndexRequestTestTrait
             $validator = validator($data, $this->createRequest()->rules());
             $this->assertFalse($validator->fails());
         }
+    }
+
+    /**
+     * Get the request class to test.
+     *
+     * @return class-string
+     */
+    abstract protected function getRequestClass(): string;
+
+    protected function createRequest(): object
+    {
+        $requestClass = $this->getRequestClass();
+
+        return new $requestClass;
     }
 }

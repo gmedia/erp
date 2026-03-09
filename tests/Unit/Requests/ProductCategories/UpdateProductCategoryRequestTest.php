@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('product-categories');
 
 test('authorize returns true', function () {
-    $request = new UpdateProductCategoryRequest();
+    $request = new UpdateProductCategoryRequest;
     expect($request->authorize())->toBeTrue();
 });
 
@@ -15,11 +15,11 @@ test('rules returns correct validation rules', function () {
     $category = ProductCategory::factory()->create();
 
     $request = Mockery::mock(UpdateProductCategoryRequest::class)->makePartial();
-    
+
     $request->shouldReceive('route')
         ->with('product_category')
         ->andReturn($category);
-        
+
     $request->shouldReceive('route')
         ->with('id')
         ->andReturn(null);

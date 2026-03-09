@@ -4,8 +4,7 @@ namespace Tests\Feature\Reports;
 
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\actingAs;
-use function Pest\Laravel\get;
+
 use function Pest\Laravel\seed;
 
 uses(RefreshDatabase::class)->group('reports');
@@ -28,4 +27,3 @@ test('balance sheet memasukkan current year earnings (net income) ke equity', fu
         ->assertJsonPath('report.equity.1.code', '9999-CYE')
         ->assertJsonPath('report.equity.1.balance', 5000000);
 });
-

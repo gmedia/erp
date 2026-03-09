@@ -8,9 +8,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('assets');
 
 test('update asset request validation rules', function () {
-    $request = new UpdateAssetRequest();
+    $request = new UpdateAssetRequest;
     $rules = $request->rules();
-    
+
     expect($rules)->toHaveKey('asset_code')
         ->and($rules)->toHaveKey('name')
         ->and($rules)->toHaveKey('status');

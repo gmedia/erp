@@ -34,19 +34,31 @@ readonly class UpdateSupplierData
 
     /**
      * Convert DTO to array for model update, filtering out null values.
-     *
-     * @return array
      */
     public function toArray(): array
     {
         $data = [];
-        if ($this->name !== null) $data['name'] = $this->name;
-        if ($this->email !== null) $data['email'] = $this->email;
-        if ($this->phone !== null) $data['phone'] = $this->phone;
-        if ($this->address !== null) $data['address'] = $this->address;
-        if ($this->branch_id !== null) $data['branch_id'] = $this->branch_id;
-        if ($this->category !== null) $data['category'] = $this->category;
-        if ($this->status !== null) $data['status'] = $this->status;
+        if ($this->name !== null) {
+            $data['name'] = $this->name;
+        }
+        if ($this->email !== null) {
+            $data['email'] = $this->email;
+        }
+        if ($this->phone !== null) {
+            $data['phone'] = $this->phone;
+        }
+        if ($this->address !== null) {
+            $data['address'] = $this->address;
+        }
+        if ($this->branch_id !== null) {
+            $data['branch_id'] = $this->branch_id;
+        }
+        if ($this->category !== null) {
+            $data['category'] = $this->category;
+        }
+        if ($this->status !== null) {
+            $data['status'] = $this->status;
+        }
 
         return $data;
     }

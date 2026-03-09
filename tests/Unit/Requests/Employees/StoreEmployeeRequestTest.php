@@ -32,7 +32,7 @@ describe('StoreEmployeeRequest', function () {
             'salary',
             'hire_date',
             'employment_status',
-            'termination_date'
+            'termination_date',
         ]);
     });
 
@@ -55,7 +55,7 @@ describe('StoreEmployeeRequest', function () {
 
         $validator = validator($data, (new StoreEmployeeRequest)->rules());
 
-        expect(!$validator->fails())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with missing required fields', function () {
@@ -203,6 +203,6 @@ describe('StoreEmployeeRequest', function () {
 
         $validator = validator($data, (new StoreEmployeeRequest)->rules());
 
-        expect(!$validator->fails())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 });

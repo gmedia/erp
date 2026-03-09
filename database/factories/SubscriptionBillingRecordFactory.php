@@ -26,12 +26,12 @@ class SubscriptionBillingRecordFactory extends Factory
         $dueDate = (clone $billingDate)->modify('+7 days');
 
         $status = fake()->randomElement(['pending', 'paid', 'overdue', 'cancelled']);
-        
+
         $subtotal = fake()->numberBetween(10, 500) * 1000;
         $taxAmount = $subtotal * 0.11;
         $discountAmount = fake()->optional(0.2)->numberBetween(0, $subtotal * 0.2);
         $totalAmount = $subtotal + $taxAmount - ($discountAmount ?? 0);
-        
+
         $amountPaid = 0;
         $paidDate = null;
         if ($status === 'paid') {
@@ -83,7 +83,7 @@ class SubscriptionBillingRecordFactory extends Factory
     public function paid(): static
     {
         $paidDate = fake()->dateTimeBetween('-30 days', 'now');
-        
+
         return $this->state(fn (array $attributes) => [
             'status' => 'paid',
             'amount_paid' => $attributes['total_amount'],

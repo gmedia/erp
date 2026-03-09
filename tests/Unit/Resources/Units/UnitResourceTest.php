@@ -12,12 +12,12 @@ test('to array returns correct structure', function () {
         'name' => 'Kilogram',
         'symbol' => 'kg',
     ]);
-    
+
     $resource = new UnitResource($unit);
     $request = Request::create('/');
-    
+
     $result = $resource->toArray($request);
-    
+
     expect($result)->toMatchArray([
         'id' => $unit->id,
         'name' => 'Kilogram',
@@ -29,7 +29,7 @@ test('to array returns correct structure', function () {
         // If the previous test passed using SimpleCrudResourceTestTrait, it only checked id, name, created_at, updated_at.
         // I'll stick to that for now unless I verify UnitResource source.
     ]);
-    
+
     expect($result['created_at'])->toBeString()
         ->and($result['updated_at'])->toBeString();
 });

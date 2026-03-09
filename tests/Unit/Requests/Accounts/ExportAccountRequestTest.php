@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Validator;
 uses()->group('accounts');
 
 test('it validates required coa_version_id', function () {
-    $request = new ExportAccountRequest();
+    $request = new ExportAccountRequest;
     $validator = Validator::make([], $request->rules());
 
     expect($validator->passes())->toBeFalse()
@@ -14,10 +14,10 @@ test('it validates required coa_version_id', function () {
 });
 
 test('it validates type if provided', function () {
-    $request = new ExportAccountRequest();
+    $request = new ExportAccountRequest;
     $validator = Validator::make([
         'coa_version_id' => 1,
-        'type' => 'invalid'
+        'type' => 'invalid',
     ], $request->rules());
 
     expect($validator->passes())->toBeFalse()

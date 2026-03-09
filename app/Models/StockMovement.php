@@ -11,25 +11,44 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $product_id
  * @property int $warehouse_id
  * @property string $movement_type
- * @property string $quantity_in
- * @property string $quantity_out
- * @property string $balance_after
- * @property string|null $unit_cost
- * @property string|null $average_cost_after
+ * @property numeric $quantity_in
+ * @property numeric $quantity_out
+ * @property numeric $balance_after
+ * @property numeric|null $unit_cost
+ * @property numeric|null $average_cost_after
  * @property string|null $reference_type
  * @property int|null $reference_id
  * @property string|null $reference_number
  * @property string|null $notes
- * @property string $moved_at
+ * @property \Illuminate\Support\Carbon $moved_at
  * @property int|null $created_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- *
- * @property-read Product $product
- * @property-read Warehouse $warehouse
- * @property-read User|null $createdBy
+ * @property-read \App\Models\User|null $createdBy
+ * @property-read \App\Models\Product $product
+ * @property-read \App\Models\Warehouse $warehouse
  *
  * @method static \Database\Factories\StockMovementFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereAverageCostAfter($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereBalanceAfter($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereMovedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereMovementType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereQuantityIn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereQuantityOut($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereReferenceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereReferenceNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereReferenceType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereUnitCost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereWarehouseId($value)
  *
  * @mixin \Eloquent
  */
@@ -91,4 +110,3 @@ class StockMovement extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 }
-

@@ -27,7 +27,7 @@ class IndexBookValueDepreciationRequest extends FormRequest
                     'purchase_date',
                     'purchase_cost',
                     'book_value',
-                    'accumulated_depreciation'
+                    'accumulated_depreciation',
                 ]),
             ],
             'sort_direction' => ['nullable', 'string', Rule::in(['asc', 'desc'])],

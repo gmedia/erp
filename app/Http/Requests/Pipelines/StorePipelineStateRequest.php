@@ -22,6 +22,7 @@ class StorePipelineStateRequest extends FormRequest
     public function rules(): array
     {
         $pipeline = $this->route('pipeline');
+
         return [
             'code' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('pipeline_states')->where('pipeline_id', $pipeline->id)],
             'name' => ['required', 'string', 'max:255'],

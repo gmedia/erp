@@ -22,7 +22,7 @@ class StockTransferExport implements FromQuery, WithHeadings, WithMapping, WithS
     {
         $query = StockTransfer::query()->with(['fromWarehouse', 'toWarehouse']);
 
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('transfer_number', 'like', "%{$search}%")
@@ -30,23 +30,23 @@ class StockTransferExport implements FromQuery, WithHeadings, WithMapping, WithS
             });
         }
 
-        if (!empty($this->filters['from_warehouse_id'])) {
+        if (! empty($this->filters['from_warehouse_id'])) {
             $query->where('from_warehouse_id', $this->filters['from_warehouse_id']);
         }
 
-        if (!empty($this->filters['to_warehouse_id'])) {
+        if (! empty($this->filters['to_warehouse_id'])) {
             $query->where('to_warehouse_id', $this->filters['to_warehouse_id']);
         }
 
-        if (!empty($this->filters['status'])) {
+        if (! empty($this->filters['status'])) {
             $query->where('status', $this->filters['status']);
         }
 
-        if (!empty($this->filters['transfer_date_from'])) {
+        if (! empty($this->filters['transfer_date_from'])) {
             $query->whereDate('transfer_date', '>=', $this->filters['transfer_date_from']);
         }
 
-        if (!empty($this->filters['transfer_date_to'])) {
+        if (! empty($this->filters['transfer_date_to'])) {
             $query->whereDate('transfer_date', '<=', $this->filters['transfer_date_to']);
         }
 

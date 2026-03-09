@@ -7,6 +7,7 @@ use App\Models\StockMovement;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class)->group('stock-monitor');

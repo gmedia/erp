@@ -19,7 +19,7 @@ describe('CustomerCategory API Endpoints', function () {
             'customer_category',
             'customer_category.create',
             'customer_category.edit',
-            'customer_category.delete'
+            'customer_category.delete',
         ]);
 
         actingAs($user);
@@ -33,9 +33,9 @@ describe('CustomerCategory API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'name', 'created_at', 'updated_at']
+                    '*' => ['id', 'name', 'created_at', 'updated_at'],
                 ],
-                'meta' => ['total', 'per_page', 'current_page']
+                'meta' => ['total', 'per_page', 'current_page'],
             ]);
 
         expect($response->json('meta.total'))->toBe(15)
@@ -61,9 +61,9 @@ describe('CustomerCategory API Endpoints', function () {
 
         $response->assertOk();
         expect($response->json('data.0.name'))->toBe('ZZZZ Beta');
-        
+
         $response = getJson('/api/customer-categories?sort_by=name&sort_direction=asc');
-        
+
         $response->assertOk();
         expect($response->json('data.0.name'))->toBe('AAAA Alpha');
     });

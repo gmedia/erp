@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('subscription_billing_records', function (Blueprint $table) {
@@ -17,7 +14,7 @@ return new class extends Migration
                 ->constrained('customer_subscriptions')
                 ->onDelete('cascade');
             $table->string('invoice_number')->unique();
-            
+
             // Billing period
             $table->date('period_start');
             $table->date('period_end');
@@ -25,14 +22,14 @@ return new class extends Migration
                 ->comment('When invoice was generated');
             $table->date('due_date')
                 ->comment('Payment due date');
-            
+
             // Amounts
             $table->decimal('subtotal', 15, 2);
             $table->decimal('tax_amount', 15, 2)->default(0);
             $table->decimal('discount_amount', 15, 2)->default(0);
             $table->decimal('total_amount', 15, 2);
             $table->decimal('amount_paid', 15, 2)->default(0);
-            
+
             // Status
             $table->enum('status', [
                 'draft',           // Not yet sent
@@ -41,20 +38,20 @@ return new class extends Migration
                 'partially_paid',  // Partial payment received
                 'overdue',         // Past due date
                 'cancelled',       // Cancelled
-                'refunded'         // Refunded
+                'refunded',         // Refunded
             ])->default('pending');
-            
+
             $table->date('paid_date')->nullable();
             $table->string('payment_method')->nullable();
             $table->string('payment_reference')->nullable();
-            
+
             $table->integer('retry_count')->default(0)
                 ->comment('Number of payment retry attempts');
             $table->date('next_retry_date')->nullable();
-            
+
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             $table->index('customer_subscription_id');
             $table->index('status');
             $table->index('due_date');
@@ -62,9 +59,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('subscription_billing_records');

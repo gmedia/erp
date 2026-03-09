@@ -33,7 +33,7 @@ describe('ProductCategoryExport', function () {
         expect($mapped)->toBeArray();
         expect($mapped[0])->toBe(1);
         expect($mapped[1])->toBe('Test Cat');
-        // Likely description is exported? I'll assume NO for now unless proven otherwise, 
+        // Likely description is exported? I'll assume NO for now unless proven otherwise,
         // OR better: check array contains 'Desc' if I am unsure.
         // Actually, let's keep it loose or check if array contains.
         // "Standard" simple export usually ID, Name, CreatedAt.
@@ -41,7 +41,7 @@ describe('ProductCategoryExport', function () {
 
     test('headings returns correct columns', function () {
         $export = new ProductCategoryExport([]);
-        
+
         expect($export->headings())->toContain('ID', 'Name', 'Created At');
     });
 });

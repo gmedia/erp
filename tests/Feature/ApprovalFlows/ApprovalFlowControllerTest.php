@@ -5,7 +5,6 @@ use App\Models\Department;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
@@ -43,7 +42,7 @@ describe('Approval Flow API Endpoints', function () {
                         'is_active',
                         'created_at',
                         'updated_at',
-                    ]
+                    ],
                 ],
                 'meta' => [
                     'current_page',
@@ -69,7 +68,7 @@ describe('Approval Flow API Endpoints', function () {
         $response = getJson('/api/approval-flows?search=Standard');
         $response->assertOk();
         expect($response->json('data'))->toHaveCount(1);
-        
+
         // Search by code
         $response = getJson('/api/approval-flows?search=REQ-');
         $response->assertOk();
@@ -143,8 +142,8 @@ describe('Approval Flow API Endpoints', function () {
                     'escalate_after_hours' => null,
                     'escalation_user_id' => null,
                     'can_reject' => false,
-                ]
-            ]
+                ],
+            ],
         ];
 
         $response = postJson('/api/approval-flows', $payload);
@@ -159,7 +158,7 @@ describe('Approval Flow API Endpoints', function () {
                     'description',
                     'is_active',
                     'steps',
-                ]
+                ],
             ])
             ->assertJsonFragment([
                 'name' => 'Standard Asset Request',
@@ -185,7 +184,7 @@ describe('Approval Flow API Endpoints', function () {
             ->assertJsonValidationErrors([
                 'name',
                 'code',
-                'approvable_type'
+                'approvable_type',
             ]);
     });
 
@@ -204,8 +203,8 @@ describe('Approval Flow API Endpoints', function () {
                     'approver_user_id' => User::factory()->create()->id,
                     'required_action' => 'approve',
                     'can_reject' => true,
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $response->assertUnprocessable()
@@ -233,13 +232,13 @@ describe('Approval Flow API Endpoints', function () {
                     'code',
                     'approvable_type',
                     'steps',
-                ]
+                ],
             ])
             ->assertJsonFragment([
                 'id' => $flow->id,
                 'name' => $flow->name,
             ]);
-            
+
         expect($response->json('data.steps'))->toHaveCount(1);
     });
 
@@ -273,8 +272,8 @@ describe('Approval Flow API Endpoints', function () {
                     'approver_role_id' => 1,
                     'required_action' => 'review',
                     'can_reject' => false,
-                ]
-            ]
+                ],
+            ],
         ];
 
         $response = putJson("/api/approval-flows/{$flow->id}", $payload);
@@ -288,7 +287,7 @@ describe('Approval Flow API Endpoints', function () {
         expect($flow->name)->toBe('New Name');
         expect($flow->steps)->toHaveCount(1);
         expect($flow->steps->first()->name)->toBe('New Step 1');
-        
+
         assertDatabaseMissing('approval_flow_steps', [
             'name' => 'Old Step',
         ]);
@@ -309,8 +308,8 @@ describe('Approval Flow API Endpoints', function () {
                     'approver_user_id' => User::factory()->create()->id,
                     'required_action' => 'approve',
                     'can_reject' => true,
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $response->assertOk();
@@ -329,8 +328,8 @@ describe('Approval Flow API Endpoints', function () {
                     'approver_user_id' => User::factory()->create()->id,
                     'required_action' => 'approve',
                     'can_reject' => true,
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $response->assertNotFound();
@@ -352,4 +351,3 @@ describe('Approval Flow API Endpoints', function () {
         $response->assertNotFound();
     });
 });
-

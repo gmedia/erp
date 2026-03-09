@@ -10,7 +10,7 @@ test('apply search filters by transfer_number', function () {
     StockTransfer::factory()->create(['transfer_number' => 'ST-MAIN-001', 'status' => 'draft']);
     StockTransfer::factory()->create(['transfer_number' => 'ST-OTHER-001', 'status' => 'draft']);
 
-    $service = new StockTransferFilterService();
+    $service = new StockTransferFilterService;
     $query = StockTransfer::query();
 
     $service->applySearch($query, 'ST-MAIN', ['transfer_number', 'notes']);
@@ -23,7 +23,7 @@ test('applyAdvancedFilters filters by status', function () {
     StockTransfer::factory()->create(['status' => 'draft']);
     StockTransfer::factory()->create(['status' => 'approved']);
 
-    $service = new StockTransferFilterService();
+    $service = new StockTransferFilterService;
     $query = StockTransfer::query();
 
     $service->applyAdvancedFilters($query, ['status' => 'approved']);
@@ -31,4 +31,3 @@ test('applyAdvancedFilters filters by status', function () {
     expect($query->count())->toBe(1)
         ->and($query->first()->status)->toBe('approved');
 });
-

@@ -4,6 +4,7 @@ use App\Models\AssetStocktake;
 use App\Models\Branch;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Laravel\assertDatabaseHas;
 
 uses(RefreshDatabase::class)->group('asset-stocktakes');

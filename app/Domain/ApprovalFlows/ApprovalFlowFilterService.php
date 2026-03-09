@@ -10,8 +10,8 @@ class ApprovalFlowFilterService
     use BaseFilterService;
 
     /**
-     * @param Builder<\App\Models\ApprovalFlow> $query
-     * @param array<string, mixed> $filters
+     * @param  Builder<\App\Models\ApprovalFlow>  $query
+     * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {

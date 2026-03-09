@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('coa-versions');
 
 beforeEach(function () {
-    $this->service = new CoaVersionFilterService();
+    $this->service = new CoaVersionFilterService;
 });
 
 test('applySearch filters by name', function () {
@@ -40,7 +40,7 @@ test('applyAdvancedFilters filters by status and fiscal year', function () {
     $this->service->applyAdvancedFilters($query, ['fiscal_year_id' => $fy1->id]);
     expect($query->count())->toBe(1)
         ->and($query->first()->fiscal_year_id)->toBe($fy1->id);
-        
+
     // Test combined filters
     $query = CoaVersion::query();
     $this->service->applyAdvancedFilters($query, ['status' => 'active', 'fiscal_year_id' => $fy2->id]);

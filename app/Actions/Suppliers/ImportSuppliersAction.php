@@ -10,14 +10,11 @@ class ImportSuppliersAction
 {
     /**
      * Execute the import process.
-     *
-     * @param  \Illuminate\Http\UploadedFile  $file
-     * @return array
      */
     public function execute(UploadedFile $file): array
     {
-        $importer = new SupplierImport();
-        
+        $importer = new SupplierImport;
+
         // Import the file using the importer class
         Excel::import($importer, $file);
 

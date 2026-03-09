@@ -3,16 +3,13 @@
 use App\Models\Asset;
 use App\Models\AssetCategory;
 use App\Models\Branch;
-use App\Models\User;
-use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class)->group('book-value-depreciation-reports');
-
-use function Pest\Laravel\actingAs;
 
 beforeEach(function () {
     $this->user = createTestUserWithPermissions(['asset']);
@@ -33,8 +30,6 @@ beforeEach(function () {
         'book_value' => 8000,
     ]);
 });
-
-
 
 test('it can fetch book value report data via json', function () {
     \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
@@ -99,7 +94,7 @@ test('it can export the report data to excel', function () {
     $filename = $response->json('filename');
     expect($filename)->toStartWith('book_value_depreciation_report_2026-01-01_10-00-00_');
     expect($filename)->toEndWith('.xlsx');
-    
+
     Excel::assertStored('exports/' . $filename, 'public');
     Carbon::setTestNow();
 })->group('book-value-depreciation-reports');

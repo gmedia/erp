@@ -14,14 +14,14 @@ test('authorize returns true', function () {
 
 test('rules returns correct validation rules', function () {
     $flow = new ApprovalFlow(['id' => 1]);
-    
+
     $request = new UpdateApprovalFlowRequest;
-    
+
     // Mock the route parameter
     $route = Mockery::mock(Route::class);
     $route->shouldReceive('parameter')->with('approval_flow', null)->andReturn($flow);
-    $request->setRouteResolver(fn() => $route);
-    
+    $request->setRouteResolver(fn () => $route);
+
     expect($request->rules())->toEqual([
         'name' => 'sometimes|required|string|max:255',
         'code' => [
@@ -35,7 +35,7 @@ test('rules returns correct validation rules', function () {
         'description' => 'nullable|string',
         'is_active' => 'boolean',
         'conditions' => 'nullable|array',
-        
+
         'steps' => 'nullable|array',
         'steps.*.id' => 'nullable|exists:approval_flow_steps,id',
         'steps.*.name' => 'required|string|max:255',

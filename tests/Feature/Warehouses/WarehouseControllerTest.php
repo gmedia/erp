@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Warehouse;
 use App\Models\Branch;
+use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\actingAs;
@@ -20,7 +20,7 @@ describe('Warehouse API Endpoints', function () {
             'warehouse',
             'warehouse.create',
             'warehouse.edit',
-            'warehouse.delete'
+            'warehouse.delete',
         ]);
 
         actingAs($user);
@@ -39,9 +39,9 @@ describe('Warehouse API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'branch_id', 'branch', 'code', 'name', 'created_at', 'updated_at']
+                    '*' => ['id', 'branch_id', 'branch', 'code', 'name', 'created_at', 'updated_at'],
                 ],
-                'meta' => ['total', 'per_page', 'current_page']
+                'meta' => ['total', 'per_page', 'current_page'],
             ]);
 
         expect($response->json('meta.total'))->toBe(15)

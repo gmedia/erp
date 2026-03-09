@@ -51,7 +51,7 @@ describe('AssetCategoryExport', function () {
 
     test('headings returns correct columns', function () {
         $export = new AssetCategoryExport([]);
-        
+
         expect($export->headings())->toContain('ID', 'Code', 'Name', 'Default Useful Life (Months)', 'Created At');
     });
 });

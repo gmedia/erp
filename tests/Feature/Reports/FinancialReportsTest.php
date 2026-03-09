@@ -7,21 +7,19 @@ use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
-use App\Models\User;
 use Carbon\Carbon;
-use function Pest\Laravel\actingAs;
-use function Pest\Laravel\get;
-use function Pest\Laravel\seed;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
+use function Pest\Laravel\seed;
 
 uses(RefreshDatabase::class)->group('reports');
 
 beforeEach(function () {
     // seed(); // Avoid full seed to prevent conflicts/slowness
-    
+
     // Create necessary data for testing
     $this->user = createTestUserWithPermissions(['trial_balance_report', 'balance_sheet_report', 'cash_flow_report']);
-    
+
     // Create Fiscal Year
     $this->fiscalYear = FiscalYear::create([
         'name' => '2025',
@@ -37,8 +35,6 @@ beforeEach(function () {
         'status' => 'active',
     ]);
 });
-
-
 
 test('trial balance calculations are correct', function () {
     // Create Accounts
@@ -107,7 +103,7 @@ test('trial balance calculations are correct', function () {
         ->assertStatus(200)
         ->assertJsonCount(3, 'report')
         ->assertJsonPath('report.0.code', '1000') // Parent
-        ->assertJsonPath('report.0.level', 1) 
+        ->assertJsonPath('report.0.level', 1)
         ->assertJsonPath('report.1.code', '1100') // Child
         ->assertJsonPath('report.1.level', 2)
         ->assertJsonPath('report.1.parent_id', $parentAccount->id)
@@ -213,7 +209,7 @@ test('balance sheet accounts include net income in equity', function () {
         'type' => 'revenue',
         'normal_balance' => 'credit',
     ]);
-    
+
     $expense = Account::factory()->create([
         'coa_version_id' => $this->coaVersion->id,
         'code' => '5000',
@@ -257,11 +253,11 @@ test('balance sheet comparison works', function () {
         'end_date' => Carbon::now()->subYear()->endOfYear(),
         'status' => 'closed',
     ]);
-    
+
     $prevCoaVersion = CoaVersion::factory()->create([
-        'name' => 'v1-Prev', 
+        'name' => 'v1-Prev',
         'status' => 'active',
-        'fiscal_year_id' => $prevFiscalYear->id
+        'fiscal_year_id' => $prevFiscalYear->id,
     ]);
     // $prevFiscalYear->coaVersions()->attach($prevCoaVersion);
 
@@ -271,7 +267,7 @@ test('balance sheet comparison works', function () {
         'code' => '1000', // Matches
         'type' => 'asset',
         'normal_balance' => 'debit',
-        'name' => 'Cash'
+        'name' => 'Cash',
     ]);
 
     $prevAssetAccount = Account::factory()->create([
@@ -279,7 +275,7 @@ test('balance sheet comparison works', function () {
         'code' => '1000', // SAME CODE
         'type' => 'asset',
         'normal_balance' => 'debit',
-        'name' => 'Cash Prev'
+        'name' => 'Cash Prev',
     ]);
 
     // Current Year txn

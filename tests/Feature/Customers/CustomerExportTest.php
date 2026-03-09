@@ -78,7 +78,7 @@ describe('CustomerExport', function () {
 
     test('headings returns correct columns', function () {
         $export = new CustomerExport([]);
-        
+
         expect($export->headings())->toBe([
             'ID',
             'Name',

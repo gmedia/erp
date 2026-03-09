@@ -4,7 +4,6 @@ namespace App\Exports;
 
 use App\Actions\Reports\IndexBookValueDepreciationReportAction;
 use App\Http\Requests\Reports\IndexBookValueDepreciationRequest;
-use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -27,7 +26,7 @@ class BookValueDepreciationExport implements FromCollection, ShouldAutoSize, Wit
         $action = app(IndexBookValueDepreciationReportAction::class);
 
         // Build a fake request from the filters
-        $request = new IndexBookValueDepreciationRequest();
+        $request = new IndexBookValueDepreciationRequest;
         $request->merge($this->filters);
 
         return $action->execute($request);

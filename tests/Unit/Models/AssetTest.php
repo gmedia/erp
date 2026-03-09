@@ -3,8 +3,8 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Asset;
-use App\Models\Branch;
 use App\Models\AssetCategory;
+use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('assets');

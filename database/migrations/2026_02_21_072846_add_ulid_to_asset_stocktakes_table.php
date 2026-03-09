@@ -6,12 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        if (!Schema::hasColumn('asset_stocktakes', 'ulid')) {
+        if (! Schema::hasColumn('asset_stocktakes', 'ulid')) {
             Schema::table('asset_stocktakes', function (Blueprint $table) {
                 $table->ulid('ulid')->nullable()->after('id')->index();
             });
@@ -27,9 +24,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('asset_stocktakes', function (Blueprint $table) {

@@ -26,9 +26,6 @@ class CustomerController extends Controller
      * Display a listing of the customers with filtering and sorting.
      *
      * Supports pagination, search, advanced filters (branch, customer_type, status), and sorting.
-     *
-     * @param  \App\Http\Requests\Customers\IndexCustomerRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function index(IndexCustomerRequest $request): JsonResponse
     {
@@ -39,9 +36,6 @@ class CustomerController extends Controller
 
     /**
      * Store a newly created customer in storage.
-     *
-     * @param  \App\Http\Requests\Customers\StoreCustomerRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreCustomerRequest $request): JsonResponse
     {
@@ -54,9 +48,6 @@ class CustomerController extends Controller
 
     /**
      * Display the specified customer.
-     *
-     * @param  \App\Models\Customer  $customer
-     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Customer $customer): JsonResponse
     {
@@ -67,10 +58,6 @@ class CustomerController extends Controller
 
     /**
      * Update the specified customer in storage.
-     *
-     * @param  \App\Http\Requests\Customers\UpdateCustomerRequest  $request
-     * @param  \App\Models\Customer  $customer
-     * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateCustomerRequest $request, Customer $customer): JsonResponse
     {
@@ -81,27 +68,20 @@ class CustomerController extends Controller
     }
 
     /**
-     * Export customers to Excel.
-     *
-     * @param  \App\Http\Requests\Customers\ExportCustomerRequest  $request
-     * @param  \App\Actions\Customers\ExportCustomersAction  $action
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function export(ExportCustomerRequest $request, ExportCustomersAction $action): JsonResponse
-    {
-        return $action->execute($request);
-    }
-
-    /**
      * Remove the specified customer from storage.
-     *
-     * @param  \App\Models\Customer  $customer
-     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Customer $customer): JsonResponse
     {
         $customer->delete();
 
         return response()->json(null, 204);
+    }
+
+    /**
+     * Export customers to Excel.
+     */
+    public function export(ExportCustomerRequest $request, ExportCustomersAction $action): JsonResponse
+    {
+        return $action->execute($request);
     }
 }

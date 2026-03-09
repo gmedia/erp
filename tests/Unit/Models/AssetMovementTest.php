@@ -3,18 +3,18 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Asset;
+use App\Models\AssetLocation;
 use App\Models\AssetMovement;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
-use App\Models\AssetLocation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('asset-movements');
 
 test('it has fillable attributes', function () {
-    $model = new AssetMovement();
+    $model = new AssetMovement;
     expect($model->getFillable())->toBe([
         'asset_id',
         'movement_type',

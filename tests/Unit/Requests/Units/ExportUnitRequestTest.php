@@ -5,12 +5,12 @@ use App\Http\Requests\Units\ExportUnitRequest;
 uses()->group('units');
 
 test('authorize returns true', function () {
-    $request = new ExportUnitRequest();
+    $request = new ExportUnitRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new ExportUnitRequest();
+    $request = new ExportUnitRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

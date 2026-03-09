@@ -21,12 +21,12 @@ test('to array returns correct structure', function () {
         'status' => 'active',
         'notes' => 'Test Notes',
     ]);
-    
+
     $resource = new CustomerResource($customer);
     $request = Request::create('/api/customers');
-    
+
     $result = $resource->toArray($request);
-    
+
     expect($result)->toMatchArray([
         'id' => $customer->id,
         'name' => 'John Doe',

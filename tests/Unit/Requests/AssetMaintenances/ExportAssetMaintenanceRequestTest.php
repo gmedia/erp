@@ -8,7 +8,7 @@ uses()->group('asset-maintenances');
 
 function createExportRequest(): ExportAssetMaintenanceRequest
 {
-    return new ExportAssetMaintenanceRequest();
+    return new ExportAssetMaintenanceRequest;
 }
 
 test('it authorizes request', function () {

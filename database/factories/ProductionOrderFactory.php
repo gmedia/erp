@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Branch;
 use App\Models\Product;
 use App\Models\ProductionOrder;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -23,7 +22,7 @@ class ProductionOrderFactory extends Factory
     {
         $productionDate = fake()->dateTimeBetween('-2 months', '+1 month');
         $status = fake()->randomElement(['draft', 'in_progress', 'completed', 'cancelled']);
-        
+
         $completionDate = null;
         if ($status === 'completed') {
             $completionDate = fake()->dateTimeBetween($productionDate, 'now');
@@ -60,7 +59,7 @@ class ProductionOrderFactory extends Factory
     public function completed(): static
     {
         $productionDate = now()->subDays(fake()->numberBetween(7, 60));
-        
+
         return $this->state(fn (array $attributes) => [
             'status' => 'completed',
             'production_date' => $productionDate,

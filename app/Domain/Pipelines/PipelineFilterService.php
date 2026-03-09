@@ -10,8 +10,8 @@ class PipelineFilterService
     use BaseFilterService;
 
     /**
-     * @param Builder<\App\Models\Pipeline> $query
-     * @param array<string, mixed> $filters
+     * @param  Builder<\App\Models\Pipeline>  $query
+     * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {

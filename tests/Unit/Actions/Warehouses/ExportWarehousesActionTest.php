@@ -17,7 +17,7 @@ test('execute generates excel file and returns url', function () {
 
     Warehouse::factory()->count(3)->create();
 
-    $action = new ExportWarehousesAction();
+    $action = new ExportWarehousesAction;
     $request = Mockery::mock(ExportWarehouseRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'search' => null,
@@ -45,7 +45,7 @@ test('execute filters export by search term', function () {
     Warehouse::factory()->create(['name' => 'Main Warehouse']);
     Warehouse::factory()->create(['name' => 'Transit Warehouse']);
 
-    $action = new ExportWarehousesAction();
+    $action = new ExportWarehousesAction;
     $request = Mockery::mock(ExportWarehouseRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'search' => 'Main',

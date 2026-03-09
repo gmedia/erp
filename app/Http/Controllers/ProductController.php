@@ -74,6 +74,6 @@ class ProductController extends Controller
      */
     public function export(ExportProductRequest $request): JsonResponse
     {
-        return (new ExportProductsAction())->execute($request);
+        return (new ExportProductsAction)->execute($request);
     }
 }

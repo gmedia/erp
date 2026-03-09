@@ -9,12 +9,12 @@ uses(RefreshDatabase::class)->group('units');
 
 test('to array transforms collection', function () {
     $units = Unit::factory()->count(3)->create();
-    
+
     $collection = new UnitCollection($units);
     $request = Request::create('/');
-    
+
     $result = $collection->toArray($request);
-    
+
     expect($result)->toHaveCount(3);
     expect($result[0]['name'])->toBe($units[0]->name);
 });

@@ -27,7 +27,7 @@ class BranchController extends Controller
      */
     public function index(IndexBranchRequest $request): JsonResponse
     {
-        $branches = (new IndexBranchesAction())->execute($request);
+        $branches = (new IndexBranchesAction)->execute($request);
 
         return (new BranchCollection($branches))->response();
     }
@@ -77,6 +77,6 @@ class BranchController extends Controller
      */
     public function export(ExportBranchRequest $request): JsonResponse
     {
-        return (new ExportBranchesAction())->execute($request);
+        return (new ExportBranchesAction)->execute($request);
     }
 }

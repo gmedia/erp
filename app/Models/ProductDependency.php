@@ -11,15 +11,32 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $product_id
  * @property int $required_product_id
  * @property string $dependency_type
- * @property int $minimum_quantity
- * @property string|null $description
+ * @property int $minimum_quantity Minimum quantity of required product needed
+ * @property string|null $description Explanation of the dependency
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Product $product
+ * @property-read \App\Models\Product $requiredProduct
  *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency addOns()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency alternatives()
+ * @method static \Database\Factories\ProductDependencyFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency prerequisites()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency recommended()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereDependencyType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereMinimumQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereRequiredProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

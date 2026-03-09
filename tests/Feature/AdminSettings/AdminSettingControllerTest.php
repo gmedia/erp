@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Setting;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -36,8 +35,8 @@ describe('AdminSettingController@index', function () {
         $response->assertJsonStructure([
             'settings' => [
                 'general',
-                'regional'
-            ]
+                'regional',
+            ],
         ]);
     });
 
@@ -55,16 +54,16 @@ describe('AdminSettingController@index', function () {
                     'company_phone',
                     'company_email',
                     'company_logo_path',
-                    'company_logo_url'
+                    'company_logo_url',
                 ],
                 'regional' => [
                     'timezone',
                     'currency',
                     'date_format',
                     'number_format_decimal',
-                    'number_format_thousand'
-                ]
-            ]
+                    'number_format_thousand',
+                ],
+            ],
         ]);
     });
 });
@@ -76,8 +75,6 @@ describe('AdminSettingController@update', function () {
         ]);
         $response->assertStatus(401);
     });
-
-
 
     test('user with edit permission can update general settings', function () {
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
@@ -201,8 +198,6 @@ describe('AdminSettingController@testSmtp', function () {
         ]);
         $response->assertStatus(401);
     });
-
-
 
     test('user with edit permission can send test email successfully', function () {
         \Illuminate\Support\Facades\Mail::fake();

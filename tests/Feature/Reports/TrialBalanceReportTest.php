@@ -4,8 +4,7 @@ namespace Tests\Feature\Reports;
 
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\actingAs;
-use function Pest\Laravel\get;
+
 use function Pest\Laravel\seed;
 
 uses(RefreshDatabase::class)->group('reports');

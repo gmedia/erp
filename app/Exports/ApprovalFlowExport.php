@@ -24,18 +24,18 @@ class ApprovalFlowExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
     {
         $query = ApprovalFlow::query()->with(['creator']);
 
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%");
+                    ->orWhere('code', 'like', "%{$search}%");
             });
         }
 
         if (array_key_exists('approvable_type', $this->filters) && $this->filters['approvable_type'] !== '') {
             $query->where('approvable_type', $this->filters['approvable_type']);
         }
-        
+
         if (array_key_exists('is_active', $this->filters) && $this->filters['is_active'] !== '') {
             $query->where('is_active', $this->filters['is_active']);
         }
@@ -43,7 +43,7 @@ class ApprovalFlowExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
         $sortBy = $this->filters['sort_by'] ?? 'created_at';
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
         $allowedSortColumns = ['name', 'code', 'approvable_type', 'is_active', 'created_at'];
-        
+
         if (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);
         }

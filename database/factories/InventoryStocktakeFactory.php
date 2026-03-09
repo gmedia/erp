@@ -29,4 +29,3 @@ class InventoryStocktakeFactory extends Factory
         ];
     }
 }
-

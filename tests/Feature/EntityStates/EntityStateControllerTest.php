@@ -4,16 +4,16 @@ use App\Models\Asset;
 use App\Models\Pipeline;
 use App\Models\PipelineEntityState;
 use App\Models\PipelineState;
-use App\Models\PipelineStateLog;
 use App\Models\PipelineTransition;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class)->group('entity-state-actions');
 
 beforeEach(function () {
     $this->user = createTestUserWithPermissions(['pipeline']);
-    
+
     // Create pipeline setup
     $this->pipeline = Pipeline::factory()->create([
         'entity_type' => App\Models\Asset::class,
@@ -57,13 +57,13 @@ beforeEach(function () {
         'requires_comment' => true,
         'guard_conditions' => [
             'field_checks' => [
-                ['field' => 'status', 'operator' => 'equals', 'value' => 'active']
-            ]
-        ]
+                ['field' => 'status', 'operator' => 'equals', 'value' => 'active'],
+            ],
+        ],
     ]);
 
     $this->asset = Asset::factory()->create([
-        'status' => 'active'
+        'status' => 'active',
     ]);
 });
 
@@ -132,7 +132,7 @@ it('evaluates permissions and guards in available transitions', function () {
 
     $response->assertStatus(200);
     $transitions = $response->json('data.available_transitions');
-    
+
     // We expect 1 transition (Approve) but it should be disabled due to lack of permission
     $this->assertCount(1, $transitions);
     $this->assertFalse($transitions[0]['is_allowed']);
@@ -141,17 +141,18 @@ it('evaluates permissions and guards in available transitions', function () {
     // Now request with authorized user
     $adminUser = createTestUserWithPermissions(['pipeline', 'asset.approve']);
     $responseAdmin = actingAs($adminUser)->getJson("/api/entity-states/asset/{$this->asset->ulid}");
-    
+
     $transitionsAdmin = $responseAdmin->json('data.available_transitions');
     // It should be allowed because user has permission AND the asset status is 'active' (guard passes)
-    dump($transitionsAdmin[0]['rejection_reasons']); $this->assertTrue($transitionsAdmin[0]['is_allowed']);
+    dump($transitionsAdmin[0]['rejection_reasons']);
+    $this->assertTrue($transitionsAdmin[0]['is_allowed']);
 
     // Now change asset so guard fails
     $this->asset->update(['status' => 'maintenance']);
-    
+
     $responseFailedGuard = actingAs($adminUser)->getJson("/api/entity-states/asset/{$this->asset->ulid}");
     $transitionsFailed = $responseFailedGuard->json('data.available_transitions');
-    
+
     $this->assertFalse($transitionsFailed[0]['is_allowed']);
     $this->assertStringContainsString('Field check failed: status must equals', $transitionsFailed[0]['rejection_reasons'][0]);
 });
@@ -181,7 +182,7 @@ it('executes update_field transition action', function () {
         'action_type' => 'update_field',
         'config' => [
             'field' => 'condition',
-            'value' => 'good'
+            'value' => 'good',
         ],
         'execution_order' => 1,
     ]);
@@ -190,7 +191,7 @@ it('executes update_field transition action', function () {
     $this->asset->update(['condition' => 'needs_repair']);
 
     actingAs($this->user)->getJson("/api/entity-states/asset/{$this->asset->ulid}");
-    
+
     actingAs($this->user)->postJson("/api/entity-states/asset/{$this->asset->ulid}/transition", [
         'transition_id' => $this->transitionSubmit->id,
     ]);

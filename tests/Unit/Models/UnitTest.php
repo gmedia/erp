@@ -2,6 +2,7 @@
 
 use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Laravel\assertDatabaseHas;
 
 uses(RefreshDatabase::class)->group('units');

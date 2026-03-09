@@ -22,7 +22,7 @@ class CalculateDepreciationAction
 
             if ($existingRun) {
                 throw ValidationException::withMessages([
-                    'period_start' => 'A depreciation run already exists for this period.'
+                    'period_start' => 'A depreciation run already exists for this period.',
                 ]);
             }
 
@@ -42,7 +42,7 @@ class CalculateDepreciationAction
                 ->where('useful_life_months', '>', 0)
                 ->where(function ($q) {
                     $q->whereNull('book_value')
-                      ->orWhereRaw('book_value > COALESCE(salvage_value, 0)');
+                        ->orWhereRaw('book_value > COALESCE(salvage_value, 0)');
                 })
                 ->get();
 
@@ -60,7 +60,7 @@ class CalculateDepreciationAction
 
                 // Adjust if amount exceeds remaining depreciable value
                 $maxDepreciable = $bookValueBefore - $salvage;
-                
+
                 if ($maxDepreciable <= 0) {
                     continue; // Already fully depreciated
                 }
@@ -82,7 +82,7 @@ class CalculateDepreciationAction
                 ];
             }
 
-            if (!empty($lines)) {
+            if (! empty($lines)) {
                 AssetDepreciationLine::insert($lines);
             }
 

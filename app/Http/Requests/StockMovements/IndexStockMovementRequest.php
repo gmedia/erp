@@ -31,4 +31,3 @@ class IndexStockMovementRequest extends FormRequest
         ];
     }
 }
-

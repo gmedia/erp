@@ -5,12 +5,12 @@ use App\Http\Requests\StockTransfers\StoreStockTransferRequest;
 uses()->group('stock-transfers');
 
 test('authorize returns true', function () {
-    $request = new StoreStockTransferRequest();
+    $request = new StoreStockTransferRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules contains required fields and item rules', function () {
-    $request = new StoreStockTransferRequest();
+    $request = new StoreStockTransferRequest;
     $rules = $request->rules();
 
     expect($rules)->toHaveKeys([

@@ -22,7 +22,7 @@ class JournalEntryResource extends JsonResource
                 'id' => $this->resource->fiscal_year_id,
                 'name' => $this->resource->fiscalYear?->name,
             ],
-            'lines' => $this->resource->lines->map(fn($line) => [
+            'lines' => $this->resource->lines->map(fn ($line) => [
                 'id' => $line->id,
                 'account_id' => $line->account_id,
                 'account_name' => $line->account?->name,

@@ -30,7 +30,7 @@ readonly class UpdateApprovalDelegationData
     public function toArray(): array
     {
         $data = [];
-        
+
         if ($this->delegator_user_id !== null) {
             $data['delegator_user_id'] = $this->delegator_user_id;
         }

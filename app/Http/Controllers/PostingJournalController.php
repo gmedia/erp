@@ -13,14 +13,14 @@ class PostingJournalController extends Controller
 {
     public function index(IndexJournalEntryRequest $request, IndexJournalEntriesAction $action): JsonResponse
     {
-        // Force draft status and balanced condition if possible, 
+        // Force draft status and balanced condition if possible,
         // though index action might not support balanced filter directly yet.
         // We'll filter balanced manually in the collection if needed or rely on frontend.
         // According to IndexJournalEntriesAction, it accepts status filter.
         // Force draft status
         $request->query->set('status', 'draft');
         $request->offsetSet('status', 'draft');
-        
+
         $journalEntries = $action->execute($request);
 
         return (new JournalEntryCollection($journalEntries))->response();

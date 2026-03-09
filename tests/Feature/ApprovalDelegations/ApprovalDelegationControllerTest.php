@@ -4,7 +4,6 @@ use App\Models\ApprovalDelegation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
@@ -20,7 +19,7 @@ describe('Approval Delegation API Endpoints', function () {
             'approval_delegation',
             'approval_delegation.create',
             'approval_delegation.edit',
-            'approval_delegation.delete'
+            'approval_delegation.delete',
         ]);
         \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
     });
@@ -34,7 +33,7 @@ describe('Approval Delegation API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data',
-                'meta' => ['total', 'per_page', 'current_page']
+                'meta' => ['total', 'per_page', 'current_page'],
             ]);
 
         expect($response->json('meta.total'))->toBe($baseline + 15)
@@ -68,7 +67,7 @@ describe('Approval Delegation API Endpoints', function () {
 
     test('index supports filtering by status', function () {
         $baselineActive = ApprovalDelegation::where('is_active', true)->count();
-        
+
         ApprovalDelegation::factory()->create(['is_active' => true]);
         ApprovalDelegation::factory()->create(['is_active' => false]);
 
@@ -99,7 +98,6 @@ describe('Approval Delegation API Endpoints', function () {
         assertDatabaseHas('approval_delegations', ['reason' => 'Test reason']);
     });
 
-
     test('store validates delegate cannot be delegator', function () {
         $user = User::factory()->create();
 
@@ -108,7 +106,7 @@ describe('Approval Delegation API Endpoints', function () {
             'delegate_user_id' => $user->id,
             'start_date' => '2026-03-01',
             'end_date' => '2026-03-10',
-            'is_active' => true
+            'is_active' => true,
         ]);
 
         $response->assertUnprocessable()
@@ -117,17 +115,17 @@ describe('Approval Delegation API Endpoints', function () {
 
     test('update modifies approval delegation', function () {
         $delegation = ApprovalDelegation::factory()->create();
-        
+
         $data = [
             'reason' => 'Updated reason',
-            'is_active' => false
+            'is_active' => false,
         ];
 
         $response = putJson("/api/approval-delegations/{$delegation->id}", $data);
 
         $response->assertOk()
             ->assertJsonFragment(['reason' => 'Updated reason']);
-            
+
         $delegation->refresh();
         expect($delegation->reason)->toBe('Updated reason')
             ->and($delegation->is_active)->toBe(false);

@@ -3,17 +3,17 @@
 use App\Actions\CustomerCategories\IndexCustomerCategoriesAction;
 use App\Http\Requests\CustomerCategories\IndexCustomerCategoryRequest;
 use App\Models\CustomerCategory;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 uses(RefreshDatabase::class)->group('customer-categories');
 
 test('execute returns paginated results', function () {
     CustomerCategory::factory()->count(3)->create();
 
-    $action = new IndexCustomerCategoriesAction();
-    $request = new IndexCustomerCategoryRequest();
-    
+    $action = new IndexCustomerCategoriesAction;
+    $request = new IndexCustomerCategoryRequest;
+
     $result = $action->execute($request);
 
     expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
@@ -24,9 +24,9 @@ test('execute filters by search term', function () {
     CustomerCategory::factory()->create(['name' => 'VIP']);
     CustomerCategory::factory()->create(['name' => 'Regular']);
 
-    $action = new IndexCustomerCategoriesAction();
+    $action = new IndexCustomerCategoriesAction;
     $request = new IndexCustomerCategoryRequest(['search' => 'VIP']);
-    
+
     $result = $action->execute($request);
 
     expect($result->count())->toBe(1)

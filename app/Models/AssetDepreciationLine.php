@@ -6,6 +6,35 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $asset_depreciation_run_id
+ * @property int $asset_id
+ * @property numeric $amount
+ * @property numeric $accumulated_before
+ * @property numeric $accumulated_after
+ * @property numeric $book_value_after
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Asset $asset
+ * @property-read \App\Models\AssetDepreciationRun $run
+ *
+ * @method static \Database\Factories\AssetDepreciationLineFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereAccumulatedAfter($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereAccumulatedBefore($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereAssetDepreciationRunId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereAssetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereBookValueAfter($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereUpdatedAt($value)
+ *
+ * @mixin \Eloquent
+ */
 class AssetDepreciationLine extends Model
 {
     use HasFactory;

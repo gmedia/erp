@@ -4,7 +4,6 @@ use App\Models\AssetStocktake;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
@@ -19,7 +18,7 @@ beforeEach(function () {
         'asset_stocktake',
         'asset_stocktake.create',
         'asset_stocktake.edit',
-        'asset_stocktake.delete'
+        'asset_stocktake.delete',
     ]);
     \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
     $this->branch = Branch::factory()->create();
@@ -57,7 +56,7 @@ test('it can update asset stocktake', function () {
 
     $response = putJson("/api/asset-stocktakes/{$stocktake->ulid}", [
         'reference' => 'ST-UPDATED',
-        // branch_id not sent, validation rule might require it if not careful, 
+        // branch_id not sent, validation rule might require it if not careful,
         // but my UpdateRequest had 'sometimes' and exists check.
         // Wait, 'branch_id' => ['sometimes', 'required', ...]
         // If I don't send it, it's fine.

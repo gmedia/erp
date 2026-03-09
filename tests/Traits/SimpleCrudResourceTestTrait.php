@@ -4,27 +4,13 @@ namespace Tests\Traits;
 
 /**
  * Trait for testing Simple CRUD Resource classes.
- * 
+ *
  * Requires the consumer to define:
  * - getResourceClass(): string - The resource class to test
  * - getModelClass(): string - The model class for factory
  */
 trait SimpleCrudResourceTestTrait
 {
-    /**
-     * Get the resource class to test.
-     * 
-     * @return class-string
-     */
-    abstract protected function getResourceClass(): string;
-
-    /**
-     * Get the model class for factory.
-     * 
-     * @return class-string
-     */
-    abstract protected function getModelClass(): string;
-
     public function test_to_array_transforms_model_correctly(): void
     {
         $modelClass = $this->getModelClass();
@@ -36,7 +22,7 @@ trait SimpleCrudResourceTestTrait
 
         $resourceClass = $this->getResourceClass();
         $resource = new $resourceClass($model);
-        $request = new \Illuminate\Http\Request();
+        $request = new \Illuminate\Http\Request;
 
         $result = $resource->toArray($request);
 
@@ -55,7 +41,7 @@ trait SimpleCrudResourceTestTrait
 
         $resourceClass = $this->getResourceClass();
         $resource = new $resourceClass($model);
-        $request = new \Illuminate\Http\Request();
+        $request = new \Illuminate\Http\Request;
 
         $result = $resource->toArray($request);
 
@@ -76,11 +62,25 @@ trait SimpleCrudResourceTestTrait
 
         $resourceClass = $this->getResourceClass();
         $resource = new $resourceClass($model);
-        $request = new \Illuminate\Http\Request();
+        $request = new \Illuminate\Http\Request;
 
         $result = $resource->toArray($request);
 
         $this->assertNull($result['created_at']);
         $this->assertNull($result['updated_at']);
     }
+
+    /**
+     * Get the resource class to test.
+     *
+     * @return class-string
+     */
+    abstract protected function getResourceClass(): string;
+
+    /**
+     * Get the model class for factory.
+     *
+     * @return class-string
+     */
+    abstract protected function getModelClass(): string;
 }

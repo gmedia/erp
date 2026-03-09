@@ -13,25 +13,12 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class IndexCoaVersionsAction extends SimpleCrudIndexAction
 {
-    protected function getModelClass(): string
-    {
-        return CoaVersion::class;
-    }
-
-    protected function getSortableFields(): array
-    {
-        return ['id', 'name', 'fiscal_year_id', 'status', 'created_at', 'updated_at'];
-    }
-
     public function __construct(
         private CoaVersionFilterService $filterService
     ) {}
 
     /**
      * Execute the action to retrieve paginated entities with filters.
-     *
-     * @param  \Illuminate\Foundation\Http\FormRequest  $request
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function execute(FormRequest $request): LengthAwarePaginator
     {
@@ -65,5 +52,15 @@ class IndexCoaVersionsAction extends SimpleCrudIndexAction
         }
 
         return $query->paginate($request->get('per_page', $this->getDefaultPerPage()));
+    }
+
+    protected function getModelClass(): string
+    {
+        return CoaVersion::class;
+    }
+
+    protected function getSortableFields(): array
+    {
+        return ['id', 'name', 'fiscal_year_id', 'status', 'created_at', 'updated_at'];
     }
 }

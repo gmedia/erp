@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 uses(RefreshDatabase::class)->group('accounts');
 
 test('it validates required fields', function () {
-    $request = new StoreAccountRequest();
+    $request = new StoreAccountRequest;
     $validator = Validator::make([], $request->rules());
 
     expect($validator->passes())->toBeFalse()
@@ -27,7 +27,7 @@ test('it passes with valid data', function () {
         'is_active' => true,
     ];
 
-    $request = new StoreAccountRequest();
+    $request = new StoreAccountRequest;
     $validator = Validator::make($data, $request->rules());
 
     expect($validator->passes())->toBeTrue();

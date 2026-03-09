@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('production_orders', function (Blueprint $table) {
@@ -30,15 +27,12 @@ return new class extends Migration
             $table->decimal('total_cost', 15, 2)->default(0);
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             $table->index('status');
             $table->index('production_date');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('production_orders');

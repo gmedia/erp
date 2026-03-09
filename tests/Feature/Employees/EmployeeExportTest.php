@@ -70,7 +70,7 @@ describe('EmployeeExport', function () {
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(2);
-        $salaries = $results->pluck('salary')->map(fn($s) => (float)$s)->sort()->values();
+        $salaries = $results->pluck('salary')->map(fn ($s) => (float) $s)->sort()->values();
         expect($salaries[0])->toBeGreaterThanOrEqual(65000.00)
             ->and($salaries[1])->toBeGreaterThanOrEqual(65000.00);
     });
@@ -85,7 +85,7 @@ describe('EmployeeExport', function () {
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(2);
-        $salaries = $results->pluck('salary')->map(fn($s) => (float)$s)->sort()->values();
+        $salaries = $results->pluck('salary')->map(fn ($s) => (float) $s)->sort()->values();
         expect($salaries[0])->toBeLessThanOrEqual(65000.00)
             ->and($salaries[1])->toBeLessThanOrEqual(65000.00);
     });
@@ -104,7 +104,7 @@ describe('EmployeeExport', function () {
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(2);
-        $salaries = $results->pluck('salary')->map(fn($s) => (float)$s)->sort()->values();
+        $salaries = $results->pluck('salary')->map(fn ($s) => (float) $s)->sort()->values();
         expect($salaries[0])->toBe(60000.00)
             ->and($salaries[1])->toBe(80000.00);
     });
@@ -119,7 +119,7 @@ describe('EmployeeExport', function () {
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(2);
-        $hireDates = $results->pluck('hire_date')->map(fn($d) => $d->format('Y-m-d'))->sort()->values();
+        $hireDates = $results->pluck('hire_date')->map(fn ($d) => $d->format('Y-m-d'))->sort()->values();
         expect($hireDates)->toContain('2023-06-01', '2023-12-01');
     });
 
@@ -133,7 +133,7 @@ describe('EmployeeExport', function () {
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(2);
-        $hireDates = $results->pluck('hire_date')->map(fn($d) => $d->format('Y-m-d'))->sort()->values();
+        $hireDates = $results->pluck('hire_date')->map(fn ($d) => $d->format('Y-m-d'))->sort()->values();
         expect($hireDates)->toContain('2023-01-01', '2023-06-01');
     });
 
@@ -223,7 +223,7 @@ describe('EmployeeExport', function () {
             'department_id' => $engineering->id,
             'min_salary' => 60000,
             'sort_by' => 'name',
-            'sort_direction' => 'asc'
+            'sort_direction' => 'asc',
         ]);
 
         $results = $export->query()->get();

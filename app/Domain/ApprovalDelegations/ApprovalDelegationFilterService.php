@@ -12,16 +12,16 @@ class ApprovalDelegationFilterService
     /**
      * Apply advanced filters to the ApprovalDelegation query.
      *
-     * @param Builder<\App\Models\ApprovalDelegation> $query
-     * @param array<string, mixed> $filters
+     * @param  Builder<\App\Models\ApprovalDelegation>  $query
+     * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (!empty($filters['delegator_user_id'])) {
+        if (! empty($filters['delegator_user_id'])) {
             $query->where('delegator_user_id', $filters['delegator_user_id']);
         }
-        
-        if (!empty($filters['delegate_user_id'])) {
+
+        if (! empty($filters['delegate_user_id'])) {
             $query->where('delegate_user_id', $filters['delegate_user_id']);
         }
 
@@ -31,11 +31,11 @@ class ApprovalDelegationFilterService
             $query->where('is_active', false);
         }
 
-        if (!empty($filters['start_date_from'])) {
+        if (! empty($filters['start_date_from'])) {
             $query->whereDate('start_date', '>=', $filters['start_date_from']);
         }
 
-        if (!empty($filters['start_date_to'])) {
+        if (! empty($filters['start_date_to'])) {
             $query->whereDate('start_date', '<=', $filters['start_date_to']);
         }
     }

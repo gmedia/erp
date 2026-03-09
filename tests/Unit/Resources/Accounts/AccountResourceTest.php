@@ -23,5 +23,5 @@ test('it formats account data', function () {
         ->and($data['name'])->toBe('Cash')
         ->and($data['type'])->toBe('asset')
         ->and($data['normal_balance'])->toBe('debit')
-        ->and((bool)$data['is_active'])->toBeTrue();
+        ->and((bool) $data['is_active'])->toBeTrue();
 });

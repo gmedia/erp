@@ -6,12 +6,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('account-mappings');
 
 test('ExportAccountMappingRequest → authorize returns true', function () {
-    $request = new ExportAccountMappingRequest();
+    $request = new ExportAccountMappingRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('ExportAccountMappingRequest → rules contains expected filters', function () {
-    $rules = (new ExportAccountMappingRequest())->rules();
+    $rules = (new ExportAccountMappingRequest)->rules();
 
     expect($rules)->toHaveKeys([
         'search',
@@ -22,4 +22,3 @@ test('ExportAccountMappingRequest → rules contains expected filters', function
         'target_coa_version_id',
     ]);
 });
-

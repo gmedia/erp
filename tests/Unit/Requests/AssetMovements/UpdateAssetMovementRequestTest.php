@@ -5,27 +5,36 @@ namespace Tests\Unit\Requests\AssetMovements;
 use App\Http\Requests\AssetMovements\UpdateAssetMovementRequest;
 use App\Models\AssetMovement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 uses(RefreshDatabase::class)->group('asset-movements');
 
 function createUpdateRequest($model, array $data = []): UpdateAssetMovementRequest
 {
-    $request = new UpdateAssetMovementRequest();
+    $request = new UpdateAssetMovementRequest;
     $request->merge($data);
     $request->setRouteResolver(function () use ($model) {
-        return new class($model) {
+        return new class($model)
+        {
             private $model;
-            public function __construct($model) { $this->model = $model; }
-            public function parameter($name) { return $this->model; }
+
+            public function __construct($model)
+            {
+                $this->model = $model;
+            }
+
+            public function parameter($name)
+            {
+                return $this->model;
+            }
         };
     });
+
     return $request;
 }
 
 function assertUpdateValidationPasses($data, $model = null)
 {
-    if (!$model) {
+    if (! $model) {
         $model = AssetMovement::factory()->create();
     }
     $request = createUpdateRequest($model, $data);

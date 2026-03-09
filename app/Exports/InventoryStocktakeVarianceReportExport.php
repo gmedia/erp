@@ -24,7 +24,7 @@ class InventoryStocktakeVarianceReportExport implements FromCollection, ShouldAu
     public function collection()
     {
         $action = app(IndexInventoryStocktakeVarianceReportAction::class);
-        $request = new IndexInventoryStocktakeVarianceReportRequest();
+        $request = new IndexInventoryStocktakeVarianceReportRequest;
         $request->merge($this->filters);
 
         return $action->execute($request);

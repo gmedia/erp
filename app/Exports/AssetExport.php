@@ -4,7 +4,11 @@ namespace App\Exports;
 
 use App\Models\Asset;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\{FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles};
+use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
@@ -22,7 +26,7 @@ class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
 
         $filterService = app(\App\Domain\Assets\AssetFilterService::class);
 
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $filterService->applySearch($query, $this->filters['search'], ['name', 'asset_code', 'serial_number', 'barcode']);
         } else {
             $filterService->applyAdvancedFilters($query, [
@@ -53,7 +57,7 @@ class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
             'ID', 'Asset Code', 'Name', 'Category', 'Model', 'Serial Number', 'Barcode',
             'Branch', 'Location', 'Department', 'Employee', 'Supplier',
             'Purchase Date', 'Purchase Cost', 'Currency', 'Warranty End Date',
-            'Status', 'Condition', 'Depreciation Method', 'Useful Life (Months)', 'Created At'
+            'Status', 'Condition', 'Depreciation Method', 'Useful Life (Months)', 'Created At',
         ];
     }
 

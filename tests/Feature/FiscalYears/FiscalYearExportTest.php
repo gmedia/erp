@@ -39,7 +39,7 @@ describe('FiscalYearExport', function () {
     test('map handles null values gracefully', function () {
         $fiscalYear = new FiscalYear([
             'name' => 'Partial FY',
-            'status' => 'open'
+            'status' => 'open',
         ]);
 
         $export = new FiscalYearExport([]);

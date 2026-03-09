@@ -4,16 +4,16 @@ namespace Tests\Feature\Assets;
 
 use App\Models\Asset;
 use App\Models\AssetCategory;
-use App\Models\Branch;
 use App\Models\AssetMovement;
+use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\actingAs;
+
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertSoftDeleted;
+use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
-use function Pest\Laravel\deleteJson;
-use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\assertSoftDeleted;
 
 uses(RefreshDatabase::class)->group('assets');
 
@@ -173,14 +173,14 @@ test('it exports assets with filters', function () {
     Asset::factory()->create(['asset_category_id' => $category->id]);
 
     // Filter by branch
-    $response = postJson("/api/assets/export", ['branch_id' => $branch->id]);
+    $response = postJson('/api/assets/export', ['branch_id' => $branch->id]);
     $response->assertStatus(200);
 
     // Filter by category
-    $response = postJson("/api/assets/export", ['asset_category_id' => $category->id]);
+    $response = postJson('/api/assets/export', ['asset_category_id' => $category->id]);
     $response->assertStatus(200);
 
     // Filter by status
-    $response = postJson("/api/assets/export", ['status' => 'active']);
+    $response = postJson('/api/assets/export', ['status' => 'active']);
     $response->assertStatus(200);
 });

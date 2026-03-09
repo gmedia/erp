@@ -17,26 +17,6 @@ use Maatwebsite\Excel\Facades\Excel;
  */
 class ExportCoaVersionsAction extends SimpleCrudExportAction
 {
-    protected function getModelClass(): string
-    {
-        return CoaVersion::class;
-    }
-
-    protected function getExportInstance(array $filters, ?Builder $query): FromQuery
-    {
-        return new CoaVersionExport($filters, $query);
-    }
-
-    protected function getFilenamePrefix(): string
-    {
-        return 'coa_versions';
-    }
-
-    protected function getSortableFields(): array
-    {
-        return ['id', 'name', 'fiscal_year_id', 'status', 'created_at', 'updated_at'];
-    }
-
     public function execute(FormRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -75,5 +55,25 @@ class ExportCoaVersionsAction extends SimpleCrudExportAction
             'url' => Storage::disk('public')->url($filePath),
             'filename' => $filename,
         ]);
+    }
+
+    protected function getModelClass(): string
+    {
+        return CoaVersion::class;
+    }
+
+    protected function getExportInstance(array $filters, ?Builder $query): FromQuery
+    {
+        return new CoaVersionExport($filters, $query);
+    }
+
+    protected function getFilenamePrefix(): string
+    {
+        return 'coa_versions';
+    }
+
+    protected function getSortableFields(): array
+    {
+        return ['id', 'name', 'fiscal_year_id', 'status', 'created_at', 'updated_at'];
     }
 }

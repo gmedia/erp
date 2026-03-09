@@ -6,9 +6,8 @@ use App\Models\Asset;
 use App\Models\AssetLocation;
 use App\Models\AssetMovement;
 use App\Models\Branch;
-use App\Models\Department;
-use App\Models\Employee;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\deleteJson;

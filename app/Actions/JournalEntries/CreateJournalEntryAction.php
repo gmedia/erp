@@ -4,6 +4,7 @@ namespace App\Actions\JournalEntries;
 
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -18,19 +19,19 @@ class CreateJournalEntryAction
             try {
                 return DB::transaction(function () use ($data) {
                     $entryDate = $data['entry_date'];
-                    
+
                     $fiscalYear = FiscalYear::where('start_date', '<=', $entryDate)
                         ->where('end_date', '>=', $entryDate)
                         ->lockForUpdate()
                         ->first();
 
-                    if (!$fiscalYear) {
+                    if (! $fiscalYear) {
                         throw ValidationException::withMessages([
                             'entry_date' => 'No fiscal year found for this date.',
                         ]);
                     }
 
-                    if (!$fiscalYear->isOpen()) {
+                    if (! $fiscalYear->isOpen()) {
                         throw ValidationException::withMessages([
                             'entry_date' => 'Fiscal year is closed or locked.',
                         ]);
@@ -51,7 +52,7 @@ class CreateJournalEntryAction
                     } else {
                         $count = 1;
                     }
-                    
+
                     $entryNumber = 'JV-' . $fiscalYear->name . '-' . str_pad($count, 5, '0', STR_PAD_LEFT);
 
                     $journalEntry = JournalEntry::create([
@@ -82,13 +83,14 @@ class CreateJournalEntryAction
                     if ($attempts >= $maxAttempts) {
                         throw $e;
                     }
+
                     // Retry
                     continue;
                 }
                 throw $e;
             }
         }
-        
-        throw new \Exception("Failed to create journal entry after {$maxAttempts} attempts.");
+
+        throw new Exception("Failed to create journal entry after {$maxAttempts} attempts.");
     }
 }

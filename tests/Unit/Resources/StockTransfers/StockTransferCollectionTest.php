@@ -18,4 +18,3 @@ test('to array transforms collection of transfers', function () {
     expect($result)->toHaveCount(3);
     expect($result[0])->toHaveKeys(['id', 'transfer_number', 'from_warehouse', 'to_warehouse', 'created_at', 'updated_at']);
 });
-

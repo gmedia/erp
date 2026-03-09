@@ -3,8 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Setting;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
+use Throwable;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
                     return Setting::get('company_name') ?? config('app.name', 'Laravel');
                 });
                 $view->with('companyName', $companyName);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // Fallback to config if cache/database fails
                 report($e); // Log the error for debugging
                 $view->with('companyName', config('app.name', 'Laravel'));
@@ -43,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
     protected function bootMailSettings(): void
     {
         try {
-            if (app()->runningInConsole() && !app()->runningUnitTests()) {
+            if (app()->runningInConsole() && ! app()->runningUnitTests()) {
                 return;
             }
 
@@ -63,10 +64,10 @@ class AppServiceProvider extends ServiceProvider
                     $settings[$key] = Setting::get($key);
                 }
 
-                return array_filter($settings, fn($value) => !is_null($value) && $value !== '');
+                return array_filter($settings, fn ($value) => ! is_null($value) && $value !== '');
             });
 
-            if (!empty($mailSettings)) {
+            if (! empty($mailSettings)) {
                 // Force default mailer to smtp to ensure database settings are used
                 config(['mail.default' => 'smtp']);
 
@@ -92,7 +93,7 @@ class AppServiceProvider extends ServiceProvider
                     config(['mail.from.name' => $mailSettings['mail_from_name']]);
                 }
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             report($e);
         }
     }

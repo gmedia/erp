@@ -16,7 +16,7 @@ test('execute calls filter service with correct parameters', function () {
     $request->shouldReceive('get')->with('page', 1)->andReturn(1);
     $request->shouldReceive('filled')->with('search')->andReturn(true);
     $request->shouldReceive('get')->with('search')->andReturn('test');
-    
+
     // Advanced filters
     $request->shouldReceive('get')->with('branch_id')->andReturn(1);
     $request->shouldReceive('get')->with('category_id')->andReturn(1);
@@ -41,7 +41,7 @@ test('execute calls filter service with correct parameters', function () {
 
     $filterService->shouldReceive('applySorting')
         ->once()
-        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc', 
+        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
             ['id', 'name', 'email', 'phone', 'branch_id', 'category_id', 'status', 'created_at', 'updated_at']);
 
     $result = $action->execute($request);

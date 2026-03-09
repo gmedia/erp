@@ -5,12 +5,12 @@ use App\Http\Requests\StockTransfers\ExportStockTransferRequest;
 uses()->group('stock-transfers');
 
 test('authorize returns true', function () {
-    $request = new ExportStockTransferRequest();
+    $request = new ExportStockTransferRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new ExportStockTransferRequest();
+    $request = new ExportStockTransferRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],
@@ -23,4 +23,3 @@ test('rules returns correct validation rules', function () {
         'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
     ]);
 });
-

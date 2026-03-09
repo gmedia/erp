@@ -2,7 +2,6 @@
 
 use App\Http\Requests\Employees\ExportEmployeeRequest;
 
-
 uses()->group('employees');
 
 test('authorize returns true', function () {

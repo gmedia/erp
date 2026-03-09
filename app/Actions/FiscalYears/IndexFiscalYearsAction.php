@@ -12,25 +12,12 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class IndexFiscalYearsAction extends SimpleCrudIndexAction
 {
-    protected function getModelClass(): string
-    {
-        return FiscalYear::class;
-    }
-
-    protected function getSortableFields(): array
-    {
-        return ['id', 'name', 'start_date', 'end_date', 'status', 'created_at', 'updated_at'];
-    }
-
     public function __construct(
         private \App\Domain\FiscalYears\FiscalYearFilterService $filterService
     ) {}
 
     /**
      * Execute the action to retrieve paginated entities with filters.
-     *
-     * @param  \Illuminate\Foundation\Http\FormRequest  $request
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function execute(FormRequest $request): LengthAwarePaginator
     {
@@ -53,5 +40,15 @@ class IndexFiscalYearsAction extends SimpleCrudIndexAction
         );
 
         return $query->paginate($request->get('per_page', $this->getDefaultPerPage()));
+    }
+
+    protected function getModelClass(): string
+    {
+        return FiscalYear::class;
+    }
+
+    protected function getSortableFields(): array
+    {
+        return ['id', 'name', 'start_date', 'end_date', 'status', 'created_at', 'updated_at'];
     }
 }

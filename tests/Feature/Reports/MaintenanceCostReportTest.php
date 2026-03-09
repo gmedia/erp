@@ -2,18 +2,16 @@
 
 use App\Models\Asset;
 use App\Models\AssetCategory;
+use App\Models\AssetMaintenance;
 use App\Models\Branch;
 use App\Models\Supplier;
-use App\Models\AssetMaintenance;
-use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class)->group('assets');
-
-use function Pest\Laravel\actingAs;
 
 beforeEach(function () {
     $this->user = createTestUserWithPermissions(['asset']);
@@ -43,8 +41,6 @@ beforeEach(function () {
     ]);
 });
 
-
-
 test('it can fetch maintenance cost report data via json', function () {
     \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/maintenance-cost')
@@ -73,12 +69,12 @@ test('it can fetch maintenance cost report data via json', function () {
 test('it can filter the report by various parameters', function () {
     // Modify maintenance to be older
     $this->maintenance->update(['performed_at' => '2025-01-01']);
-    
+
     // Create another maintenance record
     $otherCategory = AssetCategory::factory()->create(['name' => 'Furniture']);
     $otherBranch = Branch::factory()->create(['name' => 'Branch B']);
     $otherSupplier = Supplier::factory()->create(['name' => 'FixIt Corp']);
-    
+
     $otherAsset = Asset::factory()->create([
         'asset_code' => 'FR-001',
         'name' => 'Desk',
@@ -86,7 +82,7 @@ test('it can filter the report by various parameters', function () {
         'branch_id' => $otherBranch->id,
         'status' => 'active',
     ]);
-    
+
     AssetMaintenance::create([
         'asset_id' => $otherAsset->id,
         'maintenance_type' => 'corrective',
@@ -112,21 +108,21 @@ test('it can filter the report by various parameters', function () {
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'FR-001');
-        
+
     // Filter by supplier
     \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/maintenance-cost?supplier_id=' . $otherSupplier->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'FR-001');
-        
+
     // Filter by type
     \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/maintenance-cost?maintenance_type=preventive')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'IT-001');
-        
+
     // Filter by date range
     \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/maintenance-cost?start_date=2025-12-01&end_date=2026-12-31')
@@ -148,7 +144,7 @@ test('it can export the report data to excel', function () {
     $filename = $response->json('filename');
     expect($filename)->toStartWith('maintenance_cost_report_2026-02-01_10-00-00_');
     expect($filename)->toEndWith('.xlsx');
-    
+
     Excel::assertStored('exports/' . $filename, 'public');
     Carbon::setTestNow();
 });

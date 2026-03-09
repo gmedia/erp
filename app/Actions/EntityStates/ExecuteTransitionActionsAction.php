@@ -2,23 +2,27 @@
 
 namespace App\Actions\EntityStates;
 
-use App\Models\PipelineTransition;
 use App\Actions\Approvals\TriggerApprovalAction;
+use App\Models\PipelineTransition;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 
 class ExecuteTransitionActionsAction
 {
     public function __construct(
         protected TriggerApprovalAction $triggerApprovalAction
     ) {}
+
     /**
      * Execute all actions defined for a specific transition on a given entity.
-     * 
-     * @param PipelineTransition $transition The transition being executed
-     * @param Model $entity The target entity
+     *
+     * @param  PipelineTransition  $transition  The transition being executed
+     * @param  Model  $entity  The target entity
      * @return array Results of the executed actions
-     * @throws \Exception if an action fails and on_failure policy is 'abort'
+     *
+     * @throws Exception if an action fails and on_failure policy is 'abort'
      */
     public function execute(PipelineTransition $transition, Model $entity): array
     {
@@ -38,15 +42,15 @@ class ExecuteTransitionActionsAction
                     'dispatch_job' => $this->handleDispatchJob($entity, $params),
                     'trigger_approval' => $this->handleTriggerApproval($entity, $params),
                     'custom' => $this->handleCustomAction($entity, $params),
-                    default => throw new \Exception("Unsupported transition action type: {$type}"),
+                    default => throw new Exception("Unsupported transition action type: {$type}"),
                 };
-                
+
                 $results[$actionDefinition->id] = ['status' => 'success', 'result' => $result];
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error("Pipeline transition action failed. Action ID: {$actionDefinition->id}, Type: {$type}. Error: {$e->getMessage()}");
-                
+
                 $results[$actionDefinition->id] = ['status' => 'failed', 'error' => $e->getMessage()];
-                
+
                 if ($onFailure === 'abort') {
                     throw $e; // Re-throw to abort the entire transaction
                 } elseif ($onFailure === 'log_and_continue') {
@@ -62,14 +66,15 @@ class ExecuteTransitionActionsAction
 
     private function handleUpdateField(Model $entity, array $params): bool
     {
-        if (!isset($params['field']) || !isset($params['value'])) {
-            throw new \InvalidArgumentException("Missing 'field' or 'value' for update_field action.");
+        if (! isset($params['field']) || ! isset($params['value'])) {
+            throw new InvalidArgumentException("Missing 'field' or 'value' for update_field action.");
         }
 
         $field = $params['field'];
         $value = $params['value'];
 
         $entity->$field = $value;
+
         return $entity->save(); // Saves the model with the updated field
     }
 
@@ -77,6 +82,7 @@ class ExecuteTransitionActionsAction
     {
         // MVP: Not implemented fully. Log a warning
         Log::warning("'create_record' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->id})");
+
         return true;
     }
 
@@ -84,6 +90,7 @@ class ExecuteTransitionActionsAction
     {
         // MVP: Not implemented fully. Log a warning
         Log::warning("'send_notification' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->id})");
+
         return true;
     }
 
@@ -91,31 +98,33 @@ class ExecuteTransitionActionsAction
     {
         // MVP: Not implemented fully. Log a warning
         Log::warning("'dispatch_job' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->getKey()})");
+
         return true;
     }
 
     private function handleTriggerApproval(Model $entity, array $params): bool
     {
         $this->triggerApprovalAction->execute($entity, $params);
+
         return true;
     }
 
     private function handleCustomAction(Model $entity, array $params): mixed
     {
-        if (!isset($params['class']) || !isset($params['method'])) {
-            throw new \InvalidArgumentException("Missing 'class' or 'method' for custom action.");
+        if (! isset($params['class']) || ! isset($params['method'])) {
+            throw new InvalidArgumentException("Missing 'class' or 'method' for custom action.");
         }
 
         $class = $params['class'];
         $method = $params['method'];
 
-        if (!class_exists($class)) {
-            throw new \Exception("Custom action class not found: {$class}");
+        if (! class_exists($class)) {
+            throw new Exception("Custom action class not found: {$class}");
         }
 
-        $instance = new $class();
-        if (!method_exists($instance, $method)) {
-            throw new \Exception("Custom action method not found: {$class}::{$method}");
+        $instance = new $class;
+        if (! method_exists($instance, $method)) {
+            throw new Exception("Custom action method not found: {$class}::{$method}");
         }
 
         // Call the custom action, passing the entity and optionally other params

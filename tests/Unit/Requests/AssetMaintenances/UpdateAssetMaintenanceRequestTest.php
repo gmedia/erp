@@ -8,7 +8,7 @@ uses()->group('asset-maintenances');
 
 function createUpdateRequest(): UpdateAssetMaintenanceRequest
 {
-    return new UpdateAssetMaintenanceRequest();
+    return new UpdateAssetMaintenanceRequest;
 }
 
 test('it authorizes request', function () {

@@ -19,7 +19,7 @@ describe('Branch API Endpoints', function () {
             'branch',
             'branch.create',
             'branch.edit',
-            'branch.delete'
+            'branch.delete',
         ]);
 
         actingAs($user);
@@ -34,9 +34,9 @@ describe('Branch API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'name', 'created_at', 'updated_at']
+                    '*' => ['id', 'name', 'created_at', 'updated_at'],
                 ],
-                'meta' => ['total', 'per_page', 'current_page']
+                'meta' => ['total', 'per_page', 'current_page'],
             ]);
 
         expect($response->json('meta.total'))->toBe($baseline + 15)
@@ -57,7 +57,7 @@ describe('Branch API Endpoints', function () {
     test('index sorts results', function () {
         // Ensure the automatically created branch doesn't interfere with first/last checks
         // We can just create names that we know will be at the extremes
-        
+
         Branch::factory()->create(['name' => 'AAAA Alpha']);
         Branch::factory()->create(['name' => 'ZZZZ Beta']);
 
@@ -66,10 +66,10 @@ describe('Branch API Endpoints', function () {
 
         $response->assertOk();
         expect($response->json('data.0.name'))->toBe('ZZZZ Beta');
-        
+
         // Sort Ascending -> AAAA Alpha should be first
         $response = getJson('/api/branches?sort_by=name&sort_direction=asc');
-        
+
         $response->assertOk();
         expect($response->json('data.0.name'))->toBe('AAAA Alpha');
     });

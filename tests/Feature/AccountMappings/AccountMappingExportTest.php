@@ -56,4 +56,3 @@ describe('Account Mapping Export API', function () {
         Carbon::setTestNow();
     });
 });
-

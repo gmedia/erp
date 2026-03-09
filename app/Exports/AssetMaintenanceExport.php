@@ -5,7 +5,11 @@ namespace App\Exports;
 use App\Domain\AssetMaintenances\AssetMaintenanceFilterService;
 use App\Models\AssetMaintenance;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\{FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles};
+use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AssetMaintenanceExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles

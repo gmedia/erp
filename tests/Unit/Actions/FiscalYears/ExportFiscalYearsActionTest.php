@@ -2,9 +2,7 @@
 
 use App\Actions\FiscalYears\ExportFiscalYearsAction;
 use App\Http\Requests\FiscalYears\ExportFiscalYearRequest;
-use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Exports\FiscalYearExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class)->group('fiscal-years');
@@ -12,8 +10,8 @@ uses(RefreshDatabase::class)->group('fiscal-years');
 test('execute returns export response', function () {
     Excel::fake();
     Illuminate\Support\Carbon::setTestNow('2026-01-31 12:00:00');
-    
-    $action = new ExportFiscalYearsAction();
+
+    $action = new ExportFiscalYearsAction;
 
     $request = Mockery::mock(ExportFiscalYearRequest::class);
     $request->shouldReceive('validated')->andReturn([]);
@@ -29,6 +27,6 @@ test('execute returns export response', function () {
 
     expect($data)->toHaveKeys(['url', 'filename'])
         ->and($data['filename'])->toBe('fiscal_years_export_2026-01-31_12-00-00.xlsx');
-        
+
     Excel::assertStored('exports/fiscal_years_export_2026-01-31_12-00-00.xlsx', 'public');
 });

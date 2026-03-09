@@ -8,17 +8,13 @@ trait HandlesConditions
 {
     /**
      * Evaluate field and relation checks against an entity.
-     *
-     * @param array $conditions
-     * @param Model $entity
-     * @return bool
      */
     protected function evaluateConditions(array $conditions, Model $entity): bool
     {
         // 1. Evaluate field_checks
         if (isset($conditions['field_checks']) && is_array($conditions['field_checks'])) {
             foreach ($conditions['field_checks'] as $check) {
-                if (!$this->evaluateFieldCheck($check, $entity)) {
+                if (! $this->evaluateFieldCheck($check, $entity)) {
                     return false;
                 }
             }
@@ -27,7 +23,7 @@ trait HandlesConditions
         // 2. Evaluate relation_checks
         if (isset($conditions['relation_checks']) && is_array($conditions['relation_checks'])) {
             foreach ($conditions['relation_checks'] as $check) {
-                if (!$this->evaluateRelationCheck($check, $entity)) {
+                if (! $this->evaluateRelationCheck($check, $entity)) {
                     return false;
                 }
             }
@@ -45,7 +41,9 @@ trait HandlesConditions
         $operator = $check['operator'] ?? 'equals';
         $expectedValue = $check['value'] ?? null;
 
-        if (!$field) return true;
+        if (! $field) {
+            return true;
+        }
 
         $actualValue = $entity->$field;
 
@@ -56,11 +54,11 @@ trait HandlesConditions
             'less_than', '<' => $actualValue < $expectedValue,
             'greater_than_or_equal', '>=' => $actualValue >= $expectedValue,
             'less_than_or_equal', '<=' => $actualValue <= $expectedValue,
-            'contains' => str_contains((string)$actualValue, (string)$expectedValue),
-            'not_null' => !is_null($actualValue),
+            'contains' => str_contains((string) $actualValue, (string) $expectedValue),
+            'not_null' => ! is_null($actualValue),
             'is_null' => is_null($actualValue),
             'in' => is_array($expectedValue) ? in_array($actualValue, $expectedValue) : ($actualValue == $expectedValue),
-            'not_in' => is_array($expectedValue) ? !in_array($actualValue, $expectedValue) : ($actualValue != $expectedValue),
+            'not_in' => is_array($expectedValue) ? ! in_array($actualValue, $expectedValue) : ($actualValue != $expectedValue),
             default => false,
         };
     }
@@ -75,16 +73,20 @@ trait HandlesConditions
         $operator = $check['operator'] ?? 'equals';
         $expectedValue = $check['value'] ?? null;
 
-        if (!$relation || !$field) return true;
+        if (! $relation || ! $field) {
+            return true;
+        }
 
         // Load relation if not loaded
-        if (!$entity->relationLoaded($relation)) {
+        if (! $entity->relationLoaded($relation)) {
             $entity->load($relation);
         }
 
         $relatedModel = $entity->getRelation($relation);
-        
-        if (!$relatedModel) return false;
+
+        if (! $relatedModel) {
+            return false;
+        }
 
         $actualValue = $relatedModel->$field;
 
@@ -95,10 +97,10 @@ trait HandlesConditions
             'less_than', '<' => $actualValue < $expectedValue,
             'greater_than_or_equal', '>=' => $actualValue >= $expectedValue,
             'less_than_or_equal', '<=' => $actualValue <= $expectedValue,
-            'not_null' => !is_null($actualValue),
+            'not_null' => ! is_null($actualValue),
             'is_null' => is_null($actualValue),
             'in' => is_array($expectedValue) ? in_array($actualValue, $expectedValue) : ($actualValue == $expectedValue),
-            'not_in' => is_array($expectedValue) ? !in_array($actualValue, $expectedValue) : ($actualValue != $expectedValue),
+            'not_in' => is_array($expectedValue) ? ! in_array($actualValue, $expectedValue) : ($actualValue != $expectedValue),
             default => false,
         };
     }

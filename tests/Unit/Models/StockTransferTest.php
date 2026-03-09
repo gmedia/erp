@@ -19,4 +19,3 @@ test('relationships are defined', function () {
     expect($transfer->fromWarehouse)->not->toBeNull()
         ->and($transfer->toWarehouse)->not->toBeNull();
 });
-

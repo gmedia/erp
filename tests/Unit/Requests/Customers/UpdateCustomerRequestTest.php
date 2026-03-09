@@ -3,8 +3,6 @@
 use App\Http\Requests\Customers\UpdateCustomerRequest;
 use App\Models\Customer;
 use Illuminate\Routing\Route;
-use Illuminate\Validation\Rule;
-
 
 uses()->group('customers');
 
@@ -15,14 +13,14 @@ test('authorize returns true', function () {
 
 test('rules returns correct validation rules', function () {
     $customer = new Customer(['id' => 1]);
-    
+
     $request = new UpdateCustomerRequest;
-    
+
     // Mock the route parameter
     $route = Mockery::mock(Route::class);
     $route->shouldReceive('parameter')->with('customer', null)->andReturn($customer);
-    $request->setRouteResolver(fn() => $route);
-    
+    $request->setRouteResolver(fn () => $route);
+
     expect($request->rules())->toEqual([
         'name' => 'sometimes|required|string|max:255',
         'email' => [

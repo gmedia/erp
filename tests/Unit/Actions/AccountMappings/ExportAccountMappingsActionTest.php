@@ -20,7 +20,7 @@ test('execute stores export file and returns json response', function () {
     ]);
     $request->shouldReceive('filled')->with('search')->andReturn(true);
 
-    $action = new ExportAccountMappingsAction(new AccountMappingFilterService());
+    $action = new ExportAccountMappingsAction(new AccountMappingFilterService);
     $response = $action->execute($request);
 
     expect($response->getStatusCode())->toBe(200);
@@ -30,4 +30,3 @@ test('execute stores export file and returns json response', function () {
 
     Excel::assertStored('exports/' . $data['filename'], 'public');
 });
-

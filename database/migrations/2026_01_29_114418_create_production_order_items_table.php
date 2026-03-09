@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('production_order_items', function (Blueprint $table) {
@@ -25,15 +22,12 @@ return new class extends Migration
             $table->decimal('total_cost', 15, 2)
                 ->comment('quantity_used * unit_cost');
             $table->timestamps();
-            
+
             $table->index('production_order_id');
             $table->index('raw_material_id');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('production_order_items');

@@ -19,8 +19,7 @@ readonly class UpdateStockTransferData
         public ?string $shipped_at = null,
         public ?int $received_by = null,
         public ?string $received_at = null,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('units');
 
 test('authorize returns true', function () {
-    $request = new UpdateUnitRequest();
+    $request = new UpdateUnitRequest;
     expect($request->authorize())->toBeTrue();
 });
 
@@ -15,11 +15,11 @@ test('rules returns correct validation rules', function () {
     $unit = Unit::factory()->create();
 
     $request = Mockery::mock(UpdateUnitRequest::class)->makePartial();
-    
+
     $request->shouldReceive('route')
         ->with('unit')
         ->andReturn($unit);
-        
+
     $request->shouldReceive('route')
         ->with('id')
         ->andReturn(null);

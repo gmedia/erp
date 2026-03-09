@@ -26,7 +26,7 @@ class IndexMaintenanceCostReportAction
             $query->where(function (Builder $q) use ($request) {
                 $q->whereHas('asset', function (Builder $sq) use ($request) {
                     $sq->where('asset_code', 'like', '%' . $request->search . '%')
-                       ->orWhere('name', 'like', '%' . $request->search . '%');
+                        ->orWhere('name', 'like', '%' . $request->search . '%');
                 })->orWhere('notes', 'like', '%' . $request->search . '%');
             });
         }
@@ -60,22 +60,22 @@ class IndexMaintenanceCostReportAction
 
         if (in_array($sortBy, ['asset_code', 'asset_name'])) {
             $query->join('assets', 'asset_maintenances.asset_id', '=', 'assets.id')
-                  ->orderBy($sortBy === 'asset_name' ? 'assets.name' : 'assets.asset_code', $sortDirection)
-                  ->select('asset_maintenances.*');
+                ->orderBy($sortBy === 'asset_name' ? 'assets.name' : 'assets.asset_code', $sortDirection)
+                ->select('asset_maintenances.*');
         } elseif ($sortBy === 'supplier_name') {
             $query->leftJoin('suppliers', 'asset_maintenances.supplier_id', '=', 'suppliers.id')
-                  ->orderBy('suppliers.name', $sortDirection)
-                  ->select('asset_maintenances.*');
+                ->orderBy('suppliers.name', $sortDirection)
+                ->select('asset_maintenances.*');
         } else {
             $query->orderBy('asset_maintenances.' . $sortBy, $sortDirection);
         }
 
         if ($request->boolean('export')) {
-             return $query->get();
+            return $query->get();
         }
 
         $perPage = $request->get('per_page', 15);
-        
+
         return $query->paginate($perPage)->withQueryString();
     }
 }

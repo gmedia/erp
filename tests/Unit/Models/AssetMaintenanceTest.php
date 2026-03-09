@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('asset-maintenances');
 
 test('it has fillable attributes', function () {
-    $model = new AssetMaintenance();
+    $model = new AssetMaintenance;
 
     expect($model->getFillable())->toBe([
         'asset_id',

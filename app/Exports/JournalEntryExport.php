@@ -24,24 +24,24 @@ class JournalEntryExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
     {
         $query = JournalEntry::query()->with(['fiscalYear', 'createdBy']);
 
-        if (!empty($this->filters['search'])) {
-             $search = $this->filters['search'];
-             $query->where(function($q) use ($search) {
-                 $q->where('entry_number', 'like', "%{$search}%")
-                   ->orWhere('description', 'like', "%{$search}%")
-                   ->orWhere('reference', 'like', "%{$search}%");
-             });
+        if (! empty($this->filters['search'])) {
+            $search = $this->filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('entry_number', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('reference', 'like', "%{$search}%");
+            });
         }
 
-        if (!empty($this->filters['status'])) {
+        if (! empty($this->filters['status'])) {
             $query->where('status', $this->filters['status']);
         }
-        
-        if (!empty($this->filters['start_date'])) {
+
+        if (! empty($this->filters['start_date'])) {
             $query->whereDate('entry_date', '>=', $this->filters['start_date']);
         }
 
-        if (!empty($this->filters['end_date'])) {
+        if (! empty($this->filters['end_date'])) {
             $query->whereDate('entry_date', '<=', $this->filters['end_date']);
         }
 

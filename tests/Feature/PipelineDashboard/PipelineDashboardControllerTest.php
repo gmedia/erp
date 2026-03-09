@@ -6,13 +6,14 @@ use App\Models\PipelineEntityState;
 use App\Models\PipelineState;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class)->group('pipeline-dashboard');
 
 beforeEach(function () {
     $this->user = createTestUserWithPermissions(['pipeline_dashboard']);
-    
+
     // Create pipeline setup
     $this->pipeline = Pipeline::factory()->create([
         'entity_type' => Asset::class,
@@ -81,13 +82,13 @@ it('returns correct summary data via API', function () {
     $response->assertOk()
         ->assertJsonStructure([
             'summary' => [
-                '*' => ['state_id', 'name', 'code', 'color', 'count']
+                '*' => ['state_id', 'name', 'code', 'color', 'count'],
             ],
-            'stale_entities'
+            'stale_entities',
         ]);
 
     $data = $response->json();
-    
+
     // Order based on states retrieved from pipeline
     expect($data['summary'][0]['count'])->toBe(2); // Draft
     expect($data['summary'][1]['count'])->toBe(3); // Review
@@ -99,7 +100,7 @@ it('filters data by pipeline_id', function () {
         'entity_type' => Asset::class,
         'is_active' => true,
     ]);
-    
+
     $state2Draft = PipelineState::factory()->create([
         'pipeline_id' => $pipeline2->id,
         'code' => 'draft',
@@ -130,7 +131,7 @@ it('filters data by pipeline_id', function () {
     \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
     $response1 = getJson("/api/pipeline-dashboard/data?pipeline_id={$this->pipeline->id}");
     $data1 = $response1->json();
-    
+
     // Only states from pipeline 1 should be present in summary
     expect(count($data1['summary']))->toBe(3); // Pipeline 1 has 3 states
     // The sum in pipeline 1 is 1
@@ -140,7 +141,7 @@ it('filters data by pipeline_id', function () {
     // Request with filter for Pipeline 2
     $response2 = getJson("/api/pipeline-dashboard/data?pipeline_id={$pipeline2->id}");
     $data2 = $response2->json();
-    
+
     expect(count($data2['summary']))->toBe(1); // Pipeline 2 has 1 state
     $totalCount2 = collect($data2['summary'])->sum('count');
     expect($totalCount2)->toBe(4);
@@ -164,14 +165,14 @@ it('detects stale entities based on threshold', function () {
         'entity_type' => Asset::class,
         'entity_id' => 2,
     ]);
-    
+
     // Default threshold is 7 days
     \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
     $response = getJson('/api/pipeline-dashboard/data');
-    
+
     $response->assertOk();
     $data = $response->json();
-    
+
     expect(count($data['stale_entities']))->toBe(1);
     expect($data['stale_entities'][0]['id'])->toBe($staleEntity->id);
     expect($data['stale_entities'][0]['days_in_state'])->toBeGreaterThanOrEqual(10);

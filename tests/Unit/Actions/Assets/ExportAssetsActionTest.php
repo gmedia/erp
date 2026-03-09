@@ -14,17 +14,17 @@ uses(RefreshDatabase::class)->group('assets');
 test('export assets action returns json with url', function () {
     Excel::fake();
     Storage::fake('public');
-    
-    $request = new ExportAssetRequest();
-    
+
+    $request = new ExportAssetRequest;
+
     // FormRequest::validated() calls $this->validator->validated()
     // We need to set a validator on the request
     $validator = Validator::make([], $request->rules());
     $validator->passes(); // Run validation so it has validated data
     $request->setValidator($validator);
-    
-    $action = new ExportAssetsAction();
-    
+
+    $action = new ExportAssetsAction;
+
     $response = $action->execute($request);
     $data = $response->getData(true);
 

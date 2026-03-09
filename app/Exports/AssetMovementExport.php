@@ -4,7 +4,11 @@ namespace App\Exports;
 
 use App\Models\AssetMovement;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\{FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles};
+use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AssetMovementExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
@@ -20,12 +24,12 @@ class AssetMovementExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
     {
         $query = AssetMovement::query()->with([
             'asset', 'fromBranch', 'toBranch', 'fromLocation', 'toLocation',
-            'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy'
+            'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy',
         ]);
 
         $filterService = app(\App\Domain\AssetMovements\AssetMovementFilterService::class);
 
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $filterService->applySearch($query, $this->filters['search'], ['reference', 'notes']);
         } else {
             $filterService->applyAdvancedFilters($query, $this->filters);
@@ -49,7 +53,7 @@ class AssetMovementExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
             'Origin Location', 'Destination Location',
             'Origin Department', 'Destination Department',
             'Origin Employee', 'Destination Employee',
-            'Reference', 'Notes', 'Recorded By', 'Created At'
+            'Reference', 'Notes', 'Recorded By', 'Created At',
         ];
     }
 

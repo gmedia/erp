@@ -25,7 +25,7 @@ class AssetStocktakeExport implements FromQuery, ShouldAutoSize, WithHeadings, W
         $query = AssetStocktake::query()->with(['branch', 'createdBy']);
 
         // Search
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('reference', 'like', "%{$search}%");
@@ -33,11 +33,11 @@ class AssetStocktakeExport implements FromQuery, ShouldAutoSize, WithHeadings, W
         }
 
         // Filters
-        if (!empty($this->filters['branch'])) {
+        if (! empty($this->filters['branch'])) {
             $query->where('branch_id', $this->filters['branch']);
         }
 
-        if (!empty($this->filters['status'])) {
+        if (! empty($this->filters['status'])) {
             $query->where('status', $this->filters['status']);
         }
 
@@ -45,7 +45,7 @@ class AssetStocktakeExport implements FromQuery, ShouldAutoSize, WithHeadings, W
         $sortBy = $this->filters['sort_by'] ?? 'created_at';
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
         $allowedSortColumns = ['reference', 'branch_id', 'planned_at', 'performed_at', 'status', 'created_at'];
-        
+
         if (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);
         }

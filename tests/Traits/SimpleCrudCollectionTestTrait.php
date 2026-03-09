@@ -2,41 +2,15 @@
 
 namespace Tests\Traits;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
 /**
  * Trait for testing Simple CRUD Collection classes.
- * 
+ *
  * Requires the consumer to define:
  * - getCollectionClass(): string - The collection class to test
  * - getModelClass(): string - The model class for factory
  */
 trait SimpleCrudCollectionTestTrait
 {
-    /**
-     * Get the collection class to test.
-     * 
-     * @return class-string
-     */
-    abstract protected function getCollectionClass(): string;
-
-    /**
-     * Get the model class for factory.
-     * 
-     * @return class-string
-     */
-    abstract protected function getModelClass(): string;
-
-    /**
-     * Get the resource class that the collection should collect.
-     * 
-     * @return class-string
-     */
-    protected function getResourceClass(): string
-    {
-        return \App\Http\Resources\SimpleCrudResource::class;
-    }
-
     public function test_collects_property_is_set_correctly(): void
     {
         $collectionClass = $this->getCollectionClass();
@@ -52,7 +26,7 @@ trait SimpleCrudCollectionTestTrait
 
         $collectionClass = $this->getCollectionClass();
         $collection = new $collectionClass($models);
-        $request = new \Illuminate\Http\Request();
+        $request = new \Illuminate\Http\Request;
 
         $result = $collection->toArray($request);
 
@@ -75,11 +49,35 @@ trait SimpleCrudCollectionTestTrait
     {
         $collectionClass = $this->getCollectionClass();
         $collection = new $collectionClass(collect());
-        $request = new \Illuminate\Http\Request();
+        $request = new \Illuminate\Http\Request;
 
         $result = $collection->toArray($request);
 
         $this->assertIsArray($result);
         $this->assertCount(0, $result);
+    }
+
+    /**
+     * Get the collection class to test.
+     *
+     * @return class-string
+     */
+    abstract protected function getCollectionClass(): string;
+
+    /**
+     * Get the model class for factory.
+     *
+     * @return class-string
+     */
+    abstract protected function getModelClass(): string;
+
+    /**
+     * Get the resource class that the collection should collect.
+     *
+     * @return class-string
+     */
+    protected function getResourceClass(): string
+    {
+        return \App\Http\Resources\SimpleCrudResource::class;
     }
 }

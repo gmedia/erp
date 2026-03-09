@@ -5,15 +5,12 @@ namespace Tests\Feature\Users;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\actingAs;
+
 use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class)->group('users');
-
-
 
 describe('Get User By Employee API', function () {
     beforeEach(function () {

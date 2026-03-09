@@ -22,7 +22,7 @@ class ExportApprovalFlowsAction
             'sort_direction' => $validated['sort_direction'] ?? 'desc',
         ];
 
-        $filters = array_filter($filters, fn($val) => $val !== null && $val !== '');
+        $filters = array_filter($filters, fn ($val) => $val !== null && $val !== '');
 
         $filename = 'approval_flows_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
         $filePath = 'exports/' . $filename;

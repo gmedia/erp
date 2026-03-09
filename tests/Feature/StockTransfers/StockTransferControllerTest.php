@@ -192,4 +192,3 @@ describe('Stock Transfer API Endpoints', function () {
         assertDatabaseHas('stock_transfers', ['id' => $transfer->id, 'status' => 'cancelled']);
     });
 });
-

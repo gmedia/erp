@@ -19,7 +19,7 @@ describe('ProductCategory API Endpoints', function () {
             'product_category',
             'product_category.create',
             'product_category.edit',
-            'product_category.delete'
+            'product_category.delete',
         ]);
 
         actingAs($user);
@@ -33,9 +33,9 @@ describe('ProductCategory API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'name', 'description', 'created_at', 'updated_at']
+                    '*' => ['id', 'name', 'description', 'created_at', 'updated_at'],
                 ],
-                'meta' => ['total', 'per_page', 'current_page']
+                'meta' => ['total', 'per_page', 'current_page'],
             ]);
 
         expect($response->json('meta.total'))->toBe(15)
@@ -61,9 +61,9 @@ describe('ProductCategory API Endpoints', function () {
 
         $response->assertOk();
         expect($response->json('data.0.name'))->toBe('ZZZZ Beta');
-        
+
         $response = getJson('/api/product-categories?sort_by=name&sort_direction=asc');
-        
+
         $response->assertOk();
         expect($response->json('data.0.name'))->toBe('AAAA Alpha');
     });
@@ -71,7 +71,7 @@ describe('ProductCategory API Endpoints', function () {
     test('store creates product category', function () {
         $data = [
             'name' => 'New Category',
-            'description' => 'Category Description'
+            'description' => 'Category Description',
         ];
 
         $response = postJson('/api/product-categories', $data);
@@ -97,7 +97,7 @@ describe('ProductCategory API Endpoints', function () {
         $category = ProductCategory::factory()->create();
         $data = [
             'name' => 'Updated Cat',
-            'description' => 'Updated Description'
+            'description' => 'Updated Description',
         ];
 
         $response = putJson("/api/product-categories/{$category->id}", $data);

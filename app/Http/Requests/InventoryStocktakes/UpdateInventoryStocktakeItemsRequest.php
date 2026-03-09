@@ -23,4 +23,3 @@ class UpdateInventoryStocktakeItemsRequest extends FormRequest
         ];
     }
 }
-

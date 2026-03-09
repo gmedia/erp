@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\FiscalYear;
-use App\Models\JournalEntry;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

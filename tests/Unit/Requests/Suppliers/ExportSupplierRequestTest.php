@@ -2,7 +2,6 @@
 
 use App\Http\Requests\Suppliers\ExportSupplierRequest;
 
-
 uses()->group('suppliers');
 
 test('authorize returns true', function () {

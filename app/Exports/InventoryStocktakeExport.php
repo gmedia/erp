@@ -22,7 +22,7 @@ class InventoryStocktakeExport implements FromQuery, WithHeadings, WithMapping, 
     {
         $query = InventoryStocktake::query()->with(['warehouse', 'productCategory']);
 
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('stocktake_number', 'like', "%{$search}%")
@@ -30,23 +30,23 @@ class InventoryStocktakeExport implements FromQuery, WithHeadings, WithMapping, 
             });
         }
 
-        if (!empty($this->filters['warehouse_id'])) {
+        if (! empty($this->filters['warehouse_id'])) {
             $query->where('warehouse_id', $this->filters['warehouse_id']);
         }
 
-        if (!empty($this->filters['product_category_id'])) {
+        if (! empty($this->filters['product_category_id'])) {
             $query->where('product_category_id', $this->filters['product_category_id']);
         }
 
-        if (!empty($this->filters['status'])) {
+        if (! empty($this->filters['status'])) {
             $query->where('status', $this->filters['status']);
         }
 
-        if (!empty($this->filters['stocktake_date_from'])) {
+        if (! empty($this->filters['stocktake_date_from'])) {
             $query->whereDate('stocktake_date', '>=', $this->filters['stocktake_date_from']);
         }
 
-        if (!empty($this->filters['stocktake_date_to'])) {
+        if (! empty($this->filters['stocktake_date_to'])) {
             $query->whereDate('stocktake_date', '<=', $this->filters['stocktake_date_to']);
         }
 

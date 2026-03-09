@@ -16,7 +16,6 @@ trait BaseFilterService
      * Apply search filters to query across multiple fields.
      *
      * @param  \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $query
-     * @param  string  $search
      * @param  array<int, string>  $searchFields
      */
     public function applySearch(Builder $query, string $search, array $searchFields): void
@@ -32,8 +31,6 @@ trait BaseFilterService
      * Apply sorting to query with validation against allowed columns.
      *
      * @param  \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $query
-     * @param  string  $sortBy
-     * @param  string  $sortDirection
      * @param  array<int, string>  $allowedSorts
      */
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void

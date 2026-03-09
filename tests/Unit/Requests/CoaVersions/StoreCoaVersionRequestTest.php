@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\Validator;
 uses(RefreshDatabase::class)->group('coa-versions');
 
 test('StoreCoaVersionRequest → authorize returns true', function () {
-    $request = new StoreCoaVersionRequest();
+    $request = new StoreCoaVersionRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('StoreCoaVersionRequest → rules returns valid definitions', function () {
-    $rules = (new StoreCoaVersionRequest())->rules();
+    $rules = (new StoreCoaVersionRequest)->rules();
 
     expect($rules['name'])->toContain('required', 'string', 'max:255')
         ->and($rules['fiscal_year_id'])->toContain('required', 'integer', 'exists:fiscal_years,id')
@@ -28,7 +28,7 @@ test('StoreCoaVersionRequest → validation passes with valid data', function ()
         'status' => 'draft',
     ];
 
-    $request = new StoreCoaVersionRequest();
+    $request = new StoreCoaVersionRequest;
     $request->merge($data);
     $validator = Validator::make($data, $request->rules());
 
@@ -43,7 +43,7 @@ test('StoreCoaVersionRequest → validation fails with invalid status', function
         'status' => 'invalid-status',
     ];
 
-    $request = new StoreCoaVersionRequest();
+    $request = new StoreCoaVersionRequest;
     $request->merge($data);
     $validator = Validator::make($data, $request->rules());
 
@@ -64,7 +64,7 @@ test('StoreCoaVersionRequest → validation fails when unique name in same fisca
         'status' => 'active',
     ];
 
-    $request = new StoreCoaVersionRequest();
+    $request = new StoreCoaVersionRequest;
     $request->merge($data);
     $validator = Validator::make($data, $request->rules());
 

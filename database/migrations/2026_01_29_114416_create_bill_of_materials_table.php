@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('bill_of_materials', function (Blueprint $table) {
@@ -28,15 +25,12 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['finished_product_id', 'raw_material_id']);
             $table->index('raw_material_id');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('bill_of_materials');

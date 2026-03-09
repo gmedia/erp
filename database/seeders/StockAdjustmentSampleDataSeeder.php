@@ -283,6 +283,7 @@ class StockAdjustmentSampleDataSeeder extends Seeder
 
         if (empty($items)) {
             $products = $this->ensureProductsWithStock($branchId);
+
             return $this->makeManualAdjustmentItems($products, $branchId, -1.0);
         }
 

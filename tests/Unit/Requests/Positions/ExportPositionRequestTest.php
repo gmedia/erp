@@ -5,12 +5,12 @@ use App\Http\Requests\Positions\ExportPositionRequest;
 uses()->group('positions');
 
 test('authorize returns true', function () {
-    $request = new ExportPositionRequest();
+    $request = new ExportPositionRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new ExportPositionRequest();
+    $request = new ExportPositionRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

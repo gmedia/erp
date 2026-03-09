@@ -8,16 +8,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 class AssetCategoryExport extends SimpleCrudExport
 {
-    protected function getModelClass(): string
-    {
-        return AssetCategory::class;
-    }
-
-    protected function getSortableFields(): array
-    {
-        return ['id', 'code', 'name', 'useful_life_months_default', 'created_at', 'updated_at'];
-    }
-
     public function query(): Builder
     {
         if ($this->query) {
@@ -28,11 +18,11 @@ class AssetCategoryExport extends SimpleCrudExport
         $query = $modelClass::query();
 
         // Apply search filter if provided
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%");
+                    ->orWhere('code', 'like', "%{$search}%");
             });
         }
 
@@ -70,5 +60,15 @@ class AssetCategoryExport extends SimpleCrudExport
             $model->created_at ? $model->created_at->toIso8601String() : null,
             $model->updated_at ? $model->updated_at->toIso8601String() : null,
         ];
+    }
+
+    protected function getModelClass(): string
+    {
+        return AssetCategory::class;
+    }
+
+    protected function getSortableFields(): array
+    {
+        return ['id', 'code', 'name', 'useful_life_months_default', 'created_at', 'updated_at'];
     }
 }

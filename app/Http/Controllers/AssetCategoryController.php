@@ -17,7 +17,7 @@ class AssetCategoryController extends Controller
 {
     public function index(IndexAssetCategoryRequest $request): JsonResponse
     {
-        $categories = (new IndexAssetCategoriesAction())->execute($request);
+        $categories = (new IndexAssetCategoriesAction)->execute($request);
 
         return (new AssetCategoryCollection($categories))->response();
     }
@@ -52,6 +52,6 @@ class AssetCategoryController extends Controller
 
     public function export(ExportAssetCategoryRequest $request): JsonResponse
     {
-        return (new ExportAssetCategoriesAction())->execute($request);
+        return (new ExportAssetCategoriesAction)->execute($request);
     }
 }

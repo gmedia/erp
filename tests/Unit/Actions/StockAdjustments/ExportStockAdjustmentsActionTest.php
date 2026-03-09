@@ -17,7 +17,7 @@ test('execute generates excel file and returns url', function () {
 
     StockAdjustment::factory()->count(3)->create(['status' => 'draft']);
 
-    $action = new ExportStockAdjustmentsAction();
+    $action = new ExportStockAdjustmentsAction;
     $request = Mockery::mock(ExportStockAdjustmentRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'search' => null,

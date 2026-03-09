@@ -2,7 +2,6 @@
 
 use App\Models\AssetCategory;
 use App\Models\AssetModel;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\actingAs;
@@ -21,7 +20,7 @@ describe('Asset Model API Endpoints', function () {
             'asset_model',
             'asset_model.create',
             'asset_model.edit',
-            'asset_model.delete'
+            'asset_model.delete',
         ]);
 
         actingAs($user);
@@ -36,7 +35,7 @@ describe('Asset Model API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data',
-                'meta' => ['total', 'per_page', 'current_page']
+                'meta' => ['total', 'per_page', 'current_page'],
             ]);
 
         expect($response->json('meta.total'))->toBe(15)

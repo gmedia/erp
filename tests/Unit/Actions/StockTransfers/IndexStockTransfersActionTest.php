@@ -12,8 +12,8 @@ uses(RefreshDatabase::class)->group('stock-transfers');
 test('execute returns paginated results', function () {
     StockTransfer::factory()->count(3)->create(['status' => 'draft']);
 
-    $action = new IndexStockTransfersAction(new StockTransferFilterService());
-    $request = new IndexStockTransferRequest();
+    $action = new IndexStockTransfersAction(new StockTransferFilterService);
+    $request = new IndexStockTransferRequest;
 
     $result = $action->execute($request);
 
@@ -25,7 +25,7 @@ test('execute filters by search term', function () {
     StockTransfer::factory()->create(['transfer_number' => 'ST-ABC-001', 'status' => 'draft']);
     StockTransfer::factory()->create(['transfer_number' => 'ST-XYZ-001', 'status' => 'draft']);
 
-    $action = new IndexStockTransfersAction(new StockTransferFilterService());
+    $action = new IndexStockTransfersAction(new StockTransferFilterService);
     $request = new IndexStockTransferRequest(['search' => 'ST-ABC']);
 
     $result = $action->execute($request);
@@ -38,8 +38,8 @@ test('execute excludes cancelled by default', function () {
     StockTransfer::factory()->create(['status' => 'cancelled']);
     StockTransfer::factory()->create(['status' => 'draft']);
 
-    $action = new IndexStockTransfersAction(new StockTransferFilterService());
-    $request = new IndexStockTransferRequest();
+    $action = new IndexStockTransfersAction(new StockTransferFilterService);
+    $request = new IndexStockTransferRequest;
 
     $result = $action->execute($request);
 
@@ -50,7 +50,7 @@ test('execute excludes cancelled by default', function () {
 test('execute can include cancelled when status filter set', function () {
     StockTransfer::factory()->create(['status' => 'cancelled']);
 
-    $action = new IndexStockTransfersAction(new StockTransferFilterService());
+    $action = new IndexStockTransfersAction(new StockTransferFilterService);
     $request = new IndexStockTransferRequest(['status' => 'cancelled']);
 
     $result = $action->execute($request);
@@ -58,4 +58,3 @@ test('execute can include cancelled when status filter set', function () {
     expect($result->count())->toBe(1)
         ->and($result->first()->status)->toBe('cancelled');
 });
-

@@ -13,14 +13,12 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class StockMonitorExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
-    public function __construct(private readonly array $filters = [])
-    {
-    }
+    public function __construct(private readonly array $filters = []) {}
 
     public function collection()
     {
         $action = app(IndexStockMonitorAction::class);
-        $request = new IndexStockMonitorRequest();
+        $request = new IndexStockMonitorRequest;
         $request->merge(array_merge($this->filters, [
             'per_page' => 100000,
         ]));

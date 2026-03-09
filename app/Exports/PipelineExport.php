@@ -24,12 +24,12 @@ class PipelineExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
     {
         $query = Pipeline::query()->with(['creator']);
 
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -46,8 +46,8 @@ class PipelineExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
 
         if ($sortBy === 'created_by') {
             $query->leftJoin('users as creator', 'pipelines.created_by', '=', 'creator.id')
-                  ->orderBy('creator.name', $sortDirection === 'asc' ? 'asc' : 'desc')
-                  ->select('pipelines.*');
+                ->orderBy('creator.name', $sortDirection === 'asc' ? 'asc' : 'desc')
+                ->select('pipelines.*');
         } elseif (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection == 'asc' ? 'asc' : 'desc');
         }

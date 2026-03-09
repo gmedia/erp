@@ -6,12 +6,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('account-mappings');
 
 test('IndexAccountMappingRequest → authorize returns true', function () {
-    $request = new IndexAccountMappingRequest();
+    $request = new IndexAccountMappingRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('IndexAccountMappingRequest → rules contains expected filters', function () {
-    $rules = (new IndexAccountMappingRequest())->rules();
+    $rules = (new IndexAccountMappingRequest)->rules();
 
     expect($rules)->toHaveKeys([
         'search',

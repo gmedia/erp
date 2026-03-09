@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\FiscalYear;
 use App\Services\FinancialReportService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
@@ -17,7 +17,7 @@ class ReportController extends Controller
     {
         $fiscalYears = FiscalYear::orderBy('start_date', 'desc')->get();
         $currentFiscalYear = $fiscalYears->firstWhere('status', 'open') ?? $fiscalYears->first();
-        
+
         $selectedYearId = $request->input('fiscal_year_id', $currentFiscalYear?->id);
 
         $report = [];
@@ -36,7 +36,7 @@ class ReportController extends Controller
     {
         $fiscalYears = FiscalYear::orderBy('start_date', 'desc')->get();
         $currentFiscalYear = $fiscalYears->firstWhere('status', 'open') ?? $fiscalYears->first();
-        
+
         $selectedYearId = $request->input('fiscal_year_id', $currentFiscalYear?->id);
         $comparisonYearId = $request->input('comparison_year_id');
 

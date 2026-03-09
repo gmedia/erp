@@ -14,6 +14,7 @@ class PipelineStateController extends Controller
     public function index(Pipeline $pipeline): JsonResponse
     {
         $states = $pipeline->states;
+
         return PipelineStateResource::collection($states)->response();
     }
 
@@ -21,6 +22,7 @@ class PipelineStateController extends Controller
     {
         $data = $request->validated();
         $state = $pipeline->states()->create($data);
+
         return (new PipelineStateResource($state))->response()->setStatusCode(201);
     }
 
@@ -32,6 +34,7 @@ class PipelineStateController extends Controller
         }
         $data = $request->validated();
         $state->update($data);
+
         return (new PipelineStateResource($state))->response();
     }
 
@@ -42,6 +45,7 @@ class PipelineStateController extends Controller
             abort(404);
         }
         $state->delete();
+
         return response()->json(null, 204);
     }
 }

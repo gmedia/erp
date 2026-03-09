@@ -9,7 +9,7 @@ uses(RefreshDatabase::class)->group('accounts');
 
 test('it returns collection of resources', function () {
     $coaVersion = CoaVersion::factory()->create();
-    
+
     Account::factory()->create([
         'coa_version_id' => $coaVersion->id,
         'code' => 'ACC001',
@@ -25,7 +25,7 @@ test('it returns collection of resources', function () {
         'code' => 'ACC003',
         'name' => 'Account 3',
     ]);
-    
+
     $accounts = Account::all();
 
     $collection = new AccountCollection($accounts);
@@ -33,7 +33,7 @@ test('it returns collection of resources', function () {
 
     expect($data['data'])->toHaveCount(3)
         ->and($data['meta']['count'])->toBe(3);
-    
+
     // Check first item data
     $firstItem = $data['data'][0]->toArray(request());
     expect($firstItem)->toHaveKey('id');

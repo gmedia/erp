@@ -97,4 +97,3 @@ class StockMovementSampleDataSeeder extends Seeder
         }
     }
 }
-

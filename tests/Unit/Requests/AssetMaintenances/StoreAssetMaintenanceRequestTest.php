@@ -8,7 +8,7 @@ uses()->group('asset-maintenances');
 
 function createStoreRequest(): StoreAssetMaintenanceRequest
 {
-    return new StoreAssetMaintenanceRequest();
+    return new StoreAssetMaintenanceRequest;
 }
 
 test('it authorizes request', function () {

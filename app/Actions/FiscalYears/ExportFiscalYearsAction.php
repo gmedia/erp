@@ -17,26 +17,6 @@ use Maatwebsite\Excel\Facades\Excel;
  */
 class ExportFiscalYearsAction extends SimpleCrudExportAction
 {
-    protected function getModelClass(): string
-    {
-        return FiscalYear::class;
-    }
-
-    protected function getExportInstance(array $filters, ?Builder $query): FromQuery
-    {
-        return new FiscalYearExport($filters, $query);
-    }
-
-    protected function getFilenamePrefix(): string
-    {
-        return 'fiscal_years';
-    }
-
-    protected function getSortableFields(): array
-    {
-        return ['id', 'name', 'start_date', 'end_date', 'status', 'created_at', 'updated_at'];
-    }
-
     public function execute(FormRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -71,5 +51,25 @@ class ExportFiscalYearsAction extends SimpleCrudExportAction
             'url' => Storage::disk('public')->url($filePath),
             'filename' => $filename,
         ]);
+    }
+
+    protected function getModelClass(): string
+    {
+        return FiscalYear::class;
+    }
+
+    protected function getExportInstance(array $filters, ?Builder $query): FromQuery
+    {
+        return new FiscalYearExport($filters, $query);
+    }
+
+    protected function getFilenamePrefix(): string
+    {
+        return 'fiscal_years';
+    }
+
+    protected function getSortableFields(): array
+    {
+        return ['id', 'name', 'start_date', 'end_date', 'status', 'created_at', 'updated_at'];
     }
 }

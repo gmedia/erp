@@ -5,12 +5,12 @@ use App\Http\Requests\ProductCategories\ExportProductCategoryRequest;
 uses()->group('product-categories');
 
 test('authorize returns true', function () {
-    $request = new ExportProductCategoryRequest();
+    $request = new ExportProductCategoryRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new ExportProductCategoryRequest();
+    $request = new ExportProductCategoryRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

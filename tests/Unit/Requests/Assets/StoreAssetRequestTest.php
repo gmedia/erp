@@ -3,7 +3,6 @@
 namespace Tests\Unit\Requests\Assets;
 
 use App\Http\Requests\Assets\StoreAssetRequest;
-use App\Models\Asset;
 use App\Models\AssetCategory;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,7 +23,7 @@ test('store asset request validation results', function (array $data, bool $shou
         $data['branch_id'] = $branch->id;
     }
 
-    $request = new StoreAssetRequest();
+    $request = new StoreAssetRequest;
     $validator = Validator::make($data, $request->rules());
 
     expect($validator->passes())->toBe($shouldPass);
@@ -41,11 +40,11 @@ test('store asset request validation results', function (array $data, bool $shou
             'status' => 'draft',
             'depreciation_method' => 'straight_line',
         ],
-        true
+        true,
     ],
     'missing required fields' => [
         [],
-        false
+        false,
     ],
     'invalid status' => [
         [
@@ -59,6 +58,6 @@ test('store asset request validation results', function (array $data, bool $shou
             'status' => 'invalid-status',
             'depreciation_method' => 'straight_line',
         ],
-        false
+        false,
     ],
 ]);

@@ -2,12 +2,10 @@
 
 use App\Models\Department;
 use App\Models\Employee;
-use App\Models\Permission;
 use App\Models\Position;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
@@ -45,7 +43,7 @@ describe('Employee API Endpoints', function () {
                         'hire_date',
                         'created_at',
                         'updated_at',
-                    ]
+                    ],
                 ],
                 'meta' => [
                     'current_page',
@@ -67,7 +65,7 @@ describe('Employee API Endpoints', function () {
         $user = createTestUserWithPermissions(['employee', 'employee.create', 'employee.edit', 'employee.delete']);
         $user->employee->update([
             'name' => 'Zebra Tester',
-            'email' => 'zebra@example.com'
+            'email' => 'zebra@example.com',
         ]);
         \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
 
@@ -151,7 +149,7 @@ describe('Employee API Endpoints', function () {
                     'hire_date',
                     'created_at',
                     'updated_at',
-                ]
+                ],
             ])
             ->assertJsonFragment([
                 'name' => 'John Doe',
@@ -228,12 +226,12 @@ describe('Employee API Endpoints', function () {
                     'hire_date',
                     'created_at',
                     'updated_at',
-                ]
+                ],
             ])
             ->assertJsonFragment([
                 'id' => $employee->id,
                 'name' => $employee->name,
-                'email' => $employee->email
+                'email' => $employee->email,
             ]);
     });
 
@@ -279,7 +277,7 @@ describe('Employee API Endpoints', function () {
                     'hire_date',
                     'created_at',
                     'updated_at',
-                ]
+                ],
             ])
             ->assertJsonFragment([
                 'name' => 'Updated Name',
@@ -324,7 +322,7 @@ describe('Employee API Endpoints', function () {
                 'salary',
                 'hire_date',
                 'employment_status',
-                'termination_date'
+                'termination_date',
             ]);
     });
 
@@ -425,4 +423,3 @@ describe('Employee API Endpoints', function () {
     });
 
 });
-

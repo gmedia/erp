@@ -17,9 +17,10 @@ function makeUpdateUserRequest(array $data, ?Employee $employee = null): array
 {
     $employee = $employee ?? Employee::factory()->create(['user_id' => null]);
 
-    $request = new UpdateUserRequest();
+    $request = new UpdateUserRequest;
     $request->setRouteResolver(function () use ($employee) {
-        return new class($employee) {
+        return new class($employee)
+        {
             private Employee $employee;
 
             public function __construct(Employee $employee)

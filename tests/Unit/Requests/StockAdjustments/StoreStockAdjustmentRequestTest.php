@@ -5,12 +5,12 @@ use App\Http\Requests\StockAdjustments\StoreStockAdjustmentRequest;
 uses()->group('stock-adjustments');
 
 test('authorize returns true', function () {
-    $request = new StoreStockAdjustmentRequest();
+    $request = new StoreStockAdjustmentRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules contains required fields and item rules', function () {
-    $request = new StoreStockAdjustmentRequest();
+    $request = new StoreStockAdjustmentRequest;
     $rules = $request->rules();
 
     expect($rules)->toHaveKeys([

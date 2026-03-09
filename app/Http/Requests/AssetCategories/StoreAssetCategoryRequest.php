@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\AssetCategories;
 
-use App\Models\AssetCategory;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreAssetCategoryRequest extends FormRequest

@@ -15,8 +15,7 @@ readonly class UpdateStockAdjustmentData
         public ?int $journal_entry_id = null,
         public ?int $approved_by = null,
         public ?string $approved_at = null,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

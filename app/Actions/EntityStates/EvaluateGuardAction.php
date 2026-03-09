@@ -4,17 +4,19 @@ namespace App\Actions\EntityStates;
 
 use App\Models\PipelineTransition;
 use App\Traits\HandlesConditions;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class EvaluateGuardAction
 {
     use HandlesConditions;
+
     /**
      * Evaluate the guard conditions for a specific transition on a given entity.
-     * 
-     * @param PipelineTransition $transition The proposed transition
-     * @param Model $entity The target entity
+     *
+     * @param  PipelineTransition  $transition  The proposed transition
+     * @param  Model  $entity  The target entity
      * @return array Array of failure messages (empty means all guards passed)
      */
     public function execute(PipelineTransition $transition, Model $entity): array
@@ -29,7 +31,7 @@ class EvaluateGuardAction
         // 1. Evaluate field_checks: [ {"field": "status", "operator": "equals", "value": "active"} ]
         if (isset($guards['field_checks']) && is_array($guards['field_checks'])) {
             foreach ($guards['field_checks'] as $check) {
-                if (!$this->evaluateFieldCheck($check, $entity)) {
+                if (! $this->evaluateFieldCheck($check, $entity)) {
                     $field = $check['field'] ?? 'unknown';
                     $operator = $check['operator'] ?? 'equals';
                     $expectedValue = $check['value'] ?? 'unknown';
@@ -42,13 +44,13 @@ class EvaluateGuardAction
         // 2. Evaluate relation_checks: [ {"relation": "category", "field": "code", "operator": "equals", "value": "IT"} ]
         if (isset($guards['relation_checks']) && is_array($guards['relation_checks'])) {
             foreach ($guards['relation_checks'] as $check) {
-                if (!$this->evaluateRelationCheck($check, $entity)) {
+                if (! $this->evaluateRelationCheck($check, $entity)) {
                     $relation = $check['relation'] ?? 'unknown';
                     $field = $check['field'] ?? 'unknown';
                     $operator = $check['operator'] ?? 'equals';
                     $expectedValue = $check['value'] ?? 'unknown';
-                    
-                    if (!$entity->relationLoaded($relation)) {
+
+                    if (! $entity->relationLoaded($relation)) {
                         $entity->load($relation);
                     }
                     $relatedModel = $entity->getRelation($relation);
@@ -64,14 +66,14 @@ class EvaluateGuardAction
             $ruleClass = $guards['custom_rule'];
             if (class_exists($ruleClass)) {
                 try {
-                    $rule = new $ruleClass();
+                    $rule = new $ruleClass;
                     if (method_exists($rule, 'evaluate')) {
                         $passed = $rule->evaluate($entity, $transition);
-                        if (!$passed) {
+                        if (! $passed) {
                             $failures[] = "Custom rule check failed: {$ruleClass}";
                         }
                     }
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     Log::error("Failed to evaluate custom pipeline guard rule: {$ruleClass}. Error: {$e->getMessage()}");
                     $failures[] = "Custom rule execution failed: {$ruleClass}";
                 }

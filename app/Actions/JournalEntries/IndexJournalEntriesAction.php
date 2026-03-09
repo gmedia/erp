@@ -24,7 +24,7 @@ class IndexJournalEntriesAction
 
         if ($request->filled('search')) {
             $this->filterService->applySearch($query, $request->get('search'), [
-                'entry_number', 'description', 'reference'
+                'entry_number', 'description', 'reference',
             ]);
         }
 

@@ -48,15 +48,15 @@ class AssetLocationController extends Controller
         return (new AssetLocationResource($assetLocation))->response();
     }
 
-    public function export(ExportAssetLocationRequest $request, ExportAssetLocationsAction $action): JsonResponse
-    {
-        return $action->execute($request);
-    }
-
     public function destroy(AssetLocation $assetLocation): JsonResponse
     {
         $assetLocation->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function export(ExportAssetLocationRequest $request, ExportAssetLocationsAction $action): JsonResponse
+    {
+        return $action->execute($request);
     }
 }

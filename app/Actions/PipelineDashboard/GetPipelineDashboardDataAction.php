@@ -23,7 +23,7 @@ class GetPipelineDashboardDataAction
         if ($pipelineId) {
             $pipelineQuery->where('id', $pipelineId);
         }
-        
+
         $pipelines = $pipelineQuery->get();
         if ($pipelines->isEmpty()) {
             return [
@@ -70,7 +70,7 @@ class GetPipelineDashboardDataAction
 
         // Fetch Stale Entities (in intermediate state for more than X days)
         $staleThreshold = Carbon::now()->subDays($staleDays);
-        
+
         $staleQuery = PipelineEntityState::with(['currentState', 'lastTransitionedBy'])
             ->whereHas('currentState', function ($q) {
                 // Focus stale detection on intermediate states where things can get stuck
@@ -83,7 +83,7 @@ class GetPipelineDashboardDataAction
         } else {
             $staleQuery->whereIn('pipeline_id', $pipelines->pluck('id'));
         }
-        
+
         if ($entityType) {
             $staleQuery->where('entity_type', $entityType);
         }
@@ -91,11 +91,11 @@ class GetPipelineDashboardDataAction
         $staleEntitiesModels = $staleQuery->orderBy('last_transitioned_at', 'asc')
             ->limit(50)
             ->get();
-            
+
         // Map polymorphic entity names for display (e.g. Asset code/name)
         $staleEntities = $staleEntitiesModels->map(function ($state) {
             $entityName = "ID: {$state->entity_id}"; // fallback
-            
+
             // Try to resolve entity and get a descriptive string
             $modelClass = $state->entity_type;
             if (class_exists($modelClass)) {
@@ -104,9 +104,9 @@ class GetPipelineDashboardDataAction
                     $entityName = $entity->name ?? $entity->code ?? $entity->title ?? $entity->reference ?? $entityName;
                 }
             }
-            
+
             $shortType = class_basename($state->entity_type);
-            
+
             return [
                 'id' => $state->id,
                 'entity_type' => $shortType,

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use App\Models\ApprovalRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class EntityApprovalHistoryController extends Controller
 {
@@ -19,7 +19,7 @@ class EntityApprovalHistoryController extends Controller
             // Add more as needed, like: 'purchase-request' => \App\Models\PurchaseRequest::class
         ];
 
-        if (!isset($entityMap[$entityType])) {
+        if (! isset($entityMap[$entityType])) {
             return response()->json(['message' => 'Entity type not supported for approvals.'], 400);
         }
 
@@ -27,7 +27,7 @@ class EntityApprovalHistoryController extends Controller
         $resolvedId = $entityId;
 
         // If the model uses ULID and the provided ID is not numeric, resolve it
-        if (!is_numeric($entityId) && in_array(\Illuminate\Database\Eloquent\Concerns\HasUlids::class, class_uses_recursive($modelClass))) {
+        if (! is_numeric($entityId) && in_array(\Illuminate\Database\Eloquent\Concerns\HasUlids::class, class_uses_recursive($modelClass))) {
             $instance = $modelClass::where('ulid', $entityId)->first();
             if ($instance) {
                 $resolvedId = $instance->id;
@@ -44,13 +44,13 @@ class EntityApprovalHistoryController extends Controller
             'steps.delegator:id,name,email',
             'steps.flowStep', // Include the configuration logic if needed
         ])
-        ->where('approvable_type', $modelClass)
-        ->where('approvable_id', $resolvedId)
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->where('approvable_type', $modelClass)
+            ->where('approvable_id', $resolvedId)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json([
-            'data' => $history
+            'data' => $history,
         ]);
     }
 }

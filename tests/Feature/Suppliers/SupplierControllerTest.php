@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Branch;
-use App\Models\Permission;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,7 +22,7 @@ describe('Supplier API Endpoints', function () {
             'supplier',
             'supplier.create',
             'supplier.edit',
-            'supplier.delete'
+            'supplier.delete',
         ]);
 
         actingAs($user);
@@ -38,7 +37,7 @@ describe('Supplier API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data',
-                'meta' => ['total', 'per_page', 'current_page']
+                'meta' => ['total', 'per_page', 'current_page'],
             ]);
 
         expect($response->json('meta.total'))->toBe($baseline + 15)
@@ -85,7 +84,7 @@ describe('Supplier API Endpoints', function () {
     test('index supports filtering by status', function () {
         // Get existing suppliers count before creating new ones
         $baselineActive = Supplier::where('status', 'active')->count();
-        
+
         Supplier::factory()->create(['status' => 'active']);
         Supplier::factory()->create(['status' => 'inactive']);
 
@@ -127,7 +126,7 @@ describe('Supplier API Endpoints', function () {
             'email' => 'existing@example.com',
             'branch_id' => $branch->id,
             'category_id' => $category->id,
-            'status' => 'active'
+            'status' => 'active',
         ]);
 
         $response->assertUnprocessable()
@@ -141,15 +140,14 @@ describe('Supplier API Endpoints', function () {
             'name' => 'Updated Supplier',
             'email' => $supplier->email, // keep same email
             'category_id' => $category->id,
-            'status' => 'inactive'
+            'status' => 'inactive',
         ];
-
 
         $response = putJson("/api/suppliers/{$supplier->id}", $data);
 
         $response->assertOk()
             ->assertJsonFragment(['name' => 'Updated Supplier']);
-            
+
         $supplier->refresh();
         expect($supplier->name)->toBe('Updated Supplier')
             ->and($supplier->status)->toBe('inactive');

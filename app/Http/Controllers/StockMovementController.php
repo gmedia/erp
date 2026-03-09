@@ -23,4 +23,3 @@ class StockMovementController extends Controller
         return $action->execute($request);
     }
 }
-

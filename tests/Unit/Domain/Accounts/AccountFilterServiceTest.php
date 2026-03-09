@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('accounts');
 
 beforeEach(function () {
-    $this->filterService = new AccountFilterService();
+    $this->filterService = new AccountFilterService;
 });
 
 test('it can filter by type', function () {
@@ -16,7 +16,7 @@ test('it can filter by type', function () {
 
     $query = Account::query();
     $this->filterService->applyAdvancedFilters($query, ['type' => 'asset']);
-    
+
     expect($query->count())->toBe(1)
         ->and($query->first()->type)->toBe('asset');
 });
@@ -27,9 +27,9 @@ test('it can filter by active status', function () {
 
     $query = Account::query();
     $this->filterService->applyAdvancedFilters($query, ['is_active' => true]);
-    
+
     expect($query->count())->toBe(1)
-        ->and((bool)$query->first()->is_active)->toBeTrue();
+        ->and((bool) $query->first()->is_active)->toBeTrue();
 });
 
 test('it can search by code or name', function () {

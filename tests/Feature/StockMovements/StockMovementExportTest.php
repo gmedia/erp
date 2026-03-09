@@ -48,4 +48,3 @@ test('it can export stock movements to csv', function () {
     Excel::assertStored('exports/' . $filename, 'public');
     Carbon::setTestNow();
 });
-

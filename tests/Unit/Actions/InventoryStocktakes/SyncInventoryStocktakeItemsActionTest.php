@@ -32,7 +32,7 @@ test('execute upserts items, computes result, and removes missing ones', functio
         'result' => 'match',
     ]);
 
-    $action = new SyncInventoryStocktakeItemsAction();
+    $action = new SyncInventoryStocktakeItemsAction;
     $action->execute($stocktake, [
         [
             'product_id' => $product2->id,
@@ -54,4 +54,3 @@ test('execute upserts items, computes result, and removes missing ones', functio
         'product_id' => $product1->id,
     ]);
 });
-

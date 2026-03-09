@@ -8,10 +8,6 @@ class SyncEmployeePermissionsAction
 {
     /**
      * Sync permissions for the given employee.
-     *
-     * @param  \App\Models\Employee  $employee
-     * @param  array  $permissionIds
-     * @return void
      */
     public function execute(Employee $employee, array $permissionIds): void
     {

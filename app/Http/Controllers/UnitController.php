@@ -27,7 +27,7 @@ class UnitController extends Controller
      */
     public function index(IndexUnitRequest $request): JsonResponse
     {
-        $units = (new IndexUnitsAction())->execute($request);
+        $units = (new IndexUnitsAction)->execute($request);
 
         return (new UnitCollection($units))->response();
     }
@@ -77,6 +77,6 @@ class UnitController extends Controller
      */
     public function export(ExportUnitRequest $request): JsonResponse
     {
-        return (new ExportUnitsAction())->execute($request);
+        return (new ExportUnitsAction)->execute($request);
     }
 }

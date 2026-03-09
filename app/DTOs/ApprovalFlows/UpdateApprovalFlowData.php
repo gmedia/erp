@@ -28,13 +28,25 @@ readonly class UpdateApprovalFlowData
     public function toArray(): array
     {
         $data = [];
-        
-        if ($this->name !== null) $data['name'] = $this->name;
-        if ($this->code !== null) $data['code'] = $this->code;
-        if ($this->approvable_type !== null) $data['approvable_type'] = $this->approvable_type;
-        if ($this->description !== null) $data['description'] = $this->description;
-        if ($this->is_active !== null) $data['is_active'] = $this->is_active;
-        if ($this->conditions !== null) $data['conditions'] = $this->conditions; // Could be null intentionally to clear
+
+        if ($this->name !== null) {
+            $data['name'] = $this->name;
+        }
+        if ($this->code !== null) {
+            $data['code'] = $this->code;
+        }
+        if ($this->approvable_type !== null) {
+            $data['approvable_type'] = $this->approvable_type;
+        }
+        if ($this->description !== null) {
+            $data['description'] = $this->description;
+        }
+        if ($this->is_active !== null) {
+            $data['is_active'] = $this->is_active;
+        }
+        if ($this->conditions !== null) {
+            $data['conditions'] = $this->conditions;
+        } // Could be null intentionally to clear
 
         return $data;
     }

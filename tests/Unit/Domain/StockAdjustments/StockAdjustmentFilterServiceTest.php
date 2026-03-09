@@ -10,7 +10,7 @@ test('apply search filters by adjustment_number', function () {
     StockAdjustment::factory()->create(['adjustment_number' => 'SA-MAIN-001', 'status' => 'draft']);
     StockAdjustment::factory()->create(['adjustment_number' => 'SA-OTHER-001', 'status' => 'draft']);
 
-    $service = new StockAdjustmentFilterService();
+    $service = new StockAdjustmentFilterService;
     $query = StockAdjustment::query();
 
     $service->applySearch($query, 'SA-MAIN', ['adjustment_number', 'notes']);
@@ -23,7 +23,7 @@ test('applyAdvancedFilters filters by status', function () {
     StockAdjustment::factory()->create(['status' => 'draft']);
     StockAdjustment::factory()->create(['status' => 'approved']);
 
-    $service = new StockAdjustmentFilterService();
+    $service = new StockAdjustmentFilterService;
     $query = StockAdjustment::query();
 
     $service->applyAdvancedFilters($query, ['status' => 'approved']);

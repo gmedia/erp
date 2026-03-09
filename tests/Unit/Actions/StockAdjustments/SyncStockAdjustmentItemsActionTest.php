@@ -26,7 +26,7 @@ test('execute upserts items and removes missing ones', function () {
         'quantity_adjusted' => 1,
     ]);
 
-    $action = new SyncStockAdjustmentItemsAction();
+    $action = new SyncStockAdjustmentItemsAction;
     $action->execute($adjustment, [
         [
             'product_id' => $product2->id,

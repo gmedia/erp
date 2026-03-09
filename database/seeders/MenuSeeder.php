@@ -434,7 +434,7 @@ class MenuSeeder extends Seeder
                 ],
             ],
             [
-                 'name' => 'admin',
+                'name' => 'admin',
                 'display_name' => 'Admin',
                 'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline', 'pipeline_audit_trail', 'admin_setting', 'approval_flow', 'approval_delegation', 'approval_monitoring', 'approval_audit_trail'],
                 'icon' => 'Shield',
@@ -529,7 +529,7 @@ class MenuSeeder extends Seeder
 
     private function createMenus(array $items, ?Menu $parent = null)
     {
-        foreach ($items as $item) {            
+        foreach ($items as $item) {
             $newParent = Menu::updateOrCreate([
                 'name' => $item['name'],
             ], [

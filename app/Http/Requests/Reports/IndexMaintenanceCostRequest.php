@@ -33,7 +33,7 @@ class IndexMaintenanceCostRequest extends FormRequest
                     'cost',
                     'asset_code',
                     'asset_name',
-                    'supplier_name'
+                    'supplier_name',
                 ]),
             ],
             'sort_direction' => ['nullable', 'string', Rule::in(['asc', 'desc'])],

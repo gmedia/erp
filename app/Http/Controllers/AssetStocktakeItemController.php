@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Actions\AssetStocktakes\SyncAssetStocktakeItemsAction;
 use App\Http\Requests\AssetStocktakes\UpdateAssetStocktakeItemRequest;
 use App\Http\Resources\AssetStocktakes\AssetStocktakeItemResource;
+use App\Models\Asset;
 use App\Models\AssetStocktake;
 use App\Models\AssetStocktakeItem;
-use App\Models\Asset;
 use Illuminate\Http\JsonResponse;
 
 class AssetStocktakeItemController extends Controller
@@ -33,6 +33,7 @@ class AssetStocktakeItemController extends Controller
                     'expected_location_id' => $asset->asset_location_id,
                 ]);
                 $item->setRelation('asset', $asset);
+
                 return $item;
             });
         }
@@ -45,10 +46,10 @@ class AssetStocktakeItemController extends Controller
      */
     public function syncItems(UpdateAssetStocktakeItemRequest $request, AssetStocktake $assetStocktake): JsonResponse
     {
-        (new SyncAssetStocktakeItemsAction())->execute($assetStocktake, $request->validated());
+        (new SyncAssetStocktakeItemsAction)->execute($assetStocktake, $request->validated());
 
         return response()->json([
-            'message' => 'Stocktake items updated successfully.'
+            'message' => 'Stocktake items updated successfully.',
         ]);
     }
 }

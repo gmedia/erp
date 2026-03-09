@@ -14,10 +14,10 @@ test('execute generates excel file and returns url', function () {
     Carbon::setTestNow(now());
     Excel::fake();
     Storage::fake('public');
-    
+
     SupplierCategory::factory()->count(3)->create();
 
-    $action = new ExportSupplierCategoriesAction();
+    $action = new ExportSupplierCategoriesAction;
     $request = Mockery::mock(ExportSupplierCategoryRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'search' => null,
@@ -25,7 +25,7 @@ test('execute generates excel file and returns url', function () {
         'sort_direction' => 'desc',
     ]);
     $request->shouldReceive('filled')->with('search')->andReturn(false);
-    
+
     $result = $action->execute($request);
 
     $filename = 'supplier_categories_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
@@ -33,6 +33,6 @@ test('execute generates excel file and returns url', function () {
     expect($result->getStatusCode())->toBe(200)
         ->and($result->getData(true))->toHaveKeys(['url', 'filename'])
         ->and($result->getData(true)['filename'])->toBe($filename);
-        
+
     Excel::assertStored('exports/' . $filename, 'public');
 });

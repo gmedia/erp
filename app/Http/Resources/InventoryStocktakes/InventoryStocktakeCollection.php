@@ -11,4 +11,3 @@ class InventoryStocktakeCollection extends ResourceCollection
      */
     public $collects = InventoryStocktakeResource::class;
 }
-

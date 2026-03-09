@@ -11,20 +11,20 @@ class AssignPipelineAction
 {
     /**
      * Assign an entity to its appropriate pipeline and set its initial state.
-     * 
-     * @param Model $entity The entity (e.g., Asset)
+     *
+     * @param  Model  $entity  The entity (e.g., Asset)
      * @return PipelineEntityState|null The newly created state, or null if no pipeline found
      */
     public function execute(Model $entity): ?PipelineEntityState
     {
         // 1. Find the appropriate pipeline structure for this entity type
         $entityType = $entity->getMorphClass();
-        
+
         $pipeline = Pipeline::where('entity_type', $entityType)
             ->where('is_active', true)
             ->first();
 
-        if (!$pipeline) {
+        if (! $pipeline) {
             return null; // No active pipeline configured for this entity type
         }
 
@@ -41,7 +41,7 @@ class AssignPipelineAction
         // 3. Find the initial state for the configured pipeline
         $initialState = $pipeline->states()->where('type', 'initial')->first();
 
-        if (!$initialState) {
+        if (! $initialState) {
             return null; // Pipeline is misconfigured (no initial state)
         }
 

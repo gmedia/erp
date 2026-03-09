@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Support\Facades\RateLimiter;
-use Laravel\Fortify\Features;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class)->group('auth');
 
@@ -25,7 +23,7 @@ test('users can authenticate using the login endpoint', function () {
 
     $this->assertAuthenticated();
     $response->assertStatus(200)
-             ->assertJsonStructure(['token', 'user']);
+        ->assertJsonStructure(['token', 'user']);
 });
 
 // test('users with two factor enabled are redirected to two factor challenge', function () {
@@ -42,23 +40,23 @@ test('users can not authenticate with invalid password', function () {
 
     $this->assertGuest();
     $response->assertStatus(422)
-             ->assertJsonValidationErrors('email');
+        ->assertJsonValidationErrors('email');
 });
 
 test('users can logout', function () {
     $user = User::factory()->create();
-    
+
     // Authenticate first to get token
     $token = $user->createToken('test')->plainTextToken;
 
     $response = $this->withHeader('Authorization', 'Bearer ' . $token)
-                     ->postJson('/api/logout');
+        ->postJson('/api/logout');
 
     $response->assertStatus(200)
-             ->assertJson(['message' => 'Successfully logged out']);
+        ->assertJson(['message' => 'Successfully logged out']);
 });
 
 // test('users are rate limited', function () {
-// SPA migration: AuthController currently does not implement Laravel's default 5-attempt rate limit. 
+// SPA migration: AuthController currently does not implement Laravel's default 5-attempt rate limit.
 // Rate limiting is instead handled by api throttle middleware at 60 attempts/min.
 // });

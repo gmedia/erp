@@ -11,7 +11,7 @@ class PositionSeeder extends Seeder
     {
         $positions = [
             'Junior', 'Mid-level', 'Senior', 'Senior Developer',
-            'Lead', 'Manager', 'Director', 'VP', 'C-level'
+            'Lead', 'Manager', 'Director', 'VP', 'C-level',
         ];
 
         foreach ($positions as $name) {

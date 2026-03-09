@@ -4,8 +4,8 @@ namespace App\Actions\AssetStocktakes;
 
 use App\Models\AssetStocktake;
 use App\Models\AssetStocktakeItem;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SyncAssetStocktakeItemsAction
 {
@@ -33,7 +33,7 @@ class SyncAssetStocktakeItemsAction
                     ]
                 );
             }
-            
+
             // Auto update stocktake status to in_progress if it was draft
             if ($stocktake->status === 'draft') {
                 $stocktake->update(['status' => 'in_progress']);

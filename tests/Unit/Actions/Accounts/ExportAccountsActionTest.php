@@ -21,11 +21,11 @@ test('execute stores export file and returns json response', function () {
         'search' => 'test',
     ]);
 
-    $action = new ExportAccountsAction();
+    $action = new ExportAccountsAction;
     $response = $action->execute($request);
 
     expect($response->getStatusCode())->toBe(200);
-    
+
     $data = $response->getData(true);
     expect($data)->toHaveKeys(['url', 'filename']);
 

@@ -8,7 +8,7 @@ uses(RefreshDatabase::class)->group('fiscal-years');
 
 test('collection returns multiple resources', function () {
     FiscalYear::factory()->count(3)->create();
-    
+
     $collection = new FiscalYearCollection(FiscalYear::all());
     $data = $collection->toArray(request());
 

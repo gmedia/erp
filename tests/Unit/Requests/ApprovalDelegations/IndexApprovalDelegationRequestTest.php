@@ -3,17 +3,17 @@
 namespace Tests\Unit\Requests\ApprovalDelegations;
 
 use App\Http\Requests\ApprovalDelegations\IndexApprovalDelegationRequest;
-use Illuminate\Support\Facades\Validator;
+
 uses()->group('approval-delegations');
 
 test('authorize returns true', function () {
-    $request = new IndexApprovalDelegationRequest();
+    $request = new IndexApprovalDelegationRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new IndexApprovalDelegationRequest();
-    
+    $request = new IndexApprovalDelegationRequest;
+
     expect($request->rules())->toBe([
         'search' => ['nullable', 'string'],
         'delegator_user_id' => ['nullable', 'exists:users,id'],

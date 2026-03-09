@@ -19,20 +19,20 @@ class AccountExport implements FromCollection, WithHeadings, WithMapping
     public function collection()
     {
         $query = Account::query();
-        
-        if (!empty($this->filters['coa_version_id'])) {
+
+        if (! empty($this->filters['coa_version_id'])) {
             $query->where('coa_version_id', $this->filters['coa_version_id']);
         }
-        
-        if (!empty($this->filters['search'])) {
+
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('code', 'like', "%{$search}%")
-                  ->orWhere('name', 'like', "%{$search}%");
+                    ->orWhere('name', 'like', "%{$search}%");
             });
         }
-        
-        if (!empty($this->filters['type'])) {
+
+        if (! empty($this->filters['type'])) {
             $query->where('type', $this->filters['type']);
         }
 

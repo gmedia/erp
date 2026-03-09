@@ -24,7 +24,7 @@ class AssetModelExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
     {
         $query = AssetModel::query()->with(['category']);
 
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('model_name', 'like', "%{$search}%")
@@ -32,7 +32,7 @@ class AssetModelExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
             });
         }
 
-        if (!empty($this->filters['asset_category_id'])) {
+        if (! empty($this->filters['asset_category_id'])) {
             $query->where('asset_category_id', $this->filters['asset_category_id']);
         }
 

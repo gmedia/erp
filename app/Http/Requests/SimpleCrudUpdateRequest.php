@@ -23,7 +23,7 @@ abstract class SimpleCrudUpdateRequest extends FormRequest
         $modelClass = $this->getModelClass();
         $model = new $modelClass;
         $table = $model->getTable();
-        
+
         // Try to find the route parameter that matches the model
         // Convention: model 'CustomerCategory' -> route param 'customer_category'
         $resourceName = \Illuminate\Support\Str::snake(class_basename($modelClass));

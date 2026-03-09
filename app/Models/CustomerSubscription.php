@@ -10,29 +10,62 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int $id
- * @property string $subscription_number
+ * @property string $subscription_number Unique subscription reference
  * @property int $customer_id
  * @property int $subscription_plan_id
  * @property int $product_id
  * @property string $status
  * @property \Illuminate\Support\Carbon|null $trial_start_date
  * @property \Illuminate\Support\Carbon|null $trial_end_date
- * @property \Illuminate\Support\Carbon $start_date
- * @property \Illuminate\Support\Carbon $current_period_start
- * @property \Illuminate\Support\Carbon $current_period_end
+ * @property \Illuminate\Support\Carbon $start_date Subscription start date (after trial)
+ * @property \Illuminate\Support\Carbon $current_period_start Current billing period start
+ * @property \Illuminate\Support\Carbon $current_period_end Current billing period end
  * @property \Illuminate\Support\Carbon|null $cancellation_date
- * @property \Illuminate\Support\Carbon|null $cancellation_effective_date
+ * @property \Illuminate\Support\Carbon|null $cancellation_effective_date When cancellation takes effect
  * @property int $billing_cycles_completed
  * @property bool $auto_renew
- * @property string $recurring_amount
+ * @property numeric $recurring_amount Amount charged per cycle
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SubscriptionBillingRecord> $billingRecords
+ * @property-read int|null $billing_records_count
+ * @property-read \App\Models\Customer $customer
+ * @property-read \App\Models\Product $product
+ * @property-read \App\Models\SubscriptionPlan $subscriptionPlan
  *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription cancelled()
+ * @method static \Database\Factories\CustomerSubscriptionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription pastDue()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription trial()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereAutoRenew($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereBillingCyclesCompleted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCancellationDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCancellationEffectiveDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCurrentPeriodEnd($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCurrentPeriodStart($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCustomerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereRecurringAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereStartDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereSubscriptionNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereSubscriptionPlanId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereTrialEndDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereTrialStartDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription withoutTrashed()
  *
  * @mixin \Eloquent
  */
@@ -150,8 +183,8 @@ class CustomerSubscription extends Model
      */
     public function isInTrial(): bool
     {
-        return $this->status === 'trial' && 
-               $this->trial_end_date && 
+        return $this->status === 'trial' &&
+               $this->trial_end_date &&
                now()->lte($this->trial_end_date);
     }
 

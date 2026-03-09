@@ -2,6 +2,7 @@
 
 use App\Models\ProductCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Laravel\assertDatabaseHas;
 
 uses(RefreshDatabase::class)->group('product-categories');

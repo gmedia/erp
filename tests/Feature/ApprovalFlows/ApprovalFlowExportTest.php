@@ -21,7 +21,7 @@ describe('Approval Flow Export API', function () {
 
         $response->assertOk()
             ->assertJsonStructure(['url', 'filename']);
-        
+
         $filename = $response->json('filename');
         expect($filename)->toContain('approval_flows_export_');
     });

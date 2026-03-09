@@ -20,7 +20,7 @@ describe('Asset Location API Endpoints', function () {
             'asset_location',
             'asset_location.create',
             'asset_location.edit',
-            'asset_location.delete'
+            'asset_location.delete',
         ]);
 
         actingAs($user);
@@ -35,7 +35,7 @@ describe('Asset Location API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data',
-                'meta' => ['total', 'per_page', 'current_page']
+                'meta' => ['total', 'per_page', 'current_page'],
             ]);
 
         expect($response->json('meta.total'))->toBe($baseline + 15)

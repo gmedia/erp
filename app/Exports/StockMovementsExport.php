@@ -25,7 +25,7 @@ class StockMovementsExport implements FromCollection, ShouldAutoSize, WithHeadin
     {
         $action = app(IndexStockMovementsAction::class);
 
-        $request = new IndexStockMovementRequest();
+        $request = new IndexStockMovementRequest;
         $request->merge($this->filters);
 
         return $action->execute($request);
@@ -80,4 +80,3 @@ class StockMovementsExport implements FromCollection, ShouldAutoSize, WithHeadin
         ];
     }
 }
-

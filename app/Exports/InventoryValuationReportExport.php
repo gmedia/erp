@@ -24,7 +24,7 @@ class InventoryValuationReportExport implements FromCollection, ShouldAutoSize, 
     public function collection()
     {
         $action = app(IndexInventoryValuationReportAction::class);
-        $request = new IndexInventoryValuationReportRequest();
+        $request = new IndexInventoryValuationReportRequest;
         $request->merge($this->filters);
 
         return $action->execute($request);

@@ -3,7 +3,6 @@
 namespace Tests\Feature\Pipelines;
 
 use App\Models\Pipeline;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('pipelines');

@@ -27,7 +27,7 @@ class SupplierCategoryController extends Controller
      */
     public function index(IndexSupplierCategoryRequest $request): JsonResponse
     {
-        $supplierCategories = (new IndexSupplierCategoriesAction())->execute($request);
+        $supplierCategories = (new IndexSupplierCategoriesAction)->execute($request);
 
         return (new SupplierCategoryCollection($supplierCategories))->response();
     }
@@ -77,6 +77,6 @@ class SupplierCategoryController extends Controller
      */
     public function export(ExportSupplierCategoryRequest $request): JsonResponse
     {
-        return (new ExportSupplierCategoriesAction())->execute($request);
+        return (new ExportSupplierCategoriesAction)->execute($request);
     }
 }

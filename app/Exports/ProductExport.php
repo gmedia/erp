@@ -58,7 +58,7 @@ class ProductExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
         if (! empty($this->filters['status'])) {
             $query->where('status', $this->filters['status']);
         }
- 
+
         // Apply billing model filter
         if (! empty($this->filters['billing_model'])) {
             $query->where('billing_model', $this->filters['billing_model']);

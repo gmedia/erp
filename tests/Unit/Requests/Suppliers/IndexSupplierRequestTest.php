@@ -1,12 +1,11 @@
 <?php
 
 use App\Http\Requests\Suppliers\IndexSupplierRequest;
-use Illuminate\Support\Facades\Validator;
 
 uses()->group('suppliers');
 
 test('rules are correct', function () {
-    $request = new IndexSupplierRequest();
+    $request = new IndexSupplierRequest;
 
     expect($request->rules())->toBe([
         'search' => ['nullable', 'string'],
@@ -20,9 +19,7 @@ test('rules are correct', function () {
     ]);
 });
 
-
-
 test('authorize returns true', function () {
-    $request = new IndexSupplierRequest();
+    $request = new IndexSupplierRequest;
     expect($request->authorize())->toBeTrue();
 });

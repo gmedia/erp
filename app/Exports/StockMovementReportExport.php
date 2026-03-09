@@ -24,7 +24,7 @@ class StockMovementReportExport implements FromCollection, ShouldAutoSize, WithH
     public function collection()
     {
         $action = app(IndexStockMovementReportAction::class);
-        $request = new IndexStockMovementReportRequest();
+        $request = new IndexStockMovementReportRequest;
         $request->merge($this->filters);
 
         return $action->execute($request);

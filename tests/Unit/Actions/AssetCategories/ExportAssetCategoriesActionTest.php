@@ -14,10 +14,10 @@ test('export asset categories action execute generates excel file', function () 
     Carbon::setTestNow(now());
     Excel::fake();
     Storage::fake('public');
-    
+
     AssetCategory::factory()->count(3)->create();
 
-    $action = new ExportAssetCategoriesAction();
+    $action = new ExportAssetCategoriesAction;
     $request = Mockery::mock(ExportAssetCategoryRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'search' => null,
@@ -25,7 +25,7 @@ test('export asset categories action execute generates excel file', function () 
         'sort_direction' => 'desc',
     ]);
     $request->shouldReceive('filled')->with('search')->andReturn(false);
-    
+
     $result = $action->execute($request);
 
     $filename = 'asset_categories_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';

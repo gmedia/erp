@@ -5,12 +5,12 @@ use App\Http\Requests\InventoryStocktakes\UpdateInventoryStocktakeRequest;
 uses()->group('inventory-stocktakes');
 
 test('authorize returns true', function () {
-    $request = new UpdateInventoryStocktakeRequest();
+    $request = new UpdateInventoryStocktakeRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules contains updatable fields and optional item rules', function () {
-    $request = new UpdateInventoryStocktakeRequest();
+    $request = new UpdateInventoryStocktakeRequest;
     $rules = $request->rules();
 
     expect($rules)->toHaveKeys([
@@ -24,4 +24,3 @@ test('rules contains updatable fields and optional item rules', function () {
         'items.*.system_quantity',
     ]);
 });
-

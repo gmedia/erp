@@ -44,7 +44,7 @@ class IndexAssetStocktakeVarianceAction
             $search = $request->get('search');
             $query->whereHas('asset', function (Builder $q) use ($search) {
                 $q->where('asset_code', 'like', "%{$search}%")
-                  ->orWhere('name', 'like', "%{$search}%");
+                    ->orWhere('name', 'like', "%{$search}%");
             });
         }
 
@@ -66,19 +66,19 @@ class IndexAssetStocktakeVarianceAction
                 $sortDirection
             );
         } elseif ($sortBy === 'expected_branch' || $sortBy === 'found_branch') {
-             $column = $sortBy === 'expected_branch' ? 'expected_branch_id' : 'found_branch_id';
-             $query->orderBy(
-                 \App\Models\Branch::select('name')
-                     ->whereColumn('branches.id', "asset_stocktake_items.{$column}"),
-                 $sortDirection
-             );
+            $column = $sortBy === 'expected_branch' ? 'expected_branch_id' : 'found_branch_id';
+            $query->orderBy(
+                \App\Models\Branch::select('name')
+                    ->whereColumn('branches.id', "asset_stocktake_items.{$column}"),
+                $sortDirection
+            );
         } elseif ($sortBy === 'expected_location' || $sortBy === 'found_location') {
-             $column = $sortBy === 'expected_location' ? 'expected_location_id' : 'found_location_id';
-             $query->orderBy(
-                 \App\Models\AssetLocation::select('name')
-                     ->whereColumn('asset_locations.id', "asset_stocktake_items.{$column}"),
-                 $sortDirection
-             );
+            $column = $sortBy === 'expected_location' ? 'expected_location_id' : 'found_location_id';
+            $query->orderBy(
+                \App\Models\AssetLocation::select('name')
+                    ->whereColumn('asset_locations.id', "asset_stocktake_items.{$column}"),
+                $sortDirection
+            );
         } else {
             $query->orderBy('checked_at', 'desc');
         }

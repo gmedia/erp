@@ -135,7 +135,7 @@ return [
      | It is used to send notifications and other important messages to the admin.
      |
      */
-    
+
     'admin' => env('APP_ADMIN', 'admin@dokfin.id'),
 
 ];

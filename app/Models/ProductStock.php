@@ -10,16 +10,30 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $product_id
  * @property int $branch_id
- * @property int $quantity_on_hand
- * @property int $quantity_reserved
- * @property int $minimum_quantity
- * @property string $average_cost
+ * @property int $quantity_on_hand Current physical stock
+ * @property int $quantity_reserved Reserved for production orders or sales
+ * @property int $minimum_quantity Reorder point
+ * @property numeric $average_cost Weighted average cost for COGS calculation
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Branch $branch
+ * @property-read int $quantity_available
+ * @property-read \App\Models\Product $product
  *
+ * @method static \Database\Factories\ProductStockFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductStock lowStock()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductStock newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductStock newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductStock query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductStock whereAverageCost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductStock whereBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductStock whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductStock whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductStock whereMinimumQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductStock whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductStock whereQuantityOnHand($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductStock whereQuantityReserved($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductStock whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

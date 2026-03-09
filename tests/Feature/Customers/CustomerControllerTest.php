@@ -2,12 +2,9 @@
 
 use App\Models\Branch;
 use App\Models\Customer;
-use App\Models\Employee;
-use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
@@ -44,7 +41,7 @@ describe('Customer API Endpoints', function () {
                         'notes',
                         'created_at',
                         'updated_at',
-                    ]
+                    ],
                 ],
                 'meta' => [
                     'current_page',
@@ -150,7 +147,7 @@ describe('Customer API Endpoints', function () {
 
         $response->assertOk()
             ->assertJsonStructure(['url', 'filename']);
-        
+
         $filename = $response->json('filename');
         expect($filename)->toContain('customers_export_');
     });
@@ -186,7 +183,7 @@ describe('Customer API Endpoints', function () {
                     'notes',
                     'created_at',
                     'updated_at',
-                ]
+                ],
             ])
             ->assertJsonFragment([
                 'name' => 'John Doe',
@@ -198,7 +195,7 @@ describe('Customer API Endpoints', function () {
 
         assertDatabaseHas('customers', [
             'email' => 'john.doe@example.com',
-            'name' => 'John Doe'
+            'name' => 'John Doe',
         ]);
     });
 
@@ -253,12 +250,12 @@ describe('Customer API Endpoints', function () {
                     'notes',
                     'created_at',
                     'updated_at',
-                ]
+                ],
             ])
             ->assertJsonFragment([
                 'id' => $customer->id,
                 'name' => $customer->name,
-                'email' => $customer->email
+                'email' => $customer->email,
             ]);
     });
 
@@ -372,4 +369,3 @@ describe('Customer API Endpoints', function () {
         $response->assertNotFound();
     });
 });
-

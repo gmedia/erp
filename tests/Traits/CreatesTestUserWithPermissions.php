@@ -17,8 +17,7 @@ trait CreatesTestUserWithPermissions
     /**
      * Create a user with an employee that has specific permissions.
      *
-     * @param array<string> $permissionNames Array of permission names
-     * @return User
+     * @param  array<string>  $permissionNames  Array of permission names
      */
     protected function createTestUserWithPermissions(array $permissionNames = []): User
     {
@@ -30,7 +29,7 @@ trait CreatesTestUserWithPermissions
             'branch_id' => null,
         ]);
 
-        if (!empty($permissionNames)) {
+        if (! empty($permissionNames)) {
             $permissions = [];
             foreach ($permissionNames as $name) {
                 $permissions[] = Permission::firstOrCreate(

@@ -3,14 +3,14 @@
 namespace App\Actions\JournalEntries;
 
 use App\Models\JournalEntry;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Exception;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PostJournalAction
 {
     /**
-     * @param array<int> $ids
+     * @param  array<int>  $ids
      * @return array{success: int, failures: array<int, string>}
      */
     public function execute(array $ids): array
@@ -27,7 +27,7 @@ class PostJournalAction
 
         foreach ($entries as $entry) {
             try {
-                if (!$entry->isBalanced()) {
+                if (! $entry->isBalanced()) {
                     throw new Exception("Journal entry {$entry->entry_number} is not balanced.");
                 }
 

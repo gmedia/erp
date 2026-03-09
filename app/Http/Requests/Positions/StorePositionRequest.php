@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Positions;
 
-use App\Models\Position;
 use App\Http\Requests\SimpleCrudStoreRequest;
+use App\Models\Position;
 
 class StorePositionRequest extends SimpleCrudStoreRequest
 {

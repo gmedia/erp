@@ -5,13 +5,14 @@ namespace App\Imports;
 use App\Models\Branch;
 use App\Models\Supplier;
 use App\Models\SupplierCategory;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
-class SupplierImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
+class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 {
     public int $importedCount = 0;
     public int $skippedCount = 0;
@@ -51,29 +52,32 @@ class SupplierImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                         'message' => $error,
                     ];
                 }
+
                 continue;
             }
 
             // 2. Resolve Foreign Keys
             $categoryId = $this->categories->get($row['category']);
-            if (!$categoryId) {
+            if (! $categoryId) {
                 $this->errors[] = [
                     'row' => $rowNumber,
                     'field' => 'category',
                     'message' => "Category '{$row['category']}' not found.",
                 ];
+
                 continue;
             }
 
             $branchId = null;
-            if (!empty($row['branch'])) {
+            if (! empty($row['branch'])) {
                 $branchId = $this->branches->get($row['branch']);
-                if (!$branchId) {
+                if (! $branchId) {
                     $this->errors[] = [
                         'row' => $rowNumber,
                         'field' => 'branch',
                         'message' => "Branch '{$row['branch']}' not found.",
                     ];
+
                     continue;
                 }
             }
@@ -82,7 +86,7 @@ class SupplierImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
             try {
                 // If email is provided, we use it for matching (since it must be unique). Else we match by name.
                 $matchAttributes = [];
-                if (!empty($row['email'])) {
+                if (! empty($row['email'])) {
                     $matchAttributes['email'] = $row['email'];
                 } else {
                     $matchAttributes['name'] = $row['name'];
@@ -104,13 +108,13 @@ class SupplierImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                 if ($supplier->wasRecentlyCreated) {
                     $this->importedCount++;
                 } else {
-                    $this->importedCount++; 
+                    $this->importedCount++;
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->errors[] = [
                     'row' => $rowNumber,
                     'field' => 'System',
-                    'message' => "Failed to save: " . $e->getMessage(),
+                    'message' => 'Failed to save: ' . $e->getMessage(),
                 ];
             }
         }

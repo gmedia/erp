@@ -22,7 +22,7 @@ class ExportPipelinesAction
             'sort_direction' => $validated['sort_direction'] ?? 'desc',
         ];
 
-        $filters = array_filter($filters, function($value) {
+        $filters = array_filter($filters, function ($value) {
             return $value !== null && $value !== '';
         });
 

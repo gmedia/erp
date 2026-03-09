@@ -24,7 +24,7 @@ describe('COA Version API Endpoints', function () {
             'coa_version.export',
         ]);
         actingAs($user);
-        
+
         $this->fiscalYear = FiscalYear::factory()->create([
             'name' => 'FY 2026',
             'status' => 'open',
@@ -50,7 +50,7 @@ describe('COA Version API Endpoints', function () {
                         'status',
                         'created_at',
                         'updated_at',
-                    ]
+                    ],
                 ],
                 'links',
                 'meta',
@@ -119,7 +119,7 @@ describe('COA Version API Endpoints', function () {
 
     test('index filters by fiscal year', function () {
         $otherFY = FiscalYear::factory()->create(['name' => 'FY 2027']);
-        
+
         CoaVersion::factory()->create(['name' => 'V1 2026', 'fiscal_year_id' => $this->fiscalYear->id]);
         CoaVersion::factory()->create(['name' => 'V1 2027', 'fiscal_year_id' => $otherFY->id]);
 

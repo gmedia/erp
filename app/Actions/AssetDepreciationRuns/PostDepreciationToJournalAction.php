@@ -17,7 +17,7 @@ class PostDepreciationToJournalAction
     {
         if ($run->status !== 'calculated') {
             throw ValidationException::withMessages([
-                'status' => 'Only calculated runs can be posted.'
+                'status' => 'Only calculated runs can be posted.',
             ]);
         }
 
@@ -26,7 +26,7 @@ class PostDepreciationToJournalAction
 
             if ($run->lines->isEmpty()) {
                 throw ValidationException::withMessages([
-                    'lines' => 'Cannot post an empty depreciation run.'
+                    'lines' => 'Cannot post an empty depreciation run.',
                 ]);
             }
 
@@ -39,18 +39,18 @@ class PostDepreciationToJournalAction
                 $expenseAccount = $asset->depreciation_expense_account_id;
                 $accumulatedAccount = $asset->accumulated_depr_account_id;
 
-                if (!$expenseAccount || !$accumulatedAccount) {
+                if (! $expenseAccount || ! $accumulatedAccount) {
                     throw ValidationException::withMessages([
-                        'accounts' => "Asset {$asset->asset_code} is missing depreciation accounts."
+                        'accounts' => "Asset {$asset->asset_code} is missing depreciation accounts.",
                     ]);
                 }
 
-                if (!isset($summary[$expenseAccount])) {
+                if (! isset($summary[$expenseAccount])) {
                     $summary[$expenseAccount] = ['debit' => 0, 'credit' => 0];
                 }
                 $summary[$expenseAccount]['debit'] += $line->amount;
 
-                if (!isset($summary[$accumulatedAccount])) {
+                if (! isset($summary[$accumulatedAccount])) {
                     $summary[$accumulatedAccount] = ['debit' => 0, 'credit' => 0];
                 }
                 $summary[$accumulatedAccount]['credit'] += $line->amount;

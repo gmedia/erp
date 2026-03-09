@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\Validator;
 uses(RefreshDatabase::class)->group('coa-versions');
 
 test('UpdateCoaVersionRequest → authorize returns true', function () {
-    $request = new UpdateCoaVersionRequest();
+    $request = new UpdateCoaVersionRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('UpdateCoaVersionRequest → rules returns valid definitions', function () {
-    $rules = (new UpdateCoaVersionRequest())->rules();
+    $rules = (new UpdateCoaVersionRequest)->rules();
 
     expect($rules['name'])->toContain('required', 'string', 'max:255')
         ->and($rules['fiscal_year_id'])->toContain('required', 'integer', 'exists:fiscal_years,id')
@@ -29,7 +29,7 @@ test('UpdateCoaVersionRequest → validation passes with valid data', function (
         'status' => 'active',
     ];
 
-    $request = new UpdateCoaVersionRequest();
+    $request = new UpdateCoaVersionRequest;
     $request->merge($data);
     $validator = Validator::make($data, $request->rules());
 
@@ -44,10 +44,11 @@ test('UpdateCoaVersionRequest → validation ignores current version for unique 
     ]);
 
     // Mock the route parameter
-    $request = new UpdateCoaVersionRequest();
+    $request = new UpdateCoaVersionRequest;
     $request->setRouteResolver(function () use ($version) {
         $route = Mockery::mock();
         $route->shouldReceive('parameter')->with('coa_version', Mockery::any())->andReturn($version->id);
+
         return $route;
     });
 

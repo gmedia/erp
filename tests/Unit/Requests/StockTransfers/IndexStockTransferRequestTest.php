@@ -5,12 +5,12 @@ use App\Http\Requests\StockTransfers\IndexStockTransferRequest;
 uses()->group('stock-transfers');
 
 test('authorize returns true', function () {
-    $request = new IndexStockTransferRequest();
+    $request = new IndexStockTransferRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new IndexStockTransferRequest();
+    $request = new IndexStockTransferRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],
@@ -27,4 +27,3 @@ test('rules returns correct validation rules', function () {
         'page' => ['nullable', 'integer', 'min:1'],
     ]);
 });
-

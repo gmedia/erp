@@ -2,9 +2,6 @@
 
 use App\Http\Requests\Products\UpdateProductRequest;
 use App\Models\Product;
-use App\Models\ProductCategory;
-use App\Models\Unit;
-use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 
@@ -45,11 +42,11 @@ describe('UpdateProductRequest', function () {
             'code' => 'P-002',
         ];
 
-        $request = new UpdateProductRequest();
+        $request = new UpdateProductRequest;
         $request->setMethod('PUT');
         // We simulate the route parameter by mocking it if necessary, but here we just test the rules directly
         // The ignore part might need the actual product id
-        
+
         $validator = validator($data, $request->rules());
         // Without the route param, it might fail because it doesn't know what to ignore
         // Expecting failure here because we haven't told the validator about the route param
@@ -58,11 +55,11 @@ describe('UpdateProductRequest', function () {
         // Now simulate the request with the product to be ignored
         $request = Mockery::mock(UpdateProductRequest::class)->makePartial();
         $request->shouldReceive('route')->with('product')->andReturn($product1);
-        
+
         $data = [
             'code' => 'P-001', // its own code
         ];
-        
+
         $validator = validator($data, $request->rules());
         expect($validator->passes())->toBeTrue();
     });

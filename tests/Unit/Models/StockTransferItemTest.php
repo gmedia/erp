@@ -20,4 +20,3 @@ test('relationships are defined', function () {
         ->and($item->product)->not->toBeNull()
         ->and($item->unit)->not->toBeNull();
 });
-

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Validator;
 uses()->group('fiscal-years');
 
 test('store rules have required fields', function () {
-    $rules = (new StoreFiscalYearRequest())->rules();
+    $rules = (new StoreFiscalYearRequest)->rules();
 
     expect($rules['name'])->toContain('required')
         ->and($rules['start_date'])->toContain('required')
@@ -15,7 +15,7 @@ test('store rules have required fields', function () {
 });
 
 test('validation fails with missing fields', function () {
-    $rules = (new StoreFiscalYearRequest())->rules();
+    $rules = (new StoreFiscalYearRequest)->rules();
     $validator = Validator::make([], $rules);
 
     expect($validator->fails())->toBeTrue();

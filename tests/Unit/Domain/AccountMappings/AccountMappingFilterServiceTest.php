@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('account-mappings');
 
 test('AccountMappingFilterService can search notes and account fields', function () {
-    $service = new AccountMappingFilterService();
+    $service = new AccountMappingFilterService;
 
     $sourceVersion = CoaVersion::factory()->create(['status' => 'archived']);
     $targetVersion = CoaVersion::factory()->create(['status' => 'active']);

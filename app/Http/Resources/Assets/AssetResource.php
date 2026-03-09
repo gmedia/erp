@@ -2,10 +2,10 @@
 
 namespace App\Http\Resources\Assets;
 
-use App\Http\Resources\AssetMovements\AssetMovementResource;
-use App\Http\Resources\AssetMaintenances\AssetMaintenanceResource;
-use App\Http\Resources\AssetStocktakeItems\AssetStocktakeItemResource;
 use App\Http\Resources\AssetDepreciationLines\AssetDepreciationLineResource;
+use App\Http\Resources\AssetMaintenances\AssetMaintenanceResource;
+use App\Http\Resources\AssetMovements\AssetMovementResource;
+use App\Http\Resources\AssetStocktakeItems\AssetStocktakeItemResource;
 use App\Models\Asset;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -29,7 +29,7 @@ class AssetResource extends JsonResource
             'supplier_id' => $this->resource->supplier_id,
             'serial_number' => $this->resource->serial_number,
             'barcode' => $this->resource->barcode,
-            
+
             'category' => [
                 'id' => $this->resource->asset_category_id,
                 'name' => $this->resource->category?->name,
@@ -59,29 +59,29 @@ class AssetResource extends JsonResource
                 'id' => $this->resource->supplier_id,
                 'name' => $this->resource->supplier?->name,
             ],
-            
+
             'purchase_date' => $this->resource->purchase_date?->toIso8601String(),
             'purchase_cost' => (string) $this->resource->purchase_cost,
             'currency' => $this->resource->currency,
             'warranty_end_date' => $this->resource->warranty_end_date?->toIso8601String(),
-            
+
             'status' => $this->resource->status,
             'condition' => $this->resource->condition,
             'notes' => $this->resource->notes,
-            
+
             'depreciation_method' => $this->resource->depreciation_method,
             'depreciation_start_date' => $this->resource->depreciation_start_date?->toIso8601String(),
             'useful_life_months' => $this->resource->useful_life_months,
             'salvage_value' => (string) $this->resource->salvage_value,
             'accumulated_depreciation' => (string) $this->resource->accumulated_depreciation,
             'book_value' => (string) $this->resource->book_value,
-            
+
             'depreciation_expense_account_id' => $this->resource->depreciation_expense_account_id,
             'accumulated_depr_account_id' => $this->resource->accumulated_depr_account_id,
-            
+
             'created_at' => $this->resource->created_at?->toIso8601String(),
             'updated_at' => $this->resource->updated_at?->toIso8601String(),
-            
+
             'movements' => AssetMovementResource::collection($this->whenLoaded('movements')),
             'maintenances' => AssetMaintenanceResource::collection($this->whenLoaded('maintenances')),
             'stocktake_items' => AssetStocktakeItemResource::collection($this->whenLoaded('stocktakeItems')),

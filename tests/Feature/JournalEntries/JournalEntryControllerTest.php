@@ -40,7 +40,7 @@ describe('Journal Entry API Endpoints', function () {
                         'total_debit',
                         'total_credit',
                         'created_by' => ['id', 'name'],
-                    ]
+                    ],
                 ],
                 'meta' => [
                     'current_page',
@@ -68,13 +68,13 @@ describe('Journal Entry API Endpoints', function () {
                     'account_id' => $account1->id,
                     'debit' => 1000,
                     'credit' => 0,
-                    'memo' => 'Debit Line'
+                    'memo' => 'Debit Line',
                 ],
                 [
                     'account_id' => $account2->id,
                     'debit' => 0,
                     'credit' => 1000,
-                    'memo' => 'Credit Line'
+                    'memo' => 'Credit Line',
                 ],
             ],
         ];
@@ -83,9 +83,9 @@ describe('Journal Entry API Endpoints', function () {
 
         $response->assertCreated()
             ->assertJsonStructure([
-                'data' => ['id', 'entry_number', 'lines']
+                'data' => ['id', 'entry_number', 'lines'],
             ]);
-        
+
         $entry = JournalEntry::first();
         expect($entry->description)->toBe('Opening Balance');
         expect($entry->lines)->toHaveCount(2);
@@ -120,7 +120,7 @@ describe('Journal Entry API Endpoints', function () {
         $response = putJson("/api/journal-entries/{$journalEntry->id}", $data);
 
         $response->assertOk();
-        
+
         $journalEntry->refresh();
         expect($journalEntry->description)->toBe('Updated Description');
         expect($journalEntry->total_debit)->toBe(500.0);
@@ -128,21 +128,21 @@ describe('Journal Entry API Endpoints', function () {
 
     test('destroy deletes journal entry', function () {
         $journalEntry = JournalEntry::factory()->create(['status' => 'draft']);
-        
+
         $response = deleteJson("/api/journal-entries/{$journalEntry->id}");
-        
+
         $response->assertNoContent();
-        
+
         assertDatabaseMissing('journal_entries', ['id' => $journalEntry->id]);
     });
 
     test('cannot delete posted journal entry', function () {
         $journalEntry = JournalEntry::factory()->create(['status' => 'posted']);
-        
+
         $response = deleteJson("/api/journal-entries/{$journalEntry->id}");
-        
+
         $response->assertStatus(403);
-        
+
         assertDatabaseHas('journal_entries', ['id' => $journalEntry->id]);
     });
 });

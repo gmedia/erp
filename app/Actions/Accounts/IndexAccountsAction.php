@@ -4,7 +4,6 @@ namespace App\Actions\Accounts;
 
 use App\Actions\Concerns\SimpleCrudIndexAction;
 use App\Domain\Accounts\AccountFilterService;
-use App\Http\Requests\Accounts\IndexAccountRequest;
 use App\Models\Account;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -12,30 +11,12 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class IndexAccountsAction extends SimpleCrudIndexAction
 {
-    protected function getModelClass(): string
-    {
-        return Account::class;
-    }
-
-    protected function getSearchFields(): array
-    {
-        return ['name', 'code'];
-    }
-
-    protected function getSortableFields(): array
-    {
-        return ['id', 'code', 'name', 'type', 'level', 'created_at', 'updated_at'];
-    }
-
     public function __construct(
         private AccountFilterService $filterService
     ) {}
 
     /**
      * Execute the action to fetch accounts.
-     * 
-     * @param  \Illuminate\Foundation\Http\FormRequest  $request
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Database\Eloquent\Collection
      */
     public function execute(FormRequest $request): Collection|LengthAwarePaginator
     {
@@ -56,7 +37,7 @@ class IndexAccountsAction extends SimpleCrudIndexAction
         if ($request->filled('search')) {
             $this->filterService->applySearch($query, $request->get('search'), $this->getSearchFields());
         }
-        
+
         $this->filterService->applyAdvancedFilters($query, [
             'type' => $request->get('type'),
             'is_active' => $request->get('is_active'),
@@ -76,5 +57,20 @@ class IndexAccountsAction extends SimpleCrudIndexAction
         }
 
         return $query->get();
+    }
+
+    protected function getModelClass(): string
+    {
+        return Account::class;
+    }
+
+    protected function getSearchFields(): array
+    {
+        return ['name', 'code'];
+    }
+
+    protected function getSortableFields(): array
+    {
+        return ['id', 'code', 'name', 'type', 'level', 'created_at', 'updated_at'];
     }
 }

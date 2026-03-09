@@ -16,7 +16,7 @@ test('execute calls filter service with correct parameters', function () {
     $request->shouldReceive('get')->with('page', 1)->andReturn(1);
     $request->shouldReceive('filled')->with('search')->andReturn(true);
     $request->shouldReceive('get')->with('search')->andReturn('test');
-    
+
     // Advanced filters
     $request->shouldReceive('get')->with('branch_id')->andReturn(null);
     $request->shouldReceive('get')->with('category_id')->andReturn(null);
@@ -41,7 +41,7 @@ test('execute calls filter service with correct parameters', function () {
 
     $filterService->shouldReceive('applySorting')
         ->once()
-        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc', 
+        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
             ['id', 'name', 'email', 'phone', 'address', 'branch_id', 'category_id', 'status', 'created_at', 'updated_at']);
 
     // Mock pagination
@@ -49,25 +49,25 @@ test('execute calls filter service with correct parameters', function () {
     $builder->shouldReceive('with')->with(['branch', 'category'])->andReturnSelf();
     $builder->shouldReceive('paginate')->with(15, ['*'], 'page', 1)->andReturn(new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15));
 
-    // We can't easily mock the static query() call on the model without alias mocking, 
+    // We can't easily mock the static query() call on the model without alias mocking,
     // so we'll test the service interaction via a real instance or partial mock if needed.
     // However, since IndexSuppliersAction uses Supplier::query(), it's hard to mock that without Facades.
     // Instead, let's just create real filter service interaction or rely on the fact that we passed the mock to the constructor.
     // But wait, the Action calls methods on the service.
-    
+
     // The issue is $query sent to service methods is created inside execute(): Supplier::query()
     // To test this properly without a real DB hit or complex mocking, we might just use real objects for what we can.
-    
-    // Actually, let's keep it simple and just verify the filter service methods are called. 
-    // But since we can't inject the query builder into the action, we can't easily verify the *arguments* passed to it match our expectations 
+
+    // Actually, let's keep it simple and just verify the filter service methods are called.
+    // But since we can't inject the query builder into the action, we can't easily verify the *arguments* passed to it match our expectations
     // unless we spy on the service and the service is injected.
-    
-    // The previous test for Customer used Mockery on the service, which is good. 
+
+    // The previous test for Customer used Mockery on the service, which is good.
     // However, the query builder passed validation 'Mockery::type(...)' will match any Builder.
-    
+
     // Let's just run it and see. The main thing is that we instantiated Action with the Mock Service.
     // But the Action will create a REAL Builder from Supplier::query().
     // That real builder will be passed to the mock service. That is fine.
-    
+
     $action->execute($request);
 });

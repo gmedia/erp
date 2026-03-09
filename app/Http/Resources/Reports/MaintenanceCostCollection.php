@@ -13,5 +13,4 @@ class MaintenanceCostCollection extends ResourceCollection
      */
     public $collects = MaintenanceCostResource::class;
 
-
 }

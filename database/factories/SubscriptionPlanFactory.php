@@ -22,7 +22,7 @@ class SubscriptionPlanFactory extends Factory
     {
         $interval = fake()->randomElement(['monthly', 'quarterly', 'annual']);
         $price = fake()->numberBetween(10, 500) * 1000; // 10k - 500k
-        
+
         $planNames = [
             'monthly' => 'Monthly Plan',
             'quarterly' => 'Quarterly Plan',

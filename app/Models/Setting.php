@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use InvalidArgumentException;
 
 /**
  * @property int $id
@@ -18,6 +19,13 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereGroup($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereValue($value)
  *
  * @mixin \Eloquent
  */
@@ -39,10 +47,6 @@ class Setting extends Model
 
     /**
      * Get a setting value by key.
-     *
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
      */
     public static function get(string $key, mixed $default = null): mixed
     {
@@ -57,17 +61,13 @@ class Setting extends Model
 
     /**
      * Set a setting value by key.
-     *
-     * @param string $key
-     * @param mixed $value
-     * @return Setting
      */
     public static function set(string $key, mixed $value): Setting
     {
         $setting = static::where('key', $key)->first();
 
         if (! $setting) {
-            throw new \InvalidArgumentException("Setting key [{$key}] does not exist.");
+            throw new InvalidArgumentException("Setting key [{$key}] does not exist.");
         }
 
         $setting->update([
@@ -101,7 +101,6 @@ class Setting extends Model
     /**
      * Get all settings for a specific group.
      *
-     * @param string $group
      * @return array<string, mixed>
      */
     public static function getByGroup(string $group): array
@@ -118,10 +117,6 @@ class Setting extends Model
 
     /**
      * Cast value based on type.
-     *
-     * @param string|null $value
-     * @param string $type
-     * @return mixed
      */
     protected static function castValue(?string $value, string $type): mixed
     {
@@ -139,10 +134,6 @@ class Setting extends Model
 
     /**
      * Serialize value for storage.
-     *
-     * @param mixed $value
-     * @param string $type
-     * @return string|null
      */
     protected static function serializeValue(mixed $value, string $type): ?string
     {

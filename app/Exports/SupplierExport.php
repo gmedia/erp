@@ -23,7 +23,7 @@ class SupplierExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         $query = Supplier::query()->with(['branch']);
 
         // Apply search filter
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -33,17 +33,17 @@ class SupplierExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         }
 
         // Apply branch filter (by branch_id)
-        if (!empty($this->filters['branch_id'])) {
+        if (! empty($this->filters['branch_id'])) {
             $query->where('branch_id', $this->filters['branch_id']);
         }
 
         // Apply category filter
-        if (!empty($this->filters['category_id'])) {
+        if (! empty($this->filters['category_id'])) {
             $query->where('category_id', $this->filters['category_id']);
         }
 
         // Apply status filter
-        if (!empty($this->filters['status'])) {
+        if (! empty($this->filters['status'])) {
             $query->where('status', $this->filters['status']);
         }
 

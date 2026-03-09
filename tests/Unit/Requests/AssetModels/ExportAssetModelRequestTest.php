@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('asset-models');
 
 test('export request allowed fields', function () {
-    $request = new ExportAssetModelRequest();
+    $request = new ExportAssetModelRequest;
     $rules = $request->rules();
 
     expect($rules)->toHaveKeys([
@@ -18,7 +18,7 @@ test('export request allowed fields', function () {
 });
 
 test('export request parameters are nullable', function () {
-    $request = new ExportAssetModelRequest();
+    $request = new ExportAssetModelRequest;
     $rules = $request->rules();
 
     expect($rules['search'])->toContain('nullable')

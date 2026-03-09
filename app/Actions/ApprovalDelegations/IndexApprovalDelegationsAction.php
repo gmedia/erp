@@ -5,7 +5,6 @@ namespace App\Actions\ApprovalDelegations;
 use App\Domain\ApprovalDelegations\ApprovalDelegationFilterService;
 use App\Models\ApprovalDelegation;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 
 class IndexApprovalDelegationsAction
 {
@@ -19,7 +18,7 @@ class IndexApprovalDelegationsAction
             ->with(['delegator:id,name', 'delegate:id,name']);
 
         // Base search across relationships and text fields
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $this->filterService->applySearch(
                 $query,
                 $filters['search'],

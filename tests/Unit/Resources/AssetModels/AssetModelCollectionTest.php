@@ -13,7 +13,7 @@ test('collection returns correct structure', function () {
     $assetModels->load('category');
 
     $collection = new AssetModelCollection($assetModels);
-    $response = $collection->toArray(new Request());
+    $response = $collection->toArray(new Request);
 
     expect($response['data'])->toHaveCount(3)
         ->and($response['data'][0])->toBeInstanceOf(AssetModelResource::class);

@@ -22,14 +22,14 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (! Auth::attempt($request->only('email', 'password'))) {
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
             ]);
         }
 
         $user = Auth::user();
-        
+
         // Use device name if provided, otherwise default to 'mobile_app'
         $deviceName = $request->post('device_name', 'mobile_app');
         $token = $user->createToken($deviceName);
@@ -46,7 +46,7 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         $user = $request->user();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
 
@@ -56,8 +56,8 @@ class AuthController extends Controller
         // Get company settings
         $companyName = \App\Models\Setting::get('company_name') ?? config('app.name', 'Laravel');
         $logoPath = \App\Models\Setting::get('company_logo_path');
-        $companyLogoUrl = (!is_string($logoPath) || $logoPath === '') 
-            ? null 
+        $companyLogoUrl = (! is_string($logoPath) || $logoPath === '')
+            ? null
             : \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($logoPath);
 
         // Get Pending Approvals
@@ -69,7 +69,7 @@ class AuthController extends Controller
                 })
                 ->whereHas('flowStep', function ($q) use ($user) {
                     $q->where('approver_type', 'user')
-                      ->where('approver_user_id', $user->id);
+                        ->where('approver_user_id', $user->id);
                 })
                 ->count();
         }
@@ -86,15 +86,15 @@ class AuthController extends Controller
                         });
                 });
             }])
-            ->whereNull('parent_id')
-            ->where(function ($query) use ($permissionIds) {
-                $query->whereDoesntHave('permissions')
-                    ->orWhereHas('permissions', function ($q) use ($permissionIds) {
-                        $q->whereIn('permissions.id', $permissionIds);
-                    });
-            })
-            ->get();
-            
+                ->whereNull('parent_id')
+                ->where(function ($query) use ($permissionIds) {
+                    $query->whereDoesntHave('permissions')
+                        ->orWhereHas('permissions', function ($q) use ($permissionIds) {
+                            $q->whereIn('permissions.id', $permissionIds);
+                        });
+                })
+                ->get();
+
             $menus = \App\Http\Resources\MenuResource::collection($allowedMenus)->resolve();
         }
 
@@ -167,7 +167,7 @@ class AuthController extends Controller
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
                 $user->forceFill([
-                    'password' => Hash::make($password)
+                    'password' => Hash::make($password),
                 ])->setRememberToken(Str::random(60));
                 $user->save();
             }

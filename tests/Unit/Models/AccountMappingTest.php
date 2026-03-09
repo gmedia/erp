@@ -37,4 +37,3 @@ test('it belongs to source and target account', function () {
         ->and($mapping->targetAccount)->toBeInstanceOf(Account::class)
         ->and($mapping->targetAccount->id)->toBe($target->id);
 });
-

@@ -14,7 +14,7 @@ test('resource transforms approval flow correctly', function () {
         'description' => 'Test Description',
         'is_active' => true,
     ]);
-    
+
     // Add a step
     $flow->steps()->create([
         'step_order' => 1,

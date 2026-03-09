@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Actions\JournalEntries\CreateJournalEntryAction;
+use App\Actions\JournalEntries\ExportJournalEntriesAction;
 use App\Actions\JournalEntries\IndexJournalEntriesAction;
 use App\Actions\JournalEntries\UpdateJournalEntryAction;
 use App\Http\Requests\JournalEntries\IndexJournalEntryRequest;
 use App\Http\Requests\JournalEntries\StoreJournalEntryRequest;
 use App\Http\Requests\JournalEntries\UpdateJournalEntryRequest;
-use App\Actions\JournalEntries\ExportJournalEntriesAction;
 use App\Http\Resources\JournalEntries\JournalEntryCollection;
 use App\Http\Resources\JournalEntries\JournalEntryResource;
 use App\Models\JournalEntry;
@@ -35,6 +35,7 @@ class JournalEntryController extends Controller
     public function show(JournalEntry $journalEntry): JsonResponse
     {
         $journalEntry->load(['lines.account', 'fiscalYear', 'createdBy', 'postedBy']);
+
         return (new JournalEntryResource($journalEntry))->response();
     }
 
@@ -45,20 +46,20 @@ class JournalEntryController extends Controller
         return (new JournalEntryResource($journalEntry))->response();
     }
 
-    public function export(IndexJournalEntryRequest $request, ExportJournalEntriesAction $action): JsonResponse
-    {
-        return $action->execute($request);
-    }
-
     public function destroy(JournalEntry $journalEntry): JsonResponse
     {
         if ($journalEntry->status === 'posted') {
-             return response()->json(['message' => 'Cannot delete posted journal entry.'], 403);
+            return response()->json(['message' => 'Cannot delete posted journal entry.'], 403);
         }
 
         $journalEntry->lines()->delete();
         $journalEntry->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function export(IndexJournalEntryRequest $request, ExportJournalEntriesAction $action): JsonResponse
+    {
+        return $action->execute($request);
     }
 }

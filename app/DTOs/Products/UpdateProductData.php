@@ -57,26 +57,66 @@ readonly class UpdateProductData
     {
         $data = [];
 
-        if ($this->code !== null) $data['code'] = $this->code;
-        if ($this->name !== null) $data['name'] = $this->name;
-        if ($this->description !== null) $data['description'] = $this->description;
-        if ($this->type !== null) $data['type'] = $this->type;
-        if ($this->category_id !== null) $data['category_id'] = $this->category_id;
-        if ($this->unit_id !== null) $data['unit_id'] = $this->unit_id;
-        if ($this->branch_id !== null) $data['branch_id'] = $this->branch_id;
-        if ($this->cost !== null) $data['cost'] = $this->cost;
-        if ($this->selling_price !== null) $data['selling_price'] = $this->selling_price;
-        if ($this->markup_percentage !== null) $data['markup_percentage'] = $this->markup_percentage;
-        if ($this->billing_model !== null) $data['billing_model'] = $this->billing_model;
-        if ($this->is_recurring !== null) $data['is_recurring'] = $this->is_recurring;
-        if ($this->trial_period_days !== null) $data['trial_period_days'] = $this->trial_period_days;
-        if ($this->allow_one_time_purchase !== null) $data['allow_one_time_purchase'] = $this->allow_one_time_purchase;
-        if ($this->is_manufactured !== null) $data['is_manufactured'] = $this->is_manufactured;
-        if ($this->is_purchasable !== null) $data['is_purchasable'] = $this->is_purchasable;
-        if ($this->is_sellable !== null) $data['is_sellable'] = $this->is_sellable;
-        if ($this->is_taxable !== null) $data['is_taxable'] = $this->is_taxable;
-        if ($this->status !== null) $data['status'] = $this->status;
-        if ($this->notes !== null) $data['notes'] = $this->notes;
+        if ($this->code !== null) {
+            $data['code'] = $this->code;
+        }
+        if ($this->name !== null) {
+            $data['name'] = $this->name;
+        }
+        if ($this->description !== null) {
+            $data['description'] = $this->description;
+        }
+        if ($this->type !== null) {
+            $data['type'] = $this->type;
+        }
+        if ($this->category_id !== null) {
+            $data['category_id'] = $this->category_id;
+        }
+        if ($this->unit_id !== null) {
+            $data['unit_id'] = $this->unit_id;
+        }
+        if ($this->branch_id !== null) {
+            $data['branch_id'] = $this->branch_id;
+        }
+        if ($this->cost !== null) {
+            $data['cost'] = $this->cost;
+        }
+        if ($this->selling_price !== null) {
+            $data['selling_price'] = $this->selling_price;
+        }
+        if ($this->markup_percentage !== null) {
+            $data['markup_percentage'] = $this->markup_percentage;
+        }
+        if ($this->billing_model !== null) {
+            $data['billing_model'] = $this->billing_model;
+        }
+        if ($this->is_recurring !== null) {
+            $data['is_recurring'] = $this->is_recurring;
+        }
+        if ($this->trial_period_days !== null) {
+            $data['trial_period_days'] = $this->trial_period_days;
+        }
+        if ($this->allow_one_time_purchase !== null) {
+            $data['allow_one_time_purchase'] = $this->allow_one_time_purchase;
+        }
+        if ($this->is_manufactured !== null) {
+            $data['is_manufactured'] = $this->is_manufactured;
+        }
+        if ($this->is_purchasable !== null) {
+            $data['is_purchasable'] = $this->is_purchasable;
+        }
+        if ($this->is_sellable !== null) {
+            $data['is_sellable'] = $this->is_sellable;
+        }
+        if ($this->is_taxable !== null) {
+            $data['is_taxable'] = $this->is_taxable;
+        }
+        if ($this->status !== null) {
+            $data['status'] = $this->status;
+        }
+        if ($this->notes !== null) {
+            $data['notes'] = $this->notes;
+        }
 
         return $data;
     }

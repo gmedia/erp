@@ -21,51 +21,7 @@ abstract class SimpleCrudExportAction
     use BaseFilterService;
 
     /**
-     * Get the model class for the entity.
-     *
-     * @return class-string<\Illuminate\Database\Eloquent\Model>
-     */
-    abstract protected function getModelClass(): string;
-
-    /**
-     * Get the export class for this entity.
-     *
-     * @param  array<string, mixed>  $filters
-     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
-     * @return \Maatwebsite\Excel\Concerns\FromQuery
-     */
-    abstract protected function getExportInstance(array $filters, ?Builder $query): FromQuery;
-
-    /**
-     * Get the filename prefix for exports (e.g., 'departments', 'positions').
-     */
-    abstract protected function getFilenamePrefix(): string;
-
-    /**
-     * Get the searchable fields for this entity.
-     *
-     * @return array<int, string>
-     */
-    protected function getSearchFields(): array
-    {
-        return ['name'];
-    }
-
-    /**
-     * Get the sortable fields for this entity.
-     *
-     * @return array<int, string>
-     */
-    protected function getSortableFields(): array
-    {
-        return ['id', 'name', 'created_at', 'updated_at'];
-    }
-
-    /**
      * Execute the export action.
-     *
-     * @param  \Illuminate\Foundation\Http\FormRequest  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function execute(FormRequest $request): JsonResponse
     {
@@ -102,5 +58,44 @@ abstract class SimpleCrudExportAction
             'url' => $url,
             'filename' => $filename,
         ]);
+    }
+
+    /**
+     * Get the model class for the entity.
+     *
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     */
+    abstract protected function getModelClass(): string;
+
+    /**
+     * Get the export class for this entity.
+     *
+     * @param  array<string, mixed>  $filters
+     */
+    abstract protected function getExportInstance(array $filters, ?Builder $query): FromQuery;
+
+    /**
+     * Get the filename prefix for exports (e.g., 'departments', 'positions').
+     */
+    abstract protected function getFilenamePrefix(): string;
+
+    /**
+     * Get the searchable fields for this entity.
+     *
+     * @return array<int, string>
+     */
+    protected function getSearchFields(): array
+    {
+        return ['name'];
+    }
+
+    /**
+     * Get the sortable fields for this entity.
+     *
+     * @return array<int, string>
+     */
+    protected function getSortableFields(): array
+    {
+        return ['id', 'name', 'created_at', 'updated_at'];
     }
 }

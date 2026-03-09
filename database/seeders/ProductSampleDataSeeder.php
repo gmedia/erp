@@ -215,7 +215,7 @@ class ProductSampleDataSeeder extends Seeder
         // Customer Subscriptions (if customers exist)
         if (Customer::count() > 0) {
             $customer = Customer::first();
-            
+
             $subscription = CustomerSubscription::create([
                 'subscription_number' => 'SUB-20260129-0001',
                 'customer_id' => $customer->id,

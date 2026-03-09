@@ -7,12 +7,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('warehouses');
 
 test('authorize returns true', function () {
-    $request = new StoreWarehouseRequest();
+    $request = new StoreWarehouseRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new StoreWarehouseRequest();
+    $request = new StoreWarehouseRequest;
 
     $rules = $request->rules();
     expect($rules)->toHaveKeys(['branch_id', 'code', 'name']);
@@ -26,8 +26,8 @@ test('rules validation passes with valid data', function () {
         'name' => 'Main Warehouse',
     ];
 
-    $request = new StoreWarehouseRequest();
+    $request = new StoreWarehouseRequest;
     $validator = validator($data, $request->rules());
 
-    expect(!$validator->fails())->toBeTrue();
+    expect(! $validator->fails())->toBeTrue();
 });

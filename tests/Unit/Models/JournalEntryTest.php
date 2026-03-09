@@ -17,19 +17,19 @@ test('factory creates a valid journal entry', function () {
 
 test('it calculates total debit and credit correctly', function () {
     $journalEntry = JournalEntry::factory()->create();
-    
+
     // Debit line
     JournalEntryLine::factory()->create([
         'journal_entry_id' => $journalEntry->id,
         'debit' => 1000,
-        'credit' => 0
+        'credit' => 0,
     ]);
 
     // Credit line
     JournalEntryLine::factory()->create([
         'journal_entry_id' => $journalEntry->id,
         'debit' => 0,
-        'credit' => 1000
+        'credit' => 1000,
     ]);
 
     expect($journalEntry->total_debit)->toBe(1000.0);
@@ -39,11 +39,11 @@ test('it calculates total debit and credit correctly', function () {
 
 test('it identifies unbalanced entry', function () {
     $journalEntry = JournalEntry::factory()->create();
-    
+
     JournalEntryLine::factory()->create([
         'journal_entry_id' => $journalEntry->id,
         'debit' => 1000,
-        'credit' => 0
+        'credit' => 0,
     ]);
 
     expect($journalEntry->isBalanced())->toBeFalse();

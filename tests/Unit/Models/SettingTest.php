@@ -137,7 +137,7 @@ describe('Setting Model', function () {
     });
 
     test('model has correct fillable attributes', function () {
-        $setting = new Setting();
+        $setting = new Setting;
         expect($setting->getFillable())->toBe(['group', 'key', 'value', 'type']);
     });
 });

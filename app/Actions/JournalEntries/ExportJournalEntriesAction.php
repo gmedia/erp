@@ -13,7 +13,7 @@ class ExportJournalEntriesAction
     public function execute(IndexJournalEntryRequest $request): JsonResponse
     {
         $filters = $request->validated();
-        
+
         $filename = 'journal_entries_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
         $filePath = 'exports/' . $filename;
 

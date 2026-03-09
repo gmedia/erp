@@ -25,7 +25,7 @@ class MaintenanceCostExport implements FromCollection, ShouldAutoSize, WithHeadi
     {
         $action = app(IndexMaintenanceCostReportAction::class);
 
-        $request = new IndexMaintenanceCostRequest();
+        $request = new IndexMaintenanceCostRequest;
         $request->merge($this->filters);
 
         return $action->execute($request);

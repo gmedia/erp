@@ -10,8 +10,8 @@ class SupplierCategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            'Electronics', 'Office Supplies', 'Furniture', 'IT Services', 
-            'Logistics', 'Marketing', 'Maintenance', 'Utilities'
+            'Electronics', 'Office Supplies', 'Furniture', 'IT Services',
+            'Logistics', 'Marketing', 'Maintenance', 'Utilities',
         ];
 
         foreach ($categories as $name) {

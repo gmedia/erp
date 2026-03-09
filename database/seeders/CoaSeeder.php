@@ -37,7 +37,6 @@ class CoaSeeder extends Seeder
         $accounts2025 = $this->getAccounts2025();
         $this->seedAccountsRecursive($accounts2025, $coaVersion2025->id);
 
-
         // ==========================================
         // 2026 Data (Tahun Berjalan - Active)
         // ==========================================
@@ -59,7 +58,7 @@ class CoaSeeder extends Seeder
         // 2. Renamed "Operating Expense" (52000) to "General & Admin Expense" (52000)
         $accounts2026 = $this->getAccounts2026();
         $this->seedAccountsRecursive($accounts2026, $coaVersion2026->id);
-        
+
         // Fetch account maps from database for reliability
         $accountMap2025 = Account::where('coa_version_id', $coaVersion2025->id)
             ->pluck('id', 'code')
@@ -68,12 +67,10 @@ class CoaSeeder extends Seeder
             ->pluck('id', 'code')
             ->toArray();
 
-
         // ==========================================
         // Account Mappings (untuk laporan komparatif)
         // ==========================================
         $this->createAccountMappings($accountMap2025, $accountMap2026);
-
 
         // ==========================================
         // Sample Journal Entries (2026)
@@ -92,9 +89,9 @@ class CoaSeeder extends Seeder
 
             $accountData['coa_version_id'] = $coaVersionId;
             $accountData['parent_id'] = $parentId;
-            
+
             $account = Account::create($accountData);
-            if (!empty($children)) {
+            if (! empty($children)) {
                 $this->seedAccountsRecursive($children, $coaVersionId, $account->id);
             }
         }
@@ -173,7 +170,6 @@ class CoaSeeder extends Seeder
             'memo' => 'Pendapatan penjualan',
         ]);
 
-
         // Sample Journal 2: Purchase on Account
         $journal2 = JournalEntry::create([
             'fiscal_year_id' => $fiscalYear->id,
@@ -204,7 +200,6 @@ class CoaSeeder extends Seeder
             'credit' => 3000000,
             'memo' => 'Utang dagang kepada supplier',
         ]);
-
 
         // Sample Journal 3: Pay Operating Expense (Draft)
         $journal3 = JournalEntry::create([
@@ -249,9 +244,9 @@ class CoaSeeder extends Seeder
                         ['code' => '11300', 'name' => 'Inventory', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 3],
                     ]],
                     ['code' => '12000', 'name' => 'Non-Current Assets', 'type' => 'asset', 'sub_type' => 'non_current_asset', 'normal_balance' => 'debit', 'level' => 2, 'children' => [
-                         ['code' => '12100', 'name' => 'Equipment', 'type' => 'asset', 'sub_type' => 'non_current_asset', 'normal_balance' => 'debit', 'level' => 3],
+                        ['code' => '12100', 'name' => 'Equipment', 'type' => 'asset', 'sub_type' => 'non_current_asset', 'normal_balance' => 'debit', 'level' => 3],
                     ]],
-                ]
+                ],
             ],
             // Liabilities
             [
@@ -260,7 +255,7 @@ class CoaSeeder extends Seeder
                     ['code' => '21000', 'name' => 'Current Liabilities', 'type' => 'liability', 'sub_type' => 'current_liability', 'normal_balance' => 'credit', 'level' => 2, 'children' => [
                         ['code' => '21100', 'name' => 'Accounts Payable', 'type' => 'liability', 'sub_type' => 'current_liability', 'normal_balance' => 'credit', 'level' => 3],
                     ]],
-                ]
+                ],
             ],
             // Equity
             [
@@ -268,14 +263,14 @@ class CoaSeeder extends Seeder
                 'children' => [
                     ['code' => '31000', 'name' => 'Owner Capital', 'type' => 'equity', 'normal_balance' => 'credit', 'level' => 2],
                     ['code' => '32000', 'name' => 'Retained Earnings', 'type' => 'equity', 'normal_balance' => 'credit', 'level' => 2],
-                ]
+                ],
             ],
             // Revenue
             [
                 'code' => '40000', 'name' => 'Revenue', 'type' => 'revenue', 'normal_balance' => 'credit', 'level' => 1,
                 'children' => [
                     ['code' => '41000', 'name' => 'Sales Revenue', 'type' => 'revenue', 'normal_balance' => 'credit', 'level' => 2],
-                ]
+                ],
             ],
             // Expense
             [
@@ -283,7 +278,7 @@ class CoaSeeder extends Seeder
                 'children' => [
                     ['code' => '51000', 'name' => 'Cost of Goods Sold', 'type' => 'expense', 'normal_balance' => 'debit', 'level' => 2],
                     ['code' => '52000', 'name' => 'Operating Expense', 'type' => 'expense', 'normal_balance' => 'debit', 'level' => 2],
-                ]
+                ],
             ],
         ];
     }
@@ -299,14 +294,14 @@ class CoaSeeder extends Seeder
                         // CHANGE 1: Split Cash into Cash in Bank and Petty Cash
                         ['code' => '11110', 'name' => 'Cash in Banks', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 3, 'is_cash_flow' => true],
                         ['code' => '11120', 'name' => 'Petty Cash', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 3, 'is_cash_flow' => true],
-                        
+
                         ['code' => '11200', 'name' => 'Accounts Receivable', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 3],
                         ['code' => '11300', 'name' => 'Inventory', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 3],
                     ]],
                     ['code' => '12000', 'name' => 'Non-Current Assets', 'type' => 'asset', 'sub_type' => 'non_current_asset', 'normal_balance' => 'debit', 'level' => 2, 'children' => [
-                         ['code' => '12100', 'name' => 'Equipment', 'type' => 'asset', 'sub_type' => 'non_current_asset', 'normal_balance' => 'debit', 'level' => 3],
+                        ['code' => '12100', 'name' => 'Equipment', 'type' => 'asset', 'sub_type' => 'non_current_asset', 'normal_balance' => 'debit', 'level' => 3],
                     ]],
-                ]
+                ],
             ],
             // Liabilities
             [
@@ -315,7 +310,7 @@ class CoaSeeder extends Seeder
                     ['code' => '21000', 'name' => 'Current Liabilities', 'type' => 'liability', 'sub_type' => 'current_liability', 'normal_balance' => 'credit', 'level' => 2, 'children' => [
                         ['code' => '21100', 'name' => 'Accounts Payable', 'type' => 'liability', 'sub_type' => 'current_liability', 'normal_balance' => 'credit', 'level' => 3],
                     ]],
-                ]
+                ],
             ],
             // Equity
             [
@@ -323,14 +318,14 @@ class CoaSeeder extends Seeder
                 'children' => [
                     ['code' => '31000', 'name' => 'Owner Capital', 'type' => 'equity', 'normal_balance' => 'credit', 'level' => 2],
                     ['code' => '32000', 'name' => 'Retained Earnings', 'type' => 'equity', 'normal_balance' => 'credit', 'level' => 2],
-                ]
+                ],
             ],
             // Revenue
             [
                 'code' => '40000', 'name' => 'Revenue', 'type' => 'revenue', 'normal_balance' => 'credit', 'level' => 1,
                 'children' => [
                     ['code' => '41000', 'name' => 'Sales Revenue', 'type' => 'revenue', 'normal_balance' => 'credit', 'level' => 2],
-                ]
+                ],
             ],
             // Expense
             [
@@ -338,8 +333,8 @@ class CoaSeeder extends Seeder
                 'children' => [
                     ['code' => '51000', 'name' => 'Cost of Goods Sold', 'type' => 'expense', 'normal_balance' => 'debit', 'level' => 2],
                     // CHANGE 2: Renamed Operating Expense to General & Admin Expense
-                    ['code' => '52000', 'name' => 'General & Admin Expense', 'type' => 'expense', 'normal_balance' => 'debit', 'level' => 2], 
-                ]
+                    ['code' => '52000', 'name' => 'General & Admin Expense', 'type' => 'expense', 'normal_balance' => 'debit', 'level' => 2],
+                ],
             ],
         ];
     }

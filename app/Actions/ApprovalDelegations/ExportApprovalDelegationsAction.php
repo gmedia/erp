@@ -3,9 +3,8 @@
 namespace App\Actions\ApprovalDelegations;
 
 use App\Domain\ApprovalDelegations\ApprovalDelegationFilterService;
-use App\Models\ApprovalDelegation;
 use App\Exports\ApprovalDelegations\ApprovalDelegationExport;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\ApprovalDelegation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -22,7 +21,7 @@ class ExportApprovalDelegationsAction
             ->with(['delegator:id,name', 'delegate:id,name']);
 
         // Same filtering logic as index
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $this->filterService->applySearch(
                 $query,
                 $filters['search'],

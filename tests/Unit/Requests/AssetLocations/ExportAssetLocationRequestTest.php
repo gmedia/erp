@@ -5,12 +5,12 @@ use App\Http\Requests\AssetLocations\ExportAssetLocationRequest;
 uses()->group('asset-locations');
 
 test('authorize returns true', function () {
-    $request = new ExportAssetLocationRequest();
+    $request = new ExportAssetLocationRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new ExportAssetLocationRequest();
+    $request = new ExportAssetLocationRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

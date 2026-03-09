@@ -39,7 +39,7 @@ describe('UnitExport', function () {
 
     test('headings returns correct columns', function () {
         $export = new UnitExport([]);
-        
+
         expect($export->headings())->toContain('ID', 'Name', 'Created At');
     });
 });

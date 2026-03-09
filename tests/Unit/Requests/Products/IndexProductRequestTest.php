@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Requests\Products\IndexProductRequest;
+use App\Models\Branch;
 use App\Models\ProductCategory;
 use App\Models\Unit;
-use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('products');

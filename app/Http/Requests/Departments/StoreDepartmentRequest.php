@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Departments;
 
-use App\Models\Department;
 use App\Http\Requests\SimpleCrudStoreRequest;
+use App\Models\Department;
 
 class StoreDepartmentRequest extends SimpleCrudStoreRequest
 {

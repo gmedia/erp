@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('product_dependencies', function (Blueprint $table) {
@@ -25,7 +22,7 @@ return new class extends Migration
                 'prerequisite',    // HARUS dibeli bersama, blocking
                 'recommended',     // Recommended tapi tidak blocking
                 'add_on',         // Add-on product
-                'alternative'     // Alternative/substitute product
+                'alternative',     // Alternative/substitute product
             ])->default('prerequisite');
             $table->integer('minimum_quantity')->default(1)
                 ->comment('Minimum quantity of required product needed');
@@ -33,16 +30,13 @@ return new class extends Migration
                 ->comment('Explanation of the dependency');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            
+
             $table->unique(['product_id', 'required_product_id', 'dependency_type'], 'product_deps_unique');
             $table->index('required_product_id');
             $table->index('dependency_type');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('product_dependencies');

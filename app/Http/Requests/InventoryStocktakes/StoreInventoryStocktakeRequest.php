@@ -30,4 +30,3 @@ class StoreInventoryStocktakeRequest extends FormRequest
         ];
     }
 }
-

@@ -48,15 +48,15 @@ class AssetModelController extends Controller
         return (new AssetModelResource($assetModel))->response();
     }
 
-    public function export(ExportAssetModelRequest $request, ExportAssetModelsAction $action): JsonResponse
-    {
-        return $action->execute($request);
-    }
-
     public function destroy(AssetModel $assetModel): JsonResponse
     {
         $assetModel->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function export(ExportAssetModelRequest $request, ExportAssetModelsAction $action): JsonResponse
+    {
+        return $action->execute($request);
     }
 }

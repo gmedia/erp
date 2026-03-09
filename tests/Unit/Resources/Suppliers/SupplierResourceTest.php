@@ -20,12 +20,12 @@ test('to array returns correct structure', function () {
         'category_id' => $category->id,
         'status' => 'active',
     ]);
-    
+
     $resource = new SupplierResource($supplier->load(['branch', 'category']));
     $request = Request::create('/api/suppliers');
-    
+
     $result = $resource->toArray($request);
-    
+
     expect($result)->toMatchArray([
         'id' => $supplier->id,
         'name' => 'Test Supplier',
@@ -42,7 +42,7 @@ test('to array returns correct structure', function () {
         ],
         'status' => 'active',
     ]);
-    
+
     expect($result['created_at'])->toBeString()
         ->and($result['updated_at'])->toBeString();
 });

@@ -13,8 +13,7 @@ readonly class UpdateInventoryStocktakeData
         public ?string $notes = null,
         public ?int $completed_by = null,
         public ?string $completed_at = null,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data
@@ -68,4 +67,3 @@ readonly class UpdateInventoryStocktakeData
         return $data;
     }
 }
-

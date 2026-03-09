@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('account-mappings');
 
 beforeEach(function () {
-    $this->filterService = new AccountMappingFilterService();
+    $this->filterService = new AccountMappingFilterService;
     $this->action = new IndexAccountMappingsAction($this->filterService);
 });
 

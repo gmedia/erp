@@ -3,7 +3,6 @@
 use App\Http\Requests\Employees\UpdateEmployeeRequest;
 use App\Models\Department;
 use App\Models\Employee;
-use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('employees');
@@ -20,10 +19,19 @@ describe('UpdateEmployeeRequest', function () {
         $employee = Employee::factory()->create();
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
-            return new class($employee) {
+            return new class($employee)
+            {
                 private $employee;
-                public function __construct($employee) { $this->employee = $employee; }
-                public function parameter($name) { return $this->employee; }
+
+                public function __construct($employee)
+                {
+                    $this->employee = $employee;
+                }
+
+                public function parameter($name)
+                {
+                    return $this->employee;
+                }
             };
         });
 
@@ -40,7 +48,7 @@ describe('UpdateEmployeeRequest', function () {
             'salary',
             'hire_date',
             'employment_status',
-            'termination_date'
+            'termination_date',
         ]);
     });
 
@@ -50,16 +58,25 @@ describe('UpdateEmployeeRequest', function () {
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
-            return new class($employee) {
+            return new class($employee)
+            {
                 private $employee;
-                public function __construct($employee) { $this->employee = $employee; }
-                public function parameter($name) { return $this->employee; }
+
+                public function __construct($employee)
+                {
+                    $this->employee = $employee;
+                }
+
+                public function parameter($name)
+                {
+                    return $this->employee;
+                }
             };
         });
 
         $validator = validator($data, $request->rules());
 
-        expect(!$validator->fails())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 
     test('rules validation passes with empty data', function () {
@@ -68,16 +85,25 @@ describe('UpdateEmployeeRequest', function () {
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
-            return new class($employee) {
+            return new class($employee)
+            {
                 private $employee;
-                public function __construct($employee) { $this->employee = $employee; }
-                public function parameter($name) { return $this->employee; }
+
+                public function __construct($employee)
+                {
+                    $this->employee = $employee;
+                }
+
+                public function parameter($name)
+                {
+                    return $this->employee;
+                }
             };
         });
 
         $validator = validator($data, $request->rules());
 
-        expect(!$validator->fails())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with invalid email format', function () {
@@ -86,10 +112,19 @@ describe('UpdateEmployeeRequest', function () {
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
-            return new class($employee) {
+            return new class($employee)
+            {
                 private $employee;
-                public function __construct($employee) { $this->employee = $employee; }
-                public function parameter($name) { return $this->employee; }
+
+                public function __construct($employee)
+                {
+                    $this->employee = $employee;
+                }
+
+                public function parameter($name)
+                {
+                    return $this->employee;
+                }
             };
         });
 
@@ -106,16 +141,25 @@ describe('UpdateEmployeeRequest', function () {
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
-            return new class($employee) {
+            return new class($employee)
+            {
                 private $employee;
-                public function __construct($employee) { $this->employee = $employee; }
-                public function parameter($name) { return $this->employee; }
+
+                public function __construct($employee)
+                {
+                    $this->employee = $employee;
+                }
+
+                public function parameter($name)
+                {
+                    return $this->employee;
+                }
             };
         });
 
         $validator = validator($data, $request->rules());
 
-        expect(!$validator->fails())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with duplicate email from another employee', function () {
@@ -126,10 +170,19 @@ describe('UpdateEmployeeRequest', function () {
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
-            return new class($employee) {
+            return new class($employee)
+            {
                 private $employee;
-                public function __construct($employee) { $this->employee = $employee; }
-                public function parameter($name) { return $this->employee; }
+
+                public function __construct($employee)
+                {
+                    $this->employee = $employee;
+                }
+
+                public function parameter($name)
+                {
+                    return $this->employee;
+                }
             };
         });
 
@@ -145,10 +198,19 @@ describe('UpdateEmployeeRequest', function () {
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
-            return new class($employee) {
+            return new class($employee)
+            {
                 private $employee;
-                public function __construct($employee) { $this->employee = $employee; }
-                public function parameter($name) { return $this->employee; }
+
+                public function __construct($employee)
+                {
+                    $this->employee = $employee;
+                }
+
+                public function parameter($name)
+                {
+                    return $this->employee;
+                }
             };
         });
 
@@ -164,10 +226,19 @@ describe('UpdateEmployeeRequest', function () {
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
-            return new class($employee) {
+            return new class($employee)
+            {
                 private $employee;
-                public function __construct($employee) { $this->employee = $employee; }
-                public function parameter($name) { return $this->employee; }
+
+                public function __construct($employee)
+                {
+                    $this->employee = $employee;
+                }
+
+                public function parameter($name)
+                {
+                    return $this->employee;
+                }
             };
         });
 
@@ -183,10 +254,19 @@ describe('UpdateEmployeeRequest', function () {
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
-            return new class($employee) {
+            return new class($employee)
+            {
                 private $employee;
-                public function __construct($employee) { $this->employee = $employee; }
-                public function parameter($name) { return $this->employee; }
+
+                public function __construct($employee)
+                {
+                    $this->employee = $employee;
+                }
+
+                public function parameter($name)
+                {
+                    return $this->employee;
+                }
             };
         });
 
@@ -199,21 +279,30 @@ describe('UpdateEmployeeRequest', function () {
     test('rules validation passes with valid department id', function () {
         $employee = Employee::factory()->create();
         $department = Department::factory()->create();
-        
+
         $data = ['department_id' => $department->id];
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
-            return new class($employee) {
+            return new class($employee)
+            {
                 private $employee;
-                public function __construct($employee) { $this->employee = $employee; }
-                public function parameter($name) { return $this->employee; }
+
+                public function __construct($employee)
+                {
+                    $this->employee = $employee;
+                }
+
+                public function parameter($name)
+                {
+                    return $this->employee;
+                }
             };
         });
 
         $validator = validator($data, $request->rules());
 
-        expect(!$validator->fails())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 
     test('rules validation passes with phone update', function () {
@@ -222,16 +311,25 @@ describe('UpdateEmployeeRequest', function () {
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
-            return new class($employee) {
+            return new class($employee)
+            {
                 private $employee;
-                public function __construct($employee) { $this->employee = $employee; }
-                public function parameter($name) { return $this->employee; }
+
+                public function __construct($employee)
+                {
+                    $this->employee = $employee;
+                }
+
+                public function parameter($name)
+                {
+                    return $this->employee;
+                }
             };
         });
 
         $validator = validator($data, $request->rules());
 
-        expect(!$validator->fails())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 
     test('rules validation passes with null phone', function () {
@@ -240,15 +338,24 @@ describe('UpdateEmployeeRequest', function () {
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
-            return new class($employee) {
+            return new class($employee)
+            {
                 private $employee;
-                public function __construct($employee) { $this->employee = $employee; }
-                public function parameter($name) { return $this->employee; }
+
+                public function __construct($employee)
+                {
+                    $this->employee = $employee;
+                }
+
+                public function parameter($name)
+                {
+                    return $this->employee;
+                }
             };
         });
 
         $validator = validator($data, $request->rules());
 
-        expect(!$validator->fails())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 });

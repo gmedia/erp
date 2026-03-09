@@ -27,7 +27,7 @@ class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMa
     {
         $query = Warehouse::query()->with(['branch']);
 
-        if (!empty($this->filters['search'])) {
+        if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('code', 'like', "%{$search}%")
@@ -35,7 +35,7 @@ class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMa
             });
         }
 
-        if (!empty($this->filters['branch_id'])) {
+        if (! empty($this->filters['branch_id'])) {
             $query->where('branch_id', $this->filters['branch_id']);
         }
 

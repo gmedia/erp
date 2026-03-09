@@ -10,34 +10,34 @@ class ProductFilterService
     use BaseFilterService;
 
     /**
-     * @param Builder<\App\Models\Product> $query
-     * @param array<string, mixed> $filters
+     * @param  Builder<\App\Models\Product>  $query
+     * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
         // Foreign Key Filters
-        if (!empty($filters['category_id'])) {
+        if (! empty($filters['category_id'])) {
             $query->where('category_id', $filters['category_id']);
         }
 
-        if (!empty($filters['unit_id'])) {
+        if (! empty($filters['unit_id'])) {
             $query->where('unit_id', $filters['unit_id']);
         }
 
-        if (!empty($filters['branch_id'])) {
+        if (! empty($filters['branch_id'])) {
             $query->where('branch_id', $filters['branch_id']);
         }
 
         // Enum Filters
-        if (!empty($filters['type'])) {
+        if (! empty($filters['type'])) {
             $query->where('type', $filters['type']);
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        if (!empty($filters['billing_model'])) {
+        if (! empty($filters['billing_model'])) {
             $query->where('billing_model', $filters['billing_model']);
         }
 

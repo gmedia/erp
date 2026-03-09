@@ -4,7 +4,6 @@ use App\Domain\ApprovalDelegations\ApprovalDelegationFilterService;
 use App\Models\ApprovalDelegation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Request;
 
 uses(RefreshDatabase::class)->group('approval-delegations');
 
@@ -15,8 +14,8 @@ test('applyAdvancedFilters filters by delegator_user_id', function () {
 
     $filters = ['delegator_user_id' => $delegator->id];
     $query = ApprovalDelegation::query();
-    
-    $service = new ApprovalDelegationFilterService();
+
+    $service = new ApprovalDelegationFilterService;
     $service->applyAdvancedFilters($query, $filters);
 
     expect($query->count())->toBe(1)
@@ -30,8 +29,8 @@ test('applyAdvancedFilters filters by delegate_user_id', function () {
 
     $filters = ['delegate_user_id' => $delegate->id];
     $query = ApprovalDelegation::query();
-    
-    $service = new ApprovalDelegationFilterService();
+
+    $service = new ApprovalDelegationFilterService;
     $service->applyAdvancedFilters($query, $filters);
 
     expect($query->count())->toBe(1)
@@ -44,8 +43,8 @@ test('applyAdvancedFilters filters by is_active', function () {
 
     $filters = ['is_active' => 'false'];
     $query = ApprovalDelegation::query();
-    
-    $service = new ApprovalDelegationFilterService();
+
+    $service = new ApprovalDelegationFilterService;
     $service->applyAdvancedFilters($query, $filters);
 
     expect($query->count())->toBe(1)
@@ -58,12 +57,12 @@ test('applyAdvancedFilters filters by start_date_from and start_date_to', functi
 
     $filters = [
         'start_date_from' => '2026-01-01',
-        'start_date_to' => '2026-01-31'
+        'start_date_to' => '2026-01-31',
     ];
-    
+
     $query = ApprovalDelegation::query();
-    
-    $service = new ApprovalDelegationFilterService();
+
+    $service = new ApprovalDelegationFilterService;
     $service->applyAdvancedFilters($query, $filters);
 
     expect($query->count())->toBe(1)

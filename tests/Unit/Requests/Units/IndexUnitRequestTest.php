@@ -5,12 +5,12 @@ use App\Http\Requests\Units\IndexUnitRequest;
 uses()->group('units');
 
 test('authorize returns true', function () {
-    $request = new IndexUnitRequest();
+    $request = new IndexUnitRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new IndexUnitRequest();
+    $request = new IndexUnitRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

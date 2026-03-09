@@ -9,7 +9,6 @@ use App\Models\AssetStocktakeItem;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
@@ -25,7 +24,7 @@ beforeEach(function () {
 test('it can list variance items', function () {
     $branch = Branch::factory()->create();
     $location = AssetLocation::factory()->create(['branch_id' => $branch->id]);
-    
+
     $stocktake = AssetStocktake::factory()->create([
         'branch_id' => $branch->id,
         'status' => 'completed',
@@ -63,7 +62,7 @@ test('it can list variance items', function () {
 test('it can filter variance by stocktake and result', function () {
     $branch = Branch::factory()->create();
     $stocktake = AssetStocktake::factory()->create(['branch_id' => $branch->id]);
-    
+
     $asset = Asset::factory()->create(['branch_id' => $branch->id]);
 
     AssetStocktakeItem::factory()->create([
@@ -90,7 +89,7 @@ test('it can filter variance by stocktake and result', function () {
 test('it can export variance to excel', function () {
     $branch = Branch::factory()->create();
     $stocktake = AssetStocktake::factory()->create(['branch_id' => $branch->id]);
-    
+
     $asset = Asset::factory()->create(['branch_id' => $branch->id]);
 
     AssetStocktakeItem::factory()->create([
@@ -102,7 +101,7 @@ test('it can export variance to excel', function () {
     $response = postJson('/api/asset-stocktake-variances/export');
 
     $response->assertOk()
-         ->assertJsonStructure([
+        ->assertJsonStructure([
             'url',
             'filename',
         ]);

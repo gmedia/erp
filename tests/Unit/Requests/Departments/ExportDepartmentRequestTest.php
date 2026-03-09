@@ -5,12 +5,12 @@ use App\Http\Requests\Departments\ExportDepartmentRequest;
 uses()->group('departments');
 
 test('authorize returns true', function () {
-    $request = new ExportDepartmentRequest();
+    $request = new ExportDepartmentRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new ExportDepartmentRequest();
+    $request = new ExportDepartmentRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

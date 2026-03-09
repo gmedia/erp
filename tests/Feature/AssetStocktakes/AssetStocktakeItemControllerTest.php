@@ -18,11 +18,11 @@ beforeEach(function () {
         'asset_stocktake',
         'asset_stocktake.create',
         'asset_stocktake.edit',
-        'asset_stocktake.delete'
+        'asset_stocktake.delete',
     ]);
     actingAs($this->user);
     $this->branch = Branch::factory()->create();
-    
+
     $this->stocktake = AssetStocktake::factory()->create([
         'branch_id' => $this->branch->id,
         'status' => 'draft',
@@ -39,19 +39,19 @@ test('it generates expected items when none exist', function () {
         'branch_id' => $this->branch->id,
         'status' => 'active',
     ]);
-    
+
     // Create an asset in different branch
     Asset::factory()->create(['status' => 'active']);
 
     $response = getJson("/api/asset-stocktakes/{$this->stocktake->ulid}/items");
-    
+
     if ($response->status() !== 200) {
         $response->dump();
     }
 
     $response->assertStatus(200)
         ->assertJsonCount(2, 'data');
-        
+
     $data = $response->json('data');
     expect($data[0]['asset_id'])->toBe($asset1->id);
     expect($data[1]['asset_id'])->toBe($asset2->id);
@@ -62,7 +62,7 @@ test('it returns saved items if exist', function () {
         'branch_id' => $this->branch->id,
         'status' => 'active',
     ]);
-    
+
     AssetStocktakeItem::factory()->create([
         'asset_stocktake_id' => $this->stocktake->id,
         'asset_id' => $asset->id,
@@ -73,7 +73,7 @@ test('it returns saved items if exist', function () {
 
     $response->assertStatus(200)
         ->assertJsonCount(1, 'data');
-        
+
     $data = $response->json('data');
     expect($data[0]['result'])->toBe('found');
 });
@@ -91,8 +91,8 @@ test('it can sync items and update status', function () {
                 'expected_branch_id' => $this->branch->id,
                 'result' => 'found',
                 'notes' => 'All good',
-            ]
-        ]
+            ],
+        ],
     ];
 
     $response = postJson("/api/asset-stocktakes/{$this->stocktake->ulid}/items", $payload);

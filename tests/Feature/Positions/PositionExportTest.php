@@ -37,7 +37,7 @@ describe('PositionExport', function () {
 
     test('headings returns correct columns', function () {
         $export = new PositionExport([]);
-        
+
         expect($export->headings())->toContain('ID', 'Name', 'Created At');
     });
 });

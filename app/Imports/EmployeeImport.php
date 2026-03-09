@@ -6,13 +6,14 @@ use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
-class EmployeeImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
+class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 {
     public int $importedCount = 0;
     public int $skippedCount = 0; // Skipped due to duplicates (if we use skip mode) or other non-fatal reasons
@@ -58,37 +59,41 @@ class EmployeeImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                         'message' => $error,
                     ];
                 }
+
                 continue;
             }
 
             // 2. Resolve Foreign Keys
             $departmentId = $this->departments->get($row['department']);
-            if (!$departmentId) {
+            if (! $departmentId) {
                 $this->errors[] = [
                     'row' => $rowNumber,
                     'field' => 'department',
                     'message' => "Department '{$row['department']}' not found.",
                 ];
+
                 continue;
             }
 
             $positionId = $this->positions->get($row['position']);
-            if (!$positionId) {
+            if (! $positionId) {
                 $this->errors[] = [
                     'row' => $rowNumber,
                     'field' => 'position',
                     'message' => "Position '{$row['position']}' not found.",
                 ];
+
                 continue;
             }
 
             $branchId = $this->branches->get($row['branch']);
-            if (!$branchId) {
+            if (! $branchId) {
                 $this->errors[] = [
                     'row' => $rowNumber,
                     'field' => 'branch',
                     'message' => "Branch '{$row['branch']}' not found.",
                 ];
+
                 continue;
             }
 
@@ -115,13 +120,13 @@ class EmployeeImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                     $this->importedCount++;
                 } else {
                     // It was updated
-                    $this->importedCount++; 
+                    $this->importedCount++;
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->errors[] = [
                     'row' => $rowNumber,
                     'field' => 'System',
-                    'message' => "Failed to save: " . $e->getMessage(),
+                    'message' => 'Failed to save: ' . $e->getMessage(),
                 ];
             }
         }

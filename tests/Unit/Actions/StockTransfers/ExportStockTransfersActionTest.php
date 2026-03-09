@@ -17,7 +17,7 @@ test('execute generates excel file and returns url', function () {
 
     StockTransfer::factory()->count(3)->create(['status' => 'draft']);
 
-    $action = new ExportStockTransfersAction();
+    $action = new ExportStockTransfersAction;
     $request = Mockery::mock(ExportStockTransferRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'search' => null,
@@ -35,4 +35,3 @@ test('execute generates excel file and returns url', function () {
 
     Excel::assertStored('exports/' . $filename, 'public');
 });
-

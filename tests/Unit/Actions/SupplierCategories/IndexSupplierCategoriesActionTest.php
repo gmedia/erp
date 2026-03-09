@@ -3,17 +3,17 @@
 use App\Actions\SupplierCategories\IndexSupplierCategoriesAction;
 use App\Http\Requests\SupplierCategories\IndexSupplierCategoryRequest;
 use App\Models\SupplierCategory;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 uses(RefreshDatabase::class)->group('supplier-categories');
 
 test('execute returns paginated results', function () {
     SupplierCategory::factory()->count(3)->create();
 
-    $action = new IndexSupplierCategoriesAction();
-    $request = new IndexSupplierCategoryRequest();
-    
+    $action = new IndexSupplierCategoriesAction;
+    $request = new IndexSupplierCategoryRequest;
+
     $result = $action->execute($request);
 
     expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
@@ -24,9 +24,9 @@ test('execute filters by search term', function () {
     SupplierCategory::factory()->create(['name' => 'Raw Material']);
     SupplierCategory::factory()->create(['name' => 'Service']);
 
-    $action = new IndexSupplierCategoriesAction();
+    $action = new IndexSupplierCategoriesAction;
     $request = new IndexSupplierCategoryRequest(['search' => 'Raw']);
-    
+
     $result = $action->execute($request);
 
     expect($result->count())->toBe(1)

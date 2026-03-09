@@ -18,10 +18,10 @@ test('export action stores excel file', function () {
 
     $response = $action->execute($request);
     $filename = $response->getData()->filename;
-    
+
     expect($response->getStatusCode())->toBe(200)
         ->and($response->getData()->url)->toBeString()
         ->and($response->getData()->filename)->toBeString();
-        
+
     Excel::assertStored('exports/' . $filename, 'public');
 });

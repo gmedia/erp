@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\ApprovalAuditLog;
 
 class MyApprovalController extends Controller
 {
@@ -28,7 +27,7 @@ class MyApprovalController extends Controller
             })
             ->whereHas('flowStep', function ($q) use ($userId) {
                 $q->where('approver_type', 'user')
-                  ->where('approver_user_id', $userId);
+                    ->where('approver_user_id', $userId);
             })
             ->get();
 
@@ -46,7 +45,7 @@ class MyApprovalController extends Controller
             ->where('acted_by', $userId)
             ->orWhereHas('flowStep', function ($q) use ($userId) {
                 $q->where('approver_type', 'user')
-                  ->where('approver_user_id', $userId);
+                    ->where('approver_user_id', $userId);
             })
             ->get();
 
@@ -61,9 +60,9 @@ class MyApprovalController extends Controller
     public function approve(Request $request, ApprovalRequest $approvalRequest)
     {
         $request->validate(['comments' => 'nullable|string']);
-        
+
         $userId = Auth::id();
-        
+
         DB::transaction(function () use ($approvalRequest, $userId, $request) {
             $currentStep = $approvalRequest->steps()
                 ->where('status', 'pending')
@@ -98,7 +97,7 @@ class MyApprovalController extends Controller
                 $approvalRequest->update(['current_step_order' => $nextStep->step_order, 'status' => 'in_progress']);
             } else {
                 $approvalRequest->update(['status' => 'approved', 'completed_at' => now()]);
-                
+
                 ApprovalAuditLog::create([
                     'approval_request_id' => $approvalRequest->id,
                     'approvable_type' => $approvalRequest->approvable_type,
@@ -116,7 +115,7 @@ class MyApprovalController extends Controller
     public function reject(Request $request, ApprovalRequest $approvalRequest)
     {
         $request->validate(['comments' => 'required|string']);
-        
+
         $userId = Auth::id();
 
         DB::transaction(function () use ($approvalRequest, $userId, $request) {

@@ -12,18 +12,38 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $order_number
  * @property int $product_id
  * @property int|null $branch_id
- * @property string $quantity_to_produce
+ * @property numeric $quantity_to_produce
  * @property \Illuminate\Support\Carbon $production_date
  * @property \Illuminate\Support\Carbon|null $completion_date
  * @property string $status
- * @property string $total_cost
+ * @property numeric $total_cost
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Branch|null $branch
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductionOrderItem> $items
+ * @property-read int|null $items_count
+ * @property-read \App\Models\Product $product
  *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder completed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder draft()
+ * @method static \Database\Factories\ProductionOrderFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder inProgress()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereCompletionDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereOrderNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereProductionDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereQuantityToProduce($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereTotalCost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

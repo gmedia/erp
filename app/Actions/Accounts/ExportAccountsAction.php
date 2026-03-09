@@ -13,7 +13,7 @@ class ExportAccountsAction
     public function execute(ExportAccountRequest $request): JsonResponse
     {
         $filters = $request->validated();
-        
+
         $filename = 'accounts_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
         $filePath = 'exports/' . $filename;
 

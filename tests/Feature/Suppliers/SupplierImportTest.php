@@ -23,7 +23,7 @@ test('can import suppliers from csv file', function () {
         'name,email,phone,address,branch,category,status',
         'Tech Supplier,tech@example.com,08123456789,123 Main St,Head Office,IT Equipment,active',
     ]);
-    
+
     $file = UploadedFile::fake()->createWithContent('suppliers.csv', $csvContent);
 
     $response = $this->postJson('/api/suppliers/import', [
@@ -55,7 +55,7 @@ test('returns validation errors for invalid rows', function () {
         ',no_name@example.com,0812345,123 St,Head Office,IT Equipment,active',
         'Invalid Status Supplier,inv@example.com,0812345,123 St,Head Office,IT Equipment,invalid_status',
     ]);
-    
+
     $file = UploadedFile::fake()->createWithContent('suppliers_invalid.csv', $csvContent);
 
     $response = $this->postJson('/api/suppliers/import', [
@@ -67,9 +67,9 @@ test('returns validation errors for invalid rows', function () {
             'imported' => 1,
             'skipped' => 0,
         ]);
-        
+
     $this->assertCount(2, $response->json('errors'));
-    
+
     $errors = collect($response->json('errors'));
     $this->assertTrue($errors->contains(fn ($e) => $e['row'] == 3 && $e['field'] == 'Validation'));
     $this->assertTrue($errors->contains(fn ($e) => $e['row'] == 4 && $e['field'] == 'Validation'));
@@ -80,7 +80,7 @@ test('returns errors for unknown foreign keys', function () {
         'name,email,phone,address,branch,category,status',
         'Supplier A,test@example.com,0812345,123 St,Head Office,Unknown Category,active',
     ]);
-    
+
     $file = UploadedFile::fake()->createWithContent('suppliers_fk.csv', $csvContent);
 
     $response = $this->postJson('/api/suppliers/import', [
@@ -89,7 +89,7 @@ test('returns errors for unknown foreign keys', function () {
 
     $response->assertStatus(200);
     $errors = collect($response->json('errors'));
-    
+
     $this->assertTrue($errors->contains(fn ($e) => $e['field'] == 'category' && str_contains($e['message'], 'Unknown')));
 })->group('suppliers');
 
@@ -97,14 +97,14 @@ test('skips/upserts existing supplier by email', function () {
     Supplier::factory()->create([
         'email' => 'exist@example.com',
         'name' => 'Old Name',
-        'status' => 'inactive'
+        'status' => 'inactive',
     ]);
 
     $csvContent = implode("\n", [
         'name,email,phone,address,branch,category,status',
         'New Name,exist@example.com,0812345,123 St,Head Office,IT Equipment,active',
     ]);
-    
+
     $file = UploadedFile::fake()->createWithContent('suppliers_upsert.csv', $csvContent);
 
     $response = $this->postJson('/api/suppliers/import', [
@@ -128,14 +128,14 @@ test('upserts existing supplier by name if email is absent', function () {
     Supplier::factory()->create([
         'email' => null,
         'name' => 'Unique Supplier Name',
-        'status' => 'inactive'
+        'status' => 'inactive',
     ]);
 
     $csvContent = implode("\n", [
         'name,email,phone,address,branch,category,status',
         'Unique Supplier Name,,0812345,123 St,Head Office,IT Equipment,active',
     ]);
-    
+
     $file = UploadedFile::fake()->createWithContent('suppliers_upsert_name.csv', $csvContent);
 
     $response = $this->postJson('/api/suppliers/import', [

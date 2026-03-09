@@ -10,12 +10,12 @@ uses(RefreshDatabase::class)->group('asset-models');
 
 test('index action returns paginated asset models', function () {
     AssetModel::factory()->count(5)->create();
-    
+
     $action = app(IndexAssetModelsAction::class);
-    $request = new IndexAssetModelRequest();
-    
+    $request = new IndexAssetModelRequest;
+
     $result = $action->execute($request);
-    
+
     expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
         ->and($result->total())->toBe(5);
 });
@@ -23,12 +23,12 @@ test('index action returns paginated asset models', function () {
 test('index action applies search', function () {
     AssetModel::factory()->create(['model_name' => 'Matching Model']);
     AssetModel::factory()->create(['model_name' => 'Other Model']);
-    
+
     $action = app(IndexAssetModelsAction::class);
     $request = new IndexAssetModelRequest(['search' => 'Matching']);
-    
+
     $result = $action->execute($request);
-    
+
     expect($result->total())->toBe(1)
         ->and($result->getCollection()->first()->model_name)->toBe('Matching Model');
 });

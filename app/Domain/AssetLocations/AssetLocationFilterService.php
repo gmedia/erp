@@ -10,12 +10,12 @@ class AssetLocationFilterService
     use BaseFilterService;
 
     /**
-     * @param Builder<\App\Models\AssetLocation> $query
-     * @param array<string, mixed> $filters
+     * @param  Builder<\App\Models\AssetLocation>  $query
+     * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (!empty($filters['branch_id'])) {
+        if (! empty($filters['branch_id'])) {
             $query->where('branch_id', $filters['branch_id']);
         }
 

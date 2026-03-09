@@ -7,16 +7,6 @@ use App\Models\AccountMapping;
 
 class AccountMappingExport extends SimpleCrudExport
 {
-    protected function getModelClass(): string
-    {
-        return AccountMapping::class;
-    }
-
-    protected function getSortableFields(): array
-    {
-        return ['id', 'type', 'created_at', 'updated_at'];
-    }
-
     public function headings(): array
     {
         return [
@@ -52,5 +42,15 @@ class AccountMappingExport extends SimpleCrudExport
             $model->created_at?->toIso8601String(),
             $model->updated_at?->toIso8601String(),
         ];
+    }
+
+    protected function getModelClass(): string
+    {
+        return AccountMapping::class;
+    }
+
+    protected function getSortableFields(): array
+    {
+        return ['id', 'type', 'created_at', 'updated_at'];
     }
 }

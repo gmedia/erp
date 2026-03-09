@@ -20,6 +20,7 @@ class PipelineController extends Controller
     public function index(IndexPipelineRequest $request): JsonResponse
     {
         $pipelines = (new IndexPipelinesAction(app(PipelineFilterService::class)))->execute($request);
+
         return (new PipelineCollection($pipelines))->response();
     }
 
@@ -30,14 +31,16 @@ class PipelineController extends Controller
             $data['conditions'] = json_decode($data['conditions'], true);
         }
         $data['created_by'] = auth()->id();
-        
+
         $pipeline = Pipeline::create($data);
+
         return (new PipelineResource($pipeline))->response()->setStatusCode(201);
     }
 
     public function show(Pipeline $pipeline): JsonResponse
     {
         $pipeline->load(['creator']);
+
         return (new PipelineResource($pipeline))->response();
     }
 
@@ -45,18 +48,19 @@ class PipelineController extends Controller
     {
         $dto = UpdatePipelineData::fromArray($request->validated());
         $pipeline->update($dto->toArray());
-        
-        return (new PipelineResource($pipeline->fresh(['creator'])))->response();
-    }
 
-    public function export(ExportPipelineRequest $request, ExportPipelinesAction $action): JsonResponse
-    {
-        return $action->execute($request);
+        return (new PipelineResource($pipeline->fresh(['creator'])))->response();
     }
 
     public function destroy(Pipeline $pipeline): JsonResponse
     {
         $pipeline->delete();
+
         return response()->json(null, 204);
+    }
+
+    public function export(ExportPipelineRequest $request, ExportPipelinesAction $action): JsonResponse
+    {
+        return $action->execute($request);
     }
 }

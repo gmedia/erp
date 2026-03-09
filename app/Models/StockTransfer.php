@@ -12,31 +12,52 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $transfer_number
  * @property int $from_warehouse_id
  * @property int $to_warehouse_id
- * @property string $transfer_date
- * @property string|null $expected_arrival_date
+ * @property \Illuminate\Support\Carbon $transfer_date
+ * @property \Illuminate\Support\Carbon|null $expected_arrival_date
  * @property string $status
  * @property string|null $notes
  * @property int|null $requested_by
  * @property int|null $approved_by
- * @property string|null $approved_at
+ * @property \Illuminate\Support\Carbon|null $approved_at
  * @property int|null $shipped_by
- * @property string|null $shipped_at
+ * @property \Illuminate\Support\Carbon|null $shipped_at
  * @property int|null $received_by
- * @property string|null $received_at
+ * @property \Illuminate\Support\Carbon|null $received_at
  * @property int|null $created_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- *
- * @property-read \Illuminate\Database\Eloquent\Collection<int, StockTransferItem> $items
- * @property-read Warehouse $fromWarehouse
- * @property-read Warehouse $toWarehouse
- * @property-read Employee|null $requestedBy
- * @property-read User|null $approvedBy
- * @property-read User|null $shippedBy
- * @property-read User|null $receivedBy
- * @property-read User|null $createdBy
+ * @property-read \App\Models\User|null $approvedBy
+ * @property-read \App\Models\User|null $createdBy
+ * @property-read \App\Models\Warehouse $fromWarehouse
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\StockTransferItem> $items
+ * @property-read int|null $items_count
+ * @property-read \App\Models\User|null $receivedBy
+ * @property-read \App\Models\Employee|null $requestedBy
+ * @property-read \App\Models\User|null $shippedBy
+ * @property-read \App\Models\Warehouse $toWarehouse
  *
  * @method static \Database\Factories\StockTransferFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereApprovedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereApprovedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereExpectedArrivalDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereFromWarehouseId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereReceivedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereReceivedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereRequestedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereShippedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereShippedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereToWarehouseId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereTransferDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereTransferNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

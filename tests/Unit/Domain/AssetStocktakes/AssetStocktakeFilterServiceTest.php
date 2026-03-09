@@ -14,7 +14,7 @@ test('it filters by branch', function () {
     AssetStocktake::factory()->create(['branch_id' => $branch1->id]);
     AssetStocktake::factory()->create(['branch_id' => $branch2->id]);
 
-    $service = new AssetStocktakeFilterService();
+    $service = new AssetStocktakeFilterService;
     $query = AssetStocktake::query();
 
     $service->applyAdvancedFilters($query, ['branch_id' => $branch1->id]);
@@ -27,7 +27,7 @@ test('it filters by status', function () {
     AssetStocktake::factory()->create(['status' => 'draft']);
     AssetStocktake::factory()->create(['status' => 'completed']);
 
-    $service = new AssetStocktakeFilterService();
+    $service = new AssetStocktakeFilterService;
     $query = AssetStocktake::query();
 
     $service->applyAdvancedFilters($query, ['status' => 'draft']);
@@ -41,7 +41,7 @@ test('it filters by planned_at range', function () {
     AssetStocktake::factory()->create(['planned_at' => '2024-02-01']);
     AssetStocktake::factory()->create(['planned_at' => '2024-03-01']);
 
-    $service = new AssetStocktakeFilterService();
+    $service = new AssetStocktakeFilterService;
     $query = AssetStocktake::query();
 
     $service->applyAdvancedFilters($query, [

@@ -27,7 +27,7 @@ class DepartmentController extends Controller
      */
     public function index(IndexDepartmentRequest $request): JsonResponse
     {
-        $departments = (new IndexDepartmentsAction())->execute($request);
+        $departments = (new IndexDepartmentsAction)->execute($request);
 
         return (new DepartmentCollection($departments))->response();
     }
@@ -77,6 +77,6 @@ class DepartmentController extends Controller
      */
     public function export(ExportDepartmentRequest $request): JsonResponse
     {
-        return (new ExportDepartmentsAction())->execute($request);
+        return (new ExportDepartmentsAction)->execute($request);
     }
 }

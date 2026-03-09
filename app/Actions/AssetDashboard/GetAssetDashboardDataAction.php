@@ -63,13 +63,13 @@ class GetAssetDashboardDataAction
             ->groupBy('condition')
             ->get()
             ->keyBy('condition');
-            
+
         $conditionMapping = [
             'good' => ['name' => 'Good', 'color' => '#10B981'],
             'needs_repair' => ['name' => 'Needs Repair', 'color' => '#F59E0B'],
             'damaged' => ['name' => 'Damaged', 'color' => '#EF4444'],
         ];
-        
+
         $conditionOverview = [];
         foreach ($conditionMapping as $conditionCode => $config) {
             $conditionOverview[] = [
@@ -82,8 +82,8 @@ class GetAssetDashboardDataAction
 
         // 5. Recent Maintenances
         $recentMaintenances = AssetMaintenance::with(['asset' => function ($query) {
-                $query->select('id', 'name', 'asset_code');
-            }])
+            $query->select('id', 'name', 'asset_code');
+        }])
             ->whereIn('status', ['scheduled', 'in_progress'])
             ->orderBy('scheduled_at', 'asc')
             ->limit(5)

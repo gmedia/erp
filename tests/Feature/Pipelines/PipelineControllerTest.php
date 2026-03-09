@@ -3,9 +3,7 @@
 namespace Tests\Feature\Pipelines;
 
 use App\Models\Pipeline;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class)->group('pipelines');
 
@@ -21,9 +19,9 @@ it('can list pipelines', function () {
     $response->assertStatus(200)
         ->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'name', 'code', 'entity_type', 'version', 'is_active', 'created_by']
+                '*' => ['id', 'name', 'code', 'entity_type', 'version', 'is_active', 'created_by'],
             ],
-            'meta' => ['current_page', 'last_page', 'per_page', 'total']
+            'meta' => ['current_page', 'last_page', 'per_page', 'total'],
         ]);
 });
 
@@ -99,7 +97,7 @@ it('can update a pipeline', function () {
     $payload = [
         'name' => 'Updated Name',
         'code' => 'updated_code',
-        'entity_type' => $pipeline->entity_type, 
+        'entity_type' => $pipeline->entity_type,
         'is_active' => false,
     ];
 

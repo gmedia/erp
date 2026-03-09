@@ -5,12 +5,12 @@ use App\Http\Requests\Branches\ExportBranchRequest;
 uses()->group('branches');
 
 test('authorize returns true', function () {
-    $request = new ExportBranchRequest();
+    $request = new ExportBranchRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new ExportBranchRequest();
+    $request = new ExportBranchRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

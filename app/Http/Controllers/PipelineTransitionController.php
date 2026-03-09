@@ -18,24 +18,24 @@ class PipelineTransitionController extends Controller
             ->with(['fromState', 'toState', 'actions'])
             ->orderBy('sort_order')
             ->get();
-            
+
         return PipelineTransitionResource::collection($transitions)->response();
     }
 
     public function store(StorePipelineTransitionRequest $request, Pipeline $pipeline): JsonResponse
     {
         $validated = $request->validated();
-        
+
         $transition = DB::transaction(function () use ($validated, $pipeline) {
             $transitionData = collect($validated)->except('actions')->toArray();
             $transition = $pipeline->transitions()->create($transitionData);
-            
+
             if (isset($validated['actions']) && is_array($validated['actions'])) {
                 foreach ($validated['actions'] as $actionData) {
                     $transition->actions()->create($actionData);
                 }
             }
-            
+
             return $transition->load(['fromState', 'toState', 'actions']);
         });
 
@@ -45,18 +45,18 @@ class PipelineTransitionController extends Controller
     public function update(UpdatePipelineTransitionRequest $request, Pipeline $pipeline, PipelineTransition $transition): JsonResponse
     {
         $validated = $request->validated();
-        
+
         $transition = DB::transaction(function () use ($validated, $transition, $request) {
             $transitionData = collect($validated)->except('actions')->toArray();
             $transition->update($transitionData);
-            
+
             if (isset($validated['actions']) && is_array($validated['actions'])) {
                 // Sync actions: delete ones not in the request, update existing, create new
                 $providedIds = collect($validated['actions'])->pluck('id')->filter()->toArray();
-                
+
                 // Delete removed actions
                 $transition->actions()->whereNotIn('id', $providedIds)->delete();
-                
+
                 // Update or create
                 foreach ($validated['actions'] as $actionData) {
                     if (isset($actionData['id'])) {
@@ -73,7 +73,7 @@ class PipelineTransitionController extends Controller
                     $transition->actions()->delete();
                 }
             }
-            
+
             return $transition->fresh(['fromState', 'toState', 'actions']);
         });
 
@@ -83,6 +83,7 @@ class PipelineTransitionController extends Controller
     public function destroy(Pipeline $pipeline, PipelineTransition $transition): JsonResponse
     {
         $transition->delete();
+
         return response()->json(null, 204);
     }
 }

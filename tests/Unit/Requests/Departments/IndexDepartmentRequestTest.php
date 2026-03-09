@@ -5,12 +5,12 @@ use App\Http\Requests\Departments\IndexDepartmentRequest;
 uses()->group('departments');
 
 test('authorize returns true', function () {
-    $request = new IndexDepartmentRequest();
+    $request = new IndexDepartmentRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new IndexDepartmentRequest();
+    $request = new IndexDepartmentRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

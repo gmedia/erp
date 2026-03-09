@@ -10,8 +10,8 @@ class CustomerCategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            'Retail', 'Wholesale', 'Government', 'Corporate', 
-            'Reseller', 'VIP', 'Online', 'Walk-in'
+            'Retail', 'Wholesale', 'Government', 'Corporate',
+            'Reseller', 'VIP', 'Online', 'Walk-in',
         ];
 
         foreach ($categories as $name) {

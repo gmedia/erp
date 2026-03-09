@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('asset-models');
 
 test('index request allows search parameter', function () {
-    $request = new IndexAssetModelRequest();
+    $request = new IndexAssetModelRequest;
     $rules = $request->rules();
 
     expect($rules)->toHaveKey('search')
@@ -14,14 +14,14 @@ test('index request allows search parameter', function () {
 });
 
 test('index request allows asset_category_id filter', function () {
-    $request = new IndexAssetModelRequest();
+    $request = new IndexAssetModelRequest;
     $rules = $request->rules();
 
     expect($rules)->toHaveKey('asset_category_id');
 });
 
 test('index request allows sorting parameters', function () {
-    $request = new IndexAssetModelRequest();
+    $request = new IndexAssetModelRequest;
     $rules = $request->rules();
 
     expect($rules)->toHaveKey('sort_by')
@@ -29,7 +29,7 @@ test('index request allows sorting parameters', function () {
 });
 
 test('index request allows pagination parameters', function () {
-    $request = new IndexAssetModelRequest();
+    $request = new IndexAssetModelRequest;
     $rules = $request->rules();
 
     expect($rules)->toHaveKey('per_page')

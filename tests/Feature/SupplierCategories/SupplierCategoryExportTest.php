@@ -36,7 +36,7 @@ describe('SupplierCategoryExport', function () {
 
     test('headings returns correct columns', function () {
         $export = new SupplierCategoryExport([]);
-        
+
         expect($export->headings())->toContain('ID', 'Name', 'Created At');
     });
 });

@@ -5,30 +5,28 @@ use App\Models\PipelineEntityState;
 use App\Models\PipelineState;
 use App\Models\PipelineStateLog;
 use App\Models\PipelineTransition;
-use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class)->group('pipeline-audit-trail');
-
-use function Pest\Laravel\actingAs;
 
 beforeEach(function () {
     $this->user = createTestUserWithPermissions(['pipeline_audit_trail']);
     $this->otherUser = createTestUserWithPermissions([]);
 
     $this->pipeline = Pipeline::factory()->create(['name' => 'Sales Pipeline']);
-    
+
     $this->stateA = PipelineState::factory()->create(['pipeline_id' => $this->pipeline->id, 'name' => 'Lead']);
     $this->stateB = PipelineState::factory()->create(['pipeline_id' => $this->pipeline->id, 'name' => 'Qualified']);
-    
+
     $this->transition = PipelineTransition::factory()->create([
         'pipeline_id' => $this->pipeline->id,
         'from_state_id' => $this->stateA->id,
         'to_state_id' => $this->stateB->id,
-        'name' => 'Qualify Lead'
+        'name' => 'Qualify Lead',
     ]);
 
     $this->entityState = PipelineEntityState::factory()->create([
@@ -59,8 +57,6 @@ test('it requires permission to access the audit trail', function () {
         ->assertForbidden();
 });
 
-
-
 test('it can fetch audit trail data via json', function () {
     \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/pipeline-audit-trail')
@@ -88,11 +84,11 @@ test('it can fetch audit trail data via json', function () {
 test('it can filter the report by various parameters', function () {
     // Modify log to be older
     $this->log->forceFill(['created_at' => '2025-01-01 00:00:00'])->saveQuietly();
-    
+
     // Create another log record
     $otherPipeline = Pipeline::factory()->create(['name' => 'Support Tickets']);
     $otherState = PipelineState::factory()->create(['pipeline_id' => $otherPipeline->id, 'name' => 'Open']);
-    
+
     $otherEntityState = PipelineEntityState::factory()->create([
         'pipeline_id' => $otherPipeline->id,
         'current_state_id' => $otherState->id,
@@ -126,14 +122,14 @@ test('it can filter the report by various parameters', function () {
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.entity_type_short', 'Ticket');
-        
+
     // Filter by performed by
     \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/pipeline-audit-trail?performed_by=' . $this->otherUser->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.performed_by_name', $this->otherUser->name);
-        
+
     // Filter by search term
     \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/pipeline-audit-trail?search=email')
@@ -162,7 +158,7 @@ test('it can export the audit trail data to excel', function () {
     $filename = $response->json('filename');
     expect($filename)->toStartWith('pipeline_audit_trail_2026-02-01_10-00-00_');
     expect($filename)->toEndWith('.xlsx');
-    
+
     Excel::assertStored('exports/' . $filename, 'public');
     Carbon::setTestNow();
 });

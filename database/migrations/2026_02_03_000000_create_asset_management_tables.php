@@ -6,27 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Modul: Manajemen Aset (Fixed Assets & Asset Tracking)
-     *
-     * Tujuan desain:
-     * - Menyimpan master data aset (nilai perolehan, lokasi, PIC, status).
-     * - Menyimpan audit trail pergerakan aset (transfer/assign/return/dispose).
-     * - Mendukung maintenance dan stocktake (inventarisasi berkala).
-     * - Mendukung proses depresiasi periodik dan link ke jurnal akuntansi.
-     *
-     * Contoh kasus yang didukung:
-     * 1) Pembelian aset: buat record di `assets` + log awal di `asset_movements` (movement_type = acquired).
-     * 2) Mutasi aset: pindah cabang/ruang/PIC, update kolom “current state” di `assets`,
-     *    lalu simpan histori di `asset_movements` (movement_type = transfer/assign/return).
-     * 3) Stocktake: buat `asset_stocktakes`, lalu `asset_stocktake_items` untuk hasil cek per aset
-     *    (found/missing/damaged/moved) termasuk lokasi expected vs found.
-     * 4) Depresiasi bulanan: buat `asset_depreciation_runs` (periode), generate `asset_depreciation_lines`
-     *    per aset, lalu (opsional) posting ke `journal_entries` dan simpan `journal_entry_id`.
-     *
-     * Catatan teknis:
-     * - Beberapa unique constraint diberi nama manual agar aman di MariaDB (limit panjang nama index).
-     */
     public function up(): void
     {
         // ==============================

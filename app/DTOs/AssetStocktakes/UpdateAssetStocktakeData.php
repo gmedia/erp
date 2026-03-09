@@ -26,12 +26,22 @@ readonly class UpdateAssetStocktakeData
     public function toArray(): array
     {
         $data = [];
-        
-        if ($this->branch_id !== null) $data['branch_id'] = $this->branch_id;
-        if ($this->reference !== null) $data['reference'] = $this->reference;
-        if ($this->planned_at !== null) $data['planned_at'] = $this->planned_at;
-        if ($this->performed_at !== null) $data['performed_at'] = $this->performed_at;
-        if ($this->status !== null) $data['status'] = $this->status;
+
+        if ($this->branch_id !== null) {
+            $data['branch_id'] = $this->branch_id;
+        }
+        if ($this->reference !== null) {
+            $data['reference'] = $this->reference;
+        }
+        if ($this->planned_at !== null) {
+            $data['planned_at'] = $this->planned_at;
+        }
+        if ($this->performed_at !== null) {
+            $data['performed_at'] = $this->performed_at;
+        }
+        if ($this->status !== null) {
+            $data['status'] = $this->status;
+        }
 
         return $data;
     }

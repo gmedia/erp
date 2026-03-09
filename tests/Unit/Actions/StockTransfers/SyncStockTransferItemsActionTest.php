@@ -25,7 +25,7 @@ test('execute upserts items and removes missing ones', function () {
         'quantity' => 1,
     ]);
 
-    $action = new SyncStockTransferItemsAction();
+    $action = new SyncStockTransferItemsAction;
     $action->execute($transfer, [
         [
             'product_id' => $product2->id,
@@ -48,4 +48,3 @@ test('execute upserts items and removes missing ones', function () {
         'product_id' => $product1->id,
     ]);
 });
-

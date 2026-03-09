@@ -2,7 +2,6 @@
 
 use App\Http\Requests\Customers\StoreCustomerRequest;
 
-
 uses()->group('customers');
 
 test('authorize returns true', function () {
@@ -12,7 +11,7 @@ test('authorize returns true', function () {
 
 test('rules returns correct validation rules', function () {
     $request = new StoreCustomerRequest;
-    
+
     expect($request->rules())->toBe([
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:customers,email',

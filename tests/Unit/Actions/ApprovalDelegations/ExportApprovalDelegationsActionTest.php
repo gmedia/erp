@@ -2,7 +2,6 @@
 
 use App\Actions\ApprovalDelegations\ExportApprovalDelegationsAction;
 use App\Models\ApprovalDelegation;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -19,7 +18,7 @@ test('executes export and returns file info', function () {
     $result = $action->execute([]);
 
     expect($result)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
-    
+
     $data = $result->getData(true);
     expect($data)->toHaveKeys(['url', 'filename'])
         ->and($data['filename'])->toContain('approval_delegations_export_')

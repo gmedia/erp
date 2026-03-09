@@ -5,12 +5,12 @@ use App\Http\Requests\AssetLocations\UpdateAssetLocationRequest;
 uses()->group('asset-locations');
 
 test('authorize returns true', function () {
-    $request = new UpdateAssetLocationRequest();
+    $request = new UpdateAssetLocationRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new UpdateAssetLocationRequest();
+    $request = new UpdateAssetLocationRequest;
 
     expect($request->rules())->toEqual([
         'branch_id' => 'sometimes|required|exists:branches,id',

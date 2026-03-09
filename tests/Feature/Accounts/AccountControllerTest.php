@@ -26,7 +26,7 @@ describe('Account API Endpoints', function () {
             'account.delete',
         ]);
         actingAs($user);
-        
+
         $this->coaVersion = CoaVersion::factory()->create();
     });
 
@@ -56,7 +56,7 @@ describe('Account API Endpoints', function () {
                         'description',
                         'created_at',
                         'updated_at',
-                    ]
+                    ],
                 ],
                 'meta',
             ]);

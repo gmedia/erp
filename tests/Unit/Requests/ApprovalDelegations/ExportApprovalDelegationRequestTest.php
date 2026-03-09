@@ -3,17 +3,17 @@
 namespace Tests\Unit\Requests\ApprovalDelegations;
 
 use App\Http\Requests\ApprovalDelegations\ExportApprovalDelegationRequest;
-use Illuminate\Support\Facades\Validator;
+
 uses()->group('approval-delegations');
 
 test('authorize returns true', function () {
-    $request = new ExportApprovalDelegationRequest();
+    $request = new ExportApprovalDelegationRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new ExportApprovalDelegationRequest();
-    
+    $request = new ExportApprovalDelegationRequest;
+
     expect($request->rules())->toBe([
         'search' => ['nullable', 'string'],
         'delegator' => ['nullable', 'exists:users,id'],

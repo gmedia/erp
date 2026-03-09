@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Branches;
 
-use App\Models\Branch;
 use App\Http\Requests\SimpleCrudStoreRequest;
+use App\Models\Branch;
 
 class StoreBranchRequest extends SimpleCrudStoreRequest
 {

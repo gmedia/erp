@@ -12,7 +12,7 @@ test('resource returns correct structure', function () {
     $assetModel->load('category');
 
     $resource = new AssetModelResource($assetModel);
-    $response = $resource->toArray(new Request());
+    $response = $resource->toArray(new Request);
 
     expect($response)->toHaveKeys([
         'id',
@@ -30,7 +30,7 @@ test('resource returns nested category object', function () {
     $assetModel->load('category');
 
     $resource = new AssetModelResource($assetModel);
-    $response = $resource->toArray(new Request());
+    $response = $resource->toArray(new Request);
 
     expect($response['category'])->toBeArray()
         ->and($response['category'])->toHaveKeys(['id', 'name']);

@@ -2,7 +2,6 @@
 
 use App\Http\Requests\Customers\IndexCustomerRequest;
 
-
 uses()->group('customers');
 
 test('authorize returns true', function () {
@@ -12,7 +11,7 @@ test('authorize returns true', function () {
 
 test('rules returns correct validation rules', function () {
     $request = new IndexCustomerRequest;
-    
+
     expect($request->rules())->toBe([
         'search' => ['nullable', 'string'],
         'branch_id' => ['nullable', 'exists:branches,id'],

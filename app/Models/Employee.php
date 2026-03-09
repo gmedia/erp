@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
@@ -41,25 +40,54 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  *
  * Represents an employee in the system.
  *
- * @package App\Models
+ * @property int $id
+ * @property string $employee_id
+ * @property string $name
+ * @property string $email
+ * @property string|null $phone
+ * @property int|null $department_id
+ * @property int|null $position_id
+ * @property int|null $branch_id
+ * @property int|null $user_id
+ * @property string $salary
+ * @property \Illuminate\Support\Carbon $hire_date
+ * @property string $employment_status
+ * @property \Illuminate\Support\Carbon|null $termination_date
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Branch|null $branch
+ * @property-read \App\Models\Department|null $department
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
+ * @property-read int|null $permissions_count
+ * @property-read \App\Models\Position|null $position
+ * @property-read \App\Models\User|null $user
+ *
+ * @method static \Database\Factories\EmployeeFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDepartmentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmployeeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmploymentStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHireDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePositionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereSalary($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereTerminationDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereUserId($value)
+ *
+ * @mixin \Eloquent
  */
 class Employee extends Model
 {
     /** @use HasFactory<\Database\Factories\EmployeeFactory> */
     use HasFactory;
-
-    public function permissions(): BelongsToMany
-    {
-        return $this->belongsToMany(Permission::class);
-    }
-
-    /**
-     * Check if the employee has a specific permission.
-     */
-    public function hasPermission(string $permission): bool
-    {
-        return $this->permissions()->where('name', $permission)->exists();
-    }
 
     /**
      * The attributes that are mass assignable.
@@ -100,6 +128,19 @@ class Employee extends Model
     protected $hidden = [
         'salary',
     ];
+
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class);
+    }
+
+    /**
+     * Check if the employee has a specific permission.
+     */
+    public function hasPermission(string $permission): bool
+    {
+        return $this->permissions()->where('name', $permission)->exists();
+    }
 
     /**
      * Get the formatted salary attribute.

@@ -68,7 +68,7 @@ describe('CoaVersionExport', function () {
 
     test('headings returns correct columns', function () {
         $export = new CoaVersionExport([]);
-        
+
         expect($export->headings())->toContain('ID', 'Name', 'Fiscal Year', 'Status');
     });
 });

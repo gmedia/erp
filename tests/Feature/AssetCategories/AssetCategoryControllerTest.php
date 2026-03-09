@@ -19,7 +19,7 @@ describe('Asset Category API Endpoints', function () {
             'asset_category',
             'asset_category.create',
             'asset_category.edit',
-            'asset_category.delete'
+            'asset_category.delete',
         ]);
 
         actingAs($user);
@@ -33,9 +33,9 @@ describe('Asset Category API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'code', 'name', 'useful_life_months_default', 'created_at', 'updated_at']
+                    '*' => ['id', 'code', 'name', 'useful_life_months_default', 'created_at', 'updated_at'],
                 ],
-                'meta' => ['total', 'per_page', 'current_page']
+                'meta' => ['total', 'per_page', 'current_page'],
             ]);
 
         expect($response->json('data'))->toHaveCount(10);

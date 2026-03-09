@@ -37,7 +37,7 @@ class IndexBookValueDepreciationReportAction
         $query->orderBy($sortBy, $sortDirection);
 
         $perPage = $request->get('per_page', 15);
-        
+
         return $query->paginate($perPage)->withQueryString();
     }
 }

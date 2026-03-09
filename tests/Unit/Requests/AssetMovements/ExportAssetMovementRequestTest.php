@@ -3,13 +3,12 @@
 namespace Tests\Unit\Requests\AssetMovements;
 
 use App\Http\Requests\AssetMovements\ExportAssetMovementRequest;
-use Tests\TestCase;
 
 uses()->group('asset-movements');
 
 function createExportRequest(): ExportAssetMovementRequest
 {
-    return new ExportAssetMovementRequest();
+    return new ExportAssetMovementRequest;
 }
 
 test('it authorizes request', function () {
@@ -34,7 +33,7 @@ test('it validates sort by columns', function () {
     $validColumns = ['moved_at', 'movement_type', 'created_at'];
     foreach ($validColumns as $column) {
         $validator = validator(['sort_by' => $column], createExportRequest()->rules());
-        expect($validator->fails())->toBeFalse("Sort by $column should pass");
+        expect($validator->fails())->toBeFalse("Sort by {$column} should pass");
     }
 
     // Invalid

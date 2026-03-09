@@ -5,12 +5,12 @@ use App\Http\Requests\SupplierCategories\IndexSupplierCategoryRequest;
 uses()->group('supplier-categories');
 
 test('authorize returns true', function () {
-    $request = new IndexSupplierCategoryRequest();
+    $request = new IndexSupplierCategoryRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new IndexSupplierCategoryRequest();
+    $request = new IndexSupplierCategoryRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

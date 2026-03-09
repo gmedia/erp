@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Validator;
 uses()->group('journal-entries');
 
 test('it authorizes any user', function () {
-    $request = new IndexJournalEntryRequest();
+    $request = new IndexJournalEntryRequest;
     expect($request->authorize())->toBeTrue();
 });
 
@@ -20,7 +20,7 @@ test('it validates optional filter fields', function () {
         'page' => 2,
     ];
 
-    $request = new IndexJournalEntryRequest();
+    $request = new IndexJournalEntryRequest;
     $validator = Validator::make($data, $request->rules());
 
     expect($validator->passes())->toBeTrue();
@@ -28,8 +28,8 @@ test('it validates optional filter fields', function () {
 
 test('it validates invalid status', function () {
     $data = ['status' => 'invalid_status'];
-    
-    $request = new IndexJournalEntryRequest();
+
+    $request = new IndexJournalEntryRequest;
     $validator = Validator::make($data, $request->rules());
 
     expect($validator->fails())->toBeTrue();
@@ -38,8 +38,8 @@ test('it validates invalid status', function () {
 
 test('it validates date formats', function () {
     $data = ['start_date' => 'invalid-date'];
-    
-    $request = new IndexJournalEntryRequest();
+
+    $request = new IndexJournalEntryRequest;
     $validator = Validator::make($data, $request->rules());
 
     expect($validator->fails())->toBeTrue();

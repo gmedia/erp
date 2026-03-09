@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Settings\TwoFactorAuthenticationRequest;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Laravel\Fortify\Features;

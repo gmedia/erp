@@ -33,8 +33,8 @@ class IndexPipelinesAction
 
         if ($sortBy === 'created_by') {
             $query->leftJoin('users as creator', 'pipelines.created_by', '=', 'creator.id')
-                  ->orderBy('creator.name', $sortDirection)
-                  ->select('pipelines.*');
+                ->orderBy('creator.name', $sortDirection)
+                ->select('pipelines.*');
         } else {
             $this->filterService->applySorting(
                 $query,

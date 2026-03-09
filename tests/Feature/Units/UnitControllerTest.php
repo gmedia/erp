@@ -19,7 +19,7 @@ describe('Unit API Endpoints', function () {
             'unit',
             'unit.create',
             'unit.edit',
-            'unit.delete'
+            'unit.delete',
         ]);
 
         actingAs($user);
@@ -33,9 +33,9 @@ describe('Unit API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'name', 'symbol', 'created_at', 'updated_at']
+                    '*' => ['id', 'name', 'symbol', 'created_at', 'updated_at'],
                 ],
-                'meta' => ['total', 'per_page', 'current_page']
+                'meta' => ['total', 'per_page', 'current_page'],
             ]);
 
         expect($response->json('meta.total'))->toBe(15)
@@ -61,9 +61,9 @@ describe('Unit API Endpoints', function () {
 
         $response->assertOk();
         expect($response->json('data.0.name'))->toBe('ZZZZ Beta');
-        
+
         $response = getJson('/api/units?sort_by=name&sort_direction=asc');
-        
+
         $response->assertOk();
         expect($response->json('data.0.name'))->toBe('AAAA Alpha');
     });
@@ -71,7 +71,7 @@ describe('Unit API Endpoints', function () {
     test('store creates unit', function () {
         $data = [
             'name' => 'Kilogram',
-            'symbol' => 'kg'
+            'symbol' => 'kg',
         ];
 
         $response = postJson('/api/units', $data);
@@ -87,7 +87,7 @@ describe('Unit API Endpoints', function () {
 
         $response = postJson('/api/units', [
             'name' => 'Existing Unit',
-            'symbol' => 'EU'
+            'symbol' => 'EU',
         ]);
 
         $response->assertUnprocessable()
@@ -98,7 +98,7 @@ describe('Unit API Endpoints', function () {
         $unit = Unit::factory()->create();
         $data = [
             'name' => 'Updated Unit',
-            'symbol' => 'UU'
+            'symbol' => 'UU',
         ];
 
         $response = putJson("/api/units/{$unit->id}", $data);

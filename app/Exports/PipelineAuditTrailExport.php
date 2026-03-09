@@ -26,7 +26,7 @@ class PipelineAuditTrailExport implements FromCollection, ShouldAutoSize, WithHe
     {
         $action = app(IndexPipelineAuditTrailAction::class);
 
-        $request = new IndexPipelineAuditTrailRequest();
+        $request = new IndexPipelineAuditTrailRequest;
         $request->merge($this->filters);
 
         return $action->execute($request);

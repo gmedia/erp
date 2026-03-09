@@ -5,12 +5,12 @@ use App\Http\Requests\CustomerCategories\IndexCustomerCategoryRequest;
 uses()->group('customer-categories');
 
 test('authorize returns true', function () {
-    $request = new IndexCustomerCategoryRequest();
+    $request = new IndexCustomerCategoryRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new IndexCustomerCategoryRequest();
+    $request = new IndexCustomerCategoryRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

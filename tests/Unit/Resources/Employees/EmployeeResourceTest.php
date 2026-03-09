@@ -56,7 +56,7 @@ test('toArray includes all required fields', function () {
 
     expect($result)->toHaveKeys([
         'id', 'name', 'email', 'phone', 'department',
-        'position', 'salary', 'hire_date', 'created_at', 'updated_at'
+        'position', 'salary', 'hire_date', 'created_at', 'updated_at',
     ]);
 });
 

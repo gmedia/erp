@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Validator;
 uses(RefreshDatabase::class)->group('coa-versions');
 
 test('ExportCoaVersionRequest → authorize returns true', function () {
-    $request = new ExportCoaVersionRequest();
+    $request = new ExportCoaVersionRequest;
     expect($request->authorize())->toBeTrue();
 });
 
@@ -21,7 +21,7 @@ test('ExportCoaVersionRequest → rules allow valid filters', function () {
         'sort_direction' => 'desc',
     ];
 
-    $request = new ExportCoaVersionRequest();
+    $request = new ExportCoaVersionRequest;
     $validator = Validator::make($data, $request->rules());
 
     expect($validator->passes())->toBeTrue();
@@ -30,7 +30,7 @@ test('ExportCoaVersionRequest → rules allow valid filters', function () {
 test('ExportCoaVersionRequest → rules fail with invalid sort_direction', function () {
     $data = ['sort_direction' => 'invalid'];
 
-    $request = new ExportCoaVersionRequest();
+    $request = new ExportCoaVersionRequest;
     $validator = Validator::make($data, $request->rules());
 
     expect($validator->fails())->toBeTrue()

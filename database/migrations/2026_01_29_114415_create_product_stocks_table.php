@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('product_stocks', function (Blueprint $table) {
@@ -24,15 +21,12 @@ return new class extends Migration
             $table->decimal('average_cost', 15, 2)->default(0)
                 ->comment('Weighted average cost for COGS calculation');
             $table->timestamps();
-            
+
             $table->unique(['product_id', 'branch_id']);
             $table->index('quantity_on_hand');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('product_stocks');

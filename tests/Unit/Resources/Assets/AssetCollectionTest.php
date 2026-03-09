@@ -11,10 +11,10 @@ uses(RefreshDatabase::class)->group('assets');
 
 test('asset collection transforms assets correctly', function () {
     $assets = Asset::factory()->count(1)->create();
-    
+
     $collection = new AssetCollection($assets);
     $request = Request::create('/api/assets', 'GET');
-    
+
     // ResourceCollection::toArray returns an array, but the collection property inside might be mixed.
     // Let's use toResponse and getData to be sure of the final structure if toArray is ambiguous.
     $data = $collection->toArray($request);
@@ -29,7 +29,7 @@ test('asset collection transforms assets correctly', function () {
 
     expect($items)->toBeArray();
     expect(count($items))->toBeGreaterThanOrEqual(1);
-        
+
     // items[0] should be from AssetResource, so it's a resource or array.
     $firstItem = $items[0];
     if (is_object($firstItem) && method_exists($firstItem, 'toArray')) {

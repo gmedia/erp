@@ -4,19 +4,20 @@ namespace App\Imports;
 
 use App\Models\Asset;
 use App\Models\AssetCategory;
+use App\Models\AssetLocation;
 use App\Models\AssetModel;
 use App\Models\Branch;
-use App\Models\AssetLocation;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Supplier;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
-class AssetImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
+class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 {
     public int $importedCount = 0;
     public int $skippedCount = 0;
@@ -78,104 +79,112 @@ class AssetImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                     ];
                 }
                 $this->skippedCount++;
+
                 continue;
             }
 
             // 2. Resolve Foreign Keys
             $categoryId = null;
-            if (!empty($row['asset_category'])) {
+            if (! empty($row['asset_category'])) {
                 $categoryId = $this->categories->get($row['asset_category']);
-                if (!$categoryId) {
+                if (! $categoryId) {
                     $this->errors[] = [
                         'row' => $rowNumber,
                         'field' => 'asset_category',
                         'message' => "Category '{$row['asset_category']}' not found.",
                     ];
                     $this->skippedCount++;
+
                     continue;
                 }
             }
 
             $modelId = null;
-            if (!empty($row['asset_model'])) {
+            if (! empty($row['asset_model'])) {
                 $modelId = $this->models->get($row['asset_model']);
-                if (!$modelId) {
+                if (! $modelId) {
                     $this->errors[] = [
                         'row' => $rowNumber,
                         'field' => 'asset_model',
                         'message' => "Model '{$row['asset_model']}' not found.",
                     ];
                     $this->skippedCount++;
+
                     continue;
                 }
             }
 
             $branchId = null;
-            if (!empty($row['branch'])) {
+            if (! empty($row['branch'])) {
                 $branchId = $this->branches->get($row['branch']);
-                if (!$branchId) {
+                if (! $branchId) {
                     $this->errors[] = [
                         'row' => $rowNumber,
                         'field' => 'branch',
                         'message' => "Branch '{$row['branch']}' not found.",
                     ];
                     $this->skippedCount++;
+
                     continue;
                 }
             }
 
             $locationId = null;
-            if (!empty($row['location'])) {
+            if (! empty($row['location'])) {
                 $locationId = $this->locations->get($row['location']);
-                if (!$locationId) {
+                if (! $locationId) {
                     $this->errors[] = [
                         'row' => $rowNumber,
                         'field' => 'location',
                         'message' => "Location '{$row['location']}' not found.",
                     ];
                     $this->skippedCount++;
+
                     continue;
                 }
             }
 
             $departmentId = null;
-            if (!empty($row['department'])) {
+            if (! empty($row['department'])) {
                 $departmentId = $this->departments->get($row['department']);
-                if (!$departmentId) {
+                if (! $departmentId) {
                     $this->errors[] = [
                         'row' => $rowNumber,
                         'field' => 'department',
                         'message' => "Department '{$row['department']}' not found.",
                     ];
                     $this->skippedCount++;
+
                     continue;
                 }
             }
 
             $employeeId = null;
-            if (!empty($row['employee'])) {
+            if (! empty($row['employee'])) {
                 $employeeId = $this->employees->get($row['employee']);
-                if (!$employeeId) {
+                if (! $employeeId) {
                     $this->errors[] = [
                         'row' => $rowNumber,
                         'field' => 'employee',
                         'message' => "Employee '{$row['employee']}' not found.",
                     ];
                     $this->skippedCount++;
+
                     continue;
                 }
             }
 
             $supplierId = null;
-            if (!empty($row['supplier'])) {
+            if (! empty($row['supplier'])) {
                 $supplierId = $this->suppliers->get($row['supplier']);
-                if (!$supplierId) {
+                if (! $supplierId) {
                     $this->errors[] = [
                         'row' => $rowNumber,
                         'field' => 'supplier',
                         'message' => "Supplier '{$row['supplier']}' not found.",
                     ];
                     $this->skippedCount++;
+
                     continue;
                 }
             }
@@ -211,13 +220,13 @@ class AssetImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                 if ($asset->wasRecentlyCreated) {
                     $this->importedCount++;
                 } else {
-                    $this->importedCount++; 
+                    $this->importedCount++;
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->errors[] = [
                     'row' => $rowNumber,
                     'field' => 'System',
-                    'message' => "Failed to save: " . $e->getMessage(),
+                    'message' => 'Failed to save: ' . $e->getMessage(),
                 ];
                 $this->skippedCount++;
             }

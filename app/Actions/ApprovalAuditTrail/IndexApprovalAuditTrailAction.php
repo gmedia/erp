@@ -40,9 +40,9 @@ class IndexApprovalAuditTrailAction
         if ($request->filled('search')) {
             $query->where(function (Builder $q) use ($request) {
                 $q->where('approvable_id', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('actor', function (Builder $sq) use ($request) {
-                      $sq->where('name', 'like', '%' . $request->search . '%');
-                  });
+                    ->orWhereHas('actor', function (Builder $sq) use ($request) {
+                        $sq->where('name', 'like', '%' . $request->search . '%');
+                    });
             });
         }
 
@@ -51,18 +51,18 @@ class IndexApprovalAuditTrailAction
 
         if ($sortBy === 'actor_user_id') {
             $query->leftJoin('users', 'approval_audit_logs.actor_user_id', '=', 'users.id')
-                  ->orderBy('users.name', $sortDirection)
-                  ->select('approval_audit_logs.*');
+                ->orderBy('users.name', $sortDirection)
+                ->select('approval_audit_logs.*');
         } else {
             $query->orderBy('approval_audit_logs.' . $sortBy, $sortDirection);
         }
 
         if ($request->boolean('export')) {
-             return $query->get();
+            return $query->get();
         }
 
         $perPage = $request->get('per_page', 15);
-        
+
         return $query->paginate($perPage)->withQueryString();
     }
 }

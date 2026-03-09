@@ -9,8 +9,8 @@ uses(RefreshDatabase::class)->group('asset-categories');
 
 test('asset category collection uses asset category resource', function () {
     AssetCategory::factory()->count(3)->create();
-    
+
     $collection = new AssetCategoryCollection(AssetCategory::all());
-    
+
     expect($collection->collects)->toBe(AssetCategoryResource::class);
 });

@@ -2,13 +2,13 @@
 
 use App\Http\Requests\JournalEntries\UpdateJournalEntryRequest;
 use App\Models\Account;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Validator;
 
 uses(RefreshDatabase::class)->group('journal-entries');
 
 test('it authorizes any user', function () {
-    $request = new UpdateJournalEntryRequest();
+    $request = new UpdateJournalEntryRequest;
     expect($request->authorize())->toBeTrue();
 });
 
@@ -33,7 +33,7 @@ test('it validates balanced updates', function () {
         ],
     ];
 
-    $request = new UpdateJournalEntryRequest();
+    $request = new UpdateJournalEntryRequest;
     $request->merge($data);
     $validator = Validator::make($data, $request->rules());
     $request->withValidator($validator);
@@ -62,7 +62,7 @@ test('it fails unbalanced updates', function () {
         ],
     ];
 
-    $request = new UpdateJournalEntryRequest();
+    $request = new UpdateJournalEntryRequest;
     $request->merge($data);
     $validator = Validator::make($data, $request->rules());
     $request->withValidator($validator);

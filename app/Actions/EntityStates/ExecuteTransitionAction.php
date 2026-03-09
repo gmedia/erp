@@ -17,13 +17,9 @@ class ExecuteTransitionAction
 
     /**
      * Execute a transition for a given entity state.
-     * 
-     * @param PipelineEntityState $entityState
-     * @param PipelineTransition $transition
-     * @param Model $entity
-     * @param string|null $comment
-     * @param array $metadata
+     *
      * @return PipelineEntityState The updated entity state
+     *
      * @throws ValidationException If transition is invalid
      */
     public function execute(
@@ -36,30 +32,30 @@ class ExecuteTransitionAction
         // 1. Validate the transition belongs to the entity's current pipeline schema
         if ($transition->pipeline_id !== $entityState->pipeline_id) {
             throw ValidationException::withMessages([
-                'transition_id' => 'Transition does not belong to this pipeline.'
+                'transition_id' => 'Transition does not belong to this pipeline.',
             ]);
         }
 
         // 2. Validate current state matches transition from_state
         if ($transition->from_state_id !== $entityState->current_state_id && $transition->from_state_id !== null) {
             throw ValidationException::withMessages([
-                'transition_id' => 'Current state does not allow this transition.'
+                'transition_id' => 'Current state does not allow this transition.',
             ]);
         }
 
         // 3. Check specific permission if defined
-        if ($transition->required_permission && !auth()->user()?->employee?->hasPermission($transition->required_permission)) {
+        if ($transition->required_permission && ! auth()->user()?->employee?->hasPermission($transition->required_permission)) {
             // Should be a 403 conceptually, but throwing as validation simplifies controller
             throw ValidationException::withMessages([
-                'transition_id' => 'You do not have permission to execute this transition.'
+                'transition_id' => 'You do not have permission to execute this transition.',
             ]);
         }
 
         // 4. Evaluate Guards
         $guardFailures = $this->evaluateGuardAction->execute($transition, $entity);
-        if (!empty($guardFailures)) {
+        if (! empty($guardFailures)) {
             throw ValidationException::withMessages([
-                'guards' => $guardFailures
+                'guards' => $guardFailures,
             ]);
         }
 

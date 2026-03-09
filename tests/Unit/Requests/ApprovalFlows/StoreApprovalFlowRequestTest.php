@@ -11,7 +11,7 @@ test('authorize returns true', function () {
 
 test('rules returns correct validation rules', function () {
     $request = new StoreApprovalFlowRequest;
-    
+
     expect($request->rules())->toBe([
         'name' => 'required|string|max:255',
         'code' => 'required|string|max:255|unique:approval_flows,code',
@@ -19,7 +19,7 @@ test('rules returns correct validation rules', function () {
         'description' => 'nullable|string',
         'is_active' => 'boolean',
         'conditions' => 'nullable|array',
-        
+
         'steps' => 'nullable|array',
         'steps.*.name' => 'required|string|max:255',
         'steps.*.approver_type' => 'required|in:user,role,department_head',

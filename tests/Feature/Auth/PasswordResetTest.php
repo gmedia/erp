@@ -23,7 +23,7 @@ test('reset password link can be requested via api', function () {
     Notification::assertSentTo($user, ResetPassword::class);
 });
 
-// Note: Password reset screen rendering is handled by the SPA frontend in the new architecture. 
+// Note: Password reset screen rendering is handled by the SPA frontend in the new architecture.
 // We only need to test the API endpoints for requesting and submitting the reset.
 
 test('password can be reset with valid token via api', function () {
@@ -58,5 +58,5 @@ test('password cannot be reset with invalid token via api', function () {
     ]);
 
     $response->assertStatus(422)
-             ->assertJsonValidationErrors('email');
+        ->assertJsonValidationErrors('email');
 });

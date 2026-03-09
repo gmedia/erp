@@ -5,6 +5,7 @@ use App\Models\StockMovement;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class)->group('stock-movements');
@@ -108,4 +109,3 @@ test('it can sort by product name', function () {
     expect($response->json('data.0.product.name'))->toBe('AAA');
     expect($response->json('data.1.product.name'))->toBe('BBB');
 });
-

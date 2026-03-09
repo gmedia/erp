@@ -13,11 +13,11 @@ uses(RefreshDatabase::class)->group('assets');
 
 test('index assets action returns paginated results', function () {
     Asset::factory()->count(20)->create();
-    
+
     $request = new IndexAssetRequest(['per_page' => 10]);
-    $service = new AssetFilterService();
+    $service = new AssetFilterService;
     $action = new IndexAssetsAction($service);
-    
+
     $result = $action->execute($request);
 
     expect($result)->toBeInstanceOf(LengthAwarePaginator::class)

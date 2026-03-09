@@ -14,7 +14,7 @@ test('applySearch filters by name', function () {
 
     $query = Supplier::query();
     $service->applySearch($query, 'Alpha', ['name']);
-    
+
     expect($query->count())->toBe(1)
         ->and($query->first()->name)->toBe('Alpha Corp');
 });
@@ -52,7 +52,7 @@ test('applyAdvancedFilters filters by status', function () {
     // Get existing suppliers count before creating new ones
     $baselineActive = Supplier::where('status', 'active')->count();
     $baselineInactive = Supplier::where('status', 'inactive')->count();
-    
+
     Supplier::factory()->create(['status' => 'active']);
     Supplier::factory()->create(['status' => 'inactive']);
 

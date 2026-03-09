@@ -3,8 +3,8 @@
 use App\Models\Pipeline;
 use App\Models\PipelineState;
 use App\Models\PipelineTransition;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class)->group('pipelines');
@@ -50,8 +50,8 @@ it('can create a pipeline transition with actions', function () {
                 'config' => ['field' => 'status', 'value' => 'active'],
                 'on_failure' => 'abort',
                 'is_active' => true,
-            ]
-        ]
+            ],
+        ],
     ];
 
     $response = $this->postJson("/api/pipelines/{$this->pipeline->id}/transitions", $data);
@@ -70,7 +70,7 @@ it('can update a pipeline transition and sync actions', function () {
         'from_state_id' => $this->state1->id,
         'to_state_id' => $this->state2->id,
     ]);
-    
+
     $action = $transition->actions()->create([
         'action_type' => 'update_field',
         'execution_order' => 1,
@@ -100,8 +100,8 @@ it('can update a pipeline transition and sync actions', function () {
                 'config' => ['template' => 'alert'],
                 'on_failure' => 'continue',
                 'is_active' => true,
-            ]
-        ]
+            ],
+        ],
     ];
 
     $response = $this->putJson("/api/pipelines/{$this->pipeline->id}/transitions/{$transition->id}", $data);

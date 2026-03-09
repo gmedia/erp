@@ -19,7 +19,7 @@ describe('SupplierCategory API Endpoints', function () {
             'supplier_category',
             'supplier_category.create',
             'supplier_category.edit',
-            'supplier_category.delete'
+            'supplier_category.delete',
         ]);
 
         actingAs($user);
@@ -34,9 +34,9 @@ describe('SupplierCategory API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'name', 'created_at', 'updated_at']
+                    '*' => ['id', 'name', 'created_at', 'updated_at'],
                 ],
-                'meta' => ['total', 'per_page', 'current_page']
+                'meta' => ['total', 'per_page', 'current_page'],
             ]);
 
         expect($response->json('meta.total'))->toBe($baseline + 15)
@@ -62,9 +62,9 @@ describe('SupplierCategory API Endpoints', function () {
 
         $response->assertOk();
         expect($response->json('data.0.name'))->toBe('ZZZZ Beta');
-        
+
         $response = getJson('/api/supplier-categories?sort_by=name&sort_direction=asc');
-        
+
         $response->assertOk();
         expect($response->json('data.0.name'))->toBe('AAAA Alpha');
     });

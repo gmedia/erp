@@ -10,15 +10,27 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $product_id
  * @property int $customer_category_id
- * @property string $price
+ * @property numeric $price
  * @property \Illuminate\Support\Carbon|null $effective_from
  * @property \Illuminate\Support\Carbon|null $effective_until
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\CustomerCategory $customerCategory
+ * @property-read \App\Models\Product $product
  *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice effective()
+ * @method static \Database\Factories\ProductPriceFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereCustomerCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereEffectiveFrom($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereEffectiveUntil($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

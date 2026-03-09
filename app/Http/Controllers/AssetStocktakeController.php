@@ -20,6 +20,7 @@ class AssetStocktakeController extends Controller
     public function index(IndexAssetStocktakeRequest $request, IndexAssetStocktakesAction $action): JsonResponse
     {
         $stocktakes = $action->execute($request);
+
         return (new AssetStocktakeCollection($stocktakes))->response();
     }
 
@@ -27,7 +28,7 @@ class AssetStocktakeController extends Controller
     {
         $data = $request->validated();
         $data['created_by'] = Auth::id();
-        
+
         $stocktake = AssetStocktake::create($data);
 
         return (new AssetStocktakeResource($stocktake))->response()->setStatusCode(201);
@@ -36,6 +37,7 @@ class AssetStocktakeController extends Controller
     public function show(AssetStocktake $assetStocktake): JsonResponse
     {
         $assetStocktake->load(['branch', 'createdBy']);
+
         return (new AssetStocktakeResource($assetStocktake))->response();
     }
 
@@ -50,6 +52,7 @@ class AssetStocktakeController extends Controller
     public function destroy(AssetStocktake $assetStocktake): JsonResponse
     {
         $assetStocktake->delete();
+
         return response()->json(null, 204);
     }
 

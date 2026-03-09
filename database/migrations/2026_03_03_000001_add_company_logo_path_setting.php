@@ -5,9 +5,6 @@ use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Setting::query()->updateOrCreate(
@@ -21,9 +18,6 @@ return new class extends Migration
         );
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Setting::query()->where('key', 'company_logo_path')->delete();

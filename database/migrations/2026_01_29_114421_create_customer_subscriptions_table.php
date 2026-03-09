@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('customer_subscriptions', function (Blueprint $table) {
@@ -24,7 +21,7 @@ return new class extends Migration
             $table->foreignId('product_id')
                 ->constrained('products')
                 ->onDelete('restrict');
-            
+
             // Subscription lifecycle
             $table->enum('status', [
                 'trial',           // In trial period
@@ -32,9 +29,9 @@ return new class extends Migration
                 'past_due',        // Payment failed, grace period
                 'suspended',       // Temporarily suspended
                 'cancelled',       // Cancelled by customer
-                'expired'          // Contract ended
+                'expired',          // Contract ended
             ])->default('trial');
-            
+
             // Dates
             $table->date('trial_start_date')->nullable();
             $table->date('trial_end_date')->nullable();
@@ -47,26 +44,23 @@ return new class extends Migration
             $table->date('cancellation_date')->nullable();
             $table->date('cancellation_effective_date')->nullable()
                 ->comment('When cancellation takes effect');
-            
+
             // Billing
             $table->integer('billing_cycles_completed')->default(0);
             $table->boolean('auto_renew')->default(true);
             $table->decimal('recurring_amount', 15, 2)
                 ->comment('Amount charged per cycle');
-            
+
             $table->text('notes')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            
+
             $table->index('customer_id');
             $table->index('status');
             $table->index('current_period_end');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('customer_subscriptions');

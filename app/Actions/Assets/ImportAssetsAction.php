@@ -10,10 +10,10 @@ class ImportAssetsAction
 {
     public function execute(UploadedFile $file): array
     {
-        $importer = new AssetImport();
-        
+        $importer = new AssetImport;
+
         Excel::import($importer, $file);
-        
+
         return [
             'imported' => $importer->importedCount,
             'skipped' => $importer->skippedCount,

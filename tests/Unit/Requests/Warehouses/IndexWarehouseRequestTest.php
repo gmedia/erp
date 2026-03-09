@@ -5,12 +5,12 @@ use App\Http\Requests\Warehouses\IndexWarehouseRequest;
 uses()->group('warehouses');
 
 test('authorize returns true', function () {
-    $request = new IndexWarehouseRequest();
+    $request = new IndexWarehouseRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new IndexWarehouseRequest();
+    $request = new IndexWarehouseRequest;
 
     $rules = $request->rules();
     expect($rules)->toHaveKeys([

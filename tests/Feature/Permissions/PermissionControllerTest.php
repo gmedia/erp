@@ -4,6 +4,7 @@ namespace Tests\Feature\Permissions;
 
 use App\Models\Permission;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class)->group('permissions');

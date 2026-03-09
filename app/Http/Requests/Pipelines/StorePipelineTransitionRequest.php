@@ -16,12 +16,12 @@ class StorePipelineTransitionRequest extends FormRequest
     {
         return [
             'from_state_id' => [
-                'required', 
+                'required',
                 'exists:pipeline_states,id',
                 Rule::unique('pipeline_transitions')->where(function ($query) {
                     return $query->where('pipeline_id', $this->route('pipeline')->id)
-                                 ->where('to_state_id', $this->to_state_id);
-                })
+                        ->where('to_state_id', $this->to_state_id);
+                }),
             ],
             'to_state_id' => ['required', 'exists:pipeline_states,id', 'different:from_state_id'],
             'name' => ['required', 'string', 'max:255'],
@@ -34,7 +34,7 @@ class StorePipelineTransitionRequest extends FormRequest
             'requires_approval' => ['boolean'],
             'sort_order' => ['integer'],
             'is_active' => ['boolean'],
-            
+
             // Nested actions validation
             'actions' => ['nullable', 'array'],
             'actions.*.action_type' => ['required', 'string', Rule::in(['update_field', 'create_record', 'send_notification', 'dispatch_job', 'trigger_approval', 'webhook', 'custom'])],

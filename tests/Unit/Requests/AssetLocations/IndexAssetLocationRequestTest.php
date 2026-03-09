@@ -5,12 +5,12 @@ use App\Http\Requests\AssetLocations\IndexAssetLocationRequest;
 uses()->group('asset-locations');
 
 test('authorize returns true', function () {
-    $request = new IndexAssetLocationRequest();
+    $request = new IndexAssetLocationRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new IndexAssetLocationRequest();
+    $request = new IndexAssetLocationRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

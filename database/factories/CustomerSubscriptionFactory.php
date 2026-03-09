@@ -67,7 +67,7 @@ class CustomerSubscriptionFactory extends Factory
     public function trial(): static
     {
         $trialStartDate = now()->subDays(fake()->numberBetween(1, 14));
-        
+
         return $this->state(fn (array $attributes) => [
             'status' => 'trial',
             'trial_start_date' => $trialStartDate,
@@ -95,7 +95,7 @@ class CustomerSubscriptionFactory extends Factory
     public function cancelled(): static
     {
         $cancellationDate = now()->subDays(fake()->numberBetween(1, 30));
-        
+
         return $this->state(fn (array $attributes) => [
             'status' => 'cancelled',
             'cancellation_date' => $cancellationDate,

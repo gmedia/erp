@@ -18,11 +18,24 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Branch $branch
+ * @property-read \App\Models\CustomerCategory $category
  *
  * @method static \Database\Factories\CustomerFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Customer whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

@@ -5,7 +5,6 @@ namespace App\Actions\ApprovalMonitoring;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class GetApprovalMonitoringDataAction
 {
@@ -38,9 +37,9 @@ class GetApprovalMonitoringDataAction
         if ($approverId) {
             $query->whereHas('steps', function ($q) use ($approverId) {
                 $q->where('acted_by', $approverId)
-                  ->orWhereHas('flowStep', function ($fs) use ($approverId) {
-                      $fs->where('approver_user_id', $approverId);
-                  });
+                    ->orWhereHas('flowStep', function ($fs) use ($approverId) {
+                        $fs->where('approver_user_id', $approverId);
+                    });
             });
         }
 
@@ -48,13 +47,13 @@ class GetApprovalMonitoringDataAction
 
         // Summary Calculations
         $totalPending = $allRequests->whereIn('status', ['pending', 'in_progress'])->count();
-        
+
         $today = Carbon::today();
         $approvedToday = $allRequests->where('status', 'approved')
             ->filter(function ($req) use ($today) {
                 return $req->completed_at && $req->completed_at->isSameDay($today);
             })->count();
-            
+
         $rejectedToday = $allRequests->where('status', 'rejected')
             ->filter(function ($req) use ($today) {
                 return $req->completed_at && $req->completed_at->isSameDay($today);
@@ -94,7 +93,7 @@ class GetApprovalMonitoringDataAction
                 $q->where('submitted_at', '<=', Carbon::parse($endDate)->endOfDay());
             });
         }
-        
+
         if ($approverId) {
             $overdueQuery->whereHas('flowStep', function ($fs) use ($approverId) {
                 $fs->where('approver_user_id', $approverId);
@@ -106,7 +105,7 @@ class GetApprovalMonitoringDataAction
         $overdueFormatted = $overdueSteps->map(function ($step) {
             $request = $step->request;
             $document = $request->approvable;
-            
+
             $entityName = "ID: {$request->approvable_id}";
             if ($document) {
                 $entityName = $document->name ?? $document->code ?? $document->title ?? $document->reference ?? $entityName;

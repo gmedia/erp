@@ -19,7 +19,7 @@ describe('Department API Endpoints', function () {
             'department',
             'department.create',
             'department.edit',
-            'department.delete'
+            'department.delete',
         ]);
 
         actingAs($user);
@@ -30,7 +30,7 @@ describe('Department API Endpoints', function () {
         // We dynamically calculate how many more we need to reach 15 total
         $existingCount = Department::count();
         $needed = 15 - $existingCount;
-        
+
         if ($needed > 0) {
             Department::factory()->count($needed)->create();
         }
@@ -40,9 +40,9 @@ describe('Department API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'name', 'created_at', 'updated_at']
+                    '*' => ['id', 'name', 'created_at', 'updated_at'],
                 ],
-                'meta' => ['total', 'per_page', 'current_page']
+                'meta' => ['total', 'per_page', 'current_page'],
             ]);
 
         expect($response->json('meta.total'))->toBe(15)
@@ -71,10 +71,10 @@ describe('Department API Endpoints', function () {
 
         $response->assertOk();
         expect($response->json('data.0.name'))->toBe('ZZZZ Beta');
-        
+
         // Sort Ascending -> AAAA Alpha should be first
         $response = getJson('/api/departments?sort_by=name&sort_direction=asc');
-        
+
         $response->assertOk();
         expect($response->json('data.0.name'))->toBe('AAAA Alpha');
     });

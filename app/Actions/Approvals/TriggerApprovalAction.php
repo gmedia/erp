@@ -2,10 +2,10 @@
 
 namespace App\Actions\Approvals;
 
+use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalFlow;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
-use App\Models\ApprovalAuditLog;
 use App\Traits\HandlesConditions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -19,16 +19,16 @@ class TriggerApprovalAction
     /**
      * Trigger an approval flow for a given entity.
      *
-     * @param Model $entity The entity to be approved
-     * @param array $params Configuration parameters (e.g., flow_code)
-     * @return ApprovalRequest|null
+     * @param  Model  $entity  The entity to be approved
+     * @param  array  $params  Configuration parameters (e.g., flow_code)
      */
     public function execute(Model $entity, array $params): ?ApprovalRequest
     {
         $flow = $this->resolveFlow($entity, $params);
 
-        if (!$flow) {
-            Log::warning("No matching approval flow found for entity: " . get_class($entity) . " ID: " . $entity->getKey());
+        if (! $flow) {
+            Log::warning('No matching approval flow found for entity: ' . get_class($entity) . ' ID: ' . $entity->getKey());
+
             return null;
         }
 
@@ -95,7 +95,7 @@ class TriggerApprovalAction
 
         foreach ($flows as $flow) {
             $conditions = $flow->conditions;
-            
+
             // If no conditions, it's a default flow
             if (empty($conditions)) {
                 return $flow;

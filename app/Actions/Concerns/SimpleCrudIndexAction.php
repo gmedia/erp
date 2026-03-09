@@ -3,8 +3,6 @@
 namespace App\Actions\Concerns;
 
 use App\Domain\Concerns\BaseFilterService;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -16,6 +14,28 @@ use Illuminate\Foundation\Http\FormRequest;
 abstract class SimpleCrudIndexAction
 {
     use BaseFilterService;
+
+    /**
+     * Execute the action to retrieve paginated entities with filters.
+     */
+    public function execute(FormRequest $request): \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Database\Eloquent\Collection
+    {
+        $modelClass = $this->getModelClass();
+        $query = $modelClass::query();
+
+        if ($request->filled('search')) {
+            $this->applySearch($query, $request->get('search'), $this->getSearchFields());
+        }
+
+        $this->applySorting(
+            $query,
+            $request->get('sort_by', $this->getDefaultSortBy()),
+            strtolower($request->get('sort_direction', $this->getDefaultSortDirection())) === 'asc' ? 'asc' : 'desc',
+            $this->getSortableFields()
+        );
+
+        return $query->paginate($request->get('per_page', $this->getDefaultPerPage()));
+    }
 
     /**
      * Get the model class for the entity.
@@ -66,30 +86,5 @@ abstract class SimpleCrudIndexAction
     protected function getDefaultPerPage(): int
     {
         return 15;
-    }
-
-    /**
-     * Execute the action to retrieve paginated entities with filters.
-     *
-     * @param  \Illuminate\Foundation\Http\FormRequest  $request
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Database\Eloquent\Collection
-     */
-    public function execute(FormRequest $request): \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Database\Eloquent\Collection
-    {
-        $modelClass = $this->getModelClass();
-        $query = $modelClass::query();
-
-        if ($request->filled('search')) {
-            $this->applySearch($query, $request->get('search'), $this->getSearchFields());
-        }
-
-        $this->applySorting(
-            $query,
-            $request->get('sort_by', $this->getDefaultSortBy()),
-            strtolower($request->get('sort_direction', $this->getDefaultSortDirection())) === 'asc' ? 'asc' : 'desc',
-            $this->getSortableFields()
-        );
-
-        return $query->paginate($request->get('per_page', $this->getDefaultPerPage()));
     }
 }

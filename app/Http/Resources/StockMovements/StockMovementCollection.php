@@ -11,4 +11,3 @@ class StockMovementCollection extends ResourceCollection
      */
     public $collects = StockMovementResource::class;
 }
-

@@ -11,8 +11,7 @@ class IndexStockAdjustmentsAction
 {
     public function __construct(
         private StockAdjustmentFilterService $filterService
-    ) {
-    }
+    ) {}
 
     public function execute(IndexStockAdjustmentRequest $request): LengthAwarePaginator
     {
@@ -24,7 +23,7 @@ class IndexStockAdjustmentsAction
             $this->filterService->applySearch($query, $request->get('search'), ['adjustment_number', 'notes']);
         }
 
-        if (!$request->filled('status')) {
+        if (! $request->filled('status')) {
             $query->where('status', '!=', 'cancelled');
         }
 

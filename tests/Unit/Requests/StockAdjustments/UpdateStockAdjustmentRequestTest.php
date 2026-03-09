@@ -5,12 +5,12 @@ use App\Http\Requests\StockAdjustments\UpdateStockAdjustmentRequest;
 uses()->group('stock-adjustments');
 
 test('authorize returns true', function () {
-    $request = new UpdateStockAdjustmentRequest();
+    $request = new UpdateStockAdjustmentRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules contains optional update fields', function () {
-    $request = new UpdateStockAdjustmentRequest();
+    $request = new UpdateStockAdjustmentRequest;
     $rules = $request->rules();
 
     expect($rules)->toHaveKeys([

@@ -24,7 +24,7 @@ class StockAdjustmentReportExport implements FromCollection, ShouldAutoSize, Wit
     public function collection()
     {
         $action = app(IndexStockAdjustmentReportAction::class);
-        $request = new IndexStockAdjustmentReportRequest();
+        $request = new IndexStockAdjustmentReportRequest;
         $request->merge($this->filters);
 
         return $action->execute($request);

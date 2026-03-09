@@ -53,4 +53,3 @@ test('to array returns correct structure', function () {
         ->and($result['warehouse']['name'])->toBe('Main WH')
         ->and($result['items'])->toHaveCount(1);
 });
-

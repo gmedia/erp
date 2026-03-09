@@ -14,10 +14,10 @@ test('execute generates excel file and returns url', function () {
     Carbon::setTestNow(now());
     Excel::fake();
     Storage::fake('public');
-    
+
     Department::factory()->count(3)->create();
 
-    $action = new ExportDepartmentsAction();
+    $action = new ExportDepartmentsAction;
     $request = Mockery::mock(ExportDepartmentRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'search' => null,
@@ -25,7 +25,7 @@ test('execute generates excel file and returns url', function () {
         'sort_direction' => 'desc',
     ]);
     $request->shouldReceive('filled')->with('search')->andReturn(false);
-    
+
     $result = $action->execute($request);
 
     $filename = 'departments_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
@@ -41,11 +41,11 @@ test('execute filters export by search term', function () {
     Carbon::setTestNow(now());
     Excel::fake();
     Storage::fake('public');
-    
+
     Department::factory()->create(['name' => 'IT Department']);
     Department::factory()->create(['name' => 'HR Department']);
 
-    $action = new ExportDepartmentsAction();
+    $action = new ExportDepartmentsAction;
     $request = Mockery::mock(ExportDepartmentRequest::class);
     $request->shouldReceive('validated')->andReturn([
         'search' => 'IT',
@@ -53,9 +53,9 @@ test('execute filters export by search term', function () {
         'sort_direction' => 'desc',
     ]);
     $request->shouldReceive('filled')->with('search')->andReturn(true);
-    
+
     $action->execute($request);
-    
+
     $filename = 'departments_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
     Excel::assertStored('exports/' . $filename, 'public');
 });

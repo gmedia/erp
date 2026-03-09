@@ -11,7 +11,7 @@ class DepartmentSeeder extends Seeder
     {
         $departments = [
             'HR', 'Engineering', 'Sales', 'Marketing', 'Finance',
-            'Operations', 'Customer Support', 'Product', 'Design', 'Legal'
+            'Operations', 'Customer Support', 'Product', 'Design', 'Legal',
         ];
 
         foreach ($departments as $name) {

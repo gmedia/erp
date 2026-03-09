@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Account;
 use App\Models\JournalEntry;
-use App\Models\JournalEntryLine;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

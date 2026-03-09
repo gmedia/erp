@@ -4,7 +4,6 @@ use App\Http\Requests\Employees\IndexEmployeeRequest;
 use App\Models\Department;
 use App\Models\Position;
 
-
 uses()->group('employees');
 
 describe('IndexEmployeeRequest', function () {
@@ -31,7 +30,7 @@ describe('IndexEmployeeRequest', function () {
             'sort_by',
             'sort_direction',
             'per_page',
-            'page'
+            'page',
         ]);
     });
 
@@ -55,7 +54,7 @@ describe('IndexEmployeeRequest', function () {
 
         $validator = validator($data, (new IndexEmployeeRequest)->rules());
 
-        expect(!$validator->fails())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 
     test('rules validation passes with empty data', function () {
@@ -63,7 +62,7 @@ describe('IndexEmployeeRequest', function () {
 
         $validator = validator($data, (new IndexEmployeeRequest)->rules());
 
-        expect(!$validator->fails())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with invalid sort_by', function () {
@@ -155,7 +154,7 @@ describe('IndexEmployeeRequest', function () {
 
             $validator = validator($data, (new IndexEmployeeRequest)->rules());
 
-            expect(!$validator->fails())->toBeTrue();
+            expect(! $validator->fails())->toBeTrue();
         }
     });
 
@@ -167,7 +166,7 @@ describe('IndexEmployeeRequest', function () {
 
             $validator = validator($data, (new IndexEmployeeRequest)->rules());
 
-            expect(!$validator->fails())->toBeTrue();
+            expect(! $validator->fails())->toBeTrue();
         }
     });
 
@@ -179,7 +178,7 @@ describe('IndexEmployeeRequest', function () {
 
         $validator = validator($data, (new IndexEmployeeRequest)->rules());
 
-        expect(!$validator->fails())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 
     test('rules validation passes with valid hire_date range', function () {
@@ -190,6 +189,6 @@ describe('IndexEmployeeRequest', function () {
 
         $validator = validator($data, (new IndexEmployeeRequest)->rules());
 
-        expect(!$validator->fails())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 });

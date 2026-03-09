@@ -10,23 +10,44 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property int $id
  * @property int $product_id
- * @property string $name
- * @property string $code
+ * @property string $name Plan name: Monthly, Quarterly, Annual
+ * @property string $code Unique plan code: PRD-001-MONTHLY
  * @property string|null $description
- * @property string $billing_interval
- * @property int $billing_interval_count
- * @property string $price
- * @property string $setup_fee
- * @property int|null $trial_period_days
- * @property int|null $minimum_commitment_cycles
- * @property bool $auto_renew
+ * @property string $billing_interval How often customer is billed
+ * @property int $billing_interval_count Multiplier for interval (e.g., 3 months = interval:monthly, count:3)
+ * @property numeric $price Recurring price per billing cycle
+ * @property numeric $setup_fee One-time setup/activation fee
+ * @property int|null $trial_period_days Free trial days (overrides product setting)
+ * @property int|null $minimum_commitment_cycles Minimum billing cycles required (null = no minimum)
+ * @property bool $auto_renew Auto-renew at end of commitment
  * @property string $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CustomerSubscription> $customerSubscriptions
+ * @property-read int|null $customer_subscriptions_count
+ * @property-read string $total_price
+ * @property-read \App\Models\Product $product
  *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan active()
+ * @method static \Database\Factories\SubscriptionPlanFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereAutoRenew($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereBillingInterval($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereBillingIntervalCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereMinimumCommitmentCycles($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereSetupFee($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereTrialPeriodDays($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

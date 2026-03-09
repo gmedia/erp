@@ -20,6 +20,7 @@ class FiscalYearFactory extends Factory
     public function definition(): array
     {
         $year = $this->faker->unique()->year();
+
         return [
             'name' => (string) $year,
             'start_date' => $year . '-01-01',

@@ -35,7 +35,7 @@ class SyncStockTransferItemsAction
             }
 
             $stockTransfer->items()
-                ->when(!empty($productIds), fn ($q) => $q->whereNotIn('product_id', $productIds))
+                ->when(! empty($productIds), fn ($q) => $q->whereNotIn('product_id', $productIds))
                 ->delete();
         });
     }

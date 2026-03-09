@@ -5,12 +5,12 @@ use App\Http\Requests\Positions\IndexPositionRequest;
 uses()->group('positions');
 
 test('authorize returns true', function () {
-    $request = new IndexPositionRequest();
+    $request = new IndexPositionRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new IndexPositionRequest();
+    $request = new IndexPositionRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

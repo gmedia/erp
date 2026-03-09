@@ -10,11 +10,11 @@ test('apply search filters by name', function () {
     ProductCategory::factory()->create(['name' => 'Electronics']);
     ProductCategory::factory()->create(['name' => 'Furniture']);
 
-    $service = new ProductCategoryFilterService();
+    $service = new ProductCategoryFilterService;
     $query = ProductCategory::query();
-    
+
     $service->applySearch($query, 'Electro', ['name']);
-    
+
     expect($query->count())->toBe(1)
         ->and($query->first()->name)->toBe('Electronics');
 });

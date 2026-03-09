@@ -95,7 +95,7 @@ describe('ProductExport', function () {
     test('map transforms product data correctly', function () {
         $category = ProductCategory::factory()->create(['name' => 'Electronics']);
         $unit = Unit::factory()->create(['name' => 'Pcs']);
-        
+
         $product = Product::factory()->create([
             'code' => 'P-001',
             'name' => 'Smartphone',

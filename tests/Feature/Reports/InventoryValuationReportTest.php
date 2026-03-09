@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Maatwebsite\Excel\Facades\Excel;
 
-use function Pest\Laravel\actingAs;
-
 uses(RefreshDatabase::class)->group('inventory-valuation-report');
 
 beforeEach(function () {
@@ -26,8 +24,6 @@ test('it requires permission to access inventory valuation report', function () 
     $this->getJson('/api/reports/inventory-valuation')
         ->assertForbidden();
 });
-
-
 
 test('it can fetch inventory valuation data via json', function () {
     $branch = Branch::factory()->create(['name' => 'HQ']);

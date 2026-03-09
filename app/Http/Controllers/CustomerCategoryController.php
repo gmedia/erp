@@ -27,7 +27,7 @@ class CustomerCategoryController extends Controller
      */
     public function index(IndexCustomerCategoryRequest $request): JsonResponse
     {
-        $customerCategories = (new IndexCustomerCategoriesAction())->execute($request);
+        $customerCategories = (new IndexCustomerCategoriesAction)->execute($request);
 
         return (new CustomerCategoryCollection($customerCategories))->response();
     }
@@ -77,6 +77,6 @@ class CustomerCategoryController extends Controller
      */
     public function export(ExportCustomerCategoryRequest $request): JsonResponse
     {
-        return (new ExportCustomerCategoriesAction())->execute($request);
+        return (new ExportCustomerCategoriesAction)->execute($request);
     }
 }

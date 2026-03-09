@@ -10,16 +10,6 @@ use App\Models\CoaVersion;
  */
 class CoaVersionExport extends SimpleCrudExport
 {
-    protected function getModelClass(): string
-    {
-        return CoaVersion::class;
-    }
-
-    protected function getSortableFields(): array
-    {
-        return ['id', 'name', 'fiscal_year_id', 'status', 'created_at', 'updated_at'];
-    }
-
     public function headings(): array
     {
         return [
@@ -42,5 +32,15 @@ class CoaVersionExport extends SimpleCrudExport
             $model->created_at?->toIso8601String(),
             $model->updated_at?->toIso8601String(),
         ];
+    }
+
+    protected function getModelClass(): string
+    {
+        return CoaVersion::class;
+    }
+
+    protected function getSortableFields(): array
+    {
+        return ['id', 'name', 'fiscal_year_id', 'status', 'created_at', 'updated_at'];
     }
 }

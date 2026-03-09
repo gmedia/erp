@@ -11,8 +11,7 @@ class IndexStockTransfersAction
 {
     public function __construct(
         private StockTransferFilterService $filterService
-    ) {
-    }
+    ) {}
 
     public function execute(IndexStockTransferRequest $request): LengthAwarePaginator
     {
@@ -24,7 +23,7 @@ class IndexStockTransfersAction
             $this->filterService->applySearch($query, $request->get('search'), ['transfer_number', 'notes']);
         }
 
-        if (!$request->filled('status')) {
+        if (! $request->filled('status')) {
             $query->where('status', '!=', 'cancelled');
         }
 

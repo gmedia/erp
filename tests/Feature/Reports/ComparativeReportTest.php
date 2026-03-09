@@ -8,7 +8,6 @@ use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
-use function Pest\Laravel\actingAs;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('reports');

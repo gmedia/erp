@@ -5,12 +5,12 @@ use App\Http\Requests\SupplierCategories\ExportSupplierCategoryRequest;
 uses()->group('supplier-categories');
 
 test('authorize returns true', function () {
-    $request = new ExportSupplierCategoryRequest();
+    $request = new ExportSupplierCategoryRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules returns correct validation rules', function () {
-    $request = new ExportSupplierCategoryRequest();
+    $request = new ExportSupplierCategoryRequest;
 
     expect($request->rules())->toEqual([
         'search' => ['nullable', 'string'],

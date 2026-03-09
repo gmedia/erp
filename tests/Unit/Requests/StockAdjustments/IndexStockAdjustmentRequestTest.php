@@ -5,12 +5,12 @@ use App\Http\Requests\StockAdjustments\IndexStockAdjustmentRequest;
 uses()->group('stock-adjustments');
 
 test('authorize returns true', function () {
-    $request = new IndexStockAdjustmentRequest();
+    $request = new IndexStockAdjustmentRequest;
     expect($request->authorize())->toBeTrue();
 });
 
 test('rules contains filter and pagination fields', function () {
-    $request = new IndexStockAdjustmentRequest();
+    $request = new IndexStockAdjustmentRequest;
     $rules = $request->rules();
 
     expect($rules)->toHaveKeys([

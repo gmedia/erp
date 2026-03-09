@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('stock-transfers');
 
 test('authorize returns true', function () {
-    $request = new UpdateStockTransferRequest();
+    $request = new UpdateStockTransferRequest;
     expect($request->authorize())->toBeTrue();
 });
 
@@ -22,4 +22,3 @@ test('rules builds unique rule with current model id', function () {
 
     expect($rules['transfer_number'])->toContain('unique:stock_transfers,transfer_number,' . $transfer->id);
 });
-

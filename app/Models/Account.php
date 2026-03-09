@@ -8,6 +8,54 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $coa_version_id
+ * @property int|null $parent_id
+ * @property string $code
+ * @property string $name
+ * @property string $type
+ * @property string|null $sub_type
+ * @property string $normal_balance
+ * @property int $level
+ * @property bool $is_active
+ * @property bool $is_cash_flow
+ * @property string|null $description
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Account> $children
+ * @property-read int|null $children_count
+ * @property-read \App\Models\CoaVersion $coaVersion
+ * @property-read float $balance
+ * @property-read float $total_credit
+ * @property-read float $total_debit
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JournalEntryLine> $journalLines
+ * @property-read int|null $journal_lines_count
+ * @property-read Account|null $parent
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account active()
+ * @method static \Database\Factories\AccountFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account ofType(string $type)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereCoaVersionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereIsCashFlow($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereNormalBalance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereParentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereSubType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereUpdatedAt($value)
+ *
+ * @mixin \Eloquent
+ */
 class Account extends Model
 {
     use HasFactory;
@@ -60,7 +108,7 @@ class Account extends Model
     public function getBalanceAttribute(): float
     {
         $lines = $this->journalLines()
-            ->whereHas('journalEntry', fn($q) => $q->where('status', 'posted'))
+            ->whereHas('journalEntry', fn ($q) => $q->where('status', 'posted'))
             ->get();
 
         $totalDebit = $lines->sum('debit');
@@ -81,7 +129,7 @@ class Account extends Model
         $lines = $this->journalLines()
             ->whereHas('journalEntry', function ($q) use ($startDate, $endDate) {
                 $q->where('status', 'posted')
-                  ->whereBetween('entry_date', [$startDate, $endDate]);
+                    ->whereBetween('entry_date', [$startDate, $endDate]);
             })
             ->get();
 
@@ -101,7 +149,7 @@ class Account extends Model
     public function getTotalDebitAttribute(): float
     {
         return (float) $this->journalLines()
-            ->whereHas('journalEntry', fn($q) => $q->where('status', 'posted'))
+            ->whereHas('journalEntry', fn ($q) => $q->where('status', 'posted'))
             ->sum('debit');
     }
 
@@ -111,7 +159,7 @@ class Account extends Model
     public function getTotalCreditAttribute(): float
     {
         return (float) $this->journalLines()
-            ->whereHas('journalEntry', fn($q) => $q->where('status', 'posted'))
+            ->whereHas('journalEntry', fn ($q) => $q->where('status', 'posted'))
             ->sum('credit');
     }
 
