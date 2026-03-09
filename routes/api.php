@@ -71,37 +71,49 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
 
-        // --- Master Data ---
-    require __DIR__ . '/api/master_data.php';
-
-        // --- Customer Supplier ---
-    require __DIR__ . '/api/customer_supplier.php';
-
-        // --- Products Inventory ---
-    require __DIR__ . '/api/products_inventory.php';
-
-        // --- Accounting ---
-    require __DIR__ . '/api/accounting.php';
-
-        // --- Assets ---
+    require __DIR__ . '/api/account-mappings.php';
+    require __DIR__ . '/api/accounts.php';
+    require __DIR__ . '/api/admin-settings.php';
+    require __DIR__ . '/api/approval-audit-trail.php';
+    require __DIR__ . '/api/approval-delegations.php';
+    require __DIR__ . '/api/approval-flows.php';
+    require __DIR__ . '/api/approval-monitoring.php';
+    require __DIR__ . '/api/asset-categories.php';
+    require __DIR__ . '/api/asset-depreciation-runs.php';
+    require __DIR__ . '/api/asset-locations.php';
+    require __DIR__ . '/api/asset-maintenances.php';
+    require __DIR__ . '/api/asset-models.php';
+    require __DIR__ . '/api/asset-movements.php';
+    require __DIR__ . '/api/asset-stocktakes.php';
     require __DIR__ . '/api/assets.php';
-
-        // --- Pipeline Workflow ---
-    require __DIR__ . '/api/pipeline_workflow.php';
-
-        // --- Approvals ---
-    require __DIR__ . '/api/approvals.php';
-
-        // --- Reports ---
-    require __DIR__ . '/api/reports.php';
-
-        // --- Users Permissions ---
-    require __DIR__ . '/api/users_permissions.php';
-
-        // --- Admin Settings ---
-    require __DIR__ . '/api/admin_settings.php';
-
-        // --- Dashboard ---
+    require __DIR__ . '/api/branches.php';
+    require __DIR__ . '/api/coa-versions.php';
+    require __DIR__ . '/api/customer-categories.php';
+    require __DIR__ . '/api/customers.php';
     require __DIR__ . '/api/dashboard.php';
+    require __DIR__ . '/api/departments.php';
+    require __DIR__ . '/api/employees.php';
+    require __DIR__ . '/api/fiscal-years.php';
+    require __DIR__ . '/api/inventory-stocktakes.php';
+    require __DIR__ . '/api/journal-entries.php';
+    require __DIR__ . '/api/my-approvals.php';
+    require __DIR__ . '/api/permissions.php';
+    require __DIR__ . '/api/pipeline-audit-trail.php';
+    require __DIR__ . '/api/pipeline-dashboard.php';
+    require __DIR__ . '/api/pipelines.php';
+    require __DIR__ . '/api/positions.php';
+    require __DIR__ . '/api/posting-journals.php';
+    require __DIR__ . '/api/product-categories.php';
+    require __DIR__ . '/api/products.php';
+    require __DIR__ . '/api/reports.php';
+    require __DIR__ . '/api/stock-adjustments.php';
+    require __DIR__ . '/api/stock-monitor.php';
+    require __DIR__ . '/api/stock-movements.php';
+    require __DIR__ . '/api/stock-transfers.php';
+    require __DIR__ . '/api/supplier-categories.php';
+    require __DIR__ . '/api/suppliers.php';
+    require __DIR__ . '/api/units.php';
+    require __DIR__ . '/api/users.php';
+    require __DIR__ . '/api/warehouses.php';
 });
 

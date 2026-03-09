@@ -10,7 +10,6 @@ use App\Http\Controllers\StockAdjustmentReportController;
 use App\Http\Controllers\StockMovementReportController;
 use Illuminate\Support\Facades\Route;
 
-// --- Reports ---
 Route::prefix('reports')->group(function () {
     Route::get('trial-balance', [ReportController::class, 'trialBalance'])->middleware('permission:trial_balance_report');
     Route::get('balance-sheet', [ReportController::class, 'balanceSheet'])->middleware('permission:balance_sheet_report');
