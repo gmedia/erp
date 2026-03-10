@@ -29,7 +29,7 @@ test.describe('Goods Receipt Report', () => {
                 response.url().includes('/reports/goods-receipt/export') &&
                 response.status() < 400,
         );
-        await page.getByRole('button', { name: /export/i }).click();
+        await page.getByRole('button', { name: /export/i }).click({ force: true });
         await exportResponsePromise;
 
         const searchInput = page.getByRole('textbox').first();

@@ -147,6 +147,9 @@ const ReportStockMovement = lazy(
 const ReportStockAdjustment = lazy(
     () => import('./pages/reports/stock-adjustment/index'),
 );
+const ReportGoodsReceipt = lazy(
+    () => import('./pages/reports/goods-receipt/index'),
+);
 
 // Helper to wrap protected routes
 const P = ({ children }: { children: React.ReactNode }) => (
@@ -757,6 +760,14 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <ReportStockAdjustment />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/reports/goods-receipt"
+                    element={
+                        <P>
+                            <ReportGoodsReceipt />
                         </P>
                     }
                 />

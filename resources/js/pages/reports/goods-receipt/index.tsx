@@ -9,7 +9,7 @@ import { createGoodsReceiptReportFilterFields } from '@/components/reports/goods
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 
 export default function GoodsReceiptReportPage() {
     const filterFields = createGoodsReceiptReportFilterFields();
@@ -35,7 +35,7 @@ export default function GoodsReceiptReportPage() {
     });
 
     const { data, isLoading, meta } = useCrudQuery<GoodsReceiptReportItem>({
-        endpoint: '/reports/goods-receipt',
+        endpoint: '/api/reports/goods-receipt',
         queryKey: ['goods-receipt-report'],
         entityName: 'Goods Receipt Report',
         pagination,
@@ -44,7 +44,9 @@ export default function GoodsReceiptReportPage() {
 
     return (
         <>
-            <Head title="Goods Receipt Report" />
+            <Helmet>
+                <title>Goods Receipt Report</title>
+            </Helmet>
             <AppLayout
                 breadcrumbs={[
                     { title: 'Reports', href: '#' },
@@ -78,7 +80,7 @@ export default function GoodsReceiptReportPage() {
                             onFilterChange={handleFilterChange}
                             onResetFilters={resetFilters}
                             filterFields={filterFields}
-                            exportEndpoint="/reports/goods-receipt/export"
+                            exportEndpoint="/api/reports/goods-receipt/export"
                             entityName="Goods Receipt Report"
                         />
                     </div>
