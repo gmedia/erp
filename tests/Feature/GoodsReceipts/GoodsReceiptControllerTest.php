@@ -8,7 +8,7 @@ use App\Models\Unit;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use function Pest\Laravel\actingAs;
+use Laravel\Sanctum\Sanctum;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
@@ -19,13 +19,13 @@ use function Pest\Laravel\putJson;
 uses(RefreshDatabase::class)->group('goods-receipts');
 
 beforeEach(function () {
-    $this->user = createTestUserWithPermissions([
+    $user = createTestUserWithPermissions([
         'goods_receipt',
         'goods_receipt.create',
         'goods_receipt.edit',
         'goods_receipt.delete',
     ]);
-    actingAs($this->user);
+    Sanctum::actingAs($user, ['*']);
 });
 
 function createPurchaseOrderWithItemForGoodsReceipt(): array

@@ -2,20 +2,13 @@ import { expect, Page } from '@playwright/test';
 
 export async function createGoodsReceipt(page: Page): Promise<string> {
     const createResult = await page.evaluate(async () => {
-        const csrf = document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute('content') || '';
-        const xsrfCookie = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('XSRF-TOKEN='));
-        const xsrfToken = xsrfCookie
-            ? decodeURIComponent(xsrfCookie.split('=')[1])
-            : '';
+        const apiToken = localStorage.getItem('api_token') || '';
 
         const getFirstId = async (url: string): Promise<number> => {
             const response = await fetch(url, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
+                    Authorization: `Bearer ${apiToken}`,
                 },
             });
             const json = await response.json();
@@ -35,8 +28,7 @@ export async function createGoodsReceipt(page: Page): Promise<string> {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                'X-CSRF-TOKEN': csrf,
-                'X-XSRF-TOKEN': xsrfToken,
+                Authorization: `Bearer ${apiToken}`,
                 'X-Requested-With': 'XMLHttpRequest',
             },
             body: JSON.stringify({
@@ -66,8 +58,7 @@ export async function createGoodsReceipt(page: Page): Promise<string> {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                'X-CSRF-TOKEN': csrf,
-                'X-XSRF-TOKEN': xsrfToken,
+                Authorization: `Bearer ${apiToken}`,
                 'X-Requested-With': 'XMLHttpRequest',
             },
             body: JSON.stringify({
@@ -127,21 +118,14 @@ export async function editGoodsReceipt(
 
     const updateResult = await page.evaluate(
         async ({ findBy, nextGrNumber }) => {
-            const csrf = document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute('content') || '';
-            const xsrfCookie = document.cookie
-                .split('; ')
-                .find((row) => row.startsWith('XSRF-TOKEN='));
-            const xsrfToken = xsrfCookie
-                ? decodeURIComponent(xsrfCookie.split('=')[1])
-                : '';
+            const apiToken = localStorage.getItem('api_token') || '';
 
             const findResponse = await fetch(
                 `/api/goods-receipts?search=${encodeURIComponent(findBy)}&per_page=1`,
                 {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
+                        Authorization: `Bearer ${apiToken}`,
                     },
                 },
             );
@@ -156,8 +140,7 @@ export async function editGoodsReceipt(
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-CSRF-TOKEN': csrf,
-                    'X-XSRF-TOKEN': xsrfToken,
+                    Authorization: `Bearer ${apiToken}`,
                     'X-Requested-With': 'XMLHttpRequest',
                 },
                 body: JSON.stringify({ gr_number: nextGrNumber }),

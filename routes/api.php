@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/departments.php';
     require __DIR__ . '/api/employees.php';
     require __DIR__ . '/api/fiscal-years.php';
+    require __DIR__ . '/api/goods-receipts.php';
     require __DIR__ . '/api/inventory-stocktakes.php';
     require __DIR__ . '/api/journal-entries.php';
     require __DIR__ . '/api/my-approvals.php';

@@ -5,14 +5,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
-use function Pest\Laravel\actingAs;
+use Laravel\Sanctum\Sanctum;
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class)->group('goods-receipts');
 
 beforeEach(function () {
     $user = createTestUserWithPermissions(['goods_receipt']);
-    actingAs($user);
+    Sanctum::actingAs($user, ['*']);
 });
 
 test('it exports goods receipts and returns file url', function () {

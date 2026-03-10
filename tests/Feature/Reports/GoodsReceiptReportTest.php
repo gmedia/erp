@@ -12,10 +12,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Inertia\Testing\AssertableInertia as Assert;
+use Laravel\Sanctum\Sanctum;
 use Maatwebsite\Excel\Facades\Excel;
 
-use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class)->group('goods-receipt-report');
 
@@ -25,21 +26,9 @@ beforeEach(function () {
 });
 
 test('it requires permission to access goods receipt report', function () {
-    actingAs($this->otherUser)
-        ->get(route('reports.goods-receipt'))
+    Sanctum::actingAs($this->otherUser, ['*']);
+    getJson('/api/reports/goods-receipt')
         ->assertForbidden();
-});
-
-test('it can render goods receipt report page', function () {
-    GoodsReceipt::factory()->create();
-
-    actingAs($this->user)
-        ->get(route('reports.goods-receipt'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('reports/goods-receipt/index')
-            ->has('rows.data')
-        );
 });
 
 test('it can fetch aggregated goods receipt report data', function () {
@@ -85,8 +74,8 @@ test('it can fetch aggregated goods receipt report data', function () {
         'unit_price' => 1000,
     ]);
 
-    actingAs($this->user)
-        ->getJson(route('reports.goods-receipt'))
+    Sanctum::actingAs($this->user, ['*']);
+    getJson('/api/reports/goods-receipt')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
             ->has('data', 1)
@@ -161,32 +150,29 @@ test('it can filter by supplier warehouse product status and date range', functi
         'unit_id' => $unit->id,
     ]);
 
-    actingAs($this->user)
-        ->getJson(route('reports.goods-receipt', ['supplier_id' => $supplierA->id]))
+    Sanctum::actingAs($this->user, ['*']);
+
+    getJson('/api/reports/goods-receipt?supplier_id=' . $supplierA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.goods_receipt.gr_number', 'GR-FLT-001');
 
-    actingAs($this->user)
-        ->getJson(route('reports.goods-receipt', ['warehouse_id' => $warehouseB->id]))
+    getJson('/api/reports/goods-receipt?warehouse_id=' . $warehouseB->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.goods_receipt.gr_number', 'GR-FLT-002');
 
-    actingAs($this->user)
-        ->getJson(route('reports.goods-receipt', ['product_id' => $productA->id]))
+    getJson('/api/reports/goods-receipt?product_id=' . $productA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.goods_receipt.gr_number', 'GR-FLT-001');
 
-    actingAs($this->user)
-        ->getJson(route('reports.goods-receipt', ['status' => 'draft']))
+    getJson('/api/reports/goods-receipt?status=draft')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.goods_receipt.gr_number', 'GR-FLT-002');
 
-    actingAs($this->user)
-        ->getJson(route('reports.goods-receipt', ['start_date' => '2026-03-10', 'end_date' => '2026-03-31']))
+    getJson('/api/reports/goods-receipt?start_date=2026-03-10&end_date=2026-03-31')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.goods_receipt.gr_number', 'GR-FLT-002');
@@ -197,8 +183,8 @@ test('it can export goods receipt report', function () {
     Excel::fake();
     Storage::fake('public');
 
-    $response = actingAs($this->user)
-        ->postJson(route('reports.goods-receipt.export'))
+    Sanctum::actingAs($this->user, ['*']);
+    $response = postJson('/api/reports/goods-receipt/export')
         ->assertOk()
         ->assertJsonStructure(['url', 'filename']);
 
