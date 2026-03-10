@@ -14,9 +14,11 @@ export async function createPurchaseOrderReportData(page: Page): Promise<string>
             : '';
 
         const getFirstId = async (url: string): Promise<number> => {
+            const apiToken = localStorage.getItem('api_token') || '';
             const response = await fetch(url, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
+                    Authorization: `Bearer ${apiToken}`,
                 },
             });
             const json = await response.json();
@@ -31,14 +33,14 @@ export async function createPurchaseOrderReportData(page: Page): Promise<string>
             getFirstId('/api/units?per_page=1'),
         ]);
 
+        const apiToken = localStorage.getItem('api_token') || '';
         const response = await fetch('/api/purchase-orders', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                'X-CSRF-TOKEN': csrf,
-                'X-XSRF-TOKEN': xsrfToken,
                 'X-Requested-With': 'XMLHttpRequest',
+                Authorization: `Bearer ${apiToken}`,
             },
             body: JSON.stringify({
                 supplier_id: supplierId,
@@ -76,7 +78,7 @@ export async function waitForPurchaseOrderStatusReportResponse(page: Page): Prom
     await page
         .waitForResponse(
             (response) =>
-                response.url().includes('/reports/purchase-order-status') &&
+                response.url().includes('/api/reports/purchase-order-status') &&
                 response.request().headers()['accept']?.includes(
                     'application/json',
                 ) &&

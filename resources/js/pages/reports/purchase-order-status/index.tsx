@@ -9,7 +9,7 @@ import { createPurchaseOrderStatusReportFilterFields } from '@/components/report
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 
 export default function PurchaseOrderStatusReportPage() {
     const filterFields = createPurchaseOrderStatusReportFilterFields();
@@ -36,7 +36,7 @@ export default function PurchaseOrderStatusReportPage() {
     });
 
     const { data, isLoading, meta } = useCrudQuery<PurchaseOrderStatusReportItem>({
-        endpoint: '/reports/purchase-order-status',
+        endpoint: '/api/reports/purchase-order-status',
         queryKey: ['purchase-order-status-report'],
         entityName: 'Purchase Order Status Report',
         pagination,
@@ -45,7 +45,9 @@ export default function PurchaseOrderStatusReportPage() {
 
     return (
         <>
-            <Head title="Purchase Order Status Report" />
+            <Helmet>
+                <title>Purchase Order Status Report</title>
+            </Helmet>
             <AppLayout
                 breadcrumbs={[
                     { title: 'Reports', href: '#' },
@@ -79,7 +81,7 @@ export default function PurchaseOrderStatusReportPage() {
                             onFilterChange={handleFilterChange}
                             onResetFilters={resetFilters}
                             filterFields={filterFields}
-                            exportEndpoint="/reports/purchase-order-status/export"
+                            exportEndpoint="/api/reports/purchase-order-status/export"
                             entityName="Purchase Order Status Report"
                         />
                     </div>

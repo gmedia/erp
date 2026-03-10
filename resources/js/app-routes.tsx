@@ -135,6 +135,9 @@ const ReportMaintenanceCost = lazy(
 const ReportPurchaseHistory = lazy(
     () => import('./pages/reports/purchase-history/index'),
 );
+const ReportPurchaseOrderStatus = lazy(
+    () => import('./pages/reports/purchase-order-status/index'),
+);
 const ReportAssetStocktakeVariances = lazy(
     () => import('./pages/reports/asset-stocktake-variances/index'),
 );
@@ -755,6 +758,14 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <ReportPurchaseHistory />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/reports/purchase-order-status"
+                    element={
+                        <P>
+                            <ReportPurchaseOrderStatus />
                         </P>
                     }
                 />

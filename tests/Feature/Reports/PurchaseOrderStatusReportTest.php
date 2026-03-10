@@ -13,8 +13,6 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 use Maatwebsite\Excel\Facades\Excel;
 
-use function Pest\Laravel\actingAs;
-
 uses(RefreshDatabase::class)->group('purchase-order-status-report');
 
 beforeEach(function () {
@@ -24,16 +22,16 @@ beforeEach(function () {
 });
 
 test('it requires permission to access purchase order status report', function () {
-    actingAs($this->otherUserAccount)
-        ->get('/api/reports/purchase-order-status')
+    Sanctum::actingAs($this->otherUserAccount, ['*']);
+    $this->getJson('/api/reports/purchase-order-status')
         ->assertForbidden();
 });
 
 test('it can render purchase order status report page', function () {
     PurchaseOrder::factory()->create();
 
-    actingAs($this->testUser)
-        ->get('/api/reports/purchase-order-status')
+    Sanctum::actingAs($this->testUser, ['*']);
+    $this->getJson('/api/reports/purchase-order-status')
         ->assertOk();
 });
 
@@ -94,8 +92,8 @@ test('it can fetch aggregated purchase order status report data', function () {
         'quantity_received' => 8,
     ]);
 
-    $response = actingAs($this->testUser)
-        ->getJson('/api/reports/purchase-order-status')
+    Sanctum::actingAs($this->testUser, ['*']);
+    $response = $this->getJson('/api/reports/purchase-order-status')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
             ->has('data', 3)
@@ -150,26 +148,26 @@ test('it can filter by supplier, product, status category and date range', funct
         'quantity_received' => 4,
     ]);
 
-    actingAs($this->testUser)
-        ->getJson('/api/reports/purchase-order-status?supplier_id=' . $supplierA->id)
+    Sanctum::actingAs($this->testUser, ['*']);
+    $this->getJson('/api/reports/purchase-order-status?supplier_id=' . $supplierA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.supplier.id', $supplierA->id);
 
-    actingAs($this->testUser)
-        ->getJson('/api/reports/purchase-order-status?product_id=' . $productA->id)
+    Sanctum::actingAs($this->testUser, ['*']);
+    $this->getJson('/api/reports/purchase-order-status?product_id=' . $productA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.purchase_order.po_number', 'PO-FLT-001');
 
-    actingAs($this->testUser)
-        ->getJson('/api/reports/purchase-order-status?status_category=partially_received')
+    Sanctum::actingAs($this->testUser, ['*']);
+    $this->getJson('/api/reports/purchase-order-status?status_category=partially_received')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.purchase_order.po_number', 'PO-FLT-002');
 
-    actingAs($this->testUser)
-        ->getJson('/api/reports/purchase-order-status?start_date=2026-03-05&end_date=2026-03-31')
+    Sanctum::actingAs($this->testUser, ['*']);
+    $this->getJson('/api/reports/purchase-order-status?start_date=2026-03-05&end_date=2026-03-31')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.purchase_order.po_number', 'PO-FLT-002');
@@ -180,8 +178,8 @@ test('it can export purchase order status report', function () {
     Excel::fake();
     Storage::fake('public');
 
-    $response = actingAs($this->testUser)
-        ->postJson('/api/reports/purchase-order-status/export')
+    Sanctum::actingAs($this->testUser, ['*']);
+    $response = $this->postJson('/api/reports/purchase-order-status/export')
         ->assertOk()
         ->assertJsonStructure(['url', 'filename']);
 

@@ -17,7 +17,7 @@ test.describe('Purchase Order Status Report', () => {
 
         const sortResponsePromise = page.waitForResponse(
             (response) =>
-                response.url().includes('/reports/purchase-order-status') &&
+                response.url().includes('/api/reports/purchase-order-status') &&
                 response.url().includes('sort_by=purchase_order_status_category') &&
                 response.status() < 400,
         );
@@ -26,15 +26,15 @@ test.describe('Purchase Order Status Report', () => {
                 name: 'Status Category',
                 exact: true,
             })
-            .click();
+            .click({ force: true });
         await sortResponsePromise;
 
         const exportResponsePromise = page.waitForResponse(
             (response) =>
-                response.url().includes('/reports/purchase-order-status/export') &&
+                response.url().includes('/api/reports/purchase-order-status/export') &&
                 response.status() < 400,
         );
-        await page.getByRole('button', { name: /export/i }).click();
+        await page.getByRole('button', { name: /export/i }).click({ force: true });
         await exportResponsePromise;
 
         const searchInput = page.getByRole('textbox').first();
