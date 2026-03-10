@@ -46,7 +46,7 @@ Apakah modul ini:
 | Actions | `app/Actions/{Features}/` | `SimpleCrudIndexAction`, `SimpleCrudExportAction` |
 | FilterService | `app/Domain/{Features}/{Feature}FilterService.php` | Uses `BaseFilterService` trait |
 | Exports | `app/Exports/{Feature}Export.php` | `SimpleCrudExport` |
-| Routes | `routes/{feature}.php` | - |
+| Routes | `routes/api/{feature}.php` | - |
 
 ### Frontend
 | Path |
@@ -291,34 +291,27 @@ class {Feature}Controller extends Controller
 
 > **Important:** Actions diinstantiate langsung di controller, TIDAK menggunakan dependency injection.
 
-### Routes
+### Routes (`routes/api/{feature}.php`)
+
+> **Note:** File ini ada di `routes/api/`, bukan `routes/`. Frontend routing ditangani oleh `react-router-dom` di `app-routes.tsx`.
+
 ```php
 <?php
 
 use App\Http\Controllers\{Feature}Controller;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-// Frontend route
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('{features}', function () {
-        return Inertia::render('{features}/index');
-    })->name('{features}')->middleware('permission:{feature}');
-});
-
-// API routes
-Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
-    Route::middleware('permission:{feature},true')->group(function () {
-        Route::get('{features}', [{Feature}Controller::class, 'index']);
-        Route::get('{features}/{{feature}}', [{Feature}Controller::class, 'show']);
-        Route::post('{features}', [{Feature}Controller::class, 'store'])
-            ->middleware('permission:{feature}.create,true');
-        Route::put('{features}/{{feature}}', [{Feature}Controller::class, 'update'])
-            ->middleware('permission:{feature}.edit,true');
-        Route::delete('{features}/{{feature}}', [{Feature}Controller::class, 'destroy'])
-            ->middleware('permission:{feature}.delete,true');
-        Route::post('{features}/export', [{Feature}Controller::class, 'export']);
-    });
+// API routes (sudah di-prefix /api oleh RouteServiceProvider)
+Route::middleware('permission:{feature},true')->group(function () {
+    Route::get('{features}', [{Feature}Controller::class, 'index']);
+    Route::get('{features}/{{feature}}', [{Feature}Controller::class, 'show']);
+    Route::post('{features}', [{Feature}Controller::class, 'store'])
+        ->middleware('permission:{feature}.create,true');
+    Route::put('{features}/{{feature}}', [{Feature}Controller::class, 'update'])
+        ->middleware('permission:{feature}.edit,true');
+    Route::delete('{features}/{{feature}}', [{Feature}Controller::class, 'destroy'])
+        ->middleware('permission:{feature}.delete,true');
+    Route::post('{features}/export', [{Feature}Controller::class, 'export']);
 });
 ```
 
@@ -565,7 +558,7 @@ export const {feature}Config = createSimpleEntityConfig({
 ### File & Directory Naming
 | Type | Pattern | Example (Single Word) | Example (Compound) |
 |------|---------|----------------------|-------------------|
-| Route File | snake_case, singular | `position.php` | `customer_category.php` |
+| Route File | kebab-case, plural (di `routes/api/`) | `positions.php` | `customer-categories.php` |
 | Migration File | snake_case, plural | `create_positions_table` | `create_customer_categories_table` |
 | Frontend Directory | kebab-case, plural | `positions/` | `customer-categories/` |
 | E2E Test Directory | kebab-case, plural | `positions/` | `customer-categories/` |
@@ -598,11 +591,17 @@ export const {feature}Config = createSimpleEntityConfig({
 5. **Export** - Buat Export class
 6. **Actions** - Buat Index dan Export actions
 7. **Controller** - Buat Controller dengan 6 methods
-8. **Routes** - Definisikan routes, include di `routes/web.php`
+8. **Routes** - Buat file `routes/api/{features}.php` (otomatis di-include oleh `routes/api.php`)
 
 ### Phase 3: Frontend
 1. Tambah config di `resources/js/utils/entityConfigs.ts`
 2. Buat halaman di `resources/js/pages/{features}/index.tsx`
+3. Register lazy-loaded route di `resources/js/app-routes.tsx`:
+   ```tsx
+   const {Features} = lazy(() => import('./pages/{features}/index'));
+   // ... di dalam <Routes>:
+   <Route path="/{features}" element={<P><{Features} /></P>} />
+   ```
 
 ### Phase 4: Testing (urut dari unit ke integration)
 1. **Unit Tests:**

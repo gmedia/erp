@@ -6,24 +6,15 @@ use App\Actions\{{Feature}}\Custom{{Feature}}Action;
 use App\Http\Requests\{{Feature}}\Custom{{Feature}}Request;
 use App\Http\Resources\{{Feature}}\{{Feature}}Resource;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 
 /**
  * Controller for {{feature}} management operations.
  *
  * Handles custom operations for {{feature}} (non-standard CRUD).
+ * Note: Frontend page routing ditangani oleh react-router-dom di app-routes.tsx.
  */
 class {{Feature}}Controller extends Controller
 {
-    /**
-     * Display the {{feature}} management page.
-     */
-    public function index(): Response
-    {
-        return Inertia::render('{{features}}/index');
-    }
-
     /**
      * Custom action example.
      *

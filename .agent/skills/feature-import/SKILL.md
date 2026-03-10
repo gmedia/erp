@@ -48,7 +48,7 @@ Memvalidasi file upload.
        return response()->json($summary);
    }
    ```
-2. Buka `routes/{module}.php`. Tambahkan route `POST`:
+2. Buka `routes/api/{module}.php`. Tambahkan route `POST`:
    ```php
    Route::post('{slug}/import', [Controller::class, 'import'])
        ->name('{slug}.import')

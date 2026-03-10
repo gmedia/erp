@@ -63,6 +63,11 @@ mcp_laravel-boost_read-log-entries(entries: 10)
 
 ## 🧪 Feature Test (Controller)
 
+> [!IMPORTANT]
+> **Auth:** WAJIB gunakan `Sanctum::actingAs($user)` — bukan `actingAs($user)`  
+> **Assertions:** Gunakan `assertJson()`, `assertJsonStructure()`, `assertOk()` — bukan `assertInertia()`  
+> Ini karena arsitektur API-only (stateless Bearer Token), bukan session-based.
+
 Test cases per method:
 
 | Method | Test Cases |

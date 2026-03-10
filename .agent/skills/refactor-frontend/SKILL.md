@@ -1,9 +1,9 @@
 ---
 name: Refactor Frontend
-description: Panduan refactor khusus Frontend (Inertia/React)
+description: Panduan refactor khusus Frontend (React SPA)
 ---
 
-# Refactor Frontend (Inertia/React)
+# Refactor Frontend (React SPA)
 
 Lakukan refactor kode frontend secara **TERKONTROL** tanpa merusak frontend behavior, E2E test, atau API compatibility.
 
@@ -31,6 +31,13 @@ Lakukan refactor kode frontend secara **TERKONTROL** tanpa merusak frontend beha
 - ✅ Penambahan/perbaikan TypeScript typing
 - ✅ Pemindahan logic ke helper/hooks
 - ✅ Reuse component
+
+### Anti-Pattern (DILARANG!):
+- ❌ **JANGAN** import dari `@inertiajs/react` (sudah dihapus dari project)
+- ✅ Navigasi: gunakan `Link` / `useNavigate` dari `react-router-dom`
+- ✅ Meta tags: gunakan `Helmet` dari `react-helmet-async`
+- ✅ Data fetching: gunakan React Query hooks (`useCrudQuery`, dll)
+- ✅ API calls: gunakan `axios` dari `@/lib/axios`
 
 ---
 

@@ -84,10 +84,10 @@ app/
 │   └── Update{Feature}Data.php     # DTO untuk partial updates
 └── Exports/{Feature}Export.php
 
-routes/{feature}.php                # Dedicated route file
+routes/api/{feature}.php              # API-only route file (frontend routing via react-router-dom)
 ```
 
-### Frontend (React/Inertia)
+### Frontend (React SPA)
 ```
 resources/js/
 ├── pages/{features}/index.tsx      # Just: export default createEntityCrudPage(config)
@@ -846,16 +846,21 @@ class {Feature}Controller extends Controller
 #### 2.8. Routes
 
 ```php
-// routes/{feature}.php
+// routes/api/{feature}.php
+// File ini di routes/api/, sudah di-prefix /api oleh RouteServiceProvider
+// Frontend routing ditangani oleh react-router-dom di app-routes.tsx
 use App\Http\Controllers\{Feature}Controller;
 
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/{features}', [{Feature}Controller::class, 'index']);
-    Route::post('/{features}', [{Feature}Controller::class, 'store']);
-    Route::get('/{features}/{{feature}}', [{Feature}Controller::class, 'show']);
-    Route::put('/{features}/{{feature}}', [{Feature}Controller::class, 'update']);
-    Route::delete('/{features}/{{feature}}', [{Feature}Controller::class, 'destroy']);
-    Route::post('/{features}/export', [{Feature}Controller::class, 'export']);
+Route::middleware('permission:{feature},true')->group(function () {
+    Route::get('{features}', [{Feature}Controller::class, 'index']);
+    Route::get('{features}/{{feature}}', [{Feature}Controller::class, 'show']);
+    Route::post('{features}', [{Feature}Controller::class, 'store'])
+        ->middleware('permission:{feature}.create,true');
+    Route::put('{features}/{{feature}}', [{Feature}Controller::class, 'update'])
+        ->middleware('permission:{feature}.edit,true');
+    Route::delete('{features}/{{feature}}', [{Feature}Controller::class, 'destroy'])
+        ->middleware('permission:{feature}.delete,true');
+    Route::post('{features}/export', [{Feature}Controller::class, 'export']);
 });
 ```
 
@@ -1454,7 +1459,7 @@ Before marking complete:
 - [ ] Resources return nested objects `{id, name}` for FKs
 - [ ] Export uses correct filter key names (without `_id`)
 - [ ] Controller uses Actions for index/export
-- [ ] Routes created in `routes/{feature}.php`
+- [ ] Routes created in `routes/api/{feature}.php`
 
 **Frontend:**
 - [ ] Page uses `createEntityCrudPage(config)`

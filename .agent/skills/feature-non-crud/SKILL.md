@@ -34,7 +34,7 @@ Fitur ini NON-CRUD jika:
 |------|-----------------|
 | `mcp_laravel-boost_database-schema` | Lihat model/tabel existing untuk relasi |
 | `mcp_laravel-boost_list-routes` | Lihat routes existing, plan custom routes |
-| `mcp_laravel-boost_search-docs` | Cari dokumentasi Inertia, custom routing |
+| `mcp_laravel-boost_search-docs` | Cari dokumentasi React Query, react-router-dom |
 | `mcp_laravel-boost_tinker` | Test relationships dan business logic |
 | `mcp_shadcn-ui-mcp-server_list_blocks` | Cari dashboard/UI blocks |
 | `mcp_shadcn-ui-mcp-server_get_block` | Ambil complex UI blocks |
@@ -106,7 +106,7 @@ Backend:
 │   └── Update{Feature}Request.php          # Conditional validation
 ├── app/Http/Resources/{Features}/
 │   └── {Feature}Resource.php               # Simple resource
-└── routes/{feature}.php
+└── routes/api/{feature}.php
 
 Frontend:
 ├── resources/js/pages/{features}/index.tsx
@@ -124,8 +124,8 @@ Tests:
 ```
 Backend:
 ├── app/Http/Controllers/{Feature}Controller.php
-│   └── index() method dengan data bundling
-└── routes/{feature}.php
+│   └── index() method returns JSON data
+└── routes/api/{feature}.php
 
 Frontend:
 ├── resources/js/pages/{features}/index.tsx
@@ -258,24 +258,15 @@ use App\Http\Requests\Users\UpdateUserRequest;
 use App\Http\Resources\Users\UserResource;
 use App\Models\Employee;
 use Illuminate\Http\JsonResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 
 /**
  * Controller for user management operations.
  *
  * Handles user creation, updates, and linking users to employees.
+ * Note: Frontend page routing ditangani oleh react-router-dom.
  */
 class UserController extends Controller
 {
-    /**
-     * Display the users management page.
-     */
-    public function index(): Response
-    {
-        return Inertia::render('users/index');
-    }
-
     /**
      * Get user data for an employee.
      *
@@ -315,7 +306,7 @@ class UserController extends Controller
 ```
 
 **Key Points:**
-- ✅ Separate page route (index) and API routes
+- ✅ API-only controller (frontend page routing via react-router-dom)
 - ✅ GET endpoint untuk fetch data
 - ✅ POST endpoint untuk sync (create/update)
 - ✅ Action instantiation tanpa DI (consistent dengan codebase)
@@ -325,29 +316,22 @@ class UserController extends Controller
 ```php
 <?php
 
+// routes/api/users.php
+// Frontend routing ditangani oleh react-router-dom di app-routes.tsx
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Frontend route
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('users', [UserController::class, 'index'])
-        ->name('users')
-        ->middleware('permission:user');
-});
-
 // API routes (nested under parent resource)
-Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
-    Route::middleware('permission:user,true')->group(function () {
-        Route::get('employees/{employee}/user', [UserController::class, 'getUserByEmployee']);
-        Route::post('employees/{employee}/user', [UserController::class, 'updateUser']);
-    });
+Route::middleware('permission:user,true')->group(function () {
+    Route::get('employees/{employee}/user', [UserController::class, 'getUserByEmployee']);
+    Route::post('employees/{employee}/user', [UserController::class, 'updateUser']);
 });
 ```
 
 **Key Points:**
 - ✅ Nested resource routes (`/api/employees/{employee}/user`)
-- ✅ Separate permission middleware for API
-- ✅ Frontend route menggunakan Inertia render
+- ✅ Permission middleware for API
+- ✅ Frontend route di `app-routes.tsx`, BUKAN di sini
 
 #### 5. Resource
 
@@ -390,7 +374,7 @@ class UserResource extends JsonResource
 import { useUserManagement } from '@/hooks/useUserManagement';
 import { UserForm } from '@/components/users/UserForm';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FormProvider } from 'react-hook-form';
 
@@ -410,7 +394,7 @@ export default function UsersPage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="User Management" />
+            <Helmet><title>User Management</title></Helmet>
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <Card>
                     <CardHeader>
@@ -541,7 +525,7 @@ export function UserForm({
 ```tsx
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import { router } from '@inertiajs/react';
+import axios from '@/lib/axios';
 
 export function useUserManagement() {
     const form = useForm();
@@ -560,25 +544,23 @@ export function useUserManagement() {
         }
     };
 
-    const handleSaveUser = () => {
+    const handleSaveUser = async () => {
         const employeeId = form.getValues('employee_id');
         
         setLoading(true);
-        router.post(
-            `/api/employees/${employeeId}/user`,
-            form.getValues(),
-            {
-                onSuccess: () => {
-                    setErrors({});
-                },
-                onError: (errors) => {
-                    setErrors(errors);
-                },
-                onFinish: () => {
-                    setLoading(false);
-                },
+        try {
+            const response = await axios.post(
+                `/api/employees/${employeeId}/user`,
+                form.getValues()
+            );
+            setErrors({});
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.data?.errors) {
+                setErrors(error.response.data.errors);
             }
-        );
+        } finally {
+            setLoading(false);
+        }
     };
 
     return {
@@ -612,24 +594,22 @@ export function useUserManagement() {
 namespace App\Http\Controllers;
 
 use App\Models\Permission;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\Http\JsonResponse;
 
 /**
  * Controller for permission management operations.
+ * Note: Frontend page rendering ditangani oleh react-router-dom.
  */
 class PermissionController extends Controller
 {
     /**
-     * Display the permission management page.
-     * 
-     * Note: Permissions data is bundled with the page response.
+     * Get all permissions as JSON.
      */
-    public function index(): Response
+    public function index(): JsonResponse
     {
         $permissions = Permission::orderBy('id')->get();
 
-        return Inertia::render('permissions/index', [
+        return response()->json([
             'permissions' => $permissions,
         ]);
     }
@@ -637,37 +617,31 @@ class PermissionController extends Controller
 ```
 
 **Key Points:**
-- ✅ Bundle data dengan page response (untuk data statis)
-- ✅ No separate API endpoint needed untuk initial data
+- ✅ Return JSON (bukan Inertia::render)
+- ✅ Data di-fetch oleh frontend via React Query
 
 #### 2. Routes
 
 ```php
 <?php
 
+// routes/api/permissions.php
+// Frontend routing ditangani oleh react-router-dom di app-routes.tsx
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\EmployeeController;
 use Illuminate\Support\Facades\Route;
 
-// Frontend route (dengan data bundling)
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('permissions', [PermissionController::class, 'index'])
-        ->name('permissions.index')
-        ->middleware('permission:permission');
-});
-
-// API routes (untuk sync operations)
-Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
-    Route::middleware('permission:permission,true')->group(function () {
-        Route::get('employees/{employee}/permissions', [EmployeeController::class, 'permissions']);
-        Route::post('employees/{employee}/permissions', [EmployeeController::class, 'syncPermissions']);
-    });
+// API routes
+Route::middleware('permission:permission,true')->group(function () {
+    Route::get('permissions', [PermissionController::class, 'index']);
+    Route::get('employees/{employee}/permissions', [EmployeeController::class, 'permissions']);
+    Route::post('employees/{employee}/permissions', [EmployeeController::class, 'syncPermissions']);
 });
 ```
 
 **Key Points:**
+- ✅ API-only routes (no frontend route di backend)
 - ✅ Sync operations di parent controller (EmployeeController)
-- ✅ No dedicated PermissionController API methods
 
 ---
 
@@ -683,15 +657,23 @@ import { usePermissionManagement } from '@/hooks/usePermissionManagement';
 import { EmployeeSelector } from '@/components/permissions/EmployeeSelector';
 import { PermissionManager } from '@/components/permissions/PermissionManager';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import axios from '@/lib/axios';
 
-interface Props {
-    permissions: Permission[];
-}
+export default function PermissionsPage() {
+    // Fetch permissions via React Query (bukan Inertia props)
+    const { data: permissionsData } = useQuery({
+        queryKey: ['permissions'],
+        queryFn: async () => {
+            const { data } = await axios.get('/api/permissions');
+            return data.permissions;
+        },
+    });
+    const permissions = permissionsData ?? [];
 
-export default function PermissionsPage({ permissions }: Props) {
     const form = useForm();
     const {
         loading,
@@ -717,7 +699,7 @@ export default function PermissionsPage({ permissions }: Props) {
 
     return (
         <AppLayout>
-            <Head title="Permissions" />
+            <Helmet><title>Permissions</title></Helmet>
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <Card>
                     <CardHeader>
@@ -750,7 +732,7 @@ export default function PermissionsPage({ permissions }: Props) {
 ```
 
 **Key Points:**
-- ✅ Props dari Inertia (bundled data)
+- ✅ Data di-fetch via React Query (bukan Inertia props)
 - ✅ Watch employee selection untuk trigger fetch
 - ✅ Conditional rendering (show manager setelah select)
 
@@ -846,11 +828,10 @@ use App\Models\Employee;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
-use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
+use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class)->group('users');
 
@@ -878,26 +859,18 @@ function createUserWithUserPageAccess(array $permissionNames = []): User
     return $user;
 }
 
-describe('User Page Access', function () {
-    test('unauthenticated user cannot access users page', function () {
-        $response = get('/users');
-        $response->assertRedirect('/login');
-    });
-
-    test('authenticated user with permission can access users page', function () {
-        $user = createUserWithUserPageAccess(['user']);
-        actingAs($user);
-
-        $response = get('/users');
-        $response->assertOk()
-            ->assertInertia(fn ($page) => $page->component('users/index'));
+describe('Get User By Employee API (unauthenticated)', function () {
+    test('unauthenticated user cannot access user API', function () {
+        $employee = Employee::factory()->create();
+        $response = getJson("/api/employees/{$employee->id}/user");
+        $response->assertUnauthorized();
     });
 });
 
 describe('Get User By Employee API', function () {
     beforeEach(function () {
         $user = createUserWithUserPageAccess(['user']);
-        actingAs($user);
+        Sanctum::actingAs($user);
     });
 
     test('returns null user when employee has no linked user', function () {
@@ -935,7 +908,7 @@ describe('Get User By Employee API', function () {
 describe('Update User API', function () {
     beforeEach(function () {
         $user = createUserWithUserPageAccess(['user']);
-        actingAs($user);
+        Sanctum::actingAs($user);
     });
 
     test('creates new user for employee without linked user', function () {
@@ -996,8 +969,8 @@ use App\Models\Employee;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use function Pest\Laravel\actingAs;
-use function Pest\Laravel\get;
+use function Pest\Laravel\getJson;
+use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class)->group('permissions');
 
@@ -1020,30 +993,30 @@ function createUserWithPermissionPageAccess(array $permissionNames = []): User
     return $user;
 }
 
-describe('Permission Page Access', function () {
-    test('authenticated user with permission can access permissions page', function () {
+describe('Permission API Access', function () {
+    test('authenticated user with permission can access permissions API', function () {
         $user = createUserWithPermissionPageAccess(['permission']);
-        actingAs($user);
+        Sanctum::actingAs($user);
 
-        $response = get('/permissions');
+        $response = getJson('/api/permissions');
 
         $response->assertOk()
-            ->assertInertia(fn ($page) => $page
-                ->component('permissions/index')
-                ->has('permissions')
-            );
+            ->assertJsonStructure([
+                'permissions' => [['id', 'name', 'display_name']],
+            ]);
     });
 
-    test('permissions page returns all permissions ordered by id', function () {
+    test('permissions API returns all permissions ordered by id', function () {
         Permission::factory()->create(['name' => 'test.permission.1']);
         Permission::factory()->create(['name' => 'test.permission.2']);
 
         $user = createUserWithPermissionPageAccess(['permission']);
-        actingAs($user);
+        Sanctum::actingAs($user);
 
-        $response = get('/permissions');
+        $response = getJson('/api/permissions');
 
-        $permissions = $response->original->getData()['page']['props']['permissions'];
+        $response->assertOk();
+        $permissions = $response->json('permissions');
         expect($permissions)->toBeArray();
 
         foreach ($permissions as $permission) {
@@ -1055,7 +1028,7 @@ describe('Permission Page Access', function () {
 
 **Key Points:**
 - ✅ Similar helper pattern dengan Pattern A
-- ✅ Test bundled data di page response
+- ✅ Test API endpoint (JSON assertions, bukan Inertia assertions)
 - ✅ Validate data structure
 
 ---
@@ -1075,7 +1048,7 @@ describe('Permission Page Access', function () {
 
 | Type | Pattern | Example (User) | Example (Permission) |
 |------|---------|----------------|----------------------|
-| Route File | snake_case | `user.php` | `permission.php` |
+| Route File | kebab-case (di `routes/api/`) | `users.php` | `permissions.php` |
 | Component File | PascalCase | `UserForm.tsx` | `EmployeeSelector.tsx` |
 | Hook File | camelCase | `useUserManagement.ts` | `usePermissionManagement.ts` |
 
@@ -1150,10 +1123,9 @@ describe('Permission Page Access', function () {
 
 4. **Routes**
    ```bash
-   routes/{feature}.php
+   routes/api/{feature}.php
    ```
-   - Frontend route dengan permission middleware
-   - Nested API routes
+   - API-only routes (frontend via app-routes.tsx)
 
 5. **Resource** (if needed)
    ```bash
@@ -1166,14 +1138,14 @@ describe('Permission Page Access', function () {
    ```bash
    app/Http/Controllers/{Feature}Controller.php
    ```
-   - index() dengan data bundling
+   - index() returns JSON data
    - Use parent controller untuk sync operations
 
 2. **Routes**
    ```bash
-   routes/{feature}.php
+   routes/api/{feature}.php
    ```
-   - Page route dengan data bundling
+   - API-only routes
    - API routes di parent controller
 
 ### Phase 3: Frontend Implementation
@@ -1217,7 +1189,7 @@ describe('Permission Page Access', function () {
    ```bash
    resources/js/pages/{features}/index.tsx
    ```
-   - Receive props dari Inertia
+   - Fetch data via React Query
    - Watch parent selection
    - Conditional rendering
 
@@ -1260,7 +1232,7 @@ Gunakan `mcp_laravel-boost_list-routes` untuk verify routes terdaftar.
 
 ### Backend - Pattern B (Matrix/Bulk)
 
-- [ ] Controller index() dengan data bundling
+- [ ] Controller index() returns JSON data
 - [ ] Sync operations di parent controller
 - [ ] Routes dengan permission middleware
 
@@ -1373,8 +1345,8 @@ Pattern B (Matrix/Bulk):
 **Issue**: Permission middleware not working  
 **Solution**: Check helper creates permissions with correct names
 
-**Issue**: Frontend not receiving bundled data  
-**Solution**: Verify Inertia::render() includes data array
+**Issue**: Frontend not receiving data  
+**Solution**: Verify API endpoint returns JSON correctly, check React Query config
 
 **Issue**: Nested route not found  
 **Solution**: Check route parameter name matches (camelCase)
