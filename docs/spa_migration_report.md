@@ -1,6 +1,6 @@
 # Summary Report: Migrasi Laravel + Inertia -> Laravel + React Full SPA
 
-Laporan ini berisi ringkasan perubahan pada branch `main` yang unggul 44 commit dibandingkan `origin/main`. Fokus utama dari perubahan ini adalah transisi arsitektur dari monolith (Laravel + Inertia) menjadi arsitektur *Full Single Page Application* (SPA) menggunakan Laravel API murni di sisi backend dan React SPA di sisi frontend.
+Laporan ini berisi ringkasan perubahan pada branch `main` yang unggul 59 commit dibandingkan `origin/main`. Fokus utama dari perubahan ini adalah transisi arsitektur dari monolith (Laravel + Inertia) menjadi arsitektur *Full Single Page Application* (SPA) menggunakan Laravel API murni di sisi backend dan React SPA di sisi frontend.
 
 ## 1. Perubahan Arsitektur & Teknologi Utama
 - **Penghapusan Inertia.js:** Ketergantungan pada Inertia.js telah dihilangkan sepenuhnya baik dari komponen React maupun controller Laravel.
@@ -11,6 +11,7 @@ Laporan ini berisi ringkasan perubahan pada branch `main` yang unggul 44 commit 
 
 ## 2. Struktur API (Backend)
 - **API Endpoint:** Pembentukan routing REST API spesifik di `routes/api.php` dan migrasi namespace URL prefix (banyak yang beralih menjadi `/api/*` serta penghapusan obsolete `/v1`).
+- **Modularisasi Routing & Permissions:** Pembaruan besar pada file route API dengan memecah `routes/api.php` menjadi lebih dari 40 file spesifik berdasar domain aplikasi untuk *maintainability*. Penggunaan `apiResource` dipecah menjadi definisi rute individual untuk memberlakukan kontrol otorisasi (*permissions*) yang granular untuk aksi *create*, *edit*, dan *delete*, termasuk kewajiban hak *create* pada *endpoints import*.
 - **Controller Refactoring:** Controller yang sebelumnya mengembalikan *Inertia Response* seperti `ReportController`, `AssetController`, dan *Auth Controller* telah direfaktor agar memberikan murni objek JSON API.
 - **Export/Import Action:** Transisi fungsi export laporan yang di-handle di API (men-generate file eksport dan me-return URL via `Storage::disk('public')`) untuk fungsionalitas seperti *Stock Adjustments*, *Inventory Valuations*, dan *Stock Movements*.
 
@@ -18,6 +19,7 @@ Laporan ini berisi ringkasan perubahan pada branch `main` yang unggul 44 commit 
 - **Setup Aplikasi Utama:** File titik mula React (`resources/js/app.tsx`) telah diamendmen menggunakan provider murni React dan Context API (`auth-context.tsx`). Server Side Rendering logic dari Inertia (`ssr.tsx`) telah dihapus.
 - **Lazy Loading Routes:** Implementasi teknik *route level code-splitting* (lazy load) di semua halaman aplikasi guna merampingkan *initial load times* SPA.
 - **Restrukturisasi Layout & Page:** File halaman di-refactor guna menjalankan alur data asinkron via loader secara native (misal pada komponen `ReportController` frontend).
+- **TypeScript Strictness & UI State:** Peningkatan skala besar terkait keamanan *type-checking* TypeScript (transisi tipe `any` ke `unknown`), penyederhanaan akses data, serta refactoring pada komponen antarmuka *DataTable* di mana fungsionalitas pengurutan (*sorting*) kini mengupdate *state filter* secara langsung.
 
 ## 4. Testing End-to-End (E2E) dan QA
 - **Skenario API Playwright:** Tes E2E telah diselaraskan dengan mekanisme terbaru, yaitu menggunakan inject *Bearer token* ke _local storage_ browser pada proses *beforeEach* alih-alih melakukan manipulasi session XSRF.
@@ -30,6 +32,21 @@ Laporan ini berisi ringkasan perubahan pada branch `main` yang unggul 44 commit 
 
 Berikut adalah daftar Commit ID dan Pesan terkait migrasi ini:
 
+- `8894b6d` feat: Refactor DataTable sorting to directly update filters, improve asset resource null safety, and enhance E2E test stability.
+- `01d0e4d` Refactor: Enhance TypeScript strictness by replacing `any` with `unknown` and refining type assertions across the codebase.
+- `b3a7037` run format
+- `179fa19` refactor: simplify PHPDoc type hints by removing redundant `|\Eloquent` from model property annotations.
+- `f0c4bd9` style: fully qualify Eloquent class in docblock type hints across multiple models.
+- `a660e8e` Style: Standardize docblock formatting, enhance static analysis annotations, and remove redundant `Eloquent` imports.
+- `fb1adbe` refactor: Simplify data access in various exports and resources by removing optional chaining and null coalescing operators.
+- `2155cf5` run duster fix
+- `9f06a4d` refactor: Delete numerous ERP module API route files.
+- `f88fb67` refactor: Add create permission to all import endpoints
+- `c66e698` refactor: Split API routes into 40+ individual module files matching the registry patterns
+- `736d59b` refactor: Split apiResource to assign granular create/edit/delete permissions
+- `5a45f1b` refactor: Modularize API routes into individual domain files for maintainability
+- `a8df81d` docs: Refine and shorten commit descriptions within the SPA migration report.
+- `dceadf0` docs: Update SPA migration report and add new e2e
 - `aeffd17` Update route
 - `677c93e` Modify the Employee model unit test.
 - `51b8149` feat: Remove Inertia.js dependency and related views, controllers, and middleware.
