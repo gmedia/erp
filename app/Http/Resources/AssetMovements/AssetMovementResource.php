@@ -17,8 +17,8 @@ class AssetMovementResource extends JsonResource
             'asset_id' => $this->asset_id,
             'asset' => [
                 'id' => $this->asset_id,
-                'name' => $this->asset->name,
-                'asset_code' => $this->asset->asset_code,
+                'name' => $this->asset?->name ?? 'Unknown Asset',
+                'asset_code' => $this->asset?->asset_code ?? 'N/A',
             ],
             'movement_type' => $this->movement_type,
             'moved_at' => $this->moved_at->toIso8601String(),

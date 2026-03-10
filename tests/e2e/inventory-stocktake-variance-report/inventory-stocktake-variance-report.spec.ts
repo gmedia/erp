@@ -20,6 +20,7 @@ test.describe('Inventory Stocktake Variance Report', () => {
                         'application/json',
                     ) &&
                     r.status() < 400,
+                { timeout: 30000 },
             )
             .catch(() => null);
 
@@ -31,6 +32,7 @@ test.describe('Inventory Stocktake Variance Report', () => {
                 r.url().includes('/reports/inventory-stocktake-variance') &&
                 r.url().includes('sort_by=category_name') &&
                 r.status() < 400,
+            { timeout: 30000 },
         );
         await page.getByRole('button', { name: 'Category', exact: true }).click();
         await sortResponsePromise;

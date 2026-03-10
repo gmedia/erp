@@ -608,48 +608,45 @@ class AssetSampleDataSeeder extends Seeder
                 continue;
             }
 
+            // Ensure target state exists, fallback to draft if not
             $targetStateCode = $data['pipeline_state'] ?? 'draft';
-            $targetState = $pipelineStates[$targetStateCode] ?? null;
-            if (! $targetState) {
-                continue;
-            }
+            $targetState = $pipelineStates[$targetStateCode] ?? $pipelineStates['draft'];
 
-            // Skip if already assigned
-            $existing = PipelineEntityState::where('pipeline_id', $pipeline->id)
-                ->where('entity_type', 'App\Models\Asset')
-                ->where('entity_id', $asset->id)
-                ->first();
-            if ($existing) {
-                continue;
-            }
+            // Update or create entity state record
+            $entityState = PipelineEntityState::updateOrCreate(
+                [
+                    'pipeline_id' => $pipeline->id,
+                    'entity_type' => 'App\Models\Asset',
+                    'entity_id' => $asset->id,
+                ],
+                [
+                    'current_state_id' => $targetState->id,
+                    'last_transitioned_by' => $adminUser?->id,
+                    'last_transitioned_at' => now(),
+                ]
+            );
 
-            $initialState = $pipelineStates['draft'];
-
-            // Create entity state record (final state)
-            $entityState = PipelineEntityState::create([
-                'pipeline_id' => $pipeline->id,
-                'entity_type' => 'App\Models\Asset',
-                'entity_id' => $asset->id,
-                'current_state_id' => $targetState->id,
-                'last_transitioned_by' => $adminUser?->id,
-                'last_transitioned_at' => now(),
-            ]);
-
-            // Create initial log (assigned to draft)
+            // Create initial log if not exists
             $history = $transitionHistory[$data['asset_code']] ?? [];
             $daysAgoInitial = ! empty($history) ? ($history[0][3] ?? 0) + 1 : 5;
 
-            PipelineStateLog::create([
-                'pipeline_entity_state_id' => $entityState->id,
-                'entity_type' => 'App\Models\Asset',
-                'entity_id' => $asset->id,
-                'from_state_id' => null,
-                'to_state_id' => $initialState->id,
-                'transition_id' => null,
-                'performed_by' => $adminUser?->id,
-                'comment' => 'Initial pipeline assignment',
-                'created_at' => now()->subDays($daysAgoInitial),
-            ]);
+            $initialState = $pipelineStates['draft'];
+
+            PipelineStateLog::updateOrCreate(
+                [
+                    'pipeline_entity_state_id' => $entityState->id,
+                    'entity_type' => 'App\Models\Asset',
+                    'entity_id' => $asset->id,
+                    'to_state_id' => $initialState->id,
+                ],
+                [
+                    'from_state_id' => null,
+                    'transition_id' => null,
+                    'performed_by' => $adminUser?->id,
+                    'comment' => 'Initial pipeline assignment',
+                    'created_at' => now()->subDays($daysAgoInitial),
+                ]
+            );
 
             // Create transition logs
             foreach ($history as $step) {

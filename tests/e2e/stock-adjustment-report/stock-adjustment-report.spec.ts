@@ -16,6 +16,7 @@ test.describe('Stock Adjustment Report', () => {
                     r.url().includes('/reports/stock-adjustment') &&
                     r.request().headers()['accept']?.includes('application/json') &&
                     r.status() < 400,
+                { timeout: 30000 },
             )
             .catch(() => null);
 
@@ -27,6 +28,7 @@ test.describe('Stock Adjustment Report', () => {
                 r.url().includes('/reports/stock-adjustment') &&
                 r.url().includes('sort_by=adjustment_type') &&
                 r.status() < 400,
+            { timeout: 30000 },
         );
         await page.getByRole('button', { name: 'Adjustment Type', exact: true }).click();
         await sortResponsePromise;

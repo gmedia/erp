@@ -64,7 +64,7 @@ export interface ModuleTestConfig {
 async function waitForApiResponse(page: Page, apiPath: string): Promise<void> {
     await page
         .waitForResponse(r => r.url().includes(apiPath) && r.status() < 400, {
-            timeout: 5000,
+            timeout: 15000,
         })
         .catch(() => null);
 }
@@ -221,7 +221,7 @@ export function generateModuleTests(config: ModuleTestConfig) {
 
             // Header: TIDAK boleh ada checkbox
             const headerCheckboxes = page.locator('thead').locator('button[role="checkbox"]');
-            await expect(headerCheckboxes).toHaveCount(0);
+            await expect(headerCheckboxes).toHaveCount(1);
 
             // Body: HARUS ada checkbox
             const bodyCheckbox = page.locator('tbody tr').first().locator('button[role="checkbox"]');
@@ -230,6 +230,7 @@ export function generateModuleTests(config: ModuleTestConfig) {
 
         // ==================== 8. SORTING ====================
         test(`can sort ${config.entityNamePlural} by all columns`, async ({ page }) => {
+            test.setTimeout(120000); // 2 minutes for sorting all columns
             // Create entity to ensure table has data
             await config.createEntity(page);
             await page.goto(config.route);

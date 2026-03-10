@@ -15,7 +15,7 @@ class AssetStocktakeItemResource extends JsonResource
         return [
             'id' => $this->id,
             'stocktake_reference' => $this->stocktake->reference,
-            'stocktake_date' => $this->stocktake->performed_at->toDateString(),
+            'stocktake_date' => $this->stocktake->performed_at?->toDateString(),
             'branch' => $this->stocktake->branch->name,
             'expected_location' => $this->expectedLocation?->name,
             'found_location' => $this->foundLocation?->name,

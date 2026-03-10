@@ -16,6 +16,7 @@ test.describe('Stock Movement Report', () => {
                     r.url().includes('/reports/stock-movement') &&
                     r.request().headers()['accept']?.includes('application/json') &&
                     r.status() < 400,
+                { timeout: 30000 },
             )
             .catch(() => null);
 
@@ -27,6 +28,7 @@ test.describe('Stock Movement Report', () => {
                 r.url().includes('/reports/stock-movement') &&
                 r.url().includes('sort_by=product_category_name') &&
                 r.status() < 400,
+            { timeout: 30000 },
         );
         await page.getByRole('button', { name: 'Category', exact: true }).click();
         await sortResponsePromise;

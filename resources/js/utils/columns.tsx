@@ -74,6 +74,7 @@ export function createSortingHeader(label: string) {
                 onClick={() =>
                     column.toggleSorting(column.getIsSorted() === 'asc')
                 }
+                data-testid={`sort-${label.toLowerCase().replace(/\s+/g, '-')}`}
             >
                 {label}
                 <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -366,12 +367,22 @@ export function createSelectColumn<
 >(): ColumnDef<T> {
     return {
         id: 'select',
-        header: () => null,
+        header: ({ table }) => (
+            <Checkbox
+                checked={table.getIsAllPageRowsSelected()}
+                onCheckedChange={(value) =>
+                    table.toggleAllPageRowsSelected(!!value)
+                }
+                aria-label="Select all"
+                data-testid="select-all"
+            />
+        ),
         cell: ({ row }) => (
             <Checkbox
                 checked={row.getIsSelected()}
                 onCheckedChange={(value) => row.toggleSelected(!!value)}
                 aria-label="Select row"
+                data-testid="select-row"
             />
         ),
         enableSorting: false,

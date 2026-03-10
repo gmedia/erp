@@ -149,7 +149,9 @@ test.describe('Entity State Actions', () => {
         await expect(submitBtn).not.toBeVisible();
 
         // 6. Navigate to Timeline tab and verify logs
+        const timelineResponsePromise = page.waitForResponse(r => r.url().includes('/timeline') && r.status() < 400);
         await page.getByRole('tab', { name: 'Timeline' }).click();
+        await timelineResponsePromise;
         
         // Check if logs are visible. 
         // 1. Initial Assignment log

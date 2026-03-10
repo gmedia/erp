@@ -97,6 +97,7 @@ export function DataTableToolbar<T>({
                         onChange={handleSearchChange}
                         onKeyDown={handleSearchKeyDown}
                         className="max-w-sm border-border bg-background placeholder:text-muted-foreground"
+                        data-testid="search-input"
                     />
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -105,6 +106,7 @@ export function DataTableToolbar<T>({
                         size="sm"
                         onClick={() => setIsFilterModalOpen(true)}
                         aria-label="Filters"
+                        data-testid="filter-button"
                     >
                         <Filter className="mr-2 h-4 w-4" />
                         Filters
@@ -122,7 +124,12 @@ export function DataTableToolbar<T>({
                     />
 
                     {onAdd && (
-                        <Button size="sm" onClick={onAdd}>
+                        <Button
+                            size="sm"
+                            onClick={onAdd}
+                            aria-label="Add"
+                            data-testid="add-button"
+                        >
                             <PlusCircle className="mr-2 h-4 w-4" />
                             Add
                         </Button>
@@ -135,6 +142,8 @@ export function DataTableToolbar<T>({
                         size="sm"
                         onClick={onExport}
                         disabled={!hasData || exporting}
+                        aria-label="Export"
+                        data-testid="export-button"
                     >
                         {exporting ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -153,23 +153,7 @@ export function DataTable<T>({
         return filterFields;
     }, [filterFields, entityName]);
 
-    // Memoize sorting change handler
-    const handleSortingChange = React.useCallback(
-        (columnId: string) => {
-            const existing = sorting.find((s) => s.id === columnId);
-            const newSorting: SortingState = existing
-                ? [{ id: columnId, desc: !existing.desc }]
-                : [{ id: columnId, desc: false }];
-
-            setSorting(newSorting);
-            onFilterChange({
-                ...filters,
-                sort_by: columnId,
-                sort_direction: newSorting[0].desc ? 'desc' : 'asc',
-            });
-        },
-        [sorting, filters, onFilterChange],
-    );
+    // Remove unused handleSortingChange and use onSortingChange instead
 
     // Memoize export handler
     const handleExport = React.useCallback(() => {
@@ -226,7 +210,24 @@ export function DataTable<T>({
             columnVisibility,
             rowSelection,
         },
-        onSortingChange: setSorting,
+        onSortingChange: (updater) => {
+            const nextSorting =
+                typeof updater === 'function' ? updater(sorting) : updater;
+            setSorting(nextSorting);
+
+            if (nextSorting.length > 0) {
+                onFilterChange({
+                    ...filters,
+                    sort_by: nextSorting[0].id,
+                    sort_direction: nextSorting[0].desc ? 'desc' : 'asc',
+                });
+            } else {
+                const newFilters = { ...filters };
+                delete newFilters.sort_by;
+                delete newFilters.sort_direction;
+                onFilterChange(newFilters);
+            }
+        },
         onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
         getCoreRowModel: getCoreRowModel(),
@@ -303,18 +304,7 @@ export function DataTable<T>({
                                 {headerGroup.headers.map((header) => (
                                     <TableHead
                                         key={header.id}
-                                        className={`border-border select-none ${
-                                            header.column.getCanSort()
-                                                ? 'cursor-pointer'
-                                                : ''
-                                        }`}
-                                        onClick={() => {
-                                            if (header.column.getCanSort()) {
-                                                handleSortingChange(
-                                                    header.column.id,
-                                                );
-                                            }
-                                        }}
+                                        className="border-border select-none"
                                     >
                                         {header.isPlaceholder
                                             ? null

@@ -21,7 +21,7 @@ const renderRelationCell =
             <div>
                 {typeof val === 'object' && val !== null
                     ? (val as { name: string }).name
-                    : val}
+                    : (val as string | number | null)}
             </div>
         );
     };
@@ -38,7 +38,13 @@ const renderStatusCell = ({ row }: { row: { original: Asset } }) => {
         disposed: 'destructive',
         lost: 'destructive',
     };
-    return <Badge variant={variants[status] || 'default'}>{status}</Badge>;
+    const capitalizedStatus =
+        status.charAt(0).toUpperCase() + status.slice(1);
+    return (
+        <Badge variant={variants[status] || 'default'}>
+            {capitalizedStatus}
+        </Badge>
+    );
 };
 
 export const assetColumns: ColumnDef<Asset>[] = [
