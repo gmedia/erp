@@ -81,6 +81,8 @@ const JournalEntries = lazy(() => import('./pages/journal-entries/index'));
 const PostingJournals = lazy(() => import('./pages/posting-journals/index'));
 
 // Pipeline & Approvals
+const PurchaseRequests = lazy(() => import('./pages/purchase-requests/index'));
+const PurchaseOrders = lazy(() => import('./pages/purchase-orders/index'));
 const Pipelines = lazy(() => import('./pages/pipelines/index'));
 const PipelineDashboard = lazy(
     () => import('./pages/pipeline-dashboard/index'),
@@ -494,6 +496,22 @@ export default function AppRoutes() {
                 />
 
                 {/* Pipeline & Approvals */}
+                <Route
+                    path="/purchase-requests"
+                    element={
+                        <P>
+                            <PurchaseRequests />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/purchase-orders"
+                    element={
+                        <P>
+                            <PurchaseOrders />
+                        </P>
+                    }
+                />
                 <Route
                     path="/pipelines"
                     element={

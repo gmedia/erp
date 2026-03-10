@@ -2,20 +2,13 @@ import { expect, Page } from '@playwright/test';
 
 export async function createPurchaseRequest(page: Page): Promise<string> {
     const createResult = await page.evaluate(async () => {
-        const csrf = document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute('content') || '';
-        const xsrfCookie = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('XSRF-TOKEN='));
-        const xsrfToken = xsrfCookie
-            ? decodeURIComponent(xsrfCookie.split('=')[1])
-            : '';
+        const apiToken = localStorage.getItem('api_token') || '';
 
         const getFirstId = async (url: string): Promise<number> => {
             const response = await fetch(url, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
+                    'Authorization': `Bearer ${apiToken}`,
                 },
             });
             const json = await response.json();
@@ -37,9 +30,8 @@ export async function createPurchaseRequest(page: Page): Promise<string> {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                'X-CSRF-TOKEN': csrf,
-                'X-XSRF-TOKEN': xsrfToken,
                 'X-Requested-With': 'XMLHttpRequest',
+                'Authorization': `Bearer ${apiToken}`,
             },
             body: JSON.stringify({
                 branch_id: branchId,
@@ -96,21 +88,14 @@ export async function editPurchaseRequest(
 
     const updateResult = await page.evaluate(
         async ({ findBy, nextPrNumber }) => {
-            const csrf = document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute('content') || '';
-            const xsrfCookie = document.cookie
-                .split('; ')
-                .find((row) => row.startsWith('XSRF-TOKEN='));
-            const xsrfToken = xsrfCookie
-                ? decodeURIComponent(xsrfCookie.split('=')[1])
-                : '';
+            const apiToken = localStorage.getItem('api_token') || '';
 
             const findResponse = await fetch(
                 `/api/purchase-requests?search=${encodeURIComponent(findBy)}&per_page=1`,
                 {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
+                        'Authorization': `Bearer ${apiToken}`,
                     },
                 },
             );
@@ -125,9 +110,8 @@ export async function editPurchaseRequest(
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-CSRF-TOKEN': csrf,
-                    'X-XSRF-TOKEN': xsrfToken,
                     'X-Requested-With': 'XMLHttpRequest',
+                    'Authorization': `Bearer ${apiToken}`,
                 },
                 body: JSON.stringify({ pr_number: nextPrNumber }),
             });

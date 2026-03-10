@@ -48,6 +48,8 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/posting-journals.php';
     require __DIR__ . '/api/product-categories.php';
     require __DIR__ . '/api/products.php';
+    require __DIR__ . '/api/purchase-orders.php';
+    require __DIR__ . '/api/purchase-requests.php';
     require __DIR__ . '/api/reports.php';
     require __DIR__ . '/api/stock-adjustments.php';
     require __DIR__ . '/api/stock-monitor.php';

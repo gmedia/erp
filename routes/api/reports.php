@@ -7,6 +7,8 @@ use App\Http\Controllers\InventoryValuationReportController;
 use App\Http\Controllers\MaintenanceCostReportController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StockAdjustmentReportController;
+use App\Http\Controllers\PurchaseHistoryReportController;
+use App\Http\Controllers\PurchaseOrderStatusReportController;
 use App\Http\Controllers\StockMovementReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,4 +31,8 @@ Route::prefix('reports')->group(function () {
     Route::post('stock-adjustment/export', [StockAdjustmentReportController::class, 'export'])->middleware('permission:stock_adjustment_report');
     Route::get('inventory-stocktake-variance', [InventoryStocktakeVarianceReportController::class, 'index'])->middleware('permission:inventory_stocktake_variance_report');
     Route::post('inventory-stocktake-variance/export', [InventoryStocktakeVarianceReportController::class, 'export'])->middleware('permission:inventory_stocktake_variance_report');
+    Route::get('purchase-history', [PurchaseHistoryReportController::class, 'index'])->middleware('permission:purchase_history_report');
+    Route::post('purchase-history/export', [PurchaseHistoryReportController::class, 'export'])->middleware('permission:purchase_history_report');
+    Route::get('purchase-order-status', [PurchaseOrderStatusReportController::class, 'index'])->middleware('permission:purchase_order_status_report');
+    Route::post('purchase-order-status/export', [PurchaseOrderStatusReportController::class, 'export'])->middleware('permission:purchase_order_status_report');
 });

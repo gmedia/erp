@@ -8,7 +8,7 @@ use App\Models\PurchaseRequest;
 use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use function Pest\Laravel\actingAs;
+use Laravel\Sanctum\Sanctum;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
@@ -19,13 +19,13 @@ use function Pest\Laravel\putJson;
 uses(RefreshDatabase::class)->group('purchase-requests');
 
 beforeEach(function () {
-    $this->user = createTestUserWithPermissions([
+    $user = createTestUserWithPermissions([
         'purchase_request',
         'purchase_request.create',
         'purchase_request.edit',
         'purchase_request.delete',
     ]);
-    actingAs($this->user);
+    Sanctum::actingAs($user, ['*']);
 });
 
 test('index returns paginated purchase requests', function () {

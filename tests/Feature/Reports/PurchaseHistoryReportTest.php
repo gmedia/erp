@@ -12,6 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Laravel\Sanctum\Sanctum;
 use Inertia\Testing\AssertableInertia as Assert;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -20,26 +21,23 @@ use function Pest\Laravel\actingAs;
 uses(RefreshDatabase::class)->group('purchase-history-report');
 
 beforeEach(function () {
-    $this->user = createTestUserWithPermissions(['purchase_history_report']);
-    $this->otherUser = createTestUserWithPermissions([]);
+    $this->testUser = createTestUserWithPermissions(['purchase_history_report']);
+    $this->otherUserAccount = createTestUserWithPermissions([]);
+    Sanctum::actingAs($this->testUser, ['*']);
 });
 
 test('it requires permission to access purchase history report', function () {
-    actingAs($this->otherUser)
-        ->get(route('reports.purchase-history'))
+    actingAs($this->otherUserAccount)
+        ->get('/api/reports/purchase-history')
         ->assertForbidden();
 });
 
 test('it can render purchase history report page', function () {
     PurchaseOrderItem::factory()->create();
 
-    actingAs($this->user)
-        ->get(route('reports.purchase-history'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('reports/purchase-history/index')
-            ->has('rows.data')
-        );
+    actingAs($this->testUser)
+        ->get('/api/reports/purchase-history')
+        ->assertOk();
 });
 
 test('it can fetch purchase history data via json', function () {
@@ -104,8 +102,8 @@ test('it can fetch purchase history data via json', function () {
         'quantity_rejected' => 0,
     ]);
 
-    actingAs($this->user)
-        ->getJson(route('reports.purchase-history'))
+    actingAs($this->testUser)
+        ->getJson('/api/reports/purchase-history')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
             ->has('data', 1)
@@ -160,26 +158,26 @@ test('it can filter by supplier product status and date range', function () {
         'unit_id' => $unit->id,
     ]);
 
-    actingAs($this->user)
-        ->getJson(route('reports.purchase-history', ['supplier_id' => $supplierA->id]))
+    actingAs($this->testUser)
+        ->getJson('/api/reports/purchase-history?supplier_id=' . $supplierA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.supplier.id', $supplierA->id);
 
-    actingAs($this->user)
-        ->getJson(route('reports.purchase-history', ['product_id' => $productA->id]))
+    actingAs($this->testUser)
+        ->getJson('/api/reports/purchase-history?product_id=' . $productA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.purchase_order.po_number', 'PO-PH-001');
 
-    actingAs($this->user)
-        ->getJson(route('reports.purchase-history', ['status' => 'draft']))
+    actingAs($this->testUser)
+        ->getJson('/api/reports/purchase-history?status=draft')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.purchase_order.po_number', 'PO-PH-002');
 
-    actingAs($this->user)
-        ->getJson(route('reports.purchase-history', ['start_date' => '2026-03-10', 'end_date' => '2026-03-31']))
+    actingAs($this->testUser)
+        ->getJson('/api/reports/purchase-history?start_date=2026-03-10&end_date=2026-03-31')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.purchase_order.po_number', 'PO-PH-002');
@@ -190,8 +188,8 @@ test('it can export purchase history report', function () {
     Excel::fake();
     Storage::fake('public');
 
-    $response = actingAs($this->user)
-        ->postJson(route('reports.purchase-history.export'))
+    $response = actingAs($this->testUser)
+        ->postJson('/api/reports/purchase-history/export')
         ->assertOk()
         ->assertJsonStructure(['url', 'filename']);
 

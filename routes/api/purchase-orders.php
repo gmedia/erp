@@ -2,15 +2,8 @@
 
 use App\Http\Controllers\PurchaseOrderController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('purchase-orders', function () {
-        return Inertia::render('purchase-orders/index');
-    })->name('purchase-orders')->middleware('permission:purchase_order');
-});
-
-Route::middleware(['auth', 'verified'])->prefix('api')->group(function () {
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::middleware('permission:purchase_order,true')->group(function () {
         Route::get('purchase-orders', [PurchaseOrderController::class, 'index']);
         Route::get('purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'show']);

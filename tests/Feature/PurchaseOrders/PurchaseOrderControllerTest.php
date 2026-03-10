@@ -14,17 +14,18 @@ use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
+use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class)->group('purchase-orders');
 
 beforeEach(function () {
-    $this->user = createTestUserWithPermissions([
+    $user = createTestUserWithPermissions([
         'purchase_order',
         'purchase_order.create',
         'purchase_order.edit',
         'purchase_order.delete',
     ]);
-    actingAs($this->user);
+    Sanctum::actingAs($user, ['*']);
 });
 
 test('index returns paginated purchase orders', function () {

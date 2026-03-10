@@ -539,32 +539,7 @@ export const supplierReturnConfig = createComplexEntityConfig<SupplierReturn>({
     getDeleteMessage: (supplierReturn: { return_number?: string | null }) =>
         `This action cannot be undone. This will delete supplier return ${supplierReturn.return_number || ''}.`,
 });
-export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
-    {
-        entityName: 'Stock Adjustment',
-        entityNamePlural: 'Stock Adjustments',
-        apiEndpoint: '/api/stock-adjustments',
-        exportEndpoint: '/api/stock-adjustments/export',
-        queryKey: ['stock-adjustments'],
-        breadcrumbs: [
-            { title: 'Stock Adjustments', href: '/stock-adjustments' },
-        ],
-        initialFilters: {
-            search: '',
-            warehouse_id: '',
-            status: '',
-            adjustment_type: '',
-        },
-        columns: stockAdjustmentColumns,
-        filterFields: createStockAdjustmentFilterFields(),
-        formComponent: StockAdjustmentForm,
-        formType: 'complex',
-        entityNameForSearch: 'stock adjustment',
-        viewModalComponent: StockAdjustmentViewModal,
-        getDeleteMessage: (adjustment: { adjustment_number?: string | null }) =>
-            `This action cannot be undone. This will cancel stock adjustment ${adjustment.adjustment_number || ''}.`,
-    },
-);
+
 
 export const supplierCategoryConfig = createSimpleEntityConfig({
     entityName: 'Supplier Category',

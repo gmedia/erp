@@ -8,7 +8,5 @@ Route::get('{any}', function () {
     return view('app');
 })->where('any', '^(?!api).*$');
 
-require __DIR__ . '/purchase_request.php';
-require __DIR__ . '/purchase_order.php';
 require __DIR__ . '/goods_receipt.php';
 require __DIR__ . '/supplier_return.php';

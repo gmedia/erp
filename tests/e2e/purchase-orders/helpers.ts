@@ -2,20 +2,13 @@ import { expect, Page } from '@playwright/test';
 
 export async function createPurchaseOrder(page: Page): Promise<string> {
     const createResult = await page.evaluate(async () => {
-        const csrf = document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute('content') || '';
-        const xsrfCookie = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('XSRF-TOKEN='));
-        const xsrfToken = xsrfCookie
-            ? decodeURIComponent(xsrfCookie.split('=')[1])
-            : '';
+        const apiToken = localStorage.getItem('api_token') || '';
 
         const getFirstId = async (url: string): Promise<number> => {
             const response = await fetch(url, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
+                    'Authorization': `Bearer ${apiToken}`,
                 },
             });
             const json = await response.json();
@@ -35,9 +28,8 @@ export async function createPurchaseOrder(page: Page): Promise<string> {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                'X-CSRF-TOKEN': csrf,
-                'X-XSRF-TOKEN': xsrfToken,
                 'X-Requested-With': 'XMLHttpRequest',
+                'Authorization': `Bearer ${apiToken}`,
             },
             body: JSON.stringify({
                 supplier_id: supplierId,
@@ -95,21 +87,14 @@ export async function editPurchaseOrder(
 
     const updateResult = await page.evaluate(
         async ({ findBy, nextPoNumber }) => {
-            const csrf = document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute('content') || '';
-            const xsrfCookie = document.cookie
-                .split('; ')
-                .find((row) => row.startsWith('XSRF-TOKEN='));
-            const xsrfToken = xsrfCookie
-                ? decodeURIComponent(xsrfCookie.split('=')[1])
-                : '';
+            const apiToken = localStorage.getItem('api_token') || '';
 
             const findResponse = await fetch(
                 `/api/purchase-orders?search=${encodeURIComponent(findBy)}&per_page=1`,
                 {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
+                        'Authorization': `Bearer ${apiToken}`,
                     },
                 },
             );
@@ -124,9 +109,8 @@ export async function editPurchaseOrder(
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-CSRF-TOKEN': csrf,
-                    'X-XSRF-TOKEN': xsrfToken,
                     'X-Requested-With': 'XMLHttpRequest',
+                    'Authorization': `Bearer ${apiToken}`,
                 },
                 body: JSON.stringify({ po_number: nextPoNumber }),
             });

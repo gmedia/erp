@@ -10,9 +10,11 @@ import {
 
 async function getFirstAsyncOption(page: Page, url: string) {
     return page.evaluate(async (endpoint) => {
+        const apiToken = localStorage.getItem('api_token') || '';
         const response = await fetch(`${endpoint}?per_page=1`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
+                'Authorization': `Bearer ${apiToken}`,
             },
         });
         const payload = await response.json();

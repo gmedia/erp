@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Inertia\Testing\AssertableInertia as Assert;
+use Laravel\Sanctum\Sanctum;
 use Maatwebsite\Excel\Facades\Excel;
 
 use function Pest\Laravel\actingAs;
@@ -18,26 +18,23 @@ use function Pest\Laravel\actingAs;
 uses(RefreshDatabase::class)->group('purchase-order-status-report');
 
 beforeEach(function () {
-    $this->user = createTestUserWithPermissions(['purchase_order_status_report']);
-    $this->otherUser = createTestUserWithPermissions([]);
+    $this->testUser = createTestUserWithPermissions(['purchase_order_status_report']);
+    $this->otherUserAccount = createTestUserWithPermissions([]);
+    Sanctum::actingAs($this->testUser, ['*']);
 });
 
 test('it requires permission to access purchase order status report', function () {
-    actingAs($this->otherUser)
-        ->get(route('reports.purchase-order-status'))
+    actingAs($this->otherUserAccount)
+        ->get('/api/reports/purchase-order-status')
         ->assertForbidden();
 });
 
 test('it can render purchase order status report page', function () {
     PurchaseOrder::factory()->create();
 
-    actingAs($this->user)
-        ->get(route('reports.purchase-order-status'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page
-            ->component('reports/purchase-order-status/index')
-            ->has('rows.data')
-        );
+    actingAs($this->testUser)
+        ->get('/api/reports/purchase-order-status')
+        ->assertOk();
 });
 
 test('it can fetch aggregated purchase order status report data', function () {
@@ -97,8 +94,8 @@ test('it can fetch aggregated purchase order status report data', function () {
         'quantity_received' => 8,
     ]);
 
-    $response = actingAs($this->user)
-        ->getJson(route('reports.purchase-order-status'))
+    $response = actingAs($this->testUser)
+        ->getJson('/api/reports/purchase-order-status')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
             ->has('data', 3)
@@ -153,26 +150,26 @@ test('it can filter by supplier, product, status category and date range', funct
         'quantity_received' => 4,
     ]);
 
-    actingAs($this->user)
-        ->getJson(route('reports.purchase-order-status', ['supplier_id' => $supplierA->id]))
+    actingAs($this->testUser)
+        ->getJson('/api/reports/purchase-order-status?supplier_id=' . $supplierA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.supplier.id', $supplierA->id);
 
-    actingAs($this->user)
-        ->getJson(route('reports.purchase-order-status', ['product_id' => $productA->id]))
+    actingAs($this->testUser)
+        ->getJson('/api/reports/purchase-order-status?product_id=' . $productA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.purchase_order.po_number', 'PO-FLT-001');
 
-    actingAs($this->user)
-        ->getJson(route('reports.purchase-order-status', ['status_category' => 'partially_received']))
+    actingAs($this->testUser)
+        ->getJson('/api/reports/purchase-order-status?status_category=partially_received')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.purchase_order.po_number', 'PO-FLT-002');
 
-    actingAs($this->user)
-        ->getJson(route('reports.purchase-order-status', ['start_date' => '2026-03-05', 'end_date' => '2026-03-31']))
+    actingAs($this->testUser)
+        ->getJson('/api/reports/purchase-order-status?start_date=2026-03-05&end_date=2026-03-31')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.purchase_order.po_number', 'PO-FLT-002');
@@ -183,8 +180,8 @@ test('it can export purchase order status report', function () {
     Excel::fake();
     Storage::fake('public');
 
-    $response = actingAs($this->user)
-        ->postJson(route('reports.purchase-order-status.export'))
+    $response = actingAs($this->testUser)
+        ->postJson('/api/reports/purchase-order-status/export')
         ->assertOk()
         ->assertJsonStructure(['url', 'filename']);
 
