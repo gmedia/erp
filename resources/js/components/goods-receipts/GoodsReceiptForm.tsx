@@ -1,8 +1,9 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/table';
 import { type GoodsReceipt, type GoodsReceiptFormData } from '@/types/goods-receipt';
 import { goodsReceiptFormSchema } from '@/utils/schemas';
+import { GoodsReceiptItemFormDialog } from './GoodsReceiptItemFormDialog';
 
 interface GoodsReceiptFormProps {
     open: boolean;
@@ -31,6 +33,31 @@ interface GoodsReceiptFormProps {
     onSubmit: (data: GoodsReceiptFormData) => void;
     isLoading?: boolean;
 }
+
+const createEmptyGoodsReceiptItem = (): GoodsReceiptFormData['items'][number] => ({
+    purchase_order_item_id: '',
+    product_id: '',
+    product_label: '',
+    unit_id: '',
+    unit_label: '',
+    quantity_received: 1,
+    quantity_accepted: 1,
+    quantity_rejected: 0,
+    unit_price: 0,
+    notes: '',
+});
+
+const formatItemReference = (label?: string, id?: string) => {
+    if (label) {
+        return label;
+    }
+
+    if (id) {
+        return `#${id}`;
+    }
+
+    return '-';
+};
 
 const getGoodsReceiptFormDefaults = (
     goodsReceipt?: GoodsReceipt | null,
@@ -45,18 +72,7 @@ const getGoodsReceiptFormDefaults = (
             status: 'draft',
             received_by: '',
             notes: '',
-            items: [
-                {
-                    purchase_order_item_id: '',
-                    product_id: '',
-                    unit_id: '',
-                    quantity_received: 1,
-                    quantity_accepted: 1,
-                    quantity_rejected: 0,
-                    unit_price: 0,
-                    notes: '',
-                },
-            ],
+            items: [],
         };
     }
 
@@ -81,25 +97,16 @@ const getGoodsReceiptFormDefaults = (
             ? (goodsReceipt.items || []).map((it) => ({
                 purchase_order_item_id: String(it.purchase_order_item_id),
                 product_id: it.product?.id ? String(it.product.id) : '',
+                product_label: it.product?.name || '',
                 unit_id: it.unit?.id ? String(it.unit.id) : '',
+                unit_label: it.unit?.name || '',
                 quantity_received: Number(it.quantity_received || 0),
                 quantity_accepted: Number(it.quantity_accepted || 0),
                 quantity_rejected: Number(it.quantity_rejected || 0),
                 unit_price: Number(it.unit_price || 0),
                 notes: it.notes || '',
             }))
-            : [
-                {
-                    purchase_order_item_id: '',
-                    product_id: '',
-                    unit_id: '',
-                    quantity_received: 1,
-                    quantity_accepted: 1,
-                    quantity_rejected: 0,
-                    unit_price: 0,
-                    notes: '',
-                },
-            ],
+            : [],
     };
 };
 
@@ -123,10 +130,30 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(function GoodsReceip
         defaultValues,
     });
 
-    const { fields, append, remove } = useFieldArray({
+    const { fields, append, remove, update } = useFieldArray({
         control: form.control,
         name: 'items',
     });
+    const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const watchedItems = form.watch('items');
+
+    const handleCreateNewItem = () => {
+        setEditingIndex(null);
+        setIsItemDialogOpen(true);
+    };
+
+    const handleEditItem = (index: number) => {
+        setEditingIndex(index);
+        setIsItemDialogOpen(true);
+    };
+
+    const handleSubmit = (data: GoodsReceiptFormData) => {
+        onSubmit({
+            ...data,
+            items: data.items.map(({ product_label, unit_label, ...goodsReceiptItem }) => goodsReceiptItem),
+        });
+    };
 
     useEffect(() => {
         form.reset(defaultValues);
@@ -138,7 +165,7 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(function GoodsReceip
             open={open}
             onOpenChange={onOpenChange}
             title={activeGoodsReceipt ? 'Edit Goods Receipt' : 'Add New Goods Receipt'}
-            onSubmit={onSubmit}
+            onSubmit={handleSubmit}
             isLoading={isLoading}
             className="sm:max-w-[1100px]"
         >
@@ -222,19 +249,9 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(function GoodsReceip
                     <Button
                         type="button"
                         variant="outline"
-                        onClick={() =>
-                            append({
-                                purchase_order_item_id: '',
-                                product_id: '',
-                                unit_id: '',
-                                quantity_received: 1,
-                                quantity_accepted: 1,
-                                quantity_rejected: 0,
-                                unit_price: 0,
-                                notes: '',
-                            })
-                        }
+                        onClick={handleCreateNewItem}
                     >
+                        <Plus className="mr-2 h-4 w-4" />
                         Add Item
                     </Button>
                 </div>
@@ -251,77 +268,91 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(function GoodsReceip
                                 <TableHead className="w-[120px]">Qty Rejected</TableHead>
                                 <TableHead className="w-[140px]">Unit Price</TableHead>
                                 <TableHead>Notes</TableHead>
-                                <TableHead className="w-[80px] text-right">Action</TableHead>
+                                <TableHead className="w-[120px] text-right">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {fields.map((field, index) => (
-                                <TableRow key={field.id}>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.purchase_order_item_id`} label="" />
-                                    </TableCell>
-                                    <TableCell>
-                                        <Controller
-                                            control={form.control}
-                                            name={`items.${index}.product_id`}
-                                            render={({ field: itemField }) => (
-                                                <AsyncSelect
-                                                    value={itemField.value ? String(itemField.value) : undefined}
-                                                    onValueChange={itemField.onChange}
-                                                    url="/api/products"
-                                                    placeholder="Select product"
-                                                    label="Product"
-                                                />
+                            {fields.map((field, index) => {
+                                const goodsReceiptItem = watchedItems?.[index] || createEmptyGoodsReceiptItem();
+
+                                return (
+                                    <TableRow key={field.id}>
+                                        <TableCell>
+                                            {formatItemReference(undefined, goodsReceiptItem.purchase_order_item_id)}
+                                        </TableCell>
+                                        <TableCell>
+                                            {formatItemReference(
+                                                goodsReceiptItem.product_label,
+                                                goodsReceiptItem.product_id,
                                             )}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        <Controller
-                                            control={form.control}
-                                            name={`items.${index}.unit_id`}
-                                            render={({ field: itemField }) => (
-                                                <AsyncSelect
-                                                    value={itemField.value ? String(itemField.value) : undefined}
-                                                    onValueChange={itemField.onChange}
-                                                    url="/api/units"
-                                                    placeholder="Select unit"
-                                                    label="Unit"
-                                                />
+                                        </TableCell>
+                                        <TableCell>
+                                            {formatItemReference(
+                                                goodsReceiptItem.unit_label,
+                                                goodsReceiptItem.unit_id,
                                             )}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.quantity_received`} label="" type="number" />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.quantity_accepted`} label="" type="number" />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.quantity_rejected`} label="" type="number" />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.unit_price`} label="" type="number" />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.notes`} label="" />
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => remove(index)}
-                                            disabled={fields.length === 1}
-                                        >
-                                            Remove
-                                        </Button>
+                                        </TableCell>
+                                        <TableCell>{goodsReceiptItem.quantity_received ?? 0}</TableCell>
+                                        <TableCell>{goodsReceiptItem.quantity_accepted ?? 0}</TableCell>
+                                        <TableCell>{goodsReceiptItem.quantity_rejected ?? 0}</TableCell>
+                                        <TableCell>{goodsReceiptItem.unit_price ?? 0}</TableCell>
+                                        <TableCell>{goodsReceiptItem.notes || '-'}</TableCell>
+                                        <TableCell className="text-right">
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleEditItem(index)}
+                                                title="Edit item"
+                                                aria-label={`Edit item ${index + 1}`}
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => remove(index)}
+                                                title="Remove item"
+                                                aria-label={`Remove item ${index + 1}`}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                            {!fields.length && (
+                                <TableRow>
+                                    <TableCell colSpan={9} className="py-6 text-center text-muted-foreground">
+                                        No items added yet.
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            )}
                         </TableBody>
                     </Table>
                 </div>
             </div>
+
+            <GoodsReceiptItemFormDialog
+                open={isItemDialogOpen}
+                onOpenChange={(nextOpen) => {
+                    setIsItemDialogOpen(nextOpen);
+                    if (!nextOpen) {
+                        setEditingIndex(null);
+                    }
+                }}
+                item={editingIndex !== null ? watchedItems?.[editingIndex] || null : null}
+                onSave={(data) => {
+                    if (editingIndex !== null) {
+                        update(editingIndex, data);
+                    } else {
+                        append(data);
+                    }
+                    setIsItemDialogOpen(false);
+                    setEditingIndex(null);
+                }}
+            />
         </EntityForm>
     );
 });

@@ -44,7 +44,9 @@ export interface GoodsReceiptFormData {
     items: Array<{
         purchase_order_item_id: string;
         product_id: string;
+        product_label?: string;
         unit_id: string;
+        unit_label?: string;
         quantity_received: number;
         quantity_accepted: number;
         quantity_rejected?: number;
