@@ -1,8 +1,9 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/table';
 import { type PurchaseOrder, type PurchaseOrderFormData } from '@/types/purchase-order';
 import { purchaseOrderFormSchema } from '@/utils/schemas';
+import { PurchaseOrderItemFormDialog } from './PurchaseOrderItemFormDialog';
 
 interface PurchaseOrderFormProps {
     open: boolean;
@@ -31,6 +33,31 @@ interface PurchaseOrderFormProps {
     onSubmit: (data: PurchaseOrderFormData) => void;
     isLoading?: boolean;
 }
+
+const createEmptyPurchaseOrderItem = (): PurchaseOrderFormData['items'][number] => ({
+    purchase_request_item_id: '',
+    product_id: '',
+    product_label: '',
+    unit_id: '',
+    unit_label: '',
+    quantity: 1,
+    unit_price: 0,
+    discount_percent: 0,
+    tax_percent: 0,
+    notes: '',
+});
+
+const formatItemReference = (label?: string, id?: string) => {
+    if (label) {
+        return label;
+    }
+
+    if (id) {
+        return `#${id}`;
+    }
+
+    return '-';
+};
 
 const getPurchaseOrderFormDefaults = (
     purchaseOrder?: PurchaseOrder | null,
@@ -47,18 +74,7 @@ const getPurchaseOrderFormDefaults = (
             status: 'draft',
             notes: '',
             shipping_address: '',
-            items: [
-                {
-                    purchase_request_item_id: '',
-                    product_id: '',
-                    unit_id: '',
-                    quantity: 1,
-                    unit_price: 0,
-                    discount_percent: 0,
-                    tax_percent: 0,
-                    notes: '',
-                },
-            ],
+            items: [],
         };
     }
 
@@ -77,25 +93,16 @@ const getPurchaseOrderFormDefaults = (
             ? (purchaseOrder.items || []).map((it) => ({
                 purchase_request_item_id: it.purchase_request_item_id ? String(it.purchase_request_item_id) : '',
                 product_id: it.product?.id ? String(it.product.id) : '',
+                product_label: it.product?.name || '',
                 unit_id: it.unit?.id ? String(it.unit.id) : '',
+                unit_label: it.unit?.name || '',
                 quantity: Number(it.quantity || 0),
                 unit_price: Number(it.unit_price || 0),
                 discount_percent: Number(it.discount_percent || 0),
                 tax_percent: Number(it.tax_percent || 0),
                 notes: it.notes || '',
             }))
-            : [
-                {
-                    purchase_request_item_id: '',
-                    product_id: '',
-                    unit_id: '',
-                    quantity: 1,
-                    unit_price: 0,
-                    discount_percent: 0,
-                    tax_percent: 0,
-                    notes: '',
-                },
-            ],
+            : [],
     };
 };
 
@@ -119,10 +126,30 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(function PurchaseO
         defaultValues,
     });
 
-    const { fields, append, remove } = useFieldArray({
+    const { fields, append, remove, update } = useFieldArray({
         control: form.control,
         name: 'items',
     });
+    const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const watchedItems = form.watch('items');
+
+    const handleCreateNewItem = () => {
+        setEditingIndex(null);
+        setIsItemDialogOpen(true);
+    };
+
+    const handleEditItem = (index: number) => {
+        setEditingIndex(index);
+        setIsItemDialogOpen(true);
+    };
+
+    const handleSubmit = (data: PurchaseOrderFormData) => {
+        onSubmit({
+            ...data,
+            items: data.items.map(({ product_label, unit_label, ...purchaseOrderItem }) => purchaseOrderItem),
+        });
+    };
 
     useEffect(() => {
         form.reset(defaultValues);
@@ -134,7 +161,7 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(function PurchaseO
             open={open}
             onOpenChange={onOpenChange}
             title={activePurchaseOrder ? 'Edit Purchase Order' : 'Add New Purchase Order'}
-            onSubmit={onSubmit}
+            onSubmit={handleSubmit}
             isLoading={isLoading}
             className="sm:max-w-[1100px]"
         >
@@ -212,19 +239,9 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(function PurchaseO
                     <Button
                         type="button"
                         variant="outline"
-                        onClick={() =>
-                            append({
-                                purchase_request_item_id: '',
-                                product_id: '',
-                                unit_id: '',
-                                quantity: 1,
-                                unit_price: 0,
-                                discount_percent: 0,
-                                tax_percent: 0,
-                                notes: '',
-                            })
-                        }
+                        onClick={handleCreateNewItem}
                     >
+                        <Plus className="mr-2 h-4 w-4" />
                         Add Item
                     </Button>
                 </div>
@@ -240,74 +257,88 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(function PurchaseO
                                 <TableHead className="w-[130px]">Disc %</TableHead>
                                 <TableHead className="w-[130px]">Tax %</TableHead>
                                 <TableHead>Notes</TableHead>
-                                <TableHead className="w-[80px] text-right">Action</TableHead>
+                                <TableHead className="w-[120px] text-right">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {fields.map((field, index) => (
-                                <TableRow key={field.id}>
-                                    <TableCell>
-                                        <Controller
-                                            control={form.control}
-                                            name={`items.${index}.product_id`}
-                                            render={({ field: itemField }) => (
-                                                <AsyncSelect
-                                                    value={itemField.value ? String(itemField.value) : undefined}
-                                                    onValueChange={itemField.onChange}
-                                                    url="/api/products"
-                                                    placeholder="Select product"
-                                                    label="Product"
-                                                />
+                            {fields.map((field, index) => {
+                                const purchaseOrderItem = watchedItems?.[index] || createEmptyPurchaseOrderItem();
+
+                                return (
+                                    <TableRow key={field.id}>
+                                        <TableCell>
+                                            {formatItemReference(
+                                                purchaseOrderItem.product_label,
+                                                purchaseOrderItem.product_id,
                                             )}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        <Controller
-                                            control={form.control}
-                                            name={`items.${index}.unit_id`}
-                                            render={({ field: itemField }) => (
-                                                <AsyncSelect
-                                                    value={itemField.value ? String(itemField.value) : undefined}
-                                                    onValueChange={itemField.onChange}
-                                                    url="/api/units"
-                                                    placeholder="Select unit"
-                                                    label="Unit"
-                                                />
+                                        </TableCell>
+                                        <TableCell>
+                                            {formatItemReference(
+                                                purchaseOrderItem.unit_label,
+                                                purchaseOrderItem.unit_id,
                                             )}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.quantity`} label="" type="number" />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.unit_price`} label="" type="number" />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.discount_percent`} label="" type="number" />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.tax_percent`} label="" type="number" />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.notes`} label="" />
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => remove(index)}
-                                            disabled={fields.length === 1}
-                                        >
-                                            Remove
-                                        </Button>
+                                        </TableCell>
+                                        <TableCell>{purchaseOrderItem.quantity ?? 0}</TableCell>
+                                        <TableCell>{purchaseOrderItem.unit_price ?? 0}</TableCell>
+                                        <TableCell>{purchaseOrderItem.discount_percent ?? 0}</TableCell>
+                                        <TableCell>{purchaseOrderItem.tax_percent ?? 0}</TableCell>
+                                        <TableCell>{purchaseOrderItem.notes || '-'}</TableCell>
+                                        <TableCell className="text-right">
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleEditItem(index)}
+                                                title="Edit item"
+                                                aria-label={`Edit item ${index + 1}`}
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => remove(index)}
+                                                title="Remove item"
+                                                aria-label={`Remove item ${index + 1}`}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                            {!fields.length && (
+                                <TableRow>
+                                    <TableCell colSpan={8} className="py-6 text-center text-muted-foreground">
+                                        No items added yet.
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            )}
                         </TableBody>
                     </Table>
                 </div>
             </div>
+
+            <PurchaseOrderItemFormDialog
+                open={isItemDialogOpen}
+                onOpenChange={(nextOpen) => {
+                    setIsItemDialogOpen(nextOpen);
+                    if (!nextOpen) {
+                        setEditingIndex(null);
+                    }
+                }}
+                item={editingIndex !== null ? watchedItems?.[editingIndex] || null : null}
+                onSave={(data) => {
+                    if (editingIndex !== null) {
+                        update(editingIndex, data);
+                    } else {
+                        append(data);
+                    }
+                    setIsItemDialogOpen(false);
+                    setEditingIndex(null);
+                }}
+            />
         </EntityForm>
     );
 });

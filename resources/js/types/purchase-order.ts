@@ -58,7 +58,9 @@ export interface PurchaseOrderFormData {
     items: Array<{
         purchase_request_item_id?: string;
         product_id: string;
+        product_label?: string;
         unit_id: string;
+        unit_label?: string;
         quantity: number;
         unit_price: number;
         discount_percent?: number;
