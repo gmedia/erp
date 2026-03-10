@@ -15,7 +15,7 @@ description: Aturan agent untuk project ERP
 | Routing Frontend | `react-router-dom` → `resources/js/app-routes.tsx` |
 | Routing Backend | `routes/api/*.php` (40+ modular files) |
 | Data Fetching | React Query (`useCrudQuery`, `useCrudMutations`, custom hooks) |
-| Meta Tags | `react-helmet-async` (`<Helmet>`) |
+| Meta Tags | `Helmet` via import `react-helmet-async` (alias lokal ke `resources/js/lib/react-helmet-async.tsx`) |
 | Autentikasi | Sanctum Bearer Token (stateless, bukan session/cookies) |
 | State Management | React Context (`auth-context.tsx`) + React Query cache |
 | Lazy Loading | Route-level code splitting di `app-routes.tsx` |
@@ -33,6 +33,7 @@ description: Aturan agent untuk project ERP
 - ❌ **JANGAN** gunakan `actingAs($user)` di feature test → gunakan `Sanctum::actingAs($user)`
 - ❌ **JANGAN** gunakan `assertInertia()` di test → gunakan `assertJson()`, `assertJsonStructure()`
 - ❌ **JANGAN** tambah route di `routes/web.php`
+- ❌ **JANGAN** re-add dependency upstream `react-helmet-async` ke `package.json`; tetap gunakan import `react-helmet-async` yang sudah dialias ke shim lokal React 19
 
 ## 2. Skills & MCP
 

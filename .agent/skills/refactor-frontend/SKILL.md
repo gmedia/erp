@@ -35,7 +35,7 @@ Lakukan refactor kode frontend secara **TERKONTROL** tanpa merusak frontend beha
 ### Anti-Pattern (DILARANG!):
 - ❌ **JANGAN** import dari `@inertiajs/react` (sudah dihapus dari project)
 - ✅ Navigasi: gunakan `Link` / `useNavigate` dari `react-router-dom`
-- ✅ Meta tags: gunakan `Helmet` dari `react-helmet-async`
+- ✅ Meta tags: gunakan `Helmet` dari import `react-helmet-async` yang sudah dialias ke `resources/js/lib/react-helmet-async.tsx`
 - ✅ Data fetching: gunakan React Query hooks (`useCrudQuery`, dll)
 - ✅ API calls: gunakan `axios` dari `@/lib/axios`
 
@@ -128,6 +128,7 @@ JANGAN:
 - ❌ Abstraksi tidak perlu
 - ❌ Component terlalu granular
 - ❌ Menambah dependency baru tanpa alasan
+- ❌ Re-add dependency upstream `react-helmet-async` tanpa verifikasi kompatibilitas React 19
 
 ---
 

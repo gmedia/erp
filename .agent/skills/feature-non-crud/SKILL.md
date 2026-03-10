@@ -9,6 +9,7 @@ Gunakan skill ini untuk halaman atau fitur yang tidak mengikuti pola CRUD standa
 
 > **📚 Referensi:** Ikuti pola dari modul User dan Permission  
 > **📄 Analisis lengkap:** Lihat implementasi di `app/Http/Controllers/UserController.php` dan `PermissionController.php`
+> **🪖 Catatan Helmet:** Untuk meta tags, tetap gunakan import `react-helmet-async`, tetapi resolver project mengarahkannya ke shim lokal `resources/js/lib/react-helmet-async.tsx`. Jangan menambah dependency upstream lagi tanpa verifikasi kompatibilitas React 19.
 
 ---
 
