@@ -8,8 +8,8 @@ use App\Models\SupplierReturn;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
@@ -20,13 +20,13 @@ use function Pest\Laravel\putJson;
 uses(RefreshDatabase::class)->group('supplier-returns');
 
 beforeEach(function () {
-    $this->user = createTestUserWithPermissions([
+    $user = createTestUserWithPermissions([
         'supplier_return',
         'supplier_return.create',
         'supplier_return.edit',
         'supplier_return.delete',
     ]);
-    actingAs($this->user);
+    Sanctum::actingAs($user, ['*']);
 });
 
 function createGoodsReceiptItemForSupplierReturn(): array

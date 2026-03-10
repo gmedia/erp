@@ -10,9 +10,11 @@ import {
 
 async function getFirstAsyncOption(page: Page, url: string) {
     return page.evaluate(async (endpoint) => {
+        const apiToken = localStorage.getItem('api_token') || '';
         const response = await fetch(`${endpoint}?per_page=1`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
+                Authorization: `Bearer ${apiToken}`,
             },
         });
         const payload = await response.json();
@@ -137,7 +139,8 @@ test.describe('Supplier Returns Module', () => {
 
         const firstRow = page.locator('tbody tr').first();
 
-        await firstRow.getByRole('button').last().click();
+        // Use force to prevent hanging on Radix UI Dropdown triggers flakily
+        await firstRow.getByRole('button', { name: /actions/i }).last().click({ force: true });
         await page.getByRole('menuitem', { name: 'Edit' }).click();
 
         const dialog = page.getByRole('dialog', { name: /Edit Supplier Return/i });

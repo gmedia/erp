@@ -2,20 +2,13 @@ import { expect, Page } from '@playwright/test';
 
 export async function createSupplierReturn(page: Page): Promise<string> {
     const createResult = await page.evaluate(async () => {
-        const csrf = document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute('content') || '';
-        const xsrfCookie = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('XSRF-TOKEN='));
-        const xsrfToken = xsrfCookie
-            ? decodeURIComponent(xsrfCookie.split('=')[1])
-            : '';
+        const apiToken = localStorage.getItem('api_token') || '';
 
         const getFirstId = async (url: string): Promise<number> => {
             const response = await fetch(url, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
+                    Authorization: `Bearer ${apiToken}`,
                 },
             });
             const json = await response.json();
@@ -35,8 +28,7 @@ export async function createSupplierReturn(page: Page): Promise<string> {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                'X-CSRF-TOKEN': csrf,
-                'X-XSRF-TOKEN': xsrfToken,
+                Authorization: `Bearer ${apiToken}`,
                 'X-Requested-With': 'XMLHttpRequest',
             },
             body: JSON.stringify({
@@ -66,8 +58,7 @@ export async function createSupplierReturn(page: Page): Promise<string> {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                'X-CSRF-TOKEN': csrf,
-                'X-XSRF-TOKEN': xsrfToken,
+                Authorization: `Bearer ${apiToken}`,
                 'X-Requested-With': 'XMLHttpRequest',
             },
             body: JSON.stringify({
@@ -98,8 +89,7 @@ export async function createSupplierReturn(page: Page): Promise<string> {
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
-                'X-CSRF-TOKEN': csrf,
-                'X-XSRF-TOKEN': xsrfToken,
+                Authorization: `Bearer ${apiToken}`,
                 'X-Requested-With': 'XMLHttpRequest',
             },
             body: JSON.stringify({
@@ -132,22 +122,27 @@ export async function createSupplierReturn(page: Page): Promise<string> {
     expect(createResult.ok).toBeTruthy();
     expect(createResult.returnNumber).not.toBe('');
 
+    const responsePromise = page.waitForResponse(
+        (r) => r.url().includes('/api/supplier-returns') && r.status() < 400,
+        { timeout: 10000 }
+    ).catch(() => null);
+    
     await page.reload();
-    await page
-        .waitForResponse((r) => r.url().includes('/api/supplier-returns') && r.status() < 400)
-        .catch(() => null);
+    await responsePromise;
 
     return String(createResult.returnNumber);
 }
 
 export async function searchSupplierReturn(page: Page, identifier: string): Promise<void> {
     await page.getByPlaceholder(/search/i).fill(identifier);
+    
+    const responsePromise = page.waitForResponse(
+        (r) => r.url().includes('/api/supplier-returns') && r.status() < 400,
+        { timeout: 10000 }
+    ).catch(() => null);
+    
     await page.keyboard.press('Enter');
-    await page
-        .waitForResponse(
-            (r) => r.url().includes('/api/supplier-returns') && r.status() < 400,
-        )
-        .catch(() => null);
+    await responsePromise;
 }
 
 export async function editSupplierReturn(
@@ -159,21 +154,14 @@ export async function editSupplierReturn(
 
     const updateResult = await page.evaluate(
         async ({ findBy, nextReturnNumber }) => {
-            const csrf = document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute('content') || '';
-            const xsrfCookie = document.cookie
-                .split('; ')
-                .find((row) => row.startsWith('XSRF-TOKEN='));
-            const xsrfToken = xsrfCookie
-                ? decodeURIComponent(xsrfCookie.split('=')[1])
-                : '';
+            const apiToken = localStorage.getItem('api_token') || '';
 
             const findResponse = await fetch(
                 `/api/supplier-returns?search=${encodeURIComponent(findBy)}&per_page=1`,
                 {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
+                        Authorization: `Bearer ${apiToken}`,
                     },
                 },
             );
@@ -188,8 +176,7 @@ export async function editSupplierReturn(
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-CSRF-TOKEN': csrf,
-                    'X-XSRF-TOKEN': xsrfToken,
+                    Authorization: `Bearer ${apiToken}`,
                     'X-Requested-With': 'XMLHttpRequest',
                 },
                 body: JSON.stringify({ return_number: nextReturnNumber }),
@@ -202,10 +189,11 @@ export async function editSupplierReturn(
 
     expect(updateResult.ok).toBeTruthy();
 
+    const editPromise = page.waitForResponse(
+        (r) => r.url().includes('/api/supplier-returns') && r.status() < 400,
+        { timeout: 10000 }
+    ).catch(() => null);
+    
     await page.reload();
-    await page
-        .waitForResponse(
-            (r) => r.url().includes('/api/supplier-returns') && r.status() < 400,
-        )
-        .catch(() => null);
+    await editPromise;
 }

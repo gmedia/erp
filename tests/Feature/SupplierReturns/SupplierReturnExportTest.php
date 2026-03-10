@@ -4,15 +4,15 @@ use App\Models\SupplierReturn;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
+use Laravel\Sanctum\Sanctum;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class)->group('supplier-returns');
 
 beforeEach(function () {
     $user = createTestUserWithPermissions(['supplier_return']);
-    actingAs($user);
+    Sanctum::actingAs($user, ['*']);
 });
 
 test('it exports supplier returns and returns file url', function () {
