@@ -158,13 +158,23 @@ export async function editStockAdjustment(
 
     await detailResponse;
 
+    // Wait for form to fully settle after detail data is loaded and re-rendered
+    await page.waitForTimeout(2000);
+
     if (updates.adjustment_number) {
-        await dialog
-            .locator('input[name="adjustment_number"]')
-            .fill(updates.adjustment_number);
+        const adjNumInput = dialog.locator('input[name="adjustment_number"]');
+        await expect(adjNumInput).toBeVisible();
+        await adjNumInput.click();
+        await adjNumInput.fill(updates.adjustment_number);
     }
 
+    // Click dialog title area to dismiss any floating popover/listbox
+    await dialog.locator('[class*="DialogHeader"], [class*="dialog-header"]').first().click().catch(() => null);
+    await page.waitForTimeout(300);
+
     const updateBtn = dialog.getByRole('button', { name: /Update/i });
+    await expect(updateBtn).toBeVisible({ timeout: 10000 });
+
     const updateResponse = page
         .waitForResponse(
             (r) =>
@@ -175,7 +185,8 @@ export async function editStockAdjustment(
         )
         .catch(() => null);
 
-    await updateBtn.click();
+    await updateBtn.scrollIntoViewIfNeeded();
+    await updateBtn.click({ force: true });
     await updateResponse;
 
     try {
