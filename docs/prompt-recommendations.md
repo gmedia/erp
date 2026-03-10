@@ -1,6 +1,6 @@
-# Rekomendasi Prompt untuk Membuat Fitur Baru
+# Rekomendasi Prompt untuk Agent
 
-## Prompt Templates
+## A. Membuat Fitur Baru
 
 ### 1. CRUD Simple
 
@@ -17,12 +17,13 @@ Instruksi:
 1. Gunakan skill `feature-crud-simple` → baca SKILL.md
 2. Referensi modul existing: `departments` sebagai template
 3. Output yang diharapkan:
-   - Backend: Model, Migration, Factory, Seeder, Controller, Requests, Resources, Actions, FilterService, Export, Routes
-   - Frontend: Page component + entityConfigs.ts entry
+   - Backend: Model, Migration, Factory, Seeder, Controller, Requests, Resources, Actions, FilterService, Export, Routes (`routes/api/{modul-names}.php`)
+   - Frontend: Page component + entityConfigs.ts entry + register route di `app-routes.tsx`
    - Testing Pest: Unit (Model, Actions, Requests, Resources, Domain) + Feature (Controller, Export)
    - Testing E2E: `tests/e2e/{modul-names}/{modul-name}.spec.ts` dengan helper functions
 4. Standar testing:
    - Group annotation: `->group('{modul-names}')` di SEMUA test file
+   - Feature test: gunakan `Sanctum::actingAs()` + `assertJson()`
    - E2E menggunakan `generateModuleTests()` dari `shared-test-factories.ts`
 5. Verifikasi:
    - `./vendor/bin/sail test --group {modul-names}`
@@ -48,12 +49,13 @@ Instruksi:
    - Jika ada 3+ FK + range filter → ikuti `employees`
    - Jika ada 2 FK + status enum → ikuti `suppliers` / `customers`
 3. Output yang diharapkan:
-   - Backend: Model (+ relationships), Migration, Factory, Seeder, Controller, Requests (4 files), Resources (2 files), Actions (2 files), FilterService (+ applyAdvancedFilters), DTO, Export, Routes
-   - Frontend: Page + Form + Filters + Columns + ViewModal + entityConfigs.ts entry
+   - Backend: Model (+ relationships), Migration, Factory, Seeder, Controller, Requests (4 files), Resources (2 files), Actions (2 files), FilterService (+ applyAdvancedFilters), DTO, Export, Routes (`routes/api/{modul-names}.php`)
+   - Frontend: Page + Form + Filters + Columns + ViewModal + entityConfigs.ts entry + register route di `app-routes.tsx`
    - Testing Pest: Unit (Model, Actions, Requests, Resources, Domain) + Feature (Controller, Export)
    - Testing E2E: `tests/e2e/{modul-names}/{modul-name}.spec.ts` + `tests/e2e/{modul-names}/helpers.ts`
 4. Standar testing:
    - Group annotation: `->group('{modul-names}')` di SEMUA test file
+   - Feature test: gunakan `Sanctum::actingAs()` + `assertJson()`
    - E2E menggunakan `generateModuleTests()` dari `shared-test-factories.ts`
    - E2E helper di file terpisah: `tests/e2e/{modul-names}/helpers.ts`
 5. Verifikasi:
@@ -76,9 +78,9 @@ Instruksi:
 1. Gunakan skill `feature-non-crud` → baca SKILL.md
 2. Baca spec file `docs/{MODUL_NAMES}.md` untuk memahami requirement
 3. Output yang diharapkan:
-   - Backend: Controller, Routes, (+ model/migration jika ada tabel baru)
-   - Frontend: Page component(s), komponen custom sesuai spec
-   - Testing Pest: Feature test sesuai behavior yang didefinisikan di spec
+   - Backend: Controller (API-only, return JSON), Routes (`routes/api/{modul-names}.php`), (+ model/migration jika ada tabel baru)
+   - Frontend: Page component(s) + komponen custom sesuai spec + register route di `app-routes.tsx`
+   - Testing Pest: Feature test (Sanctum::actingAs + assertJson) sesuai behavior
    - Testing E2E: Test custom sesuai user journey di spec
 4. Standar testing:
    - Group annotation: `->group('{modul-names}')` di SEMUA test file
@@ -107,11 +109,105 @@ Spesifikasi:
 
 ---
 
+## B. Refactor Modul dari Branch Lain (Inertia → SPA)
+
+Gunakan prompt ini untuk modul yang masih menggunakan arsitektur **Inertia** dan perlu di-refactor ke **Laravel API + React Full SPA**.
+
+### 5. Refactor Single Module
+
+```
+/refactor-module
+
+Refactor modul `{ModulName}` dari arsitektur Inertia ke SPA + API.
+
+Modul ini adalah {simple crud / complex crud / non-crud}.
+
+Yang perlu dilakukan:
+1. Backend:
+   - Pindah routes dari `routes/{modul}.php` ke `routes/api/{modul-names}.php` (API-only)
+   - Hapus semua `Inertia::render()` → controller return JSON saja
+   - Hapus import `use Inertia\Inertia` dan `use Inertia\Response`
+2. Frontend:
+   - Ganti `import { Head } from '@inertiajs/react'` → `import { Helmet } from 'react-helmet-async'`
+   - Ganti `<Head title="..." />` → `<Helmet><title>...</title></Helmet>`
+   - Ganti `import { router } from '@inertiajs/react'` → gunakan `axios` / React Query mutation
+   - Ganti `import { Link } from '@inertiajs/react'` → `import { Link } from 'react-router-dom'`
+   - Ganti data fetching dari Inertia props → React Query hooks
+   - Register lazy-loaded route di `app-routes.tsx`
+3. Test:
+   - Feature test: ganti `actingAs($user)` → `Sanctum::actingAs($user)`
+   - Hapus `assertInertia()` → gunakan `assertJson()`, `assertJsonStructure()`
+   - E2E: pastikan auth pakai Bearer token
+
+Referensi modul yang sudah benar:
+- Simple CRUD → `positions`, `departments`
+- Complex CRUD → `employees`, `suppliers`, `customers`
+- Non-CRUD → `users`, `permissions`
+
+Verifikasi:
+- `./vendor/bin/sail test --filter={ModulName}`
+- `./vendor/bin/sail npx playwright test tests/e2e/{modul-names}/`
+```
+
+### 6. Refactor Batch (Multiple Modules)
+
+```
+/refactor-module
+
+Refactor modul-modul berikut dari arsitektur Inertia ke SPA + API:
+
+Simple CRUD: `{ModulA}`, `{ModulB}`
+Complex CRUD: `{ModulC}`
+Non-CRUD: `{ModulD}`
+
+Kerjakan SATU MODUL PER SATU, verifikasi sebelum lanjut ke modul berikutnya.
+
+Untuk setiap modul, lakukan:
+1. Backend: pindah routes ke `routes/api/`, controller return JSON only
+2. Frontend: ganti @inertiajs/react → react-helmet-async + react-router-dom + React Query
+3. Register route di `app-routes.tsx`
+4. Test: update auth ke `Sanctum::actingAs()` + `assertJson()`
+5. Verifikasi: `./vendor/bin/sail test --filter={Modul}`
+
+Referensi: positions (simple), employees (complex), users (non-crud).
+```
+
+---
+
+## C. Test & Refactor Existing Code
+
+### 7. Buat Test untuk Fitur Existing
+
+```
+/create-tests
+
+Buatkan test untuk modul `{ModulName}` yang sudah ada.
+
+Tipe modul: {simple crud / complex crud / non-crud}
+Tipe test yang dibutuhkan: {feature test / unit test / e2e / semua}
+
+Referensi: lihat test dari modul `{referensi}` sebagai template.
+```
+
+### 8. Refactor E2E Test Existing
+
+```
+Refactor E2E test modul `{ModulName}` agar menggunakan shared test factories.
+
+Gunakan skill `refactor-e2e`. Migrasi ke `generateModuleTests()` dari `shared-test-factories.ts`.
+Helper functions harus di `tests/e2e/{modul-names}/helpers.ts`.
+```
+
+---
+
 ## Ringkasan
 
-| Tipe | Awali dengan | Referensi skill | Referensi modul | Spec file |
-|------|-------------|-----------------|-----------------|-----------|
-| Simple CRUD | `/create-feature` | `feature-crud-simple` | `departments` | ❌ |
-| Complex CRUD | `/create-feature` | `feature-crud-complex` | `employees`/`suppliers`/`customers` | ❌ |
-| Non-CRUD | `/create-feature` | `feature-non-crud` | Tergantung spec | `docs/{MODUL}.md` |
-| Import Feature | `/create-import` | `feature-import` | `employees`/`suppliers`/`assets` (import pattern) | ❌ |
+| Skenario | Awali dengan | Skill | Referensi modul |
+|----------|-------------|-------|-----------------|
+| Simple CRUD baru | `/create-feature` | `feature-crud-simple` | `departments` |
+| Complex CRUD baru | `/create-feature` | `feature-crud-complex` | `employees` / `suppliers` / `customers` |
+| Non-CRUD baru | `/create-feature` | `feature-non-crud` | `users` / `permissions` |
+| Import Excel | `/create-import` | `feature-import` | `employees` / `suppliers` |
+| Refactor Inertia → SPA | `/refactor-module` | `refactor-backend` + `refactor-frontend` | sesuai tipe CRUD |
+| Buat test baru | `/create-tests` | `testing-strategy` | sesuai tipe CRUD |
+| Refactor E2E test | — | `refactor-e2e` | `shared-test-factories.ts` |
