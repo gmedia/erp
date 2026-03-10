@@ -116,6 +116,26 @@ import { type AssetCategory } from '@/types/asset-category';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
 import { type InventoryStocktake } from '@/types/inventory-stocktake';
 import { type StockAdjustment } from '@/types/stock-adjustment';
+import { purchaseRequestColumns } from '@/components/purchase-requests/PurchaseRequestColumns';
+import { createPurchaseRequestFilterFields } from '@/components/purchase-requests/PurchaseRequestFilters';
+import { PurchaseRequestForm } from '@/components/purchase-requests/PurchaseRequestForm';
+import { PurchaseRequestViewModal } from '@/components/purchase-requests/PurchaseRequestViewModal';
+import { type PurchaseRequest } from '@/types/purchase-request';
+import { purchaseOrderColumns } from '@/components/purchase-orders/PurchaseOrderColumns';
+import { createPurchaseOrderFilterFields } from '@/components/purchase-orders/PurchaseOrderFilters';
+import { PurchaseOrderForm } from '@/components/purchase-orders/PurchaseOrderForm';
+import { PurchaseOrderViewModal } from '@/components/purchase-orders/PurchaseOrderViewModal';
+import { type PurchaseOrder } from '@/types/purchase-order';
+import { goodsReceiptColumns } from '@/components/goods-receipts/GoodsReceiptColumns';
+import { createGoodsReceiptFilterFields } from '@/components/goods-receipts/GoodsReceiptFilters';
+import { GoodsReceiptForm } from '@/components/goods-receipts/GoodsReceiptForm';
+import { GoodsReceiptViewModal } from '@/components/goods-receipts/GoodsReceiptViewModal';
+import { type GoodsReceipt } from '@/types/goods-receipt';
+import { supplierReturnColumns } from '@/components/supplier-returns/SupplierReturnColumns';
+import { createSupplierReturnFilterFields } from '@/components/supplier-returns/SupplierReturnFilters';
+import { SupplierReturnForm } from '@/components/supplier-returns/SupplierReturnForm';
+import { SupplierReturnViewModal } from '@/components/supplier-returns/SupplierReturnViewModal';
+import { type SupplierReturn } from '@/types/supplier-return';
 import { type StockTransfer } from '@/types/stock-transfer';
 import { createSimpleEntityColumns } from '@/utils/columns';
 
@@ -390,6 +410,135 @@ export const inventoryStocktakeConfig =
             `This action cannot be undone. This will cancel inventory stocktake ${stocktake.stocktake_number || ''}.`,
     });
 
+export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>({
+    entityName: 'Stock Adjustment',
+    entityNamePlural: 'Stock Adjustments',
+    apiEndpoint: '/api/stock-adjustments',
+    exportEndpoint: '/api/stock-adjustments/export',
+    queryKey: ['stock-adjustments'],
+    breadcrumbs: [{ title: 'Stock Adjustments', href: '/stock-adjustments' }],
+    initialFilters: {
+        search: '',
+        warehouse_id: '',
+        status: '',
+        adjustment_type: '',
+    },
+    columns: stockAdjustmentColumns,
+    filterFields: createStockAdjustmentFilterFields(),
+    formComponent: StockAdjustmentForm,
+    formType: 'complex',
+    entityNameForSearch: 'stock adjustment',
+    viewModalComponent: StockAdjustmentViewModal,
+    getDeleteMessage: (adjustment: { adjustment_number?: string | null }) =>
+        `This action cannot be undone. This will cancel stock adjustment ${adjustment.adjustment_number || ''}.`,
+});
+
+export const purchaseRequestConfig = createComplexEntityConfig<PurchaseRequest>({
+    entityName: 'Purchase Request',
+    entityNamePlural: 'Purchase Requests',
+    apiEndpoint: '/api/purchase-requests',
+    exportEndpoint: '/api/purchase-requests/export',
+    queryKey: ['purchase-requests'],
+    breadcrumbs: [{ title: 'Purchase Requests', href: '/purchase-requests' }],
+    initialFilters: {
+        search: '',
+        branch_id: '',
+        department_id: '',
+        requested_by: '',
+        priority: '',
+        status: '',
+        request_date_from: '',
+        request_date_to: '',
+    },
+    columns: purchaseRequestColumns,
+    filterFields: createPurchaseRequestFilterFields(),
+    formComponent: PurchaseRequestForm,
+    formType: 'complex',
+    entityNameForSearch: 'purchase request',
+    viewModalComponent: PurchaseRequestViewModal,
+    getDeleteMessage: (purchaseRequest: { pr_number?: string | null }) =>
+        `This action cannot be undone. This will cancel purchase request ${purchaseRequest.pr_number || ''}.`,
+});
+
+export const purchaseOrderConfig = createComplexEntityConfig<PurchaseOrder>({
+    entityName: 'Purchase Order',
+    entityNamePlural: 'Purchase Orders',
+    apiEndpoint: '/api/purchase-orders',
+    exportEndpoint: '/api/purchase-orders/export',
+    queryKey: ['purchase-orders'],
+    breadcrumbs: [{ title: 'Purchase Orders', href: '/purchase-orders' }],
+    initialFilters: {
+        search: '',
+        supplier_id: '',
+        warehouse_id: '',
+        status: '',
+        currency: '',
+        order_date_from: '',
+        order_date_to: '',
+    },
+    columns: purchaseOrderColumns,
+    filterFields: createPurchaseOrderFilterFields(),
+    formComponent: PurchaseOrderForm,
+    formType: 'complex',
+    entityNameForSearch: 'purchase order',
+    viewModalComponent: PurchaseOrderViewModal,
+    getDeleteMessage: (purchaseOrder: { po_number?: string | null }) =>
+        `This action cannot be undone. This will delete purchase order ${purchaseOrder.po_number || ''}.`,
+});
+
+export const goodsReceiptConfig = createComplexEntityConfig<GoodsReceipt>({
+    entityName: 'Goods Receipt',
+    entityNamePlural: 'Goods Receipts',
+    apiEndpoint: '/api/goods-receipts',
+    exportEndpoint: '/api/goods-receipts/export',
+    queryKey: ['goods-receipts'],
+    breadcrumbs: [{ title: 'Goods Receipts', href: '/goods-receipts' }],
+    initialFilters: {
+        search: '',
+        purchase_order_id: '',
+        warehouse_id: '',
+        status: '',
+        received_by: '',
+        receipt_date_from: '',
+        receipt_date_to: '',
+    },
+    columns: goodsReceiptColumns,
+    filterFields: createGoodsReceiptFilterFields(),
+    formComponent: GoodsReceiptForm,
+    formType: 'complex',
+    entityNameForSearch: 'goods receipt',
+    viewModalComponent: GoodsReceiptViewModal,
+    getDeleteMessage: (goodsReceipt: { gr_number?: string | null }) =>
+        `This action cannot be undone. This will delete goods receipt ${goodsReceipt.gr_number || ''}.`,
+});
+
+export const supplierReturnConfig = createComplexEntityConfig<SupplierReturn>({
+    entityName: 'Supplier Return',
+    entityNamePlural: 'Supplier Returns',
+    apiEndpoint: '/api/supplier-returns',
+    exportEndpoint: '/api/supplier-returns/export',
+    queryKey: ['supplier-returns'],
+    breadcrumbs: [{ title: 'Supplier Returns', href: '/supplier-returns' }],
+    initialFilters: {
+        search: '',
+        purchase_order_id: '',
+        goods_receipt_id: '',
+        supplier_id: '',
+        warehouse_id: '',
+        reason: '',
+        status: '',
+        return_date_from: '',
+        return_date_to: '',
+    },
+    columns: supplierReturnColumns,
+    filterFields: createSupplierReturnFilterFields(),
+    formComponent: SupplierReturnForm,
+    formType: 'complex',
+    entityNameForSearch: 'supplier return',
+    viewModalComponent: SupplierReturnViewModal,
+    getDeleteMessage: (supplierReturn: { return_number?: string | null }) =>
+        `This action cannot be undone. This will delete supplier return ${supplierReturn.return_number || ''}.`,
+});
 export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
     {
         entityName: 'Stock Adjustment',

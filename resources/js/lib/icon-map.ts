@@ -18,7 +18,6 @@ import {
     ClipboardList,
     Copy,
     Database,
-    Edit3,
     FileSearch,
     FileText,
     Folder,
@@ -55,6 +54,13 @@ import {
     UserPlus,
     Users,
     Warehouse,
+    Edit3,
+    History,
+    ClipboardList,
+    FilePlus2,
+    PackageCheck,
+    RotateCcw,
+    ClipboardPenLine,
     Wrench,
 } from 'lucide-react';
 
@@ -115,6 +121,10 @@ const iconMap: Record<string, LucideIcon> = {
     Edit3,
     History,
     ClipboardList,
+    FilePlus2,
+    PackageCheck,
+    RotateCcw,
+    ClipboardPenLine,
 };
 
 export function getIcon(name: string | null): LucideIcon | undefined {

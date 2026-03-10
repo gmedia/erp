@@ -20,6 +20,7 @@ interface AsyncSelectFieldProps<T extends object = Record<string, unknown>> {
     labelFn?: (item: T) => string;
     valueFn?: (item: T) => string;
     initialLabel?: string;
+    onItemSelect?: (item: any) => void;
 }
 
 export default function AsyncSelectField<T extends object = Record<string, unknown>>({
@@ -32,6 +33,7 @@ export default function AsyncSelectField<T extends object = Record<string, unkno
     labelFn,
     valueFn,
     initialLabel,
+    onItemSelect,
 }: AsyncSelectFieldProps<T>) {
     return (
         <FormField
@@ -50,6 +52,7 @@ export default function AsyncSelectField<T extends object = Record<string, unkno
                             labelFn={labelFn}
                             valueFn={valueFn}
                             initialLabel={initialLabel}
+                            onItemSelect={onItemSelect}
                             label={label}
                         />
                     </FormControl>

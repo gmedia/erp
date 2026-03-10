@@ -95,6 +95,90 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'purchase_request',
+                'display_name' => 'Purchase Request',
+                'child' => [
+                    [
+                        'name' => 'purchase_request.create',
+                        'display_name' => 'Create Purchase Request',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'purchase_request.edit',
+                        'display_name' => 'Edit Purchase Request',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'purchase_request.delete',
+                        'display_name' => 'Delete Purchase Request',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'purchase_order',
+                'display_name' => 'Purchase Order',
+                'child' => [
+                    [
+                        'name' => 'purchase_order.create',
+                        'display_name' => 'Create Purchase Order',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'purchase_order.edit',
+                        'display_name' => 'Edit Purchase Order',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'purchase_order.delete',
+                        'display_name' => 'Delete Purchase Order',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'goods_receipt',
+                'display_name' => 'Goods Receipt',
+                'child' => [
+                    [
+                        'name' => 'goods_receipt.create',
+                        'display_name' => 'Create Goods Receipt',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'goods_receipt.edit',
+                        'display_name' => 'Edit Goods Receipt',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'goods_receipt.delete',
+                        'display_name' => 'Delete Goods Receipt',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'supplier_return',
+                'display_name' => 'Supplier Return',
+                'child' => [
+                    [
+                        'name' => 'supplier_return.create',
+                        'display_name' => 'Create Supplier Return',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'supplier_return.edit',
+                        'display_name' => 'Edit Supplier Return',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'supplier_return.delete',
+                        'display_name' => 'Delete Supplier Return',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'stock_transfer',
                 'display_name' => 'Stock Transfer',
                 'child' => [
@@ -372,6 +456,21 @@ class PermissionSeeder extends Seeder
             [
                 'name' => 'stock_adjustment_report',
                 'display_name' => 'Stock Adjustment Report',
+                'child' => [],
+            ],
+            [
+                'name' => 'purchase_order_status_report',
+                'display_name' => 'Purchase Order Status Report',
+                'child' => [],
+            ],
+            [
+                'name' => 'purchase_history_report',
+                'display_name' => 'Purchase History Report',
+                'child' => [],
+            ],
+            [
+                'name' => 'goods_receipt_report',
+                'display_name' => 'Goods Receipt Report',
                 'child' => [],
             ],
             [

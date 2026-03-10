@@ -16,6 +16,7 @@ export interface AsyncSelectProps<T extends object = Record<string, unknown>> {
     value?: string;
     /** Handler for value changes. Optional when used in filter descriptors (injected by FilterModal). */
     onValueChange?: (value: string) => void;
+    onItemSelect?: (item: any) => void;
     url: string;
     placeholder?: string;
     className?: string;
@@ -28,6 +29,7 @@ export interface AsyncSelectProps<T extends object = Record<string, unknown>> {
 export function AsyncSelect<T extends object = Record<string, unknown>>({
     value,
     onValueChange,
+    onItemSelect,
     url,
     placeholder = 'Select...',
     className,
@@ -193,6 +195,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                                         )}
                                         onClick={() => {
                                             onValueChange?.(itemValue);
+                                            onItemSelect?.(item);
                                             setSelectedLabel(itemLabel);
                                             setOpen(false);
                                         }}

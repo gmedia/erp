@@ -172,6 +172,42 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
 
+- slug: purchase-requests
+  route: /purchase-requests
+  api: /api/purchase-requests
+  export_api: /api/purchase-requests/export
+  search_placeholder: "Search PR number, notes, or rejection reason..."
+  sortable_columns: [PR Number, Branch, Department, Requester, Request Date, Required Date, Priority, Status, Estimated Amount]
+  view_type: dialog
+  checkbox_header: false
+
+- slug: purchase-orders
+  route: /purchase-orders
+  api: /api/purchase-orders
+  export_api: /api/purchase-orders/export
+  search_placeholder: "Search PO number, payment terms, notes, or shipping address..."
+  sortable_columns: [PO Number, Supplier, Warehouse, Order Date, Expected Delivery, Status, Grand Total]
+  view_type: dialog
+  checkbox_header: false
+
+- slug: goods-receipts
+  route: /goods-receipts
+  api: /api/goods-receipts
+  export_api: /api/goods-receipts/export
+  search_placeholder: "Search GR number, supplier delivery note, or notes..."
+  sortable_columns: [GR Number, PO Number, Warehouse, Receipt Date, Supplier Delivery Note, Status]
+  view_type: dialog
+  checkbox_header: false
+
+- slug: supplier-returns
+  route: /supplier-returns
+  api: /api/supplier-returns
+  export_api: /api/supplier-returns/export
+  search_placeholder: "Search return number or notes..."
+  sortable_columns: [Return Number, PO Number, GR Number, Supplier, Warehouse, Return Date, Reason, Status]
+  view_type: dialog
+  checkbox_header: false
+
 - slug: products
   route: /products
   api: /api/products
@@ -449,6 +485,42 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/stock-adjustment-report/stock-adjustment-report.spec.ts
 
+- slug: purchase-order-status-report
+  route: /reports/purchase-order-status
+  api: /reports/purchase-order-status (Accepts application/json)
+  export_api: /reports/purchase-order-status/export
+  search_placeholder: "Search PO number, supplier, warehouse, or product..."
+  sortable_columns: [PO Number, Supplier, Warehouse, Status, Status Category, Ordered Qty, Received Qty, Outstanding Qty, Receipt Progress (%), Grand Total, Expected Delivery]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD laporan monitoring status purchase order (outstanding, partially received, closed) dengan agregasi kuantitas penerimaan."
+  tests:
+    - tests/e2e/purchase-order-status-report/purchase-order-status-report.spec.ts
+
+- slug: purchase-history-report
+  route: /reports/purchase-history
+  api: /reports/purchase-history (Accepts application/json)
+  export_api: /reports/purchase-history/export
+  search_placeholder: "Search PO number, supplier, warehouse, or product..."
+  sortable_columns: [PO Number, Supplier, Product, Warehouse, Status, Ordered Qty, Received Qty, Outstanding Qty, Receipt Count, Last Receipt, Total Value, Expected Delivery]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD laporan riwayat pembelian per supplier, produk, dan periode dengan agregasi penerimaan barang confirmed."
+  tests:
+    - tests/e2e/purchase-history-report/purchase-history-report.spec.ts
+
+- slug: goods-receipt-report
+  route: /reports/goods-receipt
+  api: /reports/goods-receipt (Accepts application/json)
+  export_api: /reports/goods-receipt/export
+  search_placeholder: "Search GR number, PO number, supplier, warehouse, or product..."
+  sortable_columns: [GR Number, PO Number, Supplier, Warehouse, Status, Item Count, Received Qty, Accepted Qty, Rejected Qty, Total Value]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD laporan penerimaan barang per periode, supplier, dan gudang dengan agregasi kuantitas serta nilai penerimaan."
+  tests:
+    - tests/e2e/goods-receipt-report/goods-receipt-report.spec.ts
+
 - slug: stock-monitor
   route: /stock-monitor
   api: /stock-monitor (Accepts application/json)
@@ -554,7 +626,10 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 17 | Stock Transfers | `stock-transfers` | `StockTransferControllerTest`, `StockTransferExportTest` | `StockTransferTest` | — |
 | 18 | Inventory Stocktakes | `inventory-stocktakes` | `InventoryStocktakeControllerTest`, `InventoryStocktakeExportTest` | `InventoryStocktakeTest` | — |
 | 19 | Stock Adjustments | `stock-adjustments` | `StockAdjustmentControllerTest`, `StockAdjustmentExportTest` | `StockAdjustmentTest` | — |
-| 20 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
+| 20 | Purchase Requests | `purchase-requests` | `PurchaseRequestControllerTest`, `PurchaseRequestExportTest` | `PurchaseRequestTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
+| 21 | Purchase Orders | `purchase-orders` | `PurchaseOrderControllerTest`, `PurchaseOrderExportTest` | `PurchaseOrderTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
+| 22 | Goods Receipts | `goods-receipts` | `GoodsReceiptControllerTest`, `GoodsReceiptExportTest` | `GoodsReceiptTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
+| 23 | Supplier Returns | `supplier-returns` | `SupplierReturnControllerTest`, `SupplierReturnExportTest` | `SupplierReturnTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
 
 ---
 
@@ -567,7 +642,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 3 | Dashboard | `dashboard` | `Feature/Dashboard/DashboardTest.php` | — |
 | 4 | Permissions | `permissions` | `Feature/Permissions/PermissionControllerTest.php` | — |
 | 5 | Users | `users` | `Feature/Users/UserControllerTest.php` | — |
-| 6 | Reports | `reports` | `Feature/Reports/*.php` (5 files) | Ada legacy + new tests |
+| 6 | Reports | `reports` | `Feature/Reports/*.php` (8 files) | Ada legacy + new tests |
 | 7 | Posting Journals | `posting-journals` | `Feature/PostingJournals/PostingJournalTest.php` | — |
 | 8 | Asset Depreciation Runs | `asset-depreciation-runs` | `Feature/AssetDepreciationRuns/*.php` | — |
 | 9 | Asset Reports | `asset-reports` | `Feature/AssetRegisterTest.php` | Laporan Asset Register |
@@ -588,6 +663,9 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 24 | Stock Movement Report | `stock-movement-report` | `Feature/Reports/StockMovementReportTest.php` | Laporan pergerakan stok per periode + export |
 | 25 | Inventory Stocktake Variance Report | `inventory-stocktake-variance-report` | `Feature/Reports/InventoryStocktakeVarianceReportTest.php` | Laporan variance stock opname inventory + export |
 | 26 | Stock Adjustment Report | `stock-adjustment-report` | `Feature/Reports/StockAdjustmentReportTest.php` | Laporan penyesuaian stok per tipe/periode/gudang + export |
+| 27 | Purchase Order Status Report | `purchase-order-status-report` | `Feature/Reports/PurchaseOrderStatusReportTest.php` | Laporan monitoring status PO (outstanding, partially received, closed) + export |
+| 28 | Purchase History Report | `purchase-history-report` | `Feature/Reports/PurchaseHistoryReportTest.php` | Laporan riwayat pembelian per supplier/produk/periode + export |
+| 29 | Goods Receipt Report | `goods-receipt-report` | `Feature/Reports/GoodsReceiptReportTest.php` | Laporan penerimaan barang per periode/supplier/gudang + export |
 
 ---
 
