@@ -52,7 +52,9 @@ export interface SupplierReturnFormData {
     items: Array<{
         goods_receipt_item_id: string;
         product_id: string;
+        product_label?: string;
         unit_id?: string;
+        unit_label?: string;
         quantity_returned: number;
         unit_price: number;
         notes?: string;

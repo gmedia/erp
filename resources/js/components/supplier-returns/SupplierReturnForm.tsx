@@ -1,8 +1,9 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/table';
 import { type SupplierReturn, type SupplierReturnFormData } from '@/types/supplier-return';
 import { supplierReturnFormSchema } from '@/utils/schemas';
+import { SupplierReturnItemFormDialog } from './SupplierReturnItemFormDialog';
 
 interface SupplierReturnFormProps {
     open: boolean;
@@ -31,6 +33,29 @@ interface SupplierReturnFormProps {
     onSubmit: (data: SupplierReturnFormData) => void;
     isLoading?: boolean;
 }
+
+const createEmptySupplierReturnItem = (): SupplierReturnFormData['items'][number] => ({
+    goods_receipt_item_id: '',
+    product_id: '',
+    product_label: '',
+    unit_id: '',
+    unit_label: '',
+    quantity_returned: 1,
+    unit_price: 0,
+    notes: '',
+});
+
+const formatItemReference = (label?: string, id?: string) => {
+    if (label) {
+        return label;
+    }
+
+    if (id) {
+        return `#${id}`;
+    }
+
+    return '-';
+};
 
 const getSupplierReturnFormDefaults = (
     supplierReturn?: SupplierReturn | null,
@@ -46,16 +71,7 @@ const getSupplierReturnFormDefaults = (
             reason: 'defective',
             status: 'draft',
             notes: '',
-            items: [
-                {
-                    goods_receipt_item_id: '',
-                    product_id: '',
-                    unit_id: '',
-                    quantity_returned: 1,
-                    unit_price: 0,
-                    notes: '',
-                },
-            ],
+            items: [],
         };
     }
 
@@ -83,21 +99,14 @@ const getSupplierReturnFormDefaults = (
             ? (supplierReturn.items || []).map((it) => ({
                 goods_receipt_item_id: String(it.goods_receipt_item_id),
                 product_id: it.product?.id ? String(it.product.id) : '',
+                product_label: it.product?.name || '',
                 unit_id: it.unit?.id ? String(it.unit.id) : '',
+                unit_label: it.unit?.name || '',
                 quantity_returned: Number(it.quantity_returned || 0),
                 unit_price: Number(it.unit_price || 0),
                 notes: it.notes || '',
             }))
-            : [
-                {
-                    goods_receipt_item_id: '',
-                    product_id: '',
-                    unit_id: '',
-                    quantity_returned: 1,
-                    unit_price: 0,
-                    notes: '',
-                },
-            ],
+            : [],
     };
 };
 
@@ -121,10 +130,30 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(function Supplie
         defaultValues,
     });
 
-    const { fields, append, remove } = useFieldArray({
+    const { fields, append, remove, update } = useFieldArray({
         control: form.control,
         name: 'items',
     });
+    const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const watchedItems = form.watch('items');
+
+    const handleCreateNewItem = () => {
+        setEditingIndex(null);
+        setIsItemDialogOpen(true);
+    };
+
+    const handleEditItem = (index: number) => {
+        setEditingIndex(index);
+        setIsItemDialogOpen(true);
+    };
+
+    const handleSubmit = (data: SupplierReturnFormData) => {
+        onSubmit({
+            ...data,
+            items: data.items.map(({ product_label, unit_label, ...supplierReturnItem }) => supplierReturnItem),
+        });
+    };
 
     useEffect(() => {
         form.reset(defaultValues);
@@ -136,7 +165,7 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(function Supplie
             open={open}
             onOpenChange={onOpenChange}
             title={activeSupplierReturn ? 'Edit Supplier Return' : 'Add New Supplier Return'}
-            onSubmit={onSubmit}
+            onSubmit={handleSubmit}
             isLoading={isLoading}
             className="sm:max-w-[1100px]"
         >
@@ -248,17 +277,9 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(function Supplie
                     <Button
                         type="button"
                         variant="outline"
-                        onClick={() =>
-                            append({
-                                goods_receipt_item_id: '',
-                                product_id: '',
-                                unit_id: '',
-                                quantity_returned: 1,
-                                unit_price: 0,
-                                notes: '',
-                            })
-                        }
+                        onClick={handleCreateNewItem}
                     >
+                        <Plus className="mr-2 h-4 w-4" />
                         Add Item
                     </Button>
                 </div>
@@ -273,71 +294,89 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(function Supplie
                                 <TableHead className="w-[120px]">Qty Returned</TableHead>
                                 <TableHead className="w-[140px]">Unit Price</TableHead>
                                 <TableHead>Notes</TableHead>
-                                <TableHead className="w-[80px] text-right">Action</TableHead>
+                                <TableHead className="w-[120px] text-right">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {fields.map((field, index) => (
-                                <TableRow key={field.id}>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.goods_receipt_item_id`} label="" />
-                                    </TableCell>
-                                    <TableCell>
-                                        <Controller
-                                            control={form.control}
-                                            name={`items.${index}.product_id`}
-                                            render={({ field: itemField }) => (
-                                                <AsyncSelect
-                                                    value={itemField.value ? String(itemField.value) : undefined}
-                                                    onValueChange={itemField.onChange}
-                                                    url="/api/products"
-                                                    placeholder="Select product"
-                                                    label="Product"
-                                                />
+                            {fields.map((field, index) => {
+                                const supplierReturnItem = watchedItems?.[index] || createEmptySupplierReturnItem();
+
+                                return (
+                                    <TableRow key={field.id}>
+                                        <TableCell>
+                                            {formatItemReference(undefined, supplierReturnItem.goods_receipt_item_id)}
+                                        </TableCell>
+                                        <TableCell>
+                                            {formatItemReference(
+                                                supplierReturnItem.product_label,
+                                                supplierReturnItem.product_id,
                                             )}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        <Controller
-                                            control={form.control}
-                                            name={`items.${index}.unit_id`}
-                                            render={({ field: itemField }) => (
-                                                <AsyncSelect
-                                                    value={itemField.value ? String(itemField.value) : undefined}
-                                                    onValueChange={itemField.onChange}
-                                                    url="/api/units"
-                                                    placeholder="Select unit"
-                                                    label="Unit"
-                                                />
+                                        </TableCell>
+                                        <TableCell>
+                                            {formatItemReference(
+                                                supplierReturnItem.unit_label,
+                                                supplierReturnItem.unit_id,
                                             )}
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.quantity_returned`} label="" type="number" />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.unit_price`} label="" type="number" />
-                                    </TableCell>
-                                    <TableCell>
-                                        <InputField name={`items.${index}.notes`} label="" />
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => remove(index)}
-                                            disabled={fields.length === 1}
-                                        >
-                                            Remove
-                                        </Button>
+                                        </TableCell>
+                                        <TableCell>{supplierReturnItem.quantity_returned ?? 0}</TableCell>
+                                        <TableCell>{supplierReturnItem.unit_price ?? 0}</TableCell>
+                                        <TableCell>{supplierReturnItem.notes || '-'}</TableCell>
+                                        <TableCell className="text-right">
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleEditItem(index)}
+                                                title="Edit item"
+                                                aria-label={`Edit item ${index + 1}`}
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => remove(index)}
+                                                title="Remove item"
+                                                aria-label={`Remove item ${index + 1}`}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                            {!fields.length && (
+                                <TableRow>
+                                    <TableCell colSpan={7} className="py-6 text-center text-muted-foreground">
+                                        No items added yet.
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            )}
                         </TableBody>
                     </Table>
                 </div>
             </div>
+
+            <SupplierReturnItemFormDialog
+                open={isItemDialogOpen}
+                onOpenChange={(nextOpen) => {
+                    setIsItemDialogOpen(nextOpen);
+                    if (!nextOpen) {
+                        setEditingIndex(null);
+                    }
+                }}
+                item={editingIndex !== null ? watchedItems?.[editingIndex] || null : null}
+                onSave={(data) => {
+                    if (editingIndex !== null) {
+                        update(editingIndex, data);
+                    } else {
+                        append(data);
+                    }
+                    setIsItemDialogOpen(false);
+                    setEditingIndex(null);
+                }}
+            />
         </EntityForm>
     );
 });
