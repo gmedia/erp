@@ -9,7 +9,7 @@ import { createPurchaseHistoryReportFilterFields } from '@/components/reports/pu
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
+import { Helmet } from 'react-helmet-async';
 
 export default function PurchaseHistoryReportPage() {
     const filterFields = createPurchaseHistoryReportFilterFields();
@@ -35,7 +35,7 @@ export default function PurchaseHistoryReportPage() {
     });
 
     const { data, isLoading, meta } = useCrudQuery<PurchaseHistoryReportItem>({
-        endpoint: '/reports/purchase-history',
+        endpoint: '/api/reports/purchase-history',
         queryKey: ['purchase-history-report'],
         entityName: 'Purchase History Report',
         pagination,
@@ -44,7 +44,9 @@ export default function PurchaseHistoryReportPage() {
 
     return (
         <>
-            <Head title="Purchase History Report" />
+            <Helmet>
+                <title>Purchase History Report</title>
+            </Helmet>
             <AppLayout
                 breadcrumbs={[
                     { title: 'Reports', href: '#' },
@@ -78,7 +80,7 @@ export default function PurchaseHistoryReportPage() {
                             onFilterChange={handleFilterChange}
                             onResetFilters={resetFilters}
                             filterFields={filterFields}
-                            exportEndpoint="/reports/purchase-history/export"
+                            exportEndpoint="/api/reports/purchase-history/export"
                             entityName="Purchase History Report"
                         />
                     </div>

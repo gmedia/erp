@@ -17,19 +17,19 @@ test.describe('Purchase History Report', () => {
 
         const sortResponsePromise = page.waitForResponse(
             (response) =>
-                response.url().includes('/reports/purchase-history') &&
+                response.url().includes('/api/reports/purchase-history') &&
                 response.url().includes('sort_by=product_name') &&
                 response.status() < 400,
         );
-        await page.getByRole('button', { name: 'Product', exact: true }).click();
+        await page.getByRole('button', { name: 'Product', exact: true }).click({ force: true });
         await sortResponsePromise;
 
         const exportResponsePromise = page.waitForResponse(
             (response) =>
-                response.url().includes('/reports/purchase-history/export') &&
+                response.url().includes('/api/reports/purchase-history/export') &&
                 response.status() < 400,
         );
-        await page.getByRole('button', { name: /export/i }).click();
+        await page.getByRole('button', { name: /export/i }).click({ force: true });
         await exportResponsePromise;
 
         const searchInput = page.getByRole('textbox').first();

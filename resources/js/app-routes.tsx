@@ -132,6 +132,9 @@ const ReportBookValueDepreciation = lazy(
 const ReportMaintenanceCost = lazy(
     () => import('./pages/reports/maintenance-cost/index'),
 );
+const ReportPurchaseHistory = lazy(
+    () => import('./pages/reports/purchase-history/index'),
+);
 const ReportAssetStocktakeVariances = lazy(
     () => import('./pages/reports/asset-stocktake-variances/index'),
 );
@@ -744,6 +747,14 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <ReportInventoryStocktakeVariance />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/reports/purchase-history"
+                    element={
+                        <P>
+                            <ReportPurchaseHistory />
                         </P>
                     }
                 />
