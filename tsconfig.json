@@ -109,7 +109,8 @@
         "skipLibCheck": true /* Skip type checking all .d.ts files. */,
         "baseUrl": ".",
         "paths": {
-            "@/*": ["./resources/js/*"]
+            "@/*": ["./resources/js/*"],
+            "react-helmet-async": ["./resources/js/lib/react-helmet-async.tsx"]
         },
         "jsx": "react-jsx"
     },

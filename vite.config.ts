@@ -1,3 +1,4 @@
+import { fileURLToPath, URL } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
@@ -12,6 +13,13 @@ export default defineConfig({
         react(),
         tailwindcss(),
     ],
+    resolve: {
+        alias: {
+            'react-helmet-async': fileURLToPath(
+                new URL('./resources/js/lib/react-helmet-async.tsx', import.meta.url),
+            ),
+        },
+    },
     esbuild: {
         jsx: 'automatic',
     },
