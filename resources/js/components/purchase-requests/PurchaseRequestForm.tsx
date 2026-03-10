@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/table';
 import { type PurchaseRequest, type PurchaseRequestFormData } from '@/types/purchase-request';
 import { purchaseRequestFormSchema } from '@/utils/schemas';
+import { PurchaseRequestItemFormDialog } from './PurchaseRequestItemFormDialog';
 
 interface PurchaseRequestFormProps {
     open: boolean;
@@ -112,10 +113,23 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(function Purch
         defaultValues,
     });
 
-    const { fields, append, remove } = useFieldArray({
+    const { fields, append, remove, update } = useFieldArray({
         control: form.control,
         name: 'items',
     });
+    const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const watchedItems = form.watch('items');
+
+    const handleCreateNewItem = () => {
+        setEditingIndex(null);
+        setIsItemDialogOpen(true);
+    };
+
+    const handleEditItem = (index: number) => {
+        setEditingIndex(index);
+        setIsItemDialogOpen(true);
+    };
 
     useEffect(() => {
         form.reset(defaultValues);
@@ -246,15 +260,7 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(function Purch
                     <Button
                         type="button"
                         variant="outline"
-                        onClick={() =>
-                            append({
-                                product_id: '',
-                                unit_id: '',
-                                quantity: 1,
-                                estimated_unit_price: 0,
-                                notes: '',
-                            })
-                        }
+                        onClick={handleCreateNewItem}
                     >
                         Add Item
                     </Button>
@@ -264,61 +270,45 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(function Purch
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-[250px]">Product</TableHead>
-                                <TableHead className="w-[160px]">Unit</TableHead>
+                                <TableHead className="w-[180px]">Product</TableHead>
+                                <TableHead className="w-[140px]">Unit</TableHead>
                                 <TableHead className="w-[130px]">Quantity</TableHead>
                                 <TableHead className="w-[160px]">Est. Unit Price</TableHead>
                                 <TableHead>Notes</TableHead>
-                                <TableHead className="w-[80px] text-right">Action</TableHead>
+                                <TableHead className="w-[160px] text-right">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {fields.map((field, index) => (
                                 <TableRow key={field.id}>
                                     <TableCell>
-                                        <Controller
-                                            control={form.control}
-                                            name={`items.${index}.product_id`}
-                                            render={({ field: itemField }) => (
-                                                <AsyncSelect
-                                                    value={itemField.value ? String(itemField.value) : undefined}
-                                                    onValueChange={itemField.onChange}
-                                                    url="/api/products"
-                                                    placeholder="Select product"
-                                                    label="Product"
-                                                />
-                                            )}
-                                        />
+                                        {watchedItems?.[index]?.product_id
+                                            ? `#${watchedItems[index].product_id}`
+                                            : '-'}
                                     </TableCell>
                                     <TableCell>
-                                        <Controller
-                                            control={form.control}
-                                            name={`items.${index}.unit_id`}
-                                            render={({ field: itemField }) => (
-                                                <AsyncSelect
-                                                    value={itemField.value ? String(itemField.value) : undefined}
-                                                    onValueChange={itemField.onChange}
-                                                    url="/api/units"
-                                                    placeholder="Select unit"
-                                                    label="Unit"
-                                                />
-                                            )}
-                                        />
+                                        {watchedItems?.[index]?.unit_id
+                                            ? `#${watchedItems[index].unit_id}`
+                                            : '-'}
                                     </TableCell>
                                     <TableCell>
-                                        <InputField name={`items.${index}.quantity`} label="" type="number" />
+                                        {watchedItems?.[index]?.quantity ?? 0}
                                     </TableCell>
                                     <TableCell>
-                                        <InputField
-                                            name={`items.${index}.estimated_unit_price`}
-                                            label=""
-                                            type="number"
-                                        />
+                                        {watchedItems?.[index]?.estimated_unit_price ?? 0}
                                     </TableCell>
                                     <TableCell>
-                                        <InputField name={`items.${index}.notes`} label="" />
+                                        {watchedItems?.[index]?.notes || '-'}
                                     </TableCell>
                                     <TableCell className="text-right">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleEditItem(index)}
+                                        >
+                                            Edit
+                                        </Button>
                                         <Button
                                             type="button"
                                             variant="ghost"
@@ -335,6 +325,26 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(function Purch
                     </Table>
                 </div>
             </div>
+
+            <PurchaseRequestItemFormDialog
+                open={isItemDialogOpen}
+                onOpenChange={(nextOpen) => {
+                    setIsItemDialogOpen(nextOpen);
+                    if (!nextOpen) {
+                        setEditingIndex(null);
+                    }
+                }}
+                item={editingIndex !== null ? watchedItems?.[editingIndex] || null : null}
+                onSave={(data) => {
+                    if (editingIndex !== null) {
+                        update(editingIndex, data);
+                    } else {
+                        append(data);
+                    }
+                    setIsItemDialogOpen(false);
+                    setEditingIndex(null);
+                }}
+            />
         </EntityForm>
     );
 });
