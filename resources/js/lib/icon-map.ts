@@ -55,8 +55,6 @@ import {
     Users,
     Warehouse,
     Edit3,
-    History,
-    ClipboardList,
     FilePlus2,
     PackageCheck,
     RotateCcw,

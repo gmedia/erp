@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -26,7 +27,7 @@ interface ApprovalDelegationFormProps {
 
 const getApprovalDelegationFormDefaults = (
     entity?: ApprovalDelegation | null,
-): ApprovalDelegationFormData => {
+): z.input<typeof approvalDelegationFormSchema> => {
     if (!entity) {
         return {
             delegator_user_id: '',
@@ -69,7 +70,15 @@ export const ApprovalDelegationForm = memo<ApprovalDelegationFormProps>(
             [entity],
         );
 
-        const form = useForm<ApprovalDelegationFormData>({
+        type ApprovalDelegationFormInput = z.input<
+            typeof approvalDelegationFormSchema
+        >;
+
+        const form = useForm<
+            ApprovalDelegationFormInput,
+            unknown,
+            ApprovalDelegationFormData
+        >({
             resolver: zodResolver(approvalDelegationFormSchema),
             defaultValues,
         });
@@ -79,7 +88,10 @@ export const ApprovalDelegationForm = memo<ApprovalDelegationFormProps>(
         }, [form, defaultValues]);
 
         return (
-            <EntityForm<ApprovalDelegationFormData>
+            <EntityForm<
+                ApprovalDelegationFormInput,
+                ApprovalDelegationFormData
+            >
                 form={form}
                 open={open}
                 onOpenChange={onOpenChange}

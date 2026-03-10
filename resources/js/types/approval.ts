@@ -40,7 +40,13 @@ export interface ApprovalRequest {
     completed_at: string | null;
     created_at: string;
     updated_at: string;
-    approvable?: Record<string, unknown>;
+    approvable?: {
+        ulid?: string;
+        asset_code?: string;
+        name?: string;
+        description?: string;
+        [key: string]: unknown;
+    };
     submitter?: {
         id: number;
         name: string;
@@ -63,7 +69,22 @@ export interface ApprovalRequestStep {
     due_at: string | null;
     created_at: string;
     updated_at: string;
+    actor?: {
+        id: number;
+        name: string;
+        email: string;
+    };
+    delegator?: {
+        id: number;
+        name: string;
+        email: string;
+    };
     acted_by_user?: {
+        id: number;
+        name: string;
+        email: string;
+    };
+    delegated_from_user?: {
         id: number;
         name: string;
         email: string;

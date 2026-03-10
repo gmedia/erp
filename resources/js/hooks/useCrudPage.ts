@@ -7,7 +7,7 @@ import { type ApiError } from '@/utils/errorHandling';
 import { useCallback, useMemo, useState } from 'react';
 
 export interface CrudPageConfig<
-    T extends Record<string, unknown>,
+    T extends object,
     FilterType extends FilterState = FilterState,
 > {
     // Basic configuration
@@ -93,7 +93,7 @@ export interface CrudPageState<T, FormData, FilterType extends FilterState> {
 }
 
 export function useCrudPage<
-    T extends Record<string, unknown>,
+    T extends object,
     FormData,
     FilterType extends FilterState = FilterState,
 >(
@@ -169,9 +169,15 @@ export function useCrudPage<
         (data: FormData) => {
             const identifierKey = config.identifierKey || 'id';
             if (selectedItem) {
+                const selectedItemRecord = selectedItem as Record<
+                    string,
+                    unknown
+                >;
                 updateMutation.mutate(
                     {
-                        id: selectedItem[identifierKey] as string | number,
+                        id: selectedItemRecord[identifierKey] as
+                            | string
+                            | number,
                         data,
                     },
                     {
@@ -198,8 +204,9 @@ export function useCrudPage<
     const handleDeleteConfirm = useCallback(() => {
         const identifierKey = config.identifierKey || 'id';
         if (itemToDelete) {
+            const itemToDeleteRecord = itemToDelete as Record<string, unknown>;
             deleteMutation.mutate(
-                itemToDelete[identifierKey] as string | number,
+                itemToDeleteRecord[identifierKey] as string | number,
                 {
                     onSuccess: () => {
                         setItemToDelete(null);

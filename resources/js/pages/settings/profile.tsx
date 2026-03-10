@@ -1,5 +1,6 @@
 import { useAuth } from '@/contexts/auth-context';
 import axios from '@/lib/axios';
+import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'sonner';
@@ -14,6 +15,7 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
+import { useSearchParams } from 'react-router-dom';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,16 +25,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Profile({
-    mustVerifyEmail,
+    mustVerifyEmail = true,
     status,
 }: {
-    mustVerifyEmail: boolean;
+    mustVerifyEmail?: boolean;
     status?: string;
 }) {
     const { user, refreshAuth } = useAuth();
+    const [searchParams] = useSearchParams();
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const verificationStatus = status ?? searchParams.get('status') ?? undefined;
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -52,7 +56,7 @@ export default function Profile({
             await refreshAuth();
             setTimeout(() => setRecentlySuccessful(false), 3000);
         } catch (error: unknown) {
-            if (axios.isAxiosError(error) && error.response?.status === 422) {
+            if (isAxiosError(error) && error.response?.status === 422) {
                 setErrors(error.response.data.errors || {});
                 toast.error('Please check the form for errors');
             } else {
@@ -143,7 +147,8 @@ export default function Profile({
                                         </button>
                                     </p>
 
-                                    {status === 'verification-link-sent' && (
+                                    {verificationStatus ===
+                                        'verification-link-sent' && (
                                         <div className="mt-2 text-sm font-medium text-green-600">
                                             A new verification link has been
                                             sent to your email address.

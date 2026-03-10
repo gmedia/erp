@@ -280,19 +280,26 @@ export function ApprovalHistoryTimeline({ entityType, entityId }: Props) {
                                                                 Action by{' '}
                                                                 <span className="font-medium text-foreground">
                                                                     {step
-                                                                        .acted_by
+                                                                        .actor
                                                                         ?.name ||
+                                                                        step
+                                                                            .acted_by_user
+                                                                            ?.name ||
                                                                         'System'}
                                                                 </span>
-                                                                {step.delegated_from && (
+                                                                {(step.delegator ||
+                                                                    step.delegated_from_user) && (
                                                                     <span className="text-muted-foreground">
                                                                         {' '}
                                                                         (delegated
                                                                         from{' '}
                                                                         {
                                                                             step
-                                                                                .delegated_from
-                                                                                .name
+                                                                                .delegator
+                                                                                ?.name ||
+                                                                                step
+                                                                                    .delegated_from_user
+                                                                                    ?.name
                                                                         }
                                                                         )
                                                                     </span>

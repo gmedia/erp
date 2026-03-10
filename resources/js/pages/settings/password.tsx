@@ -1,4 +1,5 @@
 import axios from '@/lib/axios';
+import { isAxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -55,7 +56,7 @@ export default function Password() {
 
             setTimeout(() => setRecentlySuccessful(false), 2000);
         } catch (error: unknown) {
-            if (axios.isAxiosError(error) && error.response?.status === 422) {
+            if (isAxiosError(error) && error.response?.status === 422) {
                 const returnedErrors = error.response.data.errors || {};
                 const formattedErrors: Record<string, string> = {};
                 Object.keys(returnedErrors).forEach((key) => {

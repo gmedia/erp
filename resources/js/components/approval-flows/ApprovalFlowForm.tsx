@@ -2,8 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo } from 'react';
-import { useFieldArray, useForm, type UseFormReturn } from 'react-hook-form';
-import * as z from 'zod';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { type input } from 'zod';
 
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
@@ -28,9 +28,11 @@ interface ApprovalFlowFormProps {
     isLoading?: boolean;
 }
 
+export type ApprovalFlowFormInput = input<typeof approvalFlowFormSchema>;
+
 const getFormDefaults = (
     item?: ApprovalFlow | null,
-): ApprovalFlowFormData => {
+): ApprovalFlowFormInput => {
     if (!item) {
         return {
             name: '',
@@ -83,7 +85,7 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
     }) {
         const defaultValues = useMemo(() => getFormDefaults(item), [item]);
 
-        const form = useForm<z.input<typeof approvalFlowFormSchema>>({
+        const form = useForm<ApprovalFlowFormInput, unknown, ApprovalFlowFormData>({
             resolver: zodResolver(approvalFlowFormSchema),
             defaultValues,
         });
@@ -91,6 +93,7 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
         const fieldArrayProps = useFieldArray({
             control: form.control,
             name: 'steps',
+            keyName: 'fieldId',
         });
 
         useEffect(() => {
@@ -110,14 +113,8 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
         };
 
         return (
-            <EntityForm<ApprovalFlowFormData>
-            form={
-                form as unknown as UseFormReturn<
-                    ApprovalFlowFormData,
-                    unknown,
-                    ApprovalFlowFormData
-                >
-            }
+            <EntityForm<ApprovalFlowFormInput, ApprovalFlowFormData>
+                form={form}
                 open={open}
                 onOpenChange={onOpenChange}
                 title={item ? 'Edit Approval Flow' : 'Add New Approval Flow'}

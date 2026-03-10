@@ -3,7 +3,7 @@ import axios from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import InputError from '@/components/input-error';
@@ -13,14 +13,17 @@ import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 
 interface ResetPasswordProps {
-    token: string;
-    email: string;
+    token?: string;
+    email?: string;
 }
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const resolvedToken = token ?? searchParams.get('token') ?? '';
+    const resolvedEmail = email ?? searchParams.get('email') ?? '';
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -30,8 +33,8 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
         const formData = new FormData(e.currentTarget);
         const data = Object.fromEntries(formData.entries());
         // Append hidden fields
-        data.token = token;
-        data.email = email;
+        data.token = resolvedToken;
+        data.email = resolvedEmail;
 
         try {
             const response = await axiosInstance.post('/api/reset-password', data);
@@ -76,7 +79,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         type="email"
                         name="email"
                         autoComplete="email"
-                        defaultValue={email}
+                        defaultValue={resolvedEmail}
                         className="mt-1 block w-full"
                         readOnly
                     />

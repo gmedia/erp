@@ -28,6 +28,19 @@ interface AssetMovementFormProps {
     isLoading?: boolean;
 }
 
+const ASSET_MOVEMENT_TYPES = [
+    'transfer',
+    'assign',
+    'return',
+    'dispose',
+    'adjustment',
+] as const;
+
+const isAssetMovementType = (
+    value: string | null | undefined,
+): value is AssetMovementFormData['movement_type'] =>
+    !!value && ASSET_MOVEMENT_TYPES.includes(value as (typeof ASSET_MOVEMENT_TYPES)[number]);
+
 const getAssetMovementFormDefaults = (
     item?: AssetMovement | null,
     asset?: Asset | null,
@@ -35,7 +48,9 @@ const getAssetMovementFormDefaults = (
     if (item) {
         return {
             asset_id: item.asset_id ? String(item.asset_id) : '',
-            movement_type: item.movement_type || 'transfer',
+            movement_type: isAssetMovementType(item.movement_type)
+                ? item.movement_type
+                : 'transfer',
             moved_at: item.moved_at ? new Date(item.moved_at) : new Date(),
             to_branch_id: item.to_branch_id ? String(item.to_branch_id) : '',
             to_location_id: item.to_location_id

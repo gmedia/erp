@@ -4,7 +4,6 @@ import { AssetMaintenance } from './asset-maintenance';
 import { AssetModel } from './asset-model';
 import { EntityWithId } from './entity';
 
-
 export interface AssetMovement extends EntityWithId {
     movement_type: string;
     movement_date: string;
@@ -26,12 +25,16 @@ export interface AssetMovement extends EntityWithId {
     reference: string | null;
     notes: string | null;
     pic: string | null;
+    created_by?: string | number | null;
 }
 
 export interface AssetStocktakeItem extends EntityWithId {
     stocktake_reference: string;
     stocktake_date: string;
     branch: string;
+    expected_location?: string | null;
+    found_location?: string | null;
+    result?: string | null;
     expected_condition: string;
     found_condition: string;
     status: string;

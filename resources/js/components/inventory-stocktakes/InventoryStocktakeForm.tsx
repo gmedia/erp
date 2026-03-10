@@ -4,6 +4,7 @@ import axios from '@/lib/axios';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -114,7 +115,15 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
             [activeStocktake],
         );
 
-        const form = useForm<InventoryStocktakeFormData>({
+        type InventoryStocktakeFormInput = z.input<
+            typeof inventoryStocktakeFormSchema
+        >;
+
+        const form = useForm<
+            InventoryStocktakeFormInput,
+            unknown,
+            InventoryStocktakeFormData
+        >({
             resolver: zodResolver(inventoryStocktakeFormSchema),
             defaultValues,
         });
@@ -154,7 +163,10 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
         }, [open, activeStocktake?.id, activeStocktake?.items, form]);
 
         return (
-            <EntityForm<InventoryStocktakeFormData>
+            <EntityForm<
+                InventoryStocktakeFormInput,
+                InventoryStocktakeFormData
+            >
                 form={form}
                 open={open}
                 onOpenChange={onOpenChange}

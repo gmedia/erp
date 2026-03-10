@@ -4,6 +4,7 @@ import axios from '@/lib/axios';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -62,6 +63,8 @@ const getStockTransferFormDefaults = (
         };
     }
 
+    const items = stockTransfer.items ?? [];
+
     return {
         transfer_number: stockTransfer.transfer_number || '',
         from_warehouse_id: stockTransfer.from_warehouse?.id
@@ -81,8 +84,8 @@ const getStockTransferFormDefaults = (
         requested_by: stockTransfer.requested_by?.id
             ? String(stockTransfer.requested_by.id)
             : '',
-        items: (stockTransfer.items || []).length
-            ? stockTransfer.items.map((item) => ({
+        items: items.length
+            ? items.map((item) => ({
                   product_id: item.product?.id ? String(item.product.id) : '',
                   unit_id: item.unit?.id ? String(item.unit.id) : '',
                   quantity: Number(item.quantity || 0),
@@ -121,7 +124,13 @@ export const StockTransferForm = memo<StockTransferFormProps>(
             [activeStockTransfer],
         );
 
-        const form = useForm<StockTransferFormData>({
+        type StockTransferFormInput = z.input<typeof stockTransferFormSchema>;
+
+        const form = useForm<
+            StockTransferFormInput,
+            unknown,
+            StockTransferFormData
+        >({
             resolver: zodResolver(stockTransferFormSchema),
             defaultValues,
         });
@@ -164,7 +173,7 @@ export const StockTransferForm = memo<StockTransferFormProps>(
         }, [open, activeStockTransfer?.id, activeStockTransfer?.items, form]);
 
         return (
-            <EntityForm<StockTransferFormData>
+            <EntityForm<StockTransferFormInput, StockTransferFormData>
                 form={form}
                 open={open}
                 onOpenChange={onOpenChange}

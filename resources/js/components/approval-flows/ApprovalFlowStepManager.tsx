@@ -7,14 +7,45 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { ApprovalFlowFormData } from '@/utils/schemas';
 import { Edit, Plus, Trash } from 'lucide-react';
 import { useState } from 'react';
 import { UseFieldArrayReturn } from 'react-hook-form';
-import { ApprovalFlowStepFormDialog } from './ApprovalFlowStepFormDialog';
+import type { ApprovalFlowFormInput } from './ApprovalFlowForm';
+import {
+    ApprovalFlowStepFormDialog,
+    type ApprovalFlowStepFormOutput,
+} from './ApprovalFlowStepFormDialog';
+
+type ApprovalFlowStepInput = NonNullable<ApprovalFlowFormInput['steps']>[number];
+
+type StepField = ApprovalFlowStepInput & {
+    fieldId: string;
+};
 
 interface ApprovalFlowStepManagerProps {
-    fieldArrayProps: UseFieldArrayReturn<ApprovalFlowFormData, 'steps', 'id'>;
+    fieldArrayProps: UseFieldArrayReturn<
+        ApprovalFlowFormInput,
+        'steps',
+        'fieldId'
+    >;
+}
+
+function toStepInput(
+    data: ApprovalFlowStepFormOutput,
+): ApprovalFlowStepInput {
+    return {
+        id: data.id,
+        name: data.name,
+        approver_type: data.approver_type,
+        approver_user_id: data.approver_user_id ?? null,
+        approver_role_id: data.approver_role_id ?? null,
+        approver_department_id: data.approver_department_id ?? null,
+        required_action: data.required_action,
+        auto_approve_after_hours: data.auto_approve_after_hours ?? null,
+        escalate_after_hours: data.escalate_after_hours ?? null,
+        escalation_user_id: data.escalation_user_id ?? null,
+        can_reject: data.can_reject,
+    };
 }
 
 export function ApprovalFlowStepManager({
@@ -41,10 +72,7 @@ export function ApprovalFlowStepManager({
         }
     };
 
-    const renderRow = (
-        step: NonNullable<ApprovalFlowFormData['steps']>[number],
-        index: number,
-    ) => {
+    const renderRow = (step: StepField, index: number) => {
         let approverLabel = '-';
         if (step.approver_type === 'user') {
             approverLabel = `User ID: ${step.approver_user_id || '-'}`;
@@ -55,7 +83,7 @@ export function ApprovalFlowStepManager({
         }
 
         return (
-            <TableRow key={step.id}>
+            <TableRow key={step.fieldId}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{step.name}</TableCell>
                 <TableCell className="capitalize">
@@ -144,10 +172,12 @@ export function ApprovalFlowStepManager({
                             : null
                     }
                     onSave={(data) => {
+                        const nextStep = toStepInput(data);
+
                         if (editingIndex !== null) {
-                            update(editingIndex, data);
+                            update(editingIndex, nextStep);
                         } else {
-                            append(data);
+                            append(nextStep);
                         }
                         setIsDialogOpen(false);
                     }}

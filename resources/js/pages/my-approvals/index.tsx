@@ -14,30 +14,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
-import {
-    ApprovalRequest,
-    ApprovalRequestStep,
-} from '@/types/approval';
+import { ApprovalRequest, ApprovalRequestStep } from '@/types/approval';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
-import { Check, Clock, Eye, X } from 'lucide-react';
+import { Check, Clock, Eye, Loader2, X } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
-interface MyApprovalsProps {
+interface MyApprovalsResponse {
     pending: ApprovalRequestStep[];
     approved: ApprovalRequestStep[];
     rejected: ApprovalRequestStep[];
     all: ApprovalRequestStep[];
 }
 
-export default function MyApprovalsPage({
-    pending,
-    approved,
-    rejected,
-    all,
-}: MyApprovalsProps) {
+export default function MyApprovalsPage() {
+    const queryClient = useQueryClient();
     const [actionDialog, setActionDialog] = useState<{
         open: boolean;
         type: 'approve' | 'reject' | null;
@@ -49,6 +43,19 @@ export default function MyApprovalsPage({
     });
     const [comments, setComments] = useState('');
     const [processing, setProcessing] = useState(false);
+
+    const { data, isLoading, error } = useQuery<MyApprovalsResponse>({
+        queryKey: ['my-approvals'],
+        queryFn: async () => {
+            const response = await axios.get('/api/my-approvals');
+            return response.data;
+        },
+    });
+
+    const pending = data?.pending ?? [];
+    const approved = data?.approved ?? [];
+    const rejected = data?.rejected ?? [];
+    const all = data?.all ?? [];
 
     const openActionDialog = (
         type: 'approve' | 'reject',
@@ -62,14 +69,14 @@ export default function MyApprovalsPage({
         if (!actionDialog.requestStep || !actionDialog.type) return;
 
         setProcessing(true);
-        const url = `/my-approvals/${actionDialog.requestStep.request.id}/${actionDialog.type}`;
+        const url = `/api/my-approvals/${actionDialog.requestStep.request.id}/${actionDialog.type}`;
 
         axios
             .post(url, { comments })
             .then(() => {
                 setActionDialog({ open: false, type: null, requestStep: null });
+                queryClient.invalidateQueries({ queryKey: ['my-approvals'] });
                 toast.success(`Request ${actionDialog.type}d successfully`);
-                // Would normally invalidate query here or refresh
             })
             .catch((error) => {
                 toast.error(`Failed to ${actionDialog.type} request`);
@@ -270,6 +277,19 @@ export default function MyApprovalsPage({
                         attention.
                     </p>
                 </div>
+
+                {isLoading && (
+                    <div className="flex items-center gap-2 rounded-lg border bg-card p-4 text-sm text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Loading approvals...
+                    </div>
+                )}
+
+                {error && (
+                    <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+                        Failed to load approvals. Please refresh and try again.
+                    </div>
+                )}
 
                 <Tabs defaultValue="pending" className="w-full">
                     <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">

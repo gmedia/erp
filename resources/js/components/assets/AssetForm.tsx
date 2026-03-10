@@ -257,7 +257,9 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
                             initialLabel={
                                 asset?.model?.name || asset?.model?.model_name
                             }
-                            labelFn={(item) => item.model_name || item.name}
+                            labelFn={(item) =>
+                                String(item.model_name ?? item.name ?? '')
+                            }
                         />
                         <InputField
                             name="serial_number"

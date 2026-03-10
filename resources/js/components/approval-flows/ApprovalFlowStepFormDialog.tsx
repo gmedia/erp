@@ -19,6 +19,7 @@ import * as z from 'zod';
 // Since steps validation is grouped with approval flow, we can create a sub-schema for this
 const stepSchema = z
     .object({
+        id: z.number().optional(),
         name: z.string().min(1, 'Name is required'),
         approver_type: z.enum(['user', 'department_head', 'role']),
         approver_user_id: z.preprocess(
@@ -46,7 +47,10 @@ const stepSchema = z
             (val) => (val === '' || val === null ? null : Number(val)),
             z.number().nullable().optional(),
         ),
-        can_reject: z.string().or(z.boolean()).optional(), // handle string true/false
+        can_reject: z
+            .union([z.boolean(), z.string()])
+            .default(true)
+            .transform((val) => val === true || val === 'true'),
     })
     .superRefine((data, ctx) => {
         if (data.approver_type === 'user' && !data.approver_user_id) {
@@ -78,11 +82,15 @@ const stepSchema = z
         }
     });
 
+export type ApprovalFlowStepFormInput = z.input<typeof stepSchema>;
+
+export type ApprovalFlowStepFormOutput = z.output<typeof stepSchema>;
+
 interface ApprovalFlowStepFormDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    step: z.infer<typeof stepSchema> | null; // The existing step payload
-    onSave: (data: z.infer<typeof stepSchema>) => void;
+    step: ApprovalFlowStepFormInput | null;
+    onSave: (data: ApprovalFlowStepFormOutput) => void;
 }
 
 export function ApprovalFlowStepFormDialog({
@@ -91,7 +99,7 @@ export function ApprovalFlowStepFormDialog({
     step,
     onSave,
 }: ApprovalFlowStepFormDialogProps) {
-    const defaultValues = useMemo(() => {
+    const defaultValues = useMemo<ApprovalFlowStepFormInput>(() => {
         if (!step) {
             return {
                 name: 'New Step',
@@ -122,7 +130,11 @@ export function ApprovalFlowStepFormDialog({
         };
     }, [step]);
 
-    const form = useForm<z.input<typeof stepSchema>>({
+    const form = useForm<
+        ApprovalFlowStepFormInput,
+        unknown,
+        ApprovalFlowStepFormOutput
+    >({
         resolver: zodResolver(stepSchema),
         defaultValues,
     });

@@ -15,6 +15,20 @@ export interface StocktakeItem {
     notes?: string;
 }
 
+const normalizeStocktakeResult = (
+    result: string | null | undefined,
+): StocktakeItem['result'] => {
+    switch (result) {
+        case 'found':
+        case 'missing':
+        case 'damaged':
+        case 'moved':
+            return result;
+        default:
+            return '';
+    }
+};
+
 export const useStocktakeItems = () => {
     const [loading, setLoading] = useState(false);
     const [items, setItems] = useState<StocktakeItem[]>([]);
@@ -26,9 +40,11 @@ export const useStocktakeItems = () => {
                 `/api/asset-stocktakes/${identifier}/items`,
             );
             // Map the data so 'result' is initialized properly for form
-            const mappedItems = (response.data.data as StocktakeItem[]).map((item) => ({
+            const mappedItems: StocktakeItem[] = (
+                response.data.data as StocktakeItem[]
+            ).map((item) => ({
                 ...item,
-                result: item.result || '',
+                result: normalizeStocktakeResult(item.result),
             }));
             setItems(mappedItems);
         } catch (error) {

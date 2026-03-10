@@ -32,10 +32,11 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
         setErrors({});
 
         const formData = new FormData(e.currentTarget);
-        const data = Object.fromEntries(formData.entries());
-        // Handle checkbox which might not be boolean in FormData
-        data.remember =
-            formData.get('remember') === 'on' ? true : false;
+        const data = {
+            email: String(formData.get('email') ?? ''),
+            password: String(formData.get('password') ?? ''),
+            remember: formData.get('remember') === 'on',
+        };
 
         try {
             // We use token based auth via API

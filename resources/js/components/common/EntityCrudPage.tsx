@@ -3,43 +3,42 @@
 import { CrudPage } from '@/components/common/CrudPage';
 import { DataTable } from '@/components/common/DataTableCore';
 import { CustomEntityConfig } from '@/utils/entityConfigs';
-import { ColumnDef } from '@tanstack/react-table';
 import React from 'react';
 
 // Form component types
 export type FormComponentType = 'simple' | 'complex';
 
 // Configuration interface for the CRUD page factory
-export interface EntityCrudConfig<T = Record<string, unknown>>
-    extends Omit<CustomEntityConfig<T>, 'columns'> {
-    columns: ColumnDef<T>[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    viewModalComponent?: React.ComponentType<any>;
+export type EntityCrudConfig<T extends object = object> = CustomEntityConfig<T> & {
     toolbarActions?: React.ReactNode;
-}
+};
+
+type CrudFormProps<T extends object> = {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    item?: T | null;
+    onSubmit: (data: unknown) => void;
+    isLoading: boolean;
+};
 
 // Simplified form props mapper
-function createFormPropsMapper(
-    config: EntityCrudConfig<Record<string, unknown>>,
-) {
-    return (crudProps: {
-        open: boolean;
-        onOpenChange: (open: boolean) => void;
-        item?: Record<string, unknown> | null;
-        onSubmit: (data: unknown) => void;
-        isLoading: boolean;
-    }) => {
+function createFormPropsMapper<T extends object>(config: EntityCrudConfig<T>) {
+    return (crudProps: CrudFormProps<T>) => {
         const baseProps = {
             open: crudProps.open,
             onOpenChange: crudProps.onOpenChange,
             onSubmit: crudProps.onSubmit,
             isLoading: crudProps.isLoading,
         };
+        const itemWithName = crudProps.item as { name?: unknown } | null;
 
         if (config.formType === 'simple') {
             return {
                 ...baseProps,
-                entity: crudProps.item ? { name: crudProps.item.name } : null,
+                entity:
+                    itemWithName && typeof itemWithName.name === 'string'
+                        ? { name: itemWithName.name }
+                        : null,
                 entityName: config.entityName,
             };
         } else {
@@ -74,7 +73,7 @@ function createFormPropsMapper(
  * export default createEntityCrudPage(employeeConfig);
  * ```
  */
-export function createEntityCrudPage<T = Record<string, unknown>>(
+export function createEntityCrudPage<T extends object>(
     config: EntityCrudConfig<T>,
 ): () => React.JSX.Element {
     // Validate input configuration
@@ -119,9 +118,7 @@ export function createEntityCrudPage<T = Record<string, unknown>>(
                             extraToolbarActions: config.toolbarActions,
                         }),
 
-                        mapFormProps: createFormPropsMapper(
-                            config as EntityCrudConfig<Record<string, unknown>>,
-                        ),
+                        mapFormProps: createFormPropsMapper(config),
 
                         ViewModalComponent: config.viewModalComponent,
 

@@ -21,19 +21,22 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FieldValues, useForm, UseFormReturn } from 'react-hook-form';
 import * as z from 'zod';
 
-interface EntityFormProps<T extends FieldValues = FieldValues> {
+interface EntityFormProps<
+    TFieldValues extends FieldValues = FieldValues,
+    TTransformedValues extends FieldValues = TFieldValues,
+> {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     title: string;
-    onSubmit: (values: T) => Promise<void> | void;
+    onSubmit: (values: TTransformedValues) => Promise<void> | void;
     /** Optional – kept for backward compatibility; not used inside EntityForm */
-    defaultValues?: Partial<T>;
+    defaultValues?: Partial<TFieldValues>;
     /** Optional – kept for backward compatibility; not used inside EntityForm */
     schema?: unknown;
     children: React.ReactNode;
     isLoading?: boolean;
     /** The form object returned by react‑hook‑form's useForm */
-    form: UseFormReturn<T, unknown, T>;
+    form: UseFormReturn<TFieldValues, unknown, TTransformedValues>;
     /** Optional – disable the submit button manually (e.g. for custom validation) */
     submitDisabled?: boolean;
     /** Optional – custom class name for the DialogContent (e.g. for wider forms) */
@@ -49,7 +52,10 @@ interface EntityFormProps<T extends FieldValues = FieldValues> {
  * field JSX passed as children inside the form. Validation is optional via a
  * Zod schema.
  */
-export default function EntityForm<T extends FieldValues = FieldValues>({
+export default function EntityForm<
+    TFieldValues extends FieldValues = FieldValues,
+    TTransformedValues extends FieldValues = TFieldValues,
+>({
     open,
     onOpenChange,
     title,
@@ -60,11 +66,11 @@ export default function EntityForm<T extends FieldValues = FieldValues>({
     submitDisabled = false,
     className,
     submitLabel,
-}: EntityFormProps<T>) {
+}: EntityFormProps<TFieldValues, TTransformedValues>) {
     const { t } = useTranslation();
 
     const handleSubmit = React.useCallback(
-        (values: T) => {
+        (values: TTransformedValues) => {
             onSubmit(values);
         },
         [onSubmit],

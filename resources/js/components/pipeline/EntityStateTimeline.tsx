@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEntityPipeline } from '@/hooks/useEntityPipeline';
 import { format } from 'date-fns';
+import { Activity } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -22,6 +23,11 @@ export function EntityStateTimeline({ entityType, entityId }: Props) {
         entityType,
         entityId,
     );
+    const iconRegistry = LucideIcons as unknown as Record<
+        string,
+        LucideIcons.LucideIcon
+    >;
+    const CommentIcon = iconRegistry.MessageCircle ?? Activity;
 
     useEffect(() => {
         fetchTimeline();
@@ -67,13 +73,9 @@ export function EntityStateTimeline({ entityType, entityId }: Props) {
                         {timeline.map((entry, idx) => {
                             const isInitial = idx === timeline.length - 1;
                             const IconComponent =
-                                entry.to_state?.icon &&
-                                entry.to_state.icon in LucideIcons
-                                    ? (LucideIcons as unknown as Record<
-                                          string,
-                                          LucideIcons.LucideIcon
-                                      >)[entry.to_state.icon]
-                                    : LucideIcons.Activity;
+                                (entry.to_state?.icon
+                                    ? iconRegistry[entry.to_state.icon]
+                                    : undefined) ?? Activity;
 
                             return (
                                 <div key={entry.id} className="relative">
@@ -137,23 +139,7 @@ export function EntityStateTimeline({ entityType, entityId }: Props) {
 
                                         {entry.comment && (
                                             <div className="mt-1 flex items-start gap-2 rounded-md border border-border/50 bg-muted/30 p-3 text-sm text-muted-foreground">
-                                                {(() => {
-                                                    const iconName = 'MessageCircle';
-                                                    if (iconName in LucideIcons) {
-                                                        const Icon = (
-                                                            LucideIcons as unknown as Record<
-                                                                string,
-                                                                LucideIcons.LucideIcon
-                                                            >
-                                                        )[iconName];
-                                                        return (
-                                                            <Icon className="mt-0.5 h-4 w-4 shrink-0" />
-                                                        );
-                                                    }
-                                                    return (
-                                                        <LucideIcons.Activity className="mt-0.5 h-4 w-4 shrink-0" />
-                                                    );
-                                                })()}
+                                                <CommentIcon className="mt-0.5 h-4 w-4 shrink-0" />
                                                 <span className="italic">
                                                     "{entry.comment}"
                                                 </span>

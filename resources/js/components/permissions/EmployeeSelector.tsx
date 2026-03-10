@@ -10,7 +10,7 @@ export function EmployeeSelector() {
             label="Select Employee"
             url="/api/employees"
             placeholder="Search for an employee..."
-            labelFn={(item) => item.name}
+            labelFn={(item) => String(item.name ?? '')}
             valueFn={(item) => String(item.id)}
         />
     );

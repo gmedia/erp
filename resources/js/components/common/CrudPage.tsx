@@ -21,7 +21,7 @@ export interface DataTableProps<T, FilterType extends FilterState = FilterState>
 }
 
 export interface FormProps<
-    T extends Record<string, unknown>,
+    T extends object,
     FormData = unknown,
 > {
     open: boolean;
@@ -32,7 +32,7 @@ export interface FormProps<
 }
 
 export interface CrudPageConfig<
-    T extends Record<string, unknown>,
+    T extends object,
     FormData,
     FilterType extends FilterState = FilterState,
 > extends BaseCrudPageConfig<T, FilterType> {
@@ -88,7 +88,7 @@ export interface CrudPageConfig<
 }
 
 interface CrudPageProps<
-    T extends Record<string, unknown>,
+    T extends object,
     FormData,
     FilterType extends FilterState = FilterState,
 > {
@@ -96,7 +96,7 @@ interface CrudPageProps<
 }
 
 export function CrudPage<
-    T extends Record<string, unknown>,
+    T extends object,
     FormData,
     FilterType extends FilterState = FilterState,
 >({ config }: CrudPageProps<T, FormData, FilterType>) {
