@@ -12,7 +12,7 @@ test('goods receipt collection wraps resources', function () {
     $rows->load(['purchaseOrder.supplier', 'warehouse', 'receiver', 'confirmer', 'creator', 'items.product', 'items.unit']);
 
     $collection = new GoodsReceiptCollection($rows);
-    $data = $collection->toArray(new Request());
+    $data = $collection->toArray(new Request);
 
     expect($data)->toHaveCount(2)
         ->and($data[0])->toHaveKey('id');

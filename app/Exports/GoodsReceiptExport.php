@@ -15,8 +15,7 @@ class GoodsReceiptExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
 {
     public function __construct(
         private readonly array $filters = []
-    ) {
-    }
+    ) {}
 
     public function query(): Builder
     {

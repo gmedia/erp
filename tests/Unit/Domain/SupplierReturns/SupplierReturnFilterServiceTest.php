@@ -13,7 +13,7 @@ test('filter service applies supplier and status filters', function () {
     SupplierReturn::factory()->create(['status' => 'confirmed']);
 
     $query = SupplierReturn::query();
-    $service = new SupplierReturnFilterService();
+    $service = new SupplierReturnFilterService;
     $service->applyAdvancedFilters($query, [
         'supplier_id' => $supplier->id,
         'status' => 'draft',

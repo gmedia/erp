@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Validator;
 uses()->group('goods-receipts');
 
 test('index goods receipt validates sort field', function () {
-    $request = new IndexGoodsReceiptRequest();
+    $request = new IndexGoodsReceiptRequest;
     $validator = Validator::make([
         'sort_by' => 'invalid_field',
     ], $request->rules());
@@ -15,7 +15,7 @@ test('index goods receipt validates sort field', function () {
 });
 
 test('index goods receipt accepts supplier delivery note as sort field', function () {
-    $request = new IndexGoodsReceiptRequest();
+    $request = new IndexGoodsReceiptRequest;
     $validator = Validator::make([
         'sort_by' => 'supplier_delivery_note',
     ], $request->rules());

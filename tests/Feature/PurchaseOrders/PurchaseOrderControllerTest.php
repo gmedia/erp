@@ -6,15 +6,14 @@ use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
-use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class)->group('purchase-orders');
 

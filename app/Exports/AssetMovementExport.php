@@ -23,7 +23,7 @@ class AssetMovementExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
     public function query(): Builder
     {
         $query = AssetMovement::query()->with([
-            'asset' => fn($q) => $q->withTrashed(),
+            'asset' => fn ($q) => $q->withTrashed(),
             'fromBranch', 'toBranch', 'fromLocation', 'toLocation',
             'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy',
         ]);

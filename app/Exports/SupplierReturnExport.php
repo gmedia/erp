@@ -15,8 +15,7 @@ class SupplierReturnExport implements FromQuery, ShouldAutoSize, WithHeadings, W
 {
     public function __construct(
         private readonly array $filters = []
-    ) {
-    }
+    ) {}
 
     public function query(): Builder
     {

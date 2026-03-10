@@ -23,7 +23,7 @@ test('goods receipt resource returns expected structure', function () {
     ]);
     $goodsReceipt->load(['purchaseOrder.supplier', 'warehouse', 'receiver', 'confirmer', 'creator', 'items.product', 'items.unit']);
 
-    $data = (new GoodsReceiptResource($goodsReceipt))->toArray(new Request());
+    $data = (new GoodsReceiptResource($goodsReceipt))->toArray(new Request);
 
     expect($data)->toHaveKeys([
         'id',

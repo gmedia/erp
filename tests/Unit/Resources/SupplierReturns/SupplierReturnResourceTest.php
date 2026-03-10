@@ -21,7 +21,7 @@ test('supplier return resource returns expected structure', function () {
     ]);
     $supplierReturn->load(['purchaseOrder', 'goodsReceipt', 'supplier', 'warehouse', 'creator', 'items.product', 'items.unit']);
 
-    $data = (new SupplierReturnResource($supplierReturn))->toArray(new Request());
+    $data = (new SupplierReturnResource($supplierReturn))->toArray(new Request);
 
     expect($data)->toHaveKeys([
         'id',

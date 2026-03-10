@@ -21,8 +21,7 @@ readonly class UpdatePurchaseOrderData
         public ?string $shipping_address = null,
         public ?int $approved_by = null,
         public ?string $approved_at = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

@@ -24,7 +24,7 @@ class GoodsReceiptReportExport implements FromCollection, ShouldAutoSize, WithHe
     public function collection()
     {
         $action = app(IndexGoodsReceiptReportAction::class);
-        $request = new IndexGoodsReceiptReportRequest();
+        $request = new IndexGoodsReceiptReportRequest;
         $request->merge($this->filters);
 
         return $action->execute($request);

@@ -13,7 +13,7 @@ test('filter service applies warehouse and status filters', function () {
     GoodsReceipt::factory()->create(['status' => 'confirmed']);
 
     $query = GoodsReceipt::query();
-    $service = new GoodsReceiptFilterService();
+    $service = new GoodsReceiptFilterService;
     $service->applyAdvancedFilters($query, [
         'warehouse_id' => $warehouse->id,
         'status' => 'draft',

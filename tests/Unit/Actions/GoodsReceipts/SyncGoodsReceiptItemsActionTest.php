@@ -15,7 +15,7 @@ test('sync items action recreates items', function () {
     $product = Product::factory()->create();
     $unit = Unit::factory()->create();
 
-    $action = new SyncGoodsReceiptItemsAction();
+    $action = new SyncGoodsReceiptItemsAction;
     $action->execute($goodsReceipt, [
         [
             'purchase_order_item_id' => $purchaseOrderItem->id,

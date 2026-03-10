@@ -15,8 +15,7 @@ readonly class UpdateGoodsReceiptData
         public ?int $received_by = null,
         public ?int $confirmed_by = null,
         public ?string $confirmed_at = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

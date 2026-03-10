@@ -18,8 +18,7 @@ readonly class UpdatePurchaseRequestData
         public ?int $approved_by = null,
         public ?string $approved_at = null,
         public ?string $rejection_reason = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

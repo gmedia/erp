@@ -15,7 +15,6 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 use Maatwebsite\Excel\Facades\Excel;
 
-
 uses(RefreshDatabase::class)->group('purchase-history-report');
 
 beforeEach(function () {

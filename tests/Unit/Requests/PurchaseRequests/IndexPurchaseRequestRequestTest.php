@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Validator;
 uses()->group('purchase-requests');
 
 test('index purchase request validates allowed sort values', function () {
-    $request = new IndexPurchaseRequestRequest();
+    $request = new IndexPurchaseRequestRequest;
     $validator = Validator::make([
         'sort_by' => 'not_allowed',
     ], $request->rules());

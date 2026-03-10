@@ -18,7 +18,7 @@ test('purchase request resource returns expected structure', function () {
     ]);
     $purchaseRequest->load(['branch', 'department', 'requester', 'approver', 'creator', 'items.product', 'items.unit']);
 
-    $data = (new PurchaseRequestResource($purchaseRequest))->toArray(new Request());
+    $data = (new PurchaseRequestResource($purchaseRequest))->toArray(new Request);
 
     expect($data)->toHaveKeys([
         'id',

@@ -11,8 +11,7 @@ class IndexSupplierReturnsAction
 {
     public function __construct(
         private SupplierReturnFilterService $filterService
-    ) {
-    }
+    ) {}
 
     public function execute(IndexSupplierReturnRequest $request): LengthAwarePaginator
     {

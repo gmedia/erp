@@ -13,7 +13,7 @@ test('sync items action recreates items and updates estimated amount', function 
     $product = Product::factory()->create();
     $unit = Unit::factory()->create();
 
-    $action = new SyncPurchaseRequestItemsAction();
+    $action = new SyncPurchaseRequestItemsAction;
     $action->execute($purchaseRequest, [
         [
             'product_id' => $product->id,

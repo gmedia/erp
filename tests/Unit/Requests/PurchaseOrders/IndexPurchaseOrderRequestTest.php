@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Validator;
 uses()->group('purchase-orders');
 
 test('index purchase order validates sort field', function () {
-    $request = new IndexPurchaseOrderRequest();
+    $request = new IndexPurchaseOrderRequest;
     $validator = Validator::make([
         'sort_by' => 'invalid_field',
     ], $request->rules());

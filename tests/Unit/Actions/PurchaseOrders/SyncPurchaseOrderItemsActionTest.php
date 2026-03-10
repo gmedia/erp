@@ -13,7 +13,7 @@ test('sync items action recalculates totals', function () {
     $product = Product::factory()->create();
     $unit = Unit::factory()->create();
 
-    $action = new SyncPurchaseOrderItemsAction();
+    $action = new SyncPurchaseOrderItemsAction;
     $action->execute($purchaseOrder, [
         [
             'product_id' => $product->id,

@@ -12,13 +12,13 @@ uses(RefreshDatabase::class)->group('goods-receipts');
 test('index action returns paginator', function () {
     GoodsReceipt::factory()->count(5)->create();
 
-    $request = new IndexGoodsReceiptRequest();
+    $request = new IndexGoodsReceiptRequest;
     $request->merge([
         'per_page' => 10,
         'page' => 1,
     ]);
 
-    $action = new IndexGoodsReceiptsAction(new GoodsReceiptFilterService());
+    $action = new IndexGoodsReceiptsAction(new GoodsReceiptFilterService);
     $result = $action->execute($request);
 
     expect($result)->toBeInstanceOf(LengthAwarePaginator::class);

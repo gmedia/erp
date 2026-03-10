@@ -3,9 +3,9 @@
 use App\Models\GoodsReceipt;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\Sanctum;
 use Maatwebsite\Excel\Facades\Excel;
 
-use Laravel\Sanctum\Sanctum;
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class)->group('goods-receipts');

@@ -15,8 +15,7 @@ class PurchaseOrderExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
 {
     public function __construct(
         private readonly array $filters = []
-    ) {
-    }
+    ) {}
 
     public function query(): Builder
     {

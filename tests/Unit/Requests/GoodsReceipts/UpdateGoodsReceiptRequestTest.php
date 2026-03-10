@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Validator;
 uses()->group('goods-receipts');
 
 test('update goods receipt validates status enum', function () {
-    $request = new UpdateGoodsReceiptRequest();
+    $request = new UpdateGoodsReceiptRequest;
     $validator = Validator::make([
         'status' => 'invalid_status',
     ], $request->rules());

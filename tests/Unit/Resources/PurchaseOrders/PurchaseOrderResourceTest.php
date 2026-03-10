@@ -20,7 +20,7 @@ test('purchase order resource returns expected structure', function () {
     ]);
     $purchaseOrder->load(['supplier', 'warehouse', 'approver', 'creator', 'items.product', 'items.unit']);
 
-    $data = (new PurchaseOrderResource($purchaseOrder))->toArray(new Request());
+    $data = (new PurchaseOrderResource($purchaseOrder))->toArray(new Request);
 
     expect($data)->toHaveKeys([
         'id',

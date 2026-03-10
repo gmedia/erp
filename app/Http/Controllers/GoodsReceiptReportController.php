@@ -9,7 +9,6 @@ use App\Http\Requests\Reports\IndexGoodsReceiptReportRequest;
 use App\Http\Resources\Reports\GoodsReceiptReportCollection;
 use Illuminate\Http\JsonResponse;
 
-
 class GoodsReceiptReportController extends Controller
 {
     public function index(

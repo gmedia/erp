@@ -24,7 +24,7 @@ class PurchaseOrderStatusReportExport implements FromCollection, ShouldAutoSize,
     public function collection()
     {
         $action = app(IndexPurchaseOrderStatusReportAction::class);
-        $request = new IndexPurchaseOrderStatusReportRequest();
+        $request = new IndexPurchaseOrderStatusReportRequest;
         $request->merge($this->filters);
 
         return $action->execute($request);

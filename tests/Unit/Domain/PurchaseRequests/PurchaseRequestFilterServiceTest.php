@@ -13,7 +13,7 @@ test('filter service applies branch and status filters', function () {
     PurchaseRequest::factory()->create(['status' => 'approved']);
 
     $query = PurchaseRequest::query();
-    $service = new PurchaseRequestFilterService();
+    $service = new PurchaseRequestFilterService;
     $service->applyAdvancedFilters($query, [
         'branch_id' => $branch->id,
         'status' => 'draft',

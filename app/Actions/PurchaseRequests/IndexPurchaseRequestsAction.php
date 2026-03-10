@@ -11,8 +11,7 @@ class IndexPurchaseRequestsAction
 {
     public function __construct(
         private PurchaseRequestFilterService $filterService
-    ) {
-    }
+    ) {}
 
     public function execute(IndexPurchaseRequestRequest $request): LengthAwarePaginator
     {

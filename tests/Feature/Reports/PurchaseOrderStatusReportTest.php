@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
-use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Warehouse;

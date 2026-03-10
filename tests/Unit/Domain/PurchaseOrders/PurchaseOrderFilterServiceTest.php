@@ -13,7 +13,7 @@ test('filter service applies supplier and status filters', function () {
     PurchaseOrder::factory()->create(['status' => 'confirmed']);
 
     $query = PurchaseOrder::query();
-    $service = new PurchaseOrderFilterService();
+    $service = new PurchaseOrderFilterService;
     $service->applyAdvancedFilters($query, [
         'supplier_id' => $supplier->id,
         'status' => 'draft',

@@ -24,7 +24,7 @@ class PurchaseHistoryReportExport implements FromCollection, ShouldAutoSize, Wit
     public function collection()
     {
         $action = app(IndexPurchaseHistoryReportAction::class);
-        $request = new IndexPurchaseHistoryReportRequest();
+        $request = new IndexPurchaseHistoryReportRequest;
         $request->merge($this->filters);
 
         return $action->execute($request);

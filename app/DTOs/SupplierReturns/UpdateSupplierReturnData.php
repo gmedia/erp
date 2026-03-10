@@ -14,8 +14,7 @@ readonly class UpdateSupplierReturnData
         public ?string $reason = null,
         public ?string $status = null,
         public ?string $notes = null,
-    ) {
-    }
+    ) {}
 
     public static function fromArray(array $data): self
     {

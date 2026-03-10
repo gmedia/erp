@@ -12,13 +12,13 @@ uses(RefreshDatabase::class)->group('supplier-returns');
 test('index action returns paginator', function () {
     SupplierReturn::factory()->count(5)->create();
 
-    $request = new IndexSupplierReturnRequest();
+    $request = new IndexSupplierReturnRequest;
     $request->merge([
         'per_page' => 10,
         'page' => 1,
     ]);
 
-    $action = new IndexSupplierReturnsAction(new SupplierReturnFilterService());
+    $action = new IndexSupplierReturnsAction(new SupplierReturnFilterService);
     $result = $action->execute($request);
 
     expect($result)->toBeInstanceOf(LengthAwarePaginator::class);

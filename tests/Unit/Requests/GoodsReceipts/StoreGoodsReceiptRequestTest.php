@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Validator;
 uses()->group('goods-receipts');
 
 test('store goods receipt requires at least one item', function () {
-    $request = new StoreGoodsReceiptRequest();
+    $request = new StoreGoodsReceiptRequest;
     $validator = Validator::make([
         'purchase_order_id' => 1,
         'warehouse_id' => 1,

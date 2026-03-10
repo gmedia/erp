@@ -15,8 +15,7 @@ class PurchaseRequestExport implements FromQuery, ShouldAutoSize, WithHeadings, 
 {
     public function __construct(
         private readonly array $filters = []
-    ) {
-    }
+    ) {}
 
     public function query(): Builder
     {

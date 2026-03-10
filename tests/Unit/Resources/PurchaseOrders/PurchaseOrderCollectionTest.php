@@ -12,7 +12,7 @@ test('purchase order collection wraps resources', function () {
     $rows->load(['supplier', 'warehouse', 'approver', 'creator', 'items.product', 'items.unit']);
 
     $collection = new PurchaseOrderCollection($rows);
-    $data = $collection->toArray(new Request());
+    $data = $collection->toArray(new Request);
 
     expect($data)->toHaveCount(2)
         ->and($data[0])->toHaveKey('id');

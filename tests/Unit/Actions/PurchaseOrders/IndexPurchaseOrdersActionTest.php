@@ -12,13 +12,13 @@ uses(RefreshDatabase::class)->group('purchase-orders');
 test('index action returns paginator', function () {
     PurchaseOrder::factory()->count(5)->create();
 
-    $request = new IndexPurchaseOrderRequest();
+    $request = new IndexPurchaseOrderRequest;
     $request->merge([
         'per_page' => 10,
         'page' => 1,
     ]);
 
-    $action = new IndexPurchaseOrdersAction(new PurchaseOrderFilterService());
+    $action = new IndexPurchaseOrdersAction(new PurchaseOrderFilterService);
     $result = $action->execute($request);
 
     expect($result)->toBeInstanceOf(LengthAwarePaginator::class);

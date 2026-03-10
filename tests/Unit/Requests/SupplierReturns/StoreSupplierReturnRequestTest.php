@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Validator;
 uses()->group('supplier-returns');
 
 test('store supplier return requires at least one item', function () {
-    $request = new StoreSupplierReturnRequest();
+    $request = new StoreSupplierReturnRequest;
     $validator = Validator::make([
         'purchase_order_id' => 1,
         'supplier_id' => 1,

@@ -6,10 +6,10 @@ use App\Http\Controllers\GoodsReceiptReportController;
 use App\Http\Controllers\InventoryStocktakeVarianceReportController;
 use App\Http\Controllers\InventoryValuationReportController;
 use App\Http\Controllers\MaintenanceCostReportController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\StockAdjustmentReportController;
 use App\Http\Controllers\PurchaseHistoryReportController;
 use App\Http\Controllers\PurchaseOrderStatusReportController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\StockAdjustmentReportController;
 use App\Http\Controllers\StockMovementReportController;
 use Illuminate\Support\Facades\Route;
 

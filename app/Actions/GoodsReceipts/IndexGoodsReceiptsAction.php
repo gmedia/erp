@@ -11,8 +11,7 @@ class IndexGoodsReceiptsAction
 {
     public function __construct(
         private GoodsReceiptFilterService $filterService
-    ) {
-    }
+    ) {}
 
     public function execute(IndexGoodsReceiptRequest $request): LengthAwarePaginator
     {
