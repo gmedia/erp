@@ -16,6 +16,7 @@ export interface AsyncSelectProps {
     value?: string;
     /** Handler for value changes. Optional when used in filter descriptors (injected by FilterModal). */
     onValueChange?: (value: string) => void;
+    onItemSelect?: (item: any) => void;
     url: string;
     placeholder?: string;
     className?: string;
@@ -28,6 +29,7 @@ export interface AsyncSelectProps {
 export function AsyncSelect({
     value,
     onValueChange,
+    onItemSelect,
     url,
     placeholder = 'Select...',
     className,
@@ -182,6 +184,7 @@ export function AsyncSelect({
                                         )}
                                         onClick={() => {
                                             onValueChange?.(itemValue);
+                                            onItemSelect?.(item);
                                             setSelectedLabel(itemLabel);
                                             setOpen(false);
                                         }}

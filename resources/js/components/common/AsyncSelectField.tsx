@@ -21,6 +21,7 @@ interface AsyncSelectFieldProps {
     labelFn?: (item: any) => string;
     valueFn?: (item: any) => string;
     initialLabel?: string;
+    onItemSelect?: (item: any) => void;
 }
 
 export default function AsyncSelectField({
@@ -33,6 +34,7 @@ export default function AsyncSelectField({
     labelFn,
     valueFn,
     initialLabel,
+    onItemSelect,
 }: AsyncSelectFieldProps) {
     return (
         <FormField
@@ -49,6 +51,7 @@ export default function AsyncSelectField({
                             labelFn={labelFn}
                             valueFn={valueFn}
                             initialLabel={initialLabel}
+                            onItemSelect={onItemSelect}
                             label={label}
                         />
                     </FormControl>

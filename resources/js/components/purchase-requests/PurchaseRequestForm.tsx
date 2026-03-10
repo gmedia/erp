@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -33,6 +34,28 @@ interface PurchaseRequestFormProps {
     isLoading?: boolean;
 }
 
+const createEmptyPurchaseRequestItem = (): PurchaseRequestFormData['items'][number] => ({
+    product_id: '',
+    product_label: '',
+    unit_id: '',
+    unit_label: '',
+    quantity: 1,
+    estimated_unit_price: 0,
+    notes: '',
+});
+
+const formatItemReference = (label?: string, id?: string) => {
+    if (label) {
+        return label;
+    }
+
+    if (id) {
+        return `#${id}`;
+    }
+
+    return '-';
+};
+
 const getPurchaseRequestFormDefaults = (
     purchaseRequest?: PurchaseRequest | null,
 ): PurchaseRequestFormData => {
@@ -49,15 +72,7 @@ const getPurchaseRequestFormDefaults = (
             estimated_amount: 0,
             notes: '',
             rejection_reason: '',
-            items: [
-                {
-                    product_id: '',
-                    unit_id: '',
-                    quantity: 1,
-                    estimated_unit_price: 0,
-                    notes: '',
-                },
-            ],
+            items: [],
         };
     }
 
@@ -76,20 +91,14 @@ const getPurchaseRequestFormDefaults = (
         items: (purchaseRequest.items || []).length
             ? (purchaseRequest.items || []).map((it) => ({
                 product_id: it.product?.id ? String(it.product.id) : '',
+                product_label: it.product?.name || '',
                 unit_id: it.unit?.id ? String(it.unit.id) : '',
+                unit_label: it.unit?.name || '',
                 quantity: Number(it.quantity || 0),
                 estimated_unit_price: Number(it.estimated_unit_price || 0),
                 notes: it.notes || '',
             }))
-            : [
-                {
-                    product_id: '',
-                    unit_id: '',
-                    quantity: 1,
-                    estimated_unit_price: 0,
-                    notes: '',
-                },
-            ],
+            : [],
     };
 };
 
@@ -131,6 +140,13 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(function Purch
         setIsItemDialogOpen(true);
     };
 
+    const handleSubmit = (data: PurchaseRequestFormData) => {
+        onSubmit({
+            ...data,
+            items: data.items.map(({ product_label, unit_label, ...purchaseRequestItem }) => purchaseRequestItem),
+        });
+    };
+
     useEffect(() => {
         form.reset(defaultValues);
     }, [form, defaultValues]);
@@ -141,7 +157,7 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(function Purch
             open={open}
             onOpenChange={onOpenChange}
             title={activePurchaseRequest ? 'Edit Purchase Request' : 'Add New Purchase Request'}
-            onSubmit={onSubmit}
+            onSubmit={handleSubmit}
             isLoading={isLoading}
             className="sm:max-w-[1000px]"
         >
@@ -262,6 +278,7 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(function Purch
                         variant="outline"
                         onClick={handleCreateNewItem}
                     >
+                        <Plus className="mr-2 h-4 w-4" />
                         Add Item
                     </Button>
                 </div>
@@ -279,48 +296,64 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(function Purch
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {fields.map((field, index) => (
-                                <TableRow key={field.id}>
-                                    <TableCell>
-                                        {watchedItems?.[index]?.product_id
-                                            ? `#${watchedItems[index].product_id}`
-                                            : '-'}
-                                    </TableCell>
-                                    <TableCell>
-                                        {watchedItems?.[index]?.unit_id
-                                            ? `#${watchedItems[index].unit_id}`
-                                            : '-'}
-                                    </TableCell>
-                                    <TableCell>
-                                        {watchedItems?.[index]?.quantity ?? 0}
-                                    </TableCell>
-                                    <TableCell>
-                                        {watchedItems?.[index]?.estimated_unit_price ?? 0}
-                                    </TableCell>
-                                    <TableCell>
-                                        {watchedItems?.[index]?.notes || '-'}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => handleEditItem(index)}
-                                        >
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => remove(index)}
-                                            disabled={fields.length === 1}
-                                        >
-                                            Remove
-                                        </Button>
+                            {fields.map((field, index) => {
+                                const purchaseRequestItem = watchedItems?.[index] || createEmptyPurchaseRequestItem();
+
+                                return (
+                                    <TableRow key={field.id}>
+                                        <TableCell>
+                                            {formatItemReference(
+                                                purchaseRequestItem.product_label,
+                                                purchaseRequestItem.product_id,
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            {formatItemReference(
+                                                purchaseRequestItem.unit_label,
+                                                purchaseRequestItem.unit_id,
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            {purchaseRequestItem.quantity ?? 0}
+                                        </TableCell>
+                                        <TableCell>
+                                            {purchaseRequestItem.estimated_unit_price ?? 0}
+                                        </TableCell>
+                                        <TableCell>
+                                            {purchaseRequestItem.notes || '-'}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleEditItem(index)}
+                                                title="Edit item"
+                                                aria-label={`Edit item ${index + 1}`}
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => remove(index)}
+                                                title="Remove item"
+                                                aria-label={`Remove item ${index + 1}`}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                            {!fields.length && (
+                                <TableRow>
+                                    <TableCell colSpan={6} className="py-6 text-center text-muted-foreground">
+                                        No items added yet.
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            )}
                         </TableBody>
                     </Table>
                 </div>

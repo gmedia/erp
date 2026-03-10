@@ -22,7 +22,9 @@ import { type PurchaseRequestFormData } from '@/types/purchase-request';
 
 const purchaseRequestItemSchema = z.object({
     product_id: z.string().min(1, { message: 'Product is required.' }),
+    product_label: z.string().optional(),
     unit_id: z.string().min(1, { message: 'Unit is required.' }),
+    unit_label: z.string().optional(),
     quantity: z.coerce.number().gt(0, { message: 'Quantity must be greater than 0.' }),
     estimated_unit_price: z.coerce.number().min(0).optional().default(0),
     notes: z.string().optional(),
@@ -47,7 +49,9 @@ export function PurchaseRequestItemFormDialog({
         if (!item) {
             return {
                 product_id: '',
+                product_label: '',
                 unit_id: '',
+                unit_label: '',
                 quantity: 1,
                 estimated_unit_price: 0,
                 notes: '',
@@ -56,7 +60,9 @@ export function PurchaseRequestItemFormDialog({
 
         return {
             product_id: item.product_id || '',
+            product_label: item.product_label || '',
             unit_id: item.unit_id || '',
+            unit_label: item.unit_label || '',
             quantity: Number(item.quantity || 0),
             estimated_unit_price: Number(item.estimated_unit_price || 0),
             notes: item.notes || '',
@@ -94,16 +100,30 @@ export function PurchaseRequestItemFormDialog({
                     >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <AsyncSelectField
+                                key={`product-${defaultValues.product_id || 'new'}-${open ? 'open' : 'closed'}`}
                                 name="product_id"
                                 label="Product"
                                 url="/api/products"
                                 placeholder="Select product"
+                                initialLabel={defaultValues.product_label}
+                                onItemSelect={(product) => {
+                                    form.setValue('product_label', product?.name || '', {
+                                        shouldDirty: true,
+                                    });
+                                }}
                             />
                             <AsyncSelectField
+                                key={`unit-${defaultValues.unit_id || 'new'}-${open ? 'open' : 'closed'}`}
                                 name="unit_id"
                                 label="Unit"
                                 url="/api/units"
                                 placeholder="Select unit"
+                                initialLabel={defaultValues.unit_label}
+                                onItemSelect={(unit) => {
+                                    form.setValue('unit_label', unit?.name || '', {
+                                        shouldDirty: true,
+                                    });
+                                }}
                             />
                             <InputField
                                 name="quantity"

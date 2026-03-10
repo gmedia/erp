@@ -52,7 +52,9 @@ export interface PurchaseRequestFormData {
     rejection_reason?: string;
     items: Array<{
         product_id: string;
+        product_label?: string;
         unit_id: string;
+        unit_label?: string;
         quantity: number;
         estimated_unit_price?: number;
         notes?: string;
