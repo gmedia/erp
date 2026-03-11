@@ -18,6 +18,11 @@ interface LoginProps {
     canResetPassword?: boolean;
 }
 
+function getFormValue(formData: FormData, key: string): string {
+    const value = formData.get(key);
+    return typeof value === 'string' ? value : '';
+}
+
 export default function Login({ status, canResetPassword = true }: LoginProps) {
     const { login } = useAuth();
     const navigate = useNavigate();
@@ -33,8 +38,8 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
 
         const formData = new FormData(e.currentTarget);
         const data = {
-            email: String(formData.get('email') ?? ''),
-            password: String(formData.get('password') ?? ''),
+            email: getFormValue(formData, 'email'),
+            password: getFormValue(formData, 'password'),
             remember: formData.get('remember') === 'on',
         };
 
