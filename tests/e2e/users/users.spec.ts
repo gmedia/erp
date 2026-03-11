@@ -2,6 +2,10 @@ import { test, expect } from '@playwright/test';
 import { login } from '../helpers';
 import { createEmployee } from '../employees/helpers';
 
+function createUserAccessCode(seed: number): string {
+    return `User-${seed}-Aa1!`;
+}
+
 test.describe('User Management', () => {
     test.beforeEach(async ({ page }) => {
         await login(page);
@@ -43,11 +47,11 @@ test.describe('User Management', () => {
         // 5. Fill in user details
         const newUserName = `User ${timestamp}`;
         const newUserEmail = `user${timestamp}@test.com`;
-        const newUserPassword = 'password123';
+        const accessCode = createUserAccessCode(timestamp);
 
         await page.fill('input#name', newUserName);
         await page.fill('input#email', newUserEmail);
-        await page.fill('input#password', newUserPassword);
+        await page.fill('input#password', accessCode);
 
         // 6. Save changes
         const saveButton = page.getByRole('button', { name: 'Save Changes' });
@@ -99,10 +103,11 @@ test.describe('User Management', () => {
         // Create user initially
         const initialName = `Initial User ${timestamp}`;
         const initialEmail = `initial${timestamp}@test.com`;
+        const accessCode = createUserAccessCode(timestamp);
         
         await page.fill('input#name', initialName);
         await page.fill('input#email', initialEmail);
-        await page.fill('input#password', 'password123');
+        await page.fill('input#password', accessCode);
         
         await page.getByRole('button', { name: 'Save Changes' }).click();
         
@@ -172,10 +177,11 @@ test.describe('User Management', () => {
         await option1.click();
 
         const sharedEmail = `shared${timestamp}@test.com`;
+        const accessCode = createUserAccessCode(timestamp);
         
         await page.fill('input#name', `User 1 ${timestamp}`);
         await page.fill('input#email', sharedEmail);
-        await page.fill('input#password', 'password123');
+        await page.fill('input#password', accessCode);
         
         await page.getByRole('button', { name: 'Save Changes' }).click();
         
@@ -195,7 +201,7 @@ test.describe('User Management', () => {
 
         await page.fill('input#name', `User 2 ${timestamp}`);
         await page.fill('input#email', sharedEmail); // Same email as user 1
-        await page.fill('input#password', 'password123');
+        await page.fill('input#password', accessCode);
         
         await page.getByRole('button', { name: 'Save Changes' }).click();
 
