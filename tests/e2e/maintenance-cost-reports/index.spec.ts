@@ -7,7 +7,7 @@ test.describe('Maintenance Cost Report', () => {
         await login(page);
 
         // Ensure we actually reach dashboard before navigating away
-        await expect(page).toHaveURL(/.*dashboard/);
+        await page.waitForURL('**/dashboard', { timeout: 15000 });
         
         // Then go to the report page
         await page.goto('/reports/maintenance-cost');
