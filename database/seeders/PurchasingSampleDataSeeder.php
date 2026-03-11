@@ -2,6 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\ApprovalAuditLog;
+use App\Models\ApprovalFlow;
+use App\Models\ApprovalRequest;
+use App\Models\ApprovalRequestStep;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
@@ -26,6 +30,7 @@ use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 class PurchasingSampleDataSeeder extends Seeder
 {
@@ -607,6 +612,30 @@ class PurchasingSampleDataSeeder extends Seeder
                 $histories[$status] ?? [],
                 $adminUserId
             );
+
+            $approvalRequestStatus = match ($status) {
+                'pending_approval' => 'pending',
+                'approved', 'partially_ordered', 'fully_ordered' => 'approved',
+                'rejected' => 'rejected',
+                default => null,
+            };
+
+            if ($approvalRequestStatus) {
+                $submittedAt = Carbon::parse($purchaseRequest->request_date)->setTime(9, 0);
+                $completedAt = $approvalRequestStatus === 'pending'
+                    ? null
+                    : Carbon::parse($purchaseRequest->request_date)->addDay()->setTime(15, 0);
+
+                $this->syncApprovalRequest(
+                    PurchaseRequest::class,
+                    $purchaseRequest->id,
+                    'purchase_request_default',
+                    $approvalRequestStatus,
+                    $adminUserId,
+                    $submittedAt,
+                    $completedAt,
+                );
+            }
         }
 
         return [$purchaseRequests, $purchaseRequestItems];
@@ -753,9 +782,192 @@ class PurchasingSampleDataSeeder extends Seeder
                 $histories[$status] ?? [],
                 $adminUserId
             );
+
+            $approvalRequestStatus = match ($status) {
+                'pending_approval' => 'pending',
+                'rejected' => 'rejected',
+                default => null,
+            };
+
+            if ($approvalRequestStatus) {
+                $submittedAt = Carbon::parse($purchaseOrder->order_date)->setTime(10, 0);
+                $completedAt = $approvalRequestStatus === 'pending'
+                    ? null
+                    : Carbon::parse($purchaseOrder->order_date)->addDay()->setTime(16, 0);
+
+                $this->syncApprovalRequest(
+                    PurchaseOrder::class,
+                    $purchaseOrder->id,
+                    'purchase_order_default',
+                    $approvalRequestStatus,
+                    $adminUserId,
+                    $submittedAt,
+                    $completedAt,
+                );
+            }
         }
 
         return [$purchaseOrders, $purchaseOrderItems];
+    }
+
+    private function syncApprovalRequest(
+        string $approvableType,
+        int $approvableId,
+        string $approvalFlowCode,
+        string $requestStatus,
+        int $submittedBy,
+        Carbon $submittedAt,
+        ?Carbon $completedAt = null,
+    ): void {
+        $flow = ApprovalFlow::with('steps')->where('code', $approvalFlowCode)->first();
+
+        if (! $flow || $flow->steps->isEmpty()) {
+            return;
+        }
+
+        $firstStepOrder = (int) $flow->steps->min('step_order');
+        $lastStepOrder = (int) $flow->steps->max('step_order');
+
+        $approvalRequest = ApprovalRequest::updateOrCreate(
+            [
+                'approvable_type' => $approvableType,
+                'approvable_id' => $approvableId,
+                'approval_flow_id' => $flow->id,
+            ],
+            [
+                'current_step_order' => $requestStatus === 'pending' ? $firstStepOrder : $lastStepOrder,
+                'status' => $requestStatus,
+                'submitted_by' => $submittedBy,
+                'submitted_at' => $submittedAt,
+                'completed_at' => in_array($requestStatus, ['approved', 'rejected'], true) ? ($completedAt ?? $submittedAt) : null,
+            ]
+        );
+
+        ApprovalAuditLog::updateOrCreate(
+            [
+                'approval_request_id' => $approvalRequest->id,
+                'event' => 'submitted',
+            ],
+            [
+                'approvable_type' => $approvableType,
+                'approvable_id' => $approvableId,
+                'actor_user_id' => $submittedBy,
+                'step_order' => null,
+                'ip_address' => '127.0.0.1',
+                'user_agent' => 'Seeder',
+                'metadata' => [
+                    'source' => 'PurchasingSampleDataSeeder',
+                    'approval_flow_code' => $approvalFlowCode,
+                    'status' => $requestStatus,
+                ],
+            ]
+        );
+
+        foreach ($flow->steps as $step) {
+            $stepStatus = 'pending';
+            $action = null;
+            $actedBy = null;
+            $comments = null;
+            $actedAt = null;
+
+            if ($requestStatus === 'approved') {
+                $stepStatus = 'approved';
+                $action = 'approve';
+                $actedBy = $step->approver_user_id;
+                $comments = 'Approved via seeder';
+                $actedAt = $completedAt ?? $submittedAt;
+            }
+
+            if ($requestStatus === 'rejected' && $step->step_order === $firstStepOrder) {
+                $stepStatus = 'rejected';
+                $action = 'reject';
+                $actedBy = $step->approver_user_id;
+                $comments = 'Rejected via seeder';
+                $actedAt = $completedAt ?? $submittedAt;
+            }
+
+            ApprovalRequestStep::updateOrCreate(
+                [
+                    'approval_request_id' => $approvalRequest->id,
+                    'approval_flow_step_id' => $step->id,
+                ],
+                [
+                    'step_order' => $step->step_order,
+                    'status' => $stepStatus,
+                    'acted_by' => $actedBy,
+                    'action' => $action,
+                    'comments' => $comments,
+                    'acted_at' => $actedAt,
+                ]
+            );
+
+            if ($requestStatus === 'approved') {
+                ApprovalAuditLog::updateOrCreate(
+                    [
+                        'approval_request_id' => $approvalRequest->id,
+                        'event' => 'step_approved',
+                        'step_order' => $step->step_order,
+                    ],
+                    [
+                        'approvable_type' => $approvableType,
+                        'approvable_id' => $approvableId,
+                        'actor_user_id' => $step->approver_user_id,
+                        'ip_address' => '127.0.0.1',
+                        'user_agent' => 'Seeder',
+                        'metadata' => [
+                            'source' => 'PurchasingSampleDataSeeder',
+                            'comments' => 'Approved via seeder',
+                        ],
+                    ]
+                );
+            }
+        }
+
+        if ($requestStatus === 'rejected') {
+            $rejectedStep = $flow->steps->firstWhere('step_order', $firstStepOrder);
+
+            ApprovalAuditLog::updateOrCreate(
+                [
+                    'approval_request_id' => $approvalRequest->id,
+                    'event' => 'step_rejected',
+                    'step_order' => $firstStepOrder,
+                ],
+                [
+                    'approvable_type' => $approvableType,
+                    'approvable_id' => $approvableId,
+                    'actor_user_id' => $rejectedStep?->approver_user_id,
+                    'ip_address' => '127.0.0.1',
+                    'user_agent' => 'Seeder',
+                    'metadata' => [
+                        'source' => 'PurchasingSampleDataSeeder',
+                        'comments' => 'Rejected via seeder',
+                    ],
+                ]
+            );
+        }
+
+        if ($requestStatus === 'approved') {
+            $finalApprover = $flow->steps->firstWhere('step_order', $lastStepOrder);
+
+            ApprovalAuditLog::updateOrCreate(
+                [
+                    'approval_request_id' => $approvalRequest->id,
+                    'event' => 'completed',
+                ],
+                [
+                    'approvable_type' => $approvableType,
+                    'approvable_id' => $approvableId,
+                    'actor_user_id' => $finalApprover?->approver_user_id,
+                    'step_order' => $lastStepOrder,
+                    'ip_address' => '127.0.0.1',
+                    'user_agent' => 'Seeder',
+                    'metadata' => [
+                        'source' => 'PurchasingSampleDataSeeder',
+                        'approval_flow_code' => $approvalFlowCode,
+                    ],
+                ]
+            );
+        }
     }
 
     private function seedGoodsReceipts(
