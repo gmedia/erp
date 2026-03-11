@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useState } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { type Resolver, Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
@@ -57,6 +57,16 @@ const formatItemReference = (label?: string, id?: string) => {
     }
 
     return '-';
+};
+
+const omitDisplayLabels = <T extends { product_label?: string; unit_label?: string }>(
+    item: T,
+) => {
+    const nextItem = { ...item };
+    delete nextItem.product_label;
+    delete nextItem.unit_label;
+
+    return nextItem;
 };
 
 const getPurchaseOrderFormDefaults = (
@@ -121,8 +131,12 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(function PurchaseO
         [activePurchaseOrder],
     );
 
-    const form = useForm<PurchaseOrderFormData>({
-        resolver: zodResolver(purchaseOrderFormSchema as any),
+    const form = useForm<PurchaseOrderFormData, unknown, PurchaseOrderFormData>({
+        resolver: zodResolver(purchaseOrderFormSchema) as Resolver<
+            PurchaseOrderFormData,
+            unknown,
+            PurchaseOrderFormData
+        >,
         defaultValues,
     });
 
@@ -147,7 +161,7 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(function PurchaseO
     const handleSubmit = (data: PurchaseOrderFormData) => {
         onSubmit({
             ...data,
-            items: data.items.map(({ product_label, unit_label, ...purchaseOrderItem }) => purchaseOrderItem),
+            items: data.items.map(omitDisplayLabels),
         });
     };
 
@@ -157,7 +171,7 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(function PurchaseO
 
     return (
         <EntityForm<PurchaseOrderFormData>
-            form={form as any}
+            form={form}
             open={open}
             onOpenChange={onOpenChange}
             title={activePurchaseOrder ? 'Edit Purchase Order' : 'Add New Purchase Order'}

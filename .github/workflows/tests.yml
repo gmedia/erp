@@ -57,12 +57,29 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull CI Sail image
+        shell: bash
         run: |
-          docker pull "$CI_SAIL_IMAGE" || {
-            echo "CI Sail image not found. Run the Build CI Image workflow first." >&2
-            exit 1
-          }
-          docker tag "$CI_SAIL_IMAGE" sail-8.4/app
+          branch_tag="${GITHUB_BASE_REF:-${GITHUB_REF_NAME}}"
+          candidates=(
+            "$CI_SAIL_IMAGE"
+            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:${branch_tag}"
+            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:latest"
+          )
+
+          for image in "${candidates[@]}"; do
+            for attempt in 1 2 3 4 5; do
+              if docker pull "$image"; then
+                docker tag "$image" sail-8.4/app
+                exit 0
+              fi
+
+              echo "CI Sail image $image not available yet. Retry ${attempt}/5 in 15s..."
+              sleep 15
+            done
+          done
+
+          echo "Unable to pull any CI Sail image candidate." >&2
+          exit 1
 
       - name: Start Sail
         run: ./vendor/bin/sail up -d --wait

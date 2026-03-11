@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useState } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { type Resolver, Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
@@ -54,6 +54,16 @@ const formatItemReference = (label?: string, id?: string) => {
     }
 
     return '-';
+};
+
+const omitDisplayLabels = <T extends { product_label?: string; unit_label?: string }>(
+    item: T,
+) => {
+    const nextItem = { ...item };
+    delete nextItem.product_label;
+    delete nextItem.unit_label;
+
+    return nextItem;
 };
 
 const getPurchaseRequestFormDefaults = (
@@ -117,8 +127,16 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(function Purch
         [activePurchaseRequest],
     );
 
-    const form = useForm<PurchaseRequestFormData>({
-        resolver: zodResolver(purchaseRequestFormSchema as any),
+    const form = useForm<
+        PurchaseRequestFormData,
+        unknown,
+        PurchaseRequestFormData
+    >({
+        resolver: zodResolver(purchaseRequestFormSchema) as Resolver<
+            PurchaseRequestFormData,
+            unknown,
+            PurchaseRequestFormData
+        >,
         defaultValues,
     });
 
@@ -143,7 +161,7 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(function Purch
     const handleSubmit = (data: PurchaseRequestFormData) => {
         onSubmit({
             ...data,
-            items: data.items.map(({ product_label, unit_label, ...purchaseRequestItem }) => purchaseRequestItem),
+            items: data.items.map(omitDisplayLabels),
         });
     };
 
@@ -153,7 +171,7 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(function Purch
 
     return (
         <EntityForm<PurchaseRequestFormData>
-            form={form as any}
+            form={form}
             open={open}
             onOpenChange={onOpenChange}
             title={activePurchaseRequest ? 'Edit Purchase Request' : 'Add New Purchase Request'}

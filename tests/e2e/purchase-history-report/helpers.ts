@@ -4,17 +4,6 @@ export async function createPurchaseHistoryReportData(
     page: Page,
 ): Promise<string> {
     const createResult = await page.evaluate(async () => {
-        const csrf =
-            document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute('content') || '';
-        const xsrfCookie = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('XSRF-TOKEN='));
-        const xsrfToken = xsrfCookie
-            ? decodeURIComponent(xsrfCookie.split('=')[1])
-            : '';
-
         const getFirstId = async (url: string): Promise<number> => {
             const apiToken = localStorage.getItem('api_token') || '';
             const response = await fetch(url, {

@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { type Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
@@ -78,8 +78,16 @@ export function GoodsReceiptItemFormDialog({
         };
     }, [item]);
 
-    const form = useForm<GoodsReceiptItemFormData>({
-        resolver: zodResolver(goodsReceiptItemSchema as any),
+    const form = useForm<
+        GoodsReceiptItemFormData,
+        unknown,
+        GoodsReceiptItemFormData
+    >({
+        resolver: zodResolver(goodsReceiptItemSchema) as Resolver<
+            GoodsReceiptItemFormData,
+            unknown,
+            GoodsReceiptItemFormData
+        >,
         defaultValues,
     });
 
@@ -99,7 +107,7 @@ export function GoodsReceiptItemFormDialog({
                     </DialogDescription>
                 </DialogHeader>
 
-                <Form {...(form as any)}>
+                <Form {...form}>
                     <form
                         onSubmit={(event) => {
                             event.stopPropagation();
@@ -116,7 +124,7 @@ export function GoodsReceiptItemFormDialog({
                                 step="1"
                                 placeholder="1"
                             />
-                            <AsyncSelectField
+                            <AsyncSelectField<{ name?: string }>
                                 key={`product-${defaultValues.product_id || 'new'}-${open ? 'open' : 'closed'}`}
                                 name="product_id"
                                 label="Product"
@@ -129,7 +137,7 @@ export function GoodsReceiptItemFormDialog({
                                     });
                                 }}
                             />
-                            <AsyncSelectField
+                            <AsyncSelectField<{ name?: string }>
                                 key={`unit-${defaultValues.unit_id || 'new'}-${open ? 'open' : 'closed'}`}
                                 name="unit_id"
                                 label="Unit"

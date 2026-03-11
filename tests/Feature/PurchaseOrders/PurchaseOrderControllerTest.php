@@ -52,7 +52,10 @@ test('index supports search and filters', function () {
         'status' => 'draft',
         'currency' => 'IDR',
     ]);
-    PurchaseOrder::factory()->create();
+    PurchaseOrder::factory()->create([
+        'status' => 'confirmed',
+        'currency' => 'USD',
+    ]);
 
     getJson('/api/purchase-orders?search=PO-SEARCH-001')
         ->assertOk()

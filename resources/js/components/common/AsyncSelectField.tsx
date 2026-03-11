@@ -20,7 +20,7 @@ interface AsyncSelectFieldProps<T extends object = Record<string, unknown>> {
     labelFn?: (item: T) => string;
     valueFn?: (item: T) => string;
     initialLabel?: string;
-    onItemSelect?: (item: any) => void;
+    onItemSelect?: (item: T) => void;
 }
 
 export default function AsyncSelectField<T extends object = Record<string, unknown>>({

@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { type Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
@@ -69,8 +69,16 @@ export function PurchaseRequestItemFormDialog({
         };
     }, [item]);
 
-    const form = useForm<PurchaseRequestItemFormData>({
-        resolver: zodResolver(purchaseRequestItemSchema as any),
+    const form = useForm<
+        PurchaseRequestItemFormData,
+        unknown,
+        PurchaseRequestItemFormData
+    >({
+        resolver: zodResolver(purchaseRequestItemSchema) as Resolver<
+            PurchaseRequestItemFormData,
+            unknown,
+            PurchaseRequestItemFormData
+        >,
         defaultValues,
     });
 
@@ -90,7 +98,7 @@ export function PurchaseRequestItemFormDialog({
                     </DialogDescription>
                 </DialogHeader>
 
-                <Form {...(form as any)}>
+                <Form {...form}>
                     <form
                         onSubmit={(event) => {
                             event.stopPropagation();
@@ -99,7 +107,7 @@ export function PurchaseRequestItemFormDialog({
                         className="space-y-4"
                     >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <AsyncSelectField
+                            <AsyncSelectField<{ name?: string }>
                                 key={`product-${defaultValues.product_id || 'new'}-${open ? 'open' : 'closed'}`}
                                 name="product_id"
                                 label="Product"
@@ -112,7 +120,7 @@ export function PurchaseRequestItemFormDialog({
                                     });
                                 }}
                             />
-                            <AsyncSelectField
+                            <AsyncSelectField<{ name?: string }>
                                 key={`unit-${defaultValues.unit_id || 'new'}-${open ? 'open' : 'closed'}`}
                                 name="unit_id"
                                 label="Unit"

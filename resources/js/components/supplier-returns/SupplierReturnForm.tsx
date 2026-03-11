@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useState } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { type Resolver, Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
@@ -55,6 +55,16 @@ const formatItemReference = (label?: string, id?: string) => {
     }
 
     return '-';
+};
+
+const omitDisplayLabels = <T extends { product_label?: string; unit_label?: string }>(
+    item: T,
+) => {
+    const nextItem = { ...item };
+    delete nextItem.product_label;
+    delete nextItem.unit_label;
+
+    return nextItem;
 };
 
 const getSupplierReturnFormDefaults = (
@@ -125,8 +135,16 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(function Supplie
         [activeSupplierReturn],
     );
 
-    const form = useForm<SupplierReturnFormData>({
-        resolver: zodResolver(supplierReturnFormSchema as any),
+    const form = useForm<
+        SupplierReturnFormData,
+        unknown,
+        SupplierReturnFormData
+    >({
+        resolver: zodResolver(supplierReturnFormSchema) as Resolver<
+            SupplierReturnFormData,
+            unknown,
+            SupplierReturnFormData
+        >,
         defaultValues,
     });
 
@@ -151,7 +169,7 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(function Supplie
     const handleSubmit = (data: SupplierReturnFormData) => {
         onSubmit({
             ...data,
-            items: data.items.map(({ product_label, unit_label, ...supplierReturnItem }) => supplierReturnItem),
+            items: data.items.map(omitDisplayLabels),
         });
     };
 
@@ -161,7 +179,7 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(function Supplie
 
     return (
         <EntityForm<SupplierReturnFormData>
-            form={form as any}
+            form={form}
             open={open}
             onOpenChange={onOpenChange}
             title={activeSupplierReturn ? 'Edit Supplier Return' : 'Add New Supplier Return'}

@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useState } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { type Resolver, Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
@@ -57,6 +57,16 @@ const formatItemReference = (label?: string, id?: string) => {
     }
 
     return '-';
+};
+
+const omitDisplayLabels = <T extends { product_label?: string; unit_label?: string }>(
+    item: T,
+) => {
+    const nextItem = { ...item };
+    delete nextItem.product_label;
+    delete nextItem.unit_label;
+
+    return nextItem;
 };
 
 const getGoodsReceiptFormDefaults = (
@@ -125,8 +135,12 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(function GoodsReceip
         [activeGoodsReceipt],
     );
 
-    const form = useForm<GoodsReceiptFormData>({
-        resolver: zodResolver(goodsReceiptFormSchema as any),
+    const form = useForm<GoodsReceiptFormData, unknown, GoodsReceiptFormData>({
+        resolver: zodResolver(goodsReceiptFormSchema) as Resolver<
+            GoodsReceiptFormData,
+            unknown,
+            GoodsReceiptFormData
+        >,
         defaultValues,
     });
 
@@ -151,7 +165,7 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(function GoodsReceip
     const handleSubmit = (data: GoodsReceiptFormData) => {
         onSubmit({
             ...data,
-            items: data.items.map(({ product_label, unit_label, ...goodsReceiptItem }) => goodsReceiptItem),
+            items: data.items.map(omitDisplayLabels),
         });
     };
 
@@ -161,7 +175,7 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(function GoodsReceip
 
     return (
         <EntityForm<GoodsReceiptFormData>
-            form={form as any}
+            form={form}
             open={open}
             onOpenChange={onOpenChange}
             title={activeGoodsReceipt ? 'Edit Goods Receipt' : 'Add New Goods Receipt'}

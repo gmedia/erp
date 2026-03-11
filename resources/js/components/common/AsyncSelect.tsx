@@ -16,7 +16,7 @@ export interface AsyncSelectProps<T extends object = Record<string, unknown>> {
     value?: string;
     /** Handler for value changes. Optional when used in filter descriptors (injected by FilterModal). */
     onValueChange?: (value: string) => void;
-    onItemSelect?: (item: any) => void;
+    onItemSelect?: (item: T) => void;
     url: string;
     placeholder?: string;
     className?: string;
