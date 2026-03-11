@@ -41,19 +41,74 @@ export async function createApprovalFlow(
   // Description
   await page.fill('textarea[name="description"]', 'E2E testing description');
 
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByRole('dialog').first();
   await expect(dialog).toBeVisible();
+
+  const addStepButton = dialog.getByRole('button', { name: /Add Step/i });
+  await expect(addStepButton).toBeVisible();
+  await addStepButton.click();
+
+  const stepDialog = page.getByRole('dialog', {
+    name: /Add Approval Step|Edit Approval Step/i,
+  });
+  await expect(stepDialog).toBeVisible();
+
+  await stepDialog.locator('input[name="name"]').fill(`Primary Approval ${timestamp}`);
+
+  const approverCombobox = stepDialog.getByRole('combobox', { name: /Approver/i });
+  await expect(approverCombobox).toBeVisible();
+  await approverCombobox.click();
+
+  const userSearchInput = page.getByPlaceholder('Search...').last();
+  await expect(userSearchInput).toBeVisible();
+  await userSearchInput.fill('Admin User');
+  await page
+    .waitForResponse(
+      response =>
+        response.url().includes('/api/users') &&
+        response.request().method() === 'GET' &&
+        response.status() < 400,
+      { timeout: 10000 },
+    )
+    .catch(() => null);
+
+  const approverOption = page
+    .locator('div[role="option"]')
+    .filter({ hasText: 'Admin User' })
+    .first();
+  await expect(approverOption).toBeVisible();
+  await approverOption.click();
+  await expect(approverCombobox).toHaveText(/Admin User/);
+
+  const saveStepButton = stepDialog.getByRole('button', { name: /Save Step/i });
+  await expect(saveStepButton).toBeVisible();
+  await saveStepButton.click();
+  await expect(stepDialog).not.toBeVisible({ timeout: 10000 });
+  await expect(dialog.getByText(`Primary Approval ${timestamp}`)).toBeVisible();
   
   const submitButton = dialog.locator('button[type="submit"]');
   await expect(submitButton).toBeVisible();
+  const createResponsePromise = page.waitForResponse(
+    response =>
+      response.url().includes('/api/approval-flows') &&
+      response.request().method() === 'POST' &&
+      response.status() < 400,
+    { timeout: 15000 },
+  );
   await submitButton.click();
 
   try {
+      await createResponsePromise;
       await expect(dialog).not.toBeVisible({ timeout: 15000 });
-      // Wait for the API response after saving to ensure the grid is updated
-      await page.waitForResponse(r => r.url().includes('/api/approval-flows') && r.request().method() === 'POST' && r.status() < 400).catch(() => null);
   } catch (error) {
       console.error(`Dialog did not close after 15s. Likely validation error or backend failure.`);
+      const errorMessages = await dialog
+        .locator('.text-destructive, .text-red-500, [role="alert"]')
+        .allTextContents()
+        .catch(() => []);
+      if (errorMessages.length > 0) {
+          console.error(`Found error messages in dialog: ${errorMessages.join(', ')}`);
+      }
       await page.screenshot({ path: 'test-validation-error.png', fullPage: true });
       throw error;
   }
