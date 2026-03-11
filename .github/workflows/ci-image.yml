@@ -1,0 +1,100 @@
+name: Build CI Image
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - docker/8.4/**
+      - docker-compose.yml
+      - .github/workflows/ci-image.yml
+  pull_request:
+    branches:
+      - develop
+      - main
+    paths:
+      - docker/8.4/**
+      - docker-compose.yml
+      - .github/workflows/ci-image.yml
+  workflow_dispatch:
+
+concurrency:
+  group: ci-image-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/ci-sail
+  IMAGE_TAG: 8.4
+
+jobs:
+  validate:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate CI image build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./docker/8.4
+          file: ./docker/8.4/Dockerfile
+          push: false
+          build-args: |
+            MYSQL_CLIENT=mariadb-client
+          cache-from: type=gha,scope=ci-sail-image
+          cache-to: type=gha,mode=max,scope=ci-sail-image
+
+  publish:
+    if: ${{ github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ env.IMAGE_TAG }}
+            type=raw,value=develop,enable=${{ github.ref == 'refs/heads/develop' }}
+            type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=sha,format=short,prefix=sha-
+
+      - name: Build and publish CI image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./docker/8.4
+          file: ./docker/8.4/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            MYSQL_CLIENT=mariadb-client
+          cache-from: type=gha,scope=ci-sail-image
+          cache-to: type=gha,mode=max,scope=ci-sail-image

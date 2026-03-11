@@ -16,6 +16,10 @@ concurrency:
 
 permissions:
   contents: read
+  packages: read
+
+env:
+  CI_SAIL_IMAGE: ghcr.io/${{ github.repository }}/ci-sail:8.4
 
 jobs:
   ci:
@@ -45,8 +49,23 @@ jobs:
       - name: Bootstrap Sail dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull CI Sail image
+        run: |
+          docker pull "$CI_SAIL_IMAGE" || {
+            echo "CI Sail image not found. Run the Build CI Image workflow first." >&2
+            exit 1
+          }
+          docker tag "$CI_SAIL_IMAGE" sail-8.4/app
+
       - name: Start Sail
-        run: ./vendor/bin/sail up -d --wait --build
+        run: ./vendor/bin/sail up -d --wait
 
       - name: Configure MinIO bucket
         run: |
