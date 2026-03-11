@@ -185,7 +185,21 @@ describe('Approval Flow API Endpoints', function () {
                 'name',
                 'code',
                 'approvable_type',
+                'steps',
             ]);
+    });
+
+    test('store requires at least one approval step', function () {
+        $response = postJson('/api/approval-flows', [
+            'name' => 'Flow Without Steps',
+            'code' => 'flow_without_steps',
+            'approvable_type' => 'App\\Models\\AssetMovement',
+            'is_active' => true,
+            'steps' => [],
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['steps']);
     });
 
     test('store validates unique code constraint', function () {

@@ -32,6 +32,14 @@ class TriggerApprovalAction
             return null;
         }
 
+        $flow->loadMissing('steps');
+
+        if ($flow->steps->isEmpty()) {
+            Log::warning('Approval flow has no steps and cannot be triggered. Flow ID: ' . $flow->id . ', Entity: ' . get_class($entity) . ' ID: ' . $entity->getKey());
+
+            return null;
+        }
+
         return DB::transaction(function () use ($entity, $flow) {
             // 1. Create the Approval Request
             $request = ApprovalRequest::create([

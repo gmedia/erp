@@ -15,37 +15,32 @@ class MyApprovalController extends Controller
     {
         $userId = Auth::id();
 
-        // A step is waiting for the current user if:
-        // 1. the step is pending
-        // 2. the step's approver_type is 'user' and approver_user_id == $userId
-        // (Role and department logic omitted for MVP unless needed)
+        $inboxQuery = fn () => ApprovalRequestStep::with([
+            'request.approvable',
+            'request.submitter',
+            'flowStep',
+        ])->orderByDesc('updated_at')->orderByDesc('id');
 
-        $pending = ApprovalRequestStep::with(['request.approvable', 'request.submitter', 'flowStep'])
-            ->where('status', 'pending')
-            ->whereHas('request', function ($q) {
-                $q->whereIn('status', ['pending', 'in_progress']);
-            })
-            ->whereHas('flowStep', function ($q) use ($userId) {
-                $q->where('approver_type', 'user')
-                    ->where('approver_user_id', $userId);
-            })
+        $pending = $inboxQuery()
+            ->pendingInboxForUser($userId)
             ->get();
 
-        $approvedByMe = ApprovalRequestStep::with(['request.approvable', 'request.submitter', 'flowStep'])
+        $approvedByMe = $inboxQuery()
             ->where('status', 'approved')
             ->where('acted_by', $userId)
             ->get();
 
-        $rejectedByMe = ApprovalRequestStep::with(['request.approvable', 'request.submitter', 'flowStep'])
+        $rejectedByMe = $inboxQuery()
             ->where('status', 'rejected')
             ->where('acted_by', $userId)
             ->get();
 
-        $all = ApprovalRequestStep::with(['request.approvable', 'request.submitter', 'flowStep'])
-            ->where('acted_by', $userId)
-            ->orWhereHas('flowStep', function ($q) use ($userId) {
-                $q->where('approver_type', 'user')
-                    ->where('approver_user_id', $userId);
+        $all = $inboxQuery()
+            ->where(function ($query) use ($userId) {
+                $query->where('acted_by', $userId)
+                    ->orWhere(function ($pendingQuery) use ($userId) {
+                        $pendingQuery->pendingInboxForUser($userId);
+                    });
             })
             ->get();
 
@@ -63,13 +58,19 @@ class MyApprovalController extends Controller
 
         $userId = Auth::id();
 
-        DB::transaction(function () use ($approvalRequest, $userId, $request) {
-            /** @var \App\Models\ApprovalRequestStep $currentStep */
-            $currentStep = $approvalRequest->steps()
-                ->where('status', 'pending')
-                ->where('step_order', $approvalRequest->current_step_order)
-                ->firstOrFail();
+        $currentStep = $approvalRequest->steps()
+            ->where('status', 'pending')
+            ->where('step_order', $approvalRequest->current_step_order)
+            ->assignedToUser($userId)
+            ->first();
 
+        abort_unless(
+            $currentStep,
+            403,
+            'You are not authorized to act on this approval step.',
+        );
+
+        DB::transaction(function () use ($approvalRequest, $userId, $request, $currentStep) {
             $currentStep->update([
                 'status' => 'approved',
                 'acted_by' => $userId,
@@ -120,13 +121,19 @@ class MyApprovalController extends Controller
 
         $userId = Auth::id();
 
-        DB::transaction(function () use ($approvalRequest, $userId, $request) {
-            /** @var \App\Models\ApprovalRequestStep $currentStep */
-            $currentStep = $approvalRequest->steps()
-                ->where('status', 'pending')
-                ->where('step_order', $approvalRequest->current_step_order)
-                ->firstOrFail();
+        $currentStep = $approvalRequest->steps()
+            ->where('status', 'pending')
+            ->where('step_order', $approvalRequest->current_step_order)
+            ->assignedToUser($userId)
+            ->first();
 
+        abort_unless(
+            $currentStep,
+            403,
+            'You are not authorized to act on this approval step.',
+        );
+
+        DB::transaction(function () use ($approvalRequest, $userId, $request, $currentStep) {
             $currentStep->update([
                 'status' => 'rejected',
                 'acted_by' => $userId,

@@ -23,7 +23,7 @@ class StoreApprovalFlowRequest extends FormRequest
             'description' => 'nullable|string',
             'is_active' => 'boolean',
             'conditions' => 'nullable|array',
-            'steps' => 'nullable|array',
+            'steps' => 'required|array|min:1',
             'steps.*.name' => 'required|string|max:255',
             'steps.*.approver_type' => 'required|in:user,role,department_head',
             'steps.*.approver_user_id' => 'required_if:steps.*.approver_type,user|nullable|exists:users,id',

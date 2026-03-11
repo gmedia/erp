@@ -28,6 +28,7 @@ interface ApprovalFlowStepManagerProps {
         'steps',
         'fieldId'
     >;
+    errorMessage?: string;
 }
 
 function toStepInput(
@@ -50,6 +51,7 @@ function toStepInput(
 
 export function ApprovalFlowStepManager({
     fieldArrayProps,
+    errorMessage,
 }: ApprovalFlowStepManagerProps) {
     const { fields, append, remove, update } = fieldArrayProps;
 
@@ -121,7 +123,17 @@ export function ApprovalFlowStepManager({
     return (
         <div className="mt-8 border-t border-border pt-6">
             <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-medium">Approval Steps</h3>
+                <div>
+                    <h3 className="text-lg font-medium">Approval Steps</h3>
+                    <p className="text-sm text-muted-foreground">
+                        Define the ordered steps that will receive and process this approval.
+                    </p>
+                    {errorMessage && (
+                        <p className="mt-2 text-sm font-medium text-destructive">
+                            {errorMessage}
+                        </p>
+                    )}
+                </div>
                 <Button
                     type="button"
                     variant="outline"

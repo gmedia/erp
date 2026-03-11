@@ -6,6 +6,7 @@ use App\Models\ApprovalRequestStep;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
@@ -43,6 +44,49 @@ it('lists pending approvals assigned to the current user', function () {
     $response->assertStatus(200);
 });
 
+it('only lists the current actionable step in pending approvals', function () {
+    $currentApprover = User::factory()->create();
+    $futureApprover = User::factory()->create();
+
+    $request = ApprovalRequest::factory()->create([
+        'status' => 'in_progress',
+        'current_step_order' => 1,
+    ]);
+
+    $currentFlowStep = ApprovalFlowStep::factory()->create([
+        'step_order' => 1,
+        'approver_type' => 'user',
+        'approver_user_id' => $currentApprover->id,
+    ]);
+
+    $futureFlowStep = ApprovalFlowStep::factory()->create([
+        'step_order' => 2,
+        'approver_type' => 'user',
+        'approver_user_id' => $futureApprover->id,
+    ]);
+
+    ApprovalRequestStep::factory()->create([
+        'approval_request_id' => $request->id,
+        'approval_flow_step_id' => $currentFlowStep->id,
+        'step_order' => 1,
+        'status' => 'pending',
+    ]);
+
+    $futureStep = ApprovalRequestStep::factory()->create([
+        'approval_request_id' => $request->id,
+        'approval_flow_step_id' => $futureFlowStep->id,
+        'step_order' => 2,
+        'status' => 'pending',
+    ]);
+
+    \Laravel\Sanctum\Sanctum::actingAs($futureApprover, ['*']);
+
+    getJson('/api/my-approvals')
+        ->assertOk()
+        ->assertJsonCount(0, 'pending')
+        ->assertJsonMissing(['id' => $futureStep->id]);
+});
+
 it('can approve a pending request step', function () {
     $user = User::factory()->create();
 
@@ -69,7 +113,7 @@ it('can approve a pending request step', function () {
     expect($step->fresh()->status)->toBe('approved');
     expect($step->fresh()->comments)->toBe('Looks good to me');
 
-    $this->assertDatabaseHas('approval_audit_logs', [
+    assertDatabaseHas('approval_audit_logs', [
         'approval_request_id' => $request->id,
         'event' => 'completed',
     ]);
@@ -100,4 +144,66 @@ it('can reject a pending request step', function () {
 
     expect($step->fresh()->status)->toBe('rejected');
     expect($request->fresh()->status)->toBe('rejected');
+});
+
+it('forbids approving a step that is not assigned to the current user', function () {
+    $owner = User::factory()->create();
+    $intruder = User::factory()->create();
+
+    $request = ApprovalRequest::factory()->create([
+        'status' => 'pending',
+        'current_step_order' => 1,
+    ]);
+
+    $flowStep = ApprovalFlowStep::factory()->create([
+        'approver_type' => 'user',
+        'approver_user_id' => $owner->id,
+    ]);
+
+    $step = ApprovalRequestStep::factory()->create([
+        'approval_request_id' => $request->id,
+        'approval_flow_step_id' => $flowStep->id,
+        'step_order' => 1,
+        'status' => 'pending',
+    ]);
+
+    \Laravel\Sanctum\Sanctum::actingAs($intruder, ['*']);
+
+    postJson("/api/my-approvals/{$request->id}/approve", [
+        'comments' => 'Trying to approve another user step',
+    ])->assertForbidden();
+
+    expect($step->fresh()->status)->toBe('pending');
+    expect($request->fresh()->status)->toBe('pending');
+});
+
+it('forbids rejecting a step that is not assigned to the current user', function () {
+    $owner = User::factory()->create();
+    $intruder = User::factory()->create();
+
+    $request = ApprovalRequest::factory()->create([
+        'status' => 'pending',
+        'current_step_order' => 1,
+    ]);
+
+    $flowStep = ApprovalFlowStep::factory()->create([
+        'approver_type' => 'user',
+        'approver_user_id' => $owner->id,
+    ]);
+
+    $step = ApprovalRequestStep::factory()->create([
+        'approval_request_id' => $request->id,
+        'approval_flow_step_id' => $flowStep->id,
+        'step_order' => 1,
+        'status' => 'pending',
+    ]);
+
+    \Laravel\Sanctum\Sanctum::actingAs($intruder, ['*']);
+
+    postJson("/api/my-approvals/{$request->id}/reject", [
+        'comments' => 'Trying to reject another user step',
+    ])->assertForbidden();
+
+    expect($step->fresh()->status)->toBe('pending');
+    expect($request->fresh()->status)->toBe('pending');
 });

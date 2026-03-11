@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -78,5 +79,38 @@ class ApprovalRequestStep extends Model
     public function delegator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'delegated_from');
+    }
+
+    public function scopeAssignedToUser(Builder $query, int $userId): Builder
+    {
+        return $query->whereHas('flowStep', function (Builder $flowStepQuery) use ($userId) {
+            $flowStepQuery->where('approver_type', 'user')
+                ->where('approver_user_id', $userId);
+        });
+    }
+
+    public function scopeForActiveRequests(Builder $query): Builder
+    {
+        return $query->whereHas('request', function (Builder $requestQuery) {
+            $requestQuery->whereIn('status', ['pending', 'in_progress']);
+        });
+    }
+
+    public function scopeCurrentRequestStep(Builder $query): Builder
+    {
+        return $query->whereHas('request', function (Builder $requestQuery) {
+            $requestQuery->whereColumn(
+                'approval_requests.current_step_order',
+                'approval_request_steps.step_order',
+            );
+        });
+    }
+
+    public function scopePendingInboxForUser(Builder $query, int $userId): Builder
+    {
+        return $query->where('status', 'pending')
+            ->forActiveRequests()
+            ->currentRequestStep()
+            ->assignedToUser($userId);
     }
 }

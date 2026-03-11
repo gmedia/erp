@@ -90,6 +90,11 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
             defaultValues,
         });
 
+        const stepsErrorMessage =
+            typeof form.formState.errors.steps?.message === 'string'
+                ? form.formState.errors.steps.message
+                : undefined;
+
         const fieldArrayProps = useFieldArray({
             control: form.control,
             name: 'steps',
@@ -166,11 +171,10 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
                         rows={2}
                     />
 
-                    {item && (
-                        <ApprovalFlowStepManager
-                            fieldArrayProps={fieldArrayProps}
-                        />
-                    )}
+                    <ApprovalFlowStepManager
+                        fieldArrayProps={fieldArrayProps}
+                        errorMessage={stepsErrorMessage}
+                    />
                 </div>
             </EntityForm>
         );

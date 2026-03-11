@@ -63,14 +63,7 @@ class AuthController extends Controller
         // Get Pending Approvals
         $pendingApprovalsCount = 0;
         if ($user->id) {
-            $pendingApprovalsCount = \App\Models\ApprovalRequestStep::where('status', 'pending')
-                ->whereHas('request', function ($q) {
-                    $q->whereIn('status', ['pending', 'in_progress']);
-                })
-                ->whereHas('flowStep', function ($q) use ($user) {
-                    $q->where('approver_type', 'user')
-                        ->where('approver_user_id', $user->id);
-                })
+            $pendingApprovalsCount = \App\Models\ApprovalRequestStep::pendingInboxForUser($user->id)
                 ->count();
         }
 
