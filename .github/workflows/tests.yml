@@ -1,4 +1,4 @@
-name: Tests
+name: CI
 
 on:
   push:
@@ -11,25 +11,32 @@ on:
       - main
 
 concurrency:
-  group: tests-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
   packages: read
 
 env:
   CI_SAIL_IMAGE: ghcr.io/${{ github.repository }}/ci-sail:8.4
 
 jobs:
-  ci:
-    name: Test suite via Sail
+  quality:
+    name: Quality checks via Sail
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 75
+    outputs:
+      autofix_applied: ${{ steps.autofix.outputs.changed }}
 
     steps:
-      - name: Checkout
+      - name: Checkout source branch
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+          repository: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -84,29 +91,82 @@ jobs:
       - name: Start Sail
         run: ./vendor/bin/sail up -d --wait
 
+      - name: Validate Composer configuration
+        run: ./vendor/bin/sail composer validate --strict
+
+      - name: Install Node dependencies
+        run: ./vendor/bin/sail npm ci
+
+      - name: Run Pint
+        run: ./vendor/bin/sail run php -d sys_temp_dir=/var/www/html/storage/tmp ./vendor/bin/pint
+
+      - name: Format frontend
+        run: ./vendor/bin/sail npm run format
+
+      - name: Lint frontend
+        run: ./vendor/bin/sail npm run lint
+
+      - name: Auto-commit lint fixes
+        id: autofix
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_REPOSITORY: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          TARGET_BRANCH: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git status --short
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+          if [ "$GITHUB_ACTOR" = "github-actions[bot]" ]; then
+            echo "Lint autofixes are still changing files on the bot rerun." >&2
+            exit 1
+          fi
+
+          if [ "$EVENT_NAME" = "pull_request" ] && [ "$HEAD_REPOSITORY" != "$GITHUB_REPOSITORY" ]; then
+            echo "Lint autofixes were generated, but this pull request comes from a fork so CI cannot push them back." >&2
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "style: apply CI autofixes"
+          git push origin "HEAD:$TARGET_BRANCH"
+
       - name: Configure MinIO bucket
+        if: steps.autofix.outputs.changed != 'true'
         run: |
           ./vendor/bin/sail exec -T minio mc alias set myminio http://localhost:9000 sail password
           ./vendor/bin/sail exec -T minio mc mb myminio/local || true
           ./vendor/bin/sail exec -T minio mc anonymous set download myminio/local || true
 
-      - name: Install Node dependencies
-        run: ./vendor/bin/sail npm ci
-
       - name: Generate Application Key
+        if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail artisan key:generate
 
       - name: Clear configuration cache
+        if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail artisan config:clear
 
+      - name: Check TypeScript
+        if: steps.autofix.outputs.changed != 'true'
+        run: ./vendor/bin/sail npm run types
+
       - name: Build assets
+        if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run build
 
       - name: Run tests
+        if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail test --colors=always
 
       - name: Upload failure logs
-        if: failure()
+        if: failure() && steps.autofix.outputs.changed != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: laravel-logs
@@ -119,3 +179,19 @@ jobs:
           if [ -x ./vendor/bin/sail ]; then
             ./vendor/bin/sail down -v
           fi
+
+  ci:
+    name: Test suite via Sail
+    needs: quality
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reflect combined CI result
+        shell: bash
+        run: |
+          if [ "${{ needs.quality.outputs.autofix_applied }}" = "true" ]; then
+            echo "Autofixes were pushed. The follow-up CI run on the new commit must complete instead." >&2
+            exit 1
+          fi
+
+          [ "${{ needs.quality.result }}" = "success" ]
