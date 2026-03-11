@@ -97,8 +97,8 @@ jobs:
       - name: Install Node dependencies
         run: ./vendor/bin/sail npm ci
 
-      - name: Run Pint
-        run: ./vendor/bin/sail run php -d sys_temp_dir=/var/www/html/storage/tmp ./vendor/bin/pint
+      - name: Run Duster
+        run: ./vendor/bin/sail bin duster fix --no-interaction
 
       - name: Format frontend
         run: ./vendor/bin/sail npm run format
