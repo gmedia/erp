@@ -33,28 +33,33 @@ jobs:
           tools: composer:v2
 
       - name: Prepare environment
-        run: cp .env.example .env
+        run: |
+          cp .env.example .env
+          sed -i "s/^WWWUSER=.*/WWWUSER=$(id -u)/" .env
+          sed -i "s/^WWWGROUP=.*/WWWGROUP=$(id -g)/" .env
+          mkdir -p storage/tmp
+          chmod 777 storage/tmp
 
       - name: Bootstrap Sail dependencies
         run: composer install -q --no-ansi --no-interaction --no-progress --prefer-dist
 
       - name: Start Sail
-        run: ./vendor/bin/sail up -d --wait
+        run: ./vendor/bin/sail up -d --wait --build
 
       - name: Validate Composer configuration
         run: ./vendor/bin/sail composer validate --strict
 
-      - name: Run Pint in test mode
-        run: ./vendor/bin/sail pint --test
+      - name: Run Pint
+        run: ./vendor/bin/sail run php -d sys_temp_dir=/var/www/html/storage/tmp ./vendor/bin/pint
 
       - name: Install Node dependencies
         run: ./vendor/bin/sail npm ci
 
-      - name: Check Prettier formatting
-        run: ./vendor/bin/sail npm run format:check
+      - name: Format frontend
+        run: ./vendor/bin/sail npm run format
 
       - name: Lint frontend
-        run: ./vendor/bin/sail npm run lint:check
+        run: ./vendor/bin/sail npm run lint
 
       - name: Check TypeScript
         run: ./vendor/bin/sail npm run types

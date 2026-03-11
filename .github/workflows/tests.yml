@@ -19,52 +19,9 @@ permissions:
 
 jobs:
   ci:
-    name: Test suite
+    name: Test suite via Sail
     runs-on: ubuntu-latest
-    timeout-minutes: 35
-    env:
-      APP_ENV: testing
-      APP_DEBUG: true
-      APP_URL: http://localhost
-      DB_CONNECTION: mariadb
-      DB_HOST: 127.0.0.1
-      DB_PORT: 3306
-      DB_DATABASE: testing
-      DB_USERNAME: sail
-      DB_PASSWORD: password
-      REDIS_CLIENT: phpredis
-      REDIS_HOST: 127.0.0.1
-      REDIS_PASSWORD: null
-      REDIS_PORT: 6379
-      CACHE_STORE: array
-      QUEUE_CONNECTION: sync
-      SESSION_DRIVER: array
-      FILESYSTEM_DISK: local
-      MAIL_MAILER: array
-    services:
-      mariadb:
-        image: mariadb:11
-        env:
-          MARIADB_DATABASE: testing
-          MARIADB_USER: sail
-          MARIADB_PASSWORD: password
-          MARIADB_ROOT_PASSWORD: root
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mariadb-admin ping -h 127.0.0.1 --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
-      valkey:
-        image: valkey/valkey:alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd="valkey-cli ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
+    timeout-minutes: 50
 
     steps:
       - name: Checkout
@@ -76,34 +33,41 @@ jobs:
           php-version: 8.4
           tools: composer:v2
           coverage: none
-          extensions: redis
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
 
       - name: Prepare environment
-        run: cp .env.example .env
+        run: |
+          cp .env.example .env
+          sed -i "s/^WWWUSER=.*/WWWUSER=$(id -u)/" .env
+          sed -i "s/^WWWGROUP=.*/WWWGROUP=$(id -g)/" .env
+          mkdir -p storage/tmp
+          chmod 777 storage/tmp
 
-      - name: Install Composer dependencies
+      - name: Bootstrap Sail dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      - name: Start Sail
+        run: ./vendor/bin/sail up -d --wait --build
+
+      - name: Configure MinIO bucket
+        run: |
+          ./vendor/bin/sail exec -T minio mc alias set myminio http://localhost:9000 sail password
+          ./vendor/bin/sail exec -T minio mc mb myminio/local || true
+          ./vendor/bin/sail exec -T minio mc anonymous set download myminio/local || true
+
       - name: Install Node dependencies
-        run: npm ci
+        run: ./vendor/bin/sail npm ci
 
       - name: Generate Application Key
-        run: php artisan key:generate
+        run: ./vendor/bin/sail artisan key:generate
 
       - name: Clear configuration cache
-        run: php artisan config:clear
+        run: ./vendor/bin/sail artisan config:clear
 
       - name: Build assets
-        run: npm run build
+        run: ./vendor/bin/sail npm run build
 
       - name: Run tests
-        run: ./vendor/bin/pest --colors=always --exclude-group=integration,minio,s3
+        run: ./vendor/bin/sail test --colors=always
 
       - name: Upload failure logs
         if: failure()
@@ -112,3 +76,10 @@ jobs:
           name: laravel-logs
           path: storage/logs
           if-no-files-found: ignore
+
+      - name: Stop Sail
+        if: always()
+        run: |
+          if [ -x ./vendor/bin/sail ]; then
+            ./vendor/bin/sail down -v
+          fi
