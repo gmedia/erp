@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalFlow;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
@@ -514,6 +515,26 @@ class AssetSampleDataSeeder extends Seeder
                         ]
                     );
 
+                    ApprovalAuditLog::updateOrCreate(
+                        [
+                            'approval_request_id' => $request->id,
+                            'event' => 'submitted',
+                        ],
+                        [
+                            'approvable_type' => Asset::class,
+                            'approvable_id' => $asset->id,
+                            'actor_user_id' => $adminUser?->id,
+                            'step_order' => null,
+                            'ip_address' => '127.0.0.1',
+                            'user_agent' => 'Seeder',
+                            'metadata' => [
+                                'source' => 'AssetSampleDataSeeder',
+                                'approval_status' => $approvalStatus,
+                                'asset_code' => $asset->asset_code,
+                            ],
+                        ]
+                    );
+
                     // Create Steps
                     foreach ($flow->steps as $step) {
                         ApprovalRequestStep::updateOrCreate(
@@ -528,6 +549,49 @@ class AssetSampleDataSeeder extends Seeder
                                 'action' => $approvalStatus === 'approved' ? 'approve' : null,
                                 'comments' => $approvalStatus === 'approved' ? 'Approved via seeder' : null,
                                 'acted_at' => $approvalStatus === 'approved' ? now() : null,
+                            ]
+                        );
+
+                        if ($approvalStatus === 'approved') {
+                            ApprovalAuditLog::updateOrCreate(
+                                [
+                                    'approval_request_id' => $request->id,
+                                    'event' => 'step_approved',
+                                    'step_order' => $step->step_order,
+                                ],
+                                [
+                                    'approvable_type' => Asset::class,
+                                    'approvable_id' => $asset->id,
+                                    'actor_user_id' => $step->approver_user_id,
+                                    'ip_address' => '127.0.0.1',
+                                    'user_agent' => 'Seeder',
+                                    'metadata' => [
+                                        'source' => 'AssetSampleDataSeeder',
+                                        'comments' => 'Approved via seeder',
+                                        'asset_code' => $asset->asset_code,
+                                    ],
+                                ]
+                            );
+                        }
+                    }
+
+                    if ($approvalStatus === 'approved') {
+                        ApprovalAuditLog::updateOrCreate(
+                            [
+                                'approval_request_id' => $request->id,
+                                'event' => 'completed',
+                            ],
+                            [
+                                'approvable_type' => Asset::class,
+                                'approvable_id' => $asset->id,
+                                'actor_user_id' => $flow->steps()->orderByDesc('step_order')->value('approver_user_id'),
+                                'step_order' => $flow->steps()->max('step_order'),
+                                'ip_address' => '127.0.0.1',
+                                'user_agent' => 'Seeder',
+                                'metadata' => [
+                                    'source' => 'AssetSampleDataSeeder',
+                                    'asset_code' => $asset->asset_code,
+                                ],
                             ]
                         );
                     }

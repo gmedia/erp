@@ -39,8 +39,6 @@ function toStepInput(
         name: data.name,
         approver_type: data.approver_type,
         approver_user_id: data.approver_user_id ?? null,
-        approver_role_id: data.approver_role_id ?? null,
-        approver_department_id: data.approver_department_id ?? null,
         required_action: data.required_action,
         auto_approve_after_hours: data.auto_approve_after_hours ?? null,
         escalate_after_hours: data.escalate_after_hours ?? null,
@@ -75,14 +73,7 @@ export function ApprovalFlowStepManager({
     };
 
     const renderRow = (step: StepField, index: number) => {
-        let approverLabel = '-';
-        if (step.approver_type === 'user') {
-            approverLabel = `User ID: ${step.approver_user_id || '-'}`;
-        } else if (step.approver_type === 'department_head') {
-            approverLabel = `Dept ID: ${step.approver_department_id || '-'}`;
-        } else if (step.approver_type === 'role') {
-            approverLabel = `Role ID: ${step.approver_role_id || '-'}`;
-        }
+        const approverLabel = `User ID: ${step.approver_user_id || '-'}`;
 
         return (
             <TableRow key={step.fieldId}>

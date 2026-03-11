@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\ApprovalFlow;
-use App\Models\Department;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -112,8 +111,8 @@ describe('Approval Flow API Endpoints', function () {
     });
 
     test('store creates approval flow with valid data and returns 201 status', function () {
-        $department = Department::factory()->create();
         $approver = User::factory()->create();
+        $secondApprover = User::factory()->create();
 
         $payload = [
             'name' => 'Standard Asset Request',
@@ -134,9 +133,9 @@ describe('Approval Flow API Endpoints', function () {
                     'can_reject' => true,
                 ],
                 [
-                    'name' => 'Dept Head Review',
-                    'approver_type' => 'department_head',
-                    'approver_department_id' => $department->id,
+                    'name' => 'Finance Approval',
+                    'approver_type' => 'user',
+                    'approver_user_id' => $secondApprover->id,
                     'required_action' => 'review',
                     'auto_approve_after_hours' => 24,
                     'escalate_after_hours' => null,
@@ -187,6 +186,27 @@ describe('Approval Flow API Endpoints', function () {
                 'approvable_type',
                 'steps',
             ]);
+    });
+
+    test('store rejects approver types that are not executable at runtime', function () {
+        $response = postJson('/api/approval-flows', [
+            'name' => 'Invalid Flow',
+            'code' => 'invalid_flow',
+            'approvable_type' => 'App\\Models\\AssetMovement',
+            'is_active' => true,
+            'steps' => [
+                [
+                    'name' => 'Role Approval',
+                    'approver_type' => 'role',
+                    'approver_role_id' => 1,
+                    'required_action' => 'approve',
+                    'can_reject' => true,
+                ],
+            ],
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['steps.0.approver_type']);
     });
 
     test('store requires at least one approval step', function () {
@@ -282,8 +302,8 @@ describe('Approval Flow API Endpoints', function () {
             'steps' => [
                 [
                     'name' => 'New Step 1',
-                    'approver_type' => 'role',
-                    'approver_role_id' => 1,
+                    'approver_type' => 'user',
+                    'approver_user_id' => User::factory()->create()->id,
                     'required_action' => 'review',
                     'can_reject' => false,
                 ],

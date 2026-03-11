@@ -61,10 +61,11 @@ const getFormDefaults = (
             ? item.steps.map((step) => ({
                   id: step.id,
                   name: step.name,
-                  approver_type: step.approver_type,
-                  approver_user_id: step.approver_user_id,
-                  approver_role_id: step.approver_role_id,
-                  approver_department_id: step.approver_department_id,
+                  approver_type: 'user',
+                  approver_user_id:
+                      step.approver_type === 'user'
+                          ? step.approver_user_id
+                          : null,
                   required_action: step.required_action,
                   auto_approve_after_hours: step.auto_approve_after_hours,
                   escalate_after_hours: step.escalate_after_hours,

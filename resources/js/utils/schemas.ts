@@ -593,18 +593,12 @@ export const approvalFlowFormSchema = z.object({
             z.object({
                 id: z.number().optional(),
                 name: z.string().min(1, 'Step name is required'),
-                approver_type: z.enum(['user', 'role', 'department_head']),
+                approver_type: z.literal('user'),
                 approver_user_id: z.preprocess(
                     (val) => (val === '' || val === null ? null : Number(val)),
-                    z.number().nullable().optional(),
-                ),
-                approver_role_id: z.preprocess(
-                    (val) => (val === '' || val === null ? null : Number(val)),
-                    z.number().nullable().optional(),
-                ),
-                approver_department_id: z.preprocess(
-                    (val) => (val === '' || val === null ? null : Number(val)),
-                    z.number().nullable().optional(),
+                    z.number().nullable().refine((value) => value !== null, {
+                        message: 'Approver user is required',
+                    }),
                 ),
                 required_action: z.enum(['approve', 'review', 'acknowledge']),
                 auto_approve_after_hours: z.preprocess(
@@ -624,7 +618,7 @@ export const approvalFlowFormSchema = z.object({
                     .transform((val) => val === true || val === 'true'),
             }),
         )
-        .optional(),
+            .min(1, 'At least one approval step is required'),
 });
 
 export type ApprovalFlowFormData = z.infer<typeof approvalFlowFormSchema>;

@@ -14,10 +14,6 @@ class ApprovalFlowSampleDataSeeder extends Seeder
         $admin = \App\Models\User::where('email', config('app.admin'))->first();
         $hrManager = \App\Models\User::where('email', 'manager.hr@dokfin.id')->first();
         $financeDirector = \App\Models\User::where('email', 'director.finance@dokfin.id')->first();
-        $itStaff = \App\Models\User::where('email', 'staff.it@dokfin.id')->first();
-
-        $hrDept = \App\Models\Department::where('name', 'HR')->first();
-        $financeDept = \App\Models\Department::where('name', 'Finance')->first();
 
         // Flow 1: High Value Asset Registration
         $flow1 = \App\Models\ApprovalFlow::firstOrCreate(
@@ -55,36 +51,5 @@ class ApprovalFlowSampleDataSeeder extends Seeder
                 'approver_user_id' => $financeDirector->id,
             ]
         );
-
-        // Seed a dummy Approval Audit Log for UI testing
-        $dummyRequest = \App\Models\ApprovalRequest::firstOrCreate(
-            [
-                'approval_flow_id' => $flow1->id,
-                'approvable_type' => 'App\\Models\\Asset',
-                'approvable_id' => 1,
-            ],
-            [
-                'status' => 'pending',
-                'current_step_order' => 1,
-                'submitted_by' => $admin->id,
-            ]
-        );
-
-        \App\Models\ApprovalAuditLog::firstOrCreate(
-            [
-                'approval_request_id' => $dummyRequest->id,
-                'event' => 'submitted',
-            ],
-            [
-                'approvable_type' => 'App\\Models\\Asset',
-                'approvable_id' => 1,
-                'actor_user_id' => $admin->id,
-                'step_order' => 1,
-                'ip_address' => '127.0.0.1',
-                'user_agent' => 'Mozilla/5.0',
-                'metadata' => ['note' => 'Test submission'],
-            ]
-        );
-
     }
 }

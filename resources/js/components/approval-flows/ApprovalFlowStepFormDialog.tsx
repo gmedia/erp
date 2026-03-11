@@ -21,18 +21,12 @@ const stepSchema = z
     .object({
         id: z.number().optional(),
         name: z.string().min(1, 'Name is required'),
-        approver_type: z.enum(['user', 'department_head', 'role']),
+        approver_type: z.literal('user'),
         approver_user_id: z.preprocess(
             (val) => (val === '' || val === null ? null : Number(val)),
-            z.number().nullable().optional(),
-        ),
-        approver_role_id: z.preprocess(
-            (val) => (val === '' || val === null ? null : Number(val)),
-            z.number().nullable().optional(),
-        ),
-        approver_department_id: z.preprocess(
-            (val) => (val === '' || val === null ? null : Number(val)),
-            z.number().nullable().optional(),
+            z.number().nullable().refine((value) => value !== null, {
+                message: 'Approver user is required',
+            }),
         ),
         required_action: z.enum(['approve', 'review', 'acknowledge']),
         auto_approve_after_hours: z.preprocess(
@@ -51,35 +45,6 @@ const stepSchema = z
             .union([z.boolean(), z.string()])
             .default(true)
             .transform((val) => val === true || val === 'true'),
-    })
-    .superRefine((data, ctx) => {
-        if (data.approver_type === 'user' && !data.approver_user_id) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message:
-                    "User ID is required when Approver Type is 'Specific User'",
-                path: ['approver_user_id'],
-            });
-        }
-        if (
-            data.approver_type === 'department_head' &&
-            !data.approver_department_id
-        ) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message:
-                    "Department ID is required when Approver Type is 'Department Head'",
-                path: ['approver_department_id'],
-            });
-        }
-        if (data.approver_type === 'role' && !data.approver_role_id) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message:
-                    "Role ID is required when Approver Type is 'Specific Role'",
-                path: ['approver_role_id'],
-            });
-        }
     });
 
 export type ApprovalFlowStepFormInput = z.input<typeof stepSchema>;
@@ -105,8 +70,6 @@ export function ApprovalFlowStepFormDialog({
                 name: 'New Step',
                 approver_type: 'user',
                 approver_user_id: '',
-                approver_role_id: '',
-                approver_department_id: '',
                 required_action: 'approve',
                 auto_approve_after_hours: '',
                 escalate_after_hours: '',
@@ -118,8 +81,6 @@ export function ApprovalFlowStepFormDialog({
         return {
             ...step,
             approver_user_id: step.approver_user_id ?? '',
-            approver_role_id: step.approver_role_id ?? '',
-            approver_department_id: step.approver_department_id ?? '',
             auto_approve_after_hours: step.auto_approve_after_hours ?? '',
             escalate_after_hours: step.escalate_after_hours ?? '',
             escalation_user_id: step.escalation_user_id ?? '',
@@ -144,8 +105,6 @@ export function ApprovalFlowStepFormDialog({
             form.reset(defaultValues);
         }
     }, [open, defaultValues, form]);
-
-    const approverType = form.watch('approver_type');
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -190,55 +149,18 @@ export function ApprovalFlowStepFormDialog({
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-                            <SelectField
-                                name="approver_type"
-                                label="Approver Type"
-                                options={[
-                                    { value: 'user', label: 'Specific User' },
-                                    {
-                                        value: 'department_head',
-                                        label: 'Department Head',
-                                    },
-                                    { value: 'role', label: 'Specific Role' },
-                                ]}
+                            <AsyncSelectField
+                                name="approver_user_id"
+                                label="Approver"
+                                url="/api/users"
+                                labelFn={(user: Record<string, unknown>) =>
+                                    user.name as string
+                                }
+                                valueFn={(user: Record<string, unknown>) =>
+                                    String(user.id)
+                                }
+                                placeholder="Select approver..."
                             />
-
-                            {approverType === 'user' && (
-                                <AsyncSelectField
-                                    name="approver_user_id"
-                                    label="Select User"
-                                    url="/api/users"
-                                    labelFn={(user: Record<string, unknown>) =>
-                                        user.name as string
-                                    }
-                                    valueFn={(user: Record<string, unknown>) =>
-                                        String(user.id)
-                                    }
-                                    placeholder="Select user..."
-                                />
-                            )}
-                            {approverType === 'department_head' && (
-                                <AsyncSelectField
-                                    name="approver_department_id"
-                                    label="Select Department"
-                                    url="/api/departments"
-                                    labelFn={(dept: Record<string, unknown>) =>
-                                        dept.name as string
-                                    }
-                                    valueFn={(dept: Record<string, unknown>) =>
-                                        String(dept.id)
-                                    }
-                                    placeholder="Select department..."
-                                />
-                            )}
-                            {approverType === 'role' && (
-                                <InputField
-                                    name="approver_role_id"
-                                    label="Role ID"
-                                    type="number"
-                                    placeholder="Enter Role ID"
-                                />
-                            )}
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
