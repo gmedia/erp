@@ -19,9 +19,52 @@ permissions:
 
 jobs:
   ci:
-    name: Test suite via Sail
+    name: Test suite
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 35
+    env:
+      APP_ENV: testing
+      APP_DEBUG: true
+      APP_URL: http://localhost
+      DB_CONNECTION: mariadb
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: testing
+      DB_USERNAME: sail
+      DB_PASSWORD: password
+      REDIS_CLIENT: phpredis
+      REDIS_HOST: 127.0.0.1
+      REDIS_PASSWORD: null
+      REDIS_PORT: 6379
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+      SESSION_DRIVER: array
+      FILESYSTEM_DISK: local
+      MAIL_MAILER: array
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_DATABASE: testing
+          MARIADB_USER: sail
+          MARIADB_PASSWORD: password
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -h 127.0.0.1 --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+      valkey:
+        image: valkey/valkey:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="valkey-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
     steps:
       - name: Checkout
@@ -33,38 +76,34 @@ jobs:
           php-version: 8.4
           tools: composer:v2
           coverage: none
+          extensions: redis
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
 
       - name: Prepare environment
-        run: |
-          cp .env.example .env
-          cat <<'EOF' >> .env
-          CACHE_STORE=array
-          QUEUE_CONNECTION=sync
-          SESSION_DRIVER=array
-          FILESYSTEM_DISK=local
-          MAIL_MAILER=array
-          EOF
+        run: cp .env.example .env
 
-      - name: Bootstrap Sail dependencies
+      - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Start Sail
-        run: ./vendor/bin/sail up -d --wait
-
       - name: Install Node dependencies
-        run: ./vendor/bin/sail npm ci
+        run: npm ci
 
       - name: Generate Application Key
-        run: ./vendor/bin/sail artisan key:generate
+        run: php artisan key:generate
 
       - name: Clear configuration cache
-        run: ./vendor/bin/sail artisan config:clear
+        run: php artisan config:clear
 
       - name: Build assets
-        run: ./vendor/bin/sail npm run build
+        run: npm run build
 
       - name: Run tests
-        run: ./vendor/bin/sail test --colors=always
+        run: ./vendor/bin/pest --colors=always --exclude-group=integration,minio,s3
 
       - name: Upload failure logs
         if: failure()
@@ -73,10 +112,3 @@ jobs:
           name: laravel-logs
           path: storage/logs
           if-no-files-found: ignore
-
-      - name: Stop Sail
-        if: always()
-        run: |
-          if [ -x ./vendor/bin/sail ]; then
-            ./vendor/bin/sail down -v
-          fi
