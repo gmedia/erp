@@ -143,8 +143,14 @@ export function ApprovalFlowStepFormDialog({
                                         name="required_action"
                                         label="Required Action"
                                         options={[
-                                            { value: 'approve', label: 'Approve' },
-                                            { value: 'review', label: 'Review' },
+                                            {
+                                                value: 'approve',
+                                                label: 'Approve',
+                                            },
+                                            {
+                                                value: 'review',
+                                                label: 'Review',
+                                            },
                                             {
                                                 value: 'acknowledge',
                                                 label: 'Acknowledge',
@@ -158,12 +164,12 @@ export function ApprovalFlowStepFormDialog({
                                         name="approver_user_id"
                                         label="Approver"
                                         url="/api/users"
-                                        labelFn={(user: Record<string, unknown>) =>
-                                            user.name as string
-                                        }
-                                        valueFn={(user: Record<string, unknown>) =>
-                                            String(user.id)
-                                        }
+                                        labelFn={(
+                                            user: Record<string, unknown>,
+                                        ) => user.name as string}
+                                        valueFn={(
+                                            user: Record<string, unknown>,
+                                        ) => String(user.id)}
                                         placeholder="Select approver..."
                                     />
                                 </div>
@@ -185,12 +191,12 @@ export function ApprovalFlowStepFormDialog({
                                         name="escalation_user_id"
                                         label="Escalate To User"
                                         url="/api/users"
-                                        labelFn={(user: Record<string, unknown>) =>
-                                            user.name as string
-                                        }
-                                        valueFn={(user: Record<string, unknown>) =>
-                                            String(user.id)
-                                        }
+                                        labelFn={(
+                                            user: Record<string, unknown>,
+                                        ) => user.name as string}
+                                        valueFn={(
+                                            user: Record<string, unknown>,
+                                        ) => String(user.id)}
                                         placeholder="Select user..."
                                     />
                                     <SelectField
