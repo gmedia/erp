@@ -692,7 +692,9 @@ export const inventoryStocktakeFormSchema = z.object({
                 product_id: z
                     .string()
                     .min(1, { message: 'Product is required.' }),
+                product_label: z.string().optional(),
                 unit_id: z.string().min(1, { message: 'Unit is required.' }),
+                unit_label: z.string().optional(),
                 system_quantity: z.coerce
                     .number()
                     .min(0, { message: 'System quantity must be at least 0.' }),
