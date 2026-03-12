@@ -2,9 +2,9 @@
 
 import axios from '@/lib/axios';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { z } from 'zod';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
@@ -39,15 +39,16 @@ interface InventoryStocktakeFormProps {
     isLoading?: boolean;
 }
 
-const createEmptyInventoryStocktakeItem = (): InventoryStocktakeFormData['items'][number] => ({
-    product_id: '',
-    product_label: '',
-    unit_id: '',
-    unit_label: '',
-    system_quantity: 0,
-    counted_quantity: 0,
-    notes: '',
-});
+const createEmptyInventoryStocktakeItem =
+    (): InventoryStocktakeFormData['items'][number] => ({
+        product_id: '',
+        product_label: '',
+        unit_id: '',
+        unit_label: '',
+        system_quantity: 0,
+        counted_quantity: 0,
+        notes: '',
+    });
 
 const formatItemReference = (label?: string, id?: string) => {
     if (label) {
@@ -61,7 +62,9 @@ const formatItemReference = (label?: string, id?: string) => {
     return '-';
 };
 
-const omitDisplayLabels = <T extends { product_label?: string; unit_label?: string }>(
+const omitDisplayLabels = <
+    T extends { product_label?: string; unit_label?: string },
+>(
     item: T,
 ) => {
     const nextItem = { ...item };
@@ -306,12 +309,22 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[220px]">Product</TableHead>
-                                    <TableHead className="w-[160px]">Unit</TableHead>
-                                    <TableHead className="w-[140px]">System Qty</TableHead>
-                                    <TableHead className="w-[140px]">Counted Qty</TableHead>
+                                    <TableHead className="w-[220px]">
+                                        Product
+                                    </TableHead>
+                                    <TableHead className="w-[160px]">
+                                        Unit
+                                    </TableHead>
+                                    <TableHead className="w-[140px]">
+                                        System Qty
+                                    </TableHead>
+                                    <TableHead className="w-[140px]">
+                                        Counted Qty
+                                    </TableHead>
                                     <TableHead>Notes</TableHead>
-                                    <TableHead className="w-[120px] text-right">Action</TableHead>
+                                    <TableHead className="w-[120px] text-right">
+                                        Action
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -345,10 +358,12 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                                                     )}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {stocktakeItem.system_quantity ?? 0}
+                                                    {stocktakeItem.system_quantity ??
+                                                        0}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {stocktakeItem.counted_quantity ?? 0}
+                                                    {stocktakeItem.counted_quantity ??
+                                                        0}
                                                 </TableCell>
                                                 <TableCell>
                                                     {stocktakeItem.notes || '-'}
@@ -359,7 +374,9 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                                                         variant="ghost"
                                                         size="icon"
                                                         onClick={() =>
-                                                            handleEditItem(index)
+                                                            handleEditItem(
+                                                                index,
+                                                            )
                                                         }
                                                         title="Edit item"
                                                         aria-label={`Edit item ${index + 1}`}
@@ -370,7 +387,9 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                                                         type="button"
                                                         variant="ghost"
                                                         size="icon"
-                                                        onClick={() => remove(index)}
+                                                        onClick={() =>
+                                                            remove(index)
+                                                        }
                                                         title="Remove item"
                                                         aria-label={`Remove item ${index + 1}`}
                                                     >
