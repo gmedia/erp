@@ -56,8 +56,7 @@ const normalizeStockAdjustmentItem = (
 ): StockAdjustmentFormData['items'][number] => ({
     ...createEmptyStockAdjustmentItem(),
     ...item,
-    product_id:
-        typeof item?.product_id === 'string' ? item.product_id : '',
+    product_id: typeof item?.product_id === 'string' ? item.product_id : '',
     product_label:
         typeof item?.product_label === 'string' ? item.product_label : '',
     unit_id: typeof item?.unit_id === 'string' ? item.unit_id : '',
