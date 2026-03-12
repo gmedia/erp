@@ -17,6 +17,7 @@ concurrency:
 permissions:
   contents: write
   packages: read
+  pull-requests: read
 
 env:
   CI_SAIL_IMAGE: ghcr.io/${{ github.repository }}/ci-sail:8.4
@@ -168,9 +169,26 @@ jobs:
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run build
 
+      - name: Run tests with coverage
+        if: ${{ steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        run: ./vendor/bin/sail test --colors=always --coverage-clover=coverage.xml
+
       - name: Run tests
-        if: steps.autofix.outputs.changed != 'true'
+        if: ${{ steps.autofix.outputs.changed != 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
         run: ./vendor/bin/sail test --colors=always
+
+      - name: Run SonarQube Cloud scan
+        if: ${{ steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dproject.settings=.sonarcloud.properties
+            -Dsonar.organization=gmedia
+            -Dsonar.projectKey=gmedia_erp
 
       - name: Upload failure logs
         if: failure() && steps.autofix.outputs.changed != 'true'
