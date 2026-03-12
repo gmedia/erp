@@ -30,11 +30,19 @@ const toOptionalSelectValue = (
     primaryValue: string | number | null | undefined,
     fallbackValue?: string | number | null,
 ) => {
-    if (primaryValue !== null && primaryValue !== undefined && primaryValue !== '') {
+    if (
+        primaryValue !== null &&
+        primaryValue !== undefined &&
+        primaryValue !== ''
+    ) {
         return String(primaryValue);
     }
 
-    if (fallbackValue !== null && fallbackValue !== undefined && fallbackValue !== '') {
+    if (
+        fallbackValue !== null &&
+        fallbackValue !== undefined &&
+        fallbackValue !== ''
+    ) {
         return String(fallbackValue);
     }
 
