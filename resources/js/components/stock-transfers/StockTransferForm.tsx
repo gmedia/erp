@@ -2,8 +2,9 @@
 
 import axios from '@/lib/axios';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { z } from 'zod';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
@@ -26,6 +27,7 @@ import {
     stockTransferFormSchema,
     type StockTransferFormData,
 } from '@/utils/schemas';
+import { StockTransferItemFormDialog } from './StockTransferItemFormDialog';
 
 interface StockTransferFormProps {
     open: boolean;
@@ -36,6 +38,39 @@ interface StockTransferFormProps {
     onSubmit: (data: StockTransferFormData) => void;
     isLoading?: boolean;
 }
+
+const createEmptyStockTransferItem = (): StockTransferFormData['items'][number] => ({
+    product_id: '',
+    product_label: '',
+    unit_id: '',
+    unit_label: '',
+    quantity: 1,
+    quantity_received: 0,
+    unit_cost: 0,
+    notes: '',
+});
+
+const formatItemReference = (label?: string, id?: string) => {
+    if (label) {
+        return label;
+    }
+
+    if (id) {
+        return `#${id}`;
+    }
+
+    return '-';
+};
+
+const omitDisplayLabels = <T extends { product_label?: string; unit_label?: string }>(
+    item: T,
+) => {
+    const nextItem = { ...item };
+    delete nextItem.product_label;
+    delete nextItem.unit_label;
+
+    return nextItem;
+};
 
 const getStockTransferFormDefaults = (
     stockTransfer?: StockTransfer | null,
@@ -50,16 +85,7 @@ const getStockTransferFormDefaults = (
             status: 'draft',
             notes: '',
             requested_by: '',
-            items: [
-                {
-                    product_id: '',
-                    unit_id: '',
-                    quantity: 1,
-                    quantity_received: 0,
-                    unit_cost: 0,
-                    notes: '',
-                },
-            ],
+            items: [],
         };
     }
 
@@ -87,22 +113,15 @@ const getStockTransferFormDefaults = (
         items: items.length
             ? items.map((item) => ({
                   product_id: item.product?.id ? String(item.product.id) : '',
+                  product_label: item.product?.name || '',
                   unit_id: item.unit?.id ? String(item.unit.id) : '',
+                  unit_label: item.unit?.name || '',
                   quantity: Number(item.quantity || 0),
                   quantity_received: Number(item.quantity_received || 0),
                   unit_cost: Number(item.unit_cost || 0),
                   notes: item.notes || '',
               }))
-            : [
-                  {
-                      product_id: '',
-                      unit_id: '',
-                      quantity: 1,
-                      quantity_received: 0,
-                      unit_cost: 0,
-                      notes: '',
-                  },
-              ],
+            : [],
     };
 };
 
@@ -135,10 +154,30 @@ export const StockTransferForm = memo<StockTransferFormProps>(
             defaultValues,
         });
 
-        const { fields, append, remove } = useFieldArray({
+        const { fields, append, remove, update } = useFieldArray({
             control: form.control,
             name: 'items',
         });
+        const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
+        const [editingIndex, setEditingIndex] = useState<number | null>(null);
+        const watchedItems = form.watch('items');
+
+        const handleCreateNewItem = () => {
+            setEditingIndex(null);
+            setIsItemDialogOpen(true);
+        };
+
+        const handleEditItem = (index: number) => {
+            setEditingIndex(index);
+            setIsItemDialogOpen(true);
+        };
+
+        const handleSubmit = (data: StockTransferFormData) => {
+            onSubmit({
+                ...data,
+                items: data.items.map(omitDisplayLabels),
+            });
+        };
 
         useEffect(() => {
             form.reset(defaultValues);
@@ -182,7 +221,7 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                         ? 'Edit Stock Transfer'
                         : 'Add New Stock Transfer'
                 }
-                onSubmit={onSubmit}
+                onSubmit={handleSubmit}
                 isLoading={isLoading}
                 className="sm:max-w-[900px]"
             >
@@ -299,17 +338,9 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() =>
-                                append({
-                                    product_id: '',
-                                    unit_id: '',
-                                    quantity: 1,
-                                    quantity_received: 0,
-                                    unit_cost: 0,
-                                    notes: '',
-                                })
-                            }
+                            onClick={handleCreateNewItem}
                         >
+                            <Plus className="mr-2 h-4 w-4" />
                             Add Item
                         </Button>
                     </div>
@@ -318,23 +349,13 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[260px]">
-                                        Product
-                                    </TableHead>
-                                    <TableHead className="w-[160px]">
-                                        Unit
-                                    </TableHead>
-                                    <TableHead className="w-[120px]">
-                                        Qty
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        Qty Received
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        Unit Cost
-                                    </TableHead>
+                                    <TableHead className="w-[220px]">Product</TableHead>
+                                    <TableHead className="w-[160px]">Unit</TableHead>
+                                    <TableHead className="w-[120px]">Qty</TableHead>
+                                    <TableHead className="w-[140px]">Qty Received</TableHead>
+                                    <TableHead className="w-[140px]">Unit Cost</TableHead>
                                     <TableHead>Notes</TableHead>
-                                    <TableHead className="w-[80px]"></TableHead>
+                                    <TableHead className="w-[120px] text-right">Action</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -344,156 +365,97 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                             colSpan={7}
                                             className="py-8 text-center text-muted-foreground"
                                         >
-                                            No items.
+                                            No items added yet.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    fields.map((field, index) => (
-                                        <TableRow key={field.id}>
-                                            <TableCell>
-                                                <Controller
-                                                    control={form.control}
-                                                    name={`items.${index}.product_id`}
-                                                    render={({
-                                                        field: productField,
-                                                    }) => (
-                                                        <AsyncSelect
-                                                            value={
-                                                                productField.value
-                                                                    ? String(
-                                                                          productField.value,
-                                                                      )
-                                                                    : undefined
-                                                            }
-                                                            onValueChange={
-                                                                productField.onChange
-                                                            }
-                                                            url="/api/products"
-                                                            placeholder="Select product"
-                                                            label="Product"
-                                                        />
+                                    fields.map((field, index) => {
+                                        const stockTransferItem =
+                                            watchedItems?.[index] ||
+                                            createEmptyStockTransferItem();
+
+                                        return (
+                                            <TableRow key={field.id}>
+                                                <TableCell>
+                                                    {formatItemReference(
+                                                        stockTransferItem.product_label,
+                                                        stockTransferItem.product_id,
                                                     )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Controller
-                                                    control={form.control}
-                                                    name={`items.${index}.unit_id`}
-                                                    render={({
-                                                        field: unitField,
-                                                    }) => (
-                                                        <AsyncSelect
-                                                            value={
-                                                                unitField.value
-                                                                    ? String(
-                                                                          unitField.value,
-                                                                      )
-                                                                    : undefined
-                                                            }
-                                                            onValueChange={
-                                                                unitField.onChange
-                                                            }
-                                                            url="/api/units"
-                                                            placeholder="Select unit"
-                                                            label="Unit"
-                                                        />
+                                                </TableCell>
+                                                <TableCell>
+                                                    {formatItemReference(
+                                                        stockTransferItem.unit_label,
+                                                        stockTransferItem.unit_id,
                                                     )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Controller
-                                                    control={form.control}
-                                                    name={`items.${index}.quantity`}
-                                                    render={({
-                                                        field: qtyField,
-                                                    }) => (
-                                                        <InputField
-                                                            name={qtyField.name}
-                                                            label=""
-                                                            type="number"
-                                                            placeholder="0"
-                                                            className="space-y-0"
-                                                        />
-                                                    )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Controller
-                                                    control={form.control}
-                                                    name={`items.${index}.quantity_received`}
-                                                    render={({
-                                                        field: qtyReceivedField,
-                                                    }) => (
-                                                        <InputField
-                                                            name={
-                                                                qtyReceivedField.name
-                                                            }
-                                                            label=""
-                                                            type="number"
-                                                            placeholder="0"
-                                                            className="space-y-0"
-                                                        />
-                                                    )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Controller
-                                                    control={form.control}
-                                                    name={`items.${index}.unit_cost`}
-                                                    render={({
-                                                        field: costField,
-                                                    }) => (
-                                                        <InputField
-                                                            name={
-                                                                costField.name
-                                                            }
-                                                            label=""
-                                                            type="number"
-                                                            placeholder="0"
-                                                            className="space-y-0"
-                                                        />
-                                                    )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Controller
-                                                    control={form.control}
-                                                    name={`items.${index}.notes`}
-                                                    render={({
-                                                        field: notesField,
-                                                    }) => (
-                                                        <InputField
-                                                            name={
-                                                                notesField.name
-                                                            }
-                                                            label=""
-                                                            placeholder="Notes"
-                                                            className="space-y-0"
-                                                        />
-                                                    )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    onClick={() =>
-                                                        remove(index)
-                                                    }
-                                                    disabled={
-                                                        fields.length === 1
-                                                    }
-                                                >
-                                                    Remove
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
+                                                </TableCell>
+                                                <TableCell>
+                                                    {stockTransferItem.quantity ?? 0}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {stockTransferItem.quantity_received ?? 0}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {stockTransferItem.unit_cost ?? 0}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {stockTransferItem.notes || '-'}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() =>
+                                                            handleEditItem(index)
+                                                        }
+                                                        title="Edit item"
+                                                        aria-label={`Edit item ${index + 1}`}
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => remove(index)}
+                                                        title="Remove item"
+                                                        aria-label={`Remove item ${index + 1}`}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
                                 )}
                             </TableBody>
                         </Table>
                     </div>
                 </div>
+
+                <StockTransferItemFormDialog
+                    open={isItemDialogOpen}
+                    onOpenChange={(nextOpen) => {
+                        setIsItemDialogOpen(nextOpen);
+                        if (!nextOpen) {
+                            setEditingIndex(null);
+                        }
+                    }}
+                    item={
+                        editingIndex !== null
+                            ? watchedItems?.[editingIndex] || null
+                            : null
+                    }
+                    onSave={(data) => {
+                        if (editingIndex !== null) {
+                            update(editingIndex, data);
+                        } else {
+                            append(data);
+                        }
+                        setIsItemDialogOpen(false);
+                        setEditingIndex(null);
+                    }}
+                />
             </EntityForm>
         );
     },
