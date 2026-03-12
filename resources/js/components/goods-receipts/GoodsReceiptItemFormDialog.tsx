@@ -21,15 +21,23 @@ import { Form } from '@/components/ui/form';
 import { type GoodsReceiptFormData } from '@/types/goods-receipt';
 
 const goodsReceiptItemSchema = z.object({
-    purchase_order_item_id: z.string().min(1, { message: 'PO Item is required.' }),
+    purchase_order_item_id: z
+        .string()
+        .min(1, { message: 'PO Item is required.' }),
     product_id: z.string().min(1, { message: 'Product is required.' }),
     product_label: z.string().optional(),
     unit_id: z.string().min(1, { message: 'Unit is required.' }),
     unit_label: z.string().optional(),
-    quantity_received: z.coerce.number().gt(0, { message: 'Quantity received must be greater than 0.' }),
-    quantity_accepted: z.coerce.number().min(0, { message: 'Quantity accepted must be at least 0.' }),
+    quantity_received: z.coerce
+        .number()
+        .gt(0, { message: 'Quantity received must be greater than 0.' }),
+    quantity_accepted: z.coerce
+        .number()
+        .min(0, { message: 'Quantity accepted must be at least 0.' }),
     quantity_rejected: z.coerce.number().min(0).optional().default(0),
-    unit_price: z.coerce.number().min(0, { message: 'Unit price must be at least 0.' }),
+    unit_price: z.coerce
+        .number()
+        .min(0, { message: 'Unit price must be at least 0.' }),
     notes: z.string().optional(),
 });
 
@@ -103,7 +111,9 @@ export function GoodsReceiptItemFormDialog({
                 <DialogHeader>
                     <DialogTitle>{item ? 'Edit Item' : 'Add Item'}</DialogTitle>
                     <DialogDescription className="sr-only">
-                        {item ? 'Edit goods receipt item.' : 'Add goods receipt item.'}
+                        {item
+                            ? 'Edit goods receipt item.'
+                            : 'Add goods receipt item.'}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -132,9 +142,13 @@ export function GoodsReceiptItemFormDialog({
                                 placeholder="Select product"
                                 initialLabel={defaultValues.product_label}
                                 onItemSelect={(product) => {
-                                    form.setValue('product_label', product?.name || '', {
-                                        shouldDirty: true,
-                                    });
+                                    form.setValue(
+                                        'product_label',
+                                        product?.name || '',
+                                        {
+                                            shouldDirty: true,
+                                        },
+                                    );
                                 }}
                             />
                             <AsyncSelectField<{ name?: string }>
@@ -145,9 +159,13 @@ export function GoodsReceiptItemFormDialog({
                                 placeholder="Select unit"
                                 initialLabel={defaultValues.unit_label}
                                 onItemSelect={(unit) => {
-                                    form.setValue('unit_label', unit?.name || '', {
-                                        shouldDirty: true,
-                                    });
+                                    form.setValue(
+                                        'unit_label',
+                                        unit?.name || '',
+                                        {
+                                            shouldDirty: true,
+                                        },
+                                    );
                                 }}
                             />
                             <InputField
@@ -192,10 +210,16 @@ export function GoodsReceiptItemFormDialog({
                         />
 
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => onOpenChange(false)}
+                            >
                                 Cancel
                             </Button>
-                            <Button type="submit">{item ? 'Update Item' : 'Save Item'}</Button>
+                            <Button type="submit">
+                                {item ? 'Update Item' : 'Save Item'}
+                            </Button>
                         </DialogFooter>
                     </form>
                 </Form>

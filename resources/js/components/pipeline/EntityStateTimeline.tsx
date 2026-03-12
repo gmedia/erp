@@ -9,8 +9,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEntityPipeline } from '@/hooks/useEntityPipeline';
 import { format } from 'date-fns';
-import { Activity } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import { Activity } from 'lucide-react';
 import { useEffect } from 'react';
 
 interface Props {

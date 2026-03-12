@@ -58,7 +58,9 @@ export const assetStocktakeColumns: ColumnDef<AssetStocktake>[] = [
         enableHiding: false,
         cell: ({ row, table }) => {
             const item = row.original;
-            const meta = table.options.meta as CustomTableMeta<AssetStocktake> | undefined;
+            const meta = table.options.meta as
+                | CustomTableMeta<AssetStocktake>
+                | undefined;
             return (
                 <GenericActions
                     item={item}

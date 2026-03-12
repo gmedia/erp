@@ -23,9 +23,11 @@ const renderSupplierCell = ({ row }: { row: { original: SupplierReturn } }) => (
     <div>{row.original.supplier?.name ?? '-'}</div>
 );
 
-const renderWarehouseCell = ({ row }: { row: { original: SupplierReturn } }) => (
-    <div>{row.original.warehouse?.name ?? '-'}</div>
-);
+const renderWarehouseCell = ({
+    row,
+}: {
+    row: { original: SupplierReturn };
+}) => <div>{row.original.warehouse?.name ?? '-'}</div>;
 
 const renderStatusCell = ({ row }: { row: { original: SupplierReturn } }) => (
     <Badge variant="outline">{row.original.status}</Badge>
@@ -33,7 +35,10 @@ const renderStatusCell = ({ row }: { row: { original: SupplierReturn } }) => (
 
 export const supplierReturnColumns: ColumnDef<SupplierReturn>[] = [
     createSelectColumn<SupplierReturn>(),
-    createTextColumn<SupplierReturn>({ accessorKey: 'return_number', label: 'Return Number' }),
+    createTextColumn<SupplierReturn>({
+        accessorKey: 'return_number',
+        label: 'Return Number',
+    }),
     {
         accessorKey: 'purchase_order',
         ...createSortingHeader('PO Number'),
@@ -54,7 +59,10 @@ export const supplierReturnColumns: ColumnDef<SupplierReturn>[] = [
         ...createSortingHeader('Warehouse'),
         cell: renderWarehouseCell,
     },
-    createDateColumn<SupplierReturn>({ accessorKey: 'return_date', label: 'Return Date' }),
+    createDateColumn<SupplierReturn>({
+        accessorKey: 'return_date',
+        label: 'Return Date',
+    }),
     {
         accessorKey: 'reason',
         ...createSortingHeader('Reason'),

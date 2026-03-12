@@ -117,7 +117,9 @@ export function PipelineTransitionFormDialog({
         label: s.name,
     }));
 
-    const onSubmit = async (data: z.input<typeof pipelineTransitionFormSchema>) => {
+    const onSubmit = async (
+        data: z.input<typeof pipelineTransitionFormSchema>,
+    ) => {
         const payload = {
             ...data,
             guard_conditions: data.guard_conditions
@@ -131,8 +133,13 @@ export function PipelineTransitionFormDialog({
         };
 
         const success = transition
-            ? await updateTransition(transition.id, payload as unknown as PipelineTransitionFormData)
-            : await createTransition(payload as unknown as PipelineTransitionFormData);
+            ? await updateTransition(
+                  transition.id,
+                  payload as unknown as PipelineTransitionFormData,
+              )
+            : await createTransition(
+                  payload as unknown as PipelineTransitionFormData,
+              );
 
         if (success) {
             onSuccess();
@@ -152,7 +159,13 @@ export function PipelineTransitionFormDialog({
                     </DialogDescription>
                 </DialogHeader>
 
-                <Form {...(form as unknown as UseFormReturn<PipelineTransitionFormData, unknown, PipelineTransitionFormData>)}>
+                <Form
+                    {...(form as unknown as UseFormReturn<
+                        PipelineTransitionFormData,
+                        unknown,
+                        PipelineTransitionFormData
+                    >)}
+                >
                     <form
                         onSubmit={(e) => {
                             e.stopPropagation();

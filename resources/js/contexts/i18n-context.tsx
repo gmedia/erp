@@ -10,7 +10,6 @@ import {
     useMemo,
 } from 'react';
 
-
 // Shared page props interface
 
 // i18n context value interface

@@ -20,10 +20,7 @@ export interface DataTableProps<T, FilterType extends FilterState = FilterState>
     onFilterChange: (filters: Partial<FilterType>) => void;
 }
 
-export interface FormProps<
-    T extends object,
-    FormData = unknown,
-> {
+export interface FormProps<T extends object, FormData = unknown> {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     item?: T | null;

@@ -65,7 +65,10 @@ export function useEntityPipeline(
             setStateData(response.data.data);
         } catch (err: unknown) {
             if (axios.isAxiosError(err)) {
-                if (err.response?.status !== 404 && err.response?.status !== 400) {
+                if (
+                    err.response?.status !== 404 &&
+                    err.response?.status !== 400
+                ) {
                     setError(
                         err.response?.data?.message ||
                             'Failed to fetch entity state',
@@ -85,7 +88,9 @@ export function useEntityPipeline(
         async (page = 1) => {
             setTimelineLoading(true);
             try {
-                const response = await axiosInstance.get<{ data: TimelineEntry[] }>(
+                const response = await axiosInstance.get<{
+                    data: TimelineEntry[];
+                }>(
                     `/api/entity-states/${entityType}/${entityId}/timeline?page=${page}`,
                 );
                 setTimeline(response.data.data);

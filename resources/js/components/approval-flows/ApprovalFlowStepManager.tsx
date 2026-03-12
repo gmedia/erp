@@ -16,7 +16,9 @@ import {
     type ApprovalFlowStepFormOutput,
 } from './ApprovalFlowStepFormDialog';
 
-type ApprovalFlowStepInput = NonNullable<ApprovalFlowFormInput['steps']>[number];
+type ApprovalFlowStepInput = NonNullable<
+    ApprovalFlowFormInput['steps']
+>[number];
 
 type StepField = ApprovalFlowStepInput & {
     fieldId: string;
@@ -31,9 +33,7 @@ interface ApprovalFlowStepManagerProps {
     errorMessage?: string;
 }
 
-function toStepInput(
-    data: ApprovalFlowStepFormOutput,
-): ApprovalFlowStepInput {
+function toStepInput(data: ApprovalFlowStepFormOutput): ApprovalFlowStepInput {
     return {
         id: data.id,
         name: data.name,
@@ -117,7 +117,8 @@ export function ApprovalFlowStepManager({
                 <div>
                     <h3 className="text-lg font-medium">Approval Steps</h3>
                     <p className="text-sm text-muted-foreground">
-                        Define the ordered steps that will receive and process this approval.
+                        Define the ordered steps that will receive and process
+                        this approval.
                     </p>
                     {errorMessage && (
                         <p className="mt-2 text-sm font-medium text-destructive">

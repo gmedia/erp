@@ -116,7 +116,9 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
             [activeStockAdjustment],
         );
 
-        type StockAdjustmentFormInput = z.input<typeof stockAdjustmentFormSchema>;
+        type StockAdjustmentFormInput = z.input<
+            typeof stockAdjustmentFormSchema
+        >;
 
         const form = useForm<
             StockAdjustmentFormInput,
@@ -265,7 +267,9 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                                     placeholder="Select stocktake"
                                     label="Inventory Stocktake"
                                     labelFn={(it) =>
-                                        String(it.stocktake_number ?? it.id ?? '')
+                                        String(
+                                            it.stocktake_number ?? it.id ?? '',
+                                        )
                                     }
                                     valueFn={(it) => String(it.id)}
                                 />

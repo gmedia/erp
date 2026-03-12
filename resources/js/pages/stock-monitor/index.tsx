@@ -69,22 +69,30 @@ export default function StockMonitorPage() {
                         }),
                     ]);
                 setFilterOptions({
-                    products: (products.data.data || []).map((p: { id: number; name: string }) => ({
-                        value: String(p.id),
-                        label: p.name,
-                    })),
-                    warehouses: (warehouses.data.data || []).map((w: { id: number; name: string }) => ({
-                        value: String(w.id),
-                        label: w.name,
-                    })),
-                    branches: (branches.data.data || []).map((b: { id: number; name: string }) => ({
-                        value: String(b.id),
-                        label: b.name,
-                    })),
-                    categories: (categories.data.data || []).map((c: { id: number; name: string }) => ({
-                        value: String(c.id),
-                        label: c.name,
-                    })),
+                    products: (products.data.data || []).map(
+                        (p: { id: number; name: string }) => ({
+                            value: String(p.id),
+                            label: p.name,
+                        }),
+                    ),
+                    warehouses: (warehouses.data.data || []).map(
+                        (w: { id: number; name: string }) => ({
+                            value: String(w.id),
+                            label: w.name,
+                        }),
+                    ),
+                    branches: (branches.data.data || []).map(
+                        (b: { id: number; name: string }) => ({
+                            value: String(b.id),
+                            label: b.name,
+                        }),
+                    ),
+                    categories: (categories.data.data || []).map(
+                        (c: { id: number; name: string }) => ({
+                            value: String(c.id),
+                            label: c.name,
+                        }),
+                    ),
                 });
             } catch (e) {
                 console.error('Failed to load filter options', e);

@@ -221,11 +221,21 @@ export const ProductForm = memo<ProductFormProps>(function ProductForm({
 
     return (
         <EntityForm
-            form={form as unknown as UseFormReturn<ProductFormData, unknown, ProductFormData>}
+            form={
+                form as unknown as UseFormReturn<
+                    ProductFormData,
+                    unknown,
+                    ProductFormData
+                >
+            }
             open={open}
             onOpenChange={onOpenChange}
             title={product ? 'Edit Product/Service' : 'Add New Product/Service'}
-            onSubmit={onSubmit as unknown as (data: z.input<typeof productFormSchema>) => void}
+            onSubmit={
+                onSubmit as unknown as (
+                    data: z.input<typeof productFormSchema>,
+                ) => void
+            }
             isLoading={isLoading}
         >
             {renderGeneralInfoSection()}

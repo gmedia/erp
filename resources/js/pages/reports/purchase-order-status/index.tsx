@@ -35,13 +35,14 @@ export default function PurchaseOrderStatusReportPage() {
         },
     });
 
-    const { data, isLoading, meta } = useCrudQuery<PurchaseOrderStatusReportItem>({
-        endpoint: '/api/reports/purchase-order-status',
-        queryKey: ['purchase-order-status-report'],
-        entityName: 'Purchase Order Status Report',
-        pagination,
-        filters,
-    });
+    const { data, isLoading, meta } =
+        useCrudQuery<PurchaseOrderStatusReportItem>({
+            endpoint: '/api/reports/purchase-order-status',
+            queryKey: ['purchase-order-status-report'],
+            entityName: 'Purchase Order Status Report',
+            pagination,
+            filters,
+        });
 
     return (
         <>

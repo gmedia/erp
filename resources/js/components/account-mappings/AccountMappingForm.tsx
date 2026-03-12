@@ -4,18 +4,17 @@ import AsyncSelectField from '@/components/common/AsyncSelectField';
 import EntityForm from '@/components/common/EntityForm';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { type Account } from '@/types/account';
 import { type AccountMapping } from '@/types/account-mapping';
+import { type CoaVersion } from '@/types/coa-version';
 import {
     accountMappingFormSchema,
     type AccountMappingFormData,
 } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useMemo, useRef } from 'react';
-import { useForm, type UseFormReturn } from 'react-hook-form';
+import { useForm, type FieldValues, type UseFormReturn } from 'react-hook-form';
 import * as z from 'zod';
-import { type Account } from '@/types/account';
-import { type CoaVersion } from '@/types/coa-version';
-import { type FieldValues } from 'react-hook-form';
 
 interface AccountMappingFormProps {
     open: boolean;
@@ -30,7 +29,8 @@ interface AccountMappingFormProps {
 const coaVersionLabel = (v: CoaVersion) =>
     v?.status ? `${v.name} (${v.status})` : v?.name;
 
-const accountLabel = (a: Account) => (a?.code ? `${a.code} - ${a.name}` : a?.name);
+const accountLabel = (a: Account) =>
+    a?.code ? `${a.code} - ${a.name}` : a?.name;
 
 export function AccountMappingForm({
     open,

@@ -2,9 +2,9 @@
 
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import axiosInstance from '@/lib/axios';
-import axios from 'axios';
 import { JournalEntry } from '@/types/journal-entry';
 import { useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -82,9 +82,12 @@ export function usePostingJournal() {
 
         setIsPosting(true);
         try {
-            const response = await axiosInstance.post('/api/posting-journals/post', {
-                ids: selectedIds,
-            });
+            const response = await axiosInstance.post(
+                '/api/posting-journals/post',
+                {
+                    ids: selectedIds,
+                },
+            );
 
             toast.success(response.data.message);
             setSelectedIds([]);

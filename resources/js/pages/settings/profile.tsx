@@ -36,7 +36,8 @@ export default function Profile({
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const verificationStatus = status ?? searchParams.get('status') ?? undefined;
+    const verificationStatus =
+        status ?? searchParams.get('status') ?? undefined;
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

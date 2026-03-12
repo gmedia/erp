@@ -11,10 +11,10 @@ import {
 import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { type FiscalYear } from '@/types/fiscal-year';
+import { type AssetDepreciationCalculationFormData } from '@/utils/schemas';
 import { Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { type AssetDepreciationCalculationFormData } from '@/utils/schemas';
-import { type FiscalYear } from '@/types/fiscal-year';
 
 interface CalculateFormModalProps {
     open: boolean;
@@ -55,13 +55,10 @@ export function CalculateFormModal({
         if (result && result.errors) {
             const errors = result.errors;
             Object.keys(errors).forEach((key) => {
-                setError(
-                    key as keyof AssetDepreciationCalculationFormData,
-                    {
-                        type: 'server',
-                        message: errors[key][0],
-                    },
-                );
+                setError(key as keyof AssetDepreciationCalculationFormData, {
+                    type: 'server',
+                    message: errors[key][0],
+                });
             });
         } else if (result) {
             reset();

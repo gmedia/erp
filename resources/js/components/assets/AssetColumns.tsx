@@ -38,8 +38,7 @@ const renderStatusCell = ({ row }: { row: { original: Asset } }) => {
         disposed: 'destructive',
         lost: 'destructive',
     };
-    const capitalizedStatus =
-        status.charAt(0).toUpperCase() + status.slice(1);
+    const capitalizedStatus = status.charAt(0).toUpperCase() + status.slice(1);
     return (
         <Badge variant={variants[status] || 'default'}>
             {capitalizedStatus}

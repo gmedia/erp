@@ -17,35 +17,37 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 // Since steps validation is grouped with approval flow, we can create a sub-schema for this
-const stepSchema = z
-    .object({
-        id: z.number().optional(),
-        name: z.string().min(1, 'Name is required'),
-        approver_type: z.literal('user'),
-        approver_user_id: z.preprocess(
-            (val) => (val === '' || val === null ? null : Number(val)),
-            z.number().nullable().refine((value) => value !== null, {
+const stepSchema = z.object({
+    id: z.number().optional(),
+    name: z.string().min(1, 'Name is required'),
+    approver_type: z.literal('user'),
+    approver_user_id: z.preprocess(
+        (val) => (val === '' || val === null ? null : Number(val)),
+        z
+            .number()
+            .nullable()
+            .refine((value) => value !== null, {
                 message: 'Approver user is required',
             }),
-        ),
-        required_action: z.enum(['approve', 'review', 'acknowledge']),
-        auto_approve_after_hours: z.preprocess(
-            (val) => (val === '' || val === null ? null : Number(val)),
-            z.number().nullable().optional(),
-        ),
-        escalate_after_hours: z.preprocess(
-            (val) => (val === '' || val === null ? null : Number(val)),
-            z.number().nullable().optional(),
-        ),
-        escalation_user_id: z.preprocess(
-            (val) => (val === '' || val === null ? null : Number(val)),
-            z.number().nullable().optional(),
-        ),
-        can_reject: z
-            .union([z.boolean(), z.string()])
-            .default(true)
-            .transform((val) => val === true || val === 'true'),
-    });
+    ),
+    required_action: z.enum(['approve', 'review', 'acknowledge']),
+    auto_approve_after_hours: z.preprocess(
+        (val) => (val === '' || val === null ? null : Number(val)),
+        z.number().nullable().optional(),
+    ),
+    escalate_after_hours: z.preprocess(
+        (val) => (val === '' || val === null ? null : Number(val)),
+        z.number().nullable().optional(),
+    ),
+    escalation_user_id: z.preprocess(
+        (val) => (val === '' || val === null ? null : Number(val)),
+        z.number().nullable().optional(),
+    ),
+    can_reject: z
+        .union([z.boolean(), z.string()])
+        .default(true)
+        .transform((val) => val === true || val === 'true'),
+});
 
 export type ApprovalFlowStepFormInput = z.input<typeof stepSchema>;
 

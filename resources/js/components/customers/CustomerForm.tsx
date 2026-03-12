@@ -22,7 +22,6 @@ interface CustomerFormProps {
     isLoading?: boolean;
 }
 
-
 // Status options
 const statusOptions = [
     { value: 'active', label: 'Active' },

@@ -26,8 +26,12 @@ const purchaseOrderItemSchema = z.object({
     product_label: z.string().optional(),
     unit_id: z.string().min(1, { message: 'Unit is required.' }),
     unit_label: z.string().optional(),
-    quantity: z.coerce.number().gt(0, { message: 'Quantity must be greater than 0.' }),
-    unit_price: z.coerce.number().min(0, { message: 'Unit price must be at least 0.' }),
+    quantity: z.coerce
+        .number()
+        .gt(0, { message: 'Quantity must be greater than 0.' }),
+    unit_price: z.coerce
+        .number()
+        .min(0, { message: 'Unit price must be at least 0.' }),
     discount_percent: z.coerce.number().min(0).max(100).optional().default(0),
     tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
     notes: z.string().optional(),
@@ -103,7 +107,9 @@ export function PurchaseOrderItemFormDialog({
                 <DialogHeader>
                     <DialogTitle>{item ? 'Edit Item' : 'Add Item'}</DialogTitle>
                     <DialogDescription className="sr-only">
-                        {item ? 'Edit purchase order item.' : 'Add purchase order item.'}
+                        {item
+                            ? 'Edit purchase order item.'
+                            : 'Add purchase order item.'}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -124,9 +130,13 @@ export function PurchaseOrderItemFormDialog({
                                 placeholder="Select product"
                                 initialLabel={defaultValues.product_label}
                                 onItemSelect={(product) => {
-                                    form.setValue('product_label', product?.name || '', {
-                                        shouldDirty: true,
-                                    });
+                                    form.setValue(
+                                        'product_label',
+                                        product?.name || '',
+                                        {
+                                            shouldDirty: true,
+                                        },
+                                    );
                                 }}
                             />
                             <AsyncSelectField<{ name?: string }>
@@ -137,9 +147,13 @@ export function PurchaseOrderItemFormDialog({
                                 placeholder="Select unit"
                                 initialLabel={defaultValues.unit_label}
                                 onItemSelect={(unit) => {
-                                    form.setValue('unit_label', unit?.name || '', {
-                                        shouldDirty: true,
-                                    });
+                                    form.setValue(
+                                        'unit_label',
+                                        unit?.name || '',
+                                        {
+                                            shouldDirty: true,
+                                        },
+                                    );
                                 }}
                             />
                             <InputField
@@ -186,10 +200,16 @@ export function PurchaseOrderItemFormDialog({
                         />
 
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => onOpenChange(false)}
+                            >
                                 Cancel
                             </Button>
-                            <Button type="submit">{item ? 'Update Item' : 'Save Item'}</Button>
+                            <Button type="submit">
+                                {item ? 'Update Item' : 'Save Item'}
+                            </Button>
                         </DialogFooter>
                     </form>
                 </Form>

@@ -37,7 +37,10 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
         data.email = resolvedEmail;
 
         try {
-            const response = await axiosInstance.post('/api/reset-password', data);
+            const response = await axiosInstance.post(
+                '/api/reset-password',
+                data,
+            );
             toast.success(
                 response.data.status || 'Password has been successfully reset.',
             );

@@ -1,8 +1,8 @@
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import axiosInstance from '@/lib/axios';
-import axios from 'axios';
 import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
 import { useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -89,7 +89,8 @@ export function useAssetDepreciationRuns() {
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 const message =
-                    error.response?.data?.message || 'Failed to post to journal';
+                    error.response?.data?.message ||
+                    'Failed to post to journal';
                 toast.error(message);
             } else {
                 toast.error('An unexpected error occurred');

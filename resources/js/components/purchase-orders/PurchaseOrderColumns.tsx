@@ -26,7 +26,10 @@ const renderStatusCell = ({ row }: { row: { original: PurchaseOrder } }) => (
 
 export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
     createSelectColumn<PurchaseOrder>(),
-    createTextColumn<PurchaseOrder>({ accessorKey: 'po_number', label: 'PO Number' }),
+    createTextColumn<PurchaseOrder>({
+        accessorKey: 'po_number',
+        label: 'PO Number',
+    }),
     {
         accessorKey: 'supplier',
         ...createSortingHeader('Supplier'),
@@ -37,9 +40,18 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
         ...createSortingHeader('Warehouse'),
         cell: renderWarehouseCell,
     },
-    createDateColumn<PurchaseOrder>({ accessorKey: 'order_date', label: 'Order Date' }),
-    createDateColumn<PurchaseOrder>({ accessorKey: 'expected_delivery_date', label: 'Expected Delivery' }),
-    createTextColumn<PurchaseOrder>({ accessorKey: 'currency', label: 'Currency' }),
+    createDateColumn<PurchaseOrder>({
+        accessorKey: 'order_date',
+        label: 'Order Date',
+    }),
+    createDateColumn<PurchaseOrder>({
+        accessorKey: 'expected_delivery_date',
+        label: 'Expected Delivery',
+    }),
+    createTextColumn<PurchaseOrder>({
+        accessorKey: 'currency',
+        label: 'Currency',
+    }),
     {
         accessorKey: 'status',
         ...createSortingHeader('Status'),

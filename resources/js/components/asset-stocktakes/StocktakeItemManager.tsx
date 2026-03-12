@@ -179,10 +179,18 @@ export function StocktakeItemManager({
                                                                 placeholder="Search location..."
                                                                 url={`/api/asset-locations?branch_id=${stocktakeBranchId}`}
                                                                 labelFn={(
-                                                                    item: Record<string, unknown>,
-                                                                ) => item.name as string}
+                                                                    item: Record<
+                                                                        string,
+                                                                        unknown
+                                                                    >,
+                                                                ) =>
+                                                                    item.name as string
+                                                                }
                                                                 valueFn={(
-                                                                    item: Record<string, unknown>,
+                                                                    item: Record<
+                                                                        string,
+                                                                        unknown
+                                                                    >,
                                                                 ) =>
                                                                     String(
                                                                         item.id,

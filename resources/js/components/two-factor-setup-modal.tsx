@@ -14,8 +14,8 @@ import {
 } from '@/components/ui/input-otp';
 import { useClipboard } from '@/hooks/use-clipboard';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
-import axios from 'axios';
 import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { Check, Copy, Loader2, ScanLine } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -152,9 +152,12 @@ function TwoFactorVerificationStep({
         setError('');
 
         try {
-            await axiosInstance.post('/user/confirmed-two-factor-authentication', {
-                code,
-            });
+            await axiosInstance.post(
+                '/user/confirmed-two-factor-authentication',
+                {
+                    code,
+                },
+            );
             onClose();
             // Optional: hard reload or update context block to reflect changes
             window.location.reload();

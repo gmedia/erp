@@ -163,10 +163,7 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
         }, [open, activeStocktake?.id, activeStocktake?.items, form]);
 
         return (
-            <EntityForm<
-                InventoryStocktakeFormInput,
-                InventoryStocktakeFormData
-            >
+            <EntityForm<InventoryStocktakeFormInput, InventoryStocktakeFormData>
                 form={form}
                 open={open}
                 onOpenChange={onOpenChange}

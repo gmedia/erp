@@ -19,15 +19,15 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import {
     Asset,
+    AssetDepreciationLine,
     AssetMovement,
     AssetStocktakeItem,
-    AssetDepreciationLine,
 } from '@/types/asset';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import {
     Activity,
     AlertCircle,
@@ -597,73 +597,106 @@ export default function AssetProfile() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {item.movements?.map((m: AssetMovement) => (
-                                                <TableRow
-                                                    key={m.id}
-                                                    className="hover:bg-muted/30"
-                                                >
-                                                    <TableCell>
-                                                        <Badge
-                                                            variant="outline"
-                                                            className="font-medium capitalize"
-                                                        >
-                                                            {m.movement_type}
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="text-sm whitespace-nowrap">
-                                                        {formatDate(m.moved_at || null)}
-                                                    </TableCell>
-                                                    <TableCell className="text-xs">
-                                                        {m.from_branch && (
-                                                            <div className="font-medium">
-                                                                {m.from_branch.name}
-                                                            </div>
-                                                        )}
-                                                        {m.from_location && (
-                                                            <div className="text-muted-foreground">
-                                                                {m.from_location.name}
-                                                            </div>
-                                                        )}
-                                                        {m.from_employee && (
-                                                            <div className="text-primary">
-                                                                {m.from_employee.name}
-                                                            </div>
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell className="text-xs">
-                                                        {m.to_branch && (
-                                                            <div className="font-medium">
-                                                                {m.to_branch.name}
-                                                            </div>
-                                                        )}
-                                                        {m.to_location && (
-                                                            <div className="text-muted-foreground">
-                                                                {m.to_location.name}
-                                                            </div>
-                                                        )}
-                                                        {m.to_employee && (
-                                                            <div className="text-primary">
-                                                                {m.to_employee.name}
-                                                            </div>
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell className="max-w-[200px]">
-                                                        {m.reference && (
-                                                            <div className="text-xs font-semibold">
-                                                                {m.reference}
-                                                            </div>
-                                                        )}
-                                                        {m.notes && (
-                                                            <div className="truncate text-xs text-muted-foreground">
-                                                                {m.notes}
-                                                            </div>
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell className="text-xs whitespace-nowrap">
-                                                        {m.created_by}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
+                                            {item.movements?.map(
+                                                (m: AssetMovement) => (
+                                                    <TableRow
+                                                        key={m.id}
+                                                        className="hover:bg-muted/30"
+                                                    >
+                                                        <TableCell>
+                                                            <Badge
+                                                                variant="outline"
+                                                                className="font-medium capitalize"
+                                                            >
+                                                                {
+                                                                    m.movement_type
+                                                                }
+                                                            </Badge>
+                                                        </TableCell>
+                                                        <TableCell className="text-sm whitespace-nowrap">
+                                                            {formatDate(
+                                                                m.moved_at ||
+                                                                    null,
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell className="text-xs">
+                                                            {m.from_branch && (
+                                                                <div className="font-medium">
+                                                                    {
+                                                                        m
+                                                                            .from_branch
+                                                                            .name
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            {m.from_location && (
+                                                                <div className="text-muted-foreground">
+                                                                    {
+                                                                        m
+                                                                            .from_location
+                                                                            .name
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            {m.from_employee && (
+                                                                <div className="text-primary">
+                                                                    {
+                                                                        m
+                                                                            .from_employee
+                                                                            .name
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell className="text-xs">
+                                                            {m.to_branch && (
+                                                                <div className="font-medium">
+                                                                    {
+                                                                        m
+                                                                            .to_branch
+                                                                            .name
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            {m.to_location && (
+                                                                <div className="text-muted-foreground">
+                                                                    {
+                                                                        m
+                                                                            .to_location
+                                                                            .name
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            {m.to_employee && (
+                                                                <div className="text-primary">
+                                                                    {
+                                                                        m
+                                                                            .to_employee
+                                                                            .name
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell className="max-w-[200px]">
+                                                            {m.reference && (
+                                                                <div className="text-xs font-semibold">
+                                                                    {
+                                                                        m.reference
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            {m.notes && (
+                                                                <div className="truncate text-xs text-muted-foreground">
+                                                                    {m.notes}
+                                                                </div>
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell className="text-xs whitespace-nowrap">
+                                                            {m.created_by}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ),
+                                            )}
                                         </TableBody>
                                     </Table>
                                 ) : (
@@ -703,59 +736,65 @@ export default function AssetProfile() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {item.maintenances?.map((m: AssetMaintenance) => (
-                                                <TableRow
-                                                    key={m.id}
-                                                    className="hover:bg-muted/30"
-                                                >
-                                                    <TableCell>
-                                                        <Badge
-                                                            variant="outline"
-                                                            className="font-medium capitalize"
-                                                        >
-                                                            {m.maintenance_type}
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Badge
-                                                            variant={
-                                                                m.status ===
-                                                                'completed'
-                                                                    ? 'default'
-                                                                    : 'secondary'
-                                                            }
-                                                            className="capitalize"
-                                                        >
-                                                            {m.status}
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="text-xs whitespace-nowrap">
-                                                        <div className="flex items-center gap-1">
-                                                            <Calendar className="h-3 w-3 text-muted-foreground" />
-                                                            {formatDate(
-                                                                m.scheduled_at,
-                                                            )}
-                                                        </div>
-                                                        {m.performed_at && (
-                                                            <div className="mt-1 flex items-center gap-1 text-muted-foreground">
-                                                                <Clock className="h-3 w-3" />
+                                            {item.maintenances?.map(
+                                                (m: AssetMaintenance) => (
+                                                    <TableRow
+                                                        key={m.id}
+                                                        className="hover:bg-muted/30"
+                                                    >
+                                                        <TableCell>
+                                                            <Badge
+                                                                variant="outline"
+                                                                className="font-medium capitalize"
+                                                            >
+                                                                {
+                                                                    m.maintenance_type
+                                                                }
+                                                            </Badge>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Badge
+                                                                variant={
+                                                                    m.status ===
+                                                                    'completed'
+                                                                        ? 'default'
+                                                                        : 'secondary'
+                                                                }
+                                                                className="capitalize"
+                                                            >
+                                                                {m.status}
+                                                            </Badge>
+                                                        </TableCell>
+                                                        <TableCell className="text-xs whitespace-nowrap">
+                                                            <div className="flex items-center gap-1">
+                                                                <Calendar className="h-3 w-3 text-muted-foreground" />
                                                                 {formatDate(
-                                                                    m.performed_at,
+                                                                    m.scheduled_at,
                                                                 )}
                                                             </div>
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell className="text-sm">
-                                                        {m.supplier || '-'}
-                                                    </TableCell>
-                                                    <TableCell className="text-right font-medium">
-                                                        {formatCurrency(m.cost)}
-                                                    </TableCell>
-                                                    <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground">
-                                                        {m.notes}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
+                                                            {m.performed_at && (
+                                                                <div className="mt-1 flex items-center gap-1 text-muted-foreground">
+                                                                    <Clock className="h-3 w-3" />
+                                                                    {formatDate(
+                                                                        m.performed_at,
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell className="text-sm">
+                                                            {m.supplier || '-'}
+                                                        </TableCell>
+                                                        <TableCell className="text-right font-medium">
+                                                            {formatCurrency(
+                                                                m.cost,
+                                                            )}
+                                                        </TableCell>
+                                                        <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground">
+                                                            {m.notes}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ),
+                                            )}
                                         </TableBody>
                                     </Table>
                                 ) : (
@@ -795,50 +834,56 @@ export default function AssetProfile() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {item.stocktake_items?.map((s: AssetStocktakeItem) => (
-                                                <TableRow
-                                                    key={s.id}
-                                                    className="hover:bg-muted/30"
-                                                >
-                                                    <TableCell className="font-mono font-medium">
-                                                        {s.stocktake_reference}
-                                                    </TableCell>
-                                                    <TableCell className="text-sm whitespace-nowrap">
-                                                        {s.stocktake_date}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {s.branch}
-                                                    </TableCell>
-                                                    <TableCell className="text-xs">
-                                                        <div className="flex items-center gap-1 text-muted-foreground">
-                                                            <AlertCircle className="h-3 w-3" />
+                                            {item.stocktake_items?.map(
+                                                (s: AssetStocktakeItem) => (
+                                                    <TableRow
+                                                        key={s.id}
+                                                        className="hover:bg-muted/30"
+                                                    >
+                                                        <TableCell className="font-mono font-medium">
                                                             {
-                                                                s.expected_location
+                                                                s.stocktake_reference
                                                             }
-                                                        </div>
-                                                        <div className="mt-1 flex items-center gap-1 font-medium text-primary">
-                                                            <MapPin className="h-3 w-3" />
-                                                            {s.found_location}
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Badge
-                                                            variant={
-                                                                s.result ===
-                                                                'found'
-                                                                    ? 'default'
-                                                                    : 'destructive'
-                                                            }
-                                                            className="capitalize"
-                                                        >
-                                                            {s.result}
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground">
-                                                        {s.notes}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
+                                                        </TableCell>
+                                                        <TableCell className="text-sm whitespace-nowrap">
+                                                            {s.stocktake_date}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {s.branch}
+                                                        </TableCell>
+                                                        <TableCell className="text-xs">
+                                                            <div className="flex items-center gap-1 text-muted-foreground">
+                                                                <AlertCircle className="h-3 w-3" />
+                                                                {
+                                                                    s.expected_location
+                                                                }
+                                                            </div>
+                                                            <div className="mt-1 flex items-center gap-1 font-medium text-primary">
+                                                                <MapPin className="h-3 w-3" />
+                                                                {
+                                                                    s.found_location
+                                                                }
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Badge
+                                                                variant={
+                                                                    s.result ===
+                                                                    'found'
+                                                                        ? 'default'
+                                                                        : 'destructive'
+                                                                }
+                                                                className="capitalize"
+                                                            >
+                                                                {s.result}
+                                                            </Badge>
+                                                        </TableCell>
+                                                        <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground">
+                                                            {s.notes}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ),
+                                            )}
                                         </TableBody>
                                     </Table>
                                 ) : (
@@ -901,12 +946,14 @@ export default function AssetProfile() {
                                                         </TableCell>
                                                         <TableCell className="text-right text-sm text-muted-foreground">
                                                             {formatCurrency(
-                                                                d.accumulated_after || 0,
+                                                                d.accumulated_after ||
+                                                                    0,
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="text-right font-semibold text-primary">
                                                             {formatCurrency(
-                                                                d.book_value_after || 0,
+                                                                d.book_value_after ||
+                                                                    0,
                                                             )}
                                                         </TableCell>
                                                         <TableCell>

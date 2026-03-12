@@ -5,7 +5,10 @@ import { Download, Loader2, Search } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
-import { AccountForm } from '@/components/accounts/AccountForm';
+import {
+    AccountForm,
+    type AccountFormData,
+} from '@/components/accounts/AccountForm';
 import { AccountTree } from '@/components/accounts/AccountTree';
 import {
     AlertDialog,
@@ -29,7 +32,6 @@ import {
 import { useExport } from '@/hooks/useExport';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { type AccountFormData } from '@/components/accounts/AccountForm';
 import { type Account } from '@/types/account';
 import { type CoaVersion } from '@/types/coa-version';
 import axios from 'axios';
@@ -70,7 +72,9 @@ export default function AccountIndex() {
 
     const fetchCoaVersions = useCallback(async () => {
         try {
-            const response = await axiosInstance.get('/api/coa-versions?per_page=100');
+            const response = await axiosInstance.get(
+                '/api/coa-versions?per_page=100',
+            );
             const data = response.data.data;
             setCoaVersions(data);
             if (data.length > 0 && !selectedVersionId) {
@@ -85,23 +89,26 @@ export default function AccountIndex() {
         }
     }, [selectedVersionId]);
 
-    const fetchAccounts = useCallback(async (searchTerm = search) => {
-        if (!selectedVersionId) return;
-        setIsLoading(true);
-        try {
-            const response = await axiosInstance.get('/api/accounts', {
-                params: {
-                    coa_version_id: selectedVersionId,
-                    search: searchTerm,
-                },
-            });
-            setAccounts(response.data.data);
-        } catch {
-            toast.error('Failed to fetch accounts');
-        } finally {
-            setIsLoading(false);
-        }
-    }, [selectedVersionId, search]);
+    const fetchAccounts = useCallback(
+        async (searchTerm = search) => {
+            if (!selectedVersionId) return;
+            setIsLoading(true);
+            try {
+                const response = await axiosInstance.get('/api/accounts', {
+                    params: {
+                        coa_version_id: selectedVersionId,
+                        search: searchTerm,
+                    },
+                });
+                setAccounts(response.data.data);
+            } catch {
+                toast.error('Failed to fetch accounts');
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        [selectedVersionId, search],
+    );
 
     useEffect(() => {
         fetchCoaVersions();
@@ -140,7 +147,10 @@ export default function AccountIndex() {
         setIsActionLoading(true);
         try {
             if (selectedAccount) {
-                await axiosInstance.put(`/api/accounts/${selectedAccount.id}`, data);
+                await axiosInstance.put(
+                    `/api/accounts/${selectedAccount.id}`,
+                    data,
+                );
                 toast.success('Account updated successfully');
             } else {
                 await axiosInstance.post('/api/accounts', data);

@@ -128,8 +128,18 @@ export function AccountForm({
             open={open}
             onOpenChange={onOpenChange}
             title={account ? 'Edit Account' : 'Create Account'}
-            form={form as unknown as UseFormReturn<AccountFormData, unknown, AccountFormData>}
-            onSubmit={onSubmit as unknown as (data: z.input<typeof accountSchema>) => void}
+            form={
+                form as unknown as UseFormReturn<
+                    AccountFormData,
+                    unknown,
+                    AccountFormData
+                >
+            }
+            onSubmit={
+                onSubmit as unknown as (
+                    data: z.input<typeof accountSchema>,
+                ) => void
+            }
             isLoading={isLoading}
         >
             <div className="grid gap-4 py-4">

@@ -3,9 +3,6 @@ import { DatePickerField } from '@/components/common/DatePickerField';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 
-
-
-
 export function ApprovalDelegationFilters() {
     return (
         <>

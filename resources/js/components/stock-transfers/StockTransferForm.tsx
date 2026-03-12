@@ -2,9 +2,9 @@
 
 import axios from '@/lib/axios';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { z } from 'zod';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
@@ -39,16 +39,17 @@ interface StockTransferFormProps {
     isLoading?: boolean;
 }
 
-const createEmptyStockTransferItem = (): StockTransferFormData['items'][number] => ({
-    product_id: '',
-    product_label: '',
-    unit_id: '',
-    unit_label: '',
-    quantity: 1,
-    quantity_received: 0,
-    unit_cost: 0,
-    notes: '',
-});
+const createEmptyStockTransferItem =
+    (): StockTransferFormData['items'][number] => ({
+        product_id: '',
+        product_label: '',
+        unit_id: '',
+        unit_label: '',
+        quantity: 1,
+        quantity_received: 0,
+        unit_cost: 0,
+        notes: '',
+    });
 
 const formatItemReference = (label?: string, id?: string) => {
     if (label) {
@@ -62,7 +63,9 @@ const formatItemReference = (label?: string, id?: string) => {
     return '-';
 };
 
-const omitDisplayLabels = <T extends { product_label?: string; unit_label?: string }>(
+const omitDisplayLabels = <
+    T extends { product_label?: string; unit_label?: string },
+>(
     item: T,
 ) => {
     const nextItem = { ...item };
@@ -349,13 +352,25 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[220px]">Product</TableHead>
-                                    <TableHead className="w-[160px]">Unit</TableHead>
-                                    <TableHead className="w-[120px]">Qty</TableHead>
-                                    <TableHead className="w-[140px]">Qty Received</TableHead>
-                                    <TableHead className="w-[140px]">Unit Cost</TableHead>
+                                    <TableHead className="w-[220px]">
+                                        Product
+                                    </TableHead>
+                                    <TableHead className="w-[160px]">
+                                        Unit
+                                    </TableHead>
+                                    <TableHead className="w-[120px]">
+                                        Qty
+                                    </TableHead>
+                                    <TableHead className="w-[140px]">
+                                        Qty Received
+                                    </TableHead>
+                                    <TableHead className="w-[140px]">
+                                        Unit Cost
+                                    </TableHead>
                                     <TableHead>Notes</TableHead>
-                                    <TableHead className="w-[120px] text-right">Action</TableHead>
+                                    <TableHead className="w-[120px] text-right">
+                                        Action
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -389,16 +404,20 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                                     )}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {stockTransferItem.quantity ?? 0}
+                                                    {stockTransferItem.quantity ??
+                                                        0}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {stockTransferItem.quantity_received ?? 0}
+                                                    {stockTransferItem.quantity_received ??
+                                                        0}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {stockTransferItem.unit_cost ?? 0}
+                                                    {stockTransferItem.unit_cost ??
+                                                        0}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {stockTransferItem.notes || '-'}
+                                                    {stockTransferItem.notes ||
+                                                        '-'}
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <Button
@@ -406,7 +425,9 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                                         variant="ghost"
                                                         size="icon"
                                                         onClick={() =>
-                                                            handleEditItem(index)
+                                                            handleEditItem(
+                                                                index,
+                                                            )
                                                         }
                                                         title="Edit item"
                                                         aria-label={`Edit item ${index + 1}`}
@@ -417,7 +438,9 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                                         type="button"
                                                         variant="ghost"
                                                         size="icon"
-                                                        onClick={() => remove(index)}
+                                                        onClick={() =>
+                                                            remove(index)
+                                                        }
                                                         title="Remove item"
                                                         aria-label={`Remove item ${index + 1}`}
                                                     >

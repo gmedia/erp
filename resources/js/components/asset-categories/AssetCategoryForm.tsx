@@ -58,13 +58,13 @@ export const AssetCategoryForm = memo<AssetCategoryFormProps>(
 
         return (
             <EntityForm<AssetCategoryFormData>
-            form={
-                form as unknown as UseFormReturn<
-                    AssetCategoryFormData,
-                    unknown,
-                    AssetCategoryFormData
-                >
-            }
+                form={
+                    form as unknown as UseFormReturn<
+                        AssetCategoryFormData,
+                        unknown,
+                        AssetCategoryFormData
+                    >
+                }
                 open={open}
                 onOpenChange={onOpenChange}
                 title={

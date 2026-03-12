@@ -1,7 +1,7 @@
 import axiosInstance from '@/lib/axios';
-import axios from 'axios';
 import { PipelineState } from '@/types/pipeline';
 import { PipelineStateFormData } from '@/utils/schemas';
+import axios from 'axios';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -30,7 +30,10 @@ export function usePipelineState(pipelineId?: number) {
         if (!pipelineId) return false;
 
         try {
-            await axiosInstance.post(`/api/pipelines/${pipelineId}/states`, data);
+            await axiosInstance.post(
+                `/api/pipelines/${pipelineId}/states`,
+                data,
+            );
             toast.success('Pipeline state created successfully.');
             await fetchStates();
             return true;

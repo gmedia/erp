@@ -12,11 +12,11 @@ import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { type AssetMaintenance } from '@/types/asset-maintenance';
 import {
     AssetMaintenanceFormData,
     assetMaintenanceFormSchema,
 } from '@/utils/schemas';
-import { type AssetMaintenance } from '@/types/asset-maintenance';
 
 interface AssetMaintenanceFormProps {
     open: boolean;

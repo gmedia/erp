@@ -88,10 +88,7 @@ export const ApprovalDelegationForm = memo<ApprovalDelegationFormProps>(
         }, [form, defaultValues]);
 
         return (
-            <EntityForm<
-                ApprovalDelegationFormInput,
-                ApprovalDelegationFormData
-            >
+            <EntityForm<ApprovalDelegationFormInput, ApprovalDelegationFormData>
                 form={form}
                 open={open}
                 onOpenChange={onOpenChange}

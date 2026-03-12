@@ -30,9 +30,7 @@ interface ApprovalFlowFormProps {
 
 export type ApprovalFlowFormInput = input<typeof approvalFlowFormSchema>;
 
-const getFormDefaults = (
-    item?: ApprovalFlow | null,
-): ApprovalFlowFormInput => {
+const getFormDefaults = (item?: ApprovalFlow | null): ApprovalFlowFormInput => {
     if (!item) {
         return {
             name: '',
@@ -86,7 +84,11 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
     }) {
         const defaultValues = useMemo(() => getFormDefaults(item), [item]);
 
-        const form = useForm<ApprovalFlowFormInput, unknown, ApprovalFlowFormData>({
+        const form = useForm<
+            ApprovalFlowFormInput,
+            unknown,
+            ApprovalFlowFormData
+        >({
             resolver: zodResolver(approvalFlowFormSchema),
             defaultValues,
         });

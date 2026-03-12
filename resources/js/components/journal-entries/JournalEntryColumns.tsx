@@ -7,10 +7,10 @@ import {
     createSelectColumn,
     createSortingHeader,
     createTextColumn,
+    type CustomTableMeta,
 } from '@/utils/columns';
 import { type ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
-import { type CustomTableMeta } from '@/utils/columns';
 
 export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
     createSelectColumn<JournalEntry>(),

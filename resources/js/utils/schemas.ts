@@ -434,13 +434,13 @@ export const assetStocktakeFormSchema = z.object({
 });
 
 export type AssetStocktakeFormData = z.infer<typeof assetStocktakeFormSchema>;
- 
+
 export const assetDepreciationCalculationFormSchema = z.object({
     fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
     period_start: z.string().min(1, { message: 'Start period is required.' }),
     period_end: z.string().min(1, { message: 'End period is required.' }),
 });
- 
+
 export type AssetDepreciationCalculationFormData = z.infer<
     typeof assetDepreciationCalculationFormSchema
 >;
@@ -596,9 +596,12 @@ export const approvalFlowFormSchema = z.object({
                 approver_type: z.literal('user'),
                 approver_user_id: z.preprocess(
                     (val) => (val === '' || val === null ? null : Number(val)),
-                    z.number().nullable().refine((value) => value !== null, {
-                        message: 'Approver user is required',
-                    }),
+                    z
+                        .number()
+                        .nullable()
+                        .refine((value) => value !== null, {
+                            message: 'Approver user is required',
+                        }),
                 ),
                 required_action: z.enum(['approve', 'review', 'acknowledge']),
                 auto_approve_after_hours: z.preprocess(
@@ -618,7 +621,7 @@ export const approvalFlowFormSchema = z.object({
                     .transform((val) => val === true || val === 'true'),
             }),
         )
-            .min(1, 'At least one approval step is required'),
+        .min(1, 'At least one approval step is required'),
 });
 
 export type ApprovalFlowFormData = z.infer<typeof approvalFlowFormSchema>;
@@ -743,11 +746,9 @@ export const stockAdjustmentFormSchema = z.object({
                     .min(0, { message: 'Quantity before must be at least 0.' })
                     .optional()
                     .default(0),
-                quantity_adjusted: z.coerce
-                    .number()
-                    .refine((n) => n !== 0, {
-                        message: 'Quantity adjusted cannot be 0.',
-                    }),
+                quantity_adjusted: z.coerce.number().refine((n) => n !== 0, {
+                    message: 'Quantity adjusted cannot be 0.',
+                }),
                 unit_cost: z.coerce
                     .number()
                     .min(0, { message: 'Unit cost must be at least 0.' })
@@ -771,19 +772,42 @@ export const purchaseRequestFormSchema = z.object({
     priority: z.enum(['low', 'normal', 'high', 'urgent'], {
         message: 'Priority is required.',
     }),
-    status: z.enum(['draft', 'pending_approval', 'approved', 'rejected', 'partially_ordered', 'fully_ordered', 'cancelled'], {
-        message: 'Status is required.',
-    }),
+    status: z.enum(
+        [
+            'draft',
+            'pending_approval',
+            'approved',
+            'rejected',
+            'partially_ordered',
+            'fully_ordered',
+            'cancelled',
+        ],
+        {
+            message: 'Status is required.',
+        },
+    ),
     estimated_amount: z.coerce.number().min(0).optional(),
     notes: z.string().optional(),
     rejection_reason: z.string().optional(),
-    items: z.array(z.object({
-        product_id: z.string().min(1, { message: 'Product is required.' }),
-        unit_id: z.string().min(1, { message: 'Unit is required.' }),
-        quantity: z.coerce.number().gt(0, { message: 'Quantity must be greater than 0.' }),
-        estimated_unit_price: z.coerce.number().min(0).optional().default(0),
-        notes: z.string().optional(),
-    })).min(1, { message: 'At least 1 item is required.' }),
+    items: z
+        .array(
+            z.object({
+                product_id: z
+                    .string()
+                    .min(1, { message: 'Product is required.' }),
+                unit_id: z.string().min(1, { message: 'Unit is required.' }),
+                quantity: z.coerce
+                    .number()
+                    .gt(0, { message: 'Quantity must be greater than 0.' }),
+                estimated_unit_price: z.coerce
+                    .number()
+                    .min(0)
+                    .optional()
+                    .default(0),
+                notes: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least 1 item is required.' }),
 });
 
 export type PurchaseRequestFormData = z.infer<typeof purchaseRequestFormSchema>;
@@ -796,28 +820,62 @@ export const purchaseOrderFormSchema = z.object({
     expected_delivery_date: z.date().optional().nullable(),
     payment_terms: z.string().optional(),
     currency: z.string().min(3, { message: 'Currency is required.' }).max(3),
-    status: z.enum(['draft', 'pending_approval', 'confirmed', 'rejected', 'partially_received', 'fully_received', 'cancelled', 'closed'], {
-        message: 'Status is required.',
-    }),
+    status: z.enum(
+        [
+            'draft',
+            'pending_approval',
+            'confirmed',
+            'rejected',
+            'partially_received',
+            'fully_received',
+            'cancelled',
+            'closed',
+        ],
+        {
+            message: 'Status is required.',
+        },
+    ),
     notes: z.string().optional(),
     shipping_address: z.string().optional(),
-    items: z.array(z.object({
-        purchase_request_item_id: z.string().optional(),
-        product_id: z.string().min(1, { message: 'Product is required.' }),
-        unit_id: z.string().min(1, { message: 'Unit is required.' }),
-        quantity: z.coerce.number().gt(0, { message: 'Quantity must be greater than 0.' }),
-        unit_price: z.coerce.number().min(0, { message: 'Unit price must be at least 0.' }),
-        discount_percent: z.coerce.number().min(0).max(100).optional().default(0),
-        tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
-        notes: z.string().optional(),
-    })).min(1, { message: 'At least 1 item is required.' }),
+    items: z
+        .array(
+            z.object({
+                purchase_request_item_id: z.string().optional(),
+                product_id: z
+                    .string()
+                    .min(1, { message: 'Product is required.' }),
+                unit_id: z.string().min(1, { message: 'Unit is required.' }),
+                quantity: z.coerce
+                    .number()
+                    .gt(0, { message: 'Quantity must be greater than 0.' }),
+                unit_price: z.coerce
+                    .number()
+                    .min(0, { message: 'Unit price must be at least 0.' }),
+                discount_percent: z.coerce
+                    .number()
+                    .min(0)
+                    .max(100)
+                    .optional()
+                    .default(0),
+                tax_percent: z.coerce
+                    .number()
+                    .min(0)
+                    .max(100)
+                    .optional()
+                    .default(0),
+                notes: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least 1 item is required.' }),
 });
 
 export type PurchaseOrderFormData = z.infer<typeof purchaseOrderFormSchema>;
 
 export const goodsReceiptFormSchema = z.object({
     gr_number: z.string().optional(),
-    purchase_order_id: z.string().min(1, { message: 'Purchase order is required.' }),
+    purchase_order_id: z
+        .string()
+        .min(1, { message: 'Purchase order is required.' }),
     warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
     receipt_date: z.date({ message: 'Receipt date is required.' }),
     supplier_delivery_note: z.string().optional(),
@@ -826,42 +884,83 @@ export const goodsReceiptFormSchema = z.object({
     }),
     received_by: z.string().optional(),
     notes: z.string().optional(),
-    items: z.array(z.object({
-        purchase_order_item_id: z.string().min(1, { message: 'PO Item is required.' }),
-        product_id: z.string().min(1, { message: 'Product is required.' }),
-        unit_id: z.string().min(1, { message: 'Unit is required.' }),
-        quantity_received: z.coerce.number().gt(0, { message: 'Quantity received must be greater than 0.' }),
-        quantity_accepted: z.coerce.number().min(0, { message: 'Quantity accepted must be at least 0.' }),
-        quantity_rejected: z.coerce.number().min(0).optional().default(0),
-        unit_price: z.coerce.number().min(0, { message: 'Unit price must be at least 0.' }),
-        notes: z.string().optional(),
-    })).min(1, { message: 'At least 1 item is required.' }),
+    items: z
+        .array(
+            z.object({
+                purchase_order_item_id: z
+                    .string()
+                    .min(1, { message: 'PO Item is required.' }),
+                product_id: z
+                    .string()
+                    .min(1, { message: 'Product is required.' }),
+                unit_id: z.string().min(1, { message: 'Unit is required.' }),
+                quantity_received: z.coerce
+                    .number()
+                    .gt(0, {
+                        message: 'Quantity received must be greater than 0.',
+                    }),
+                quantity_accepted: z.coerce
+                    .number()
+                    .min(0, {
+                        message: 'Quantity accepted must be at least 0.',
+                    }),
+                quantity_rejected: z.coerce
+                    .number()
+                    .min(0)
+                    .optional()
+                    .default(0),
+                unit_price: z.coerce
+                    .number()
+                    .min(0, { message: 'Unit price must be at least 0.' }),
+                notes: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least 1 item is required.' }),
 });
 
 export type GoodsReceiptFormData = z.infer<typeof goodsReceiptFormSchema>;
 
 export const supplierReturnFormSchema = z.object({
     return_number: z.string().optional(),
-    purchase_order_id: z.string().min(1, { message: 'Purchase order is required.' }),
+    purchase_order_id: z
+        .string()
+        .min(1, { message: 'Purchase order is required.' }),
     goods_receipt_id: z.string().optional(),
     supplier_id: z.string().min(1, { message: 'Supplier is required.' }),
     warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
     return_date: z.date({ message: 'Return date is required.' }),
-    reason: z.enum(['defective', 'wrong_item', 'excess_quantity', 'damaged', 'other'], {
-        message: 'Reason is required.',
-    }),
+    reason: z.enum(
+        ['defective', 'wrong_item', 'excess_quantity', 'damaged', 'other'],
+        {
+            message: 'Reason is required.',
+        },
+    ),
     status: z.enum(['draft', 'confirmed', 'cancelled'], {
         message: 'Status is required.',
     }),
     notes: z.string().optional(),
-    items: z.array(z.object({
-        goods_receipt_item_id: z.string().min(1, { message: 'GR item is required.' }),
-        product_id: z.string().min(1, { message: 'Product is required.' }),
-        unit_id: z.string().optional(),
-        quantity_returned: z.coerce.number().gt(0, { message: 'Quantity returned must be greater than 0.' }),
-        unit_price: z.coerce.number().min(0, { message: 'Unit price must be at least 0.' }),
-        notes: z.string().optional(),
-    })).min(1, { message: 'At least 1 item is required.' }),
+    items: z
+        .array(
+            z.object({
+                goods_receipt_item_id: z
+                    .string()
+                    .min(1, { message: 'GR item is required.' }),
+                product_id: z
+                    .string()
+                    .min(1, { message: 'Product is required.' }),
+                unit_id: z.string().optional(),
+                quantity_returned: z.coerce
+                    .number()
+                    .gt(0, {
+                        message: 'Quantity returned must be greater than 0.',
+                    }),
+                unit_price: z.coerce
+                    .number()
+                    .min(0, { message: 'Unit price must be at least 0.' }),
+                notes: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least 1 item is required.' }),
 });
 
 export type SupplierReturnFormData = z.infer<typeof supplierReturnFormSchema>;

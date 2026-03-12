@@ -279,8 +279,7 @@ export function ApprovalHistoryTimeline({ entityType, entityId }: Props) {
                                                             <>
                                                                 Action by{' '}
                                                                 <span className="font-medium text-foreground">
-                                                                    {step
-                                                                        .actor
+                                                                    {step.actor
                                                                         ?.name ||
                                                                         step
                                                                             .acted_by_user
@@ -293,14 +292,12 @@ export function ApprovalHistoryTimeline({ entityType, entityId }: Props) {
                                                                         {' '}
                                                                         (delegated
                                                                         from{' '}
-                                                                        {
+                                                                        {step
+                                                                            .delegator
+                                                                            ?.name ||
                                                                             step
-                                                                                .delegator
-                                                                                ?.name ||
-                                                                                step
-                                                                                    .delegated_from_user
-                                                                                    ?.name
-                                                                        }
+                                                                                .delegated_from_user
+                                                                                ?.name}
                                                                         )
                                                                     </span>
                                                                 )}

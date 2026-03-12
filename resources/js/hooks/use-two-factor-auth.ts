@@ -1,8 +1,6 @@
 import axios from '@/lib/axios';
 import { useCallback, useMemo, useState } from 'react';
 
-
-
 export const OTP_MAX_LENGTH = 6;
 
 export const useTwoFactorAuth = () => {

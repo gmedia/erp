@@ -25,7 +25,10 @@ const renderStatusCell = ({ row }: { row: { original: GoodsReceipt } }) => (
 
 export const goodsReceiptColumns: ColumnDef<GoodsReceipt>[] = [
     createSelectColumn<GoodsReceipt>(),
-    createTextColumn<GoodsReceipt>({ accessorKey: 'gr_number', label: 'GR Number' }),
+    createTextColumn<GoodsReceipt>({
+        accessorKey: 'gr_number',
+        label: 'GR Number',
+    }),
     {
         accessorKey: 'purchase_order',
         ...createSortingHeader('PO Number'),
@@ -36,8 +39,14 @@ export const goodsReceiptColumns: ColumnDef<GoodsReceipt>[] = [
         ...createSortingHeader('Warehouse'),
         cell: renderWarehouseCell,
     },
-    createDateColumn<GoodsReceipt>({ accessorKey: 'receipt_date', label: 'Receipt Date' }),
-    createTextColumn<GoodsReceipt>({ accessorKey: 'supplier_delivery_note', label: 'Supplier Delivery Note' }),
+    createDateColumn<GoodsReceipt>({
+        accessorKey: 'receipt_date',
+        label: 'Receipt Date',
+    }),
+    createTextColumn<GoodsReceipt>({
+        accessorKey: 'supplier_delivery_note',
+        label: 'Supplier Delivery Note',
+    }),
     {
         accessorKey: 'status',
         ...createSortingHeader('Status'),

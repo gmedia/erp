@@ -1,3 +1,5 @@
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -6,8 +8,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import React from 'react';
 
@@ -19,7 +19,13 @@ interface PurchaseRequestViewModalProps {
     item: PurchaseRequest | null;
 }
 
-const ViewField = ({ label, value }: { label: string; value: React.ReactNode }) => (
+const ViewField = ({
+    label,
+    value,
+}: {
+    label: string;
+    value: React.ReactNode;
+}) => (
     <div className="space-y-1">
         <h4 className="text-sm font-medium text-muted-foreground">{label}</h4>
         <div className="text-sm font-medium">{value || '-'}</div>
@@ -35,25 +41,55 @@ export const PurchaseRequestViewModal = React.memo(
                 <DialogContent className="max-w-3xl">
                     <DialogHeader>
                         <DialogTitle>Purchase Request Details</DialogTitle>
-                        <DialogDescription>View details and requested items</DialogDescription>
+                        <DialogDescription>
+                            View details and requested items
+                        </DialogDescription>
                     </DialogHeader>
 
                     <div className="grid grid-cols-2 gap-6 py-2">
                         <ViewField label="PR Number" value={item.pr_number} />
                         <ViewField label="Branch" value={item.branch?.name} />
-                        <ViewField label="Department" value={item.department?.name} />
-                        <ViewField label="Requested By" value={item.requester?.name} />
+                        <ViewField
+                            label="Department"
+                            value={item.department?.name}
+                        />
+                        <ViewField
+                            label="Requested By"
+                            value={item.requester?.name}
+                        />
                         <ViewField
                             label="Request Date"
-                            value={item.request_date ? format(new Date(item.request_date), 'PPP') : '-'}
+                            value={
+                                item.request_date
+                                    ? format(new Date(item.request_date), 'PPP')
+                                    : '-'
+                            }
                         />
                         <ViewField
                             label="Required Date"
-                            value={item.required_date ? format(new Date(item.required_date), 'PPP') : '-'}
+                            value={
+                                item.required_date
+                                    ? format(
+                                          new Date(item.required_date),
+                                          'PPP',
+                                      )
+                                    : '-'
+                            }
                         />
-                        <ViewField label="Priority" value={<Badge>{item.priority}</Badge>} />
-                        <ViewField label="Status" value={<Badge variant="outline">{item.status}</Badge>} />
-                        <ViewField label="Estimated Amount" value={item.estimated_amount ?? '0'} />
+                        <ViewField
+                            label="Priority"
+                            value={<Badge>{item.priority}</Badge>}
+                        />
+                        <ViewField
+                            label="Status"
+                            value={
+                                <Badge variant="outline">{item.status}</Badge>
+                            }
+                        />
+                        <ViewField
+                            label="Estimated Amount"
+                            value={item.estimated_amount ?? '0'}
+                        />
                         <ViewField label="Notes" value={item.notes || '-'} />
                     </div>
 
@@ -63,21 +99,42 @@ export const PurchaseRequestViewModal = React.memo(
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b">
-                                        <th className="text-left p-2">Product</th>
-                                        <th className="text-left p-2">Unit</th>
-                                        <th className="text-right p-2">Quantity</th>
-                                        <th className="text-right p-2">Est. Unit Price</th>
-                                        <th className="text-right p-2">Est. Total</th>
+                                        <th className="p-2 text-left">
+                                            Product
+                                        </th>
+                                        <th className="p-2 text-left">Unit</th>
+                                        <th className="p-2 text-right">
+                                            Quantity
+                                        </th>
+                                        <th className="p-2 text-right">
+                                            Est. Unit Price
+                                        </th>
+                                        <th className="p-2 text-right">
+                                            Est. Total
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {(item.items || []).map((it) => (
-                                        <tr key={it.id} className="border-b last:border-b-0">
-                                            <td className="p-2">{it.product?.name || '-'}</td>
-                                            <td className="p-2">{it.unit?.name || '-'}</td>
-                                            <td className="p-2 text-right">{it.quantity}</td>
-                                            <td className="p-2 text-right">{it.estimated_unit_price || '0'}</td>
-                                            <td className="p-2 text-right">{it.estimated_total || '0'}</td>
+                                        <tr
+                                            key={it.id}
+                                            className="border-b last:border-b-0"
+                                        >
+                                            <td className="p-2">
+                                                {it.product?.name || '-'}
+                                            </td>
+                                            <td className="p-2">
+                                                {it.unit?.name || '-'}
+                                            </td>
+                                            <td className="p-2 text-right">
+                                                {it.quantity}
+                                            </td>
+                                            <td className="p-2 text-right">
+                                                {it.estimated_unit_price || '0'}
+                                            </td>
+                                            <td className="p-2 text-right">
+                                                {it.estimated_total || '0'}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

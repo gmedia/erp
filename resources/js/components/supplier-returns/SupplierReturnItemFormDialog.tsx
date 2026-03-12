@@ -21,13 +21,19 @@ import { Form } from '@/components/ui/form';
 import { type SupplierReturnFormData } from '@/types/supplier-return';
 
 const supplierReturnItemSchema = z.object({
-    goods_receipt_item_id: z.string().min(1, { message: 'GR item is required.' }),
+    goods_receipt_item_id: z
+        .string()
+        .min(1, { message: 'GR item is required.' }),
     product_id: z.string().min(1, { message: 'Product is required.' }),
     product_label: z.string().optional(),
     unit_id: z.string().optional(),
     unit_label: z.string().optional(),
-    quantity_returned: z.coerce.number().gt(0, { message: 'Quantity returned must be greater than 0.' }),
-    unit_price: z.coerce.number().min(0, { message: 'Unit price must be at least 0.' }),
+    quantity_returned: z.coerce
+        .number()
+        .gt(0, { message: 'Quantity returned must be greater than 0.' }),
+    unit_price: z.coerce
+        .number()
+        .min(0, { message: 'Unit price must be at least 0.' }),
     notes: z.string().optional(),
 });
 
@@ -97,7 +103,9 @@ export function SupplierReturnItemFormDialog({
                 <DialogHeader>
                     <DialogTitle>{item ? 'Edit Item' : 'Add Item'}</DialogTitle>
                     <DialogDescription className="sr-only">
-                        {item ? 'Edit supplier return item.' : 'Add supplier return item.'}
+                        {item
+                            ? 'Edit supplier return item.'
+                            : 'Add supplier return item.'}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -126,9 +134,13 @@ export function SupplierReturnItemFormDialog({
                                 placeholder="Select product"
                                 initialLabel={defaultValues.product_label}
                                 onItemSelect={(product) => {
-                                    form.setValue('product_label', product?.name || '', {
-                                        shouldDirty: true,
-                                    });
+                                    form.setValue(
+                                        'product_label',
+                                        product?.name || '',
+                                        {
+                                            shouldDirty: true,
+                                        },
+                                    );
                                 }}
                             />
                             <AsyncSelectField<{ name?: string }>
@@ -139,9 +151,13 @@ export function SupplierReturnItemFormDialog({
                                 placeholder="Select unit"
                                 initialLabel={defaultValues.unit_label}
                                 onItemSelect={(unit) => {
-                                    form.setValue('unit_label', unit?.name || '', {
-                                        shouldDirty: true,
-                                    });
+                                    form.setValue(
+                                        'unit_label',
+                                        unit?.name || '',
+                                        {
+                                            shouldDirty: true,
+                                        },
+                                    );
                                 }}
                             />
                             <InputField
@@ -170,10 +186,16 @@ export function SupplierReturnItemFormDialog({
                         />
 
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => onOpenChange(false)}
+                            >
                                 Cancel
                             </Button>
-                            <Button type="submit">{item ? 'Update Item' : 'Save Item'}</Button>
+                            <Button type="submit">
+                                {item ? 'Update Item' : 'Save Item'}
+                            </Button>
                         </DialogFooter>
                     </form>
                 </Form>

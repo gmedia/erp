@@ -40,7 +40,10 @@ const ATTRIBUTE_ALIASES: Record<string, string> = {
 };
 
 function toAttributeName(name: string): string {
-    return ATTRIBUTE_ALIASES[name] ?? name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`);
+    return (
+        ATTRIBUTE_ALIASES[name] ??
+        name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+    );
 }
 
 function getTextContent(node: ReactNode): string {
@@ -64,8 +67,12 @@ function getTextContent(node: ReactNode): string {
 }
 
 function getElementContent(props: Record<string, unknown>): string | undefined {
-    if (typeof props.dangerouslySetInnerHTML === 'object' && props.dangerouslySetInnerHTML !== null) {
-        const html = (props.dangerouslySetInnerHTML as { __html?: unknown }).__html;
+    if (
+        typeof props.dangerouslySetInnerHTML === 'object' &&
+        props.dangerouslySetInnerHTML !== null
+    ) {
+        const html = (props.dangerouslySetInnerHTML as { __html?: unknown })
+            .__html;
         return typeof html === 'string' ? html : undefined;
     }
 
@@ -87,7 +94,11 @@ function computeElementKey(
 
     if (tagName === 'meta') {
         const discriminator =
-            props.name ?? props.property ?? props.httpEquiv ?? props.charSet ?? props.itemProp;
+            props.name ??
+            props.property ??
+            props.httpEquiv ??
+            props.charSet ??
+            props.itemProp;
         if (typeof discriminator === 'string') {
             return `meta:${discriminator}`;
         }
@@ -95,7 +106,8 @@ function computeElementKey(
 
     if (tagName === 'link') {
         const rel = typeof props.rel === 'string' ? props.rel : 'link';
-        const href = typeof props.href === 'string' ? props.href : index.toString();
+        const href =
+            typeof props.href === 'string' ? props.href : index.toString();
         return `link:${rel}:${href}`;
     }
 
@@ -114,7 +126,9 @@ function computeElementKey(
     return `${tagName}:${content ?? index}`;
 }
 
-function parseAttributes(props: Record<string, unknown>): Record<string, string> {
+function parseAttributes(
+    props: Record<string, unknown>,
+): Record<string, string> {
     const attributes: Record<string, string> = {};
 
     for (const [name, value] of Object.entries(props)) {
@@ -164,14 +178,20 @@ function collectHelmetState(children: ReactNode): HelmetState {
         const props = child.props as Record<string, unknown>;
 
         if (tagName === 'title') {
-            const nextTitle = getTextContent(props.children as ReactNode).trim();
+            const nextTitle = getTextContent(
+                props.children as ReactNode,
+            ).trim();
             if (nextTitle !== '') {
                 title = nextTitle;
             }
             return;
         }
 
-        if (!['base', 'link', 'meta', 'noscript', 'script', 'style'].includes(tagName)) {
+        if (
+            !['base', 'link', 'meta', 'noscript', 'script', 'style'].includes(
+                tagName,
+            )
+        ) {
             return;
         }
 
@@ -180,7 +200,12 @@ function collectHelmetState(children: ReactNode): HelmetState {
             tagName: tagName as HeadTagName,
             attributes: parseAttributes(props),
             content,
-            key: computeElementKey(tagName as HeadTagName, props, index, content),
+            key: computeElementKey(
+                tagName as HeadTagName,
+                props,
+                index,
+                content,
+            ),
         });
     });
 
@@ -210,12 +235,16 @@ function applyHeadState(): void {
     defaultDocumentTitle ??= document.title;
 
     const activeStates = Array.from(headState.values());
-    const nextTitle = [...activeStates].reverse().find((state) => state.title !== undefined)?.title;
+    const nextTitle = [...activeStates]
+        .reverse()
+        .find((state) => state.title !== undefined)?.title;
     document.title = nextTitle ?? defaultDocumentTitle ?? '';
 
-    document.querySelectorAll(`[${MANAGED_ATTRIBUTE}="true"]`).forEach((element) => {
-        element.remove();
-    });
+    document
+        .querySelectorAll(`[${MANAGED_ATTRIBUTE}="true"]`)
+        .forEach((element) => {
+            element.remove();
+        });
 
     const dedupedElements = new Map<string, HeadElementSpec>();
     for (const state of activeStates) {

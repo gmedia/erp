@@ -13,6 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { CustomTableMeta } from '@/utils/columns';
 import {
     ColumnDef,
     SortingState,
@@ -22,7 +23,6 @@ import {
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import { CustomTableMeta } from '@/utils/columns';
 
 import { useExport } from '@/hooks/useExport';
 import * as React from 'react';

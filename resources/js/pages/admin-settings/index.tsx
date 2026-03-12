@@ -6,10 +6,10 @@ import { Separator } from '@/components/ui/separator';
 import AdminSettingsLayout from '@/layouts/admin-settings/layout';
 import AppLayout from '@/layouts/app-layout';
 import axiosInstance from '@/lib/axios';
-import axios from 'axios';
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -77,7 +77,10 @@ function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
         } catch (error: unknown) {
             if (axios.isAxiosError(error) && error.response?.status === 422) {
                 const newErrors: Record<string, string> = {};
-                const serverErrors = error.response.data.errors as Record<string, string[]>;
+                const serverErrors = error.response.data.errors as Record<
+                    string,
+                    string[]
+                >;
                 Object.keys(serverErrors).forEach((key) => {
                     newErrors[key] = serverErrors[key][0];
                 });
@@ -246,7 +249,10 @@ function RegionalSettings({
         } catch (error: unknown) {
             if (axios.isAxiosError(error) && error.response?.status === 422) {
                 const newErrors: Record<string, string> = {};
-                const serverErrors = error.response.data.errors as Record<string, string[]>;
+                const serverErrors = error.response.data.errors as Record<
+                    string,
+                    string[]
+                >;
                 Object.keys(serverErrors).forEach((key) => {
                     newErrors[key] = serverErrors[key][0];
                 });
@@ -402,7 +408,10 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
         } catch (error: unknown) {
             if (axios.isAxiosError(error) && error.response?.status === 422) {
                 const newErrors: Record<string, string> = {};
-                const serverErrors = error.response.data.errors as Record<string, string[]>;
+                const serverErrors = error.response.data.errors as Record<
+                    string,
+                    string[]
+                >;
                 Object.keys(serverErrors).forEach((key) => {
                     newErrors[key] = serverErrors[key][0];
                 });
@@ -435,7 +444,10 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 422) {
                     const newErrors: Record<string, string> = {};
-                    const serverErrors = error.response.data.errors as Record<string, string[]>;
+                    const serverErrors = error.response.data.errors as Record<
+                        string,
+                        string[]
+                    >;
                     Object.keys(serverErrors).forEach((key) => {
                         newErrors[key] = serverErrors[key][0];
                     });

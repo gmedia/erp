@@ -1,6 +1,6 @@
 import axiosInstance from '@/lib/axios';
-import { type Permission } from '@/types/permission';
 import { type Translations } from '@/types/i18n';
+import { type Permission } from '@/types/permission';
 import { type User } from '@/types/user';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
@@ -32,7 +32,10 @@ interface AuthContextType {
     locale: string;
     pendingApprovalsCount: number;
     isLoading: boolean;
-    login: (token: string, userData: { user: User; employee: Employee }) => void;
+    login: (
+        token: string,
+        userData: { user: User; employee: Employee },
+    ) => void;
     logout: () => Promise<void>;
     refreshAuth: () => Promise<void>;
 }
@@ -87,8 +90,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             setPendingApprovalsCount(data.pendingApprovalsCount || 0);
 
             // Make translations available globally if needed by unhandled context cases
-            (window as unknown as { __APP_COMPANY_NAME__: string }).__APP_COMPANY_NAME__ =
-                data.companyName;
+            (
+                window as unknown as { __APP_COMPANY_NAME__: string }
+            ).__APP_COMPANY_NAME__ = data.companyName;
         } catch (error) {
             console.error('Failed to fetch auth state', error);
             localStorage.removeItem('api_token');

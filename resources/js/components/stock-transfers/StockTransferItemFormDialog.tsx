@@ -25,7 +25,9 @@ const stockTransferItemSchema = z.object({
     product_label: z.string().optional(),
     unit_id: z.string().min(1, { message: 'Unit is required.' }),
     unit_label: z.string().optional(),
-    quantity: z.coerce.number().gt(0, { message: 'Quantity must be greater than 0.' }),
+    quantity: z.coerce
+        .number()
+        .gt(0, { message: 'Quantity must be greater than 0.' }),
     quantity_received: z.coerce.number().min(0).optional().default(0),
     unit_cost: z.coerce.number().min(0).optional().default(0),
     notes: z.string().optional(),
@@ -97,7 +99,9 @@ export function StockTransferItemFormDialog({
                 <DialogHeader>
                     <DialogTitle>{item ? 'Edit Item' : 'Add Item'}</DialogTitle>
                     <DialogDescription className="sr-only">
-                        {item ? 'Edit stock transfer item.' : 'Add stock transfer item.'}
+                        {item
+                            ? 'Edit stock transfer item.'
+                            : 'Add stock transfer item.'}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -118,9 +122,13 @@ export function StockTransferItemFormDialog({
                                 placeholder="Select product"
                                 initialLabel={defaultValues.product_label}
                                 onItemSelect={(product) => {
-                                    form.setValue('product_label', product?.name || '', {
-                                        shouldDirty: true,
-                                    });
+                                    form.setValue(
+                                        'product_label',
+                                        product?.name || '',
+                                        {
+                                            shouldDirty: true,
+                                        },
+                                    );
                                 }}
                             />
                             <AsyncSelectField<{ name?: string }>
@@ -131,9 +139,13 @@ export function StockTransferItemFormDialog({
                                 placeholder="Select unit"
                                 initialLabel={defaultValues.unit_label}
                                 onItemSelect={(unit) => {
-                                    form.setValue('unit_label', unit?.name || '', {
-                                        shouldDirty: true,
-                                    });
+                                    form.setValue(
+                                        'unit_label',
+                                        unit?.name || '',
+                                        {
+                                            shouldDirty: true,
+                                        },
+                                    );
                                 }}
                             />
                             <InputField
@@ -170,10 +182,16 @@ export function StockTransferItemFormDialog({
                         />
 
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => onOpenChange(false)}
+                            >
                                 Cancel
                             </Button>
-                            <Button type="submit">{item ? 'Update Item' : 'Save Item'}</Button>
+                            <Button type="submit">
+                                {item ? 'Update Item' : 'Save Item'}
+                            </Button>
                         </DialogFooter>
                     </form>
                 </Form>

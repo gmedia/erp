@@ -134,7 +134,9 @@ export const purchaseHistoryReportColumns: ColumnDef<PurchaseHistoryReportItem>[
         {
             accessorKey: 'goods_receipt.last_receipt_date',
             ...createSortingHeader('Last Receipt'),
-            cell: ({ row }) => <div>{formatDate(row.original.last_receipt_date)}</div>,
+            cell: ({ row }) => (
+                <div>{formatDate(row.original.last_receipt_date)}</div>
+            ),
         },
         createCurrencyColumn<PurchaseHistoryReportItem>({
             accessorKey: 'total_purchase_value',

@@ -48,14 +48,30 @@ export type {
     FiscalYearFilters,
     FiscalYearFormData,
 } from './fiscal-year';
+export type {
+    GoodsReceipt,
+    GoodsReceiptFilters,
+    GoodsReceiptFormData,
+} from './goods-receipt';
 export type { Pipeline } from './pipeline';
 export type { Position, PositionFormData } from './position';
 export type { Product, ProductFormData } from './product';
-export type { PurchaseRequest, PurchaseRequestFormData, PurchaseRequestFilters } from './purchase-request';
-export type { PurchaseOrder, PurchaseOrderFormData, PurchaseOrderFilters } from './purchase-order';
-export type { GoodsReceipt, GoodsReceiptFormData, GoodsReceiptFilters } from './goods-receipt';
-export type { SupplierReturn, SupplierReturnFormData, SupplierReturnFilters } from './supplier-return';
+export type {
+    PurchaseOrder,
+    PurchaseOrderFilters,
+    PurchaseOrderFormData,
+} from './purchase-order';
+export type {
+    PurchaseRequest,
+    PurchaseRequestFilters,
+    PurchaseRequestFormData,
+} from './purchase-request';
 export type { Supplier, SupplierFilters, SupplierFormData } from './supplier';
+export type {
+    SupplierReturn,
+    SupplierReturnFilters,
+    SupplierReturnFormData,
+} from './supplier-return';
 export type {
     Warehouse,
     WarehouseFilters,

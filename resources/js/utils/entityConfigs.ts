@@ -78,6 +78,10 @@ import { employeeColumns } from '@/components/employees/EmployeeColumns';
 import { createEmployeeFilterFields } from '@/components/employees/EmployeeFilters';
 import { EmployeeForm } from '@/components/employees/EmployeeForm';
 import { EmployeeViewModal } from '@/components/employees/EmployeeViewModal';
+import { goodsReceiptColumns } from '@/components/goods-receipts/GoodsReceiptColumns';
+import { createGoodsReceiptFilterFields } from '@/components/goods-receipts/GoodsReceiptFilters';
+import { GoodsReceiptForm } from '@/components/goods-receipts/GoodsReceiptForm';
+import { GoodsReceiptViewModal } from '@/components/goods-receipts/GoodsReceiptViewModal';
 import { inventoryStocktakeColumns } from '@/components/inventory-stocktakes/InventoryStocktakeColumns';
 import { createInventoryStocktakeFilterFields } from '@/components/inventory-stocktakes/InventoryStocktakeFilters';
 import { InventoryStocktakeForm } from '@/components/inventory-stocktakes/InventoryStocktakeForm';
@@ -92,6 +96,14 @@ import { productColumns } from '@/components/products/ProductColumns';
 import { createProductFilterFields } from '@/components/products/ProductFilters';
 import { ProductForm } from '@/components/products/ProductForm';
 import { ProductViewModal } from '@/components/products/ProductViewModal';
+import { purchaseOrderColumns } from '@/components/purchase-orders/PurchaseOrderColumns';
+import { createPurchaseOrderFilterFields } from '@/components/purchase-orders/PurchaseOrderFilters';
+import { PurchaseOrderForm } from '@/components/purchase-orders/PurchaseOrderForm';
+import { PurchaseOrderViewModal } from '@/components/purchase-orders/PurchaseOrderViewModal';
+import { purchaseRequestColumns } from '@/components/purchase-requests/PurchaseRequestColumns';
+import { createPurchaseRequestFilterFields } from '@/components/purchase-requests/PurchaseRequestFilters';
+import { PurchaseRequestForm } from '@/components/purchase-requests/PurchaseRequestForm';
+import { PurchaseRequestViewModal } from '@/components/purchase-requests/PurchaseRequestViewModal';
 import { stockAdjustmentColumns } from '@/components/stock-adjustments/StockAdjustmentColumns';
 import { createStockAdjustmentFilterFields } from '@/components/stock-adjustments/StockAdjustmentFilters';
 import { StockAdjustmentForm } from '@/components/stock-adjustments/StockAdjustmentForm';
@@ -100,6 +112,10 @@ import { stockTransferColumns } from '@/components/stock-transfers/StockTransfer
 import { createStockTransferFilterFields } from '@/components/stock-transfers/StockTransferFilters';
 import { StockTransferForm } from '@/components/stock-transfers/StockTransferForm';
 import { StockTransferViewModal } from '@/components/stock-transfers/StockTransferViewModal';
+import { supplierReturnColumns } from '@/components/supplier-returns/SupplierReturnColumns';
+import { createSupplierReturnFilterFields } from '@/components/supplier-returns/SupplierReturnFilters';
+import { SupplierReturnForm } from '@/components/supplier-returns/SupplierReturnForm';
+import { SupplierReturnViewModal } from '@/components/supplier-returns/SupplierReturnViewModal';
 import { supplierColumns } from '@/components/suppliers/SupplierColumns';
 import { createSupplierFilterFields } from '@/components/suppliers/SupplierFilters';
 import { SupplierForm } from '@/components/suppliers/SupplierForm';
@@ -114,29 +130,13 @@ import { WarehouseViewModal } from '@/components/warehouses/WarehouseViewModal';
 import { type Asset } from '@/types/asset';
 import { type AssetCategory } from '@/types/asset-category';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
-import { type InventoryStocktake } from '@/types/inventory-stocktake';
-import { type StockAdjustment } from '@/types/stock-adjustment';
-import { purchaseRequestColumns } from '@/components/purchase-requests/PurchaseRequestColumns';
-import { createPurchaseRequestFilterFields } from '@/components/purchase-requests/PurchaseRequestFilters';
-import { PurchaseRequestForm } from '@/components/purchase-requests/PurchaseRequestForm';
-import { PurchaseRequestViewModal } from '@/components/purchase-requests/PurchaseRequestViewModal';
-import { type PurchaseRequest } from '@/types/purchase-request';
-import { purchaseOrderColumns } from '@/components/purchase-orders/PurchaseOrderColumns';
-import { createPurchaseOrderFilterFields } from '@/components/purchase-orders/PurchaseOrderFilters';
-import { PurchaseOrderForm } from '@/components/purchase-orders/PurchaseOrderForm';
-import { PurchaseOrderViewModal } from '@/components/purchase-orders/PurchaseOrderViewModal';
-import { type PurchaseOrder } from '@/types/purchase-order';
-import { goodsReceiptColumns } from '@/components/goods-receipts/GoodsReceiptColumns';
-import { createGoodsReceiptFilterFields } from '@/components/goods-receipts/GoodsReceiptFilters';
-import { GoodsReceiptForm } from '@/components/goods-receipts/GoodsReceiptForm';
-import { GoodsReceiptViewModal } from '@/components/goods-receipts/GoodsReceiptViewModal';
 import { type GoodsReceipt } from '@/types/goods-receipt';
-import { supplierReturnColumns } from '@/components/supplier-returns/SupplierReturnColumns';
-import { createSupplierReturnFilterFields } from '@/components/supplier-returns/SupplierReturnFilters';
-import { SupplierReturnForm } from '@/components/supplier-returns/SupplierReturnForm';
-import { SupplierReturnViewModal } from '@/components/supplier-returns/SupplierReturnViewModal';
-import { type SupplierReturn } from '@/types/supplier-return';
+import { type InventoryStocktake } from '@/types/inventory-stocktake';
+import { type PurchaseOrder } from '@/types/purchase-order';
+import { type PurchaseRequest } from '@/types/purchase-request';
+import { type StockAdjustment } from '@/types/stock-adjustment';
 import { type StockTransfer } from '@/types/stock-transfer';
+import { type SupplierReturn } from '@/types/supplier-return';
 import { createSimpleEntityColumns } from '@/utils/columns';
 
 // Helper function to create generic delete messages
@@ -410,55 +410,63 @@ export const inventoryStocktakeConfig =
             `This action cannot be undone. This will cancel inventory stocktake ${stocktake.stocktake_number || ''}.`,
     });
 
-export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>({
-    entityName: 'Stock Adjustment',
-    entityNamePlural: 'Stock Adjustments',
-    apiEndpoint: '/api/stock-adjustments',
-    exportEndpoint: '/api/stock-adjustments/export',
-    queryKey: ['stock-adjustments'],
-    breadcrumbs: [{ title: 'Stock Adjustments', href: '/stock-adjustments' }],
-    initialFilters: {
-        search: '',
-        warehouse_id: '',
-        status: '',
-        adjustment_type: '',
+export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
+    {
+        entityName: 'Stock Adjustment',
+        entityNamePlural: 'Stock Adjustments',
+        apiEndpoint: '/api/stock-adjustments',
+        exportEndpoint: '/api/stock-adjustments/export',
+        queryKey: ['stock-adjustments'],
+        breadcrumbs: [
+            { title: 'Stock Adjustments', href: '/stock-adjustments' },
+        ],
+        initialFilters: {
+            search: '',
+            warehouse_id: '',
+            status: '',
+            adjustment_type: '',
+        },
+        columns: stockAdjustmentColumns,
+        filterFields: createStockAdjustmentFilterFields(),
+        formComponent: StockAdjustmentForm,
+        formType: 'complex',
+        entityNameForSearch: 'stock adjustment',
+        viewModalComponent: StockAdjustmentViewModal,
+        getDeleteMessage: (adjustment: { adjustment_number?: string | null }) =>
+            `This action cannot be undone. This will cancel stock adjustment ${adjustment.adjustment_number || ''}.`,
     },
-    columns: stockAdjustmentColumns,
-    filterFields: createStockAdjustmentFilterFields(),
-    formComponent: StockAdjustmentForm,
-    formType: 'complex',
-    entityNameForSearch: 'stock adjustment',
-    viewModalComponent: StockAdjustmentViewModal,
-    getDeleteMessage: (adjustment: { adjustment_number?: string | null }) =>
-        `This action cannot be undone. This will cancel stock adjustment ${adjustment.adjustment_number || ''}.`,
-});
+);
 
-export const purchaseRequestConfig = createComplexEntityConfig<PurchaseRequest>({
-    entityName: 'Purchase Request',
-    entityNamePlural: 'Purchase Requests',
-    apiEndpoint: '/api/purchase-requests',
-    exportEndpoint: '/api/purchase-requests/export',
-    queryKey: ['purchase-requests'],
-    breadcrumbs: [{ title: 'Purchase Requests', href: '/purchase-requests' }],
-    initialFilters: {
-        search: '',
-        branch_id: '',
-        department_id: '',
-        requested_by: '',
-        priority: '',
-        status: '',
-        request_date_from: '',
-        request_date_to: '',
+export const purchaseRequestConfig = createComplexEntityConfig<PurchaseRequest>(
+    {
+        entityName: 'Purchase Request',
+        entityNamePlural: 'Purchase Requests',
+        apiEndpoint: '/api/purchase-requests',
+        exportEndpoint: '/api/purchase-requests/export',
+        queryKey: ['purchase-requests'],
+        breadcrumbs: [
+            { title: 'Purchase Requests', href: '/purchase-requests' },
+        ],
+        initialFilters: {
+            search: '',
+            branch_id: '',
+            department_id: '',
+            requested_by: '',
+            priority: '',
+            status: '',
+            request_date_from: '',
+            request_date_to: '',
+        },
+        columns: purchaseRequestColumns,
+        filterFields: createPurchaseRequestFilterFields(),
+        formComponent: PurchaseRequestForm,
+        formType: 'complex',
+        entityNameForSearch: 'purchase request',
+        viewModalComponent: PurchaseRequestViewModal,
+        getDeleteMessage: (purchaseRequest: { pr_number?: string | null }) =>
+            `This action cannot be undone. This will cancel purchase request ${purchaseRequest.pr_number || ''}.`,
     },
-    columns: purchaseRequestColumns,
-    filterFields: createPurchaseRequestFilterFields(),
-    formComponent: PurchaseRequestForm,
-    formType: 'complex',
-    entityNameForSearch: 'purchase request',
-    viewModalComponent: PurchaseRequestViewModal,
-    getDeleteMessage: (purchaseRequest: { pr_number?: string | null }) =>
-        `This action cannot be undone. This will cancel purchase request ${purchaseRequest.pr_number || ''}.`,
-});
+);
 
 export const purchaseOrderConfig = createComplexEntityConfig<PurchaseOrder>({
     entityName: 'Purchase Order',
@@ -539,7 +547,6 @@ export const supplierReturnConfig = createComplexEntityConfig<SupplierReturn>({
     getDeleteMessage: (supplierReturn: { return_number?: string | null }) =>
         `This action cannot be undone. This will delete supplier return ${supplierReturn.return_number || ''}.`,
 });
-
 
 export const supplierCategoryConfig = createSimpleEntityConfig({
     entityName: 'Supplier Category',
@@ -929,7 +936,7 @@ import { ApprovalFlowForm } from '@/components/approval-flows/ApprovalFlowForm';
 import { ApprovalFlowViewModal } from '@/components/approval-flows/ApprovalFlowViewModal';
 
 import { type ApprovalFlow } from '@/types/approval';
- 
+
 export const approvalFlowConfig = createComplexEntityConfig<ApprovalFlow>({
     entityName: 'Approval Flow',
     entityNamePlural: 'Approval Flows',
@@ -954,30 +961,31 @@ import { ApprovalDelegationForm } from '@/components/approval-delegations/Approv
 import { ApprovalDelegationViewModal } from '@/components/approval-delegations/ApprovalDelegationViewModal';
 
 import { type ApprovalDelegation } from '@/types/approval-delegation';
- 
-export const approvalDelegationConfig = createComplexEntityConfig<ApprovalDelegation>({
-    entityName: 'Approval Delegation',
-    entityNamePlural: 'Approval Delegations',
-    apiEndpoint: '/api/approval-delegations',
-    exportEndpoint: '/api/approval-delegations/export',
-    queryKey: ['approval-delegations'],
-    breadcrumbs: [
-        { title: 'Approval Delegations', href: '/approval-delegations' },
-    ],
-    initialFilters: {
-        search: '',
-        delegator_user_id: '',
-        delegate_user_id: '',
-        is_active: '',
-        start_date_from: '',
-        start_date_to: '',
-    },
-    columns: approvalDelegationColumns,
-    filterFields: createApprovalDelegationFilterFields(),
-    formComponent: ApprovalDelegationForm,
-    formType: 'complex',
-    entityNameForSearch: 'approval delegation',
-    viewModalComponent: ApprovalDelegationViewModal,
-    getDeleteMessage: () =>
-        `This action cannot be undone. This will permanently delete the selected approval delegation.`,
-});
+
+export const approvalDelegationConfig =
+    createComplexEntityConfig<ApprovalDelegation>({
+        entityName: 'Approval Delegation',
+        entityNamePlural: 'Approval Delegations',
+        apiEndpoint: '/api/approval-delegations',
+        exportEndpoint: '/api/approval-delegations/export',
+        queryKey: ['approval-delegations'],
+        breadcrumbs: [
+            { title: 'Approval Delegations', href: '/approval-delegations' },
+        ],
+        initialFilters: {
+            search: '',
+            delegator_user_id: '',
+            delegate_user_id: '',
+            is_active: '',
+            start_date_from: '',
+            start_date_to: '',
+        },
+        columns: approvalDelegationColumns,
+        filterFields: createApprovalDelegationFilterFields(),
+        formComponent: ApprovalDelegationForm,
+        formType: 'complex',
+        entityNameForSearch: 'approval delegation',
+        viewModalComponent: ApprovalDelegationViewModal,
+        getDeleteMessage: () =>
+            `This action cannot be undone. This will permanently delete the selected approval delegation.`,
+    });

@@ -35,7 +35,10 @@ export default function DeleteUser() {
             localStorage.removeItem('api_token');
             window.location.href = '/login';
         } catch (error: unknown) {
-            if (rawAxios.isAxiosError(error) && error.response?.status === 422) {
+            if (
+                rawAxios.isAxiosError(error) &&
+                error.response?.status === 422
+            ) {
                 const serverErrors =
                     (
                         error.response.data as {

@@ -9,9 +9,10 @@ import React from 'react';
 export type FormComponentType = 'simple' | 'complex';
 
 // Configuration interface for the CRUD page factory
-export type EntityCrudConfig<T extends object = object> = CustomEntityConfig<T> & {
-    toolbarActions?: React.ReactNode;
-};
+export type EntityCrudConfig<T extends object = object> =
+    CustomEntityConfig<T> & {
+        toolbarActions?: React.ReactNode;
+    };
 
 type CrudFormProps<T extends object> = {
     open: boolean;

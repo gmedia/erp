@@ -23,7 +23,9 @@ interface AsyncSelectFieldProps<T extends object = Record<string, unknown>> {
     onItemSelect?: (item: T) => void;
 }
 
-export default function AsyncSelectField<T extends object = Record<string, unknown>>({
+export default function AsyncSelectField<
+    T extends object = Record<string, unknown>,
+>({
     name,
     label,
     url,

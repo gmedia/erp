@@ -100,9 +100,12 @@ export function EntityStateActions({
     // Dynamically render the icon
     const IconComponent =
         current_state.icon && current_state.icon in LucideIcons
-            ? (LucideIcons as unknown as Record<string, LucideIcons.LucideIcon>)[
-                  current_state.icon
-              ]
+            ? (
+                  LucideIcons as unknown as Record<
+                      string,
+                      LucideIcons.LucideIcon
+                  >
+              )[current_state.icon]
             : null;
 
     return (

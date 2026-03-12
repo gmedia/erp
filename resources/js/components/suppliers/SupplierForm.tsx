@@ -124,11 +124,21 @@ export const SupplierForm = memo<SupplierFormProps>(function SupplierForm({
 
     return (
         <EntityForm<SupplierFormData>
-            form={form as unknown as UseFormReturn<SupplierFormData, unknown, SupplierFormData>}
+            form={
+                form as unknown as UseFormReturn<
+                    SupplierFormData,
+                    unknown,
+                    SupplierFormData
+                >
+            }
             open={open}
             onOpenChange={onOpenChange}
             title={supplier ? 'Edit Supplier' : 'Add New Supplier'}
-            onSubmit={onSubmit as unknown as (data: z.input<typeof supplierFormSchema>) => void}
+            onSubmit={
+                onSubmit as unknown as (
+                    data: z.input<typeof supplierFormSchema>,
+                ) => void
+            }
             isLoading={isLoading}
         >
             {renderBasicInfoSection()}

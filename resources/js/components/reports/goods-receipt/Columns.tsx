@@ -63,7 +63,9 @@ export const goodsReceiptReportColumns: ColumnDef<GoodsReceiptReportItem>[] = [
     {
         accessorKey: 'purchase_order.po_number',
         ...createSortingHeader('PO Number'),
-        cell: ({ row }) => <div>{row.original.purchase_order?.po_number ?? '-'}</div>,
+        cell: ({ row }) => (
+            <div>{row.original.purchase_order?.po_number ?? '-'}</div>
+        ),
     },
     {
         accessorKey: 'supplier.name',
@@ -75,8 +77,12 @@ export const goodsReceiptReportColumns: ColumnDef<GoodsReceiptReportItem>[] = [
         ...createSortingHeader('Warehouse'),
         cell: ({ row }) => (
             <div className="space-y-0.5">
-                <div className="font-medium">{row.original.warehouse?.name ?? '-'}</div>
-                <div className="text-xs text-muted-foreground">{row.original.warehouse?.code ?? '-'}</div>
+                <div className="font-medium">
+                    {row.original.warehouse?.name ?? '-'}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                    {row.original.warehouse?.code ?? '-'}
+                </div>
             </div>
         ),
     },

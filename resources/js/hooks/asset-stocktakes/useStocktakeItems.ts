@@ -71,7 +71,8 @@ export const useStocktakeItems = () => {
                 console.error('Failed to save items', error);
                 if (axios.isAxiosError(error)) {
                     const msg =
-                        error.response?.data?.message || 'Failed to save items.';
+                        error.response?.data?.message ||
+                        'Failed to save items.';
                     toast.error(msg);
                 } else {
                     toast.error('An unexpected error occurred');

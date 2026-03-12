@@ -39,7 +39,10 @@ const ASSET_MOVEMENT_TYPES = [
 const isAssetMovementType = (
     value: string | null | undefined,
 ): value is AssetMovementFormData['movement_type'] =>
-    !!value && ASSET_MOVEMENT_TYPES.includes(value as (typeof ASSET_MOVEMENT_TYPES)[number]);
+    !!value &&
+    ASSET_MOVEMENT_TYPES.includes(
+        value as (typeof ASSET_MOVEMENT_TYPES)[number],
+    );
 
 const getAssetMovementFormDefaults = (
     item?: AssetMovement | null,

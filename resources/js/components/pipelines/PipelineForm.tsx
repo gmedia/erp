@@ -135,7 +135,13 @@ export const PipelineForm = memo<PipelineFormProps>(function PipelineForm({
 
     return (
         <EntityForm<PipelineFormData>
-            form={form as unknown as UseFormReturn<PipelineFormData, unknown, PipelineFormData>}
+            form={
+                form as unknown as UseFormReturn<
+                    PipelineFormData,
+                    unknown,
+                    PipelineFormData
+                >
+            }
             open={open}
             onOpenChange={onOpenChange}
             title={pipeline ? 'Edit Pipeline' : 'Add New Pipeline'}
