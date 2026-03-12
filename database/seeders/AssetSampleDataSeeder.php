@@ -881,7 +881,9 @@ class AssetSampleDataSeeder extends Seeder
                     'accumulated_depr_account_id' => $accumAcc->id,
                 ]);
 
-                if (! AssetDepreciationRun::where('fiscal_year_id', $fiscalYear->id)->where('period_start', $periodStart->toDateString())->exists()) {
+                if (! AssetDepreciationRun::where('fiscal_year_id', $fiscalYear->id)
+                    ->where('period_start', $periodStart->toDateString())
+                    ->exists()) {
                     $calculateAction = app(CalculateDepreciationAction::class);
                     $run = $calculateAction->execute([
                         'fiscal_year_id' => $fiscalYear->id,

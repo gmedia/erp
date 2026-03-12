@@ -12,8 +12,12 @@ class StoreCoaVersionRequest extends SimpleCrudStoreRequest
     {
         return [
             'name' => [
-                'required', 'string', 'max:255',
-                Rule::unique('coa_versions')->where(fn ($query) => $query->where('fiscal_year_id', $this->fiscal_year_id)),
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('coa_versions')->where(
+                    fn ($query) => $query->where('fiscal_year_id', $this->fiscal_year_id)
+                ),
             ],
             'fiscal_year_id' => ['required', 'integer', 'exists:fiscal_years,id'],
             'status' => ['required', 'string', 'in:draft,active,archived'],

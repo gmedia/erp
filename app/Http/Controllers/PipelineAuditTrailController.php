@@ -14,7 +14,10 @@ class PipelineAuditTrailController extends Controller
     /**
      * Display the Pipeline Audit Trail page.
      */
-    public function index(IndexPipelineAuditTrailRequest $request, IndexPipelineAuditTrailAction $action): PipelineAuditTrailCollection
+    public function index(
+        IndexPipelineAuditTrailRequest $request,
+        IndexPipelineAuditTrailAction $action
+    ): PipelineAuditTrailCollection
     {
         $logs = $action->execute($request);
 
@@ -24,7 +27,10 @@ class PipelineAuditTrailController extends Controller
     /**
      * Export the Pipeline Audit Trail to Excel/CSV.
      */
-    public function export(ExportPipelineAuditTrailRequest $request, ExportPipelineAuditTrailAction $action): JsonResponse
+    public function export(
+        ExportPipelineAuditTrailRequest $request,
+        ExportPipelineAuditTrailAction $action
+    ): JsonResponse
     {
         return $action->execute($request);
     }

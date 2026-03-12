@@ -53,7 +53,9 @@ export const createApprovalAuditTrailColumns = ({
             const formatted = eventStr
                 ? eventStr
                       .replaceAll('_', ' ')
-                      .replace(/\b\w/g, (l) => l.toUpperCase())
+                      .replaceAll(/\b\w/g, (letter) =>
+                          letter.toUpperCase(),
+                      )
                 : '-';
             let variant: 'default' | 'secondary' | 'destructive' | 'outline' =
                 'outline';

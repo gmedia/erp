@@ -13,10 +13,14 @@ use App\Http\Resources\AssetMaintenances\AssetMaintenanceCollection;
 use App\Http\Resources\AssetMaintenances\AssetMaintenanceResource;
 use App\Models\AssetMaintenance;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class AssetMaintenanceController extends Controller
 {
-    public function index(IndexAssetMaintenanceRequest $request, IndexAssetMaintenancesAction $action): AssetMaintenanceCollection
+    public function index(
+        IndexAssetMaintenanceRequest $request,
+        IndexAssetMaintenancesAction $action
+    ): AssetMaintenanceCollection
     {
         $maintenances = $action->execute($request);
 
@@ -33,7 +37,7 @@ class AssetMaintenanceController extends Controller
 
         $maintenance = AssetMaintenance::create([
             ...$data,
-            'created_by' => auth()->id(),
+            'created_by' => Auth::id(),
         ]);
 
         return response()->json([
@@ -77,7 +81,10 @@ class AssetMaintenanceController extends Controller
         ]);
     }
 
-    public function export(ExportAssetMaintenanceRequest $request, ExportAssetMaintenancesAction $action): JsonResponse
+    public function export(
+        ExportAssetMaintenanceRequest $request,
+        ExportAssetMaintenancesAction $action
+    ): JsonResponse
     {
         return $action->execute($request);
     }

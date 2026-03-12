@@ -32,6 +32,14 @@ interface ImportDialogProps {
     onSuccess?: () => void;
 }
 
+const getCsvCellValue = (value: unknown) => {
+    if (typeof value === 'string' || typeof value === 'number') {
+        return String(value);
+    }
+
+    return '';
+};
+
 export default function ImportDialog({
     title = 'Import Data',
     trigger,
@@ -57,7 +65,7 @@ export default function ImportDialog({
             sampleData.length > 0
                 ? sampleData.map((row) =>
                       templateHeaders
-                          .map((header) => row[header] || '')
+                          .map((header) => getCsvCellValue(row[header]))
                           .join(','),
                   )
                 : [templateHeaders.map(() => '').join(',')];
@@ -74,7 +82,7 @@ export default function ImportDialog({
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
+        if (e.target.files?.length) {
             setFile(e.target.files[0]);
             setResult(null); // Reset result when new file selected
         }
@@ -96,7 +104,7 @@ export default function ImportDialog({
                     description: `Successfully imported ${response.data.imported} rows.`,
                 });
                 if (onSuccess) onSuccess();
-                window.location.reload();
+                globalThis.location.reload();
             } else if (response.data.errors.length > 0) {
                 toast.error('Import Finished with Errors', {
                     description: 'Check the error list below.',
@@ -200,9 +208,9 @@ export default function ImportDialog({
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {result.errors.map((err, idx) => (
+                                            {result.errors.map((err) => (
                                                 <tr
-                                                    key={idx}
+                                                    key={`${err.row}-${err.field}-${err.message}`}
                                                     className="border-t border-slate-100"
                                                 >
                                                     <td className="py-1 align-top font-mono text-slate-500">

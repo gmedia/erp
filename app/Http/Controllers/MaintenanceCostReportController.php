@@ -14,7 +14,10 @@ class MaintenanceCostReportController extends Controller
     /**
      * Display the Maintenance Cost report.
      */
-    public function index(IndexMaintenanceCostRequest $request, IndexMaintenanceCostReportAction $action): MaintenanceCostCollection
+    public function index(
+        IndexMaintenanceCostRequest $request,
+        IndexMaintenanceCostReportAction $action
+    ): MaintenanceCostCollection
     {
         $maintenances = $action->execute($request);
 
@@ -24,7 +27,10 @@ class MaintenanceCostReportController extends Controller
     /**
      * Export the Maintenance Cost report to Excel/CSV.
      */
-    public function export(ExportMaintenanceCostRequest $request, ExportMaintenanceCostReportAction $action): JsonResponse
+    public function export(
+        ExportMaintenanceCostRequest $request,
+        ExportMaintenanceCostReportAction $action
+    ): JsonResponse
     {
         return $action->execute($request);
     }
