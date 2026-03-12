@@ -100,13 +100,16 @@ jobs:
       - name: Run Duster
         run: ./vendor/bin/sail bin duster fix --no-interaction
 
+      - name: Format Blade templates
+        run: ./vendor/bin/sail npm run blade:formatter
+
       - name: Format frontend
         run: ./vendor/bin/sail npm run format
 
       - name: Lint frontend
         run: ./vendor/bin/sail npm run lint
 
-      - name: Auto-commit lint fixes
+      - name: Auto-commit quality autofixes
         id: autofix
         shell: bash
         env:
@@ -152,6 +155,10 @@ jobs:
       - name: Clear configuration cache
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail artisan config:clear
+
+      - name: Run PHPStan
+        if: steps.autofix.outputs.changed != 'true'
+        run: ./vendor/bin/sail bin phpstan analyze
 
       - name: Check TypeScript
         if: steps.autofix.outputs.changed != 'true'
