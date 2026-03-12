@@ -50,7 +50,10 @@ export const GoodsReceiptViewModal = React.memo(
                     <ScrollArea className="flex-1 pr-4">
                         <div className="space-y-6 py-2">
                             <div className="grid grid-cols-2 gap-6">
-                                <ViewField label="GR Number" value={item.gr_number} />
+                                <ViewField
+                                    label="GR Number"
+                                    value={item.gr_number}
+                                />
                                 <ViewField
                                     label="PO Number"
                                     value={item.purchase_order?.po_number}
@@ -67,7 +70,10 @@ export const GoodsReceiptViewModal = React.memo(
                                     label="Receipt Date"
                                     value={
                                         item.receipt_date
-                                            ? format(new Date(item.receipt_date), 'PPP')
+                                            ? format(
+                                                  new Date(item.receipt_date),
+                                                  'PPP',
+                                              )
                                             : '-'
                                     }
                                 />
@@ -78,14 +84,19 @@ export const GoodsReceiptViewModal = React.memo(
                                 <ViewField
                                     label="Status"
                                     value={
-                                        <Badge variant="outline">{item.status}</Badge>
+                                        <Badge variant="outline">
+                                            {item.status}
+                                        </Badge>
                                     }
                                 />
                                 <ViewField
                                     label="Received By"
                                     value={item.received_by?.name || '-'}
                                 />
-                                <ViewField label="Notes" value={item.notes || '-'} />
+                                <ViewField
+                                    label="Notes"
+                                    value={item.notes || '-'}
+                                />
                             </div>
 
                             <div className="space-y-2">
@@ -100,7 +111,9 @@ export const GoodsReceiptViewModal = React.memo(
                                                 <th className="p-2 text-left">
                                                     Product
                                                 </th>
-                                                <th className="p-2 text-left">Unit</th>
+                                                <th className="p-2 text-left">
+                                                    Unit
+                                                </th>
                                                 <th className="p-2 text-right">
                                                     Qty Received
                                                 </th>
@@ -122,10 +135,13 @@ export const GoodsReceiptViewModal = React.memo(
                                                     className="border-b last:border-b-0"
                                                 >
                                                     <td className="p-2">
-                                                        {it.purchase_order_item_id}
+                                                        {
+                                                            it.purchase_order_item_id
+                                                        }
                                                     </td>
                                                     <td className="p-2">
-                                                        {it.product?.name || '-'}
+                                                        {it.product?.name ||
+                                                            '-'}
                                                     </td>
                                                     <td className="p-2">
                                                         {it.unit?.name || '-'}

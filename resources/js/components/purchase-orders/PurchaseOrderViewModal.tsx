@@ -50,7 +50,10 @@ export const PurchaseOrderViewModal = React.memo(
                     <ScrollArea className="flex-1 pr-4">
                         <div className="space-y-6 py-2">
                             <div className="grid grid-cols-2 gap-6">
-                                <ViewField label="PO Number" value={item.po_number} />
+                                <ViewField
+                                    label="PO Number"
+                                    value={item.po_number}
+                                />
                                 <ViewField
                                     label="Supplier"
                                     value={item.supplier?.name}
@@ -63,7 +66,10 @@ export const PurchaseOrderViewModal = React.memo(
                                     label="Order Date"
                                     value={
                                         item.order_date
-                                            ? format(new Date(item.order_date), 'PPP')
+                                            ? format(
+                                                  new Date(item.order_date),
+                                                  'PPP',
+                                              )
                                             : '-'
                                     }
                                 />
@@ -72,7 +78,9 @@ export const PurchaseOrderViewModal = React.memo(
                                     value={
                                         item.expected_delivery_date
                                             ? format(
-                                                  new Date(item.expected_delivery_date),
+                                                  new Date(
+                                                      item.expected_delivery_date,
+                                                  ),
                                                   'PPP',
                                               )
                                             : '-'
@@ -82,15 +90,26 @@ export const PurchaseOrderViewModal = React.memo(
                                     label="Payment Terms"
                                     value={item.payment_terms}
                                 />
-                                <ViewField label="Currency" value={item.currency} />
+                                <ViewField
+                                    label="Currency"
+                                    value={item.currency}
+                                />
                                 <ViewField
                                     label="Status"
                                     value={
-                                        <Badge variant="outline">{item.status}</Badge>
+                                        <Badge variant="outline">
+                                            {item.status}
+                                        </Badge>
                                     }
                                 />
-                                <ViewField label="Subtotal" value={item.subtotal} />
-                                <ViewField label="Tax Amount" value={item.tax_amount} />
+                                <ViewField
+                                    label="Subtotal"
+                                    value={item.subtotal}
+                                />
+                                <ViewField
+                                    label="Tax Amount"
+                                    value={item.tax_amount}
+                                />
                                 <ViewField
                                     label="Discount Amount"
                                     value={item.discount_amount}
@@ -103,7 +122,10 @@ export const PurchaseOrderViewModal = React.memo(
                                     label="Shipping Address"
                                     value={item.shipping_address || '-'}
                                 />
-                                <ViewField label="Notes" value={item.notes || '-'} />
+                                <ViewField
+                                    label="Notes"
+                                    value={item.notes || '-'}
+                                />
                             </div>
 
                             <div className="space-y-2">
@@ -115,8 +137,12 @@ export const PurchaseOrderViewModal = React.memo(
                                                 <th className="p-2 text-left">
                                                     Product
                                                 </th>
-                                                <th className="p-2 text-left">Unit</th>
-                                                <th className="p-2 text-right">Qty</th>
+                                                <th className="p-2 text-left">
+                                                    Unit
+                                                </th>
+                                                <th className="p-2 text-right">
+                                                    Qty
+                                                </th>
                                                 <th className="p-2 text-right">
                                                     Unit Price
                                                 </th>
@@ -138,7 +164,8 @@ export const PurchaseOrderViewModal = React.memo(
                                                     className="border-b last:border-b-0"
                                                 >
                                                     <td className="p-2">
-                                                        {it.product?.name || '-'}
+                                                        {it.product?.name ||
+                                                            '-'}
                                                     </td>
                                                     <td className="p-2">
                                                         {it.unit?.name || '-'}
