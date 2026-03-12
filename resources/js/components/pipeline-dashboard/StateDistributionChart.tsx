@@ -8,8 +8,8 @@ import {
 import { StateSummary } from '@/hooks/usePipelineDashboard';
 
 interface StateDistributionChartProps {
-    data: StateSummary[];
-    isLoading: boolean;
+    readonly data: StateSummary[];
+    readonly isLoading: boolean;
 }
 
 export function StateDistributionChart({

@@ -35,9 +35,9 @@ import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface Props {
-    entityType: string;
-    entityId: string | number;
-    onStateChange?: () => void; // Optional callback when state changes to refresh parent data
+    readonly entityType: string;
+    readonly entityId: string | number;
+    readonly onStateChange?: () => void; // Optional callback when state changes to refresh parent data
 }
 
 export function EntityStateActions({

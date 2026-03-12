@@ -11,9 +11,9 @@ import {
 import { type Warehouse } from '@/types/entity';
 
 interface WarehouseViewModalProps {
-    open: boolean;
-    onClose: () => void;
-    item: Warehouse | null;
+    readonly open: boolean;
+    readonly onClose: () => void;
+    readonly item: Warehouse | null;
 }
 
 export function WarehouseViewModal({
