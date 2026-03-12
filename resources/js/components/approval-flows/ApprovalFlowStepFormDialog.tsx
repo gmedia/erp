@@ -11,6 +11,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
@@ -110,7 +111,7 @@ export function ApprovalFlowStepFormDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-h-[90vh] max-w-xl overflow-y-auto">
+            <DialogContent className="flex max-h-[90vh] max-w-xl flex-col overflow-hidden">
                 <DialogHeader>
                     <DialogTitle>
                         {step ? 'Edit Approval Step' : 'Add Approval Step'}
@@ -128,79 +129,83 @@ export function ApprovalFlowStepFormDialog({
                             e.stopPropagation();
                             form.handleSubmit(onSave)(e);
                         }}
-                        className="space-y-6"
+                        className="flex min-h-0 flex-1 flex-col"
                     >
-                        <div className="grid grid-cols-2 gap-4">
-                            <InputField
-                                name="name"
-                                label="Step Name"
-                                placeholder="e.g. Manager Approval"
-                            />
-                            <SelectField
-                                name="required_action"
-                                label="Required Action"
-                                options={[
-                                    { value: 'approve', label: 'Approve' },
-                                    { value: 'review', label: 'Review' },
-                                    {
-                                        value: 'acknowledge',
-                                        label: 'Acknowledge',
-                                    },
-                                ]}
-                            />
-                        </div>
+                        <ScrollArea className="flex-1 pr-4">
+                            <div className="space-y-6 py-1">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <InputField
+                                        name="name"
+                                        label="Step Name"
+                                        placeholder="e.g. Manager Approval"
+                                    />
+                                    <SelectField
+                                        name="required_action"
+                                        label="Required Action"
+                                        options={[
+                                            { value: 'approve', label: 'Approve' },
+                                            { value: 'review', label: 'Review' },
+                                            {
+                                                value: 'acknowledge',
+                                                label: 'Acknowledge',
+                                            },
+                                        ]}
+                                    />
+                                </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <AsyncSelectField
-                                name="approver_user_id"
-                                label="Approver"
-                                url="/api/users"
-                                labelFn={(user: Record<string, unknown>) =>
-                                    user.name as string
-                                }
-                                valueFn={(user: Record<string, unknown>) =>
-                                    String(user.id)
-                                }
-                                placeholder="Select approver..."
-                            />
-                        </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <AsyncSelectField
+                                        name="approver_user_id"
+                                        label="Approver"
+                                        url="/api/users"
+                                        labelFn={(user: Record<string, unknown>) =>
+                                            user.name as string
+                                        }
+                                        valueFn={(user: Record<string, unknown>) =>
+                                            String(user.id)
+                                        }
+                                        placeholder="Select approver..."
+                                    />
+                                </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <InputField
-                                name="auto_approve_after_hours"
-                                label="Auto Approve After (Hours)"
-                                type="number"
-                                placeholder="e.g. 48"
-                            />
-                            <InputField
-                                name="escalate_after_hours"
-                                label="Escalate After (Hours)"
-                                type="number"
-                                placeholder="e.g. 24"
-                            />
-                            <AsyncSelectField
-                                name="escalation_user_id"
-                                label="Escalate To User"
-                                url="/api/users"
-                                labelFn={(user: Record<string, unknown>) =>
-                                    user.name as string
-                                }
-                                valueFn={(user: Record<string, unknown>) =>
-                                    String(user.id)
-                                }
-                                placeholder="Select user..."
-                            />
-                            <SelectField
-                                name="can_reject"
-                                label="Can Reject"
-                                options={[
-                                    { value: 'true', label: 'Yes' },
-                                    { value: 'false', label: 'No' },
-                                ]}
-                            />
-                        </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <InputField
+                                        name="auto_approve_after_hours"
+                                        label="Auto Approve After (Hours)"
+                                        type="number"
+                                        placeholder="e.g. 48"
+                                    />
+                                    <InputField
+                                        name="escalate_after_hours"
+                                        label="Escalate After (Hours)"
+                                        type="number"
+                                        placeholder="e.g. 24"
+                                    />
+                                    <AsyncSelectField
+                                        name="escalation_user_id"
+                                        label="Escalate To User"
+                                        url="/api/users"
+                                        labelFn={(user: Record<string, unknown>) =>
+                                            user.name as string
+                                        }
+                                        valueFn={(user: Record<string, unknown>) =>
+                                            String(user.id)
+                                        }
+                                        placeholder="Select user..."
+                                    />
+                                    <SelectField
+                                        name="can_reject"
+                                        label="Can Reject"
+                                        options={[
+                                            { value: 'true', label: 'Yes' },
+                                            { value: 'false', label: 'No' },
+                                        ]}
+                                    />
+                                </div>
+                            </div>
+                        </ScrollArea>
 
-                        <DialogFooter>
+                        <DialogFooter className="shrink-0 pt-4">
                             <Button
                                 type="button"
                                 variant="outline"
