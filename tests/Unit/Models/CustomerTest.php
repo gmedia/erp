@@ -2,6 +2,7 @@
 
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\CustomerCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -34,10 +35,10 @@ test('customer belongs to a branch', function () {
 });
 
 test('customer belongs to a category', function () {
-    $category = \App\Models\CustomerCategory::factory()->create();
+    $category = CustomerCategory::factory()->create();
     $customer = Customer::factory()->create(['category_id' => $category->id]);
 
-    expect($customer->category)->toBeInstanceOf(\App\Models\CustomerCategory::class)
+    expect($customer->category)->toBeInstanceOf(CustomerCategory::class)
         ->and($customer->category->id)->toBe($category->id);
 });
 

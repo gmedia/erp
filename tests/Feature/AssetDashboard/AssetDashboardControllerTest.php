@@ -5,6 +5,7 @@ use App\Models\AssetCategory;
 use App\Models\AssetMaintenance;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 use Tests\Traits\CreatesTestUserWithPermissions;
 
 use function Pest\Laravel\getJson;
@@ -13,7 +14,7 @@ uses(RefreshDatabase::class, CreatesTestUserWithPermissions::class)->group('asse
 
 describe('Asset Dashboard Data API', function () {
     beforeEach(function () {
-        \Laravel\Sanctum\Sanctum::actingAs($this->createTestUserWithPermissions(['asset']), ['*']);
+        Sanctum::actingAs($this->createTestUserWithPermissions(['asset']), ['*']);
     });
 
     test('returns correct JSON structure', function () {

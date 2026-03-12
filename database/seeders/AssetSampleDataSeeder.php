@@ -2,18 +2,26 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AssetDepreciationRuns\CalculateDepreciationAction;
+use App\Actions\AssetDepreciationRuns\PostDepreciationToJournalAction;
+use App\Models\Account;
 use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalFlow;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
 use App\Models\Asset;
 use App\Models\AssetCategory;
+use App\Models\AssetDepreciationRun;
 use App\Models\AssetLocation;
+use App\Models\AssetMaintenance;
 use App\Models\AssetModel;
 use App\Models\AssetMovement;
+use App\Models\AssetStocktake;
+use App\Models\AssetStocktakeItem;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\FiscalYear;
 use App\Models\Pipeline;
 use App\Models\PipelineEntityState;
 use App\Models\PipelineState;
@@ -765,8 +773,8 @@ class AssetSampleDataSeeder extends Seeder
         }
 
         // Maintenance: Laptop screen replacement (completed)
-        if ($laptopAsset && ! \App\Models\AssetMaintenance::where('asset_id', $laptopAsset->id)->exists()) {
-            \App\Models\AssetMaintenance::create([
+        if ($laptopAsset && ! AssetMaintenance::where('asset_id', $laptopAsset->id)->exists()) {
+            AssetMaintenance::create([
                 'asset_id' => $laptopAsset->id,
                 'supplier_id' => $supplier->id,
                 'maintenance_type' => 'corrective',
@@ -780,8 +788,8 @@ class AssetSampleDataSeeder extends Seeder
         }
 
         // Maintenance: Machine repair (in progress)
-        if ($machineAsset && ! \App\Models\AssetMaintenance::where('asset_id', $machineAsset->id)->exists()) {
-            \App\Models\AssetMaintenance::create([
+        if ($machineAsset && ! AssetMaintenance::where('asset_id', $machineAsset->id)->exists()) {
+            AssetMaintenance::create([
                 'asset_id' => $machineAsset->id,
                 'supplier_id' => $supplier->id,
                 'maintenance_type' => 'corrective',
@@ -794,8 +802,8 @@ class AssetSampleDataSeeder extends Seeder
         }
 
         // Maintenance: Car routine service (scheduled)
-        if ($carAsset && ! \App\Models\AssetMaintenance::where('asset_id', $carAsset->id)->exists()) {
-            \App\Models\AssetMaintenance::create([
+        if ($carAsset && ! AssetMaintenance::where('asset_id', $carAsset->id)->exists()) {
+            AssetMaintenance::create([
                 'asset_id' => $carAsset->id,
                 'supplier_id' => $supplier->id,
                 'maintenance_type' => 'preventive',
@@ -807,8 +815,8 @@ class AssetSampleDataSeeder extends Seeder
         }
 
         // Stocktake
-        if (! \App\Models\AssetStocktake::where('branch_id', $headOffice->id)->exists()) {
-            $stocktake = \App\Models\AssetStocktake::create([
+        if (! AssetStocktake::where('branch_id', $headOffice->id)->exists()) {
+            $stocktake = AssetStocktake::create([
                 'branch_id' => $headOffice->id,
                 'reference' => 'STK-' . date('Ym'),
                 'planned_at' => now()->subDays(1),
@@ -818,7 +826,7 @@ class AssetSampleDataSeeder extends Seeder
             ]);
 
             if ($laptopAsset) {
-                \App\Models\AssetStocktakeItem::create([
+                AssetStocktakeItem::create([
                     'asset_stocktake_id' => $stocktake->id,
                     'asset_id' => $laptopAsset->id,
                     'expected_branch_id' => $headOffice->id,
@@ -832,7 +840,7 @@ class AssetSampleDataSeeder extends Seeder
             }
 
             if ($printerAsset) {
-                \App\Models\AssetStocktakeItem::create([
+                AssetStocktakeItem::create([
                     'asset_stocktake_id' => $stocktake->id,
                     'asset_id' => $printerAsset->id,
                     'expected_branch_id' => $headOffice->id,
@@ -844,7 +852,7 @@ class AssetSampleDataSeeder extends Seeder
             }
 
             if ($carAsset) {
-                \App\Models\AssetStocktakeItem::create([
+                AssetStocktakeItem::create([
                     'asset_stocktake_id' => $stocktake->id,
                     'asset_id' => $carAsset->id,
                     'expected_branch_id' => $headOffice->id,
@@ -859,13 +867,13 @@ class AssetSampleDataSeeder extends Seeder
         }
 
         // Depreciation Run
-        $fiscalYear = \App\Models\FiscalYear::where('status', 'open')->first();
+        $fiscalYear = FiscalYear::where('status', 'open')->first();
         if ($fiscalYear) {
             $periodStart = now()->subMonth()->startOfMonth();
             $periodEnd = now()->subMonth()->endOfMonth();
 
-            $expenseAcc = \App\Models\Account::where('type', 'expense')->first();
-            $accumAcc = \App\Models\Account::where('type', 'asset')->first();
+            $expenseAcc = Account::where('type', 'expense')->first();
+            $accumAcc = Account::where('type', 'asset')->first();
 
             if ($expenseAcc && $accumAcc) {
                 Asset::whereNull('depreciation_expense_account_id')->update([
@@ -873,15 +881,15 @@ class AssetSampleDataSeeder extends Seeder
                     'accumulated_depr_account_id' => $accumAcc->id,
                 ]);
 
-                if (! \App\Models\AssetDepreciationRun::where('fiscal_year_id', $fiscalYear->id)->where('period_start', $periodStart->toDateString())->exists()) {
-                    $calculateAction = app(\App\Actions\AssetDepreciationRuns\CalculateDepreciationAction::class);
+                if (! AssetDepreciationRun::where('fiscal_year_id', $fiscalYear->id)->where('period_start', $periodStart->toDateString())->exists()) {
+                    $calculateAction = app(CalculateDepreciationAction::class);
                     $run = $calculateAction->execute([
                         'fiscal_year_id' => $fiscalYear->id,
                         'period_start' => $periodStart->toDateString(),
                         'period_end' => $periodEnd->toDateString(),
                     ]);
 
-                    $postAction = app(\App\Actions\AssetDepreciationRuns\PostDepreciationToJournalAction::class);
+                    $postAction = app(PostDepreciationToJournalAction::class);
                     $postAction->execute($run);
                 }
             }

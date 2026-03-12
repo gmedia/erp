@@ -7,6 +7,7 @@ use App\Http\Requests\Reports\ExportGoodsReceiptReportRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Excel as ExcelExcel;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExportGoodsReceiptReportAction
@@ -17,7 +18,7 @@ class ExportGoodsReceiptReportAction
 
         $format = $request->get('format', 'xlsx');
         $extension = $format === 'csv' ? 'csv' : 'xlsx';
-        $writerType = $format === 'csv' ? \Maatwebsite\Excel\Excel::CSV : \Maatwebsite\Excel\Excel::XLSX;
+        $writerType = $format === 'csv' ? ExcelExcel::CSV : ExcelExcel::XLSX;
 
         $filename = 'goods_receipt_report_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.' . $extension;
         $filePath = 'exports/' . $filename;

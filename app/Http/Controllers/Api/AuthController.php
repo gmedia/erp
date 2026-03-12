@@ -3,10 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MenuResource;
+use App\Models\ApprovalRequestStep;
+use App\Models\Menu;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -54,16 +60,16 @@ class AuthController extends Controller
         $employee = $user->employee;
 
         // Get company settings
-        $companyName = \App\Models\Setting::get('company_name') ?? config('app.name', 'Laravel');
-        $logoPath = \App\Models\Setting::get('company_logo_path');
+        $companyName = Setting::get('company_name') ?? config('app.name', 'Laravel');
+        $logoPath = Setting::get('company_logo_path');
         $companyLogoUrl = (! is_string($logoPath) || $logoPath === '')
             ? null
-            : \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->url($logoPath);
+            : Storage::disk(config('filesystems.default'))->url($logoPath);
 
         // Get Pending Approvals
         $pendingApprovalsCount = 0;
         if ($user->id) {
-            $pendingApprovalsCount = \App\Models\ApprovalRequestStep::pendingInboxForUser($user->id)
+            $pendingApprovalsCount = ApprovalRequestStep::pendingInboxForUser($user->id)
                 ->count();
         }
 
@@ -71,7 +77,7 @@ class AuthController extends Controller
         $menus = [];
         if ($employee) {
             $permissionIds = $employee->permissions()->pluck('permissions.id')->toArray();
-            $allowedMenus = \App\Models\Menu::with(['children' => function ($query) use ($permissionIds) {
+            $allowedMenus = Menu::with(['children' => function ($query) use ($permissionIds) {
                 $query->where(function ($q) use ($permissionIds) {
                     $q->whereDoesntHave('permissions')
                         ->orWhereHas('permissions', function ($subQ) use ($permissionIds) {
@@ -88,19 +94,19 @@ class AuthController extends Controller
                 })
                 ->get();
 
-            $menus = \App\Http\Resources\MenuResource::collection($allowedMenus)->resolve();
+            $menus = MenuResource::collection($allowedMenus)->resolve();
         }
 
         // Get Translations
         $locale = app()->getLocale();
         $path = lang_path("{$locale}.json");
         $translations = [];
-        if (\Illuminate\Support\Facades\File::exists($path)) {
-            $translations = json_decode(\Illuminate\Support\Facades\File::get($path), true) ?? [];
+        if (File::exists($path)) {
+            $translations = json_decode(File::get($path), true) ?? [];
         } else {
             $fallbackPath = lang_path('en.json');
-            if (\Illuminate\Support\Facades\File::exists($fallbackPath)) {
-                $translations = json_decode(\Illuminate\Support\Facades\File::get($fallbackPath), true) ?? [];
+            if (File::exists($fallbackPath)) {
+                $translations = json_decode(File::get($fallbackPath), true) ?? [];
             }
         }
 

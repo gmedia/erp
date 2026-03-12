@@ -9,6 +9,7 @@ use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\seed;
 
@@ -98,7 +99,7 @@ test('trial balance calculations are correct', function () {
         'credit' => 1000,
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/trial-balance?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertStatus(200)
         ->assertJsonCount(3, 'report')
@@ -190,7 +191,7 @@ test('cash flow calculations are correct', function () {
         'credit' => 200,
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertStatus(200)
         ->assertJsonCount(2, 'report')
@@ -239,7 +240,7 @@ test('balance sheet accounts include net income in equity', function () {
         'credit' => 0,
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/balance-sheet?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertStatus(200)
         ->assertJsonPath('report.totals.equity', 800); // Assumes no other equity
@@ -286,7 +287,7 @@ test('balance sheet comparison works', function () {
     $jePrev = JournalEntry::factory()->create(['fiscal_year_id' => $prevFiscalYear->id, 'status' => 'posted']);
     JournalEntryLine::factory()->create(['journal_entry_id' => $jePrev->id, 'account_id' => $prevAssetAccount->id, 'debit' => 300, 'credit' => 0]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/balance-sheet?fiscal_year_id=' . $this->fiscalYear->id . '&comparison_year_id=' . $prevFiscalYear->id)
         ->assertStatus(200)
         ->assertJsonPath('report.totals.assets', 500)

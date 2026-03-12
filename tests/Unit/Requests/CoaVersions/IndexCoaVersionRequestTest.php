@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Requests\CoaVersions\IndexCoaVersionRequest;
+use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
 
@@ -12,7 +13,7 @@ test('IndexCoaVersionRequest → authorize returns true', function () {
 });
 
 test('IndexCoaVersionRequest → rules allow optional filters', function () {
-    $fy = \App\Models\FiscalYear::factory()->create();
+    $fy = FiscalYear::factory()->create();
     $data = [
         'search' => 'test',
         'status' => 'active',

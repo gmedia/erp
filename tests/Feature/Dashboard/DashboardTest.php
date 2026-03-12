@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
 
@@ -16,7 +17,7 @@ uses(RefreshDatabase::class)->group('dashboard');
 describe('Dashboard', function () {
     test('authenticated user can see totals on dashboard', function () {
         $user = User::factory()->create();
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
 
         Customer::factory()->count(2)->create();
         Employee::factory()->count(3)->create();

@@ -4,6 +4,7 @@ namespace Tests\Feature\Permissions;
 
 use App\Models\Permission;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
 
@@ -18,7 +19,7 @@ describe('Permission Page Access', function () {
 
     test('authenticated user without permission cannot access permissions', function () {
         $user = createTestUserWithPermissions([]);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
 
         $response = getJson('/api/permissions');
 
@@ -27,7 +28,7 @@ describe('Permission Page Access', function () {
 
     test('authenticated user with permission can access permissions', function () {
         $user = createTestUserWithPermissions(['permission']);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
 
         $response = getJson('/api/permissions');
 
@@ -42,7 +43,7 @@ describe('Permission Page Access', function () {
         Permission::factory()->create(['name' => 'test.permission.3', 'display_name' => 'Test Permission 3']);
 
         $user = createTestUserWithPermissions(['permission']);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
 
         $response = getJson('/api/permissions');
 

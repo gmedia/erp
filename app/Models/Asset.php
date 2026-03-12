@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasPipeline;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -107,7 +108,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Asset extends Model
 {
-    use \App\Traits\HasPipeline, HasFactory, HasUlids, SoftDeletes;
+    use HasFactory, HasPipeline, HasUlids, SoftDeletes;
 
     protected $fillable = [
         'ulid',

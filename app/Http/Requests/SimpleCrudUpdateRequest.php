@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 abstract class SimpleCrudUpdateRequest extends FormRequest
 {
@@ -26,7 +27,7 @@ abstract class SimpleCrudUpdateRequest extends FormRequest
 
         // Try to find the route parameter that matches the model
         // Convention: model 'CustomerCategory' -> route param 'customer_category'
-        $resourceName = \Illuminate\Support\Str::snake(class_basename($modelClass));
+        $resourceName = Str::snake(class_basename($modelClass));
         $resourceId = $this->route($resourceName)->id ?? $this->route('id');
 
         return [

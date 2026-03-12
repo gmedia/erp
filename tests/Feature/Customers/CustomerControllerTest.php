@@ -2,8 +2,10 @@
 
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\CustomerCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -18,7 +20,7 @@ describe('Customer API Endpoints', function () {
     beforeEach(function () {
         // Create user with all customer permissions for existing tests
         $user = createTestUserWithPermissions(['customer', 'customer.create', 'customer.edit', 'customer.delete']);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
     });
 
     test('index returns paginated customers with proper meta structure', function () {
@@ -92,8 +94,8 @@ describe('Customer API Endpoints', function () {
 
     test('index filters by category', function () {
         Customer::query()->delete();
-        $categoryA = \App\Models\CustomerCategory::factory()->create(['name' => 'Category A']);
-        $categoryB = \App\Models\CustomerCategory::factory()->create(['name' => 'Category B']);
+        $categoryA = CustomerCategory::factory()->create(['name' => 'Category A']);
+        $categoryB = CustomerCategory::factory()->create(['name' => 'Category B']);
 
         Customer::factory()->count(2)->create(['category_id' => $categoryA->id]);
         Customer::factory()->create(['category_id' => $categoryB->id]);
@@ -154,7 +156,7 @@ describe('Customer API Endpoints', function () {
 
     test('store creates customer with valid data and returns 201 status', function () {
         $branch = Branch::factory()->create();
-        $category = \App\Models\CustomerCategory::factory()->create();
+        $category = CustomerCategory::factory()->create();
 
         $customerData = [
             'name' => 'John Doe',
@@ -216,7 +218,7 @@ describe('Customer API Endpoints', function () {
         Customer::factory()->create(['email' => 'existing@example.com']);
         $branch = Branch::factory()->create();
 
-        $category = \App\Models\CustomerCategory::factory()->create();
+        $category = CustomerCategory::factory()->create();
 
         $response = postJson('/api/customers', [
             'name' => 'New Customer',
@@ -273,7 +275,7 @@ describe('Customer API Endpoints', function () {
         ]);
 
         $newBranch = Branch::factory()->create();
-        $newCategory = \App\Models\CustomerCategory::factory()->create();
+        $newCategory = CustomerCategory::factory()->create();
 
         $updateData = [
             'name' => 'Updated Name',
@@ -322,7 +324,7 @@ describe('Customer API Endpoints', function () {
 
     test('update ignores unique email validation for same customer', function () {
         $branch = Branch::factory()->create();
-        $category = \App\Models\CustomerCategory::factory()->create();
+        $category = CustomerCategory::factory()->create();
         $customer = Customer::factory()->create(['email' => 'john@example.com']);
 
         $response = putJson("/api/customers/{$customer->id}", [
@@ -339,7 +341,7 @@ describe('Customer API Endpoints', function () {
 
     test('update returns 404 for non-existent customer', function () {
         $branch = Branch::factory()->create();
-        $category = \App\Models\CustomerCategory::factory()->create();
+        $category = CustomerCategory::factory()->create();
 
         $response = putJson('/api/customers/99999', [
             'name' => 'Test Customer',

@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Account;
 use App\Models\Asset;
+use App\Models\AssetDepreciationLine;
 use App\Models\AssetDepreciationRun;
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -73,7 +75,7 @@ test('user can view depreciation run lines', function () {
 });
 
 test('user can post depreciation run to journal', function () {
-    $account = \App\Models\Account::factory()->create();
+    $account = Account::factory()->create();
 
     $asset = Asset::factory()->create([
         'purchase_cost' => 12000000,
@@ -95,7 +97,7 @@ test('user can post depreciation run to journal', function () {
         'status' => 'calculated',
     ]);
 
-    \App\Models\AssetDepreciationLine::factory()->create([
+    AssetDepreciationLine::factory()->create([
         'asset_depreciation_run_id' => $run->id,
         'asset_id' => $asset->id,
         'amount' => 200000,

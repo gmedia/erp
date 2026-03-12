@@ -3,6 +3,7 @@
 use App\Models\ApprovalDelegation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -21,7 +22,7 @@ describe('Approval Delegation API Endpoints', function () {
             'approval_delegation.edit',
             'approval_delegation.delete',
         ]);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
     });
 
     test('index returns paginated delegations', function () {

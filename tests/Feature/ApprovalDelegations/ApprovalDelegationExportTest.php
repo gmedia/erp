@@ -2,6 +2,7 @@
 
 use App\Models\ApprovalDelegation;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\actingAs;
@@ -22,7 +23,7 @@ describe('Approval Delegation Export API Ending', function () {
 
     test('can export approval delegations to excel', function () {
         $now = now();
-        \Carbon\Carbon::setTestNow($now);
+        Carbon::setTestNow($now);
 
         ApprovalDelegation::factory()->count(3)->create();
 
@@ -41,7 +42,7 @@ describe('Approval Delegation Export API Ending', function () {
 
     test('can export with search filter', function () {
         $now = now();
-        \Carbon\Carbon::setTestNow($now);
+        Carbon::setTestNow($now);
 
         ApprovalDelegation::factory()->create(['reason' => 'Annual Leave']);
         ApprovalDelegation::factory()->create(['reason' => 'Business Trip']);
@@ -60,7 +61,7 @@ describe('Approval Delegation Export API Ending', function () {
 
     test('can export with status filter', function () {
         $now = now();
-        \Carbon\Carbon::setTestNow($now);
+        Carbon::setTestNow($now);
 
         ApprovalDelegation::factory()->create(['is_active' => true]);
         ApprovalDelegation::factory()->create(['is_active' => false]);

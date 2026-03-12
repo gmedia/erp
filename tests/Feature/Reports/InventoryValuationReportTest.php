@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Laravel\Sanctum\Sanctum;
 use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class)->group('inventory-valuation-report');
@@ -20,7 +21,7 @@ beforeEach(function () {
 });
 
 test('it requires permission to access inventory valuation report', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->otherUser, ['*']);
+    Sanctum::actingAs($this->otherUser, ['*']);
     $this->getJson('/api/reports/inventory-valuation')
         ->assertForbidden();
 });
@@ -49,7 +50,7 @@ test('it can fetch inventory valuation data via json', function () {
         'average_cost_after' => 6000,
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-valuation')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
@@ -90,31 +91,31 @@ test('it can filter by product, warehouse, branch, category and search', functio
         'balance_after' => 15,
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-valuation?product_id=' . $productA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.product.id', $productA->id);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-valuation?warehouse_id=' . $warehouseA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.warehouse.id', $warehouseA->id);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-valuation?branch_id=' . $branchA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.warehouse.branch.id', $branchA->id);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-valuation?category_id=' . $categoryA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.product.category.id', $categoryA->id);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-valuation?search=PA-01')
         ->assertOk()
         ->assertJsonCount(1, 'data')
@@ -126,7 +127,7 @@ test('it can export inventory valuation report', function () {
     Excel::fake();
     Storage::fake('public');
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $response = $this->postJson('/api/reports/inventory-valuation/export')
         ->assertOk()
         ->assertJsonStructure(['url', 'filename']);

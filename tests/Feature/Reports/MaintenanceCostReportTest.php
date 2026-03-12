@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Laravel\Sanctum\Sanctum;
 use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class)->group('assets');
@@ -42,7 +43,7 @@ beforeEach(function () {
 });
 
 test('it can fetch maintenance cost report data via json', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/maintenance-cost')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
@@ -96,35 +97,35 @@ test('it can filter the report by various parameters', function () {
     ]);
 
     // Filter by branch
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/maintenance-cost?branch_id=' . $this->branch->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'IT-001');
 
     // Filter by category
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/maintenance-cost?asset_category_id=' . $otherCategory->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'FR-001');
 
     // Filter by supplier
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/maintenance-cost?supplier_id=' . $otherSupplier->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'FR-001');
 
     // Filter by type
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/maintenance-cost?maintenance_type=preventive')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'IT-001');
 
     // Filter by date range
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/maintenance-cost?start_date=2025-12-01&end_date=2026-12-31')
         ->assertOk()
         ->assertJsonCount(1, 'data')
@@ -136,7 +137,7 @@ test('it can export the report data to excel', function () {
     Excel::fake();
     Storage::fake('public');
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $response = $this->postJson('/api/reports/maintenance-cost/export')
         ->assertOk()
         ->assertJsonStructure(['url', 'filename']);

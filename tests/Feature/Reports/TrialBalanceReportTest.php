@@ -4,6 +4,7 @@ namespace Tests\Feature\Reports;
 
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\seed;
 
@@ -17,7 +18,7 @@ beforeEach(function () {
 });
 
 test('trial balance seimbang dan sesuai jurnal posted pada seed', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $response = $this->getJson('/api/reports/trial-balance?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertStatus(200)
         ->assertJsonPath('selectedYearId', $this->fiscalYear->id);

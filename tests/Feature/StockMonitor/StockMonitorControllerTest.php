@@ -7,6 +7,7 @@ use App\Models\StockMovement;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
 
@@ -18,7 +19,7 @@ beforeEach(function () {
 });
 
 test('it requires permission to access stock monitor', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->otherUser, ['*']);
+    Sanctum::actingAs($this->otherUser, ['*']);
     getJson('/api/stock-monitor')
         ->assertForbidden();
 });
@@ -53,7 +54,7 @@ test('it returns current stock snapshot per product and warehouse', function () 
         'moved_at' => now(),
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $response = getJson('/api/stock-monitor?per_page=10');
     $response->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
@@ -90,7 +91,7 @@ test('it can filter by branch, warehouse, category, product, and low stock thres
         'balance_after' => 50,
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     getJson('/api/stock-monitor?branch_id=' . $branchA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')

@@ -4,7 +4,10 @@ use App\Models\Asset;
 use App\Models\Pipeline;
 use App\Models\PipelineEntityState;
 use App\Models\PipelineState;
+use App\Models\PipelineStateLog;
 use App\Models\PipelineTransition;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\actingAs;
@@ -28,7 +31,7 @@ beforeEach(function () {
 
     // Create pipeline setup
     $this->pipeline = Pipeline::factory()->create([
-        'entity_type' => App\Models\Asset::class,
+        'entity_type' => Asset::class,
         'is_active' => true,
     ]);
 
@@ -88,7 +91,7 @@ it('prevents unauthenticated access', function () {
 it('returns 400 for entity that does not support pipelines', function () {
     // Assuming User model does not use Pipeline trait. If it does, find another model.
     // We'll use a mocked class or another known model. Here we use 'user' route.
-    $user = \App\Models\User::factory()->create();
+    $user = User::factory()->create();
     $response = actingAs($this->user)->getJson("/api/entity-states/user/{$user->id}");
     $response->assertStatus(400)
         ->assertJsonPath('message', 'Entity type user does not support pipelines.');
@@ -109,7 +112,7 @@ it('returns timeline logs ordered newest-first', function () {
     actingAs($this->user)->getJson("/api/entity-states/asset/{$this->asset->ulid}");
 
     // add a slight delay or modify created_at to ensure order
-    \Carbon\Carbon::setTestNow(now()->addMinute());
+    Carbon::setTestNow(now()->addMinute());
     actingAs($this->user)->postJson("/api/entity-states/asset/{$this->asset->ulid}/transition", [
         'transition_id' => $this->transitionSubmit->id,
         'comment' => 'Transition 1',
@@ -144,7 +147,7 @@ it('has correct content for initial assignment log', function () {
 it('has correct content for transition log', function () {
     actingAs($this->user)->getJson("/api/entity-states/asset/{$this->asset->ulid}");
 
-    \Carbon\Carbon::setTestNow(now()->addMinute());
+    Carbon::setTestNow(now()->addMinute());
     actingAs($this->user)->postJson("/api/entity-states/asset/{$this->asset->ulid}/transition", [
         'transition_id' => $this->transitionSubmit->id,
         'comment' => 'Moving to review',
@@ -170,9 +173,9 @@ it('paginates timeline results', function () {
     // we just insert logs directly to test pagination.
     $entityState = PipelineEntityState::where('entity_id', $this->asset->id)->first();
 
-    \App\Models\PipelineStateLog::factory()->count(20)->create([
+    PipelineStateLog::factory()->count(20)->create([
         'pipeline_entity_state_id' => $entityState->id,
-        'entity_type' => App\Models\Asset::class,
+        'entity_type' => Asset::class,
         'entity_id' => $this->asset->id,
         'to_state_id' => $this->stateDraft->id,
         'comment' => 'Dummy test log',
@@ -194,14 +197,14 @@ it('returns correct timeline after multiple transitions', function () {
     actingAs($this->user)->getJson("/api/entity-states/asset/{$this->asset->ulid}");
 
     // Transition 1 -> Review
-    \Carbon\Carbon::setTestNow(now()->addMinute(1));
+    Carbon::setTestNow(now()->addMinute(1));
     actingAs($this->user)->postJson("/api/entity-states/asset/{$this->asset->ulid}/transition", [
         'transition_id' => $this->transitionSubmit->id,
         'comment' => 'Requesting review',
     ]);
 
     // Transition 2 -> Active
-    \Carbon\Carbon::setTestNow(now()->addMinute(2));
+    Carbon::setTestNow(now()->addMinute(2));
     actingAs($this->user)->postJson("/api/entity-states/asset/{$this->asset->ulid}/transition", [
         'transition_id' => $this->transitionApprove->id,
         'comment' => 'LGTM',

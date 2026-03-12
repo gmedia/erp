@@ -3,6 +3,7 @@
 use App\Http\Resources\Suppliers\SupplierResource;
 use App\Models\Branch;
 use App\Models\Supplier;
+use App\Models\SupplierCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
@@ -10,7 +11,7 @@ uses(RefreshDatabase::class)->group('suppliers');
 
 test('to array returns correct structure', function () {
     $branch = Branch::factory()->create(['name' => 'Test Branch']);
-    $category = \App\Models\SupplierCategory::factory()->create(['name' => 'IT Services']);
+    $category = SupplierCategory::factory()->create(['name' => 'IT Services']);
     $supplier = Supplier::factory()->create([
         'name' => 'Test Supplier',
         'email' => 'test@example.com',

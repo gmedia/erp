@@ -3,9 +3,15 @@
 namespace App\Actions\AssetStocktakes;
 
 use App\Http\Requests\AssetStocktakes\ExportAssetStocktakeVarianceRequest;
+use App\Models\Asset;
+use App\Models\AssetLocation;
+use App\Models\AssetStocktake;
 use App\Models\AssetStocktakeItem;
+use App\Models\Branch;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -54,27 +60,27 @@ class ExportAssetStocktakeVariancesAction
             $query->orderBy($sortBy, $sortDirection);
         } elseif ($sortBy === 'stocktake_reference') {
             $query->orderBy(
-                \App\Models\AssetStocktake::select('reference')
+                AssetStocktake::select('reference')
                     ->whereColumn('asset_stocktakes.id', 'asset_stocktake_items.asset_stocktake_id'),
                 $sortDirection
             );
         } elseif ($sortBy === 'asset_code' || $sortBy === 'asset_name') {
             $query->orderBy(
-                \App\Models\Asset::select($sortBy === 'asset_code' ? 'asset_code' : 'name')
+                Asset::select($sortBy === 'asset_code' ? 'asset_code' : 'name')
                     ->whereColumn('assets.id', 'asset_stocktake_items.asset_id'),
                 $sortDirection
             );
         } elseif ($sortBy === 'expected_branch' || $sortBy === 'found_branch') {
             $column = $sortBy === 'expected_branch' ? 'expected_branch_id' : 'found_branch_id';
             $query->orderBy(
-                \App\Models\Branch::select('name')
+                Branch::select('name')
                     ->whereColumn('branches.id', "asset_stocktake_items.{$column}"),
                 $sortDirection
             );
         } elseif ($sortBy === 'expected_location' || $sortBy === 'found_location') {
             $column = $sortBy === 'expected_location' ? 'expected_location_id' : 'found_location_id';
             $query->orderBy(
-                \App\Models\AssetLocation::select('name')
+                AssetLocation::select('name')
                     ->whereColumn('asset_locations.id', "asset_stocktake_items.{$column}"),
                 $sortDirection
             );
@@ -102,7 +108,7 @@ class ExportAssetStocktakeVariancesAction
         ];
 
         foreach ($headers as $index => $header) {
-            $column = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($index + 1);
+            $column = Coordinate::stringFromColumnIndex($index + 1);
             $sheet->setCellValue($column . '1', $header);
             $sheet->getStyle($column . '1')->getFont()->setBold(true);
         }
@@ -134,15 +140,15 @@ class ExportAssetStocktakeVariancesAction
         $fileName = 'asset_stocktake_variances_' . date('Ymd_His') . '.xlsx';
         $filePath = 'exports/' . $fileName;
 
-        if (! \Illuminate\Support\Facades\Storage::disk('public')->exists('exports')) {
-            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('exports');
+        if (! Storage::disk('public')->exists('exports')) {
+            Storage::disk('public')->makeDirectory('exports');
         }
 
         $writer = new Xlsx($spreadsheet);
         $writer->save(storage_path('app/public/' . $filePath));
 
         return response()->json([
-            'url' => \Illuminate\Support\Facades\Storage::disk('public')->url($filePath),
+            'url' => Storage::disk('public')->url($filePath),
             'filename' => $fileName,
         ]);
     }

@@ -3,6 +3,7 @@
 use App\Http\Resources\Customers\CustomerResource;
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\CustomerCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
@@ -10,7 +11,7 @@ uses(RefreshDatabase::class)->group('customers');
 
 test('to array returns correct structure', function () {
     $branch = Branch::factory()->create(['name' => 'Test Branch']);
-    $category = \App\Models\CustomerCategory::factory()->create(['name' => 'Test Category']);
+    $category = CustomerCategory::factory()->create(['name' => 'Test Category']);
     $customer = Customer::factory()->create([
         'name' => 'John Doe',
         'email' => 'john@example.com',

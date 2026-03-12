@@ -3,6 +3,7 @@
 use App\Exports\SupplierExport;
 use App\Models\Branch;
 use App\Models\Supplier;
+use App\Models\SupplierCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('suppliers');
@@ -38,7 +39,7 @@ describe('SupplierExport', function () {
     });
 
     test('query applies exact category filter', function () {
-        $category = \App\Models\SupplierCategory::factory()->create();
+        $category = SupplierCategory::factory()->create();
         Supplier::factory()->create(['category_id' => $category->id]);
         Supplier::factory()->create(); // different category
 
@@ -66,7 +67,7 @@ describe('SupplierExport', function () {
     });
 
     test('map function returns correct data', function () {
-        $category = \App\Models\SupplierCategory::factory()->make(['name' => 'Electronics']);
+        $category = SupplierCategory::factory()->make(['name' => 'Electronics']);
         $supplier = Supplier::factory()->make([
             'id' => 1,
             'name' => 'Test Supplier',

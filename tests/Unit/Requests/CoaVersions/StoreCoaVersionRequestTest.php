@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Requests\CoaVersions\StoreCoaVersionRequest;
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
@@ -53,7 +54,7 @@ test('StoreCoaVersionRequest → validation fails with invalid status', function
 
 test('StoreCoaVersionRequest → validation fails when unique name in same fiscal year', function () {
     $fy = FiscalYear::factory()->create();
-    \App\Models\CoaVersion::factory()->create([
+    CoaVersion::factory()->create([
         'name' => 'Existing Version',
         'fiscal_year_id' => $fy->id,
     ]);

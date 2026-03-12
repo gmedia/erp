@@ -4,6 +4,7 @@ use App\Actions\Suppliers\IndexSuppliersAction;
 use App\Domain\Suppliers\SupplierFilterService;
 use App\Http\Requests\Suppliers\IndexSupplierRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 uses(RefreshDatabase::class)->group('suppliers');
 
@@ -47,7 +48,7 @@ test('execute calls filter service with correct parameters', function () {
     // Mock pagination
     $builder = Mockery::mock('Illuminate\Database\Eloquent\Builder');
     $builder->shouldReceive('with')->with(['branch', 'category'])->andReturnSelf();
-    $builder->shouldReceive('paginate')->with(15, ['*'], 'page', 1)->andReturn(new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15));
+    $builder->shouldReceive('paginate')->with(15, ['*'], 'page', 1)->andReturn(new LengthAwarePaginator([], 0, 15));
 
     // We can't easily mock the static query() call on the model without alias mocking,
     // so we'll test the service interaction via a real instance or partial mock if needed.

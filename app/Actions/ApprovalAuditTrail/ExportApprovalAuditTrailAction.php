@@ -7,6 +7,7 @@ use App\Http\Requests\ApprovalAuditTrail\ExportApprovalAuditTrailRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Excel as ExcelExcel;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExportApprovalAuditTrailAction
@@ -17,7 +18,7 @@ class ExportApprovalAuditTrailAction
 
         $format = $request->get('format', 'xlsx');
         $extension = $format === 'csv' ? 'csv' : 'xlsx';
-        $writerType = $format === 'csv' ? \Maatwebsite\Excel\Excel::CSV : \Maatwebsite\Excel\Excel::XLSX;
+        $writerType = $format === 'csv' ? ExcelExcel::CSV : ExcelExcel::XLSX;
 
         $filename = 'approval_audit_trail_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.' . $extension;
         $filePath = 'exports/' . $filename;

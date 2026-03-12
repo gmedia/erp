@@ -6,6 +6,7 @@ use App\Models\PipelineEntityState;
 use App\Models\PipelineState;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
 
@@ -51,7 +52,7 @@ it('requires authentication and permission to access the dashboard', function ()
 
     // Authenticated without permission
     $userWithoutPermission = createTestUserWithPermissions([]);
-    \Laravel\Sanctum\Sanctum::actingAs($userWithoutPermission, ['*']);
+    Sanctum::actingAs($userWithoutPermission, ['*']);
     getJson('/api/pipeline-dashboard/data')->assertForbidden();
 });
 
@@ -76,7 +77,7 @@ it('returns correct summary data via API', function () {
         'current_state_id' => $this->stateReview->id,
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $response = getJson('/api/pipeline-dashboard/data');
 
     $response->assertOk()
@@ -128,7 +129,7 @@ it('filters data by pipeline_id', function () {
     ]);
 
     // Request with filter for Pipeline 1
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $response1 = getJson("/api/pipeline-dashboard/data?pipeline_id={$this->pipeline->id}");
     $data1 = $response1->json();
 
@@ -167,7 +168,7 @@ it('detects stale entities based on threshold', function () {
     ]);
 
     // Default threshold is 7 days
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $response = getJson('/api/pipeline-dashboard/data');
 
     $response->assertOk();

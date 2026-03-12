@@ -6,13 +6,14 @@ use App\Actions\AssetMaintenances\ExportAssetMaintenancesAction;
 use App\Http\Requests\AssetMaintenances\ExportAssetMaintenanceRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use Mockery;
 
 uses(RefreshDatabase::class)->group('asset-maintenances');
 
 test('it can download export file', function () {
-    \Illuminate\Support\Carbon::setTestNow('2023-01-01 00:00:00');
+    Carbon::setTestNow('2023-01-01 00:00:00');
     Excel::fake();
 
     $request = Mockery::mock(ExportAssetMaintenanceRequest::class);

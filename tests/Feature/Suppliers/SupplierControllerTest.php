@@ -2,6 +2,7 @@
 
 use App\Models\Branch;
 use App\Models\Supplier;
+use App\Models\SupplierCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -70,7 +71,7 @@ describe('Supplier API Endpoints', function () {
     });
 
     test('index supports filtering by category', function () {
-        $category = \App\Models\SupplierCategory::factory()->create();
+        $category = SupplierCategory::factory()->create();
         Supplier::factory()->create(['category_id' => $category->id]);
         Supplier::factory()->create(); // different category
 
@@ -97,7 +98,7 @@ describe('Supplier API Endpoints', function () {
 
     test('store creates supplier', function () {
         $branch = Branch::factory()->create();
-        $category = \App\Models\SupplierCategory::factory()->create();
+        $category = SupplierCategory::factory()->create();
         $data = [
             'name' => 'New Supplier',
             'email' => 'new@example.com',
@@ -119,7 +120,7 @@ describe('Supplier API Endpoints', function () {
     test('store validates unique email', function () {
         Supplier::factory()->create(['email' => 'existing@example.com']);
         $branch = Branch::factory()->create();
-        $category = \App\Models\SupplierCategory::factory()->create();
+        $category = SupplierCategory::factory()->create();
 
         $response = postJson('/api/suppliers', [
             'name' => 'Another Supplier',
@@ -135,7 +136,7 @@ describe('Supplier API Endpoints', function () {
 
     test('update modifies supplier', function () {
         $supplier = Supplier::factory()->create();
-        $category = \App\Models\SupplierCategory::factory()->create();
+        $category = SupplierCategory::factory()->create();
         $data = [
             'name' => 'Updated Supplier',
             'email' => $supplier->email, // keep same email

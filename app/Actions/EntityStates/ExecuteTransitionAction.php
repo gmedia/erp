@@ -3,6 +3,7 @@
 namespace App\Actions\EntityStates;
 
 use App\Models\PipelineEntityState;
+use App\Models\PipelineStateLog;
 use App\Models\PipelineTransition;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -75,7 +76,7 @@ class ExecuteTransitionAction
             $logMetadata = array_merge($metadata, ['action_results' => $actionResults]);
 
             // 7. Create State Log
-            \App\Models\PipelineStateLog::create([
+            PipelineStateLog::create([
                 'entity_type' => $entity->getMorphClass(),
                 'entity_id' => $entity->getKey(),
                 'pipeline_entity_state_id' => $entityState->id,

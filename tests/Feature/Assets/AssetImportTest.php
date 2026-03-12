@@ -10,13 +10,14 @@ use App\Models\Employee;
 use App\Models\Supplier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class)->group('assets');
 
 beforeEach(function () {
     // Create user with necessary permissions
     $this->user = createTestUserWithPermissions(['asset', 'asset.create']);
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
 
     $this->category = AssetCategory::factory()->create(['name' => 'IT Equipment']);
     $this->model = AssetModel::factory()->create(['model_name' => 'MacBook Pro', 'asset_category_id' => $this->category->id]);

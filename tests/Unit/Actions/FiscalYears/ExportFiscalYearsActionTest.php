@@ -3,13 +3,14 @@
 use App\Actions\FiscalYears\ExportFiscalYearsAction;
 use App\Http\Requests\FiscalYears\ExportFiscalYearRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class)->group('fiscal-years');
 
 test('execute returns export response', function () {
     Excel::fake();
-    Illuminate\Support\Carbon::setTestNow('2026-01-31 12:00:00');
+    Carbon::setTestNow('2026-01-31 12:00:00');
 
     $action = new ExportFiscalYearsAction;
 

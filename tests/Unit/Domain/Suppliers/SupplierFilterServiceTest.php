@@ -3,6 +3,7 @@
 use App\Domain\Suppliers\SupplierFilterService;
 use App\Models\Branch;
 use App\Models\Supplier;
+use App\Models\SupplierCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('suppliers');
@@ -36,7 +37,7 @@ test('applyAdvancedFilters filters by branch', function () {
 
 test('applyAdvancedFilters filters by category', function () {
     $service = new SupplierFilterService;
-    $category = \App\Models\SupplierCategory::factory()->create();
+    $category = SupplierCategory::factory()->create();
     Supplier::factory()->create(['category_id' => $category->id]);
     Supplier::factory()->create(); // different category
 

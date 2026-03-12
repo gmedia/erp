@@ -5,9 +5,10 @@ namespace Database\Seeders;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Permission;
 use App\Models\Position;
-use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -167,7 +168,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Assign all permissions to sample users for easy testing
-        $allPermissions = \App\Models\Permission::all();
+        $allPermissions = Permission::all();
         foreach ([config('app.admin'), 'manager.hr@dokfin.id', 'director.finance@dokfin.id', 'staff.it@dokfin.id'] as $email) {
             $employee = Employee::where('email', $email)->first();
             if ($employee) {

@@ -4,6 +4,7 @@ namespace Tests\Feature\Reports;
 
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\seed;
 
@@ -17,7 +18,7 @@ beforeEach(function () {
 });
 
 test('income statement menampilkan laporan sesuai seed (posted saja)', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/income-statement?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertStatus(200)
         ->assertJsonPath('selectedYearId', $this->fiscalYear->id)

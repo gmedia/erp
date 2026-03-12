@@ -5,6 +5,7 @@ namespace Tests\Feature\Assets;
 use App\Models\Asset;
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
 
@@ -12,7 +13,7 @@ uses(RefreshDatabase::class)->group('assets');
 
 beforeEach(function () {
     $user = createTestUserWithPermissions(['asset', 'asset_profile', 'asset_movement']);
-    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+    Sanctum::actingAs($user, ['*']);
 
     FiscalYear::factory()->create(['status' => 'open']);
 });

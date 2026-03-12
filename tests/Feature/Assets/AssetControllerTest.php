@@ -7,6 +7,7 @@ use App\Models\AssetCategory;
 use App\Models\AssetMovement;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertSoftDeleted;
@@ -19,7 +20,7 @@ uses(RefreshDatabase::class)->group('assets');
 
 beforeEach(function () {
     $user = createTestUserWithPermissions(['asset', 'asset.create', 'asset.edit', 'asset.delete']);
-    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+    Sanctum::actingAs($user, ['*']);
 });
 
 test('it returns asset index', function () {

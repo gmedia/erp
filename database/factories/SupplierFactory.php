@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Branch;
 use App\Models\Supplier;
+use App\Models\SupplierCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -26,7 +27,7 @@ class SupplierFactory extends Factory
             'phone' => $this->faker->phoneNumber(),
             'address' => $this->faker->address(),
             'branch_id' => Branch::factory(),
-            'category_id' => \App\Models\SupplierCategory::factory(),
+            'category_id' => SupplierCategory::factory(),
             'status' => $this->faker->randomElement(['active', 'inactive']),
         ];
     }

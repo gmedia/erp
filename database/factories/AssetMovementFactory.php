@@ -3,7 +3,11 @@
 namespace Database\Factories;
 
 use App\Models\Asset;
+use App\Models\AssetLocation;
 use App\Models\AssetMovement;
+use App\Models\Branch;
+use App\Models\Department;
+use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,14 +21,14 @@ class AssetMovementFactory extends Factory
             'asset_id' => Asset::factory(),
             'movement_type' => $this->faker->randomElement(['acquired', 'transfer', 'assign', 'return', 'dispose', 'adjustment']),
             'moved_at' => $this->faker->dateTimeBetween('-2 years', 'now'),
-            'from_branch_id' => \App\Models\Branch::factory(),
-            'to_branch_id' => \App\Models\Branch::factory(),
-            'from_location_id' => \App\Models\AssetLocation::factory(),
-            'to_location_id' => \App\Models\AssetLocation::factory(),
-            'from_department_id' => \App\Models\Department::factory(),
-            'to_department_id' => \App\Models\Department::factory(),
-            'from_employee_id' => \App\Models\Employee::factory(),
-            'to_employee_id' => \App\Models\Employee::factory(),
+            'from_branch_id' => Branch::factory(),
+            'to_branch_id' => Branch::factory(),
+            'from_location_id' => AssetLocation::factory(),
+            'to_location_id' => AssetLocation::factory(),
+            'from_department_id' => Department::factory(),
+            'to_department_id' => Department::factory(),
+            'from_employee_id' => Employee::factory(),
+            'to_employee_id' => Employee::factory(),
             'created_by' => User::factory(),
             'reference' => $this->faker->optional()->bothify('MOV-#####'),
             'notes' => $this->faker->optional()->sentence(),

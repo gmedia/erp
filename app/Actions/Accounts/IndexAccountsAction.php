@@ -5,6 +5,7 @@ namespace App\Actions\Accounts;
 use App\Actions\Concerns\SimpleCrudIndexAction;
 use App\Domain\Accounts\AccountFilterService;
 use App\Models\Account;
+use App\Models\CoaVersion;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
@@ -27,7 +28,7 @@ class IndexAccountsAction extends SimpleCrudIndexAction
             $query->where('coa_version_id', $request->coa_version_id);
         } else {
             // Find active coa version
-            $activeVersion = \App\Models\CoaVersion::where('status', 'active')->first();
+            $activeVersion = CoaVersion::where('status', 'active')->first();
             if ($activeVersion) {
                 $query->where('coa_version_id', $activeVersion->id);
             }

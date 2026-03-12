@@ -9,6 +9,7 @@ use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class)->group('reports');
 
@@ -43,7 +44,7 @@ beforeEach(function () {
 });
 
 test('can view comparative report properties via json', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/comparative')
         ->assertStatus(200)
         ->assertJsonStructure(['fiscalYears', 'selectedYearId', 'comparisonYearId']);
@@ -126,7 +127,7 @@ test('comparative uses archived previous year and mapping split allocated to LCA
         'credit' => 0,
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/comparative?fiscal_year_id=' . $this->fyCurr->id . '&comparison_year_id=' . $this->fyPrev->id)
         ->assertStatus(200)
         ->assertJsonPath('report.totals.assets', 0)

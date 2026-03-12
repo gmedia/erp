@@ -3,6 +3,7 @@
 use App\Domain\Customers\CustomerFilterService;
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\CustomerCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('customers');
@@ -43,8 +44,8 @@ test('applyAdvancedFilters applies branch filter', function () {
 
 test('applyAdvancedFilters applies category filter', function () {
     $service = new CustomerFilterService;
-    $categoryA = \App\Models\CustomerCategory::factory()->create();
-    $categoryB = \App\Models\CustomerCategory::factory()->create();
+    $categoryA = CustomerCategory::factory()->create();
+    $categoryB = CustomerCategory::factory()->create();
 
     Customer::factory()->create(['category_id' => $categoryA->id]);
     Customer::factory()->create(['category_id' => $categoryB->id]);

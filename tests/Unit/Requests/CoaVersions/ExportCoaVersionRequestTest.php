@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Requests\CoaVersions\ExportCoaVersionRequest;
+use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
 
@@ -12,7 +13,7 @@ test('ExportCoaVersionRequest → authorize returns true', function () {
 });
 
 test('ExportCoaVersionRequest → rules allow valid filters', function () {
-    $fy = \App\Models\FiscalYear::factory()->create();
+    $fy = FiscalYear::factory()->create();
     $data = [
         'search' => 'test',
         'status' => 'active',

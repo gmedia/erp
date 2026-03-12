@@ -1,8 +1,11 @@
 <?php
 
+use App\Models\BillOfMaterial;
 use App\Models\Branch;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductPrice;
+use App\Models\ProductStock;
 use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -43,21 +46,21 @@ test('product has scope for type', function () {
 
 test('product has prices relationship', function () {
     $product = Product::factory()->create();
-    \App\Models\ProductPrice::factory()->count(3)->create(['product_id' => $product->id]);
+    ProductPrice::factory()->count(3)->create(['product_id' => $product->id]);
 
     expect($product->prices)->toHaveCount(3);
 });
 
 test('product has stocks relationship', function () {
     $product = Product::factory()->create();
-    \App\Models\ProductStock::factory()->count(2)->create(['product_id' => $product->id]);
+    ProductStock::factory()->count(2)->create(['product_id' => $product->id]);
 
     expect($product->stocks)->toHaveCount(2);
 });
 
 test('product has bill of materials relationship', function () {
     $finishedProduct = Product::factory()->create(['is_manufactured' => true]);
-    \App\Models\BillOfMaterial::factory()->count(2)->create(['finished_product_id' => $finishedProduct->id]);
+    BillOfMaterial::factory()->count(2)->create(['finished_product_id' => $finishedProduct->id]);
 
     expect($finishedProduct->billOfMaterials)->toHaveCount(2);
 });

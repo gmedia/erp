@@ -5,6 +5,7 @@ use App\Models\StockMovement;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
 
@@ -16,7 +17,7 @@ beforeEach(function () {
 });
 
 test('it requires permission to access stock movements', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->otherUser, ['*']);
+    Sanctum::actingAs($this->otherUser, ['*']);
     getJson('/api/stock-movements')
         ->assertForbidden();
 });
@@ -35,7 +36,7 @@ test('it can fetch stock movements data via json', function () {
         'reference_number' => 'SA-2026-000001',
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     getJson('/api/stock-movements?per_page=10')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
@@ -72,7 +73,7 @@ test('it can filter by product, warehouse, movement_type, and date range', funct
         'moved_at' => '2025-01-01 10:00:00',
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     getJson('/api/stock-movements?product_id=' . $p1->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
@@ -102,7 +103,7 @@ test('it can sort by product name', function () {
     StockMovement::factory()->create(['product_id' => $pB->id, 'warehouse_id' => $w->id, 'moved_at' => '2026-01-01 00:00:00']);
     StockMovement::factory()->create(['product_id' => $pA->id, 'warehouse_id' => $w->id, 'moved_at' => '2026-01-01 00:00:00']);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $response = getJson('/api/stock-movements?sort_by=product_name&sort_direction=asc')
         ->assertOk();
 

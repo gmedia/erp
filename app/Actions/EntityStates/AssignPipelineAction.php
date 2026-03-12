@@ -4,6 +4,7 @@ namespace App\Actions\EntityStates;
 
 use App\Models\Pipeline;
 use App\Models\PipelineEntityState;
+use App\Models\PipelineStateLog;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -58,7 +59,7 @@ class AssignPipelineAction
             ]);
 
             // 5. Create the initial log entry
-            \App\Models\PipelineStateLog::create([
+            PipelineStateLog::create([
                 'entity_type' => $entityType,
                 'entity_id' => $entity->getKey(),
                 'pipeline_entity_state_id' => $entityState->id,

@@ -3,6 +3,7 @@
 use App\Models\Asset;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class)->group('assets');
 
@@ -13,7 +14,7 @@ it('can view asset register report', function () {
         'name' => 'Test Asset XYZ',
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+    Sanctum::actingAs($user, ['*']);
     $response = $this->getJson('/api/reports/assets/register');
 
     $response->assertStatus(200)
@@ -23,7 +24,7 @@ it('can view asset register report', function () {
 it('cannot view asset register report without permission', function () {
     $user = User::factory()->create();
 
-    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+    Sanctum::actingAs($user, ['*']);
     $response = $this->getJson('/api/reports/assets/register');
 
     $response->assertStatus(403);

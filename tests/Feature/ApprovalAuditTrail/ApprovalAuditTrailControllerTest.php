@@ -5,7 +5,9 @@ use App\Models\ApprovalRequest;
 use App\Models\Asset;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -51,19 +53,19 @@ describe('index', function () {
     });
 
     it('denies access without permission', function () {
-        \Laravel\Sanctum\Sanctum::actingAs($this->noPermissionUser, ['*']);
+        Sanctum::actingAs($this->noPermissionUser, ['*']);
         getJson('/api/approval-audit-trail')
             ->assertForbidden();
     });
 
     it('allows access with permission', function () {
-        \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+        Sanctum::actingAs($this->user, ['*']);
         getJson('/api/approval-audit-trail')
             ->assertOk();
     });
 
     it('returns json data when requested', function () {
-        \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+        Sanctum::actingAs($this->user, ['*']);
         getJson('/api/approval-audit-trail')
             ->assertOk()
             ->assertJson(function (AssertableJson $json) {
@@ -75,7 +77,7 @@ describe('index', function () {
     });
 
     it('can filter by event', function () {
-        \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+        Sanctum::actingAs($this->user, ['*']);
         getJson('/api/approval-audit-trail?event=submitted')
             ->assertOk()
             ->assertJson(function (AssertableJson $json) {
@@ -86,7 +88,7 @@ describe('index', function () {
     });
 
     it('can filter by actor', function () {
-        \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+        Sanctum::actingAs($this->user, ['*']);
         getJson('/api/approval-audit-trail?actor_user_id=' . $this->superAdmin->id)
             ->assertOk()
             ->assertJson(function (AssertableJson $json) {
@@ -103,19 +105,19 @@ describe('export', function () {
     });
 
     it('denies access without permission', function () {
-        \Laravel\Sanctum\Sanctum::actingAs($this->noPermissionUser, ['*']);
+        Sanctum::actingAs($this->noPermissionUser, ['*']);
         postJson('/api/approval-audit-trail/export')
             ->assertForbidden();
     });
 
     it('allows access with permission and exports data', function () {
-        \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+        Sanctum::actingAs($this->user, ['*']);
         $response = postJson('/api/approval-audit-trail/export')
             ->assertOk()
             ->assertJsonStructure(['url', 'filename']);
 
         // Check file exists in storage
         $filename = $response->json('filename');
-        \Illuminate\Support\Facades\Storage::disk('public')->assertExists('exports/' . $filename);
+        Storage::disk('public')->assertExists('exports/' . $filename);
     });
 });

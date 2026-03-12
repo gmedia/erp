@@ -5,6 +5,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -18,7 +19,7 @@ uses(RefreshDatabase::class)->group('products');
 describe('Product API Endpoints', function () {
     beforeEach(function () {
         $user = createTestUserWithPermissions(['product', 'product.create', 'product.edit', 'product.delete']);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
     });
 
     test('index returns paginated products with proper structure', function () {

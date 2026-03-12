@@ -5,6 +5,7 @@ namespace Tests\Feature\Users;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
@@ -15,7 +16,7 @@ uses(RefreshDatabase::class)->group('users');
 describe('Get User By Employee API', function () {
     beforeEach(function () {
         $user = createTestUserWithPermissions(['user']);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
     });
 
     test('returns null user when employee has no linked user', function () {
@@ -63,7 +64,7 @@ describe('Get User By Employee API', function () {
 describe('Update User API', function () {
     beforeEach(function () {
         $user = createTestUserWithPermissions(['user']);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
     });
 
     test('creates new user for employee without linked user', function () {
@@ -172,7 +173,7 @@ describe('Update User API', function () {
 describe('User API Permission Tests', function () {
     test('getUserByEmployee returns 403 when user lacks user permission', function () {
         $user = createTestUserWithPermissions([]);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
 
         $employee = Employee::factory()->create();
 
@@ -183,7 +184,7 @@ describe('User API Permission Tests', function () {
 
     test('updateUser returns 403 when user lacks user permission', function () {
         $user = createTestUserWithPermissions([]);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
 
         $employee = Employee::factory()->create(['user_id' => null]);
 

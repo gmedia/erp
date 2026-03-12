@@ -3,6 +3,7 @@
 use App\Models\AssetStocktake;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -20,7 +21,7 @@ beforeEach(function () {
         'asset_stocktake.edit',
         'asset_stocktake.delete',
     ]);
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->branch = Branch::factory()->create();
 });
 

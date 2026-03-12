@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Laravel\Sanctum\Sanctum;
 use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class)->group('book-value-depreciation-reports');
@@ -32,7 +33,7 @@ beforeEach(function () {
 });
 
 test('it can fetch book value report data via json', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/book-value-depreciation')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
@@ -67,14 +68,14 @@ test('it can filter the report by category and branch', function () {
     ]);
 
     // Filter by branch
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/book-value-depreciation?branch_id=' . $this->branch->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'IT-001');
 
     // Filter by category
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/book-value-depreciation?asset_category_id=' . $otherCategory->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
@@ -86,7 +87,7 @@ test('it can export the report data to excel', function () {
     Excel::fake();
     Storage::fake('public');
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $response = $this->postJson('/api/reports/book-value-depreciation/export')
         ->assertOk()
         ->assertJsonStructure(['url', 'filename']);

@@ -6,6 +6,7 @@ use App\Actions\Pipelines\IndexPipelinesAction;
 use App\Domain\Pipelines\PipelineFilterService;
 use App\Http\Requests\Pipelines\IndexPipelineRequest;
 use App\Models\Pipeline;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('pipelines');
@@ -46,8 +47,8 @@ it('filters pipelines by search', function () {
 });
 
 it('sorts pipelines by created_by', function () {
-    $user1 = \App\Models\User::factory()->create(['name' => 'Alice User']);
-    $user2 = \App\Models\User::factory()->create(['name' => 'Zack User']);
+    $user1 = User::factory()->create(['name' => 'Alice User']);
+    $user2 = User::factory()->create(['name' => 'Zack User']);
 
     Pipeline::factory()->create(['created_by' => $user2->id, 'name' => 'Pipeline Z']);
     Pipeline::factory()->create(['created_by' => $user1->id, 'name' => 'Pipeline A']);

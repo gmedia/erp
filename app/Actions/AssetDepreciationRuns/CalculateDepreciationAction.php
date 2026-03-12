@@ -5,6 +5,7 @@ namespace App\Actions\AssetDepreciationRuns;
 use App\Models\Asset;
 use App\Models\AssetDepreciationLine;
 use App\Models\AssetDepreciationRun;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -31,7 +32,7 @@ class CalculateDepreciationAction
                 'period_start' => $data['period_start'],
                 'period_end' => $data['period_end'],
                 'status' => 'calculated',
-                'created_by' => \Illuminate\Support\Facades\Auth::id(),
+                'created_by' => Auth::id(),
             ]);
 
             // Find eligible assets

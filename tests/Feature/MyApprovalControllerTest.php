@@ -5,6 +5,7 @@ use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
@@ -15,7 +16,7 @@ uses(RefreshDatabase::class)->group('my-approvals');
 it('displays the my approvals inbox page', function () {
     $user = User::factory()->create();
 
-    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+    Sanctum::actingAs($user, ['*']);
     getJson('/api/my-approvals')
         ->assertStatus(200);
 });
@@ -38,7 +39,7 @@ it('lists pending approvals assigned to the current user', function () {
         'status' => 'pending',
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+    Sanctum::actingAs($user, ['*']);
     $response = getJson('/api/my-approvals');
 
     $response->assertStatus(200);
@@ -79,7 +80,7 @@ it('only lists the current actionable step in pending approvals', function () {
         'status' => 'pending',
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($futureApprover, ['*']);
+    Sanctum::actingAs($futureApprover, ['*']);
 
     getJson('/api/my-approvals')
         ->assertOk()
@@ -104,7 +105,7 @@ it('can approve a pending request step', function () {
         'status' => 'pending',
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+    Sanctum::actingAs($user, ['*']);
     postJson("/api/my-approvals/{$request->id}/approve", [
         'comments' => 'Looks good to me',
     ])
@@ -136,7 +137,7 @@ it('can reject a pending request step', function () {
         'status' => 'pending',
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+    Sanctum::actingAs($user, ['*']);
     postJson("/api/my-approvals/{$request->id}/reject", [
         'comments' => 'Missing information',
     ])
@@ -167,7 +168,7 @@ it('forbids approving a step that is not assigned to the current user', function
         'status' => 'pending',
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($intruder, ['*']);
+    Sanctum::actingAs($intruder, ['*']);
 
     postJson("/api/my-approvals/{$request->id}/approve", [
         'comments' => 'Trying to approve another user step',
@@ -198,7 +199,7 @@ it('forbids rejecting a step that is not assigned to the current user', function
         'status' => 'pending',
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($intruder, ['*']);
+    Sanctum::actingAs($intruder, ['*']);
 
     postJson("/api/my-approvals/{$request->id}/reject", [
         'comments' => 'Trying to reject another user step',

@@ -3,6 +3,7 @@
 use App\Models\ApprovalFlow;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -21,7 +22,7 @@ describe('Approval Flow API Endpoints', function () {
             'approval_flow.edit',
             'approval_flow.delete',
         ]);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
     });
 
     test('index returns paginated approval flows with proper meta structure', function () {

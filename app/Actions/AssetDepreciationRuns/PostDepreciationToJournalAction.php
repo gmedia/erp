@@ -4,6 +4,7 @@ namespace App\Actions\AssetDepreciationRuns;
 
 use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\AssetDepreciationRun;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -93,7 +94,7 @@ class PostDepreciationToJournalAction
             $run->update([
                 'status' => 'posted',
                 'journal_entry_id' => $journalEntry->id,
-                'posted_by' => \Illuminate\Support\Facades\Auth::id(),
+                'posted_by' => Auth::id(),
                 'posted_at' => now(),
             ]);
         });

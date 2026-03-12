@@ -5,6 +5,7 @@ use App\Models\Pipeline;
 use App\Models\PipelineState;
 use App\Models\PipelineTransition;
 use App\Models\PipelineTransitionAction;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\actingAs;
@@ -265,17 +266,17 @@ it('final state has no available transitions', function () {
 it('timeline shows complete lifecycle history after multiple transitions', function () {
     actingAs($this->user)->getJson("/api/entity-states/asset/{$this->asset->ulid}");
 
-    \Carbon\Carbon::setTestNow(now()->addMinute());
+    Carbon::setTestNow(now()->addMinute());
     actingAs($this->user)->postJson("/api/entity-states/asset/{$this->asset->ulid}/transition", [
         'transition_id' => $this->transActivate->id,
     ]);
 
-    \Carbon\Carbon::setTestNow(now()->addMinutes(2));
+    Carbon::setTestNow(now()->addMinutes(2));
     actingAs($this->user)->postJson("/api/entity-states/asset/{$this->asset->ulid}/transition", [
         'transition_id' => $this->transSendMaint->id,
     ]);
 
-    \Carbon\Carbon::setTestNow(now()->addMinutes(3));
+    Carbon::setTestNow(now()->addMinutes(3));
     actingAs($this->user)->postJson("/api/entity-states/asset/{$this->asset->ulid}/transition", [
         'transition_id' => $this->transReturnMaint->id,
     ]);

@@ -3,6 +3,7 @@
 use App\Http\Requests\Suppliers\UpdateSupplierRequest;
 use App\Models\Supplier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\Rule;
 
 uses(RefreshDatabase::class)->group('suppliers');
 
@@ -32,7 +33,7 @@ test('rules returns correct validation rules', function () {
         'email' => [
             'nullable',
             'email',
-            \Illuminate\Validation\Rule::unique('suppliers', 'email')->ignore($supplier->id),
+            Rule::unique('suppliers', 'email')->ignore($supplier->id),
         ],
         'phone' => 'nullable|string|max:20',
         'address' => 'nullable|string',

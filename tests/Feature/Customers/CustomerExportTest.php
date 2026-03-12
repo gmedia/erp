@@ -3,6 +3,7 @@
 use App\Exports\CustomerExport;
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\CustomerCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('customers');
@@ -38,8 +39,8 @@ describe('CustomerExport', function () {
     });
 
     test('query applies exact category filter', function () {
-        $categoryA = \App\Models\CustomerCategory::factory()->create();
-        $categoryB = \App\Models\CustomerCategory::factory()->create();
+        $categoryA = CustomerCategory::factory()->create();
+        $categoryB = CustomerCategory::factory()->create();
 
         Customer::factory()->create(['category_id' => $categoryA->id]);
         Customer::factory()->create(['category_id' => $categoryB->id]);
@@ -95,7 +96,7 @@ describe('CustomerExport', function () {
 
     test('map formats data correctly', function () {
         $branch = Branch::factory()->create(['name' => 'Test Branch']);
-        $category = \App\Models\CustomerCategory::factory()->create(['name' => 'Test Category']);
+        $category = CustomerCategory::factory()->create(['name' => 'Test Category']);
         $customer = Customer::factory()->create([
             'name' => 'Test Customer',
             'email' => 'test@example.com',

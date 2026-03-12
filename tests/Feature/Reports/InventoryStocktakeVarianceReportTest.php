@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Laravel\Sanctum\Sanctum;
 use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class)->group('inventory-stocktake-variance-report');
@@ -21,7 +22,7 @@ beforeEach(function () {
 });
 
 test('it requires permission to access inventory stocktake variance report', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->otherUser, ['*']);
+    Sanctum::actingAs($this->otherUser, ['*']);
     $this->getJson('/api/reports/inventory-stocktake-variance')
         ->assertForbidden();
 });
@@ -55,7 +56,7 @@ test('it can fetch inventory stocktake variance report data via json', function 
         'counted_at' => now(),
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-stocktake-variance')
         ->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
@@ -102,43 +103,43 @@ test('it can filter by dimensions and result', function () {
         'result' => 'deficit',
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-stocktake-variance?inventory_stocktake_id=' . $stocktakeA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.stocktake.id', $stocktakeA->id);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-stocktake-variance?product_id=' . $productA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.product.id', $productA->id);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-stocktake-variance?warehouse_id=' . $warehouseA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.warehouse.id', $warehouseA->id);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-stocktake-variance?branch_id=' . $branchA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.warehouse.branch.id', $branchA->id);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-stocktake-variance?category_id=' . $categoryA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.product.category.id', $categoryA->id);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-stocktake-variance?result=deficit')
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.result', 'deficit');
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/inventory-stocktake-variance?start_date=2026-03-05&end_date=2026-03-31')
         ->assertOk()
         ->assertJsonCount(1, 'data')
@@ -150,7 +151,7 @@ test('it can export inventory stocktake variance report', function () {
     Excel::fake();
     Storage::fake('public');
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $response = $this->postJson('/api/reports/inventory-stocktake-variance/export')
         ->assertOk()
         ->assertJsonStructure(['url', 'filename']);

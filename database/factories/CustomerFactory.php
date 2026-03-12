@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\CustomerCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -26,7 +27,7 @@ class CustomerFactory extends Factory
             'phone' => fake()->phoneNumber(),
             'address' => fake()->address(),
             'branch_id' => Branch::factory(),
-            'category_id' => \App\Models\CustomerCategory::factory(),
+            'category_id' => CustomerCategory::factory(),
             'status' => fake()->randomElement(['active', 'inactive']),
             'notes' => fake()->optional()->sentence(),
         ];

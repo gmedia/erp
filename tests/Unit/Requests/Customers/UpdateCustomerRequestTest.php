@@ -3,6 +3,7 @@
 use App\Http\Requests\Customers\UpdateCustomerRequest;
 use App\Models\Customer;
 use Illuminate\Routing\Route;
+use Illuminate\Validation\Rule;
 
 uses()->group('customers');
 
@@ -27,7 +28,7 @@ test('rules returns correct validation rules', function () {
             'sometimes',
             'required',
             'email',
-            \Illuminate\Validation\Rule::unique('customers', 'email')->ignore($customer->id),
+            Rule::unique('customers', 'email')->ignore($customer->id),
         ],
         'phone' => 'nullable|string|max:20',
         'address' => 'nullable|string',

@@ -1,9 +1,13 @@
 <?php
 
+use App\Mail\TestSmtpMail;
 use App\Models\Setting;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class)->group('admin-settings');
 
@@ -20,7 +24,7 @@ describe('AdminSettingController@index', function () {
     test('user without permission gets 403', function () {
         $user = createTestUserWithPermissions([]);
 
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->getJson('/api/admin-settings');
         $response->assertStatus(403);
     });
@@ -28,7 +32,7 @@ describe('AdminSettingController@index', function () {
     test('user with admin_setting permission can view settings', function () {
         $user = createTestUserWithPermissions(['admin_setting']);
 
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->getJson('/api/admin-settings');
 
         $response->assertStatus(200);
@@ -43,7 +47,7 @@ describe('AdminSettingController@index', function () {
     test('index returns grouped settings with correct keys', function () {
         $user = createTestUserWithPermissions(['admin_setting']);
 
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->getJson('/api/admin-settings');
 
         $response->assertJsonStructure([
@@ -79,7 +83,7 @@ describe('AdminSettingController@update', function () {
     test('user with edit permission can update general settings', function () {
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->putJson('/api/admin-settings', [
             'company_name' => 'Acme Corporation',
             'company_address' => '123 Main Street',
@@ -98,7 +102,7 @@ describe('AdminSettingController@update', function () {
     test('user with edit permission can update regional settings', function () {
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->putJson('/api/admin-settings', [
             'timezone' => 'Asia/Makassar',
             'currency' => 'USD',
@@ -119,7 +123,7 @@ describe('AdminSettingController@update', function () {
     test('update validates email format', function () {
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->putJson('/api/admin-settings', [
             'company_email' => 'not-an-email',
         ]);
@@ -131,7 +135,7 @@ describe('AdminSettingController@update', function () {
     test('update validates timezone', function () {
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->putJson('/api/admin-settings', [
             'timezone' => 'Invalid/Timezone',
         ]);
@@ -143,7 +147,7 @@ describe('AdminSettingController@update', function () {
     test('update validates max length', function () {
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->putJson('/api/admin-settings', [
             'company_name' => str_repeat('a', 256),
         ]);
@@ -160,7 +164,7 @@ describe('AdminSettingController@update', function () {
         Setting::set('company_phone', '111');
 
         // Update only company_name
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->putJson('/api/admin-settings', [
             'company_name' => 'Updated Company',
         ]);
@@ -177,7 +181,7 @@ describe('AdminSettingController@update', function () {
 
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->putJson('/api/admin-settings', [
             'company_logo' => UploadedFile::fake()->create('logo.svg', 10, 'image/svg+xml'),
         ]);
@@ -200,29 +204,29 @@ describe('AdminSettingController@testSmtp', function () {
     });
 
     test('user with edit permission can send test email successfully', function () {
-        \Illuminate\Support\Facades\Mail::fake();
+        Mail::fake();
 
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->postJson('/api/admin-settings/test-smtp', [
             'test_email' => 'test@example.com',
         ]);
 
         $response->assertOk();
 
-        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\TestSmtpMail::class, function ($mail) {
+        Mail::assertSent(TestSmtpMail::class, function ($mail) {
             return $mail->hasTo('test@example.com');
         });
     });
 
     test('fails gracefully when sending test email results in exception', function () {
         // Mock the mailer to throw an exception
-        \Illuminate\Support\Facades\Mail::shouldReceive('to->send')->andThrow(new \Exception('Connection refused'));
+        Mail::shouldReceive('to->send')->andThrow(new Exception('Connection refused'));
 
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->postJson('/api/admin-settings/test-smtp', [
             'test_email' => 'test@example.com',
         ]);
@@ -235,7 +239,7 @@ describe('AdminSettingController@testSmtp', function () {
     test('validates email format', function () {
         $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
 
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
         $response = $this->postJson('/api/admin-settings/test-smtp', [
             'test_email' => 'not-an-email',
         ]);

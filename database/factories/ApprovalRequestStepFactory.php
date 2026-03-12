@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\ApprovalFlowStep;
+use App\Models\ApprovalRequest;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,8 +19,8 @@ class ApprovalRequestStepFactory extends Factory
     public function definition(): array
     {
         return [
-            'approval_request_id' => \App\Models\ApprovalRequest::factory(),
-            'approval_flow_step_id' => \App\Models\ApprovalFlowStep::factory(),
+            'approval_request_id' => ApprovalRequest::factory(),
+            'approval_flow_step_id' => ApprovalFlowStep::factory(),
             'step_order' => 1,
             'status' => 'pending',
             'comments' => null,

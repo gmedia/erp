@@ -8,6 +8,7 @@ use App\Models\AssetStocktake;
 use App\Models\AssetStocktakeItem;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -18,7 +19,7 @@ beforeEach(function () {
     $this->user = createTestUserWithPermissions([
         'asset_stocktake',
     ]);
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
 });
 
 test('it can list variance items', function () {

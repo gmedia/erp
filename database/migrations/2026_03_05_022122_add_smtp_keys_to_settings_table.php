@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Setting;
 use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
@@ -17,7 +18,7 @@ return new class extends Migration
         ];
 
         foreach ($settings as $setting) {
-            \App\Models\Setting::firstOrCreate(
+            Setting::firstOrCreate(
                 ['key' => $setting['key']],
                 $setting
             );
@@ -36,6 +37,6 @@ return new class extends Migration
             'mail_from_name',
         ];
 
-        \App\Models\Setting::whereIn('key', $keys)->delete();
+        Setting::whereIn('key', $keys)->delete();
     }
 };

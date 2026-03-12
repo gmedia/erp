@@ -7,6 +7,7 @@ use App\Models\ApprovalRequestStep;
 use App\Models\Asset;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
 
@@ -66,7 +67,7 @@ test('can fetch approval monitoring data', function () {
         'completed_at' => now(),
     ]);
 
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     $response = getJson('/api/approval-monitoring/data');
 
     $response->assertOk()
@@ -101,7 +102,7 @@ test('can fetch approval monitoring data', function () {
 });
 
 test('can filter overdue approvals by document type', function () {
-    \Laravel\Sanctum\Sanctum::actingAs($this->user, ['*']);
+    Sanctum::actingAs($this->user, ['*']);
     // Create an approval request for PR
     $prRequest = ApprovalRequest::create([
         'approval_flow_id' => $this->flow->id,

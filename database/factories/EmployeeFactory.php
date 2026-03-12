@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
@@ -32,7 +33,7 @@ class EmployeeFactory extends Factory
             'phone' => $this->faker->optional()->phoneNumber(),
             'department_id' => Department::factory(),
             'position_id' => Position::factory(),
-            'branch_id' => \App\Models\Branch::factory(),
+            'branch_id' => Branch::factory(),
             'user_id' => $this->faker->boolean(20) ? User::factory() : null,
             // nullable two-decimal salary
             'salary' => $this->faker->optional(0.8, null)->randomFloat(2, 30000, 150000),

@@ -1,10 +1,12 @@
 <?php
 
+use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -19,7 +21,7 @@ describe('Employee API Endpoints', function () {
     beforeEach(function () {
         // Create user with all employee permissions for existing tests
         $user = createTestUserWithPermissions(['employee', 'employee.create', 'employee.edit', 'employee.delete']);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
     });
 
     test('index returns paginated employees with proper meta structure', function () {
@@ -67,7 +69,7 @@ describe('Employee API Endpoints', function () {
             'name' => 'Zebra Tester',
             'email' => 'zebra@example.com',
         ]);
-        \Laravel\Sanctum\Sanctum::actingAs($user, ['*']);
+        Sanctum::actingAs($user, ['*']);
 
         Employee::factory()->create(['name' => 'John Smith', 'email' => 'john@example.com']);
         Employee::factory()->create(['name' => 'Jane Doe', 'email' => 'jane@example.com']);
@@ -118,7 +120,7 @@ describe('Employee API Endpoints', function () {
     test('store creates employee with valid data and returns 201 status', function () {
         $department = Department::factory()->create();
         $position = Position::factory()->create();
-        $branch = \App\Models\Branch::factory()->create();
+        $branch = Branch::factory()->create();
 
         $employeeData = [
             'employee_id' => 'EMP-001',
@@ -189,7 +191,7 @@ describe('Employee API Endpoints', function () {
         Employee::factory()->create(['email' => 'existing@example.com']);
         $department = Department::factory()->create();
         $position = Position::factory()->create();
-        $branch = \App\Models\Branch::factory()->create();
+        $branch = Branch::factory()->create();
 
         $response = postJson('/api/employees', [
             'employee_id' => 'EMP-002',
@@ -244,7 +246,7 @@ describe('Employee API Endpoints', function () {
     test('update modifies employee and returns updated resource', function () {
         $department = Department::factory()->create();
         $position = Position::factory()->create(['name' => 'Junior Developer']);
-        $branch = \App\Models\Branch::factory()->create();
+        $branch = Branch::factory()->create();
         $employee = Employee::factory()->create([
             'name' => 'Old Name',
             'department_id' => $department->id,
@@ -253,7 +255,7 @@ describe('Employee API Endpoints', function () {
         ]);
 
         $newPosition = Position::factory()->create(['name' => 'Senior Developer']);
-        $newBranch = \App\Models\Branch::factory()->create(['name' => 'New Branch']);
+        $newBranch = Branch::factory()->create(['name' => 'New Branch']);
 
         $updateData = [
             'name' => 'Updated Name',
@@ -330,7 +332,7 @@ describe('Employee API Endpoints', function () {
         $employee = Employee::factory()->create(['email' => 'john@example.com']);
         $department = Department::factory()->create();
         $position = Position::factory()->create();
-        $branch = \App\Models\Branch::factory()->create();
+        $branch = Branch::factory()->create();
 
         $response = putJson("/api/employees/{$employee->id}", [
             'name' => 'Updated Name',
@@ -348,7 +350,7 @@ describe('Employee API Endpoints', function () {
     test('update returns 404 for non-existent employee', function () {
         $department = Department::factory()->create();
         $position = Position::factory()->create();
-        $branch = \App\Models\Branch::factory()->create();
+        $branch = Branch::factory()->create();
 
         $response = putJson('/api/employees/99999', [
             'name' => 'Test Employee',
@@ -402,8 +404,8 @@ describe('Employee API Endpoints', function () {
         $marketing = Department::factory()->create(['name' => 'Marketing']);
         $developer = Position::factory()->create(['name' => 'Developer']);
         $manager = Position::factory()->create(['name' => 'Manager']);
-        $branchA = \App\Models\Branch::factory()->create(['name' => 'Branch A']);
-        $branchB = \App\Models\Branch::factory()->create(['name' => 'Branch B']);
+        $branchA = Branch::factory()->create(['name' => 'Branch A']);
+        $branchB = Branch::factory()->create(['name' => 'Branch B']);
 
         Employee::factory()->create(['department_id' => $engineering->id, 'position_id' => $developer->id, 'branch_id' => $branchA->id]);
         Employee::factory()->create(['department_id' => $marketing->id, 'position_id' => $manager->id, 'branch_id' => $branchB->id]);

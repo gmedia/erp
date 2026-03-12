@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Actions\ApprovalFlows\ExportApprovalFlowsAction;
 use App\Actions\ApprovalFlows\IndexApprovalFlowsAction;
+use App\DTOs\ApprovalFlows\UpdateApprovalFlowData;
 use App\Http\Requests\ApprovalFlows\ExportApprovalFlowRequest;
 use App\Http\Requests\ApprovalFlows\IndexApprovalFlowRequest;
 use App\Http\Requests\ApprovalFlows\StoreApprovalFlowRequest;
 use App\Http\Requests\ApprovalFlows\UpdateApprovalFlowRequest;
 use App\Http\Resources\ApprovalFlows\ApprovalFlowCollection;
 use App\Http\Resources\ApprovalFlows\ApprovalFlowResource;
+use App\Models\ApprovalFlow;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class ApprovalFlowController extends Controller
 {
@@ -20,10 +24,10 @@ class ApprovalFlowController extends Controller
 
     public function store(StoreApprovalFlowRequest $request): ApprovalFlowResource
     {
-        $flow = \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+        $flow = DB::transaction(function () use ($request) {
             $validated = $request->validated();
 
-            $flow = \App\Models\ApprovalFlow::create([
+            $flow = ApprovalFlow::create([
                 'name' => $validated['name'],
                 'code' => $validated['code'],
                 'approvable_type' => $validated['approvable_type'],
@@ -57,16 +61,16 @@ class ApprovalFlowController extends Controller
         return new ApprovalFlowResource($flow);
     }
 
-    public function show(\App\Models\ApprovalFlow $approvalFlow): ApprovalFlowResource
+    public function show(ApprovalFlow $approvalFlow): ApprovalFlowResource
     {
         return new ApprovalFlowResource($approvalFlow->load(['steps.user', 'steps.department', 'creator']));
     }
 
-    public function update(UpdateApprovalFlowRequest $request, \App\Models\ApprovalFlow $approvalFlow): ApprovalFlowResource
+    public function update(UpdateApprovalFlowRequest $request, ApprovalFlow $approvalFlow): ApprovalFlowResource
     {
-        $flow = \Illuminate\Support\Facades\DB::transaction(function () use ($request, $approvalFlow) {
+        $flow = DB::transaction(function () use ($request, $approvalFlow) {
             $validated = $request->validated();
-            $dto = \App\DTOs\ApprovalFlows\UpdateApprovalFlowData::fromArray($validated);
+            $dto = UpdateApprovalFlowData::fromArray($validated);
 
             $approvalFlow->update($dto->toArray());
 
@@ -96,14 +100,14 @@ class ApprovalFlowController extends Controller
         return new ApprovalFlowResource($flow);
     }
 
-    public function destroy(\App\Models\ApprovalFlow $approvalFlow): \Illuminate\Http\JsonResponse
+    public function destroy(ApprovalFlow $approvalFlow): JsonResponse
     {
         $approvalFlow->delete();
 
         return response()->json(null, 204);
     }
 
-    public function export(ExportApprovalFlowRequest $request, ExportApprovalFlowsAction $action): \Illuminate\Http\JsonResponse
+    public function export(ExportApprovalFlowRequest $request, ExportApprovalFlowsAction $action): JsonResponse
     {
         return $action->execute($request);
     }

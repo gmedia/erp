@@ -3,6 +3,7 @@
 namespace App\Http\Requests\ApprovalFlows;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateApprovalFlowRequest extends FormRequest
 {
@@ -18,7 +19,7 @@ class UpdateApprovalFlowRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255',
-            'code' => ['sometimes', 'required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('approval_flows')->ignore($this->approval_flow)],
+            'code' => ['sometimes', 'required', 'string', 'max:255', Rule::unique('approval_flows')->ignore($this->approval_flow)],
             'approvable_type' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'is_active' => 'boolean',

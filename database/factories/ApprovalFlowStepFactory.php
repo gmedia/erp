@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\ApprovalFlow;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,11 +19,11 @@ class ApprovalFlowStepFactory extends Factory
     public function definition(): array
     {
         return [
-            'approval_flow_id' => \App\Models\ApprovalFlow::factory(),
+            'approval_flow_id' => ApprovalFlow::factory(),
             'step_order' => $this->faker->numberBetween(1, 10),
             'name' => $this->faker->jobTitle() . ' Approval',
             'approver_type' => 'user',
-            'approver_user_id' => \App\Models\User::factory(),
+            'approver_user_id' => User::factory(),
             'approver_role_id' => null,
             'approver_department_id' => null,
             'required_action' => 'approve',

@@ -3,7 +3,11 @@
 namespace App\Actions\AssetStocktakes;
 
 use App\Http\Requests\AssetStocktakes\IndexAssetStocktakeVarianceRequest;
+use App\Models\Asset;
+use App\Models\AssetLocation;
+use App\Models\AssetStocktake;
 use App\Models\AssetStocktakeItem;
+use App\Models\Branch;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -55,27 +59,27 @@ class IndexAssetStocktakeVarianceAction
             $query->orderBy($sortBy, $sortDirection);
         } elseif ($sortBy === 'stocktake_reference') {
             $query->orderBy(
-                \App\Models\AssetStocktake::select('reference')
+                AssetStocktake::select('reference')
                     ->whereColumn('asset_stocktakes.id', 'asset_stocktake_items.asset_stocktake_id'),
                 $sortDirection
             );
         } elseif ($sortBy === 'asset_code' || $sortBy === 'asset_name') {
             $query->orderBy(
-                \App\Models\Asset::select($sortBy === 'asset_code' ? 'asset_code' : 'name')
+                Asset::select($sortBy === 'asset_code' ? 'asset_code' : 'name')
                     ->whereColumn('assets.id', 'asset_stocktake_items.asset_id'),
                 $sortDirection
             );
         } elseif ($sortBy === 'expected_branch' || $sortBy === 'found_branch') {
             $column = $sortBy === 'expected_branch' ? 'expected_branch_id' : 'found_branch_id';
             $query->orderBy(
-                \App\Models\Branch::select('name')
+                Branch::select('name')
                     ->whereColumn('branches.id', "asset_stocktake_items.{$column}"),
                 $sortDirection
             );
         } elseif ($sortBy === 'expected_location' || $sortBy === 'found_location') {
             $column = $sortBy === 'expected_location' ? 'expected_location_id' : 'found_location_id';
             $query->orderBy(
-                \App\Models\AssetLocation::select('name')
+                AssetLocation::select('name')
                     ->whereColumn('asset_locations.id', "asset_stocktake_items.{$column}"),
                 $sortDirection
             );

@@ -144,7 +144,6 @@ it('evaluates permissions and guards in available transitions', function () {
 
     $transitionsAdmin = $responseAdmin->json('data.available_transitions');
     // It should be allowed because user has permission AND the asset status is 'active' (guard passes)
-    dump($transitionsAdmin[0]['rejection_reasons']);
     $this->assertTrue($transitionsAdmin[0]['is_allowed']);
 
     // Now change asset so guard fails

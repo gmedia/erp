@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Requests\Employees\StoreEmployeeRequest;
+use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
@@ -47,7 +48,7 @@ describe('StoreEmployeeRequest', function () {
             'phone' => '555-1234',
             'department_id' => $department->id,
             'position_id' => $position->id,
-            'branch_id' => \App\Models\Branch::factory()->create()->id,
+            'branch_id' => Branch::factory()->create()->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
             'employment_status' => 'regular',
@@ -84,7 +85,7 @@ describe('StoreEmployeeRequest', function () {
             'email' => 'invalid-email',
             'department_id' => $department->id,
             'position_id' => $position->id,
-            'branch_id' => \App\Models\Branch::factory()->create()->id,
+            'branch_id' => Branch::factory()->create()->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
             'employment_status' => 'regular',
@@ -107,7 +108,7 @@ describe('StoreEmployeeRequest', function () {
             'email' => 'existing@example.com',
             'department_id' => $department->id,
             'position_id' => $position->id,
-            'branch_id' => \App\Models\Branch::factory()->create()->id,
+            'branch_id' => Branch::factory()->create()->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
             'employment_status' => 'regular',
@@ -128,7 +129,7 @@ describe('StoreEmployeeRequest', function () {
             'email' => 'john.doe@example.com',
             'department_id' => 999999, // non-existent department id
             'position_id' => $position->id,
-            'branch_id' => \App\Models\Branch::factory()->create()->id,
+            'branch_id' => Branch::factory()->create()->id,
             'salary' => '75000.00',
             'hire_date' => '2023-01-15',
             'employment_status' => 'regular',
@@ -150,7 +151,7 @@ describe('StoreEmployeeRequest', function () {
             'email' => 'john.doe@example.com',
             'department_id' => $department->id,
             'position_id' => $position->id,
-            'branch_id' => \App\Models\Branch::factory()->create()->id,
+            'branch_id' => Branch::factory()->create()->id,
             'salary' => '-1000',
             'hire_date' => '2023-01-15',
             'employment_status' => 'regular',
@@ -172,7 +173,7 @@ describe('StoreEmployeeRequest', function () {
             'email' => 'john.doe@example.com',
             'department_id' => $department->id,
             'position_id' => $position->id,
-            'branch_id' => \App\Models\Branch::factory()->create()->id,
+            'branch_id' => Branch::factory()->create()->id,
             'salary' => '75000.00',
             'hire_date' => 'invalid-date',
             'employment_status' => 'regular',
@@ -187,7 +188,7 @@ describe('StoreEmployeeRequest', function () {
     test('rules validation passes with valid branch id', function () {
         $department = Department::factory()->create();
         $position = Position::factory()->create();
-        $branch = \App\Models\Branch::factory()->create();
+        $branch = Branch::factory()->create();
 
         $data = [
             'employee_id' => 'EMP-123',

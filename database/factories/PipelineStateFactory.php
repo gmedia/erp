@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Pipeline;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,7 @@ class PipelineStateFactory extends Factory
     public function definition(): array
     {
         return [
-            'pipeline_id' => \App\Models\Pipeline::factory(),
+            'pipeline_id' => Pipeline::factory(),
             'code' => $this->faker->unique()->slug,
             'name' => $this->faker->word,
             'type' => $this->faker->randomElement(['initial', 'intermediate', 'final']),

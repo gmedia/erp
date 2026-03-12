@@ -2,6 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\ApprovalFlow;
+use App\Models\ApprovalFlowStep;
+use App\Models\Asset;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseRequest;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class ApprovalFlowSampleDataSeeder extends Seeder
@@ -11,9 +17,9 @@ class ApprovalFlowSampleDataSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = \App\Models\User::where('email', config('app.admin'))->first();
-        $hrManager = \App\Models\User::where('email', 'manager.hr@dokfin.id')->first();
-        $financeDirector = \App\Models\User::where('email', 'director.finance@dokfin.id')->first();
+        $admin = User::where('email', config('app.admin'))->first();
+        $hrManager = User::where('email', 'manager.hr@dokfin.id')->first();
+        $financeDirector = User::where('email', 'director.finance@dokfin.id')->first();
 
         if (! $admin || ! $hrManager || ! $financeDirector) {
             return;
@@ -23,7 +29,7 @@ class ApprovalFlowSampleDataSeeder extends Seeder
             [
                 'code' => 'asset_registration_high_value',
                 'name' => 'High Value Asset Registration',
-                'approvable_type' => \App\Models\Asset::class,
+                'approvable_type' => Asset::class,
                 'description' => 'Approval for registering assets with cost > 100M',
                 'conditions' => ['field_checks' => [['field' => 'purchase_cost', 'operator' => '>', 'value' => 100000000]]],
                 'steps' => [
@@ -42,7 +48,7 @@ class ApprovalFlowSampleDataSeeder extends Seeder
             [
                 'code' => 'purchase_request_default',
                 'name' => 'Purchase Request Default Approval',
-                'approvable_type' => \App\Models\PurchaseRequest::class,
+                'approvable_type' => PurchaseRequest::class,
                 'description' => 'Default approval flow for submitted purchase requests',
                 'conditions' => null,
                 'steps' => [
@@ -56,7 +62,7 @@ class ApprovalFlowSampleDataSeeder extends Seeder
             [
                 'code' => 'purchase_order_default',
                 'name' => 'Purchase Order Default Approval',
-                'approvable_type' => \App\Models\PurchaseOrder::class,
+                'approvable_type' => PurchaseOrder::class,
                 'description' => 'Default approval flow for submitted purchase orders',
                 'conditions' => null,
                 'steps' => [
@@ -72,7 +78,7 @@ class ApprovalFlowSampleDataSeeder extends Seeder
         foreach ($flows as $flowDefinition) {
             $steps = $flowDefinition['steps'];
 
-            $flow = \App\Models\ApprovalFlow::updateOrCreate(
+            $flow = ApprovalFlow::updateOrCreate(
                 ['code' => $flowDefinition['code']],
                 [
                     'name' => $flowDefinition['name'],
@@ -85,7 +91,7 @@ class ApprovalFlowSampleDataSeeder extends Seeder
             );
 
             foreach ($steps as $stepDefinition) {
-                \App\Models\ApprovalFlowStep::updateOrCreate(
+                ApprovalFlowStep::updateOrCreate(
                     [
                         'approval_flow_id' => $flow->id,
                         'step_order' => $stepDefinition['step_order'],
