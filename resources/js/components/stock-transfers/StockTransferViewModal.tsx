@@ -110,7 +110,9 @@ export const StockTransferViewModal = React.memo(
                                     value={
                                         current.transfer_date
                                             ? format(
-                                                  new Date(current.transfer_date),
+                                                  new Date(
+                                                      current.transfer_date,
+                                                  ),
                                                   'PPP',
                                               )
                                             : '-'
@@ -133,11 +135,16 @@ export const StockTransferViewModal = React.memo(
                                     label="Requested By"
                                     value={current.requested_by?.name || '-'}
                                 />
-                                <ViewField label="Notes" value={current.notes || '-'} />
+                                <ViewField
+                                    label="Notes"
+                                    value={current.notes || '-'}
+                                />
                             </div>
 
                             <div className="space-y-2">
-                                <div className="text-sm font-semibold">Items</div>
+                                <div className="text-sm font-semibold">
+                                    Items
+                                </div>
                                 <div className="overflow-x-auto rounded-md border">
                                     <Table>
                                         <TableHeader>
@@ -157,7 +164,8 @@ export const StockTransferViewModal = React.memo(
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {(current.items || []).length === 0 ? (
+                                            {(current.items || []).length ===
+                                            0 ? (
                                                 <TableRow>
                                                     <TableCell
                                                         colSpan={6}
@@ -167,28 +175,37 @@ export const StockTransferViewModal = React.memo(
                                                     </TableCell>
                                                 </TableRow>
                                             ) : (
-                                                (current.items || []).map((it) => (
-                                                    <TableRow key={it.id}>
-                                                        <TableCell>
-                                                            {it.product?.name || '-'}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {it.unit?.name || '-'}
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            {it.quantity}
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            {it.quantity_received}
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            {it.unit_cost}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {it.notes || '-'}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))
+                                                (current.items || []).map(
+                                                    (it) => (
+                                                        <TableRow key={it.id}>
+                                                            <TableCell>
+                                                                {it.product
+                                                                    ?.name ||
+                                                                    '-'}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                {it.unit
+                                                                    ?.name ||
+                                                                    '-'}
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                {it.quantity}
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                {
+                                                                    it.quantity_received
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                {it.unit_cost}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                {it.notes ||
+                                                                    '-'}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ),
+                                                )
                                             )}
                                         </TableBody>
                                     </Table>

@@ -74,7 +74,10 @@ export const SupplierReturnViewModal = React.memo(
                                     label="Return Date"
                                     value={
                                         item.return_date
-                                            ? format(new Date(item.return_date), 'PPP')
+                                            ? format(
+                                                  new Date(item.return_date),
+                                                  'PPP',
+                                              )
                                             : '-'
                                     }
                                 />
@@ -82,10 +85,15 @@ export const SupplierReturnViewModal = React.memo(
                                 <ViewField
                                     label="Status"
                                     value={
-                                        <Badge variant="outline">{item.status}</Badge>
+                                        <Badge variant="outline">
+                                            {item.status}
+                                        </Badge>
                                     }
                                 />
-                                <ViewField label="Notes" value={item.notes || '-'} />
+                                <ViewField
+                                    label="Notes"
+                                    value={item.notes || '-'}
+                                />
                             </div>
 
                             <div className="space-y-2">
@@ -100,7 +108,9 @@ export const SupplierReturnViewModal = React.memo(
                                                 <th className="p-2 text-left">
                                                     Product
                                                 </th>
-                                                <th className="p-2 text-left">Unit</th>
+                                                <th className="p-2 text-left">
+                                                    Unit
+                                                </th>
                                                 <th className="p-2 text-right">
                                                     Qty Returned
                                                 </th>
@@ -116,10 +126,13 @@ export const SupplierReturnViewModal = React.memo(
                                                     className="border-b last:border-b-0"
                                                 >
                                                     <td className="p-2">
-                                                        {it.goods_receipt_item_id}
+                                                        {
+                                                            it.goods_receipt_item_id
+                                                        }
                                                     </td>
                                                     <td className="p-2">
-                                                        {it.product?.name || '-'}
+                                                        {it.product?.name ||
+                                                            '-'}
                                                     </td>
                                                     <td className="p-2">
                                                         {it.unit?.name || '-'}

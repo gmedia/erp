@@ -50,8 +50,14 @@ export const PurchaseRequestViewModal = React.memo(
                     <ScrollArea className="flex-1 pr-4">
                         <div className="space-y-6 py-2">
                             <div className="grid grid-cols-2 gap-6">
-                                <ViewField label="PR Number" value={item.pr_number} />
-                                <ViewField label="Branch" value={item.branch?.name} />
+                                <ViewField
+                                    label="PR Number"
+                                    value={item.pr_number}
+                                />
+                                <ViewField
+                                    label="Branch"
+                                    value={item.branch?.name}
+                                />
                                 <ViewField
                                     label="Department"
                                     value={item.department?.name}
@@ -64,7 +70,10 @@ export const PurchaseRequestViewModal = React.memo(
                                     label="Request Date"
                                     value={
                                         item.request_date
-                                            ? format(new Date(item.request_date), 'PPP')
+                                            ? format(
+                                                  new Date(item.request_date),
+                                                  'PPP',
+                                              )
                                             : '-'
                                     }
                                 />
@@ -86,14 +95,19 @@ export const PurchaseRequestViewModal = React.memo(
                                 <ViewField
                                     label="Status"
                                     value={
-                                        <Badge variant="outline">{item.status}</Badge>
+                                        <Badge variant="outline">
+                                            {item.status}
+                                        </Badge>
                                     }
                                 />
                                 <ViewField
                                     label="Estimated Amount"
                                     value={item.estimated_amount ?? '0'}
                                 />
-                                <ViewField label="Notes" value={item.notes || '-'} />
+                                <ViewField
+                                    label="Notes"
+                                    value={item.notes || '-'}
+                                />
                             </div>
 
                             <div className="space-y-2">
@@ -105,7 +119,9 @@ export const PurchaseRequestViewModal = React.memo(
                                                 <th className="p-2 text-left">
                                                     Product
                                                 </th>
-                                                <th className="p-2 text-left">Unit</th>
+                                                <th className="p-2 text-left">
+                                                    Unit
+                                                </th>
                                                 <th className="p-2 text-right">
                                                     Quantity
                                                 </th>
@@ -124,7 +140,8 @@ export const PurchaseRequestViewModal = React.memo(
                                                     className="border-b last:border-b-0"
                                                 >
                                                     <td className="p-2">
-                                                        {it.product?.name || '-'}
+                                                        {it.product?.name ||
+                                                            '-'}
                                                     </td>
                                                     <td className="p-2">
                                                         {it.unit?.name || '-'}
@@ -133,10 +150,12 @@ export const PurchaseRequestViewModal = React.memo(
                                                         {it.quantity}
                                                     </td>
                                                     <td className="p-2 text-right">
-                                                        {it.estimated_unit_price || '0'}
+                                                        {it.estimated_unit_price ||
+                                                            '0'}
                                                     </td>
                                                     <td className="p-2 text-right">
-                                                        {it.estimated_total || '0'}
+                                                        {it.estimated_total ||
+                                                            '0'}
                                                     </td>
                                                 </tr>
                                             ))}

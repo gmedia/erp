@@ -12,6 +12,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePipelineTransition } from '@/hooks/usePipelineTransition';
 import { PipelineState, PipelineTransition } from '@/types/pipeline';
@@ -148,7 +149,7 @@ export function PipelineTransitionFormDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+            <DialogContent className="flex max-h-[90vh] max-w-3xl flex-col overflow-hidden">
                 <DialogHeader>
                     <DialogTitle>
                         {transition ? 'Edit Transition' : 'New Transition'}
@@ -171,224 +172,267 @@ export function PipelineTransitionFormDialog({
                             e.stopPropagation();
                             form.handleSubmit(onSubmit)(e);
                         }}
-                        className="space-y-6"
+                        className="flex min-h-0 flex-1 flex-col"
                     >
-                        <Tabs defaultValue="details">
-                            <TabsList className="mb-4">
-                                <TabsTrigger value="details">
-                                    Details
-                                </TabsTrigger>
-                                <TabsTrigger value="actions">
-                                    Actions ({actionFields.length})
-                                </TabsTrigger>
-                            </TabsList>
+                        <ScrollArea className="flex-1 pr-4">
+                            <div className="py-1">
+                                <Tabs
+                                    defaultValue="details"
+                                    className="space-y-4"
+                                >
+                                    <TabsList>
+                                        <TabsTrigger value="details">
+                                            Details
+                                        </TabsTrigger>
+                                        <TabsTrigger value="actions">
+                                            Actions ({actionFields.length})
+                                        </TabsTrigger>
+                                    </TabsList>
 
-                            <TabsContent value="details" className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <SelectField
-                                        name="from_state_id"
-                                        label="From State"
-                                        options={stateOptions}
-                                    />
-                                    <SelectField
-                                        name="to_state_id"
-                                        label="To State"
-                                        options={stateOptions}
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <InputField
-                                        name="name"
-                                        label="Name (e.g. Approve)"
-                                    />
-                                    <InputField
-                                        name="code"
-                                        label="Code (e.g. approve_order)"
-                                    />
-                                </div>
-
-                                <TextareaField
-                                    name="description"
-                                    label="Description"
-                                    rows={2}
-                                />
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <InputField
-                                        name="required_permission"
-                                        label="Required Permission"
-                                        placeholder="e.g. order.approve"
-                                    />
-                                    <InputField
-                                        name="sort_order"
-                                        label="Sort Order"
-                                        type="number"
-                                    />
-                                </div>
-
-                                <TextareaField
-                                    name="guard_conditions"
-                                    label="Guard Conditions (JSON)"
-                                    rows={3}
-                                    placeholder='{"amount": {"lt": 1000}}'
-                                />
-
-                                <div className="mt-2 grid grid-cols-2 gap-4 md:grid-cols-4">
-                                    <SelectField
-                                        name="requires_confirmation"
-                                        label="Confirmation"
-                                        options={[
-                                            { value: 'true', label: 'Yes' },
-                                            { value: 'false', label: 'No' },
-                                        ]}
-                                    />
-                                    <SelectField
-                                        name="requires_comment"
-                                        label="Comment"
-                                        options={[
-                                            { value: 'true', label: 'Yes' },
-                                            { value: 'false', label: 'No' },
-                                        ]}
-                                    />
-                                    <SelectField
-                                        name="requires_approval"
-                                        label="Approval"
-                                        options={[
-                                            { value: 'true', label: 'Yes' },
-                                            { value: 'false', label: 'No' },
-                                        ]}
-                                    />
-                                    <SelectField
-                                        name="is_active"
-                                        label="Active"
-                                        options={[
-                                            { value: 'true', label: 'Yes' },
-                                            { value: 'false', label: 'No' },
-                                        ]}
-                                    />
-                                </div>
-                            </TabsContent>
-
-                            <TabsContent value="actions" className="space-y-4">
-                                <div className="flex items-center justify-between rounded bg-muted p-2">
-                                    <p className="text-sm text-muted-foreground">
-                                        Actions execute side effects when this
-                                        transition occurs.
-                                    </p>
-                                    <Button
-                                        type="button"
-                                        size="sm"
-                                        onClick={() =>
-                                            appendAction({
-                                                action_type: 'update_field',
-                                                execution_order:
-                                                    (actionFields.length + 1) *
-                                                    10,
-                                                config: '{\n  "field": "status",\n  "value": "approved"\n}',
-                                                is_async: false,
-                                                on_failure: 'abort',
-                                                is_active: true,
-                                            })
-                                        }
+                                    <TabsContent
+                                        value="details"
+                                        className="space-y-4"
                                     >
-                                        <Plus className="mr-1 h-4 w-4" /> Add
-                                        Action
-                                    </Button>
-                                </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <SelectField
+                                                name="from_state_id"
+                                                label="From State"
+                                                options={stateOptions}
+                                            />
+                                            <SelectField
+                                                name="to_state_id"
+                                                label="To State"
+                                                options={stateOptions}
+                                            />
+                                        </div>
 
-                                <div className="max-h-[400px] space-y-4 overflow-y-auto p-1">
-                                    {actionFields.map((field, index) => (
-                                        <Card key={field.id}>
-                                            <CardContent className="relative pt-4 pb-2">
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="absolute top-2 right-2 text-red-500"
-                                                    onClick={() =>
-                                                        removeAction(index)
-                                                    }
-                                                >
-                                                    <Trash className="h-4 w-4" />
-                                                </Button>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <InputField
+                                                name="name"
+                                                label="Name (e.g. Approve)"
+                                            />
+                                            <InputField
+                                                name="code"
+                                                label="Code (e.g. approve_order)"
+                                            />
+                                        </div>
 
-                                                <div className="mb-4 grid grid-cols-2 gap-4 pr-8">
-                                                    <SelectField
-                                                        name={`actions.${index}.action_type`}
-                                                        label="Action Type"
-                                                        options={[
-                                                            {
-                                                                value: 'update_field',
-                                                                label: 'Update Field',
-                                                            },
-                                                            {
-                                                                value: 'create_record',
-                                                                label: 'Create Record',
-                                                            },
-                                                            {
-                                                                value: 'send_notification',
-                                                                label: 'Send Notification',
-                                                            },
-                                                            {
-                                                                value: 'dispatch_job',
-                                                                label: 'Dispatch Job',
-                                                            },
-                                                            {
-                                                                value: 'trigger_approval',
-                                                                label: 'Trigger Approval',
-                                                            },
-                                                            {
-                                                                value: 'webhook',
-                                                                label: 'Webhook',
-                                                            },
-                                                            {
-                                                                value: 'custom',
-                                                                label: 'Custom',
-                                                            },
-                                                        ]}
-                                                    />
-                                                    <div className="grid grid-cols-2 gap-2">
-                                                        <InputField
-                                                            name={`actions.${index}.execution_order`}
-                                                            label="Order"
-                                                            type="number"
-                                                        />
-                                                        <SelectField
-                                                            name={`actions.${index}.on_failure`}
-                                                            label="On Failure"
-                                                            options={[
-                                                                {
-                                                                    value: 'abort',
-                                                                    label: 'Abort',
-                                                                },
-                                                                {
-                                                                    value: 'continue',
-                                                                    label: 'Continue',
-                                                                },
-                                                                {
-                                                                    value: 'log_and_continue',
-                                                                    label: 'Log & Continue',
-                                                                },
-                                                            ]}
-                                                        />
-                                                    </div>
-                                                </div>
+                                        <TextareaField
+                                            name="description"
+                                            label="Description"
+                                            rows={2}
+                                        />
 
-                                                <TextareaField
-                                                    name={`actions.${index}.config`}
-                                                    label="Configuration (JSON)"
-                                                    rows={4}
-                                                    className="font-mono text-sm"
-                                                />
-                                            </CardContent>
-                                        </Card>
-                                    ))}
-                                </div>
-                            </TabsContent>
-                        </Tabs>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <InputField
+                                                name="required_permission"
+                                                label="Required Permission"
+                                                placeholder="e.g. order.approve"
+                                            />
+                                            <InputField
+                                                name="sort_order"
+                                                label="Sort Order"
+                                                type="number"
+                                            />
+                                        </div>
 
-                        <DialogFooter>
+                                        <TextareaField
+                                            name="guard_conditions"
+                                            label="Guard Conditions (JSON)"
+                                            rows={3}
+                                            placeholder='{"amount": {"lt": 1000}}'
+                                        />
+
+                                        <div className="mt-2 grid grid-cols-2 gap-4 md:grid-cols-4">
+                                            <SelectField
+                                                name="requires_confirmation"
+                                                label="Confirmation"
+                                                options={[
+                                                    {
+                                                        value: 'true',
+                                                        label: 'Yes',
+                                                    },
+                                                    {
+                                                        value: 'false',
+                                                        label: 'No',
+                                                    },
+                                                ]}
+                                            />
+                                            <SelectField
+                                                name="requires_comment"
+                                                label="Comment"
+                                                options={[
+                                                    {
+                                                        value: 'true',
+                                                        label: 'Yes',
+                                                    },
+                                                    {
+                                                        value: 'false',
+                                                        label: 'No',
+                                                    },
+                                                ]}
+                                            />
+                                            <SelectField
+                                                name="requires_approval"
+                                                label="Approval"
+                                                options={[
+                                                    {
+                                                        value: 'true',
+                                                        label: 'Yes',
+                                                    },
+                                                    {
+                                                        value: 'false',
+                                                        label: 'No',
+                                                    },
+                                                ]}
+                                            />
+                                            <SelectField
+                                                name="is_active"
+                                                label="Active"
+                                                options={[
+                                                    {
+                                                        value: 'true',
+                                                        label: 'Yes',
+                                                    },
+                                                    {
+                                                        value: 'false',
+                                                        label: 'No',
+                                                    },
+                                                ]}
+                                            />
+                                        </div>
+                                    </TabsContent>
+
+                                    <TabsContent
+                                        value="actions"
+                                        className="space-y-4"
+                                    >
+                                        <div className="flex items-center justify-between rounded bg-muted p-2">
+                                            <p className="text-sm text-muted-foreground">
+                                                Actions execute side effects
+                                                when this transition occurs.
+                                            </p>
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                onClick={() =>
+                                                    appendAction({
+                                                        action_type:
+                                                            'update_field',
+                                                        execution_order:
+                                                            (actionFields.length +
+                                                                1) *
+                                                            10,
+                                                        config: '{\n  "field": "status",\n  "value": "approved"\n}',
+                                                        is_async: false,
+                                                        on_failure: 'abort',
+                                                        is_active: true,
+                                                    })
+                                                }
+                                            >
+                                                <Plus className="mr-1 h-4 w-4" />{' '}
+                                                Add Action
+                                            </Button>
+                                        </div>
+
+                                        <div className="max-h-[400px] space-y-4 overflow-y-auto p-1">
+                                            {actionFields.map(
+                                                (field, index) => (
+                                                    <Card key={field.id}>
+                                                        <CardContent className="relative pt-4 pb-2">
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="absolute top-2 right-2 text-red-500"
+                                                                onClick={() =>
+                                                                    removeAction(
+                                                                        index,
+                                                                    )
+                                                                }
+                                                            >
+                                                                <Trash className="h-4 w-4" />
+                                                            </Button>
+
+                                                            <div className="mb-4 grid grid-cols-2 gap-4 pr-8">
+                                                                <SelectField
+                                                                    name={`actions.${index}.action_type`}
+                                                                    label="Action Type"
+                                                                    options={[
+                                                                        {
+                                                                            value: 'update_field',
+                                                                            label: 'Update Field',
+                                                                        },
+                                                                        {
+                                                                            value: 'create_record',
+                                                                            label: 'Create Record',
+                                                                        },
+                                                                        {
+                                                                            value: 'send_notification',
+                                                                            label: 'Send Notification',
+                                                                        },
+                                                                        {
+                                                                            value: 'dispatch_job',
+                                                                            label: 'Dispatch Job',
+                                                                        },
+                                                                        {
+                                                                            value: 'trigger_approval',
+                                                                            label: 'Trigger Approval',
+                                                                        },
+                                                                        {
+                                                                            value: 'webhook',
+                                                                            label: 'Webhook',
+                                                                        },
+                                                                        {
+                                                                            value: 'custom',
+                                                                            label: 'Custom',
+                                                                        },
+                                                                    ]}
+                                                                />
+                                                                <div className="grid grid-cols-2 gap-2">
+                                                                    <InputField
+                                                                        name={`actions.${index}.execution_order`}
+                                                                        label="Order"
+                                                                        type="number"
+                                                                    />
+                                                                    <SelectField
+                                                                        name={`actions.${index}.on_failure`}
+                                                                        label="On Failure"
+                                                                        options={[
+                                                                            {
+                                                                                value: 'abort',
+                                                                                label: 'Abort',
+                                                                            },
+                                                                            {
+                                                                                value: 'continue',
+                                                                                label: 'Continue',
+                                                                            },
+                                                                            {
+                                                                                value: 'log_and_continue',
+                                                                                label: 'Log & Continue',
+                                                                            },
+                                                                        ]}
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            <TextareaField
+                                                                name={`actions.${index}.config`}
+                                                                label="Configuration (JSON)"
+                                                                rows={4}
+                                                                className="font-mono text-sm"
+                                                            />
+                                                        </CardContent>
+                                                    </Card>
+                                                ),
+                                            )}
+                                        </div>
+                                    </TabsContent>
+                                </Tabs>
+                            </div>
+                        </ScrollArea>
+
+                        <DialogFooter className="shrink-0 pt-4">
                             <Button
                                 type="button"
                                 variant="outline"
