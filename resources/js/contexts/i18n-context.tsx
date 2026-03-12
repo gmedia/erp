@@ -154,10 +154,14 @@ const defaultTranslations: Translations = {
 
 // Provider props - accepts translations as props for flexibility
 interface I18nProviderProps {
-    children: ReactNode;
-    locale?: string;
-    availableLocales?: string[];
-    translations?: Translations;
+    readonly children: ReactNode;
+    readonly locale?: string;
+    readonly availableLocales?: string[];
+    readonly translations?: Translations;
+}
+
+interface AppI18nProviderProps {
+    readonly children: ReactNode;
 }
 
 /**
@@ -246,7 +250,7 @@ export function I18nProvider({
  * App-aware I18nProvider that reads locale and translations from auth context.
  * Use this at the app level to wrap the entire application.
  */
-export function AppI18nProvider({ children }: { children: ReactNode }) {
+export function AppI18nProvider({ children }: AppI18nProviderProps) {
     const { locale, translations } = useAuth();
 
     // We can fetch availableLocales from an environment variable or globally define it

@@ -18,10 +18,12 @@ import { StaleEntity } from '@/hooks/usePipelineDashboard';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { AlertCircle, Clock } from 'lucide-react';
 
+const STALE_ENTITY_SKELETON_ROWS = [1, 2, 3] as const;
+
 interface StaleEntitiesTableProps {
-    data: StaleEntity[];
-    isLoading: boolean;
-    staleDaysThreshold: number;
+    readonly data: StaleEntity[];
+    readonly isLoading: boolean;
+    readonly staleDaysThreshold: number;
 }
 
 export function StaleEntitiesTable({
@@ -39,9 +41,9 @@ export function StaleEntitiesTable({
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-4">
-                        {[...Array(3)].map((_, i) => (
+                        {STALE_ENTITY_SKELETON_ROWS.map((rowNumber) => (
                             <div
-                                key={i}
+                                key={`stale-entity-skeleton-${rowNumber}`}
                                 className="h-12 animate-pulse rounded bg-muted"
                             />
                         ))}

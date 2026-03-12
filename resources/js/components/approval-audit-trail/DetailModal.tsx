@@ -19,7 +19,9 @@ export function DetailModal({ item, open, onOpenChange }: DetailModalProps) {
     if (!item) return null;
 
     const eventFormatted = item.event
-        ? item.event.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+        ? item.event
+              .replaceAll('_', ' ')
+              .replace(/\b\w/g, (l) => l.toUpperCase())
         : '-';
     let variant: 'default' | 'secondary' | 'destructive' | 'outline' =
         'outline';

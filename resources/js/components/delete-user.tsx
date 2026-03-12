@@ -33,7 +33,7 @@ export default function DeleteUser() {
         try {
             await axios.delete('/api/profile', { data });
             localStorage.removeItem('api_token');
-            window.location.href = '/login';
+            globalThis.location.href = '/login';
         } catch (error: unknown) {
             if (
                 rawAxios.isAxiosError(error) &&
@@ -47,9 +47,10 @@ export default function DeleteUser() {
                     ).errors || {};
                 const flatErrors: Record<string, string> = {};
                 for (const key of Object.keys(serverErrors)) {
-                    flatErrors[key] = Array.isArray(serverErrors[key])
-                        ? serverErrors[key][0]
-                        : (serverErrors[key] as string);
+                    const fieldErrors = serverErrors[key];
+                    flatErrors[key] = Array.isArray(fieldErrors)
+                        ? fieldErrors[0]
+                        : fieldErrors;
                 }
                 setErrors(flatErrors);
                 passwordInput.current?.focus();

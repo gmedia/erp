@@ -30,6 +30,20 @@ interface ApprovalFlowFormProps {
 
 export type ApprovalFlowFormInput = input<typeof approvalFlowFormSchema>;
 
+const stringifyApprovalFlowConditions = (
+    conditions: ApprovalFlow['conditions'],
+) => {
+    if (typeof conditions === 'string') {
+        return conditions;
+    }
+
+    if (conditions) {
+        return JSON.stringify(conditions);
+    }
+
+    return '';
+};
+
 const getFormDefaults = (item?: ApprovalFlow | null): ApprovalFlowFormInput => {
     if (!item) {
         return {
@@ -49,12 +63,7 @@ const getFormDefaults = (item?: ApprovalFlow | null): ApprovalFlowFormInput => {
         approvable_type: item.approvable_type,
         description: item.description || '',
         is_active: !!item.is_active,
-        conditions:
-            typeof item.conditions === 'string'
-                ? item.conditions
-                : item.conditions
-                  ? JSON.stringify(item.conditions)
-                  : '',
+        conditions: stringifyApprovalFlowConditions(item.conditions),
         steps: item.steps?.length
             ? item.steps.map((step) => ({
                   id: step.id,

@@ -14,8 +14,8 @@ import { Helmet } from 'react-helmet-async';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface LoginProps {
-    status?: string;
-    canResetPassword?: boolean;
+    readonly status?: string;
+    readonly canResetPassword?: boolean;
 }
 
 function getFormValue(formData: FormData, key: string): string {
@@ -97,7 +97,6 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                             name="email"
                             required
                             autoFocus
-                            tabIndex={1}
                             autoComplete="email"
                             placeholder="email@example.com"
                         />
@@ -111,7 +110,6 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                                 <TextLink
                                     to="/forgot-password"
                                     className="ml-auto text-sm"
-                                    tabIndex={5}
                                 >
                                     Forgot password?
                                 </TextLink>
@@ -122,7 +120,6 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                             type="password"
                             name="password"
                             required
-                            tabIndex={2}
                             autoComplete="current-password"
                             placeholder="Password"
                         />
@@ -130,14 +127,13 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        <Checkbox id="remember" name="remember" tabIndex={3} />
+                        <Checkbox id="remember" name="remember" />
                         <Label htmlFor="remember">Remember me</Label>
                     </div>
 
                     <Button
                         type="submit"
                         className="mt-4 w-full"
-                        tabIndex={4}
                         disabled={processing}
                         data-test="login-button"
                     >

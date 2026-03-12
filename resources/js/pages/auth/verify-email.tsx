@@ -9,11 +9,13 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
 
+interface VerifyEmailProps {
+    readonly status?: string;
+}
+
 export default function VerifyEmail({
     status: initialStatus,
-}: {
-    status?: string;
-}) {
+}: VerifyEmailProps) {
     const { logout } = useAuth();
     const navigate = useNavigate();
     const [status, setStatus] = useState(initialStatus);
