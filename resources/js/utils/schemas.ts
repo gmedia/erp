@@ -742,7 +742,9 @@ export const stockAdjustmentFormSchema = z.object({
                 product_id: z
                     .string()
                     .min(1, { message: 'Product is required.' }),
+                product_label: z.string().optional(),
                 unit_id: z.string().min(1, { message: 'Unit is required.' }),
+                unit_label: z.string().optional(),
                 quantity_before: z.coerce
                     .number()
                     .min(0, { message: 'Quantity before must be at least 0.' })

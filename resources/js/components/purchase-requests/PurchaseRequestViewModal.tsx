@@ -38,7 +38,7 @@ export const PurchaseRequestViewModal = React.memo(
 
         return (
             <Dialog open={open} onOpenChange={onClose}>
-                <DialogContent className="max-w-3xl">
+                <DialogContent className="max-h-[90vh] max-w-[95vw] overflow-y-auto sm:max-w-7xl">
                     <DialogHeader>
                         <DialogTitle>Purchase Request Details</DialogTitle>
                         <DialogDescription>
