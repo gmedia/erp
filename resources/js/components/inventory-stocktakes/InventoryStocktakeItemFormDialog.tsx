@@ -36,7 +36,8 @@ const inventoryStocktakeItemSchema = z.object({
     notes: z.string().optional(),
 });
 
-type InventoryStocktakeItemFormData = InventoryStocktakeFormData['items'][number];
+type InventoryStocktakeItemFormData =
+    InventoryStocktakeFormData['items'][number];
 
 interface InventoryStocktakeItemFormDialogProps {
     open: boolean;
@@ -71,7 +72,8 @@ export function InventoryStocktakeItemFormDialog({
             unit_label: item.unit_label || '',
             system_quantity: Number(item.system_quantity || 0),
             counted_quantity:
-                item.counted_quantity === null || item.counted_quantity === undefined
+                item.counted_quantity === null ||
+                item.counted_quantity === undefined
                     ? 0
                     : Number(item.counted_quantity),
             notes: item.notes || '',
@@ -126,9 +128,13 @@ export function InventoryStocktakeItemFormDialog({
                                 placeholder="Select product"
                                 initialLabel={defaultValues.product_label}
                                 onItemSelect={(product) => {
-                                    form.setValue('product_label', product?.name || '', {
-                                        shouldDirty: true,
-                                    });
+                                    form.setValue(
+                                        'product_label',
+                                        product?.name || '',
+                                        {
+                                            shouldDirty: true,
+                                        },
+                                    );
                                 }}
                             />
                             <AsyncSelectField<{ name?: string }>
@@ -139,9 +145,13 @@ export function InventoryStocktakeItemFormDialog({
                                 placeholder="Select unit"
                                 initialLabel={defaultValues.unit_label}
                                 onItemSelect={(unit) => {
-                                    form.setValue('unit_label', unit?.name || '', {
-                                        shouldDirty: true,
-                                    });
+                                    form.setValue(
+                                        'unit_label',
+                                        unit?.name || '',
+                                        {
+                                            shouldDirty: true,
+                                        },
+                                    );
                                 }}
                             />
                             <InputField
