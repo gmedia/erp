@@ -8,9 +8,9 @@ import {
 import { type Pipeline } from '@/types/entity';
 
 interface PipelineViewModalProps {
-    open: boolean;
-    onClose: () => void;
-    item: Pipeline | null;
+    readonly open: boolean;
+    readonly onClose: () => void;
+    readonly item: Pipeline | null;
 }
 
 export function PipelineViewModal({

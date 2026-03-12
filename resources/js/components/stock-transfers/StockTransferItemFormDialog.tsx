@@ -36,10 +36,10 @@ const stockTransferItemSchema = z.object({
 type StockTransferItemFormData = StockTransferFormData['items'][number];
 
 interface StockTransferItemFormDialogProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    item: StockTransferItemFormData | null;
-    onSave: (data: StockTransferItemFormData) => void;
+    readonly open: boolean;
+    readonly onOpenChange: (open: boolean) => void;
+    readonly item: StockTransferItemFormData | null;
+    readonly onSave: (data: StockTransferItemFormData) => void;
 }
 
 export function StockTransferItemFormDialog({

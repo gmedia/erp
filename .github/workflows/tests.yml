@@ -17,6 +17,7 @@ concurrency:
 permissions:
   contents: write
   packages: read
+  pull-requests: read
 
 env:
   CI_SAIL_IMAGE: ghcr.io/${{ github.repository }}/ci-sail:8.4
@@ -100,13 +101,16 @@ jobs:
       - name: Run Duster
         run: ./vendor/bin/sail bin duster fix --no-interaction
 
+      - name: Format Blade templates
+        run: ./vendor/bin/sail npm run blade:formatter
+
       - name: Format frontend
         run: ./vendor/bin/sail npm run format
 
       - name: Lint frontend
         run: ./vendor/bin/sail npm run lint
 
-      - name: Auto-commit lint fixes
+      - name: Auto-commit quality autofixes
         id: autofix
         shell: bash
         env:
@@ -153,6 +157,10 @@ jobs:
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail artisan config:clear
 
+      - name: Run PHPStan
+        if: steps.autofix.outputs.changed != 'true'
+        run: ./vendor/bin/sail bin phpstan analyze
+
       - name: Check TypeScript
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run types
@@ -161,9 +169,26 @@ jobs:
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run build
 
+      - name: Run tests with coverage
+        if: ${{ steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        run: ./vendor/bin/sail test --colors=always --coverage-clover=coverage.xml
+
       - name: Run tests
-        if: steps.autofix.outputs.changed != 'true'
+        if: ${{ steps.autofix.outputs.changed != 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
         run: ./vendor/bin/sail test --colors=always
+
+      - name: Run SonarQube Cloud scan
+        if: ${{ steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dproject.settings=.sonarcloud.properties
+            -Dsonar.organization=gmedia
+            -Dsonar.projectKey=gmedia_erp
 
       - name: Upload failure logs
         if: failure() && steps.autofix.outputs.changed != 'true'
