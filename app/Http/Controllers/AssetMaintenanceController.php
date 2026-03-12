@@ -20,8 +20,7 @@ class AssetMaintenanceController extends Controller
     public function index(
         IndexAssetMaintenanceRequest $request,
         IndexAssetMaintenancesAction $action
-    ): AssetMaintenanceCollection
-    {
+    ): AssetMaintenanceCollection {
         $maintenances = $action->execute($request);
 
         return new AssetMaintenanceCollection($maintenances);
@@ -84,8 +83,7 @@ class AssetMaintenanceController extends Controller
     public function export(
         ExportAssetMaintenanceRequest $request,
         ExportAssetMaintenancesAction $action
-    ): JsonResponse
-    {
+    ): JsonResponse {
         return $action->execute($request);
     }
 }

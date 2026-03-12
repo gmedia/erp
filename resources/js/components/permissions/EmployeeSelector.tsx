@@ -10,9 +10,7 @@ export function EmployeeSelector() {
             label="Select Employee"
             url="/api/employees"
             placeholder="Search for an employee..."
-            labelFn={(item) =>
-                typeof item.name === 'string' ? item.name : ''
-            }
+            labelFn={(item) => (typeof item.name === 'string' ? item.name : '')}
             valueFn={(item) => String(item.id)}
         />
     );

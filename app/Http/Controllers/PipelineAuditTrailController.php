@@ -17,8 +17,7 @@ class PipelineAuditTrailController extends Controller
     public function index(
         IndexPipelineAuditTrailRequest $request,
         IndexPipelineAuditTrailAction $action
-    ): PipelineAuditTrailCollection
-    {
+    ): PipelineAuditTrailCollection {
         $logs = $action->execute($request);
 
         return new PipelineAuditTrailCollection($logs);
@@ -30,8 +29,7 @@ class PipelineAuditTrailController extends Controller
     public function export(
         ExportPipelineAuditTrailRequest $request,
         ExportPipelineAuditTrailAction $action
-    ): JsonResponse
-    {
+    ): JsonResponse {
         return $action->execute($request);
     }
 }
