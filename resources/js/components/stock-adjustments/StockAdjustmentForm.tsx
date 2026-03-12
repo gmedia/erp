@@ -37,6 +37,25 @@ interface StockAdjustmentFormProps {
     isLoading?: boolean;
 }
 
+const getInventoryStocktakeOptionLabel = (option: Record<string, unknown>) => {
+    const stocktakeNumber = option.stocktake_number;
+
+    if (
+        typeof stocktakeNumber === 'string' ||
+        typeof stocktakeNumber === 'number'
+    ) {
+        return String(stocktakeNumber);
+    }
+
+    const optionId = option.id;
+
+    if (typeof optionId === 'string' || typeof optionId === 'number') {
+        return String(optionId);
+    }
+
+    return '';
+};
+
 const getStockAdjustmentFormDefaults = (
     stockAdjustment?: StockAdjustment | null,
 ): StockAdjustmentFormData => {
@@ -266,11 +285,7 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                                     url="/api/inventory-stocktakes"
                                     placeholder="Select stocktake"
                                     label="Inventory Stocktake"
-                                    labelFn={(it) =>
-                                        String(
-                                            it.stocktake_number ?? it.id ?? '',
-                                        )
-                                    }
+                                    labelFn={getInventoryStocktakeOptionLabel}
                                     valueFn={(it) => String(it.id)}
                                 />
                             </div>

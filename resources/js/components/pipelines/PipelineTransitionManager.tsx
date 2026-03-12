@@ -48,7 +48,9 @@ export function PipelineTransitionManager({
 
     const handleDelete = async (transitionId: number) => {
         if (
-            window.confirm('Are you sure you want to delete this transition?')
+            globalThis.confirm(
+                'Are you sure you want to delete this transition?',
+            )
         ) {
             await deleteTransition(transitionId);
         }

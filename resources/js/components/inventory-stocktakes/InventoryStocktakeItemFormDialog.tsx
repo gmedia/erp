@@ -18,46 +18,48 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
-import { type StockTransferFormData } from '@/utils/schemas';
+import { type InventoryStocktakeFormData } from '@/utils/schemas';
 
-const stockTransferItemSchema = z.object({
+const inventoryStocktakeItemSchema = z.object({
     product_id: z.string().min(1, { message: 'Product is required.' }),
     product_label: z.string().optional(),
     unit_id: z.string().min(1, { message: 'Unit is required.' }),
     unit_label: z.string().optional(),
-    quantity: z.coerce
+    system_quantity: z.coerce
         .number()
-        .gt(0, { message: 'Quantity must be greater than 0.' }),
-    quantity_received: z.coerce.number().min(0).optional().default(0),
-    unit_cost: z.coerce.number().min(0).optional().default(0),
+        .min(0, { message: 'System quantity must be at least 0.' }),
+    counted_quantity: z.coerce
+        .number()
+        .min(0, { message: 'Counted quantity must be at least 0.' })
+        .optional()
+        .default(0),
     notes: z.string().optional(),
 });
 
-type StockTransferItemFormData = StockTransferFormData['items'][number];
+type InventoryStocktakeItemFormData = InventoryStocktakeFormData['items'][number];
 
-interface StockTransferItemFormDialogProps {
-    readonly open: boolean;
-    readonly onOpenChange: (open: boolean) => void;
-    readonly item: StockTransferItemFormData | null;
-    readonly onSave: (data: StockTransferItemFormData) => void;
+interface InventoryStocktakeItemFormDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    item: InventoryStocktakeItemFormData | null;
+    onSave: (data: InventoryStocktakeItemFormData) => void;
 }
 
-export function StockTransferItemFormDialog({
+export function InventoryStocktakeItemFormDialog({
     open,
     onOpenChange,
     item,
     onSave,
-}: StockTransferItemFormDialogProps) {
-    const defaultValues = useMemo<StockTransferItemFormData>(() => {
+}: InventoryStocktakeItemFormDialogProps) {
+    const defaultValues = useMemo<InventoryStocktakeItemFormData>(() => {
         if (!item) {
             return {
                 product_id: '',
                 product_label: '',
                 unit_id: '',
                 unit_label: '',
-                quantity: 1,
-                quantity_received: 0,
-                unit_cost: 0,
+                system_quantity: 0,
+                counted_quantity: 0,
                 notes: '',
             };
         }
@@ -67,22 +69,24 @@ export function StockTransferItemFormDialog({
             product_label: item.product_label || '',
             unit_id: item.unit_id || '',
             unit_label: item.unit_label || '',
-            quantity: Number(item.quantity || 0),
-            quantity_received: Number(item.quantity_received || 0),
-            unit_cost: Number(item.unit_cost || 0),
+            system_quantity: Number(item.system_quantity || 0),
+            counted_quantity:
+                item.counted_quantity === null || item.counted_quantity === undefined
+                    ? 0
+                    : Number(item.counted_quantity),
             notes: item.notes || '',
         };
     }, [item]);
 
     const form = useForm<
-        StockTransferItemFormData,
+        InventoryStocktakeItemFormData,
         unknown,
-        StockTransferItemFormData
+        InventoryStocktakeItemFormData
     >({
-        resolver: zodResolver(stockTransferItemSchema) as Resolver<
-            StockTransferItemFormData,
+        resolver: zodResolver(inventoryStocktakeItemSchema) as Resolver<
+            InventoryStocktakeItemFormData,
             unknown,
-            StockTransferItemFormData
+            InventoryStocktakeItemFormData
         >,
         defaultValues,
     });
@@ -100,8 +104,8 @@ export function StockTransferItemFormDialog({
                     <DialogTitle>{item ? 'Edit Item' : 'Add Item'}</DialogTitle>
                     <DialogDescription className="sr-only">
                         {item
-                            ? 'Edit stock transfer item.'
-                            : 'Add stock transfer item.'}
+                            ? 'Edit inventory stocktake item.'
+                            : 'Add inventory stocktake item.'}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -122,13 +126,9 @@ export function StockTransferItemFormDialog({
                                 placeholder="Select product"
                                 initialLabel={defaultValues.product_label}
                                 onItemSelect={(product) => {
-                                    form.setValue(
-                                        'product_label',
-                                        product?.name || '',
-                                        {
-                                            shouldDirty: true,
-                                        },
-                                    );
+                                    form.setValue('product_label', product?.name || '', {
+                                        shouldDirty: true,
+                                    });
                                 }}
                             />
                             <AsyncSelectField<{ name?: string }>
@@ -139,34 +139,22 @@ export function StockTransferItemFormDialog({
                                 placeholder="Select unit"
                                 initialLabel={defaultValues.unit_label}
                                 onItemSelect={(unit) => {
-                                    form.setValue(
-                                        'unit_label',
-                                        unit?.name || '',
-                                        {
-                                            shouldDirty: true,
-                                        },
-                                    );
+                                    form.setValue('unit_label', unit?.name || '', {
+                                        shouldDirty: true,
+                                    });
                                 }}
                             />
                             <InputField
-                                name="quantity"
-                                label="Quantity"
-                                type="number"
-                                min={0}
-                                step="any"
-                                placeholder="1"
-                            />
-                            <InputField
-                                name="quantity_received"
-                                label="Quantity Received"
+                                name="system_quantity"
+                                label="System Quantity"
                                 type="number"
                                 min={0}
                                 step="any"
                                 placeholder="0"
                             />
                             <InputField
-                                name="unit_cost"
-                                label="Unit Cost"
+                                name="counted_quantity"
+                                label="Counted Quantity"
                                 type="number"
                                 min={0}
                                 step="any"

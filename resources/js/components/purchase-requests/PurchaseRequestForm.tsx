@@ -461,14 +461,16 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
                     open={isItemDialogOpen}
                     onOpenChange={(nextOpen) => {
                         setIsItemDialogOpen(nextOpen);
-                        if (!nextOpen) {
-                            setEditingIndex(null);
+                        if (nextOpen) {
+                            return;
                         }
+
+                        setEditingIndex(null);
                     }}
                     item={
-                        editingIndex !== null
-                            ? watchedItems?.[editingIndex] || null
-                            : null
+                        editingIndex === null
+                            ? null
+                            : watchedItems?.[editingIndex] || null
                     }
                     onSave={(data) => {
                         if (editingIndex !== null) {
