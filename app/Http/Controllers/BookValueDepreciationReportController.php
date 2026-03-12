@@ -17,8 +17,7 @@ class BookValueDepreciationReportController extends Controller
     public function index(
         IndexBookValueDepreciationRequest $request,
         IndexBookValueDepreciationReportAction $action
-    ): BookValueDepreciationCollection
-    {
+    ): BookValueDepreciationCollection {
         $assets = $action->execute($request);
 
         return new BookValueDepreciationCollection($assets);

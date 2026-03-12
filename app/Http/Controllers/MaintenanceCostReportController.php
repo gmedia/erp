@@ -17,8 +17,7 @@ class MaintenanceCostReportController extends Controller
     public function index(
         IndexMaintenanceCostRequest $request,
         IndexMaintenanceCostReportAction $action
-    ): MaintenanceCostCollection
-    {
+    ): MaintenanceCostCollection {
         $maintenances = $action->execute($request);
 
         return new MaintenanceCostCollection($maintenances);
@@ -30,8 +29,7 @@ class MaintenanceCostReportController extends Controller
     public function export(
         ExportMaintenanceCostRequest $request,
         ExportMaintenanceCostReportAction $action
-    ): JsonResponse
-    {
+    ): JsonResponse {
         return $action->execute($request);
     }
 }

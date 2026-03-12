@@ -111,8 +111,7 @@ class IndexStockMonitorAction
                 'total_quantity' => (string) $summaryRows->sum('quantity_on_hand'),
                 'total_stock_value' => (string) $summaryRows->sum('stock_value'),
                 'low_stock_items' => (int) $summaryRows->filter(
-                    fn (StockMovement $movement) =>
-                        (float) $movement->getAttribute('quantity_on_hand')
+                    fn (StockMovement $movement) => (float) $movement->getAttribute('quantity_on_hand')
                             <= (float) $request->float('low_stock_threshold', 10)
                 )->count(),
                 'by_warehouse' => $this->buildWarehouseSummary($summaryRows),

@@ -14,8 +14,7 @@ class StockMovementController extends Controller
     public function index(
         IndexStockMovementRequest $request,
         IndexStockMovementsAction $action
-    ): StockMovementCollection
-    {
+    ): StockMovementCollection {
         $movements = $action->execute($request);
 
         return new StockMovementCollection($movements);
@@ -24,8 +23,7 @@ class StockMovementController extends Controller
     public function export(
         ExportStockMovementRequest $request,
         ExportStockMovementsAction $action
-    ): JsonResponse
-    {
+    ): JsonResponse {
         return $action->execute($request);
     }
 }
