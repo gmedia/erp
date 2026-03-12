@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import axios from '@/lib/axios';
 import rawAxios from 'axios';
 import {
@@ -184,41 +185,43 @@ export default function ImportDialog({
                             </div>
 
                             {result.errors.length > 0 && (
-                                <div className="max-h-40 overflow-y-auto rounded bg-slate-50 p-2 text-xs">
-                                    <table className="w-full text-left">
-                                        <thead>
-                                            <tr>
-                                                <th className="pb-1 text-slate-500">
-                                                    Row
-                                                </th>
-                                                <th className="pb-1 text-slate-500">
-                                                    Field
-                                                </th>
-                                                <th className="pb-1 text-slate-500">
-                                                    Message
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {result.errors.map((err, idx) => (
-                                                <tr
-                                                    key={idx}
-                                                    className="border-t border-slate-100"
-                                                >
-                                                    <td className="py-1 align-top font-mono text-slate-500">
-                                                        {err.row}
-                                                    </td>
-                                                    <td className="py-1 align-top font-medium text-slate-700">
-                                                        {err.field}
-                                                    </td>
-                                                    <td className="py-1 align-top text-red-600">
-                                                        {err.message}
-                                                    </td>
+                                <ScrollArea className="max-h-40 rounded bg-slate-50">
+                                    <div className="p-2 pr-4 text-xs">
+                                        <table className="w-full text-left">
+                                            <thead>
+                                                <tr>
+                                                    <th className="pb-1 text-slate-500">
+                                                        Row
+                                                    </th>
+                                                    <th className="pb-1 text-slate-500">
+                                                        Field
+                                                    </th>
+                                                    <th className="pb-1 text-slate-500">
+                                                        Message
+                                                    </th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </thead>
+                                            <tbody>
+                                                {result.errors.map((err, idx) => (
+                                                    <tr
+                                                        key={idx}
+                                                        className="border-t border-slate-100"
+                                                    >
+                                                        <td className="py-1 align-top font-mono text-slate-500">
+                                                            {err.row}
+                                                        </td>
+                                                        <td className="py-1 align-top font-medium text-slate-700">
+                                                            {err.field}
+                                                        </td>
+                                                        <td className="py-1 align-top text-red-600">
+                                                            {err.message}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </ScrollArea>
                             )}
                         </div>
                     )}

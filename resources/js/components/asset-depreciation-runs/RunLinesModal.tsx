@@ -5,6 +5,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
     Table,
     TableBody,
@@ -45,7 +46,7 @@ export function RunLinesModal({ runId, open, onClose }: RunLinesModalProps) {
 
     return (
         <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-            <DialogContent className="flex max-h-[90vh] max-w-[95vw] flex-col sm:max-w-7xl">
+            <DialogContent className="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden sm:max-w-7xl">
                 <DialogHeader>
                     <DialogTitle>Depreciation Run Lines</DialogTitle>
                     <DialogDescription>
@@ -54,7 +55,7 @@ export function RunLinesModal({ runId, open, onClose }: RunLinesModalProps) {
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="flex-1 overflow-auto rounded-md border">
+                <ScrollArea className="flex-1 rounded-md border">
                     <Table>
                         <TableHeader className="sticky top-0 bg-muted">
                             <TableRow>
@@ -131,7 +132,7 @@ export function RunLinesModal({ runId, open, onClose }: RunLinesModalProps) {
                             )}
                         </TableBody>
                     </Table>
-                </div>
+                </ScrollArea>
             </DialogContent>
         </Dialog>
     );
