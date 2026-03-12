@@ -71,7 +71,11 @@ class GetApprovalMonitoringDataAction
 
         // Fetch Overdue Approvals
         // Looking at pending request steps where due_at is past
-        $overdueQuery = ApprovalRequestStep::with(['request.approvable', 'request.submitter', 'flowStep'])
+        $overdueQuery = ApprovalRequestStep::with([
+            'request.approvable',
+            'request.submitter',
+            'flowStep',
+        ])
             ->where('status', 'pending')
             ->whereNotNull('due_at')
             ->where('due_at', '<', now());
@@ -106,7 +110,11 @@ class GetApprovalMonitoringDataAction
             $request = $step->request;
             $document = $request->approvable;
 
-            $entityName = $document->name ?? $document->code ?? $document->title ?? $document->reference ?? "ID: {$request->approvable_id}";
+            $entityName = $document->name
+                ?? $document->code
+                ?? $document->title
+                ?? $document->reference
+                ?? "ID: {$request->approvable_id}";
 
             return [
                 'id' => $step->id,

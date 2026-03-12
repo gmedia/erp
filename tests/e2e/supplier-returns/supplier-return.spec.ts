@@ -31,7 +31,7 @@ async function getFirstAsyncOption(page: Page, url: string) {
 async function selectAsyncOption(page: Page, container: Page | Locator, label: string, optionName: string) {
     await container.getByRole('combobox', { name: label }).click();
     await page
-        .getByRole('option', { name: new RegExp(optionName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
+    .getByRole('option', { name: new RegExp(optionName.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
         .first()
         .click();
 }
