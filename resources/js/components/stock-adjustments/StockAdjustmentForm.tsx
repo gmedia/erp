@@ -2,8 +2,9 @@
 
 import axios from '@/lib/axios';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { z } from 'zod';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
@@ -26,6 +27,7 @@ import {
     stockAdjustmentFormSchema,
     type StockAdjustmentFormData,
 } from '@/utils/schemas';
+import { StockAdjustmentItemFormDialog } from './StockAdjustmentItemFormDialog';
 
 interface StockAdjustmentFormProps {
     open: boolean;
@@ -36,6 +38,39 @@ interface StockAdjustmentFormProps {
     onSubmit: (data: StockAdjustmentFormData) => void;
     isLoading?: boolean;
 }
+
+const createEmptyStockAdjustmentItem = (): StockAdjustmentFormData['items'][number] => ({
+    product_id: '',
+    product_label: '',
+    unit_id: '',
+    unit_label: '',
+    quantity_before: 0,
+    quantity_adjusted: 1,
+    unit_cost: 0,
+    reason: '',
+});
+
+const formatItemReference = (label?: string, id?: string) => {
+    if (label) {
+        return label;
+    }
+
+    if (id) {
+        return `#${id}`;
+    }
+
+    return '-';
+};
+
+const omitDisplayLabels = <T extends { product_label?: string; unit_label?: string }>(
+    item: T,
+) => {
+    const nextItem = { ...item };
+    delete nextItem.product_label;
+    delete nextItem.unit_label;
+
+    return nextItem;
+};
 
 const getInventoryStocktakeOptionLabel = (option: Record<string, unknown>) => {
     const stocktakeNumber = option.stocktake_number;
@@ -68,16 +103,7 @@ const getStockAdjustmentFormDefaults = (
             status: 'draft',
             inventory_stocktake_id: '',
             notes: '',
-            items: [
-                {
-                    product_id: '',
-                    unit_id: '',
-                    quantity_before: 0,
-                    quantity_adjusted: 1,
-                    unit_cost: 0,
-                    reason: '',
-                },
-            ],
+            items: [],
         };
     }
 
@@ -98,22 +124,15 @@ const getStockAdjustmentFormDefaults = (
         items: (stockAdjustment.items || []).length
             ? (stockAdjustment.items || []).map((it) => ({
                   product_id: it.product?.id ? String(it.product.id) : '',
+                  product_label: it.product?.name || '',
                   unit_id: it.unit?.id ? String(it.unit.id) : '',
+                  unit_label: it.unit?.name || '',
                   quantity_before: Number(it.quantity_before || 0),
                   quantity_adjusted: Number(it.quantity_adjusted || 0),
                   unit_cost: Number(it.unit_cost || 0),
                   reason: it.reason || '',
               }))
-            : [
-                  {
-                      product_id: '',
-                      unit_id: '',
-                      quantity_before: 0,
-                      quantity_adjusted: 1,
-                      unit_cost: 0,
-                      reason: '',
-                  },
-              ],
+            : [],
     };
 };
 
@@ -148,10 +167,30 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
             defaultValues,
         });
 
-        const { fields, append, remove } = useFieldArray({
+        const { fields, append, remove, update } = useFieldArray({
             control: form.control,
             name: 'items',
         });
+        const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
+        const [editingIndex, setEditingIndex] = useState<number | null>(null);
+        const watchedItems = form.watch('items');
+
+        const handleCreateNewItem = () => {
+            setEditingIndex(null);
+            setIsItemDialogOpen(true);
+        };
+
+        const handleEditItem = (index: number) => {
+            setEditingIndex(index);
+            setIsItemDialogOpen(true);
+        };
+
+        const handleSubmit = (data: StockAdjustmentFormData) => {
+            onSubmit({
+                ...data,
+                items: data.items.map(omitDisplayLabels),
+            });
+        };
 
         useEffect(() => {
             form.reset(defaultValues);
@@ -200,7 +239,7 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                         ? 'Edit Stock Adjustment'
                         : 'Add New Stock Adjustment'
                 }
-                onSubmit={onSubmit}
+                onSubmit={handleSubmit}
                 isLoading={isLoading}
                 className="sm:max-w-[1000px]"
             >
@@ -307,17 +346,9 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() =>
-                                append({
-                                    product_id: '',
-                                    unit_id: '',
-                                    quantity_before: 0,
-                                    quantity_adjusted: 1,
-                                    unit_cost: 0,
-                                    reason: '',
-                                })
-                            }
+                            onClick={handleCreateNewItem}
                         >
+                            <Plus className="mr-2 h-4 w-4" />
                             Add Item
                         </Button>
                     </div>
@@ -326,23 +357,13 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[250px]">
-                                        Product
-                                    </TableHead>
-                                    <TableHead className="w-[160px]">
-                                        Unit
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        Qty Before
-                                    </TableHead>
-                                    <TableHead className="w-[160px]">
-                                        Qty Adjusted
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        Unit Cost
-                                    </TableHead>
+                                    <TableHead className="w-[250px]">Product</TableHead>
+                                    <TableHead className="w-[160px]">Unit</TableHead>
+                                    <TableHead className="w-[140px]">Qty Before</TableHead>
+                                    <TableHead className="w-[160px]">Qty Adjusted</TableHead>
+                                    <TableHead className="w-[140px]">Unit Cost</TableHead>
                                     <TableHead>Reason</TableHead>
-                                    <TableHead className="w-[80px]"></TableHead>
+                                    <TableHead className="w-[120px] text-right">Action</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -352,152 +373,97 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                                             colSpan={7}
                                             className="py-8 text-center text-muted-foreground"
                                         >
-                                            No items.
+                                            No items added yet.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    fields.map((f, index) => (
-                                        <TableRow key={f.id}>
-                                            <TableCell>
-                                                <Controller
-                                                    control={form.control}
-                                                    name={`items.${index}.product_id`}
-                                                    render={({
-                                                        field: productField,
-                                                    }) => (
-                                                        <AsyncSelect
-                                                            value={
-                                                                productField.value
-                                                                    ? String(
-                                                                          productField.value,
-                                                                      )
-                                                                    : undefined
-                                                            }
-                                                            onValueChange={
-                                                                productField.onChange
-                                                            }
-                                                            url="/api/products"
-                                                            placeholder="Select product"
-                                                            label="Product"
-                                                        />
+                                    fields.map((f, index) => {
+                                        const adjustmentItem =
+                                            watchedItems?.[index] ||
+                                            createEmptyStockAdjustmentItem();
+
+                                        return (
+                                            <TableRow key={f.id}>
+                                                <TableCell>
+                                                    {formatItemReference(
+                                                        adjustmentItem.product_label,
+                                                        adjustmentItem.product_id,
                                                     )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Controller
-                                                    control={form.control}
-                                                    name={`items.${index}.unit_id`}
-                                                    render={({
-                                                        field: unitField,
-                                                    }) => (
-                                                        <AsyncSelect
-                                                            value={
-                                                                unitField.value
-                                                                    ? String(
-                                                                          unitField.value,
-                                                                      )
-                                                                    : undefined
-                                                            }
-                                                            onValueChange={
-                                                                unitField.onChange
-                                                            }
-                                                            url="/api/units"
-                                                            placeholder="Select unit"
-                                                            label="Unit"
-                                                        />
+                                                </TableCell>
+                                                <TableCell>
+                                                    {formatItemReference(
+                                                        adjustmentItem.unit_label,
+                                                        adjustmentItem.unit_id,
                                                     )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Controller
-                                                    control={form.control}
-                                                    name={`items.${index}.quantity_before`}
-                                                    render={({
-                                                        field: qbField,
-                                                    }) => (
-                                                        <InputField
-                                                            name={qbField.name}
-                                                            label=""
-                                                            type="number"
-                                                            placeholder="0"
-                                                            className="space-y-0"
-                                                        />
-                                                    )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Controller
-                                                    control={form.control}
-                                                    name={`items.${index}.quantity_adjusted`}
-                                                    render={({
-                                                        field: qaField,
-                                                    }) => (
-                                                        <InputField
-                                                            name={qaField.name}
-                                                            label=""
-                                                            type="number"
-                                                            placeholder="0"
-                                                            className="space-y-0"
-                                                        />
-                                                    )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Controller
-                                                    control={form.control}
-                                                    name={`items.${index}.unit_cost`}
-                                                    render={({
-                                                        field: ucField,
-                                                    }) => (
-                                                        <InputField
-                                                            name={ucField.name}
-                                                            label=""
-                                                            type="number"
-                                                            placeholder="0"
-                                                            className="space-y-0"
-                                                        />
-                                                    )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Controller
-                                                    control={form.control}
-                                                    name={`items.${index}.reason`}
-                                                    render={({
-                                                        field: reasonField,
-                                                    }) => (
-                                                        <InputField
-                                                            name={
-                                                                reasonField.name
-                                                            }
-                                                            label=""
-                                                            placeholder="Reason"
-                                                            className="space-y-0"
-                                                        />
-                                                    )}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    onClick={() =>
-                                                        remove(index)
-                                                    }
-                                                    disabled={
-                                                        fields.length === 1
-                                                    }
-                                                >
-                                                    Remove
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
+                                                </TableCell>
+                                                <TableCell>
+                                                    {adjustmentItem.quantity_before ?? 0}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {adjustmentItem.quantity_adjusted ?? 0}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {adjustmentItem.unit_cost ?? 0}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {adjustmentItem.reason || '-'}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() =>
+                                                            handleEditItem(index)
+                                                        }
+                                                        title="Edit item"
+                                                        aria-label={`Edit item ${index + 1}`}
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => remove(index)}
+                                                        title="Remove item"
+                                                        aria-label={`Remove item ${index + 1}`}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
                                 )}
                             </TableBody>
                         </Table>
                     </div>
                 </div>
+
+                <StockAdjustmentItemFormDialog
+                    open={isItemDialogOpen}
+                    onOpenChange={(nextOpen) => {
+                        setIsItemDialogOpen(nextOpen);
+                        if (!nextOpen) {
+                            setEditingIndex(null);
+                        }
+                    }}
+                    item={
+                        editingIndex !== null
+                            ? watchedItems?.[editingIndex] || null
+                            : null
+                    }
+                    onSave={(data) => {
+                        if (editingIndex !== null) {
+                            update(editingIndex, data);
+                        } else {
+                            append(data);
+                        }
+                        setIsItemDialogOpen(false);
+                        setEditingIndex(null);
+                    }}
+                />
             </EntityForm>
         );
     },
