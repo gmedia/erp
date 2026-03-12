@@ -203,7 +203,8 @@ export function PipelineStateManager({
                         onChange={(e) =>
                             setFormData({
                                 ...formData,
-                                sort_order: parseInt(e.target.value) || 0,
+                                sort_order:
+                                    Number.parseInt(e.target.value, 10) || 0,
                             })
                         }
                         className="w-20"
