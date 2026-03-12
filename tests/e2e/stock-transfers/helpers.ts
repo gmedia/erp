@@ -59,26 +59,26 @@ export async function createStockTransfer(page: Page): Promise<string> {
         'Transit Warehouse',
     );
 
-    const firstRow = dialog.locator('tbody tr').first();
-    const productTrigger = firstRow.getByRole('combobox', { name: /Product/i });
-    await expect(productTrigger).toBeVisible();
-    await productTrigger.click();
-    const productListbox = page.locator('[role="listbox"][aria-busy="false"]').first();
-    await expect(productListbox).toBeVisible();
-    await expect(productListbox.getByRole('option').first()).toBeVisible();
-    await productListbox.getByRole('option').first().click();
-    await expect(productListbox).toBeHidden({ timeout: 5000 }).catch(() => null);
+    await dialog.getByRole('button', { name: /Add Item/i }).click();
+    const itemDialog = page.getByRole('dialog', { name: /Add Item/i });
+    await expect(itemDialog).toBeVisible();
 
-    const unitTrigger = firstRow.getByRole('combobox', { name: /Unit/i });
-    await expect(unitTrigger).toBeVisible();
-    await unitTrigger.click();
-    const unitListbox = page.locator('[role="listbox"][aria-busy="false"]').first();
-    await expect(unitListbox).toBeVisible();
-    await expect(unitListbox.getByRole('option').first()).toBeVisible();
-    await unitListbox.getByRole('option').first().click();
-    await expect(unitListbox).toBeHidden({ timeout: 5000 }).catch(() => null);
+    await selectAsyncOption(
+        page,
+        itemDialog.getByRole('combobox', { name: /Product/i }),
+        '',
+        '.+',
+    );
+    await selectAsyncOption(
+        page,
+        itemDialog.getByRole('combobox', { name: /Unit/i }),
+        '',
+        '.+',
+    );
 
-    await dialog.locator('input[name="items.0.quantity"]').fill('2');
+    await itemDialog.locator('input[name="quantity"]').fill('2');
+    await itemDialog.getByRole('button', { name: /Save Item/i }).click();
+    await expect(itemDialog).not.toBeVisible({ timeout: 10000 });
 
     const submitButton = dialog.getByRole('button', { name: 'Add', exact: true });
     const createResponse = page

@@ -654,7 +654,9 @@ export const stockTransferFormSchema = z.object({
                 product_id: z
                     .string()
                     .min(1, { message: 'Product is required.' }),
+                product_label: z.string().optional(),
                 unit_id: z.string().min(1, { message: 'Unit is required.' }),
+                unit_label: z.string().optional(),
                 quantity: z.coerce
                     .number()
                     .gt(0, { message: 'Quantity must be greater than 0.' }),
