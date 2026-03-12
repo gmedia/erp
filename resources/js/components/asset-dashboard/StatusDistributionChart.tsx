@@ -8,8 +8,8 @@ import {
 import { StatusDistributionItem } from '../../hooks/useAssetDashboard';
 
 interface StatusDistributionChartProps {
-    data?: StatusDistributionItem[];
-    isLoading: boolean;
+    readonly data?: StatusDistributionItem[];
+    readonly isLoading: boolean;
 }
 
 export function StatusDistributionChart({

@@ -22,7 +22,7 @@ import { useMemo, useState } from 'react';
 
 interface AccountTreeNodeProps {
     account: Account;
-    children?: Account[];
+    childAccounts?: Account[];
     allAccounts: Account[];
     level: number;
     onAddChild: (parent: Account) => void;
@@ -32,7 +32,7 @@ interface AccountTreeNodeProps {
 
 function AccountTreeNode({
     account,
-    children = [],
+    childAccounts = [],
     allAccounts,
     level,
     onAddChild,
@@ -40,11 +40,11 @@ function AccountTreeNode({
     onDelete,
 }: AccountTreeNodeProps) {
     const [isOpen, setIsOpen] = useState(true);
-    const hasChildren = children.length > 0;
+    const hasChildren = childAccounts.length > 0;
 
     const sortedChildren = useMemo(() => {
-        return [...children].sort((a, b) => a.code.localeCompare(b.code));
-    }, [children]);
+        return [...childAccounts].sort((a, b) => a.code.localeCompare(b.code));
+    }, [childAccounts]);
 
     return (
         <div className="flex flex-col">
@@ -146,7 +146,7 @@ function AccountTreeNode({
                         <AccountTreeNode
                             key={child.id}
                             account={child}
-                            children={allAccounts.filter(
+                            childAccounts={allAccounts.filter(
                                 (a) => a.parent_id === child.id,
                             )}
                             allAccounts={allAccounts}
@@ -212,7 +212,7 @@ export function AccountTree({
                             <AccountTreeNode
                                 key={account.id}
                                 account={account}
-                                children={accounts.filter(
+                                childAccounts={accounts.filter(
                                     (a) => a.parent_id === account.id,
                                 )}
                                 allAccounts={accounts}

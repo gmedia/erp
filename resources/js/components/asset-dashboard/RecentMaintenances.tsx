@@ -6,9 +6,11 @@ import { Calendar as CalendarIcon, ChevronRight, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RecentMaintenanceItem } from '../../hooks/useAssetDashboard';
 
+const MAINTENANCE_SKELETON_ROWS = [1, 2, 3, 4] as const;
+
 interface RecentMaintenancesProps {
-    data?: RecentMaintenanceItem[];
-    isLoading: boolean;
+    readonly data?: RecentMaintenanceItem[];
+    readonly isLoading: boolean;
 }
 
 export function RecentMaintenances({
@@ -26,9 +28,9 @@ export function RecentMaintenances({
                 </CardHeader>
                 <CardContent className="flex-1 p-0">
                     <div className="divide-y">
-                        {[...Array(4)].map((_, i) => (
+                        {MAINTENANCE_SKELETON_ROWS.map((rowNumber) => (
                             <div
-                                key={i}
+                                key={`maintenance-skeleton-${rowNumber}`}
                                 className="flex flex-col space-y-2 p-4"
                             >
                                 <div className="flex justify-between">

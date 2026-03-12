@@ -75,6 +75,9 @@ export function WarrantyAlerts({ data, isLoading }: WarrantyAlertsProps) {
                 <div className="max-h-[320px] divide-y overflow-y-auto">
                     {data.map((asset) => {
                         const isCritical = asset.days_remaining <= 7;
+                        const warningBadgeClassName = isCritical
+                            ? ''
+                            : 'bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400';
 
                         return (
                             <div
@@ -94,7 +97,7 @@ export function WarrantyAlerts({ data, isLoading }: WarrantyAlertsProps) {
                                                 ? 'destructive'
                                                 : 'secondary'
                                         }
-                                        className={`min-w-fit px-1.5 py-0 text-[10px] font-medium whitespace-nowrap ${!isCritical ? 'bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400' : ''}`}
+                                        className={`min-w-fit px-1.5 py-0 text-[10px] font-medium whitespace-nowrap ${warningBadgeClassName}`}
                                     >
                                         {asset.days_remaining}{' '}
                                         {asset.days_remaining === 1

@@ -1,9 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CategoryDistributionItem } from '../../hooks/useAssetDashboard';
 
+const CATEGORY_PLACEHOLDER_HEIGHTS = [40, 70, 45, 90, 60] as const;
+
 interface CategoryDistributionChartProps {
-    data?: CategoryDistributionItem[];
-    isLoading: boolean;
+    readonly data?: CategoryDistributionItem[];
+    readonly isLoading: boolean;
 }
 
 export function CategoryDistributionChart({
@@ -15,11 +17,11 @@ export function CategoryDistributionChart({
             <Card className="flex h-[400px] w-full items-center justify-center p-6 sm:p-8">
                 <div className="flex flex-col items-center space-y-4">
                     <div className="flex h-32 w-48 items-end space-x-2 opacity-20">
-                        {[40, 70, 45, 90, 60].map((h, i) => (
+                        {CATEGORY_PLACEHOLDER_HEIGHTS.map((height) => (
                             <div
-                                key={i}
+                                key={`chart-placeholder-${height}`}
                                 className="w-8 animate-pulse rounded-t-sm bg-muted-foreground"
-                                style={{ height: `${h}%` }}
+                                style={{ height: `${height}%` }}
                             ></div>
                         ))}
                     </div>
@@ -63,10 +65,10 @@ export function CategoryDistributionChart({
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden pb-4">
                 <div className="flex h-full w-full flex-col justify-center space-y-4 pr-4">
-                    {data.map((item, idx) => {
+                    {data.map((item) => {
                         const widthStr = `${Math.max((item.count / maxCount) * 100, 2)}%`;
                         return (
-                            <div key={idx} className="flex flex-col space-y-1">
+                            <div key={item.name} className="flex flex-col space-y-1">
                                 <div className="flex items-center justify-between text-sm">
                                     <span className="truncate pr-4 font-medium text-muted-foreground">
                                         {item.name}

@@ -28,6 +28,16 @@ interface AssetMovementFormProps {
     isLoading?: boolean;
 }
 
+const toOptionalSelectValue = (
+    value: string | number | null | undefined,
+) => {
+    if (typeof value === 'string' || typeof value === 'number') {
+        return String(value);
+    }
+
+    return '';
+};
+
 const ASSET_MOVEMENT_TYPES = [
     'transfer',
     'assign',
@@ -50,34 +60,28 @@ const getAssetMovementFormDefaults = (
 ): AssetMovementFormData => {
     if (item) {
         return {
-            asset_id: item.asset_id ? String(item.asset_id) : '',
+            asset_id: toOptionalSelectValue(item.asset_id),
             movement_type: isAssetMovementType(item.movement_type)
                 ? item.movement_type
                 : 'transfer',
             moved_at: item.moved_at ? new Date(item.moved_at) : new Date(),
-            to_branch_id: item.to_branch_id ? String(item.to_branch_id) : '',
-            to_location_id: item.to_location_id
-                ? String(item.to_location_id)
-                : '',
-            to_department_id: item.to_department_id
-                ? String(item.to_department_id)
-                : '',
-            to_employee_id: item.to_employee_id
-                ? String(item.to_employee_id)
-                : '',
+            to_branch_id: toOptionalSelectValue(item.to_branch_id),
+            to_location_id: toOptionalSelectValue(item.to_location_id),
+            to_department_id: toOptionalSelectValue(item.to_department_id),
+            to_employee_id: toOptionalSelectValue(item.to_employee_id),
             reference: item.reference || '',
             notes: item.notes || '',
         };
     }
 
     return {
-        asset_id: asset ? String(asset.id) : '',
+        asset_id: toOptionalSelectValue(asset?.id),
         movement_type: 'transfer',
         moved_at: new Date(),
-        to_branch_id: asset ? String(asset.branch_id || '') : '',
-        to_location_id: asset ? String(asset.asset_location_id || '') : '',
-        to_department_id: asset ? String(asset.department_id || '') : '',
-        to_employee_id: asset ? String(asset.employee_id || '') : '',
+        to_branch_id: toOptionalSelectValue(asset?.branch_id),
+        to_location_id: toOptionalSelectValue(asset?.asset_location_id),
+        to_department_id: toOptionalSelectValue(asset?.department_id),
+        to_employee_id: toOptionalSelectValue(asset?.employee_id),
         reference: '',
         notes: '',
     };
@@ -122,6 +126,13 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
         };
 
         const isEdit = !!item;
+        let formTitle = 'Record Asset Movement';
+
+        if (isEdit) {
+            formTitle = 'Edit Movement';
+        } else if (asset) {
+            formTitle = `Record Movement for ${asset.asset_code}`;
+        }
 
         return (
             <EntityForm<AssetMovementFormData>
@@ -134,13 +145,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                 }
                 open={open}
                 onOpenChange={onOpenChange}
-                title={
-                    isEdit
-                        ? 'Edit Movement'
-                        : asset
-                          ? `Record Movement for ${asset.asset_code}`
-                          : 'Record Asset Movement'
-                }
+                title={formTitle}
                 submitLabel={isEdit ? 'Update Movement' : 'Record Movement'}
                 onSubmit={handleFormSubmit}
                 isLoading={isLoading}
