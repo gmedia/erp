@@ -2,9 +2,9 @@
 
 import axios from '@/lib/axios';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { z } from 'zod';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
@@ -39,16 +39,17 @@ interface StockAdjustmentFormProps {
     isLoading?: boolean;
 }
 
-const createEmptyStockAdjustmentItem = (): StockAdjustmentFormData['items'][number] => ({
-    product_id: '',
-    product_label: '',
-    unit_id: '',
-    unit_label: '',
-    quantity_before: 0,
-    quantity_adjusted: 1,
-    unit_cost: 0,
-    reason: '',
-});
+const createEmptyStockAdjustmentItem =
+    (): StockAdjustmentFormData['items'][number] => ({
+        product_id: '',
+        product_label: '',
+        unit_id: '',
+        unit_label: '',
+        quantity_before: 0,
+        quantity_adjusted: 1,
+        unit_cost: 0,
+        reason: '',
+    });
 
 const formatItemReference = (label?: string, id?: string) => {
     if (label) {
@@ -62,7 +63,9 @@ const formatItemReference = (label?: string, id?: string) => {
     return '-';
 };
 
-const omitDisplayLabels = <T extends { product_label?: string; unit_label?: string }>(
+const omitDisplayLabels = <
+    T extends { product_label?: string; unit_label?: string },
+>(
     item: T,
 ) => {
     const nextItem = { ...item };
@@ -357,13 +360,25 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[250px]">Product</TableHead>
-                                    <TableHead className="w-[160px]">Unit</TableHead>
-                                    <TableHead className="w-[140px]">Qty Before</TableHead>
-                                    <TableHead className="w-[160px]">Qty Adjusted</TableHead>
-                                    <TableHead className="w-[140px]">Unit Cost</TableHead>
+                                    <TableHead className="w-[250px]">
+                                        Product
+                                    </TableHead>
+                                    <TableHead className="w-[160px]">
+                                        Unit
+                                    </TableHead>
+                                    <TableHead className="w-[140px]">
+                                        Qty Before
+                                    </TableHead>
+                                    <TableHead className="w-[160px]">
+                                        Qty Adjusted
+                                    </TableHead>
+                                    <TableHead className="w-[140px]">
+                                        Unit Cost
+                                    </TableHead>
                                     <TableHead>Reason</TableHead>
-                                    <TableHead className="w-[120px] text-right">Action</TableHead>
+                                    <TableHead className="w-[120px] text-right">
+                                        Action
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -397,16 +412,20 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                                                     )}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {adjustmentItem.quantity_before ?? 0}
+                                                    {adjustmentItem.quantity_before ??
+                                                        0}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {adjustmentItem.quantity_adjusted ?? 0}
+                                                    {adjustmentItem.quantity_adjusted ??
+                                                        0}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {adjustmentItem.unit_cost ?? 0}
+                                                    {adjustmentItem.unit_cost ??
+                                                        0}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {adjustmentItem.reason || '-'}
+                                                    {adjustmentItem.reason ||
+                                                        '-'}
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <Button
@@ -414,7 +433,9 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                                                         variant="ghost"
                                                         size="icon"
                                                         onClick={() =>
-                                                            handleEditItem(index)
+                                                            handleEditItem(
+                                                                index,
+                                                            )
                                                         }
                                                         title="Edit item"
                                                         aria-label={`Edit item ${index + 1}`}
@@ -425,7 +446,9 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                                                         type="button"
                                                         variant="ghost"
                                                         size="icon"
-                                                        onClick={() => remove(index)}
+                                                        onClick={() =>
+                                                            remove(index)
+                                                        }
                                                         title="Remove item"
                                                         aria-label={`Remove item ${index + 1}`}
                                                     >
