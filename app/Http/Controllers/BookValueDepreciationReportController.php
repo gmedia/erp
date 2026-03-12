@@ -14,7 +14,10 @@ class BookValueDepreciationReportController extends Controller
     /**
      * Display the Book Value & Depreciation report.
      */
-    public function index(IndexBookValueDepreciationRequest $request, IndexBookValueDepreciationReportAction $action): BookValueDepreciationCollection
+    public function index(
+        IndexBookValueDepreciationRequest $request,
+        IndexBookValueDepreciationReportAction $action
+    ): BookValueDepreciationCollection
     {
         $assets = $action->execute($request);
 

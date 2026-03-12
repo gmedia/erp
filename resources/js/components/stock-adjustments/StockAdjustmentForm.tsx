@@ -29,6 +29,8 @@ import {
 } from '@/utils/schemas';
 import { StockAdjustmentItemFormDialog } from './StockAdjustmentItemFormDialog';
 
+type StockAdjustmentFormInput = z.input<typeof stockAdjustmentFormSchema>;
+
 interface StockAdjustmentFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -52,7 +54,7 @@ const createEmptyStockAdjustmentItem =
     });
 
 const normalizeStockAdjustmentItem = (
-    item?: Partial<StockAdjustmentFormData['items'][number]> | null,
+    item?: Partial<StockAdjustmentFormInput['items'][number]> | null,
 ): StockAdjustmentFormData['items'][number] => ({
     ...createEmptyStockAdjustmentItem(),
     ...item,
@@ -176,10 +178,6 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
             () => getStockAdjustmentFormDefaults(activeStockAdjustment),
             [activeStockAdjustment],
         );
-
-        type StockAdjustmentFormInput = z.input<
-            typeof stockAdjustmentFormSchema
-        >;
 
         const form = useForm<
             StockAdjustmentFormInput,
@@ -415,11 +413,7 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                                     fields.map((f, index) => {
                                         const adjustmentItem =
                                             normalizeStockAdjustmentItem(
-                                                watchedItems?.[index] as
-                                                    | Partial<
-                                                          StockAdjustmentFormData['items'][number]
-                                                      >
-                                                    | undefined,
+                                                watchedItems?.[index],
                                             );
 
                                         return (
@@ -500,15 +494,11 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                         setEditingIndex(null);
                     }}
                     item={
-                        editingIndex === null
-                            ? null
-                            : normalizeStockAdjustmentItem(
-                                  watchedItems?.[editingIndex] as
-                                      | Partial<
-                                            StockAdjustmentFormData['items'][number]
-                                        >
-                                      | undefined,
+                        editingIndex !== null
+                            ? normalizeStockAdjustmentItem(
+                                  watchedItems?.[editingIndex],
                               )
+                            : null
                     }
                     onSave={(data) => {
                         if (editingIndex !== null) {

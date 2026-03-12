@@ -46,9 +46,14 @@ class ExecuteTransitionActionsAction
                     default => throw new Exception("Unsupported transition action type: {$type}"),
                 };
 
-                $results[$actionDefinition->id] = ['status' => 'success', 'result' => $result];
+                $results[$actionDefinition->id] = [
+                    'status' => 'success',
+                    'result' => $result,
+                ];
             } catch (Exception $e) {
-                Log::error("Pipeline transition action failed. Action ID: {$actionDefinition->id}, Type: {$type}. Error: {$e->getMessage()}");
+                Log::error(
+                    "Pipeline transition action failed. Action ID: {$actionDefinition->id}, Type: {$type}. Error: {$e->getMessage()}"
+                );
 
                 $results[$actionDefinition->id] = ['status' => 'failed', 'error' => $e->getMessage()];
 
@@ -82,7 +87,9 @@ class ExecuteTransitionActionsAction
     private function handleCreateRecord(Model $entity, array $params): bool
     {
         // MVP: Not implemented fully. Log a warning
-        Log::warning("'create_record' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->getKey()})");
+        Log::warning(
+            "'create_record' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->getKey()})"
+        );
 
         return true;
     }
@@ -90,7 +97,9 @@ class ExecuteTransitionActionsAction
     private function handleSendNotification(Model $entity, array $params): bool
     {
         // MVP: Not implemented fully. Log a warning
-        Log::warning("'send_notification' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->getKey()})");
+        Log::warning(
+            "'send_notification' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->getKey()})"
+        );
 
         return true;
     }
@@ -98,7 +107,9 @@ class ExecuteTransitionActionsAction
     private function handleDispatchJob(Model $entity, array $params): bool
     {
         // MVP: Not implemented fully. Log a warning
-        Log::warning("'dispatch_job' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->getKey()})");
+        Log::warning(
+            "'dispatch_job' transition action requested, but not fully implemented in MVP. Entity: {$entity->getMorphClass()} ({$entity->getKey()})"
+        );
 
         return true;
     }

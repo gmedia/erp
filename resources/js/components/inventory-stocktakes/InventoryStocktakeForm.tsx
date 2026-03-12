@@ -416,9 +416,9 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                         setEditingIndex(null);
                     }}
                     item={
-                        editingIndex === null
-                            ? null
-                            : watchedItems?.[editingIndex] || null
+                        editingIndex !== null
+                            ? watchedItems?.[editingIndex] || null
+                            : null
                     }
                     onSave={(data) => {
                         if (editingIndex !== null) {

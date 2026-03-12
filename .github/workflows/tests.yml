@@ -14,11 +14,6 @@ concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: write
-  packages: read
-  pull-requests: read
-
 env:
   CI_SAIL_IMAGE: ghcr.io/${{ github.repository }}/ci-sail:8.4
 
@@ -27,6 +22,10 @@ jobs:
     name: Quality checks via Sail
     runs-on: ubuntu-latest
     timeout-minutes: 75
+    permissions:
+      contents: write
+      packages: read
+      pull-requests: read
     outputs:
       autofix_applied: ${{ steps.autofix.outputs.changed }}
 

@@ -26,7 +26,14 @@ class UpdatePipelineStateRequest extends FormRequest
         $state = $this->route('state');
 
         return [
-            'code' => ['required', 'string', 'max:255', Rule::unique('pipeline_states')->where('pipeline_id', $pipeline->id)->ignore($state->id)],
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('pipeline_states')
+                    ->where('pipeline_id', $pipeline->id)
+                    ->ignore($state->id),
+            ],
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'in:initial,intermediate,final'],
             'color' => ['nullable', 'string', 'max:7'],

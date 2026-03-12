@@ -14,7 +14,10 @@ class ApprovalAuditTrailController extends Controller
     /**
      * Display the Approval Audit Trail page.
      */
-    public function index(IndexApprovalAuditTrailRequest $request, IndexApprovalAuditTrailAction $action): ApprovalAuditTrailCollection
+    public function index(
+        IndexApprovalAuditTrailRequest $request,
+        IndexApprovalAuditTrailAction $action
+    ): ApprovalAuditTrailCollection
     {
         $logs = $action->execute($request);
 

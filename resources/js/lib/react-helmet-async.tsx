@@ -42,7 +42,7 @@ const ATTRIBUTE_ALIASES: Record<string, string> = {
 function toAttributeName(name: string): string {
     return (
         ATTRIBUTE_ALIASES[name] ??
-        name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+        name.replaceAll(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
     );
 }
 
@@ -145,7 +145,11 @@ function parseAttributes(
             continue;
         }
 
-        attributes[toAttributeName(name)] = value === true ? '' : String(value);
+        if (typeof value !== 'string' && typeof value !== 'number') {
+            continue;
+        }
+
+        attributes[toAttributeName(name)] = String(value);
     }
 
     return attributes;
@@ -261,11 +265,11 @@ function applyHeadState(): void {
     }
 }
 
-export function HelmetProvider({ children }: HelmetProps) {
+export function HelmetProvider({ children }: Readonly<HelmetProps>) {
     return <>{children}</>;
 }
 
-export function Helmet({ children }: HelmetProps) {
+export function Helmet({ children }: Readonly<HelmetProps>) {
     const id = useId();
 
     useEffect(() => {

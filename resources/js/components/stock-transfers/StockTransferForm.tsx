@@ -29,6 +29,8 @@ import {
 } from '@/utils/schemas';
 import { StockTransferItemFormDialog } from './StockTransferItemFormDialog';
 
+type StockTransferFormInput = z.input<typeof stockTransferFormSchema>;
+
 interface StockTransferFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -50,6 +52,25 @@ const createEmptyStockTransferItem =
         unit_cost: 0,
         notes: '',
     });
+
+const normalizeStockTransferItem = (
+    item?: Partial<StockTransferFormInput['items'][number]> | null,
+): StockTransferFormData['items'][number] => ({
+    ...createEmptyStockTransferItem(),
+    ...item,
+    product_id: typeof item?.product_id === 'string' ? item.product_id : '',
+    product_label:
+        typeof item?.product_label === 'string' ? item.product_label : '',
+    unit_id: typeof item?.unit_id === 'string' ? item.unit_id : '',
+    unit_label: typeof item?.unit_label === 'string' ? item.unit_label : '',
+    quantity: typeof item?.quantity === 'number' ? item.quantity : 1,
+    quantity_received:
+        typeof item?.quantity_received === 'number'
+            ? item.quantity_received
+            : 0,
+    unit_cost: typeof item?.unit_cost === 'number' ? item.unit_cost : 0,
+    notes: typeof item?.notes === 'string' ? item.notes : '',
+});
 
 const formatItemReference = (label?: string, id?: string) => {
     if (label) {
@@ -145,8 +166,6 @@ export const StockTransferForm = memo<StockTransferFormProps>(
             () => getStockTransferFormDefaults(activeStockTransfer),
             [activeStockTransfer],
         );
-
-        type StockTransferFormInput = z.input<typeof stockTransferFormSchema>;
 
         const form = useForm<
             StockTransferFormInput,
@@ -386,8 +405,9 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                 ) : (
                                     fields.map((field, index) => {
                                         const stockTransferItem =
-                                            watchedItems?.[index] ||
-                                            createEmptyStockTransferItem();
+                                            normalizeStockTransferItem(
+                                                watchedItems?.[index],
+                                            );
 
                                         return (
                                             <TableRow key={field.id}>
@@ -467,9 +487,11 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                         setEditingIndex(null);
                     }}
                     item={
-                        editingIndex === null
-                            ? null
-                            : watchedItems?.[editingIndex] || null
+                        editingIndex !== null
+                            ? normalizeStockTransferItem(
+                                  watchedItems?.[editingIndex],
+                              )
+                            : null
                     }
                     onSave={(data) => {
                         if (editingIndex !== null) {

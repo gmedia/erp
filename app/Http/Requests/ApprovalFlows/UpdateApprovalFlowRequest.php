@@ -19,7 +19,13 @@ class UpdateApprovalFlowRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255',
-            'code' => ['sometimes', 'required', 'string', 'max:255', Rule::unique('approval_flows')->ignore($this->approval_flow)],
+            'code' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('approval_flows')->ignore($this->approval_flow),
+            ],
             'approvable_type' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
             'is_active' => 'boolean',

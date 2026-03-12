@@ -21,8 +21,12 @@ trait BaseFilterService
      * @param  array<int, string>  $searchFields
      * @param  array<string, array<int, string>>  $relationSearchFields
      */
-    public function applySearch(Builder $query, string $search, array $searchFields, array $relationSearchFields = []): void
-    {
+    public function applySearch(
+        Builder $query,
+        string $search,
+        array $searchFields,
+        array $relationSearchFields = []
+    ): void {
         $query->where(function ($q) use ($search, $searchFields, $relationSearchFields) {
             foreach ($searchFields as $field) {
                 $q->orWhere($field, 'like', "%{$search}%");

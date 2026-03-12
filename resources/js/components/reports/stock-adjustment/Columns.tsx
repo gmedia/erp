@@ -30,7 +30,7 @@ export const stockAdjustmentReportColumns: ColumnDef<StockAdjustmentReportItem>[
             ...createSortingHeader('Adjustment Type'),
             cell: ({ row }) => (
                 <div className="capitalize">
-                    {(row.original.adjustment_type ?? '-').replace(/_/g, ' ')}
+                    {(row.original.adjustment_type ?? '-').replaceAll('_', ' ')}
                 </div>
             ),
         },
@@ -39,7 +39,7 @@ export const stockAdjustmentReportColumns: ColumnDef<StockAdjustmentReportItem>[
             ...createSortingHeader('Status'),
             cell: ({ row }) => (
                 <div className="capitalize">
-                    {(row.original.status ?? '-').replace(/_/g, ' ')}
+                    {(row.original.status ?? '-').replaceAll('_', ' ')}
                 </div>
             ),
         },

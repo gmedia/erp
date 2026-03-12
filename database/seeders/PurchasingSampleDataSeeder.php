@@ -839,7 +839,11 @@ class PurchasingSampleDataSeeder extends Seeder
                 'status' => $requestStatus,
                 'submitted_by' => $submittedBy,
                 'submitted_at' => $submittedAt,
-                'completed_at' => in_array($requestStatus, ['approved', 'rejected'], true) ? ($completedAt ?? $submittedAt) : null,
+                'completed_at' => in_array(
+                    $requestStatus,
+                    ['approved', 'rejected'],
+                    true,
+                ) ? ($completedAt ?? $submittedAt) : null,
             ]
         );
 
