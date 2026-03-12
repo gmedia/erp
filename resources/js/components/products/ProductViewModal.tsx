@@ -11,6 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTranslation } from '@/contexts/i18n-context';
 import { Product } from '@/types/entity';
 import { formatRupiah } from '@/utils/formatters';
@@ -45,10 +46,8 @@ export const ProductViewModal = memo<ProductViewModalProps>(
                         </DialogHeader>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto px-6">
+                    <ScrollArea className="flex-1 px-6">
                         <div className="grid grid-cols-1 gap-x-6 gap-y-4 py-4 pr-6 md:grid-cols-2">
-                            {/* Content... */}
-                            {/* Note: I'm keeping the internal structure but ensuring max-h is on ScrollArea */}
                             {/* General Info */}
                             <div className="space-y-4 border-b pb-4 md:col-span-2">
                                 <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
@@ -202,7 +201,7 @@ export const ProductViewModal = memo<ProductViewModalProps>(
                                 <ViewField label="Notes" value={item.notes} />
                             </div>
                         </div>
-                    </div>
+                    </ScrollArea>
                     <div className="shrink-0 p-6 pt-2">
                         <DialogFooter>
                             <Button type="button" onClick={onClose}>

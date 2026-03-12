@@ -35,7 +35,7 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
                         </DialogDescription>
                     </DialogHeader>
 
-                    <ScrollArea className="flex-1 overflow-y-auto pr-4">
+                    <ScrollArea className="flex-1 pr-4">
                         <div className="space-y-6 py-4">
                             {/* Basic Info Section */}
                             <div className="grid grid-cols-2 gap-4">

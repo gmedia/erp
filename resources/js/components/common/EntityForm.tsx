@@ -14,6 +14,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form, FormMessage } from '@/components/ui/form';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTranslation } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
 import { simpleEntitySchema } from '@/utils/schemas';
@@ -112,11 +113,11 @@ export default function EntityForm<
                         onSubmit={form.handleSubmit(handleSubmit)}
                         className="flex min-h-0 flex-1 flex-col"
                     >
-                        <div className="flex-1 overflow-y-auto px-6">
+                        <ScrollArea className="flex-1 px-6">
                             <div className="space-y-4 py-1 pr-6">
                                 {children}
                             </div>
-                        </div>
+                        </ScrollArea>
                         <div className="shrink-0 p-6 pt-2">
                             <DialogFooter className="border-t pt-4">
                                 <Button

@@ -9,6 +9,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select } from '@/components/ui/select';
 import * as React from 'react';
 import type { FieldDescriptor } from './filters';
@@ -50,7 +51,7 @@ export function FilterModal({
                         </DialogDescription>
                     </DialogHeader>
                 </div>
-                <div className="flex-1 overflow-y-auto px-6">
+                <ScrollArea className="flex-1 px-6">
                     <div className="grid gap-4 py-4 pr-6">
                         {filterFields.map((field) => {
                             const element = React.isValidElement(
@@ -110,7 +111,7 @@ export function FilterModal({
                             );
                         })}
                     </div>
-                </div>
+                </ScrollArea>
                 <div className="shrink-0 p-6 pt-2">
                     <DialogFooter>
                         <Button variant="outline" onClick={onReset}>
