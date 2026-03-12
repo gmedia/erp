@@ -63,10 +63,6 @@ This Enterprise Resource Planning (ERP) system is a comprehensive business manag
     ```
     sail test --coverage-clover=coverage.xml --coverage-html=coverage-html
     ```
-- Run server for coverage report
-    ```
-    sail run php -S 0.0.0.0:9300 -t coverage-html
-    ```
 - Run Playwright e2e test
     ```
     sail npm run test:e2e
