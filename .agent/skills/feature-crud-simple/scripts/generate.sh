@@ -156,6 +156,7 @@ else
     echo "1. Create Model: ./vendor/bin/sail artisan make:model $FEATURE -mf"
     echo "2. Create Requests: Store, Update, Index, Export"
     echo "3. Create Resources: ${FEATURE}Resource, ${FEATURE}Collection"
+    echo "   - Untuk wrapper class kosong, tambahkan komentar intent agar duster tidak mengompaknya"
     echo "4. Create Controller: ${FEATURE}Controller"
     echo "5. Include route in routes/web.php"
     echo "6. Create tests"

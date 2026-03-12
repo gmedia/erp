@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\ApprovalFlow;
+use App\Models\ApprovalFlowStep;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
-use App\Models\ApprovalFlowStep;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 

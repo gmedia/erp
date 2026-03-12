@@ -59,11 +59,18 @@ Ikuti langkah di SKILL.md:
 5. Frontend
 6. Tests
 
+Catatan penting:
+- Untuk wrapper request/resource yang sengaja kosong, gunakan body multiline dengan komentar intent seperti `// Intentionally empty. Behavior is inherited from the base class.` agar `./vendor/bin/sail bin duster fix` tidak mengompaknya menjadi one-line class.
+
 ## 6. Verifikasi
 
 ```
 // turbo
 ```
+```bash
+./vendor/bin/sail bin duster fix
+```
+
 ```bash
 ./vendor/bin/sail test --filter={Feature}
 ```

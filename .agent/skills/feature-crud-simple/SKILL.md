@@ -176,12 +176,20 @@ class {Feature}Export extends SimpleCrudExport
 ### Requests
 ```php
 // Semua request extend base class yang sesuai
+// Untuk wrapper class tanpa override, tetap tambahkan komentar intent
+// agar duster tidak mengubahnya menjadi one-line empty class.
 
 // Index - No custom implementation
-class Index{Feature}Request extends SimpleCrudIndexRequest {}
+class Index{Feature}Request extends SimpleCrudIndexRequest
+{
+    // Intentionally empty. Behavior is inherited from the base class.
+}
 
 // Export - No custom implementation
-class Export{Feature}Request extends SimpleCrudExportRequest {}
+class Export{Feature}Request extends SimpleCrudExportRequest
+{
+    // Intentionally empty. Behavior is inherited from the base class.
+}
 
 // Store - Requires getModelClass()
 class Store{Feature}Request extends SimpleCrudStoreRequest 
@@ -198,9 +206,16 @@ class Update{Feature}Request extends SimpleCrudUpdateRequest
 
 ### Resources
 ```php
-// No custom implementation needed
-class {Feature}Resource extends SimpleCrudResource {}
-class {Feature}Collection extends SimpleCrudCollection {}
+// No custom implementation needed, but keep the intent comment.
+class {Feature}Resource extends SimpleCrudResource
+{
+    // Intentionally empty. Behavior is inherited from the base class.
+}
+
+class {Feature}Collection extends SimpleCrudCollection
+{
+    // Intentionally empty. Behavior is inherited from the base class.
+}
 ```
 
 ### Controller

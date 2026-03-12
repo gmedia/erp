@@ -51,6 +51,9 @@ Dari output check-architecture atau review manual:
 2. **Test** setelah setiap perubahan
 3. **Lanjut** ke layer berikutnya
 
+Catatan penting:
+- Jika menemukan wrapper request/resource kosong yang hanya mewarisi behavior dari base class, pertahankan body multiline dan tambahkan komentar intent seperti `// Intentionally empty. Behavior is inherited from the base class.` sebelum menjalankan formatter.
+
 ## 6. Verifikasi Setiap Step
 
 ```
@@ -66,6 +69,10 @@ Backend:
 ```
 // turbo
 ```
+```bash
+./vendor/bin/sail bin duster fix
+```
+
 ```bash
 bash .agent/skills/refactor-backend/scripts/check-architecture.sh {ModuleName}
 ```

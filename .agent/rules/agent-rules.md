@@ -51,3 +51,17 @@ Semua command terminal wajib via `./vendor/bin/sail <command>` (artisan/composer
 | Feature Test (PHP) | `Sanctum::actingAs($user)` | `assertJson()`, `assertJsonStructure()`, `assertOk()` |
 | Unit Test (PHP) | Tidak perlu auth | Pest assertions |
 | E2E (Playwright) | Bearer token injection ke localStorage | `waitForResponse('/api/...')` |
+
+## 5. Empty Wrapper Class
+
+- Untuk class PHP yang sengaja kosong dan hanya mewarisi behavior dari base CRUD class seperti `SimpleCrudIndexRequest`, `SimpleCrudExportRequest`, `SimpleCrudResource`, atau `SimpleCrudCollection`, **JANGAN** biarkan body class benar-benar kosong.
+- Selalu pakai body multiline dan tambahkan komentar intent berikut:
+
+```php
+class ExportBranchRequest extends SimpleCrudExportRequest
+{
+	// Intentionally empty. Behavior is inherited from the base class.
+}
+```
+
+- Alasan: `./vendor/bin/sail bin duster fix` dapat mengompak class kosong menjadi one-line class, yang membuat intent kurang jelas dan dapat memicu issue style/Sonar.

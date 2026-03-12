@@ -89,6 +89,7 @@ echo "1. Create model:     ./vendor/bin/sail artisan make:model ${FEATURE} -m -f
 echo "2. Create migration content"
 echo "3. Create Requests:  Index, Store, Update, Export"
 echo "4. Create Resources: ${FEATURE}Resource, ${FEATURE}Collection"
+echo "   - Untuk wrapper class kosong, tambahkan komentar intent agar duster tidak mengompaknya"
 echo "5. Create Actions:   Index${FEATURE_PLURAL}Action, Export${FEATURE_PLURAL}Action"
 echo "6. Create FilterService with BaseFilterService trait"
 echo "7. Create Controller"
