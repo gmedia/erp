@@ -58,7 +58,10 @@ export function JournalEntryViewModal({
                                     Date
                                 </p>
                                 <p>
-                                    {format(new Date(item.entry_date), 'dd MMMM yyyy')}
+                                    {format(
+                                        new Date(item.entry_date),
+                                        'dd MMMM yyyy',
+                                    )}
                                 </p>
                             </div>
                             <div>
@@ -115,16 +118,22 @@ export function JournalEntryViewModal({
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                {new Intl.NumberFormat('id-ID', {
-                                                    style: 'currency',
-                                                    currency: 'IDR',
-                                                }).format(line.debit)}
+                                                {new Intl.NumberFormat(
+                                                    'id-ID',
+                                                    {
+                                                        style: 'currency',
+                                                        currency: 'IDR',
+                                                    },
+                                                ).format(line.debit)}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                {new Intl.NumberFormat('id-ID', {
-                                                    style: 'currency',
-                                                    currency: 'IDR',
-                                                }).format(line.credit)}
+                                                {new Intl.NumberFormat(
+                                                    'id-ID',
+                                                    {
+                                                        style: 'currency',
+                                                        currency: 'IDR',
+                                                    },
+                                                ).format(line.credit)}
                                             </TableCell>
                                             <TableCell>{line.memo}</TableCell>
                                         </TableRow>

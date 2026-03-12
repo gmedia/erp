@@ -105,24 +105,33 @@ export const InventoryStocktakeViewModal = React.memo(
                                 />
                                 <ViewField
                                     label="Product Category"
-                                    value={current.product_category?.name || '-'}
+                                    value={
+                                        current.product_category?.name || '-'
+                                    }
                                 />
                                 <ViewField
                                     label="Stocktake Date"
                                     value={
                                         current.stocktake_date
                                             ? format(
-                                                  new Date(current.stocktake_date),
+                                                  new Date(
+                                                      current.stocktake_date,
+                                                  ),
                                                   'PPP',
                                               )
                                             : '-'
                                     }
                                 />
-                                <ViewField label="Notes" value={current.notes || '-'} />
+                                <ViewField
+                                    label="Notes"
+                                    value={current.notes || '-'}
+                                />
                             </div>
 
                             <div className="space-y-2">
-                                <div className="text-sm font-semibold">Items</div>
+                                <div className="text-sm font-semibold">
+                                    Items
+                                </div>
                                 <div className="overflow-x-auto rounded-md border">
                                     <Table>
                                         <TableHeader>
@@ -143,7 +152,8 @@ export const InventoryStocktakeViewModal = React.memo(
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {(current.items || []).length === 0 ? (
+                                            {(current.items || []).length ===
+                                            0 ? (
                                                 <TableRow>
                                                     <TableCell
                                                         colSpan={7}
@@ -153,33 +163,44 @@ export const InventoryStocktakeViewModal = React.memo(
                                                     </TableCell>
                                                 </TableRow>
                                             ) : (
-                                                (current.items || []).map((it) => (
-                                                    <TableRow key={it.id}>
-                                                        <TableCell>
-                                                            {it.product?.name || '-'}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {it.unit?.name || '-'}
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            {it.system_quantity}
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            {it.counted_quantity ?? '-'}
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            {it.variance ?? '-'}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Badge variant="outline">
-                                                                {it.result}
-                                                            </Badge>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {it.notes || '-'}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))
+                                                (current.items || []).map(
+                                                    (it) => (
+                                                        <TableRow key={it.id}>
+                                                            <TableCell>
+                                                                {it.product
+                                                                    ?.name ||
+                                                                    '-'}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                {it.unit
+                                                                    ?.name ||
+                                                                    '-'}
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                {
+                                                                    it.system_quantity
+                                                                }
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                {it.counted_quantity ??
+                                                                    '-'}
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                {it.variance ??
+                                                                    '-'}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Badge variant="outline">
+                                                                    {it.result}
+                                                                </Badge>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                {it.notes ||
+                                                                    '-'}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ),
+                                                )
                                             )}
                                         </TableBody>
                                     </Table>
