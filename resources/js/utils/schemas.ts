@@ -894,16 +894,12 @@ export const goodsReceiptFormSchema = z.object({
                     .string()
                     .min(1, { message: 'Product is required.' }),
                 unit_id: z.string().min(1, { message: 'Unit is required.' }),
-                quantity_received: z.coerce
-                    .number()
-                    .gt(0, {
-                        message: 'Quantity received must be greater than 0.',
-                    }),
-                quantity_accepted: z.coerce
-                    .number()
-                    .min(0, {
-                        message: 'Quantity accepted must be at least 0.',
-                    }),
+                quantity_received: z.coerce.number().gt(0, {
+                    message: 'Quantity received must be greater than 0.',
+                }),
+                quantity_accepted: z.coerce.number().min(0, {
+                    message: 'Quantity accepted must be at least 0.',
+                }),
                 quantity_rejected: z.coerce
                     .number()
                     .min(0)
@@ -949,11 +945,9 @@ export const supplierReturnFormSchema = z.object({
                     .string()
                     .min(1, { message: 'Product is required.' }),
                 unit_id: z.string().optional(),
-                quantity_returned: z.coerce
-                    .number()
-                    .gt(0, {
-                        message: 'Quantity returned must be greater than 0.',
-                    }),
+                quantity_returned: z.coerce.number().gt(0, {
+                    message: 'Quantity returned must be greater than 0.',
+                }),
                 unit_price: z.coerce
                     .number()
                     .min(0, { message: 'Unit price must be at least 0.' }),
