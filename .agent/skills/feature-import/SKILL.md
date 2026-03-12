@@ -42,12 +42,17 @@ Memvalidasi file upload.
 
 1. Buka `{Module}Controller.php`. Tambahkan method:
    ```php
+   use App\Actions\{Modules}\Import{Modules}Action;
+   use App\Http\Requests\{Modules}\Import{Module}Request;
+   use Illuminate\Http\JsonResponse;
+
    public function import(Import{Module}Request $request): JsonResponse
    {
-       $summary = (new \App\Actions\{Modules}\Import{Modules}Action)->execute($request->file('file'));
+      $summary = (new Import{Modules}Action())->execute($request->file('file'));
        return response()->json($summary);
    }
    ```
+   Gunakan import di header file. Jangan tulis FQCN seperti `\App\Actions\...` atau `\Illuminate\...` langsung di body method.
 2. Buka `routes/api/{module}.php`. Tambahkan route `POST`:
    ```php
    Route::post('{slug}/import', [Controller::class, 'import'])
@@ -74,6 +79,7 @@ Memvalidasi file upload.
 - Test foreign key tidak valid (mengembalikan error _not found_ di baris).
 - Test duplicate / Upsert logic.
 - Test endpoint mereturn `422` jika bukan file valid.
+- Import `Sanctum`, `Storage`, `Excel`, `Carbon`, dan model terkait di header file. Hindari FQCN seperti `\Laravel\Sanctum\Sanctum::actingAs(...)` atau `\Illuminate\Support\Facades\Storage::fake(...)` di body test.
 
 ### Playwright (`tests/e2e/{slug}/{module}.spec.ts`)
 - Tambahkan test untuk men-trigger open modal import.

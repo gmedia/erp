@@ -66,6 +66,7 @@ mcp_laravel-boost_read-log-entries(entries: 10)
 > [!IMPORTANT]
 > **Auth:** WAJIB gunakan `Sanctum::actingAs($user)` — bukan `actingAs($user)`  
 > **Assertions:** Gunakan `assertJson()`, `assertJsonStructure()`, `assertOk()` — bukan `assertInertia()`  
+> **Imports:** Import class yang dipakai (`Sanctum`, `Storage`, `Carbon`, `Rule`, model terkait) di header file, lalu gunakan short name. Hindari FQCN seperti `\Laravel\Sanctum\Sanctum`, `\Illuminate\Support\Facades\Storage`, atau `\Carbon\Carbon` di body test.  
 > Ini karena arsitektur API-only (stateless Bearer Token), bukan session-based.
 
 Test cases per method:
@@ -121,6 +122,9 @@ $this->assertTrue($validator->fails());
 
 ```bash
 // turbo-all
+
+# Lint / formatter guard
+./vendor/bin/sail bin duster fix
 
 # Backend tests
 ./vendor/bin/sail test

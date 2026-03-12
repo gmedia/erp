@@ -40,6 +40,10 @@ cat .agent/skills/testing-strategy/resources/FeatureTest.php.template
 
 Lokasi: `tests/Feature/{Module}ControllerTest.php`
 
+Catatan penting:
+- Karena project ini API-only, feature test PHP wajib import `Laravel\Sanctum\Sanctum` lalu pakai `Sanctum::actingAs($user, ['*']);`.
+- Import `Storage`, `Carbon`, `Rule`, dan model yang dipakai di header file. Hindari FQCN seperti `\Laravel\Sanctum\Sanctum` atau `\Illuminate\Support\Facades\Storage` di body test.
+
 ## 5. Buat Unit Tests
 
 Gunakan template:
@@ -70,6 +74,8 @@ Lokasi: `tests/e2e/{module}/`
 // turbo
 ```
 ```bash
+./vendor/bin/sail bin duster fix
+
 ./vendor/bin/sail test --filter={Module}
 ```
 

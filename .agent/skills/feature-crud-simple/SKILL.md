@@ -204,6 +204,8 @@ class Update{Feature}Request extends SimpleCrudUpdateRequest
 }
 ```
 
+> **Important:** Untuk executable PHP code, selalu import dependency di atas file. Hindari FQCN di body method seperti `\App\Models\...`, `\Illuminate\Validation\Rule::...`, `\Laravel\Sanctum\Sanctum::actingAs(...)`, atau `\Carbon\Carbon::setTestNow(...)`. Pengecualian hanya untuk PHPDoc, generic annotations, dan `::class` metadata.
+
 ### Resources
 ```php
 // No custom implementation needed, but keep the intent comment.
@@ -455,6 +457,8 @@ class {Feature}ControllerTest extends TestCase
     protected $structure = ['id', 'name', 'created_at', 'updated_at'];
 }
 ```
+
+> **PENTING:** Di test file, import `Sanctum`, `Storage`, `Carbon`, `Rule`, dan model yang dipakai di header file, lalu gunakan short name di body test. Jangan pakai FQCN seperti `\Laravel\Sanctum\Sanctum::actingAs(...)` atau `\Illuminate\Support\Facades\Storage::disk(...)` di assertion atau setup.
 
 #### Feature Export Test
 ```php

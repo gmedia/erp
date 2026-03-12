@@ -61,6 +61,7 @@ Ikuti langkah di SKILL.md:
 
 Catatan penting:
 - Untuk wrapper request/resource yang sengaja kosong, gunakan body multiline dengan komentar intent seperti `// Intentionally empty. Behavior is inherited from the base class.` agar `./vendor/bin/sail bin duster fix` tidak mengompaknya menjadi one-line class.
+- Untuk executable PHP code, import dependency di header file dan gunakan short class name. Hindari FQCN seperti `\App\...`, `\Illuminate\...`, `\Laravel\...`, atau `\Carbon\...` di body method/test.
 
 ## 6. Verifikasi
 

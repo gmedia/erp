@@ -53,6 +53,7 @@ Dari output check-architecture atau review manual:
 
 Catatan penting:
 - Jika menemukan wrapper request/resource kosong yang hanya mewarisi behavior dari base class, pertahankan body multiline dan tambahkan komentar intent seperti `// Intentionally empty. Behavior is inherited from the base class.` sebelum menjalankan formatter.
+- Untuk executable PHP code, pindahkan dependency ke import di bagian atas file. Hindari FQCN seperti `\App\...`, `\Illuminate\...`, `\Laravel\...`, atau `\Carbon\...` di body code kecuali untuk PHPDoc atau `::class` metadata.
 
 ## 6. Verifikasi Setiap Step
 

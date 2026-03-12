@@ -31,9 +31,11 @@ Instruksi:
    - Backend: Importer class (`app/Imports/{Module}Import.php`), Action class, Form Request, Controller methods, Route.
    - Frontend: Komponen Dialog Upload file & Summary tampilan, tombol navigasi di index.
    - Testing Pest: Test feature upload (`tests/Feature/{Modules}/{Module}ImportTest.php`). Test validasi dan test FK resolution.
+   - Import semua dependency di header file. Hindari FQCN seperti `\App\Actions\...`, `\Laravel\Sanctum\Sanctum`, `\Illuminate\Support\Facades\Storage`, atau `\Carbon\Carbon` di body code/test.
 4. Standar testing:
    - Group annotation: `->group('{modul-names}')` di SEMUA test file (wajib).
 5. Verifikasi:
+   - `./vendor/bin/sail bin duster fix`
    - `./vendor/bin/sail test --group {modul-names}`
 ```
 

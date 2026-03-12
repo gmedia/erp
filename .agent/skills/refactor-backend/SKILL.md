@@ -111,6 +111,23 @@ public function store(Request $request) // tidak spesifik
  */
 ```
 
+### Import & FQCN Hygiene
+```php
+// ✅ BENAR
+use App\Models\CoaVersion;
+use Illuminate\Validation\Rule;
+
+$activeVersion = CoaVersion::where('status', 'active')->first();
+'code' => ['required', Rule::unique('approval_flows')->ignore($this->approval_flow)];
+
+// ❌ SALAH
+$activeVersion = \App\Models\CoaVersion::where('status', 'active')->first();
+'code' => ['required', \Illuminate\Validation\Rule::unique('approval_flows')->ignore($this->approval_flow)];
+```
+
+- Terapkan aturan ini juga pada factory, migration, seeder, dan test.
+- FQCN tetap boleh dipakai di PHPDoc, generic annotations, dan `::class` metadata.
+
 ---
 
 ## ⚠️ ANTI OVER-ENGINEERING
