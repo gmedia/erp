@@ -68,7 +68,10 @@ export function CategoryDistributionChart({
                     {data.map((item) => {
                         const widthStr = `${Math.max((item.count / maxCount) * 100, 2)}%`;
                         return (
-                            <div key={item.name} className="flex flex-col space-y-1">
+                            <div
+                                key={item.name}
+                                className="flex flex-col space-y-1"
+                            >
                                 <div className="flex items-center justify-between text-sm">
                                     <span className="truncate pr-4 font-medium text-muted-foreground">
                                         {item.name}
