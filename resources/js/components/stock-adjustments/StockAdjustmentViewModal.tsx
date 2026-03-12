@@ -8,6 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
     Table,
     TableBody,
@@ -75,7 +76,7 @@ export const StockAdjustmentViewModal = React.memo(
 
         return (
             <Dialog open={open} onOpenChange={onClose}>
-                <DialogContent className="max-h-[90vh] max-w-[95vw] overflow-y-auto sm:max-w-7xl">
+                <DialogContent className="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden sm:max-w-7xl">
                     <DialogHeader>
                         <DialogTitle>Stock Adjustment Details</DialogTitle>
                         <DialogDescription>
@@ -83,122 +84,126 @@ export const StockAdjustmentViewModal = React.memo(
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="grid grid-cols-2 gap-6 py-4">
-                        <ViewField
-                            label="Adjustment Number"
-                            value={current.adjustment_number}
-                        />
-                        <ViewField
-                            label="Status"
-                            value={
-                                <Badge variant="outline">
-                                    {current.status}
-                                </Badge>
-                            }
-                        />
-                        <ViewField
-                            label="Adjustment Type"
-                            value={
-                                <Badge variant="outline">
-                                    {current.adjustment_type}
-                                </Badge>
-                            }
-                        />
-                        <ViewField
-                            label="Warehouse"
-                            value={current.warehouse?.name}
-                        />
-                        <ViewField
-                            label="Adjustment Date"
-                            value={
-                                current.adjustment_date
-                                    ? format(
-                                          new Date(current.adjustment_date),
-                                          'PPP',
-                                      )
-                                    : '-'
-                            }
-                        />
-                        <ViewField
-                            label="Stocktake"
-                            value={
-                                current.inventory_stocktake?.stocktake_number ||
-                                '-'
-                            }
-                        />
-                        <ViewField label="Notes" value={current.notes || '-'} />
-                    </div>
+                    <ScrollArea className="flex-1 pr-4">
+                        <div className="space-y-6 py-4">
+                            <div className="grid grid-cols-2 gap-6">
+                                <ViewField
+                                    label="Adjustment Number"
+                                    value={current.adjustment_number}
+                                />
+                                <ViewField
+                                    label="Status"
+                                    value={
+                                        <Badge variant="outline">
+                                            {current.status}
+                                        </Badge>
+                                    }
+                                />
+                                <ViewField
+                                    label="Adjustment Type"
+                                    value={
+                                        <Badge variant="outline">
+                                            {current.adjustment_type}
+                                        </Badge>
+                                    }
+                                />
+                                <ViewField
+                                    label="Warehouse"
+                                    value={current.warehouse?.name}
+                                />
+                                <ViewField
+                                    label="Adjustment Date"
+                                    value={
+                                        current.adjustment_date
+                                            ? format(
+                                                  new Date(current.adjustment_date),
+                                                  'PPP',
+                                              )
+                                            : '-'
+                                    }
+                                />
+                                <ViewField
+                                    label="Stocktake"
+                                    value={
+                                        current.inventory_stocktake?.stocktake_number ||
+                                        '-'
+                                    }
+                                />
+                                <ViewField label="Notes" value={current.notes || '-'} />
+                            </div>
 
-                    <div className="space-y-2">
-                        <div className="text-sm font-semibold">Items</div>
-                        <div className="rounded-md border">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Product</TableHead>
-                                        <TableHead>Unit</TableHead>
-                                        <TableHead className="text-right">
-                                            Qty Before
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Qty Adjusted
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Qty After
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Unit Cost
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Total Cost
-                                        </TableHead>
-                                        <TableHead>Reason</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {(current.items || []).length === 0 ? (
-                                        <TableRow>
-                                            <TableCell
-                                                colSpan={8}
-                                                className="py-8 text-center text-muted-foreground"
-                                            >
-                                                No items.
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        (current.items || []).map((it) => (
-                                            <TableRow key={it.id}>
-                                                <TableCell>
-                                                    {it.product?.name || '-'}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {it.unit?.name || '-'}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    {it.quantity_before}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    {it.quantity_adjusted}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    {it.quantity_after}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    {it.unit_cost}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    {it.total_cost}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {it.reason || '-'}
-                                                </TableCell>
+                            <div className="space-y-2">
+                                <div className="text-sm font-semibold">Items</div>
+                                <div className="overflow-x-auto rounded-md border">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Product</TableHead>
+                                                <TableHead>Unit</TableHead>
+                                                <TableHead className="text-right">
+                                                    Qty Before
+                                                </TableHead>
+                                                <TableHead className="text-right">
+                                                    Qty Adjusted
+                                                </TableHead>
+                                                <TableHead className="text-right">
+                                                    Qty After
+                                                </TableHead>
+                                                <TableHead className="text-right">
+                                                    Unit Cost
+                                                </TableHead>
+                                                <TableHead className="text-right">
+                                                    Total Cost
+                                                </TableHead>
+                                                <TableHead>Reason</TableHead>
                                             </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {(current.items || []).length === 0 ? (
+                                                <TableRow>
+                                                    <TableCell
+                                                        colSpan={8}
+                                                        className="py-8 text-center text-muted-foreground"
+                                                    >
+                                                        No items.
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) : (
+                                                (current.items || []).map((it) => (
+                                                    <TableRow key={it.id}>
+                                                        <TableCell>
+                                                            {it.product?.name || '-'}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {it.unit?.name || '-'}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            {it.quantity_before}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            {it.quantity_adjusted}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            {it.quantity_after}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            {it.unit_cost}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            {it.total_cost}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {it.reason || '-'}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </ScrollArea>
 
                     <DialogFooter>
                         <Button type="button" onClick={onClose}>

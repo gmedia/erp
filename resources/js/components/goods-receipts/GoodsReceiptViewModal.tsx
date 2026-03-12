@@ -8,6 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
 import React from 'react';
 
@@ -38,7 +39,7 @@ export const GoodsReceiptViewModal = React.memo(
 
         return (
             <Dialog open={open} onOpenChange={onClose}>
-                <DialogContent className="max-h-[90vh] max-w-[95vw] overflow-y-auto sm:max-w-7xl">
+                <DialogContent className="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden sm:max-w-7xl">
                     <DialogHeader>
                         <DialogTitle>Goods Receipt Details</DialogTitle>
                         <DialogDescription>
@@ -46,105 +47,109 @@ export const GoodsReceiptViewModal = React.memo(
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="grid grid-cols-2 gap-6 py-2">
-                        <ViewField label="GR Number" value={item.gr_number} />
-                        <ViewField
-                            label="PO Number"
-                            value={item.purchase_order?.po_number}
-                        />
-                        <ViewField
-                            label="Supplier"
-                            value={item.purchase_order?.supplier?.name}
-                        />
-                        <ViewField
-                            label="Warehouse"
-                            value={item.warehouse?.name}
-                        />
-                        <ViewField
-                            label="Receipt Date"
-                            value={
-                                item.receipt_date
-                                    ? format(new Date(item.receipt_date), 'PPP')
-                                    : '-'
-                            }
-                        />
-                        <ViewField
-                            label="Supplier Delivery Note"
-                            value={item.supplier_delivery_note || '-'}
-                        />
-                        <ViewField
-                            label="Status"
-                            value={
-                                <Badge variant="outline">{item.status}</Badge>
-                            }
-                        />
-                        <ViewField
-                            label="Received By"
-                            value={item.received_by?.name || '-'}
-                        />
-                        <ViewField label="Notes" value={item.notes || '-'} />
-                    </div>
+                    <ScrollArea className="flex-1 pr-4">
+                        <div className="space-y-6 py-2">
+                            <div className="grid grid-cols-2 gap-6">
+                                <ViewField label="GR Number" value={item.gr_number} />
+                                <ViewField
+                                    label="PO Number"
+                                    value={item.purchase_order?.po_number}
+                                />
+                                <ViewField
+                                    label="Supplier"
+                                    value={item.purchase_order?.supplier?.name}
+                                />
+                                <ViewField
+                                    label="Warehouse"
+                                    value={item.warehouse?.name}
+                                />
+                                <ViewField
+                                    label="Receipt Date"
+                                    value={
+                                        item.receipt_date
+                                            ? format(new Date(item.receipt_date), 'PPP')
+                                            : '-'
+                                    }
+                                />
+                                <ViewField
+                                    label="Supplier Delivery Note"
+                                    value={item.supplier_delivery_note || '-'}
+                                />
+                                <ViewField
+                                    label="Status"
+                                    value={
+                                        <Badge variant="outline">{item.status}</Badge>
+                                    }
+                                />
+                                <ViewField
+                                    label="Received By"
+                                    value={item.received_by?.name || '-'}
+                                />
+                                <ViewField label="Notes" value={item.notes || '-'} />
+                            </div>
 
-                    <div className="space-y-2">
-                        <h4 className="text-sm font-semibold">Items</h4>
-                        <div className="rounded-md border">
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b">
-                                        <th className="p-2 text-left">
-                                            PO Item ID
-                                        </th>
-                                        <th className="p-2 text-left">
-                                            Product
-                                        </th>
-                                        <th className="p-2 text-left">Unit</th>
-                                        <th className="p-2 text-right">
-                                            Qty Received
-                                        </th>
-                                        <th className="p-2 text-right">
-                                            Qty Accepted
-                                        </th>
-                                        <th className="p-2 text-right">
-                                            Qty Rejected
-                                        </th>
-                                        <th className="p-2 text-right">
-                                            Unit Price
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {(item.items || []).map((it) => (
-                                        <tr
-                                            key={it.id}
-                                            className="border-b last:border-b-0"
-                                        >
-                                            <td className="p-2">
-                                                {it.purchase_order_item_id}
-                                            </td>
-                                            <td className="p-2">
-                                                {it.product?.name || '-'}
-                                            </td>
-                                            <td className="p-2">
-                                                {it.unit?.name || '-'}
-                                            </td>
-                                            <td className="p-2 text-right">
-                                                {it.quantity_received}
-                                            </td>
-                                            <td className="p-2 text-right">
-                                                {it.quantity_accepted}
-                                            </td>
-                                            <td className="p-2 text-right">
-                                                {it.quantity_rejected}
-                                            </td>
-                                            <td className="p-2 text-right">
-                                                {it.unit_price}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                            <div className="space-y-2">
+                                <h4 className="text-sm font-semibold">Items</h4>
+                                <div className="overflow-x-auto rounded-md border">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="border-b">
+                                                <th className="p-2 text-left">
+                                                    PO Item ID
+                                                </th>
+                                                <th className="p-2 text-left">
+                                                    Product
+                                                </th>
+                                                <th className="p-2 text-left">Unit</th>
+                                                <th className="p-2 text-right">
+                                                    Qty Received
+                                                </th>
+                                                <th className="p-2 text-right">
+                                                    Qty Accepted
+                                                </th>
+                                                <th className="p-2 text-right">
+                                                    Qty Rejected
+                                                </th>
+                                                <th className="p-2 text-right">
+                                                    Unit Price
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {(item.items || []).map((it) => (
+                                                <tr
+                                                    key={it.id}
+                                                    className="border-b last:border-b-0"
+                                                >
+                                                    <td className="p-2">
+                                                        {it.purchase_order_item_id}
+                                                    </td>
+                                                    <td className="p-2">
+                                                        {it.product?.name || '-'}
+                                                    </td>
+                                                    <td className="p-2">
+                                                        {it.unit?.name || '-'}
+                                                    </td>
+                                                    <td className="p-2 text-right">
+                                                        {it.quantity_received}
+                                                    </td>
+                                                    <td className="p-2 text-right">
+                                                        {it.quantity_accepted}
+                                                    </td>
+                                                    <td className="p-2 text-right">
+                                                        {it.quantity_rejected}
+                                                    </td>
+                                                    <td className="p-2 text-right">
+                                                        {it.unit_price}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </ScrollArea>
 
                     <DialogFooter>
                         <Button type="button" onClick={onClose}>
