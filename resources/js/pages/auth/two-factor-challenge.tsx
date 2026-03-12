@@ -61,7 +61,9 @@ export default function TwoFactorChallenge() {
         const formData = new FormData(e.currentTarget);
         const data = Object.fromEntries(formData.entries());
 
-        if (!showRecoveryInput) {
+        if (showRecoveryInput) {
+            delete data.code;
+        } else {
             data.code = code;
         }
 
@@ -73,14 +75,14 @@ export default function TwoFactorChallenge() {
         } catch (error: unknown) {
             if (axios.isAxiosError(error) && error.response?.status === 422) {
                 setErrors(error.response.data.errors || {});
-                if (!showRecoveryInput) {
-                    setCode('');
-                } else {
+                if (showRecoveryInput) {
                     (
                         document.querySelector(
                             'input[name="recovery_code"]',
                         ) as HTMLInputElement
                     ).value = '';
+                } else {
+                    setCode('');
                 }
             } else {
                 toast.error('An error occurred. Please try again.');

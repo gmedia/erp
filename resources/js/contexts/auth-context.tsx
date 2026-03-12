@@ -91,7 +91,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
             // Make translations available globally if needed by unhandled context cases
             (
-                window as unknown as { __APP_COMPANY_NAME__: string }
+                globalThis as typeof globalThis & {
+                    __APP_COMPANY_NAME__?: string;
+                }
             ).__APP_COMPANY_NAME__ = data.companyName;
         } catch (error) {
             console.error('Failed to fetch auth state', error);

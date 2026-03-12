@@ -62,7 +62,7 @@ export default function TwoFactor({
         try {
             await axios.delete('/user/two-factor-authentication');
             // Hard reload to reflect changes or manually update state
-            window.location.reload();
+            globalThis.location.reload();
         } catch {
             toast.error('Failed to disable two-factor authentication.');
         } finally {

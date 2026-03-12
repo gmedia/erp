@@ -160,7 +160,7 @@ function TwoFactorVerificationStep({
             );
             onClose();
             // Optional: hard reload or update context block to reflect changes
-            window.location.reload();
+            globalThis.location.reload();
         } catch (err: unknown) {
             if (axios.isAxiosError(err)) {
                 if (err.response?.status === 422) {
@@ -168,9 +168,8 @@ function TwoFactorVerificationStep({
                         errors?: Record<string, string[]>;
                     };
                     const returnedErrors = errorData.errors || {};
-                    const firstError = Object.values(
-                        returnedErrors,
-                    ).flat()[0] as string;
+                    const firstError =
+                        Object.values(returnedErrors).flat()[0] ?? '';
                     setError(
                         firstError ||
                             'The provided two factor authentication code was invalid.',
