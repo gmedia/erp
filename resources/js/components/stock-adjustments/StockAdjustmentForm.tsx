@@ -40,7 +40,10 @@ interface StockAdjustmentFormProps {
 const getInventoryStocktakeOptionLabel = (option: Record<string, unknown>) => {
     const stocktakeNumber = option.stocktake_number;
 
-    if (typeof stocktakeNumber === 'string' || typeof stocktakeNumber === 'number') {
+    if (
+        typeof stocktakeNumber === 'string' ||
+        typeof stocktakeNumber === 'number'
+    ) {
         return String(stocktakeNumber);
     }
 
