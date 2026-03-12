@@ -51,6 +51,27 @@ const createEmptyStockAdjustmentItem =
         reason: '',
     });
 
+const normalizeStockAdjustmentItem = (
+    item?: Partial<StockAdjustmentFormData['items'][number]> | null,
+): StockAdjustmentFormData['items'][number] => ({
+    ...createEmptyStockAdjustmentItem(),
+    ...item,
+    product_id:
+        typeof item?.product_id === 'string' ? item.product_id : '',
+    product_label:
+        typeof item?.product_label === 'string' ? item.product_label : '',
+    unit_id: typeof item?.unit_id === 'string' ? item.unit_id : '',
+    unit_label: typeof item?.unit_label === 'string' ? item.unit_label : '',
+    quantity_before:
+        typeof item?.quantity_before === 'number' ? item.quantity_before : 0,
+    quantity_adjusted:
+        typeof item?.quantity_adjusted === 'number'
+            ? item.quantity_adjusted
+            : 1,
+    unit_cost: typeof item?.unit_cost === 'number' ? item.unit_cost : 0,
+    reason: typeof item?.reason === 'string' ? item.reason : '',
+});
+
 const formatItemReference = (label?: string, id?: string) => {
     if (label) {
         return label;
@@ -394,8 +415,13 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                                 ) : (
                                     fields.map((f, index) => {
                                         const adjustmentItem =
-                                            watchedItems?.[index] ||
-                                            createEmptyStockAdjustmentItem();
+                                            normalizeStockAdjustmentItem(
+                                                watchedItems?.[index] as
+                                                    | Partial<
+                                                          StockAdjustmentFormData['items'][number]
+                                                      >
+                                                    | undefined,
+                                            );
 
                                         return (
                                             <TableRow key={f.id}>
@@ -468,14 +494,22 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                     open={isItemDialogOpen}
                     onOpenChange={(nextOpen) => {
                         setIsItemDialogOpen(nextOpen);
-                        if (!nextOpen) {
-                            setEditingIndex(null);
+                        if (nextOpen) {
+                            return;
                         }
+
+                        setEditingIndex(null);
                     }}
                     item={
-                        editingIndex !== null
-                            ? watchedItems?.[editingIndex] || null
-                            : null
+                        editingIndex === null
+                            ? null
+                            : normalizeStockAdjustmentItem(
+                                  watchedItems?.[editingIndex] as
+                                      | Partial<
+                                            StockAdjustmentFormData['items'][number]
+                                        >
+                                      | undefined,
+                              )
                     }
                     onSave={(data) => {
                         if (editingIndex !== null) {

@@ -88,7 +88,7 @@ export default function Index() {
     ): Promise<{ success: boolean; errors?: Record<string, string[]> }> => {
         const result = await calculateDepreciation({
             ...formData,
-            fiscal_year_id: parseInt(formData.fiscal_year_id),
+            fiscal_year_id: Number.parseInt(formData.fiscal_year_id, 10),
         });
 
         if (result === true) {

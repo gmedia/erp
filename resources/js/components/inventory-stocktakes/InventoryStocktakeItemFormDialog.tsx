@@ -40,10 +40,10 @@ type InventoryStocktakeItemFormData =
     InventoryStocktakeFormData['items'][number];
 
 interface InventoryStocktakeItemFormDialogProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    item: InventoryStocktakeItemFormData | null;
-    onSave: (data: InventoryStocktakeItemFormData) => void;
+    readonly open: boolean;
+    readonly onOpenChange: (open: boolean) => void;
+    readonly item: InventoryStocktakeItemFormData | null;
+    readonly onSave: (data: InventoryStocktakeItemFormData) => void;
 }
 
 export function InventoryStocktakeItemFormDialog({

@@ -28,9 +28,7 @@ interface AssetMovementFormProps {
     isLoading?: boolean;
 }
 
-const toOptionalSelectValue = (
-    value: string | number | null | undefined,
-) => {
+const toOptionalSelectValue = (value: string | number | null | undefined) => {
     if (typeof value === 'string' || typeof value === 'number') {
         return String(value);
     }

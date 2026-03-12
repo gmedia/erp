@@ -11,16 +11,16 @@ import { type ReactNode } from 'react';
 import { AsyncSelect } from './AsyncSelect';
 
 interface AsyncSelectFieldProps<T extends object = Record<string, unknown>> {
-    name: string;
-    label?: string;
-    url: string; // API URL
-    placeholder?: string;
-    className?: string;
-    children?: ReactNode;
-    labelFn?: (item: T) => string;
-    valueFn?: (item: T) => string;
-    initialLabel?: string;
-    onItemSelect?: (item: T) => void;
+    readonly name: string;
+    readonly label?: string;
+    readonly url: string; // API URL
+    readonly placeholder?: string;
+    readonly className?: string;
+    readonly children?: ReactNode;
+    readonly labelFn?: (item: T) => string;
+    readonly valueFn?: (item: T) => string;
+    readonly initialLabel?: string;
+    readonly onItemSelect?: (item: T) => void;
 }
 
 export default function AsyncSelectField<
