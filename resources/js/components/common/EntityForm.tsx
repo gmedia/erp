@@ -25,24 +25,24 @@ interface EntityFormProps<
     TFieldValues extends FieldValues = FieldValues,
     TTransformedValues extends FieldValues = TFieldValues,
 > {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    title: string;
-    onSubmit: (values: TTransformedValues) => Promise<void> | void;
+    readonly open: boolean;
+    readonly onOpenChange: (open: boolean) => void;
+    readonly title: string;
+    readonly onSubmit: (values: TTransformedValues) => Promise<void> | void;
     /** Optional – kept for backward compatibility; not used inside EntityForm */
-    defaultValues?: Partial<TFieldValues>;
+    readonly defaultValues?: Partial<TFieldValues>;
     /** Optional – kept for backward compatibility; not used inside EntityForm */
-    schema?: unknown;
-    children: React.ReactNode;
-    isLoading?: boolean;
+    readonly schema?: unknown;
+    readonly children: React.ReactNode;
+    readonly isLoading?: boolean;
     /** The form object returned by react‑hook‑form's useForm */
-    form: UseFormReturn<TFieldValues, unknown, TTransformedValues>;
+    readonly form: UseFormReturn<TFieldValues, unknown, TTransformedValues>;
     /** Optional – disable the submit button manually (e.g. for custom validation) */
-    submitDisabled?: boolean;
+    readonly submitDisabled?: boolean;
     /** Optional – custom class name for the DialogContent (e.g. for wider forms) */
-    className?: string;
+    readonly className?: string;
     /** Optional – custom label for the submit button */
-    submitLabel?: string;
+    readonly submitLabel?: string;
 }
 
 /**

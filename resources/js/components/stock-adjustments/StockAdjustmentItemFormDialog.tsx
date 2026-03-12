@@ -44,10 +44,10 @@ const stockAdjustmentItemSchema = z.object({
 type StockAdjustmentItemFormData = StockAdjustmentFormData['items'][number];
 
 interface StockAdjustmentItemFormDialogProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    item: StockAdjustmentItemFormData | null;
-    onSave: (data: StockAdjustmentItemFormData) => void;
+    readonly open: boolean;
+    readonly onOpenChange: (open: boolean) => void;
+    readonly item: StockAdjustmentItemFormData | null;
+    readonly onSave: (data: StockAdjustmentItemFormData) => void;
 }
 
 export function StockAdjustmentItemFormDialog({
