@@ -11,9 +11,9 @@ import {
 import { type AssetLocation } from '@/types/entity';
 
 interface AssetLocationViewModalProps {
-    open: boolean;
-    onClose: () => void;
-    item: AssetLocation | null;
+    readonly open: boolean;
+    readonly onClose: () => void;
+    readonly item: AssetLocation | null;
 }
 
 export function AssetLocationViewModal({

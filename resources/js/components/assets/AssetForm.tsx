@@ -24,6 +24,37 @@ interface AssetFormProps {
     isLoading?: boolean;
 }
 
+const toOptionalSelectValue = (
+    primaryValue: string | number | null | undefined,
+    fallbackValue?: string | number | null,
+) => {
+    if (primaryValue !== null && primaryValue !== undefined && primaryValue !== '') {
+        return String(primaryValue);
+    }
+
+    if (fallbackValue !== null && fallbackValue !== undefined && fallbackValue !== '') {
+        return String(fallbackValue);
+    }
+
+    return '';
+};
+
+const getAssetModelOptionLabel = (option: Record<string, unknown>) => {
+    const modelName = option.model_name;
+
+    if (typeof modelName === 'string' || typeof modelName === 'number') {
+        return String(modelName);
+    }
+
+    const name = option.name;
+
+    if (typeof name === 'string' || typeof name === 'number') {
+        return String(name);
+    }
+
+    return '';
+};
+
 const getAssetFormDefaults = (asset?: Asset | null): AssetFormData => {
     if (!asset) {
         return {
@@ -57,43 +88,33 @@ const getAssetFormDefaults = (asset?: Asset | null): AssetFormData => {
     return {
         asset_code: asset.asset_code,
         name: asset.name,
-        asset_category_id: asset.category?.id
-            ? String(asset.category.id)
-            : asset.asset_category_id
-              ? String(asset.asset_category_id)
-              : '',
-        asset_model_id: asset.model?.id
-            ? String(asset.model.id)
-            : asset.asset_model_id
-              ? String(asset.asset_model_id)
-              : '',
+        asset_category_id: toOptionalSelectValue(
+            asset.category?.id,
+            asset.asset_category_id,
+        ),
+        asset_model_id: toOptionalSelectValue(
+            asset.model?.id,
+            asset.asset_model_id,
+        ),
         serial_number: asset.serial_number || '',
         barcode: asset.barcode || '',
-        branch_id: asset.branch?.id
-            ? String(asset.branch.id)
-            : asset.branch_id
-              ? String(asset.branch_id)
-              : '',
-        asset_location_id: asset.location?.id
-            ? String(asset.location.id)
-            : asset.asset_location_id
-              ? String(asset.asset_location_id)
-              : '',
-        department_id: asset.department?.id
-            ? String(asset.department.id)
-            : asset.department_id
-              ? String(asset.department_id)
-              : '',
-        employee_id: asset.employee?.id
-            ? String(asset.employee.id)
-            : asset.employee_id
-              ? String(asset.employee_id)
-              : '',
-        supplier_id: asset.supplier?.id
-            ? String(asset.supplier.id)
-            : asset.supplier_id
-              ? String(asset.supplier_id)
-              : '',
+        branch_id: toOptionalSelectValue(asset.branch?.id, asset.branch_id),
+        asset_location_id: toOptionalSelectValue(
+            asset.location?.id,
+            asset.asset_location_id,
+        ),
+        department_id: toOptionalSelectValue(
+            asset.department?.id,
+            asset.department_id,
+        ),
+        employee_id: toOptionalSelectValue(
+            asset.employee?.id,
+            asset.employee_id,
+        ),
+        supplier_id: toOptionalSelectValue(
+            asset.supplier?.id,
+            asset.supplier_id,
+        ),
         purchase_date: new Date(asset.purchase_date),
         purchase_cost: asset.purchase_cost || '',
         currency: asset.currency || 'IDR',
@@ -257,9 +278,7 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
                             initialLabel={
                                 asset?.model?.name || asset?.model?.model_name
                             }
-                            labelFn={(item) =>
-                                String(item.model_name ?? item.name ?? '')
-                            }
+                            labelFn={getAssetModelOptionLabel}
                         />
                         <InputField
                             name="serial_number"

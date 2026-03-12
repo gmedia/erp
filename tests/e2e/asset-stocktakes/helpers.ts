@@ -1,9 +1,13 @@
 import { Page, expect } from '@playwright/test';
 
 export async function createAssetStocktake(page: Page) {
+    const formDialog = page.getByRole('dialog', {
+        name: /add new asset stocktake|edit asset stocktake/i,
+    });
+
     // Open dialog
     await page.getByRole('button', { name: /add|buat/i }).click();
-    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(formDialog).toBeVisible();
 
     const timestamp = Date.now();
     const reference = `ST-${timestamp}`;
@@ -11,7 +15,11 @@ export async function createAssetStocktake(page: Page) {
     // 1. Branch (Async Select) - assuming it's the first combobox or labeled "Branch"
     // Shadcn select trigger often doesn't associate with label correctly for getByLabel without ID.
     // But let's try locating by nearby label text.
-    await page.locator('label:has-text("Branch")').locator('..').getByRole('combobox').click();
+    await formDialog
+        .locator('label:has-text("Branch")')
+        .locator('..')
+        .getByRole('combobox')
+        .click();
     
     // Wait for options and select first
     const option = page.getByRole('option').first();
@@ -23,7 +31,11 @@ export async function createAssetStocktake(page: Page) {
 
     // 3. Planned Date
     // Click date picker trigger
-    await page.locator('label:has-text("Planned Date")').locator('..').getByRole('button').click();
+    await formDialog
+        .locator('label:has-text("Planned Date")')
+        .locator('..')
+        .getByRole('button')
+        .click();
     // Select today or a date
     await page.getByRole('gridcell').first().click(); // Select first available day in calendar
 
@@ -31,10 +43,10 @@ export async function createAssetStocktake(page: Page) {
     // It's already draft by default in form.
 
     // Save
-    await page.getByRole('dialog').locator('button[type="submit"]').click();
+    await formDialog.locator('button[type="submit"]').click();
 
     // Wait for dialog to close
-    await expect(page.getByRole('dialog')).not.toBeVisible();
+    await expect(formDialog).not.toBeVisible();
 
     return reference;
 }

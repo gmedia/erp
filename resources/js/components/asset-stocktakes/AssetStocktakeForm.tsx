@@ -26,6 +26,21 @@ interface AssetStocktakeFormProps {
     isLoading?: boolean;
 }
 
+const toOptionalSelectValue = (
+    primaryValue: string | number | null | undefined,
+    fallbackValue?: string | number | null,
+) => {
+    if (primaryValue !== null && primaryValue !== undefined && primaryValue !== '') {
+        return String(primaryValue);
+    }
+
+    if (fallbackValue !== null && fallbackValue !== undefined && fallbackValue !== '') {
+        return String(fallbackValue);
+    }
+
+    return '';
+};
+
 const getAssetStocktakeFormDefaults = (
     assetStocktake?: AssetStocktake | null,
 ): AssetStocktakeFormData => {
@@ -40,11 +55,10 @@ const getAssetStocktakeFormDefaults = (
     }
 
     return {
-        branch_id: assetStocktake.branch_id
-            ? String(assetStocktake.branch_id)
-            : assetStocktake.branch?.id
-              ? String(assetStocktake.branch.id)
-              : '',
+        branch_id: toOptionalSelectValue(
+            assetStocktake.branch_id,
+            assetStocktake.branch?.id,
+        ),
         reference: assetStocktake.reference || '',
         planned_at: assetStocktake.planned_at
             ? new Date(assetStocktake.planned_at)

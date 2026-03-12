@@ -11,9 +11,9 @@ import {
 import { type AssetModel } from '@/types/entity';
 
 interface AssetModelViewModalProps {
-    open: boolean;
-    onClose: () => void;
-    item: AssetModel | null;
+    readonly open: boolean;
+    readonly onClose: () => void;
+    readonly item: AssetModel | null;
 }
 
 export function AssetModelViewModal({
