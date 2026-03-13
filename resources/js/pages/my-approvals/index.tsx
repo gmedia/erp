@@ -152,8 +152,9 @@ export default function MyApprovalsPage() {
                         className="transition-all hover:shadow-md"
                     >
                         <CardContent className="p-4 sm:p-6">
-                            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                                <div className="flex-1 space-y-1">
+                            <div className="flex flex-col gap-4">
+                                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                                    <div className="min-w-0 flex-1 space-y-1">
                                     <div className="flex items-center gap-2">
                                         <Badge
                                             variant="outline"
@@ -205,47 +206,54 @@ export default function MyApprovalsPage() {
                                                 : ''}
                                         </span>
                                     </div>
+                                    </div>
+                                    <div className="w-full sm:w-auto sm:shrink-0">
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            className="w-full sm:w-auto"
+                                            asChild
+                                        >
+                                            <Link to={getDocUrl(step.request)}>
+                                                <Eye className="mr-2 h-4 w-4" />{' '}
+                                                View Doc
+                                            </Link>
+                                        </Button>
+                                    </div>
                                 </div>
-                                <div className="mt-4 flex w-full items-center gap-2 sm:mt-0 sm:w-auto">
-                                    {isPendingTab && (
-                                        <>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                className="flex-1 border-green-200 bg-green-50 text-green-700 hover:bg-green-100 hover:text-green-800 sm:flex-none"
-                                                onClick={() =>
-                                                    openActionDialog(
-                                                        'approve',
-                                                        step,
-                                                    )
-                                                }
-                                            >
-                                                <Check className="mr-1 h-4 w-4" />{' '}
-                                                Approve
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                className="flex-1 border-red-200 bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 sm:flex-none"
-                                                onClick={() =>
-                                                    openActionDialog(
-                                                        'reject',
-                                                        step,
-                                                    )
-                                                }
-                                            >
-                                                <X className="mr-1 h-4 w-4" />{' '}
-                                                Reject
-                                            </Button>
-                                        </>
-                                    )}
-                                    <Button size="sm" variant="ghost" asChild>
-                                        <Link to={getDocUrl(step.request)}>
-                                            <Eye className="mr-2 h-4 w-4" />{' '}
-                                            View Doc
-                                        </Link>
-                                    </Button>
-                                </div>
+
+                                {isPendingTab && (
+                                    <div className="flex w-full flex-wrap items-center gap-2 border-t pt-3">
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="w-full border-green-200 bg-green-50 text-green-700 hover:bg-green-100 hover:text-green-800 sm:w-auto"
+                                            onClick={() =>
+                                                openActionDialog(
+                                                    'approve',
+                                                    step,
+                                                )
+                                            }
+                                        >
+                                            <Check className="mr-1 h-4 w-4" />{' '}
+                                            Approve
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="w-full border-red-200 bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 sm:w-auto"
+                                            onClick={() =>
+                                                openActionDialog(
+                                                    'reject',
+                                                    step,
+                                                )
+                                            }
+                                        >
+                                            <X className="mr-1 h-4 w-4" />{' '}
+                                            Reject
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
