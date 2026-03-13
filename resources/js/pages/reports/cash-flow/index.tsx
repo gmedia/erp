@@ -15,6 +15,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/lib/utils';
 import { Helmet } from 'react-helmet-async';
@@ -209,7 +210,7 @@ export default function CashFlow() {
                     </CardHeader>
                     <CardContent>
                         <div className="overflow-hidden rounded-md border">
-                            <div className="max-h-[calc(100vh-22rem)] overflow-auto">
+                            <ScrollArea className="max-h-[calc(100vh-22rem)]">
                                 <Table className="min-w-[760px]">
                                     <TableHeader className="sticky top-0 z-10 bg-background">
                                         <TableRow>
@@ -311,7 +312,8 @@ export default function CashFlow() {
                                         </TableFooter>
                                     )}
                                 </Table>
-                            </div>
+                                <ScrollBar orientation="horizontal" />
+                            </ScrollArea>
                         </div>
                     </CardContent>
                 </Card>

@@ -16,6 +16,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -199,7 +200,7 @@ export default function TrialBalance() {
                     </CardHeader>
                     <CardContent>
                         <div className="overflow-hidden rounded-md border">
-                            <div className="max-h-[calc(100vh-18rem)] overflow-auto">
+                            <ScrollArea className="max-h-[calc(100vh-18rem)]">
                                 <Table className="min-w-[760px]">
                                     <TableHeader className="sticky top-0 z-10 bg-background">
                                         <TableRow>
@@ -311,7 +312,8 @@ export default function TrialBalance() {
                                         </TableFooter>
                                     )}
                                 </Table>
-                            </div>
+                                <ScrollBar orientation="horizontal" />
+                            </ScrollArea>
                         </div>
                         {!isBalanced && report.length > 0 && (
                             <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">

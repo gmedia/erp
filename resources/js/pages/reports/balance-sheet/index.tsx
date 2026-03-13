@@ -15,6 +15,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
@@ -258,7 +259,7 @@ function Section({
                     </div>
                 ) : (
                     <div className="overflow-hidden rounded-md border">
-                        <div className="max-h-[60vh] overflow-auto">
+                        <ScrollArea className="max-h-[60vh]">
                             <div className="sticky top-0 z-10 flex items-center border-b bg-background px-2 py-2 text-xs font-medium text-muted-foreground uppercase">
                                 <div className="flex-1">Account</div>
                                 <div className="flex gap-4 text-right tabular-nums">
@@ -282,7 +283,8 @@ function Section({
                                     showComparison={showComparison}
                                 />
                             ))}
-                        </div>
+                            <ScrollBar orientation="horizontal" />
+                        </ScrollArea>
                     </div>
                 )}
             </CardContent>

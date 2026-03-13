@@ -335,98 +335,100 @@ export function PipelineTransitionFormDialog({
                                             </Button>
                                         </div>
 
-                                        <div className="max-h-[400px] space-y-4 overflow-y-auto p-1">
-                                            {actionFields.map(
-                                                (field, index) => (
-                                                    <Card key={field.id}>
-                                                        <CardContent className="relative pt-4 pb-2">
-                                                            <Button
-                                                                type="button"
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="absolute top-2 right-2 text-red-500"
-                                                                onClick={() =>
-                                                                    removeAction(
-                                                                        index,
-                                                                    )
-                                                                }
-                                                            >
-                                                                <Trash className="h-4 w-4" />
-                                                            </Button>
+                                        <ScrollArea className="max-h-[400px]">
+                                            <div className="space-y-4 p-1 pr-4">
+                                                {actionFields.map(
+                                                    (field, index) => (
+                                                        <Card key={field.id}>
+                                                            <CardContent className="relative pt-4 pb-2">
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="absolute top-2 right-2 text-red-500"
+                                                                    onClick={() =>
+                                                                        removeAction(
+                                                                            index,
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <Trash className="h-4 w-4" />
+                                                                </Button>
 
-                                                            <div className="mb-4 grid grid-cols-2 gap-4 pr-8">
-                                                                <SelectField
-                                                                    name={`actions.${index}.action_type`}
-                                                                    label="Action Type"
-                                                                    options={[
-                                                                        {
-                                                                            value: 'update_field',
-                                                                            label: 'Update Field',
-                                                                        },
-                                                                        {
-                                                                            value: 'create_record',
-                                                                            label: 'Create Record',
-                                                                        },
-                                                                        {
-                                                                            value: 'send_notification',
-                                                                            label: 'Send Notification',
-                                                                        },
-                                                                        {
-                                                                            value: 'dispatch_job',
-                                                                            label: 'Dispatch Job',
-                                                                        },
-                                                                        {
-                                                                            value: 'trigger_approval',
-                                                                            label: 'Trigger Approval',
-                                                                        },
-                                                                        {
-                                                                            value: 'webhook',
-                                                                            label: 'Webhook',
-                                                                        },
-                                                                        {
-                                                                            value: 'custom',
-                                                                            label: 'Custom',
-                                                                        },
-                                                                    ]}
-                                                                />
-                                                                <div className="grid grid-cols-2 gap-2">
-                                                                    <InputField
-                                                                        name={`actions.${index}.execution_order`}
-                                                                        label="Order"
-                                                                        type="number"
-                                                                    />
+                                                                <div className="mb-4 grid grid-cols-2 gap-4 pr-8">
                                                                     <SelectField
-                                                                        name={`actions.${index}.on_failure`}
-                                                                        label="On Failure"
+                                                                        name={`actions.${index}.action_type`}
+                                                                        label="Action Type"
                                                                         options={[
                                                                             {
-                                                                                value: 'abort',
-                                                                                label: 'Abort',
+                                                                                value: 'update_field',
+                                                                                label: 'Update Field',
                                                                             },
                                                                             {
-                                                                                value: 'continue',
-                                                                                label: 'Continue',
+                                                                                value: 'create_record',
+                                                                                label: 'Create Record',
                                                                             },
                                                                             {
-                                                                                value: 'log_and_continue',
-                                                                                label: 'Log & Continue',
+                                                                                value: 'send_notification',
+                                                                                label: 'Send Notification',
+                                                                            },
+                                                                            {
+                                                                                value: 'dispatch_job',
+                                                                                label: 'Dispatch Job',
+                                                                            },
+                                                                            {
+                                                                                value: 'trigger_approval',
+                                                                                label: 'Trigger Approval',
+                                                                            },
+                                                                            {
+                                                                                value: 'webhook',
+                                                                                label: 'Webhook',
+                                                                            },
+                                                                            {
+                                                                                value: 'custom',
+                                                                                label: 'Custom',
                                                                             },
                                                                         ]}
                                                                     />
+                                                                    <div className="grid grid-cols-2 gap-2">
+                                                                        <InputField
+                                                                            name={`actions.${index}.execution_order`}
+                                                                            label="Order"
+                                                                            type="number"
+                                                                        />
+                                                                        <SelectField
+                                                                            name={`actions.${index}.on_failure`}
+                                                                            label="On Failure"
+                                                                            options={[
+                                                                                {
+                                                                                    value: 'abort',
+                                                                                    label: 'Abort',
+                                                                                },
+                                                                                {
+                                                                                    value: 'continue',
+                                                                                    label: 'Continue',
+                                                                                },
+                                                                                {
+                                                                                    value: 'log_and_continue',
+                                                                                    label: 'Log & Continue',
+                                                                                },
+                                                                            ]}
+                                                                        />
+                                                                    </div>
                                                                 </div>
-                                                            </div>
 
-                                                            <TextareaField
-                                                                name={`actions.${index}.config`}
-                                                                label="Configuration (JSON)"
-                                                                rows={4}
-                                                                className="font-mono text-sm"
-                                                            />
-                                                        </CardContent>
-                                                    </Card>
-                                                ),
-                                            )}
-                                        </div>
+                                                                <TextareaField
+                                                                    name={`actions.${index}.config`}
+                                                                    label="Configuration (JSON)"
+                                                                    rows={4}
+                                                                    className="font-mono text-sm"
+                                                                />
+                                                            </CardContent>
+                                                        </Card>
+                                                    ),
+                                                )}
+                                            </div>
+                                        </ScrollArea>
                                     </TabsContent>
                                 </Tabs>
                             </div>
