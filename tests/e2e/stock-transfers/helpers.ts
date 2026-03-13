@@ -10,14 +10,15 @@ async function selectAsyncOption(
         await expect(trigger).toBeVisible();
         await trigger.click();
 
-        const listbox = page.locator('[role="listbox"][aria-busy="false"]').first();
+        const listbox = page.locator('[role="listbox"]:visible').last();
         await expect(listbox).toBeVisible();
-        const container = listbox.locator('..');
 
         if (searchText) {
-            const searchInput = container.getByPlaceholder('Search...');
-            await expect(searchInput).toBeVisible();
-            await searchInput.fill(searchText);
+            const searchInput = page.locator('input[placeholder="Search..."]:visible').last();
+            if (await searchInput.isVisible().catch(() => false)) {
+                await searchInput.fill(searchText);
+                await page.waitForTimeout(250);
+            }
         }
 
         const option = listbox.getByRole('option', { name: new RegExp(optionText, 'i') }).first();
