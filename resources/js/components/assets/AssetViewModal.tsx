@@ -194,7 +194,8 @@ export function AssetViewModal({ open, onClose, item }: AssetViewModalProps) {
                                             Assigned To:
                                         </span>
                                         <span className="text-right font-medium">
-                                            {item.employee?.name || 'Unassigned'}
+                                            {item.employee?.name ||
+                                                'Unassigned'}
                                         </span>
                                     </div>
                                 </div>

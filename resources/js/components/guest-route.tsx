@@ -10,9 +10,7 @@ type GuestRouteProps = Readonly<{
  * Prevents authenticated users from accessing guest-only pages (login, register, etc.).
  * Shows spinner while auth is loading, then redirects to /dashboard if already logged in.
  */
-export default function GuestRoute({
-    children,
-}: GuestRouteProps) {
+export default function GuestRoute({ children }: GuestRouteProps) {
     const { user, isLoading } = useAuth();
 
     if (isLoading) {

@@ -10,9 +10,7 @@ type ProtectedRouteProps = Readonly<{
  * Shows a full-screen loading spinner while auth state is being determined,
  * then either renders children (if authenticated) or redirects to /login.
  */
-export default function ProtectedRoute({
-    children,
-}: ProtectedRouteProps) {
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     const { user, isLoading } = useAuth();
     const location = useLocation();
 

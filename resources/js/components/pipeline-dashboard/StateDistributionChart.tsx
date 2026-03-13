@@ -101,7 +101,9 @@ export function StateDistributionChart({
                                     <div className="flex min-w-0 items-center gap-2">
                                         <span
                                             className="h-2.5 w-2.5 flex-shrink-0 rounded-full ring-1 ring-border"
-                                            style={{ backgroundColor: item.color }}
+                                            style={{
+                                                backgroundColor: item.color,
+                                            }}
                                         />
                                         <span
                                             className="truncate font-medium"
@@ -111,7 +113,8 @@ export function StateDistributionChart({
                                         </span>
                                     </div>
                                     <span className="ml-3 flex-shrink-0 text-muted-foreground tabular-nums">
-                                        {Math.round((item.count / total) * 100)}%
+                                        {Math.round((item.count / total) * 100)}
+                                        %
                                     </span>
                                 </div>
                             ))}

@@ -121,7 +121,9 @@ export function WarrantyAlerts({ data, isLoading }: WarrantyAlertsProps) {
                                         >
                                             <Calendar className="mr-1 h-3 w-3 opacity-70" />
                                             {format(
-                                                new Date(asset.warranty_end_date),
+                                                new Date(
+                                                    asset.warranty_end_date,
+                                                ),
                                                 'MMM dd, yyyy',
                                             )}
                                         </div>

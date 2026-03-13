@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
     Select,
     SelectContent,
@@ -8,7 +9,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { cn, formatCurrency } from '@/lib/utils';
