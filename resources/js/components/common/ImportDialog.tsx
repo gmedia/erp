@@ -202,22 +202,24 @@ export default function ImportDialog({
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {result.errors.map((err, idx) => (
-                                                    <tr
-                                                        key={idx}
-                                                        className="border-t border-slate-100"
-                                                    >
-                                                        <td className="py-1 align-top font-mono text-slate-500">
-                                                            {err.row}
-                                                        </td>
-                                                        <td className="py-1 align-top font-medium text-slate-700">
-                                                            {err.field}
-                                                        </td>
-                                                        <td className="py-1 align-top text-red-600">
-                                                            {err.message}
-                                                        </td>
-                                                    </tr>
-                                                ))}
+                                                {result.errors.map(
+                                                    (err, idx) => (
+                                                        <tr
+                                                            key={idx}
+                                                            className="border-t border-slate-100"
+                                                        >
+                                                            <td className="py-1 align-top font-mono text-slate-500">
+                                                                {err.row}
+                                                            </td>
+                                                            <td className="py-1 align-top font-medium text-slate-700">
+                                                                {err.field}
+                                                            </td>
+                                                            <td className="py-1 align-top text-red-600">
+                                                                {err.message}
+                                                            </td>
+                                                        </tr>
+                                                    ),
+                                                )}
                                             </tbody>
                                         </table>
                                     </div>

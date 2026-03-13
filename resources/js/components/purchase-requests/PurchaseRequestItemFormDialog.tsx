@@ -35,10 +35,10 @@ const purchaseRequestItemSchema = z.object({
 type PurchaseRequestItemFormData = PurchaseRequestFormData['items'][number];
 
 interface PurchaseRequestItemFormDialogProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    item: PurchaseRequestItemFormData | null;
-    onSave: (data: PurchaseRequestItemFormData) => void;
+    readonly open: boolean;
+    readonly onOpenChange: (open: boolean) => void;
+    readonly item: PurchaseRequestItemFormData | null;
+    readonly onSave: (data: PurchaseRequestItemFormData) => void;
 }
 
 export function PurchaseRequestItemFormDialog({
