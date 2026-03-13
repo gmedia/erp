@@ -288,7 +288,12 @@ test('balance sheet comparison works', function () {
     JournalEntryLine::factory()->create(['journal_entry_id' => $jePrev->id, 'account_id' => $prevAssetAccount->id, 'debit' => 300, 'credit' => 0]);
 
     Sanctum::actingAs($this->user, ['*']);
-    $this->getJson('/api/reports/balance-sheet?fiscal_year_id=' . $this->fiscalYear->id . '&comparison_year_id=' . $prevFiscalYear->id)
+    $this->getJson(
+        '/api/reports/balance-sheet?fiscal_year_id=' .
+            $this->fiscalYear->id .
+            '&comparison_year_id=' .
+            $prevFiscalYear->id,
+    )
         ->assertStatus(200)
         ->assertJsonPath('report.totals.assets', 500)
         ->assertJsonPath('report.totals.comparison_assets', 300)

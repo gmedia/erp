@@ -269,18 +269,18 @@ export default function CashFlow() {
                                                             {item.type}
                                                         </TableCell>
                                                         <TableCell className="text-right tabular-nums">
-                                                            {item.inflow !== 0
-                                                                ? formatCurrency(
+                                                            {item.inflow === 0
+                                                                ? '-'
+                                                                : formatCurrency(
                                                                       item.inflow,
-                                                                  )
-                                                                : '-'}
+                                                                  )}
                                                         </TableCell>
                                                         <TableCell className="text-right tabular-nums">
-                                                            {item.outflow !== 0
-                                                                ? formatCurrency(
+                                                            {item.outflow === 0
+                                                                ? '-'
+                                                                : formatCurrency(
                                                                       item.outflow,
-                                                                  )
-                                                                : '-'}
+                                                                  )}
                                                         </TableCell>
                                                     </TableRow>
                                                 );

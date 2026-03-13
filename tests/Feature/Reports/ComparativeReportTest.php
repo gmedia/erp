@@ -128,7 +128,12 @@ test('comparative uses archived previous year and mapping split allocated to LCA
     ]);
 
     Sanctum::actingAs($this->user, ['*']);
-    $this->getJson('/api/reports/comparative?fiscal_year_id=' . $this->fyCurr->id . '&comparison_year_id=' . $this->fyPrev->id)
+    $this->getJson(
+        '/api/reports/comparative?fiscal_year_id=' .
+            $this->fyCurr->id .
+            '&comparison_year_id=' .
+            $this->fyPrev->id,
+    )
         ->assertStatus(200)
         ->assertJsonPath('report.totals.assets', 0)
         ->assertJsonPath('report.totals.comparison_assets', 300)
