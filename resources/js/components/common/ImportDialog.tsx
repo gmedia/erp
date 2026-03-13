@@ -58,7 +58,10 @@ export default function ImportDialog({
             sampleData.length > 0
                 ? sampleData.map((row) =>
                       templateHeaders
-                          .map((header) => row[header] || '')
+                          .map((header) => {
+                              const value = row[header];
+                              return value == null ? '' : String(value);
+                          })
                           .join(','),
                   )
                 : [templateHeaders.map(() => '').join(',')];
@@ -97,7 +100,7 @@ export default function ImportDialog({
                     description: `Successfully imported ${response.data.imported} rows.`,
                 });
                 if (onSuccess) onSuccess();
-                window.location.reload();
+                globalThis.location.reload();
             } else if (response.data.errors.length > 0) {
                 toast.error('Import Finished with Errors', {
                     description: 'Check the error list below.',
@@ -111,8 +114,7 @@ export default function ImportDialog({
             setLoading(false);
             if (
                 rawAxios.isAxiosError(error) &&
-                error.response &&
-                error.response.status === 422
+                error.response?.status === 422
             ) {
                 toast.error('Validation Error', {
                     description: error.response.data.message || 'Invalid file.',
@@ -202,10 +204,9 @@ export default function ImportDialog({
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {result.errors.map(
-                                                    (err, idx) => (
+                                                {result.errors.map((err) => (
                                                         <tr
-                                                            key={idx}
+                                                            key={`${err.row}-${err.field}-${err.message}`}
                                                             className="border-t border-slate-100"
                                                         >
                                                             <td className="py-1 align-top font-mono text-slate-500">
@@ -218,8 +219,7 @@ export default function ImportDialog({
                                                                 {err.message}
                                                             </td>
                                                         </tr>
-                                                    ),
-                                                )}
+                                                ))}
                                             </tbody>
                                         </table>
                                     </div>

@@ -494,17 +494,17 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                         setEditingIndex(null);
                     }}
                     item={
-                        editingIndex !== null
-                            ? normalizeStockAdjustmentItem(
+                        editingIndex === null
+                            ? null
+                            : normalizeStockAdjustmentItem(
                                   watchedItems?.[editingIndex],
                               )
-                            : null
                     }
                     onSave={(data) => {
-                        if (editingIndex !== null) {
-                            update(editingIndex, data);
-                        } else {
+                        if (editingIndex === null) {
                             append(data);
+                        } else {
+                            update(editingIndex, data);
                         }
                         setIsItemDialogOpen(false);
                         setEditingIndex(null);

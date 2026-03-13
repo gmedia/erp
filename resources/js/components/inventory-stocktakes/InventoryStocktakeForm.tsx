@@ -29,6 +29,8 @@ import {
 } from '@/utils/schemas';
 import { InventoryStocktakeItemFormDialog } from './InventoryStocktakeItemFormDialog';
 
+type InventoryStocktakeFormInput = z.input<typeof inventoryStocktakeFormSchema>;
+
 interface InventoryStocktakeFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -49,6 +51,23 @@ const createEmptyInventoryStocktakeItem =
         counted_quantity: 0,
         notes: '',
     });
+
+const normalizeInventoryStocktakeItem = (
+    item?: Partial<InventoryStocktakeFormInput['items'][number]> | null,
+): InventoryStocktakeFormData['items'][number] => ({
+    ...createEmptyInventoryStocktakeItem(),
+    ...item,
+    product_id: typeof item?.product_id === 'string' ? item.product_id : '',
+    product_label:
+        typeof item?.product_label === 'string' ? item.product_label : '',
+    unit_id: typeof item?.unit_id === 'string' ? item.unit_id : '',
+    unit_label: typeof item?.unit_label === 'string' ? item.unit_label : '',
+    system_quantity:
+        typeof item?.system_quantity === 'number' ? item.system_quantity : 0,
+    counted_quantity:
+        typeof item?.counted_quantity === 'number' ? item.counted_quantity : 0,
+    notes: typeof item?.notes === 'string' ? item.notes : '',
+});
 
 const formatItemReference = (label?: string, id?: string) => {
     if (label) {
@@ -137,10 +156,6 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
             () => getInventoryStocktakeFormDefaults(activeStocktake),
             [activeStocktake],
         );
-
-        type InventoryStocktakeFormInput = z.input<
-            typeof inventoryStocktakeFormSchema
-        >;
 
         const form = useForm<
             InventoryStocktakeFormInput,
@@ -340,8 +355,9 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                                 ) : (
                                     fields.map((field, index) => {
                                         const stocktakeItem =
-                                            watchedItems?.[index] ||
-                                            createEmptyInventoryStocktakeItem();
+                                            normalizeInventoryStocktakeItem(
+                                                watchedItems?.[index],
+                                            );
 
                                         return (
                                             <TableRow key={field.id}>
@@ -416,15 +432,17 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                         setEditingIndex(null);
                     }}
                     item={
-                        editingIndex !== null
-                            ? watchedItems?.[editingIndex] || null
-                            : null
+                        editingIndex === null
+                            ? null
+                            : normalizeInventoryStocktakeItem(
+                                  watchedItems?.[editingIndex],
+                              )
                     }
                     onSave={(data) => {
-                        if (editingIndex !== null) {
-                            update(editingIndex, data);
-                        } else {
+                        if (editingIndex === null) {
                             append(data);
+                        } else {
+                            update(editingIndex, data);
                         }
                         setIsItemDialogOpen(false);
                         setEditingIndex(null);
