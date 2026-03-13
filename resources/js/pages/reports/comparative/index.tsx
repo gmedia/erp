@@ -73,6 +73,18 @@ interface ComparativeReportResponse {
     };
 }
 
+const getChangeTextClass = (changeValue: number): string => {
+    if (changeValue < 0) {
+        return 'text-red-500';
+    }
+
+    if (changeValue > 0) {
+        return 'text-green-600';
+    }
+
+    return 'text-muted-foreground';
+};
+
 const AccountRow = ({
     node,
     isExpanded = true,
@@ -85,6 +97,12 @@ const AccountRow = ({
     const [expanded, setExpanded] = useState(isExpanded);
     const hasChildren = node.children && node.children.length > 0;
     const changeValue = node.change || 0;
+    const changeTextClass = getChangeTextClass(changeValue);
+    const expandIcon = expanded ? (
+        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+    ) : (
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+    );
 
     return (
         <div className="flex flex-col">
@@ -99,15 +117,7 @@ const AccountRow = ({
                     onClick={() => hasChildren && setExpanded(!expanded)}
                     style={{ paddingLeft: `${(node.level - 1) * 1.5}rem` }}
                 >
-                    {hasChildren ? (
-                        expanded ? (
-                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                        ) : (
-                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                        )
-                    ) : (
-                        <div className="w-4" />
-                    )}
+                    {hasChildren ? expandIcon : <div className="w-4" />}
                     <span className="font-mono text-xs text-muted-foreground">
                         {node.code}
                     </span>
@@ -123,11 +133,7 @@ const AccountRow = ({
                             <div
                                 className={cn(
                                     'w-28',
-                                    changeValue < 0
-                                        ? 'text-red-500'
-                                        : changeValue > 0
-                                          ? 'text-green-600'
-                                          : 'text-muted-foreground',
+                                    changeTextClass,
                                 )}
                             >
                                 {formatCurrency(changeValue)}
@@ -135,11 +141,7 @@ const AccountRow = ({
                             <div
                                 className={cn(
                                     'w-16',
-                                    changeValue < 0
-                                        ? 'text-red-500'
-                                        : changeValue > 0
-                                          ? 'text-green-600'
-                                          : 'text-muted-foreground',
+                                    changeTextClass,
                                 )}
                             >
                                 {(node.change_percentage || 0).toFixed(1)}%
@@ -183,6 +185,7 @@ function Section({
     const [expandAll, setExpandAll] = useState(true);
     const [expandKey, setExpandKey] = useState(0);
     const changeValue = change || 0;
+    const changeTextClass = getChangeTextClass(changeValue);
 
     const setExpanded = (value: boolean) => {
         setExpandAll(value);
@@ -226,11 +229,7 @@ function Section({
                                 <span
                                     className={cn(
                                         'w-28 text-lg font-bold',
-                                        changeValue < 0
-                                            ? 'text-red-500'
-                                            : changeValue > 0
-                                              ? 'text-green-600'
-                                              : 'text-muted-foreground',
+                                        changeTextClass,
                                     )}
                                 >
                                     {formatCurrency(changeValue)}
@@ -238,11 +237,7 @@ function Section({
                                 <span
                                     className={cn(
                                         'w-16 text-lg font-bold',
-                                        changeValue < 0
-                                            ? 'text-red-500'
-                                            : changeValue > 0
-                                              ? 'text-green-600'
-                                              : 'text-muted-foreground',
+                                        changeTextClass,
                                     )}
                                 >
                                     {(changePercentage || 0).toFixed(1)}%
