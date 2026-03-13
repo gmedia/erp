@@ -110,17 +110,17 @@ const AccountRow = ({
                     <span className="truncate">{node.name}</span>
                 </div>
                 <div className="flex gap-4 text-right tabular-nums">
-                    <div className="w-32 font-mono">
+                    <div className="w-32">
                         {formatCurrency(node.balance)}
                     </div>
                     {showComparison && (
                         <>
-                            <div className="w-32 font-mono text-muted-foreground">
+                            <div className="w-32 text-muted-foreground">
                                 {formatCurrency(node.comparison_balance || 0)}
                             </div>
                             <div
                                 className={cn(
-                                    'w-28 font-mono',
+                                    'w-28',
                                     changeValue < 0
                                         ? 'text-red-500'
                                         : changeValue > 0
@@ -132,7 +132,7 @@ const AccountRow = ({
                             </div>
                             <div
                                 className={cn(
-                                    'w-16 font-mono',
+                                    'w-16',
                                     changeValue < 0
                                         ? 'text-red-500'
                                         : changeValue > 0

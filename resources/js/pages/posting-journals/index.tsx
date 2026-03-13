@@ -391,12 +391,12 @@ export default function Index() {
                                                         </div>
                                                     </TableCell>
 
-                                                    <TableCell className="pt-4 text-right align-top font-mono">
+                                                    <TableCell className="pt-4 text-right align-top">
                                                         {idr.format(
                                                             item.total_debit,
                                                         )}
                                                     </TableCell>
-                                                    <TableCell className="pt-4 text-right align-top font-mono">
+                                                    <TableCell className="pt-4 text-right align-top">
                                                         {idr.format(
                                                             item.total_credit,
                                                         )}

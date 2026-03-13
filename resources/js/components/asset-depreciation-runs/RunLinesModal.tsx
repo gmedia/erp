@@ -109,20 +109,20 @@ export function RunLinesModal({ runId, open, onClose }: RunLinesModalProps) {
                                                 {line.asset?.asset_code}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-right font-mono">
+                                        <TableCell className="text-right">
                                             {formatCurrency(line.amount)}
                                         </TableCell>
-                                        <TableCell className="text-right font-mono">
+                                        <TableCell className="text-right">
                                             {formatCurrency(
                                                 line.accumulated_before,
                                             )}
                                         </TableCell>
-                                        <TableCell className="text-right font-mono">
+                                        <TableCell className="text-right">
                                             {formatCurrency(
                                                 line.accumulated_after,
                                             )}
                                         </TableCell>
-                                        <TableCell className="text-right font-mono">
+                                        <TableCell className="text-right">
                                             {formatCurrency(
                                                 line.book_value_after,
                                             )}
