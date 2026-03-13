@@ -40,10 +40,10 @@ const supplierReturnItemSchema = z.object({
 type SupplierReturnItemFormData = SupplierReturnFormData['items'][number];
 
 interface SupplierReturnItemFormDialogProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    item: SupplierReturnItemFormData | null;
-    onSave: (data: SupplierReturnItemFormData) => void;
+    readonly open: boolean;
+    readonly onOpenChange: (open: boolean) => void;
+    readonly item: SupplierReturnItemFormData | null;
+    readonly onSave: (data: SupplierReturnItemFormData) => void;
 }
 
 export function SupplierReturnItemFormDialog({

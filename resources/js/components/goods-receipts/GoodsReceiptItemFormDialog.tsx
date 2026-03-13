@@ -44,10 +44,10 @@ const goodsReceiptItemSchema = z.object({
 type GoodsReceiptItemFormData = GoodsReceiptFormData['items'][number];
 
 interface GoodsReceiptItemFormDialogProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    item: GoodsReceiptItemFormData | null;
-    onSave: (data: GoodsReceiptItemFormData) => void;
+    readonly open: boolean;
+    readonly onOpenChange: (open: boolean) => void;
+    readonly item: GoodsReceiptItemFormData | null;
+    readonly onSave: (data: GoodsReceiptItemFormData) => void;
 }
 
 export function GoodsReceiptItemFormDialog({
