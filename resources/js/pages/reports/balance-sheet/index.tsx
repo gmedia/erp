@@ -112,9 +112,7 @@ const AccountRow = ({
                     <span className="truncate">{node.name}</span>
                 </div>
                 <div className="flex gap-4 text-right tabular-nums">
-                    <div className="w-32">
-                        {formatCurrency(node.balance)}
-                    </div>
+                    <div className="w-32">{formatCurrency(node.balance)}</div>
                     {showComparison && (
                         <>
                             <div className="w-32 text-muted-foreground">
