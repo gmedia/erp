@@ -9,6 +9,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
 
@@ -163,56 +164,54 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                             onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
-                    <div
-                        className="max-h-[200px] overflow-y-auto p-1"
-                        role="listbox"
-                        aria-busy={loading}
-                    >
-                        {loading && (
-                            <div className="flex items-center justify-center p-4">
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            </div>
-                        )}
-                        {!loading && items.length === 0 && (
-                            <div className="py-6 text-center text-sm text-muted-foreground">
-                                No results found.
-                            </div>
-                        )}
-                        {!loading &&
-                            items.map((item) => {
-                                const itemValue = valueFn(item);
-                                const itemLabel = labelFn(item);
-                                return (
-                                    <div
-                                        key={itemValue}
-                                        role="option"
-                                        aria-selected={itemValue === value}
-                                        className={cn(
-                                            'relative flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-                                            itemValue === value
-                                                ? 'bg-accent text-accent-foreground'
-                                                : '',
-                                        )}
-                                        onClick={() => {
-                                            onValueChange?.(itemValue);
-                                            onItemSelect?.(item);
-                                            setSelectedLabel(itemLabel);
-                                            setOpen(false);
-                                        }}
-                                    >
-                                        <Check
+                    <ScrollArea className="max-h-[200px]">
+                        <div className="p-1" role="listbox" aria-busy={loading}>
+                            {loading && (
+                                <div className="flex items-center justify-center p-4">
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                </div>
+                            )}
+                            {!loading && items.length === 0 && (
+                                <div className="py-6 text-center text-sm text-muted-foreground">
+                                    No results found.
+                                </div>
+                            )}
+                            {!loading &&
+                                items.map((item) => {
+                                    const itemValue = valueFn(item);
+                                    const itemLabel = labelFn(item);
+                                    return (
+                                        <div
+                                            key={itemValue}
+                                            role="option"
+                                            aria-selected={itemValue === value}
                                             className={cn(
-                                                'mr-2 h-4 w-4',
-                                                value === itemValue
-                                                    ? 'opacity-100'
-                                                    : 'opacity-0',
+                                                'relative flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+                                                itemValue === value
+                                                    ? 'bg-accent text-accent-foreground'
+                                                    : '',
                                             )}
-                                        />
-                                        {itemLabel}
-                                    </div>
-                                );
-                            })}
-                    </div>
+                                            onClick={() => {
+                                                onValueChange?.(itemValue);
+                                                onItemSelect?.(item);
+                                                setSelectedLabel(itemLabel);
+                                                setOpen(false);
+                                            }}
+                                        >
+                                            <Check
+                                                className={cn(
+                                                    'mr-2 h-4 w-4',
+                                                    value === itemValue
+                                                        ? 'opacity-100'
+                                                        : 'opacity-0',
+                                                )}
+                                            />
+                                            {itemLabel}
+                                        </div>
+                                    );
+                                })}
+                        </div>
+                    </ScrollArea>
                 </div>
             </PopoverContent>
         </Popover>

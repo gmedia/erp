@@ -5,6 +5,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { StateSummary } from '@/hooks/usePipelineDashboard';
 
 interface StateDistributionChartProps {
@@ -88,32 +89,34 @@ export function StateDistributionChart({
                 </div>
 
                 {/* Legend */}
-                <div className="flex max-h-40 w-full flex-col gap-1.5 overflow-y-auto">
-                    {data
-                        .filter((item) => item.count > 0)
-                        .map((item) => (
-                            <div
-                                key={item.state_id}
-                                className="flex items-center justify-between text-xs"
-                            >
-                                <div className="flex min-w-0 items-center gap-2">
-                                    <span
-                                        className="h-2.5 w-2.5 flex-shrink-0 rounded-full ring-1 ring-border"
-                                        style={{ backgroundColor: item.color }}
-                                    />
-                                    <span
-                                        className="truncate font-medium"
-                                        title={item.name}
-                                    >
-                                        {item.name}
+                <ScrollArea className="max-h-40 w-full">
+                    <div className="flex flex-col gap-1.5 pr-4">
+                        {data
+                            .filter((item) => item.count > 0)
+                            .map((item) => (
+                                <div
+                                    key={item.state_id}
+                                    className="flex items-center justify-between text-xs"
+                                >
+                                    <div className="flex min-w-0 items-center gap-2">
+                                        <span
+                                            className="h-2.5 w-2.5 flex-shrink-0 rounded-full ring-1 ring-border"
+                                            style={{ backgroundColor: item.color }}
+                                        />
+                                        <span
+                                            className="truncate font-medium"
+                                            title={item.name}
+                                        >
+                                            {item.name}
+                                        </span>
+                                    </div>
+                                    <span className="ml-3 flex-shrink-0 text-muted-foreground tabular-nums">
+                                        {Math.round((item.count / total) * 100)}%
                                     </span>
                                 </div>
-                                <span className="ml-3 flex-shrink-0 text-muted-foreground tabular-nums">
-                                    {Math.round((item.count / total) * 100)}%
-                                </span>
-                            </div>
-                        ))}
-                </div>
+                            ))}
+                    </div>
+                </ScrollArea>
             </CardContent>
         </Card>
     );

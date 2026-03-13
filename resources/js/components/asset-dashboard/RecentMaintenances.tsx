@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronRight, Wrench } from 'lucide-react';
@@ -103,56 +104,58 @@ export function RecentMaintenances({
                 </Link>
             </CardHeader>
             <CardContent className="flex-1 p-0">
-                <div className="max-h-[320px] divide-y overflow-y-auto">
-                    {data.map((maintenance) => {
-                        const dateFormatted = maintenance.scheduled_at
-                            ? format(
-                                  new Date(maintenance.scheduled_at),
-                                  'MMM dd, yyyy',
-                              )
-                            : 'Not scheduled';
+                <ScrollArea className="max-h-[320px]">
+                    <div className="divide-y pr-4">
+                        {data.map((maintenance) => {
+                            const dateFormatted = maintenance.scheduled_at
+                                ? format(
+                                      new Date(maintenance.scheduled_at),
+                                      'MMM dd, yyyy',
+                                  )
+                                : 'Not scheduled';
 
-                        return (
-                            <div
-                                key={maintenance.id}
-                                className="p-4 transition-colors hover:bg-muted/50"
-                            >
-                                <div className="mb-2 flex items-start justify-between">
-                                    <p className="line-clamp-1 pr-2 text-sm leading-tight font-medium text-foreground">
-                                        {maintenance.asset_name}
-                                    </p>
-                                    <Badge
-                                        variant={getStatusColor(
-                                            maintenance.status,
-                                        )}
-                                        className="px-1.5 py-0 text-[10px]"
-                                    >
-                                        {getStatusLabel(maintenance.status)}
-                                    </Badge>
-                                </div>
+                            return (
+                                <div
+                                    key={maintenance.id}
+                                    className="p-4 transition-colors hover:bg-muted/50"
+                                >
+                                    <div className="mb-2 flex items-start justify-between">
+                                        <p className="line-clamp-1 pr-2 text-sm leading-tight font-medium text-foreground">
+                                            {maintenance.asset_name}
+                                        </p>
+                                        <Badge
+                                            variant={getStatusColor(
+                                                maintenance.status,
+                                            )}
+                                            className="px-1.5 py-0 text-[10px]"
+                                        >
+                                            {getStatusLabel(maintenance.status)}
+                                        </Badge>
+                                    </div>
 
-                                <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                                    <div className="flex items-center">
-                                        <span className="rounded border bg-muted px-1 py-0.5 font-mono text-[10px] text-muted-foreground">
-                                            {maintenance.asset_code}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center capitalize">
-                                        <Wrench className="mr-1 h-3 w-3 opacity-70" />
-                                        {maintenance.maintenance_type.replace(
-                                            '_',
-                                            ' ',
-                                        )}
-                                    </div>
-                                    <div className="flex items-center">
-                                        <CalendarIcon className="mr-1 h-3 w-3 opacity-70" />
-                                        {dateFormatted}
+                                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                                        <div className="flex items-center">
+                                            <span className="rounded border bg-muted px-1 py-0.5 font-mono text-[10px] text-muted-foreground">
+                                                {maintenance.asset_code}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center capitalize">
+                                            <Wrench className="mr-1 h-3 w-3 opacity-70" />
+                                            {maintenance.maintenance_type.replace(
+                                                '_',
+                                                ' ',
+                                            )}
+                                        </div>
+                                        <div className="flex items-center">
+                                            <CalendarIcon className="mr-1 h-3 w-3 opacity-70" />
+                                            {dateFormatted}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                            );
+                        })}
+                    </div>
+                </ScrollArea>
             </CardContent>
         </Card>
     );
