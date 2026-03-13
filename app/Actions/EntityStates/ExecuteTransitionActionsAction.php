@@ -52,7 +52,7 @@ class ExecuteTransitionActionsAction
                 ];
             } catch (Exception $e) {
                 Log::error(
-                    "Pipeline transition action failed. "
+                    'Pipeline transition action failed. '
                     . "Action ID: {$actionDefinition->id}, "
                     . "Type: {$type}. Error: {$e->getMessage()}"
                 );
@@ -94,7 +94,7 @@ class ExecuteTransitionActionsAction
         // MVP: Not implemented fully. Log a warning
         Log::warning(
             "'create_record' transition action requested, "
-            . "but not fully implemented in MVP. "
+            . 'but not fully implemented in MVP. '
             . "Entity: {$entity->getMorphClass()} ({$entity->getKey()})"
         );
 
@@ -106,7 +106,7 @@ class ExecuteTransitionActionsAction
         // MVP: Not implemented fully. Log a warning
         Log::warning(
             "'send_notification' transition action requested, "
-            . "but not fully implemented in MVP. "
+            . 'but not fully implemented in MVP. '
             . "Entity: {$entity->getMorphClass()} ({$entity->getKey()})"
         );
 
@@ -118,7 +118,7 @@ class ExecuteTransitionActionsAction
         // MVP: Not implemented fully. Log a warning
         Log::warning(
             "'dispatch_job' transition action requested, "
-            . "but not fully implemented in MVP. "
+            . 'but not fully implemented in MVP. '
             . "Entity: {$entity->getMorphClass()} ({$entity->getKey()})"
         );
 

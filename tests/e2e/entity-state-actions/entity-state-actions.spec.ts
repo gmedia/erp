@@ -7,6 +7,7 @@ let assetName: string | null = null;
 
 async function setupPipelineViaApi(page: Page) {
   const apiToken = await page.evaluate(() => localStorage.getItem('api_token'));
+  const assetEntityType = String.raw`App\Models\Asset`;
   const headers = { 
     'Accept': 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
@@ -18,7 +19,7 @@ async function setupPipelineViaApi(page: Page) {
   if (pipelinesRes.ok()) {
       const existingPipelines = (await pipelinesRes.json()).data;
       for (const p of existingPipelines) {
-          if (p.entity_type === 'App\\Models\\Asset') {
+        if (p.entity_type === assetEntityType) {
               await page.request.delete(`/api/pipelines/${p.id}`, { headers });
           }
       }
@@ -30,16 +31,12 @@ async function setupPipelineViaApi(page: Page) {
     data: {
       name: `E2E Asset Pipeline ${Date.now()}`,
       code: `e2e_asset_pipeline_${Date.now()}`,
-      entity_type: 'App\\Models\\Asset',
+      entity_type: assetEntityType,
       description: 'Pipeline for E2E testing',
       version: 1,
       is_active: true
     }
   });
-  if (!pipelineRes.ok()) {
-      // const err = await pipelineRes.json();
-      // console.log('API Error:', err.message || err);
-  }
   expect(pipelineRes.ok()).toBeTruthy();
   const pipeline = (await pipelineRes.json()).data;
   pipelineId = pipeline.id;
@@ -54,10 +51,6 @@ async function setupPipelineViaApi(page: Page) {
       sort_order: 10,
     }
   });
-  if (!draftRes.ok()) {
-      // const err = await draftRes.json();
-      // console.log('API Error State Draft:', err.message || err);
-  }
   expect(draftRes.ok()).toBeTruthy();
   const stateDraft = (await draftRes.json()).data;
 
@@ -71,10 +64,6 @@ async function setupPipelineViaApi(page: Page) {
       sort_order: 20,
     }
   });
-  if (!reviewRes.ok()) {
-      // const err = await reviewRes.json();
-      // console.log('API Error State Review:', err.message || err);
-  }
   expect(reviewRes.ok()).toBeTruthy();
   const stateReview = (await reviewRes.json()).data;
 
@@ -92,10 +81,6 @@ async function setupPipelineViaApi(page: Page) {
       sort_order: 10,
     }
   });
-  if (!submitRes.ok()) {
-      // const err = await submitRes.json();
-      // console.log('API Error Transition Sub:', err.message || err);
-  }
   expect(submitRes.ok()).toBeTruthy();
 }
 
