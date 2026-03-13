@@ -155,57 +155,60 @@ export default function MyApprovalsPage() {
                             <div className="flex flex-col gap-4">
                                 <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                                     <div className="min-w-0 flex-1 space-y-1">
-                                    <div className="flex items-center gap-2">
-                                        <Badge
-                                            variant="outline"
-                                            className="text-[10px] tracking-wider text-muted-foreground uppercase"
-                                        >
-                                            {step.request.approvable_type
-                                                .split('\\')
-                                                .pop()}
-                                        </Badge>
-                                        <span className="text-sm font-medium text-muted-foreground">
-                                            Ref #{step.request.approvable_id}
-                                        </span>
-                                        <StatusBadge status={step.status} />
-                                    </div>
-                                    <h4 className="text-md mt-2 font-semibold">
-                                        {step.flowStep?.name || 'Approval Step'}
-                                    </h4>
-                                    {step.request.approvable && (
-                                        <div className="text-sm font-medium">
-                                            {step.request.approvable
-                                                .asset_code && (
-                                                <span className="mr-2 rounded bg-muted px-1 font-mono text-xs">
-                                                    {
-                                                        step.request.approvable
-                                                            .asset_code
-                                                    }
-                                                </span>
-                                            )}
-                                            {step.request.approvable.name ||
-                                                step.request.approvable
-                                                    .description}
+                                        <div className="flex items-center gap-2">
+                                            <Badge
+                                                variant="outline"
+                                                className="text-[10px] tracking-wider text-muted-foreground uppercase"
+                                            >
+                                                {step.request.approvable_type
+                                                    .split('\\')
+                                                    .pop()}
+                                            </Badge>
+                                            <span className="text-sm font-medium text-muted-foreground">
+                                                Ref #
+                                                {step.request.approvable_id}
+                                            </span>
+                                            <StatusBadge status={step.status} />
                                         </div>
-                                    )}
-                                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                                        <span>
-                                            Submitted by{' '}
-                                            {step.request.submitter?.name ||
-                                                'Unknown'}
-                                        </span>
-                                        <span>•</span>
-                                        <span>
-                                            {step.request.submitted_at
-                                                ? formatDistanceToNow(
-                                                      new Date(
-                                                          step.request.submitted_at,
-                                                      ),
-                                                      { addSuffix: true },
-                                                  )
-                                                : ''}
-                                        </span>
-                                    </div>
+                                        <h4 className="text-md mt-2 font-semibold">
+                                            {step.flowStep?.name ||
+                                                'Approval Step'}
+                                        </h4>
+                                        {step.request.approvable && (
+                                            <div className="text-sm font-medium">
+                                                {step.request.approvable
+                                                    .asset_code && (
+                                                    <span className="mr-2 rounded bg-muted px-1 font-mono text-xs">
+                                                        {
+                                                            step.request
+                                                                .approvable
+                                                                .asset_code
+                                                        }
+                                                    </span>
+                                                )}
+                                                {step.request.approvable.name ||
+                                                    step.request.approvable
+                                                        .description}
+                                            </div>
+                                        )}
+                                        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                                            <span>
+                                                Submitted by{' '}
+                                                {step.request.submitter?.name ||
+                                                    'Unknown'}
+                                            </span>
+                                            <span>•</span>
+                                            <span>
+                                                {step.request.submitted_at
+                                                    ? formatDistanceToNow(
+                                                          new Date(
+                                                              step.request.submitted_at,
+                                                          ),
+                                                          { addSuffix: true },
+                                                      )
+                                                    : ''}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div className="w-full sm:w-auto sm:shrink-0">
                                         <Button
@@ -243,10 +246,7 @@ export default function MyApprovalsPage() {
                                             variant="outline"
                                             className="w-full border-red-200 bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 sm:w-auto"
                                             onClick={() =>
-                                                openActionDialog(
-                                                    'reject',
-                                                    step,
-                                                )
+                                                openActionDialog('reject', step)
                                             }
                                         >
                                             <X className="mr-1 h-4 w-4" />{' '}
