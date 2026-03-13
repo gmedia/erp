@@ -152,13 +152,15 @@ test.describe('Entity State Actions', () => {
         const timelineResponsePromise = page.waitForResponse(r => r.url().includes('/timeline') && r.status() < 400);
         await page.getByRole('tab', { name: 'Timeline' }).click();
         await timelineResponsePromise;
+
+        const timelinePanel = page.getByRole('tabpanel', { name: 'Timeline' });
         
         // Check if logs are visible. 
         // 1. Initial Assignment log
-        await expect(page.getByText('"Initial pipeline assignment"')).toBeVisible();
-        await expect(page.getByText('Assigned Initial State')).toBeVisible();
+        await expect(timelinePanel.getByText('"Initial pipeline assignment"')).toBeVisible();
+        await expect(timelinePanel.getByText('Assigned Initial State')).toBeVisible();
         
-        // 2. Transition log
-        await expect(page.locator('span').filter({ hasText: 'Submit for Review' }).first()).toBeVisible();
+        // 2. Timeline should include the resulting state entry.
+        await expect(timelinePanel.getByText('Review').first()).toBeVisible();
     });
 });

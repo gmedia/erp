@@ -43,11 +43,13 @@ export async function createApprovalDelegation(
   }
   await addButton.click();
 
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByRole('dialog', {
+    name: /Add New Approval Delegation|Edit Approval Delegation/i,
+  });
   await expect(dialog).toBeVisible();
 
   // Handle AsyncSelect for Delegator
-  const delegatorTrigger = page.getByRole('combobox', { name: /Delegator/i }).first();
+  const delegatorTrigger = dialog.getByRole('combobox', { name: /Delegator/i }).first();
   await delegatorTrigger.click();
   const delegatorListbox = page.getByRole('listbox').last();
   await expect(delegatorListbox).toBeVisible();
@@ -60,7 +62,7 @@ export async function createApprovalDelegation(
   await delegatorListbox.getByRole('option', { name: new RegExp(delegator, 'i') }).first().click();
 
   // Handle AsyncSelect for Delegate
-  const delegateTrigger = page.getByRole('combobox', { name: /Delegate/i }).first();
+  const delegateTrigger = dialog.getByRole('combobox', { name: /Delegate/i }).first();
   await delegateTrigger.click();
   const delegateListbox = page.getByRole('listbox').last();
   await expect(delegateListbox).toBeVisible();
@@ -122,7 +124,9 @@ export async function editApprovalDelegation(
   const editItem = page.getByRole('menuitem', { name: /Edit/i });
   await editItem.click();
   
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByRole('dialog', {
+    name: /Edit Approval Delegation|Add New Approval Delegation/i,
+  });
   await expect(dialog).toBeVisible();
 
   if (updates.reason) {
