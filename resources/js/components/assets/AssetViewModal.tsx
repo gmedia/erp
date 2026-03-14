@@ -18,7 +18,11 @@ interface AssetViewModalProps {
     item: Asset | null;
 }
 
-export function AssetViewModal({ open, onClose, item }: Readonly<AssetViewModalProps>) {
+export function AssetViewModal({
+    open,
+    onClose,
+    item,
+}: Readonly<AssetViewModalProps>) {
     if (!item) return null;
 
     const formatDate = (dateString: Readonly<string | null>) => {

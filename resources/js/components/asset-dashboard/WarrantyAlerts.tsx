@@ -12,7 +12,10 @@ interface WarrantyAlertsProps {
     isLoading: boolean;
 }
 
-export function WarrantyAlerts({ data, isLoading }: Readonly<WarrantyAlertsProps>) {
+export function WarrantyAlerts({
+    data,
+    isLoading,
+}: Readonly<WarrantyAlertsProps>) {
     if (isLoading) {
         return (
             <Card className="flex h-full min-h-[300px] flex-col">

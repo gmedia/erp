@@ -8,7 +8,10 @@ interface ConditionOverviewProps {
     isLoading: boolean;
 }
 
-export function ConditionOverview({ data, isLoading }: Readonly<ConditionOverviewProps>) {
+export function ConditionOverview({
+    data,
+    isLoading,
+}: Readonly<ConditionOverviewProps>) {
     if (isLoading) {
         return (
             <Card className="flex h-full min-h-[300px] flex-col">

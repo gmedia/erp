@@ -29,8 +29,7 @@ class BookValueDepreciationReportController extends Controller
     public function export(
         ExportBookValueDepreciationRequest $request,
         ExportBookValueDepreciationReportAction $action,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         return $action->execute($request);
     }
 }

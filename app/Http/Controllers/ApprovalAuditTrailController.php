@@ -29,8 +29,7 @@ class ApprovalAuditTrailController extends Controller
     public function export(
         ExportApprovalAuditTrailRequest $request,
         ExportApprovalAuditTrailAction $action,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         return $action->execute($request);
     }
 }

@@ -25,7 +25,11 @@ interface RunLinesModalProps {
     onClose: () => void;
 }
 
-export function RunLinesModal({ runId, open, onClose }: Readonly<RunLinesModalProps>) {
+export function RunLinesModal({
+    runId,
+    open,
+    onClose,
+}: Readonly<RunLinesModalProps>) {
     const { data: lines, isLoading } = useQuery<AssetDepreciationLine[]>({
         queryKey: ['asset-depreciation-run-lines', runId],
         queryFn: async () => {

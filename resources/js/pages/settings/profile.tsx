@@ -39,7 +39,9 @@ export default function Profile({
     const verificationStatus =
         status ?? searchParams.get('status') ?? undefined;
 
-    const handleSubmit = async (e: Readonly<React.FormEvent<HTMLFormElement>>) => {
+    const handleSubmit = async (
+        e: Readonly<React.FormEvent<HTMLFormElement>>,
+    ) => {
         e.preventDefault();
         setProcessing(true);
         setErrors({});

@@ -30,7 +30,7 @@ class SupplierFilterService
         $this->applySorting($query, $sortBy, $filters[
             'sort_direction'] ?? 'desc',
             ['name', 'email', 'phone', 'status', 'branch_id', 'category_id', 'created_at',
-        ]);
+            ]);
         $this->applyAdvancedFilters($query, $filters);
     }
 

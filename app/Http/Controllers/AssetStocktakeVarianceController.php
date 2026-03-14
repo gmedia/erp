@@ -14,8 +14,7 @@ class AssetStocktakeVarianceController extends Controller
     public function index(
         IndexAssetStocktakeVarianceRequest $request,
         IndexAssetStocktakeVarianceAction $action,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $variances = $action->execute($request);
 
         return response()->json(new AssetStocktakeVarianceCollection($variances));

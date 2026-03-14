@@ -7,7 +7,10 @@ interface SummaryCardsProps {
     isLoading: boolean;
 }
 
-export function SummaryCards({ summary, isLoading }: Readonly<SummaryCardsProps>) {
+export function SummaryCards({
+    summary,
+    isLoading,
+}: Readonly<SummaryCardsProps>) {
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>

@@ -17,7 +17,10 @@ interface ResetPasswordProps {
     email?: string;
 }
 
-export default function ResetPassword({ token, email }: Readonly<ResetPasswordProps>) {
+export default function ResetPassword({
+    token,
+    email,
+}: Readonly<ResetPasswordProps>) {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [processing, setProcessing] = useState(false);
@@ -25,7 +28,9 @@ export default function ResetPassword({ token, email }: Readonly<ResetPasswordPr
     const resolvedToken = token ?? searchParams.get('token') ?? '';
     const resolvedEmail = email ?? searchParams.get('email') ?? '';
 
-    const handleSubmit = async (e: Readonly<React.FormEvent<HTMLFormElement>>) => {
+    const handleSubmit = async (
+        e: Readonly<React.FormEvent<HTMLFormElement>>,
+    ) => {
         e.preventDefault();
         setProcessing(true);
         setErrors({});

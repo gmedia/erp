@@ -46,7 +46,9 @@ function TopSummaryList({ items }: Readonly<{ items: SummaryBucket[] }>) {
     );
 }
 
-export function StockMonitorSummaryCards({ summary }: Readonly<SummaryCardsProps>) {
+export function StockMonitorSummaryCards({
+    summary,
+}: Readonly<SummaryCardsProps>) {
     return (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <Card>
