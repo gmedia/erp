@@ -26,8 +26,10 @@ class InventoryStocktakeController extends Controller
         return (new InventoryStocktakeCollection($stocktakes))->response();
     }
 
-    public function store(StoreInventoryStocktakeRequest $request, SyncInventoryStocktakeItemsAction $syncItems): JsonResponse
-    {
+    public function store(
+        StoreInventoryStocktakeRequest $request,
+        SyncInventoryStocktakeItemsAction $syncItems
+    ): JsonResponse {
         $data = $request->validated();
         $items = $data['items'] ?? null;
         unset($data['items']);
@@ -39,7 +41,10 @@ class InventoryStocktakeController extends Controller
 
             if (empty($stocktake->stocktake_number)) {
                 $stocktake->update([
-                    'stocktake_number' => 'SO-' . now()->format('Y') . '-' . str_pad((string) $stocktake->id, 6, '0', STR_PAD_LEFT),
+                    'stocktake_number' => 'SO-'
+                        . now()->format('Y')
+                        . '-'
+                        . str_pad((string) $stocktake->id, 6, '0', STR_PAD_LEFT),
                 ]);
             }
 
@@ -50,7 +55,15 @@ class InventoryStocktakeController extends Controller
             return $stocktake;
         });
 
-        $stocktake->load(['warehouse', 'productCategory', 'createdBy', 'completedBy', 'items.product', 'items.unit', 'items.countedBy']);
+        $stocktake->load([
+            'warehouse',
+            'productCategory',
+            'createdBy',
+            'completedBy',
+            'items.product',
+            'items.unit',
+            'items.countedBy',
+        ]);
 
         return (new InventoryStocktakeResource($stocktake))
             ->response()
@@ -72,8 +85,11 @@ class InventoryStocktakeController extends Controller
         return (new InventoryStocktakeResource($inventoryStocktake))->response();
     }
 
-    public function update(UpdateInventoryStocktakeRequest $request, InventoryStocktake $inventoryStocktake, SyncInventoryStocktakeItemsAction $syncItems): JsonResponse
-    {
+    public function update(
+        UpdateInventoryStocktakeRequest $request,
+        InventoryStocktake $inventoryStocktake,
+        SyncInventoryStocktakeItemsAction $syncItems
+    ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
@@ -105,8 +121,10 @@ class InventoryStocktakeController extends Controller
         return response()->json(null, 204);
     }
 
-    public function export(ExportInventoryStocktakeRequest $request, ExportInventoryStocktakesAction $action): JsonResponse
-    {
+    public function export(
+        ExportInventoryStocktakeRequest $request,
+        ExportInventoryStocktakesAction $action
+    ): JsonResponse {
         return $action->execute($request);
     }
 }

@@ -44,12 +44,32 @@ test('it can bulk post balanced journals', function () {
     $accounts = Account::factory()->count(2)->create();
 
     $entry1 = JournalEntry::factory()->create(['status' => 'draft', 'fiscal_year_id' => $this->fiscalYear->id]);
-    JournalEntryLine::create(['journal_entry_id' => $entry1->id, 'account_id' => $accounts[0]->id, 'debit' => 1000, 'credit' => 0]);
-    JournalEntryLine::create(['journal_entry_id' => $entry1->id, 'account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => 1000]);
+    JournalEntryLine::create([
+        'journal_entry_id' => $entry1->id,
+        'account_id' => $accounts[0]->id,
+        'debit' => 1000,
+        'credit' => 0,
+    ]);
+    JournalEntryLine::create([
+        'journal_entry_id' => $entry1->id,
+        'account_id' => $accounts[1]->id,
+        'debit' => 0,
+        'credit' => 1000,
+    ]);
 
     $entry2 = JournalEntry::factory()->create(['status' => 'draft', 'fiscal_year_id' => $this->fiscalYear->id]);
-    JournalEntryLine::create(['journal_entry_id' => $entry2->id, 'account_id' => $accounts[0]->id, 'debit' => 500, 'credit' => 0]);
-    JournalEntryLine::create(['journal_entry_id' => $entry2->id, 'account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => 500]);
+    JournalEntryLine::create([
+        'journal_entry_id' => $entry2->id,
+        'account_id' => $accounts[0]->id,
+        'debit' => 500,
+        'credit' => 0,
+    ]);
+    JournalEntryLine::create([
+        'journal_entry_id' => $entry2->id,
+        'account_id' => $accounts[1]->id,
+        'debit' => 0,
+        'credit' => 500,
+    ]);
 
     $response = postJson('/api/posting-journals/post', [
         'ids' => [$entry1->id, $entry2->id],
@@ -68,7 +88,12 @@ test('it fails to post unbalanced journals', function () {
     $account = Account::factory()->create();
 
     $entry = JournalEntry::factory()->create(['status' => 'draft', 'fiscal_year_id' => $this->fiscalYear->id]);
-    JournalEntryLine::create(['journal_entry_id' => $entry->id, 'account_id' => $account->id, 'debit' => 1000, 'credit' => 0]);
+    JournalEntryLine::create([
+        'journal_entry_id' => $entry->id,
+        'account_id' => $account->id,
+        'debit' => 1000,
+        'credit' => 0,
+    ]);
 
     $response = postJson('/api/posting-journals/post', [
         'ids' => [$entry->id],
