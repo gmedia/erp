@@ -17,7 +17,15 @@ readonly class UpdateEmployeeData
     /**
      * Create DTO from request array.
      *
-     * @param  array{name?: string, email?: string, phone?: string|null, department?: string, position?: string, salary?: string, hire_date?: string}  $data
+    * @param  array{
+    *     name?: string,
+    *     email?: string,
+    *     phone?: string|null,
+    *     department?: string,
+    *     position?: string,
+    *     salary?: string,
+    *     hire_date?: string
+    * }  $data
      */
     public static function fromArray(array $data): self
     {
@@ -35,7 +43,15 @@ readonly class UpdateEmployeeData
     /**
      * Convert DTO to array for model update, filtering out null values.
      *
-     * @return array{name?: string, email?: string, phone?: string|null, department?: string, position?: string, salary?: string, hire_date?: string}
+    * @return array{
+    *     name?: string,
+    *     email?: string,
+    *     phone?: string|null,
+    *     department?: string,
+    *     position?: string,
+    *     salary?: string,
+    *     hire_date?: string
+    * }
      */
     public function toArray(): array
     {

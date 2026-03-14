@@ -16,7 +16,10 @@ use Illuminate\Http\JsonResponse;
 
 class AssetDepreciationRunController extends Controller
 {
-    public function apiIndex(IndexAssetDepreciationRunRequest $request, IndexAssetDepreciationRunsAction $action): JsonResponse
+    public function apiIndex(
+        IndexAssetDepreciationRunRequest $request,
+        IndexAssetDepreciationRunsAction $action,
+    ): JsonResponse
     {
         $runs = $action->execute($request);
 
@@ -33,14 +36,20 @@ class AssetDepreciationRunController extends Controller
         ]);
     }
 
-    public function lines(AssetDepreciationRun $assetDepreciationRun, IndexAssetDepreciationLinesAction $action): JsonResponse
+    public function lines(
+        AssetDepreciationRun $assetDepreciationRun,
+        IndexAssetDepreciationLinesAction $action,
+    ): JsonResponse
     {
         $lines = $action->execute($assetDepreciationRun);
 
         return (new AssetDepreciationLineCollection($lines))->response();
     }
 
-    public function postToJournal(AssetDepreciationRun $assetDepreciationRun, PostDepreciationToJournalAction $action): JsonResponse
+    public function postToJournal(
+        AssetDepreciationRun $assetDepreciationRun,
+        PostDepreciationToJournalAction $action,
+    ): JsonResponse
     {
         $action->execute($assetDepreciationRun);
 

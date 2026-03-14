@@ -25,8 +25,16 @@ describe('CoaVersionExport', function () {
 
     test('query applies status filter', function () {
         // Use a unique name to avoid overlap with seeders
-        CoaVersion::factory()->create(['name' => 'StatusActiveTest', 'status' => 'active', 'fiscal_year_id' => $this->fiscalYear->id]);
-        CoaVersion::factory()->create(['name' => 'StatusDraftTest', 'status' => 'draft', 'fiscal_year_id' => $this->fiscalYear->id]);
+        CoaVersion::factory()->create([
+            'name' => 'StatusActiveTest',
+            'status' => 'active',
+            'fiscal_year_id' => $this->fiscalYear->id,
+        ]);
+        CoaVersion::factory()->create([
+            'name' => 'StatusDraftTest',
+            'status' => 'draft',
+            'fiscal_year_id' => $this->fiscalYear->id,
+        ]);
 
         $export = new CoaVersionExport(['status' => 'active', 'search' => 'StatusActiveTest']);
         $results = $export->query()->get();

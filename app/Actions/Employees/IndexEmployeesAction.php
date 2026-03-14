@@ -24,7 +24,12 @@ class IndexEmployeesAction
 
         // Search functionality - search across name, email, phone, and employee_id
         if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), ['name', 'email', 'phone', 'employee_id']);
+            $this->filterService->applySearch($query, $request->get('search'), [
+                'name',
+                'email',
+                'phone',
+                'employee_id',
+            ]);
         } else {
             $this->filterService->applyAdvancedFilters($query, [
                 'department_id' => $request->get('department_id'),
@@ -46,7 +51,21 @@ class IndexEmployeesAction
             $query,
             $request->get('sort_by', 'created_at'),
             strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'employee_id', 'name', 'email', 'phone', 'department_id', 'position_id', 'branch_id', 'salary', 'employment_status', 'hire_date', 'created_at', 'updated_at']
+            [
+                'id',
+                'employee_id',
+                'name',
+                'email',
+                'phone',
+                'department_id',
+                'position_id',
+                'branch_id',
+                'salary',
+                'employment_status',
+                'hire_date',
+                'created_at',
+                'updated_at',
+            ]
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);

@@ -42,7 +42,10 @@ class ReportController extends Controller
 
         $report = [];
         if ($selectedYearId) {
-            $report = $this->reportService->getBalanceSheet((int) $selectedYearId, $comparisonYearId ? (int) $comparisonYearId : null);
+            $report = $this->reportService->getBalanceSheet(
+                (int) $selectedYearId,
+                $comparisonYearId ? (int) $comparisonYearId : null,
+            );
         }
 
         return response()->json([
@@ -63,7 +66,10 @@ class ReportController extends Controller
 
         $report = [];
         if ($selectedYearId) {
-            $report = $this->reportService->getIncomeStatement((int) $selectedYearId, $comparisonYearId ? (int) $comparisonYearId : null);
+            $report = $this->reportService->getIncomeStatement(
+                (int) $selectedYearId,
+                $comparisonYearId ? (int) $comparisonYearId : null,
+            );
         }
 
         return response()->json([
@@ -110,7 +116,10 @@ class ReportController extends Controller
 
         $report = [];
         if ($selectedYearId) {
-            $report = $this->reportService->getComparativeReport($selectedYearId, $comparisonYearId ? (int) $comparisonYearId : null);
+            $report = $this->reportService->getComparativeReport(
+                $selectedYearId,
+                $comparisonYearId ? (int) $comparisonYearId : null,
+            );
         }
 
         return response()->json([

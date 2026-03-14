@@ -19,7 +19,15 @@ test('supplier return resource returns expected structure', function () {
         'quantity_returned' => 4,
         'unit_price' => 5000,
     ]);
-    $supplierReturn->load(['purchaseOrder', 'goodsReceipt', 'supplier', 'warehouse', 'creator', 'items.product', 'items.unit']);
+    $supplierReturn->load([
+        'purchaseOrder',
+        'goodsReceipt',
+        'supplier',
+        'warehouse',
+        'creator',
+        'items.product',
+        'items.unit',
+    ]);
 
     $data = (new SupplierReturnResource($supplierReturn))->toArray(new Request);
 

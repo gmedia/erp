@@ -43,7 +43,11 @@ class PipelineTransitionController extends Controller
         return (new PipelineTransitionResource($transition))->response()->setStatusCode(201);
     }
 
-    public function update(UpdatePipelineTransitionRequest $request, Pipeline $pipeline, PipelineTransition $transition): JsonResponse
+    public function update(
+        UpdatePipelineTransitionRequest $request,
+        Pipeline $pipeline,
+        PipelineTransition $transition,
+    ): JsonResponse
     {
         $validated = $request->validated();
 
@@ -61,7 +65,9 @@ class PipelineTransitionController extends Controller
                 // Update or create
                 foreach ($validated['actions'] as $actionData) {
                     if (isset($actionData['id'])) {
-                        $transition->actions()->where('id', $actionData['id'])->update(collect($actionData)->except('id')->toArray());
+                        $transition->actions()
+                            ->where('id', $actionData['id'])
+                            ->update(collect($actionData)->except('id')->toArray());
                     } else {
                         $transition->actions()->create($actionData);
                     }
@@ -69,7 +75,8 @@ class PipelineTransitionController extends Controller
             } else {
                 // If actions array is explicitly passed as empty, delete all.
                 // If not passed at all, we could also delete all (or keep them based on design).
-                // Usually for nested arrays in put/patch, omitted means "don't touch", but empty array means "delete all".
+                // Usually for nested arrays in put/patch, omitted means "don't touch",
+                // but empty array means "delete all".
                 if ($request->has('actions')) {
                     $transition->actions()->delete();
                 }

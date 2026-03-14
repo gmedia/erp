@@ -39,7 +39,10 @@ class StockAdjustmentController extends Controller
 
             if (empty($adjustment->adjustment_number)) {
                 $adjustment->update([
-                    'adjustment_number' => 'SA-' . now()->format('Y') . '-' . str_pad((string) $adjustment->id, 6, '0', STR_PAD_LEFT),
+                    'adjustment_number' => 'SA-'
+                        . now()->format('Y')
+                        . '-'
+                        . str_pad((string) $adjustment->id, 6, '0', STR_PAD_LEFT),
                 ]);
             }
 
@@ -70,7 +73,11 @@ class StockAdjustmentController extends Controller
         return (new StockAdjustmentResource($stockAdjustment))->response();
     }
 
-    public function update(UpdateStockAdjustmentRequest $request, StockAdjustment $stockAdjustment, SyncStockAdjustmentItemsAction $syncItems): JsonResponse
+    public function update(
+        UpdateStockAdjustmentRequest $request,
+        StockAdjustment $stockAdjustment,
+        SyncStockAdjustmentItemsAction $syncItems,
+    ): JsonResponse
     {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;

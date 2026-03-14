@@ -40,8 +40,18 @@ class PurchaseOrderFactory extends Factory
             'status' => $status,
             'notes' => $this->faker->optional()->sentence(),
             'shipping_address' => $this->faker->optional()->address(),
-            'approved_by' => in_array($status, ['confirmed', 'partially_received', 'fully_received', 'closed'], true) ? User::factory() : null,
-            'approved_at' => in_array($status, ['confirmed', 'partially_received', 'fully_received', 'closed'], true) ? now() : null,
+            'approved_by' => in_array($status, [
+                'confirmed',
+                'partially_received',
+                'fully_received',
+                'closed',
+            ], true) ? User::factory() : null,
+            'approved_at' => in_array($status, [
+                'confirmed',
+                'partially_received',
+                'fully_received',
+                'closed',
+            ], true) ? now() : null,
             'created_by' => User::factory(),
         ];
     }

@@ -22,12 +22,23 @@ class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
 
     public function query(): Builder
     {
-        $query = Asset::query()->with(['category', 'model', 'branch', 'location', 'department', 'employee', 'supplier']);
+        $query = Asset::query()->with([
+            'category',
+            'model',
+            'branch',
+            'location',
+            'department',
+            'employee',
+            'supplier',
+        ]);
 
         $filterService = app(\App\Domain\Assets\AssetFilterService::class);
 
         if (! empty($this->filters['search'])) {
-            $filterService->applySearch($query, $this->filters['search'], ['name', 'asset_code', 'serial_number', 'barcode']);
+            $filterService->applySearch($query, $this->filters[
+                'search'],
+                ['name', 'asset_code', 'serial_number', 'barcode',
+            ]);
         } else {
             $filterService->applyAdvancedFilters($query, [
                 'asset_category_id' => $this->filters['asset_category_id'] ?? null,

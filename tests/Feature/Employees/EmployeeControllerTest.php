@@ -407,8 +407,16 @@ describe('Employee API Endpoints', function () {
         $branchA = Branch::factory()->create(['name' => 'Branch A']);
         $branchB = Branch::factory()->create(['name' => 'Branch B']);
 
-        Employee::factory()->create(['department_id' => $engineering->id, 'position_id' => $developer->id, 'branch_id' => $branchA->id]);
-        Employee::factory()->create(['department_id' => $marketing->id, 'position_id' => $manager->id, 'branch_id' => $branchB->id]);
+        Employee::factory()->create([
+            'department_id' => $engineering->id,
+            'position_id' => $developer->id,
+            'branch_id' => $branchA->id,
+        ]);
+        Employee::factory()->create([
+            'department_id' => $marketing->id,
+            'position_id' => $manager->id,
+            'branch_id' => $branchB->id,
+        ]);
         Employee::factory()->create(['position_id' => $manager->id, 'branch_id' => $branchA->id]);
 
         $response = postJson('/api/employees/export', [

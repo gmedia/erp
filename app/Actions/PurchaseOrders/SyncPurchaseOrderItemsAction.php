@@ -35,9 +35,21 @@ class SyncPurchaseOrderItemsAction
         $purchaseOrder->items()->delete();
         $purchaseOrder->items()->createMany($normalized);
 
-        $subtotal = collect($normalized)->sum(static fn (array $row) => (float) ($row['quantity'] * $row['unit_price']));
-        $discountAmount = collect($normalized)->sum(static fn (array $row) => (float) (($row['quantity'] * $row['unit_price']) * ($row['discount_percent'] / 100)));
-        $taxAmount = collect($normalized)->sum(static fn (array $row) => (float) (((($row['quantity'] * $row['unit_price']) * (1 - ($row['discount_percent'] / 100))) * ($row['tax_percent'] / 100))));
+        $subtotal = collect($normalized)
+            ->sum(static fn (array $row) => (float) ($row['quantity'] * $row['unit_price']));
+        $discountAmount = collect($normalized)
+            ->sum(static function (array $row): float {
+                $lineSubtotal = (float) ($row['quantity'] * $row['unit_price']);
+
+                return (float) ($lineSubtotal * ($row['discount_percent'] / 100));
+            });
+        $taxAmount = collect($normalized)
+            ->sum(static function (array $row): float {
+                $lineSubtotal = (float) ($row['quantity'] * $row['unit_price']);
+                $discountedSubtotal = $lineSubtotal * (1 - ($row['discount_percent'] / 100));
+
+                return (float) ($discountedSubtotal * ($row['tax_percent'] / 100));
+            });
         $grandTotal = collect($normalized)->sum(static fn (array $row) => (float) ($row['line_total']));
 
         $purchaseOrder->update([

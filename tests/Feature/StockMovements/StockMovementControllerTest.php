@@ -100,8 +100,16 @@ test('it can sort by product name', function () {
     $pB = Product::factory()->create(['name' => 'BBB']);
     $w = Warehouse::factory()->create();
 
-    StockMovement::factory()->create(['product_id' => $pB->id, 'warehouse_id' => $w->id, 'moved_at' => '2026-01-01 00:00:00']);
-    StockMovement::factory()->create(['product_id' => $pA->id, 'warehouse_id' => $w->id, 'moved_at' => '2026-01-01 00:00:00']);
+    StockMovement::factory()->create([
+        'product_id' => $pB->id,
+        'warehouse_id' => $w->id,
+        'moved_at' => '2026-01-01 00:00:00',
+    ]);
+    StockMovement::factory()->create([
+        'product_id' => $pA->id,
+        'warehouse_id' => $w->id,
+        'moved_at' => '2026-01-01 00:00:00',
+    ]);
 
     Sanctum::actingAs($this->user, ['*']);
     $response = getJson('/api/stock-movements?sort_by=product_name&sort_direction=asc')

@@ -39,7 +39,10 @@ class StockTransferController extends Controller
 
             if (empty($transfer->transfer_number)) {
                 $transfer->update([
-                    'transfer_number' => 'ST-' . now()->format('Y') . '-' . str_pad((string) $transfer->id, 6, '0', STR_PAD_LEFT),
+                    'transfer_number' => 'ST-'
+                        . now()->format('Y')
+                        . '-'
+                        . str_pad((string) $transfer->id, 6, '0', STR_PAD_LEFT),
                 ]);
             }
 
@@ -72,7 +75,11 @@ class StockTransferController extends Controller
         return (new StockTransferResource($stockTransfer))->response();
     }
 
-    public function update(UpdateStockTransferRequest $request, StockTransfer $stockTransfer, SyncStockTransferItemsAction $syncItems): JsonResponse
+    public function update(
+        UpdateStockTransferRequest $request,
+        StockTransfer $stockTransfer,
+        SyncStockTransferItemsAction $syncItems,
+    ): JsonResponse
     {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;

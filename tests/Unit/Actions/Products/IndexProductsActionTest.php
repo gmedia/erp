@@ -40,7 +40,19 @@ test('execute returns paginated products without filters', function () {
     $filterService->shouldReceive('applySorting')
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
-            ['id', 'code', 'name', 'type', 'category_id', 'unit_id', 'cost', 'selling_price', 'status', 'created_at', 'updated_at']);
+            [
+                'id',
+                'code',
+                'name',
+                'type',
+                'category_id',
+                'unit_id',
+                'cost',
+                'selling_price',
+                'status',
+                'created_at',
+                'updated_at',
+            ]);
 
     $result = $action->execute($request);
 
@@ -89,7 +101,19 @@ test('execute applies search filter when provided', function () {
     $filterService->shouldReceive('applySorting')
         ->once()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
-            ['id', 'code', 'name', 'type', 'category_id', 'unit_id', 'cost', 'selling_price', 'status', 'created_at', 'updated_at']);
+            [
+                'id',
+                'code',
+                'name',
+                'type',
+                'category_id',
+                'unit_id',
+                'cost',
+                'selling_price',
+                'status',
+                'created_at',
+                'updated_at',
+            ]);
 
     $result = $action->execute($request);
 

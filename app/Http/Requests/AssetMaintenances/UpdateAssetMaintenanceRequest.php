@@ -16,8 +16,18 @@ class UpdateAssetMaintenanceRequest extends FormRequest
     {
         return [
             'asset_id' => ['sometimes', 'required', 'exists:assets,id'],
-            'maintenance_type' => ['sometimes', 'required', 'string', Rule::in(['preventive', 'corrective', 'calibration', 'other'])],
-            'status' => ['sometimes', 'required', 'string', Rule::in(['scheduled', 'in_progress', 'completed', 'cancelled'])],
+            'maintenance_type' => [
+                'sometimes',
+                'required',
+                'string',
+                Rule::in(['preventive', 'corrective', 'calibration', 'other']),
+            ],
+            'status' => [
+                'sometimes',
+                'required',
+                'string',
+                Rule::in(['scheduled', 'in_progress', 'completed', 'cancelled']),
+            ],
             'scheduled_at' => ['sometimes', 'nullable', 'date'],
             'performed_at' => ['sometimes', 'nullable', 'date'],
             'supplier_id' => ['sometimes', 'nullable', 'exists:suppliers,id'],

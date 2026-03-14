@@ -20,11 +20,17 @@ class IndexStockMovementRequest extends FormRequest
             'movement_type' => [
                 'nullable',
                 'string',
-                'in:goods_receipt,supplier_return,transfer_out,transfer_in,adjustment_in,adjustment_out,production_consume,production_output,sales,sales_return',
+                'in:goods_receipt,supplier_return,transfer_out,transfer_in,adjustment_in,adjustment_out,'
+                    . 'production_consume,production_output,sales,sales_return',
             ],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-            'sort_by' => ['nullable', 'string', 'in:moved_at,movement_type,quantity_in,quantity_out,balance_after,unit_cost,average_cost_after,reference_number,product_name,warehouse_name,created_by'],
+            'sort_by' => [
+                'nullable',
+                'string',
+                'in:moved_at,movement_type,quantity_in,quantity_out,balance_after,unit_cost,average_cost_after,'
+                    . 'reference_number,product_name,warehouse_name,created_by',
+            ],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'export' => ['nullable', 'boolean'],

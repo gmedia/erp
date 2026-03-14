@@ -17,10 +17,23 @@ class IndexAssetsAction
     {
         ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 
-        $query = Asset::query()->with(['category', 'model', 'branch', 'location', 'department', 'employee', 'supplier']);
+        $query = Asset::query()->with([
+            'category',
+            'model',
+            'branch',
+            'location',
+            'department',
+            'employee',
+            'supplier',
+        ]);
 
         if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), ['name', 'asset_code', 'serial_number', 'barcode']);
+            $this->filterService->applySearch($query, $request->get('search'), [
+                'name',
+                'asset_code',
+                'serial_number',
+                'barcode',
+            ]);
         } else {
             $this->filterService->applyAdvancedFilters($query, [
                 'asset_category_id' => $request->get('asset_category_id'),
@@ -39,7 +52,21 @@ class IndexAssetsAction
             $query,
             $request->get('sort_by', 'created_at'),
             strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'asset_code', 'name', 'purchase_date', 'purchase_cost', 'status', 'created_at', 'category', 'branch', 'location', 'department', 'employee', 'supplier']
+            [
+                'id',
+                'asset_code',
+                'name',
+                'purchase_date',
+                'purchase_cost',
+                'status',
+                'created_at',
+                'category',
+                'branch',
+                'location',
+                'department',
+                'employee',
+                'supplier',
+            ]
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);

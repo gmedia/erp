@@ -21,12 +21,14 @@ test('to array returns correct structure', function () {
     expect($result)->toMatchArray([
         'id' => $unit->id,
         'name' => 'Kilogram',
-        // 'symbol' => 'kg', // Checking if UnitResource includes symbol. Usually SimpleCrudResource only includes id/name?
+        // 'symbol' => 'kg', // Verify whether UnitResource includes symbol.
+        // Usually SimpleCrudResource only includes id/name.
         // SimpleCrudResource default is just id, name, created_at, updated_at unless overridden.
         // Wait, does UnitResource extend SimpleCrudResource?
         // If it does, and doesn't override toArray, it WON'T have symbol.
         // I need to check UnitResource.php.
-        // If the previous test passed using SimpleCrudResourceTestTrait, it only checked id, name, created_at, updated_at.
+        // If the previous test passed using SimpleCrudResourceTestTrait,
+        // it only checked id, name, created_at, updated_at.
         // I'll stick to that for now unless I verify UnitResource source.
     ]);
 

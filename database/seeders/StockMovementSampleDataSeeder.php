@@ -33,8 +33,12 @@ class StockMovementSampleDataSeeder extends Seeder
                     'product_id' => $adjustmentItem->product_id,
                 ],
                 [
-                    'quantity_in' => $movementType === 'adjustment_in' ? abs((float) $adjustmentItem->quantity_adjusted) : 0,
-                    'quantity_out' => $movementType === 'adjustment_out' ? abs((float) $adjustmentItem->quantity_adjusted) : 0,
+                    'quantity_in' => $movementType === 'adjustment_in'
+                        ? abs((float) $adjustmentItem->quantity_adjusted)
+                        : 0,
+                    'quantity_out' => $movementType === 'adjustment_out'
+                        ? abs((float) $adjustmentItem->quantity_adjusted)
+                        : 0,
                     'balance_after' => (float) $adjustmentItem->quantity_after,
                     'unit_cost' => $adjustmentItem->unit_cost,
                     'average_cost_after' => null,
