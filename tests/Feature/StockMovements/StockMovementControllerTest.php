@@ -39,17 +39,18 @@ test('it can fetch stock movements data via json', function () {
     Sanctum::actingAs($this->user, ['*']);
     getJson('/api/stock-movements?per_page=10')
         ->assertOk()
-        ->assertJson(fn (AssertableJson $json) => $json
-            ->has('data', 1)
-            ->has('data.0', fn (AssertableJson $m) => $m
-                ->where('movement_type', 'adjustment_in')
-                ->where('reference_number', 'SA-2026-000001')
-                ->where('product.name', 'Kertas A4')
-                ->where('warehouse.name', 'Gudang Utama')
-                ->etc()
-            )
-            ->has('meta')
-            ->has('links')
+        ->assertJson(
+            fn (AssertableJson $json) => $json
+                ->has('data', 1)
+                ->has('data.0', fn (AssertableJson $m) => $m
+                    ->where('movement_type', 'adjustment_in')
+                    ->where('reference_number', 'SA-2026-000001')
+                    ->where('product.name', 'Kertas A4')
+                    ->where('warehouse.name', 'Gudang Utama')
+                    ->etc()
+                )
+                ->has('meta')
+                ->has('links')
         );
 });
 

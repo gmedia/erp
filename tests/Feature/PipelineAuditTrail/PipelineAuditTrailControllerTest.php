@@ -62,23 +62,24 @@ test('it can fetch audit trail data via json', function () {
     Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/pipeline-audit-trail')
         ->assertOk()
-        ->assertJson(fn (AssertableJson $json) => $json
-            ->has('data', 1)
-            ->has('data.0', fn ($json) => $json
-                ->where('entity_type', 'App\Models\Customer')
-                ->where('entity_type_short', 'Customer')
-                ->where('entity_id', 100)
-                ->where('pipeline_name', 'Sales Pipeline')
-                ->where('from_state_name', 'Lead')
-                ->where('to_state_name', 'Qualified')
-                ->where('transition_name', 'Qualify Lead')
-                ->where('performed_by_name', $this->user->name)
-                ->where('comment', 'Customer looks promising.')
-                ->where('metadata.score', 85)
-                ->etc()
-            )
-            ->has('meta')
-            ->has('links')
+        ->assertJson(
+            fn (AssertableJson $json) => $json
+                ->has('data', 1)
+                ->has('data.0', fn ($json) => $json
+                    ->where('entity_type', 'App\\Models\\Customer')
+                    ->where('entity_type_short', 'Customer')
+                    ->where('entity_id', 100)
+                    ->where('pipeline_name', 'Sales Pipeline')
+                    ->where('from_state_name', 'Lead')
+                    ->where('to_state_name', 'Qualified')
+                    ->where('transition_name', 'Qualify Lead')
+                    ->where('performed_by_name', $this->user->name)
+                    ->where('comment', 'Customer looks promising.')
+                    ->where('metadata.score', 85)
+                    ->etc()
+                )
+                ->has('meta')
+                ->has('links')
         );
 });
 

@@ -39,7 +39,10 @@ test('execute returns paginated products without filters', function () {
 
     $filterService->shouldReceive('applySorting')
         ->once()
-        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
+        ->with(
+            Mockery::type('Illuminate\\Database\\Eloquent\\Builder'),
+            'created_at',
+            'desc',
             [
                 'id',
                 'code',
@@ -52,7 +55,8 @@ test('execute returns paginated products without filters', function () {
                 'status',
                 'created_at',
                 'updated_at',
-            ]);
+            ],
+        );
 
     $result = $action->execute($request);
 
@@ -84,8 +88,11 @@ test('execute applies search filter when provided', function () {
     // Mock filter service calls
     $filterService->shouldReceive('applySearch')
         ->once()
-        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'widget',
-            ['code', 'name', 'description']);
+        ->with(
+            Mockery::type('Illuminate\\Database\\Eloquent\\Builder'),
+            'widget',
+            ['code', 'name', 'description'],
+        );
 
     $filterService->shouldReceive('applyAdvancedFilters')
         ->once()
@@ -100,7 +107,10 @@ test('execute applies search filter when provided', function () {
 
     $filterService->shouldReceive('applySorting')
         ->once()
-        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
+        ->with(
+            Mockery::type('Illuminate\\Database\\Eloquent\\Builder'),
+            'created_at',
+            'desc',
             [
                 'id',
                 'code',
@@ -113,7 +123,8 @@ test('execute applies search filter when provided', function () {
                 'status',
                 'created_at',
                 'updated_at',
-            ]);
+            ],
+        );
 
     $result = $action->execute($request);
 

@@ -143,9 +143,14 @@ beforeEach(function () {
  * Helper: create transition with an update_field action
  */
 function createTransitionWithAction(
-    Pipeline $pipeline, PipelineState $from, PipelineState $to,
-    string $name, string $code, ?string $permission,
-    bool $confirmation, bool $comment,
+    Pipeline $pipeline,
+    PipelineState $from,
+    PipelineState $to,
+    string $name,
+    string $code,
+    ?string $permission,
+    bool $confirmation,
+    bool $comment,
     string $statusValue
 ): PipelineTransition {
     $transition = PipelineTransition::factory()->create([
