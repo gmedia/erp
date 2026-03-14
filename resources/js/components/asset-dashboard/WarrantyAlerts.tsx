@@ -27,7 +27,12 @@ export function WarrantyAlerts({
                 </CardHeader>
                 <CardContent className="flex-1 p-0">
                     <div className="divide-y">
-                        {['warranty-1', 'warranty-2', 'warranty-3', 'warranty-4'].map((key) => (
+                        {[
+                            'warranty-1',
+                            'warranty-2',
+                            'warranty-3',
+                            'warranty-4',
+                        ].map((key) => (
                             <div
                                 key={key}
                                 className="flex flex-col space-y-2 p-4"

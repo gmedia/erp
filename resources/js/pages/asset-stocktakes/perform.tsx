@@ -72,7 +72,10 @@ export default function PerformAssetStocktakePage() {
                     </CardHeader>
                     <CardContent>
                         {(() => {
-                            if (isStocktakeLoading || (loading && items.length === 0)) {
+                            if (
+                                isStocktakeLoading ||
+                                (loading && items.length === 0)
+                            ) {
                                 return (
                                     <div className="flex h-32 items-center justify-center">
                                         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

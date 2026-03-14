@@ -177,7 +177,9 @@ export function EntityStateActions({
                                         <ul className="list-disc pl-3">
                                             {transition.rejection_reasons.map(
                                                 (reason) => (
-                                                    <li key={reason}>{reason}</li>
+                                                    <li key={reason}>
+                                                        {reason}
+                                                    </li>
                                                 ),
                                             )}
                                         </ul>

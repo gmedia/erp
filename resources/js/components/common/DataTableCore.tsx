@@ -257,7 +257,13 @@ export function DataTable<T>({
         setIsFilterModalOpen(false);
     };
 
-    const loadingRows = ['loading-row-1', 'loading-row-2', 'loading-row-3', 'loading-row-4', 'loading-row-5'];
+    const loadingRows = [
+        'loading-row-1',
+        'loading-row-2',
+        'loading-row-3',
+        'loading-row-4',
+        'loading-row-5',
+    ];
     const visibleRows = table.getRowModel().rows;
 
     let tableContent: React.ReactNode;
@@ -275,7 +281,10 @@ export function DataTable<T>({
                                 : 'loading-column';
 
                     return (
-                        <TableCell key={`${rowKey}-${columnKey}`} className="border-border">
+                        <TableCell
+                            key={`${rowKey}-${columnKey}`}
+                            className="border-border"
+                        >
                             <Skeleton className="h-4 w-full bg-muted" />
                         </TableCell>
                     );
@@ -291,7 +300,10 @@ export function DataTable<T>({
             >
                 {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="border-border">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                        )}
                     </TableCell>
                 ))}
             </TableRow>
