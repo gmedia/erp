@@ -30,7 +30,12 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'employee',
                 'display_name' => 'Employee',
-                'permissions' => ['employee', 'employee.create', 'employee.edit', 'employee.delete'],
+                'permissions' => [
+                    'employee',
+                    'employee.create',
+                    'employee.edit',
+                    'employee.delete',
+                ],
                 'icon' => 'UserCircle',
                 'url' => 'employees',
                 'child' => [],
@@ -38,7 +43,12 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'customer',
                 'display_name' => 'Customer',
-                'permissions' => ['customer', 'customer.create', 'customer.edit', 'customer.delete'],
+                'permissions' => [
+                    'customer',
+                    'customer.create',
+                    'customer.edit',
+                    'customer.delete',
+                ],
                 'icon' => 'Users',
                 'url' => 'customers',
                 'child' => [],
@@ -46,7 +56,12 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'supplier',
                 'display_name' => 'Supplier',
-                'permissions' => ['supplier', 'supplier.create', 'supplier.edit', 'supplier.delete'],
+                'permissions' => [
+                    'supplier',
+                    'supplier.create',
+                    'supplier.edit',
+                    'supplier.delete',
+                ],
                 'icon' => 'Truck',
                 'url' => 'suppliers',
                 'child' => [],
@@ -54,14 +69,22 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'accounting',
                 'display_name' => 'Accounting',
-                'permissions' => ['journal_entry', 'posting_journal'],
+                'permissions' => [
+                    'journal_entry',
+                    'posting_journal',
+                ],
                 'icon' => 'Calculator',
                 'url' => null,
                 'child' => [
                     [
                         'name' => 'journal_entry',
                         'display_name' => 'Journal Entry',
-                        'permissions' => ['journal_entry', 'journal_entry.create', 'journal_entry.edit', 'journal_entry.delete'],
+                        'permissions' => [
+                            'journal_entry',
+                            'journal_entry.create',
+                            'journal_entry.edit',
+                            'journal_entry.delete',
+                        ],
                         'icon' => 'Book',
                         'url' => 'journal-entries',
                         'child' => [],
@@ -69,7 +92,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'posting_journal',
                         'display_name' => 'Posting Journal',
-                        'permissions' => ['posting_journal'],
+                        'permissions' => [
+                            'posting_journal',
+                        ],
                         'icon' => 'CheckSquare',
                         'url' => 'posting-journals',
                         'child' => [],
@@ -79,14 +104,19 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'asset',
                 'display_name' => 'Asset',
-                'permissions' => ['asset', 'asset_depreciation_run'],
+                'permissions' => [
+                    'asset',
+                    'asset_depreciation_run',
+                ],
                 'icon' => 'Package',
                 'url' => null,
                 'child' => [
                     [
                         'name' => 'asset_dashboard',
                         'display_name' => 'Asset Dashboard',
-                        'permissions' => ['asset_dashboard'],
+                        'permissions' => [
+                            'asset_dashboard',
+                        ],
                         'icon' => 'BarChart',
                         'url' => 'asset-dashboard',
                         'child' => [],
@@ -94,7 +124,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'asset_data',
                         'display_name' => 'Asset Data',
-                        'permissions' => ['asset', 'asset.create', 'asset.edit', 'asset.delete'],
+                        'permissions' => [
+                            'asset',
+                            'asset.create',
+                            'asset.edit',
+                            'asset.delete',
+                        ],
                         'icon' => 'List',
                         'url' => 'assets',
                         'child' => [],
@@ -102,7 +137,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'asset_movement',
                         'display_name' => 'Asset Movement',
-                        'permissions' => ['asset_movement', 'asset_movement.create', 'asset_movement.edit', 'asset_movement.delete'],
+                        'permissions' => [
+                            'asset_movement',
+                            'asset_movement.create',
+                            'asset_movement.edit',
+                            'asset_movement.delete',
+                        ],
                         'icon' => 'ArrowLeftRight',
                         'url' => 'asset-movements',
                         'child' => [],
@@ -110,7 +150,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'asset_maintenance',
                         'display_name' => 'Asset Maintenance',
-                        'permissions' => ['asset_maintenance', 'asset_maintenance.create', 'asset_maintenance.edit', 'asset_maintenance.delete'],
+                        'permissions' => [
+                            'asset_maintenance',
+                            'asset_maintenance.create',
+                            'asset_maintenance.edit',
+                            'asset_maintenance.delete',
+                        ],
                         'icon' => 'Wrench',
                         'url' => 'asset-maintenances',
                         'child' => [],
@@ -118,7 +163,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'asset_stocktake',
                         'display_name' => 'Asset Stocktake',
-                        'permissions' => ['asset_stocktake', 'asset_stocktake.create', 'asset_stocktake.edit', 'asset_stocktake.delete'],
+                        'permissions' => [
+                            'asset_stocktake',
+                            'asset_stocktake.create',
+                            'asset_stocktake.edit',
+                            'asset_stocktake.delete',
+                        ],
                         'icon' => 'ClipboardCheck',
                         'url' => 'asset-stocktakes',
                         'child' => [],
@@ -126,7 +176,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'asset_depreciation_run',
                         'display_name' => 'Depreciation Run',
-                        'permissions' => ['asset_depreciation_run'],
+                        'permissions' => [
+                            'asset_depreciation_run',
+                        ],
                         'icon' => 'Calculator',
                         'url' => 'asset-depreciation-runs',
                         'child' => [],
@@ -137,14 +189,29 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'inventory',
                 'display_name' => 'Inventory',
-                'permissions' => ['purchase_request', 'purchase_order', 'goods_receipt', 'supplier_return', 'stock_transfer', 'inventory_stocktake', 'stock_adjustment', 'stock_movement', 'stock_monitor'],
+                'permissions' => [
+                    'purchase_request',
+                    'purchase_order',
+                    'goods_receipt',
+                    'supplier_return',
+                    'stock_transfer',
+                    'inventory_stocktake',
+                    'stock_adjustment',
+                    'stock_movement',
+                    'stock_monitor',
+                ],
                 'icon' => 'Box',
                 'url' => null,
                 'child' => [
                     [
                         'name' => 'purchase_request',
                         'display_name' => 'Purchase Requests',
-                        'permissions' => ['purchase_request', 'purchase_request.create', 'purchase_request.edit', 'purchase_request.delete'],
+                        'permissions' => [
+                            'purchase_request',
+                            'purchase_request.create',
+                            'purchase_request.edit',
+                            'purchase_request.delete',
+                        ],
                         'icon' => 'FilePlus2',
                         'url' => 'purchase-requests',
                         'child' => [],
@@ -152,7 +219,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'purchase_order',
                         'display_name' => 'Purchase Orders',
-                        'permissions' => ['purchase_order', 'purchase_order.create', 'purchase_order.edit', 'purchase_order.delete'],
+                        'permissions' => [
+                            'purchase_order',
+                            'purchase_order.create',
+                            'purchase_order.edit',
+                            'purchase_order.delete',
+                        ],
                         'icon' => 'ShoppingCart',
                         'url' => 'purchase-orders',
                         'child' => [],
@@ -160,7 +232,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'goods_receipt',
                         'display_name' => 'Goods Receipts',
-                        'permissions' => ['goods_receipt', 'goods_receipt.create', 'goods_receipt.edit', 'goods_receipt.delete'],
+                        'permissions' => [
+                            'goods_receipt',
+                            'goods_receipt.create',
+                            'goods_receipt.edit',
+                            'goods_receipt.delete',
+                        ],
                         'icon' => 'PackageCheck',
                         'url' => 'goods-receipts',
                         'child' => [],
@@ -168,7 +245,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'supplier_return',
                         'display_name' => 'Supplier Returns',
-                        'permissions' => ['supplier_return', 'supplier_return.create', 'supplier_return.edit', 'supplier_return.delete'],
+                        'permissions' => [
+                            'supplier_return',
+                            'supplier_return.create',
+                            'supplier_return.edit',
+                            'supplier_return.delete',
+                        ],
                         'icon' => 'RotateCcw',
                         'url' => 'supplier-returns',
                         'child' => [],
@@ -176,7 +258,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'stock_transfer',
                         'display_name' => 'Stock Transfers',
-                        'permissions' => ['stock_transfer', 'stock_transfer.create', 'stock_transfer.edit', 'stock_transfer.delete'],
+                        'permissions' => [
+                            'stock_transfer',
+                            'stock_transfer.create',
+                            'stock_transfer.edit',
+                            'stock_transfer.delete',
+                        ],
                         'icon' => 'ArrowDownUp',
                         'url' => 'stock-transfers',
                         'child' => [],
@@ -184,7 +271,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'inventory_stocktake',
                         'display_name' => 'Inventory Stocktakes',
-                        'permissions' => ['inventory_stocktake', 'inventory_stocktake.create', 'inventory_stocktake.edit', 'inventory_stocktake.delete'],
+                        'permissions' => [
+                            'inventory_stocktake',
+                            'inventory_stocktake.create',
+                            'inventory_stocktake.edit',
+                            'inventory_stocktake.delete',
+                        ],
                         'icon' => 'ClipboardCheck',
                         'url' => 'inventory-stocktakes',
                         'child' => [],
@@ -192,7 +284,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'stock_adjustment',
                         'display_name' => 'Stock Adjustments',
-                        'permissions' => ['stock_adjustment', 'stock_adjustment.create', 'stock_adjustment.edit', 'stock_adjustment.delete'],
+                        'permissions' => [
+                            'stock_adjustment',
+                            'stock_adjustment.create',
+                            'stock_adjustment.edit',
+                            'stock_adjustment.delete',
+                        ],
                         'icon' => 'Edit3',
                         'url' => 'stock-adjustments',
                         'child' => [],
@@ -200,7 +297,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'stock_movement',
                         'display_name' => 'Stock Movements',
-                        'permissions' => ['stock_movement'],
+                        'permissions' => [
+                            'stock_movement',
+                        ],
                         'icon' => 'History',
                         'url' => 'stock-movements',
                         'child' => [],
@@ -208,7 +307,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'stock_monitor',
                         'display_name' => 'Stock Monitor',
-                        'permissions' => ['stock_monitor'],
+                        'permissions' => [
+                            'stock_monitor',
+                        ],
                         'icon' => 'Activity',
                         'url' => 'stock-monitor',
                         'child' => [],
@@ -218,14 +319,27 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'report',
                 'display_name' => 'Report',
-                'permissions' => ['trial_balance_report', 'balance_sheet_report', 'income_statement_report', 'cash_flow_report', 'comparative_report', 'inventory_valuation_report', 'stock_movement_report', 'inventory_stocktake_variance_report', 'stock_adjustment_report', 'asset'],
+                'permissions' => [
+                    'trial_balance_report',
+                    'balance_sheet_report',
+                    'income_statement_report',
+                    'cash_flow_report',
+                    'comparative_report',
+                    'inventory_valuation_report',
+                    'stock_movement_report',
+                    'inventory_stocktake_variance_report',
+                    'stock_adjustment_report',
+                    'asset',
+                ],
                 'icon' => 'PieChart',
                 'url' => null,
                 'child' => [
                     [
                         'name' => 'asset_register_report',
                         'display_name' => 'Asset Register',
-                        'permissions' => ['asset'],
+                        'permissions' => [
+                            'asset',
+                        ],
                         'icon' => 'FileText',
                         'url' => 'reports/assets/register',
                         'child' => [],
@@ -233,7 +347,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'book_value_depreciation_report',
                         'display_name' => 'Book Value & Depreciation',
-                        'permissions' => ['asset'],
+                        'permissions' => [
+                            'asset',
+                        ],
                         'icon' => 'TrendingDown',
                         'url' => 'reports/book-value-depreciation',
                         'child' => [],
@@ -241,7 +357,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'maintenance_cost_report',
                         'display_name' => 'Maintenance Cost',
-                        'permissions' => ['asset'],
+                        'permissions' => [
+                            'asset',
+                        ],
                         'icon' => 'Wrench',
                         'url' => 'reports/maintenance-cost',
                         'child' => [],
@@ -249,7 +367,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'stocktake_variance_report',
                         'display_name' => 'Stocktake Variance',
-                        'permissions' => ['asset_stocktake'],
+                        'permissions' => [
+                            'asset_stocktake',
+                        ],
                         'icon' => 'AlertTriangle',
                         'url' => 'reports/asset-stocktake-variances',
                         'child' => [],
@@ -257,7 +377,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'trial_balance_report',
                         'display_name' => 'Trial Balance Report',
-                        'permissions' => ['trial_balance_report'],
+                        'permissions' => [
+                            'trial_balance_report',
+                        ],
                         'icon' => 'Scale',
                         'url' => 'reports/trial-balance',
                         'child' => [],
@@ -265,7 +387,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'balance_sheet_report',
                         'display_name' => 'Balance Sheet Report',
-                        'permissions' => ['balance_sheet_report'],
+                        'permissions' => [
+                            'balance_sheet_report',
+                        ],
                         'icon' => 'Library',
                         'url' => 'reports/balance-sheet',
                         'child' => [],
@@ -273,7 +397,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'income_statement_report',
                         'display_name' => 'Income Statement Report',
-                        'permissions' => ['income_statement_report'],
+                        'permissions' => [
+                            'income_statement_report',
+                        ],
                         'icon' => 'TrendingUp',
                         'url' => 'reports/income-statement',
                         'child' => [],
@@ -281,7 +407,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'cash_flow_report',
                         'display_name' => 'Cash Flow Report',
-                        'permissions' => ['cash_flow_report'],
+                        'permissions' => [
+                            'cash_flow_report',
+                        ],
                         'icon' => 'ArrowDownUp',
                         'url' => 'reports/cash-flow',
                         'child' => [],
@@ -289,7 +417,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'comparative_report',
                         'display_name' => 'Comparative Report',
-                        'permissions' => ['comparative_report'],
+                        'permissions' => [
+                            'comparative_report',
+                        ],
                         'icon' => 'Copy',
                         'url' => 'reports/comparative',
                         'child' => [],
@@ -297,7 +427,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'inventory_valuation_report',
                         'display_name' => 'Inventory Valuation Report',
-                        'permissions' => ['inventory_valuation_report'],
+                        'permissions' => [
+                            'inventory_valuation_report',
+                        ],
                         'icon' => 'BarChart3',
                         'url' => 'reports/inventory-valuation',
                         'child' => [],
@@ -305,7 +437,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'stock_movement_report',
                         'display_name' => 'Stock Movement Report',
-                        'permissions' => ['stock_movement_report'],
+                        'permissions' => [
+                            'stock_movement_report',
+                        ],
                         'icon' => 'ArrowLeftRight',
                         'url' => 'reports/stock-movement',
                         'child' => [],
@@ -313,7 +447,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'inventory_stocktake_variance_report',
                         'display_name' => 'Inventory Stocktake Variance Report',
-                        'permissions' => ['inventory_stocktake_variance_report'],
+                        'permissions' => [
+                            'inventory_stocktake_variance_report',
+                        ],
                         'icon' => 'ClipboardList',
                         'url' => 'reports/inventory-stocktake-variance',
                         'child' => [],
@@ -321,7 +457,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'stock_adjustment_report',
                         'display_name' => 'Stock Adjustment Report',
-                        'permissions' => ['stock_adjustment_report'],
+                        'permissions' => [
+                            'stock_adjustment_report',
+                        ],
                         'icon' => 'ClipboardCheck',
                         'url' => 'reports/stock-adjustment',
                         'child' => [],
@@ -329,7 +467,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'purchase_order_status_report',
                         'display_name' => 'Purchase Order Status Report',
-                        'permissions' => ['purchase_order_status_report'],
+                        'permissions' => [
+                            'purchase_order_status_report',
+                        ],
                         'icon' => 'ClipboardPenLine',
                         'url' => 'reports/purchase-order-status',
                         'child' => [],
@@ -337,7 +477,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'purchase_history_report',
                         'display_name' => 'Purchase History Report',
-                        'permissions' => ['purchase_history_report'],
+                        'permissions' => [
+                            'purchase_history_report',
+                        ],
                         'icon' => 'History',
                         'url' => 'reports/purchase-history',
                         'child' => [],
@@ -345,7 +487,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'goods_receipt_report',
                         'display_name' => 'Goods Receipt Report',
-                        'permissions' => ['goods_receipt_report'],
+                        'permissions' => [
+                            'goods_receipt_report',
+                        ],
                         'icon' => 'PackageCheck',
                         'url' => 'reports/goods-receipt',
                         'child' => [],
@@ -355,14 +499,38 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'master.data',
                 'display_name' => 'Master Data',
-                'permissions' => ['department', 'position', 'branch', 'warehouse', 'customer_category', 'supplier_category', 'product_category', 'unit', 'product', 'fiscal_year', 'coa_version', 'account', 'account_mapping', 'asset_category', 'asset_model', 'asset_location', 'accounts', 'pipeline'],
+                'permissions' => [
+                    'department',
+                    'position',
+                    'branch',
+                    'warehouse',
+                    'customer_category',
+                    'supplier_category',
+                    'product_category',
+                    'unit',
+                    'product',
+                    'fiscal_year',
+                    'coa_version',
+                    'account',
+                    'account_mapping',
+                    'asset_category',
+                    'asset_model',
+                    'asset_location',
+                    'accounts',
+                    'pipeline',
+                ],
                 'icon' => 'Database',
                 'url' => null,
                 'child' => [
                     [
                         'name' => 'department',
                         'display_name' => 'Department',
-                        'permissions' => ['department', 'department.create', 'department.edit', 'department.delete'],
+                        'permissions' => [
+                            'department',
+                            'department.create',
+                            'department.edit',
+                            'department.delete',
+                        ],
                         'icon' => 'Building2',
                         'url' => 'departments',
                         'child' => [],
@@ -370,7 +538,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'position',
                         'display_name' => 'Position',
-                        'permissions' => ['position', 'position.create', 'position.edit', 'position.delete'],
+                        'permissions' => [
+                            'position',
+                            'position.create',
+                            'position.edit',
+                            'position.delete',
+                        ],
                         'icon' => 'Briefcase',
                         'url' => 'positions',
                         'child' => [],
@@ -378,7 +551,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'branch',
                         'display_name' => 'Branch',
-                        'permissions' => ['branch', 'branch.create', 'branch.edit', 'branch.delete'],
+                        'permissions' => [
+                            'branch',
+                            'branch.create',
+                            'branch.edit',
+                            'branch.delete',
+                        ],
                         'icon' => 'GitBranch',
                         'url' => 'branches',
                         'child' => [],
@@ -386,7 +564,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'warehouse',
                         'display_name' => 'Warehouse',
-                        'permissions' => ['warehouse', 'warehouse.create', 'warehouse.edit', 'warehouse.delete'],
+                        'permissions' => [
+                            'warehouse',
+                            'warehouse.create',
+                            'warehouse.edit',
+                            'warehouse.delete',
+                        ],
                         'icon' => 'Warehouse',
                         'url' => 'warehouses',
                         'child' => [],
@@ -394,7 +577,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'customer_category',
                         'display_name' => 'Customer Category',
-                        'permissions' => ['customer_category', 'customer_category.create', 'customer_category.edit', 'customer_category.delete'],
+                        'permissions' => [
+                            'customer_category',
+                            'customer_category.create',
+                            'customer_category.edit',
+                            'customer_category.delete',
+                        ],
                         'icon' => 'Tags',
                         'url' => 'customer-categories',
                         'child' => [],
@@ -402,7 +590,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'supplier_category',
                         'display_name' => 'Supplier Category',
-                        'permissions' => ['supplier_category', 'supplier_category.create', 'supplier_category.edit', 'supplier_category.delete'],
+                        'permissions' => [
+                            'supplier_category',
+                            'supplier_category.create',
+                            'supplier_category.edit',
+                            'supplier_category.delete',
+                        ],
                         'icon' => 'Tags',
                         'url' => 'supplier-categories',
                         'child' => [],
@@ -410,7 +603,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'product_category',
                         'display_name' => 'Product Category',
-                        'permissions' => ['product_category', 'product_category.create', 'product_category.edit', 'product_category.delete'],
+                        'permissions' => [
+                            'product_category',
+                            'product_category.create',
+                            'product_category.edit',
+                            'product_category.delete',
+                        ],
                         'icon' => 'Box',
                         'url' => 'product-categories',
                         'child' => [],
@@ -418,7 +616,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'unit',
                         'display_name' => 'Unit',
-                        'permissions' => ['unit', 'unit.create', 'unit.edit', 'unit.delete'],
+                        'permissions' => [
+                            'unit',
+                            'unit.create',
+                            'unit.edit',
+                            'unit.delete',
+                        ],
                         'icon' => 'Ruler',
                         'url' => 'units',
                         'child' => [],
@@ -426,7 +629,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'product',
                         'display_name' => 'Product',
-                        'permissions' => ['product', 'product.create', 'product.edit', 'product.delete'],
+                        'permissions' => [
+                            'product',
+                            'product.create',
+                            'product.edit',
+                            'product.delete',
+                        ],
                         'icon' => 'ShoppingCart',
                         'url' => 'products',
                         'child' => [],
@@ -434,7 +642,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'fiscal_year',
                         'display_name' => 'Fiscal Year',
-                        'permissions' => ['fiscal_year', 'fiscal_year.create', 'fiscal_year.edit', 'fiscal_year.delete'],
+                        'permissions' => [
+                            'fiscal_year',
+                            'fiscal_year.create',
+                            'fiscal_year.edit',
+                            'fiscal_year.delete',
+                        ],
                         'icon' => 'Calendar',
                         'url' => 'fiscal-years',
                         'child' => [],
@@ -442,7 +655,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'coa_version',
                         'display_name' => 'COA Version',
-                        'permissions' => ['coa_version', 'coa_version.create', 'coa_version.edit', 'coa_version.delete'],
+                        'permissions' => [
+                            'coa_version',
+                            'coa_version.create',
+                            'coa_version.edit',
+                            'coa_version.delete',
+                        ],
                         'icon' => 'Link',
                         'url' => 'coa-versions',
                         'child' => [],
@@ -450,7 +668,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'chart_of_accounts',
                         'display_name' => 'Chart of Accounts',
-                        'permissions' => ['account', 'account.create', 'account.edit', 'account.delete'],
+                        'permissions' => [
+                            'account',
+                            'account.create',
+                            'account.edit',
+                            'account.delete',
+                        ],
                         'icon' => 'FolderTree',
                         'url' => 'accounts',
                         'child' => [],
@@ -458,7 +681,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'account_mapping',
                         'display_name' => 'Account Mappings',
-                        'permissions' => ['account_mapping', 'account_mapping.create', 'account_mapping.edit', 'account_mapping.delete'],
+                        'permissions' => [
+                            'account_mapping',
+                            'account_mapping.create',
+                            'account_mapping.edit',
+                            'account_mapping.delete',
+                        ],
                         'icon' => 'Layers',
                         'url' => 'account-mappings',
                         'child' => [],
@@ -466,7 +694,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'asset_category',
                         'display_name' => 'Asset Category',
-                        'permissions' => ['asset_category', 'asset_category.create', 'asset_category.edit', 'asset_category.delete'],
+                        'permissions' => [
+                            'asset_category',
+                            'asset_category.create',
+                            'asset_category.edit',
+                            'asset_category.delete',
+                        ],
                         'icon' => 'Tags',
                         'url' => 'asset-categories',
                         'child' => [],
@@ -474,7 +707,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'asset_model',
                         'display_name' => 'Asset Model',
-                        'permissions' => ['asset_model', 'asset_model.create', 'asset_model.edit', 'asset_model.delete'],
+                        'permissions' => [
+                            'asset_model',
+                            'asset_model.create',
+                            'asset_model.edit',
+                            'asset_model.delete',
+                        ],
                         'icon' => 'Box',
                         'url' => 'asset-models',
                         'child' => [],
@@ -482,7 +720,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'asset_location',
                         'display_name' => 'Asset Location',
-                        'permissions' => ['asset_location', 'asset_location.create', 'asset_location.edit', 'asset_location.delete'],
+                        'permissions' => [
+                            'asset_location',
+                            'asset_location.create',
+                            'asset_location.edit',
+                            'asset_location.delete',
+                        ],
                         'icon' => 'Map',
                         'url' => 'asset-locations',
                         'child' => [],
@@ -492,14 +735,28 @@ class MenuSeeder extends Seeder
             [
                 'name' => 'admin',
                 'display_name' => 'Admin',
-                'permissions' => ['permission', 'user', 'pipeline_dashboard', 'pipeline', 'pipeline_audit_trail', 'admin_setting', 'approval_flow', 'approval_delegation', 'approval_monitoring', 'approval_audit_trail'],
+                'permissions' => [
+                    'permission',
+                    'user',
+                    'pipeline_dashboard',
+                    'pipeline',
+                    'pipeline_audit_trail',
+                    'admin_setting',
+                    'approval_flow',
+                    'approval_delegation',
+                    'approval_monitoring',
+                    'approval_audit_trail',
+                ],
                 'icon' => 'Shield',
                 'url' => null,
                 'child' => [
                     [
                         'name' => 'admin_setting',
                         'display_name' => 'Setting',
-                        'permissions' => ['admin_setting', 'admin_setting.edit'],
+                        'permissions' => [
+                            'admin_setting',
+                            'admin_setting.edit',
+                        ],
                         'icon' => 'Settings',
                         'url' => 'admin-settings',
                         'child' => [],
@@ -507,7 +764,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'permission',
                         'display_name' => 'Permission',
-                        'permissions' => ['permission'],
+                        'permissions' => [
+                            'permission',
+                        ],
                         'icon' => 'Lock',
                         'url' => 'permissions',
                         'child' => [],
@@ -515,7 +774,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'user',
                         'display_name' => 'User',
-                        'permissions' => ['user'],
+                        'permissions' => [
+                            'user',
+                        ],
                         'icon' => 'User',
                         'url' => 'users',
                         'child' => [],
@@ -523,7 +784,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'pipeline_dashboard',
                         'display_name' => 'Pipeline Dashboard',
-                        'permissions' => ['pipeline_dashboard'],
+                        'permissions' => [
+                            'pipeline_dashboard',
+                        ],
                         'icon' => 'BarChart3',
                         'url' => 'pipeline-dashboard',
                         'child' => [],
@@ -531,7 +794,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'pipeline',
                         'display_name' => 'Pipeline',
-                        'permissions' => ['pipeline', 'pipeline.create', 'pipeline.edit', 'pipeline.delete'],
+                        'permissions' => [
+                            'pipeline',
+                            'pipeline.create',
+                            'pipeline.edit',
+                            'pipeline.delete',
+                        ],
                         'icon' => 'GitMerge',
                         'url' => 'pipelines',
                         'child' => [],
@@ -539,7 +807,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'pipeline_audit_trail',
                         'display_name' => 'Pipeline Audit Trail',
-                        'permissions' => ['pipeline_audit_trail'],
+                        'permissions' => [
+                            'pipeline_audit_trail',
+                        ],
                         'icon' => 'FileSearch',
                         'url' => 'pipeline-audit-trail',
                         'child' => [],
@@ -547,7 +817,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'approval_flow',
                         'display_name' => 'Approval Flow',
-                        'permissions' => ['approval_flow', 'approval_flow.create', 'approval_flow.edit', 'approval_flow.delete'],
+                        'permissions' => [
+                            'approval_flow',
+                            'approval_flow.create',
+                            'approval_flow.edit',
+                            'approval_flow.delete',
+                        ],
                         'icon' => 'CheckCircle',
                         'url' => 'approval-flows',
                         'child' => [],
@@ -555,7 +830,12 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'approval_delegation',
                         'display_name' => 'Approval Delegation',
-                        'permissions' => ['approval_delegation', 'approval_delegation.create', 'approval_delegation.edit', 'approval_delegation.delete'],
+                        'permissions' => [
+                            'approval_delegation',
+                            'approval_delegation.create',
+                            'approval_delegation.edit',
+                            'approval_delegation.delete',
+                        ],
                         'icon' => 'UserPlus',
                         'url' => 'approval-delegations',
                         'child' => [],
@@ -563,7 +843,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'approval_monitoring',
                         'display_name' => 'Approval Monitoring',
-                        'permissions' => ['approval_flow'],
+                        'permissions' => [
+                            'approval_flow',
+                        ],
                         'icon' => 'Activity',
                         'url' => 'approval-monitoring',
                         'child' => [],
@@ -571,7 +853,9 @@ class MenuSeeder extends Seeder
                     [
                         'name' => 'approval_audit_trail',
                         'display_name' => 'Approval Audit Trail',
-                        'permissions' => ['approval_audit_trail'],
+                        'permissions' => [
+                            'approval_audit_trail',
+                        ],
                         'icon' => 'FileSearch',
                         'url' => 'approval-audit-trail',
                         'child' => [],
