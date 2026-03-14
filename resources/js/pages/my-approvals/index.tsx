@@ -40,7 +40,10 @@ function StatusBadge({ status }: Readonly<{ status: string }>) {
             );
         case 'approved':
             return (
-                <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                <Badge
+                    variant="default"
+                    className="bg-green-600 hover:bg-green-700"
+                >
                     <Check className="mr-1 h-3 w-3" /> Approved
                 </Badge>
             );
