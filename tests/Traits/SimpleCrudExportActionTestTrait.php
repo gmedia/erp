@@ -15,7 +15,7 @@ use Mockery;
  */
 trait SimpleCrudExportActionTestTrait
 {
-    public function test_execute_exports_and_returns_file_info(): void
+    public function testExecuteExportsAndReturnsFileInfo(): void
     {
         $modelClass = $this->getModelClass();
         $modelClass::factory()->count(3)->create();
@@ -34,7 +34,7 @@ trait SimpleCrudExportActionTestTrait
         $this->assertStringEndsWith('.xlsx', $data['filename']);
     }
 
-    public function test_execute_exports_with_search_filter(): void
+    public function testExecuteExportsWithSearchFilter(): void
     {
         $modelClass = $this->getModelClass();
         $modelClass::factory()->create(['name' => 'Match Item']);
@@ -55,7 +55,7 @@ trait SimpleCrudExportActionTestTrait
         $this->assertArrayHasKey('filename', $data);
     }
 
-    public function test_execute_exports_with_custom_sort_parameters(): void
+    public function testExecuteExportsWithCustomSortParameters(): void
     {
         $modelClass = $this->getModelClass();
         $modelClass::factory()->count(2)->create();
@@ -77,7 +77,7 @@ trait SimpleCrudExportActionTestTrait
         $this->assertArrayHasKey('filename', $data);
     }
 
-    public function test_execute_handles_empty_filters(): void
+    public function testExecuteHandlesEmptyFilters(): void
     {
         $modelClass = $this->getModelClass();
         $modelClass::factory()->count(2)->create();

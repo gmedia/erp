@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { login, createAccount } from '../helpers';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 test('export accounts to Excel works correctly', async ({ page }) => {
   test.setTimeout(120000);

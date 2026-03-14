@@ -260,18 +260,18 @@ export default function TrialBalance() {
                                                             {item.type}
                                                         </TableCell>
                                                         <TableCell className="text-right tabular-nums">
-                                                            {item.debit !== 0
-                                                                ? formatCurrency(
+                                                            {item.debit === 0
+                                                                ? '-'
+                                                                : formatCurrency(
                                                                       item.debit,
-                                                                  )
-                                                                : '-'}
+                                                                  )}
                                                         </TableCell>
                                                         <TableCell className="text-right tabular-nums">
-                                                            {item.credit !== 0
-                                                                ? formatCurrency(
+                                                            {item.credit === 0
+                                                                ? '-'
+                                                                : formatCurrency(
                                                                       item.credit,
-                                                                  )
-                                                                : '-'}
+                                                                  )}
                                                         </TableCell>
                                                     </TableRow>
                                                 );

@@ -74,7 +74,7 @@ export function createSortingHeader(label: string) {
                 onClick={() =>
                     column.toggleSorting(column.getIsSorted() === 'asc')
                 }
-                data-testid={`sort-${label.toLowerCase().replace(/\s+/g, '-')}`}
+                data-testid={`sort-${label.toLowerCase().replaceAll(/\s+/g, '-')}`}
             >
                 {label}
                 <ArrowUpDown className="ml-2 h-4 w-4" />

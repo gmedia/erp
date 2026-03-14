@@ -7,7 +7,7 @@
 
 import { test, expect, Page } from '@playwright/test';
 import { login } from './helpers';
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 import ExcelJS from 'exceljs';
 
 // ==================== INTERFACES ====================

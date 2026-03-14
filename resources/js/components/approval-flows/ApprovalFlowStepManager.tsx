@@ -66,6 +66,9 @@ export function ApprovalFlowStepManager({
         setIsDialogOpen(true);
     };
 
+        const selectedStep =
+            editingIndex === null ? null : (fields[editingIndex] ?? null);
+
     const handleDelete = (index: number) => {
         if (window.confirm('Are you sure you want to delete this step?')) {
             remove(index);
@@ -171,10 +174,7 @@ export function ApprovalFlowStepManager({
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
                     step={
-                        editingIndex !== null && fields[editingIndex]
-                            ? fields[editingIndex]
-                            : null
-                    }
+                        step={selectedStep}
                     onSave={(data) => {
                         const nextStep = toStepInput(data);
 

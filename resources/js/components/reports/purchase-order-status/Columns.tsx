@@ -41,7 +41,7 @@ function formatDate(value: string | null | undefined): string {
 
 function formatLabel(value: string | null | undefined): string {
     if (!value) return '-';
-    return value.replace(/_/g, ' ');
+    return value.replaceAll('_', ' ');
 }
 
 export const purchaseOrderStatusReportColumns: ColumnDef<PurchaseOrderStatusReportItem>[] =

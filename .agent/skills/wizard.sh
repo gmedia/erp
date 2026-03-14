@@ -27,6 +27,8 @@ print_header() {
     echo -e "${BLUE}${BOLD}║       🧙 Agent Skills Wizard               ║${NC}"
     echo -e "${BLUE}${BOLD}╚════════════════════════════════════════════╝${NC}"
     echo ""
+
+    return 0
 }
 
 print_menu() {
@@ -40,6 +42,8 @@ print_menu() {
     echo ""
     echo -e "  ${RED}0)${NC} Exit"
     echo ""
+
+    return 0
 }
 
 print_crud_menu() {
@@ -52,6 +56,8 @@ print_crud_menu() {
     echo ""
     echo -e "  ${YELLOW}b)${NC} Kembali"
     echo ""
+
+    return 0
 }
 
 print_refactor_menu() {
@@ -63,6 +69,8 @@ print_refactor_menu() {
     echo ""
     echo -e "  ${YELLOW}b)${NC} Kembali"
     echo ""
+
+    return 0
 }
 
 print_docs_menu() {
@@ -81,6 +89,8 @@ print_docs_menu() {
     echo ""
     echo -e "  ${YELLOW}b)${NC} Kembali"
     echo ""
+
+    return 0
 }
 
 ask_feature_name() {
@@ -115,6 +125,8 @@ run_script() {
     echo -e "${CYAN}Running: bash $script $feature $action${NC}"
     echo ""
     bash "$script" "$feature" "$action"
+
+    return 0
 }
 
 handle_crud_simple() {
@@ -210,6 +222,8 @@ show_doc() {
     else
         echo -e "${RED}File tidak ditemukan: $file${NC}"
     fi
+
+    return 0
 }
 
 # Main menu loop
@@ -287,6 +301,8 @@ main_menu() {
                 ;;
         esac
     done
+
+    return 0
 }
 
 # Run main menu

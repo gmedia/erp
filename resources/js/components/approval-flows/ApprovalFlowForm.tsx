@@ -49,7 +49,7 @@ const getFormDefaults = (item?: ApprovalFlow | null): ApprovalFlowFormInput => {
         return {
             name: '',
             code: '',
-            approvable_type: 'App\\Models\\PurchaseRequest',
+            approvable_type: String.raw`App\Models\PurchaseRequest`,
             description: '',
             is_active: true,
             conditions: '',

@@ -34,6 +34,8 @@ show_help() {
     echo "  ./generate.sh Category --dry-run"
     echo "  ./generate.sh Category --all"
     echo "  ./generate.sh Category --action --filter"
+
+    return 0
 }
 
 if [[ "$1" == "--help" || -z "$1" ]]; then

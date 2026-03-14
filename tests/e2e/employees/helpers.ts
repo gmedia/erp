@@ -98,7 +98,7 @@ export async function editEmployee(
   }
 
   // Submit the edit dialog
-  await page.waitForSelector('.fixed.inset-0.bg-black\\/50', {
+  await page.waitForSelector(String.raw`.fixed.inset-0.bg-black\/50`, {
     state: 'detached',
   });
   const editDialog = page.getByRole('dialog');

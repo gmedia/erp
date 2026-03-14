@@ -17,12 +17,16 @@ safe_chmod() {
     if command -v chmod >/dev/null 2>&1; then
         chmod "$@" 2>/dev/null || true
     fi
+
+    return 0
 }
 
 safe_chown() {
     if [ "$IS_WINDOWS" = false ] && command -v chown >/dev/null 2>&1; then
         chown "$@" 2>/dev/null || true
     fi
+
+    return 0
 }
 
 mkdir -p "storage/framework"

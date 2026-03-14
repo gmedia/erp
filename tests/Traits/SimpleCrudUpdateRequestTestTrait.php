@@ -12,7 +12,7 @@ namespace Tests\Traits;
  */
 trait SimpleCrudUpdateRequestTestTrait
 {
-    public function test_authorize_returns_true(): void
+    public function testAuthorizeReturnsTrue(): void
     {
         $modelClass = $this->getModelClass();
         $model = $modelClass::factory()->create();
@@ -21,7 +21,7 @@ trait SimpleCrudUpdateRequestTestTrait
         $this->assertTrue($request->authorize());
     }
 
-    public function test_rules_returns_validation_rules(): void
+    public function testRulesReturnsValidationRules(): void
     {
         $modelClass = $this->getModelClass();
         $model = $modelClass::factory()->create();
@@ -35,7 +35,7 @@ trait SimpleCrudUpdateRequestTestTrait
         $this->assertContains('max:255', $rules['name']);
     }
 
-    public function test_rules_validation_passes_with_valid_data(): void
+    public function testRulesValidationPassesWithValidData(): void
     {
         $modelClass = $this->getModelClass();
         $model = $modelClass::factory()->create();
@@ -47,7 +47,7 @@ trait SimpleCrudUpdateRequestTestTrait
         $this->assertFalse($validator->fails());
     }
 
-    public function test_rules_validation_passes_without_name_field(): void
+    public function testRulesValidationPassesWithoutNameField(): void
     {
         $modelClass = $this->getModelClass();
         $model = $modelClass::factory()->create();
@@ -59,7 +59,7 @@ trait SimpleCrudUpdateRequestTestTrait
         $this->assertFalse($validator->fails());
     }
 
-    public function test_rules_validation_fails_with_empty_name(): void
+    public function testRulesValidationFailsWithEmptyName(): void
     {
         $modelClass = $this->getModelClass();
         $model = $modelClass::factory()->create();
@@ -72,7 +72,7 @@ trait SimpleCrudUpdateRequestTestTrait
         $this->assertTrue($validator->errors()->has('name'));
     }
 
-    public function test_rules_validation_allows_same_name_for_current_model(): void
+    public function testRulesValidationAllowsSameNameForCurrentModel(): void
     {
         $modelClass = $this->getModelClass();
         $model = $modelClass::factory()->create(['name' => 'Current Name']);
@@ -84,7 +84,7 @@ trait SimpleCrudUpdateRequestTestTrait
         $this->assertFalse($validator->fails());
     }
 
-    public function test_rules_validation_fails_with_duplicate_name_from_another_model(): void
+    public function testRulesValidationFailsWithDuplicateNameFromAnotherModel(): void
     {
         $modelClass = $this->getModelClass();
         $existingModel = $modelClass::factory()->create(['name' => 'Existing Name']);

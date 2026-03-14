@@ -25,6 +25,8 @@ show_help() {
     echo "Example:"
     echo "  ./scaffold.sh Category"
     echo "  ./scaffold.sh ProductType --dry-run"
+
+    return 0
 }
 
 if [[ "$1" == "--help" || -z "$1" ]]; then
