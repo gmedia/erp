@@ -103,9 +103,15 @@ test('it can fetch aggregated purchase order status report data', function () {
 
     $rows = collect($response->json('data'));
 
-    expect($rows->firstWhere('purchase_order.po_number', 'PO-OUT-001')['purchase_order']['status_category'])->toBe('outstanding');
-    expect($rows->firstWhere('purchase_order.po_number', 'PO-PAR-001')['purchase_order']['status_category'])->toBe('partially_received');
-    expect($rows->firstWhere('purchase_order.po_number', 'PO-CLS-001')['purchase_order']['status_category'])->toBe('closed');
+    expect(
+        $rows->firstWhere('purchase_order.po_number', 'PO-OUT-001')['purchase_order']['status_category']
+    )->toBe('outstanding');
+    expect(
+        $rows->firstWhere('purchase_order.po_number', 'PO-PAR-001')['purchase_order']['status_category']
+    )->toBe('partially_received');
+    expect(
+        $rows->firstWhere('purchase_order.po_number', 'PO-CLS-001')['purchase_order']['status_category']
+    )->toBe('closed');
 });
 
 test('it can filter by supplier, product, status category and date range', function () {

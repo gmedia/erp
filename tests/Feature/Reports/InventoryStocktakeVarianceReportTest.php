@@ -83,10 +83,24 @@ test('it can filter by dimensions and result', function () {
     $categoryA = ProductCategory::factory()->create(['name' => 'Kategori A']);
     $categoryB = ProductCategory::factory()->create(['name' => 'Kategori B']);
     $unit = Unit::factory()->create();
-    $productA = Product::factory()->create(['category_id' => $categoryA->id, 'unit_id' => $unit->id, 'code' => 'PA-01']);
-    $productB = Product::factory()->create(['category_id' => $categoryB->id, 'unit_id' => $unit->id, 'code' => 'PB-01']);
-    $stocktakeA = InventoryStocktake::factory()->create(['warehouse_id' => $warehouseA->id, 'stocktake_date' => '2026-03-01']);
-    $stocktakeB = InventoryStocktake::factory()->create(['warehouse_id' => $warehouseB->id, 'stocktake_date' => '2026-03-10']);
+    $productA = Product::factory()->create([
+        'category_id' => $categoryA->id,
+        'unit_id' => $unit->id,
+        'code' => 'PA-01',
+    ]);
+    $productB = Product::factory()->create([
+        'category_id' => $categoryB->id,
+        'unit_id' => $unit->id,
+        'code' => 'PB-01',
+    ]);
+    $stocktakeA = InventoryStocktake::factory()->create([
+        'warehouse_id' => $warehouseA->id,
+        'stocktake_date' => '2026-03-01',
+    ]);
+    $stocktakeB = InventoryStocktake::factory()->create([
+        'warehouse_id' => $warehouseB->id,
+        'stocktake_date' => '2026-03-10',
+    ]);
 
     InventoryStocktakeItem::factory()->create([
         'inventory_stocktake_id' => $stocktakeA->id,

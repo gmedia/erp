@@ -39,8 +39,14 @@ class IndexPurchaseHistoryReportAction
                 p.code as product_code,
                 p.name as product_name,
                 poi.quantity as ordered_quantity,
-                COALESCE(SUM(CASE WHEN gr.id IS NOT NULL THEN gri.quantity_received ELSE 0 END), 0) as received_quantity,
-                poi.quantity - COALESCE(SUM(CASE WHEN gr.id IS NOT NULL THEN gri.quantity_received ELSE 0 END), 0) as outstanding_quantity,
+                COALESCE(
+                    SUM(CASE WHEN gr.id IS NOT NULL THEN gri.quantity_received ELSE 0 END),
+                    0
+                ) as received_quantity,
+                poi.quantity - COALESCE(
+                    SUM(CASE WHEN gr.id IS NOT NULL THEN gri.quantity_received ELSE 0 END),
+                    0
+                ) as outstanding_quantity,
                 COUNT(DISTINCT gr.id) as receipt_count,
                 MAX(gr.receipt_date) as last_receipt_date,
                 poi.line_total as total_purchase_value
@@ -129,9 +135,27 @@ class IndexPurchaseHistoryReportAction
             $sortBy = 'last_receipt_date';
         }
 
-        if (in_array($sortBy, ['po_number', 'supplier_name', 'product_name', 'product_code', 'warehouse_name', 'order_date', 'expected_delivery_date', 'status', 'last_receipt_date'], true)) {
+        if (in_array(
+            $sortBy,
+            [
+                'po_number',
+                'supplier_name',
+                'product_name',
+                'product_code',
+                'warehouse_name',
+                'order_date',
+                'expected_delivery_date',
+                'status',
+                'last_receipt_date',
+            ],
+            true
+        )) {
             $query->orderBy($sortBy, $sortDirection);
-        } elseif (in_array($sortBy, ['ordered_quantity', 'received_quantity', 'outstanding_quantity', 'receipt_count', 'total_purchase_value'], true)) {
+        } elseif (in_array(
+            $sortBy,
+            ['ordered_quantity', 'received_quantity', 'outstanding_quantity', 'receipt_count', 'total_purchase_value'],
+            true
+        )) {
             $query->orderByRaw($sortBy . ' ' . $sortDirection);
         } else {
             $query->orderBy('order_date', 'desc');

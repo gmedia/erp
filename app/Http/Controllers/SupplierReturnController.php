@@ -39,7 +39,10 @@ class SupplierReturnController extends Controller
 
             if (empty($supplierReturn->return_number)) {
                 $supplierReturn->update([
-                    'return_number' => 'SR-' . now()->format('Y') . '-' . str_pad((string) $supplierReturn->id, 6, '0', STR_PAD_LEFT),
+                    'return_number' => 'SR-'
+                        . now()->format('Y')
+                        . '-'
+                        . str_pad((string) $supplierReturn->id, 6, '0', STR_PAD_LEFT),
                 ]);
             }
 
@@ -48,14 +51,30 @@ class SupplierReturnController extends Controller
             return $supplierReturn;
         });
 
-        $supplierReturn->load(['purchaseOrder', 'goodsReceipt', 'supplier', 'warehouse', 'creator', 'items.product', 'items.unit']);
+        $supplierReturn->load([
+            'purchaseOrder',
+            'goodsReceipt',
+            'supplier',
+            'warehouse',
+            'creator',
+            'items.product',
+            'items.unit',
+        ]);
 
         return (new SupplierReturnResource($supplierReturn))->response()->setStatusCode(201);
     }
 
     public function show(SupplierReturn $supplierReturn): JsonResponse
     {
-        $supplierReturn->load(['purchaseOrder', 'goodsReceipt', 'supplier', 'warehouse', 'creator', 'items.product', 'items.unit']);
+        $supplierReturn->load([
+            'purchaseOrder',
+            'goodsReceipt',
+            'supplier',
+            'warehouse',
+            'creator',
+            'items.product',
+            'items.unit',
+        ]);
 
         return (new SupplierReturnResource($supplierReturn))->response();
     }
@@ -79,7 +98,15 @@ class SupplierReturnController extends Controller
             }
         });
 
-        $supplierReturn->load(['purchaseOrder', 'goodsReceipt', 'supplier', 'warehouse', 'creator', 'items.product', 'items.unit']);
+        $supplierReturn->load([
+            'purchaseOrder',
+            'goodsReceipt',
+            'supplier',
+            'warehouse',
+            'creator',
+            'items.product',
+            'items.unit',
+        ]);
 
         return (new SupplierReturnResource($supplierReturn))->response();
     }

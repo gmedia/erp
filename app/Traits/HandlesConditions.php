@@ -57,8 +57,12 @@ trait HandlesConditions
             'contains' => str_contains((string) $actualValue, (string) $expectedValue),
             'not_null' => ! is_null($actualValue),
             'is_null' => is_null($actualValue),
-            'in' => is_array($expectedValue) ? in_array($actualValue, $expectedValue) : ($actualValue == $expectedValue),
-            'not_in' => is_array($expectedValue) ? ! in_array($actualValue, $expectedValue) : ($actualValue != $expectedValue),
+            'in' => is_array($expectedValue)
+                ? in_array($actualValue, $expectedValue)
+                : ($actualValue == $expectedValue),
+            'not_in' => is_array($expectedValue)
+                ? ! in_array($actualValue, $expectedValue)
+                : ($actualValue != $expectedValue),
             default => false,
         };
     }
@@ -99,8 +103,12 @@ trait HandlesConditions
             'less_than_or_equal', '<=' => $actualValue <= $expectedValue,
             'not_null' => ! is_null($actualValue),
             'is_null' => is_null($actualValue),
-            'in' => is_array($expectedValue) ? in_array($actualValue, $expectedValue) : ($actualValue == $expectedValue),
-            'not_in' => is_array($expectedValue) ? ! in_array($actualValue, $expectedValue) : ($actualValue != $expectedValue),
+            'in' => is_array($expectedValue)
+                ? in_array($actualValue, $expectedValue)
+                : ($actualValue == $expectedValue),
+            'not_in' => is_array($expectedValue)
+                ? ! in_array($actualValue, $expectedValue)
+                : ($actualValue != $expectedValue),
             default => false,
         };
     }

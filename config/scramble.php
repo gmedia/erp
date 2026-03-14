@@ -62,15 +62,18 @@ return [
         'logo' => '',
 
         /*
-         * Use to fetch the credential policy for the Try It feature. Options are: omit, include (default), and same-origin
+         * Use to fetch the credential policy for the Try It feature.
+         * Options are: omit, include (default), and same-origin.
          */
         'try_it_credentials_policy' => 'include',
 
         /*
          * There are three layouts for Elements:
          * - sidebar - (Elements default) Three-column design with a sidebar that can be resized.
-         * - responsive - Like sidebar, except at small screen sizes it collapses the sidebar into a drawer that can be toggled open.
-         * - stacked - Everything in a single column, making integrations with existing websites that have their own sidebar or other columns already.
+         * - responsive - Like sidebar, except at small screen sizes it collapses
+         *   the sidebar into a drawer that can be toggled open.
+         * - stacked - Everything in a single column, making integrations with
+         *   existing websites that already have their own sidebars/columns.
          */
         'layout' => 'responsive',
     ],
@@ -123,7 +126,8 @@ return [
      * `{"name":"foo[bar]", "schema":{"type":"int"}, "required":true}`.
      *
      * When `flatten_deep_query_parameters` is `false`, Scramble will document the parameter like so:
-     *  `{"name":"foo", "schema": {"type":"object", "properties":{"bar":{"type": "int"}}, "required": ["bar"]}, "required":true}`.
+    *  `{"name":"foo", "schema": {"type":"object", "properties":{"bar":
+    *   {"type": "int"}}, "required": ["bar"]}, "required":true}`.
      */
     'flatten_deep_query_parameters' => true,
 

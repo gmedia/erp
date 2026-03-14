@@ -75,8 +75,12 @@ test('returns validation errors for invalid rows', function () {
 
     // Check specific errors
     $errors = collect($response->json('errors'));
-    $this->assertTrue($errors->contains(fn ($e) => $e['row'] == 3 && $e['field'] == 'Validation')); // Row 3 is "No Email" (Header=1, Valid=2, NoEmail=3)
-    $this->assertTrue($errors->contains(fn ($e) => $e['row'] == 4 && $e['field'] == 'Validation')); // Row 4 is "Invalid Date"
+    $this->assertTrue(
+        $errors->contains(fn ($e) => $e['row'] == 3 && $e['field'] == 'Validation')
+    ); // Row 3 is "No Email" (Header=1, Valid=2, NoEmail=3)
+    $this->assertTrue(
+        $errors->contains(fn ($e) => $e['row'] == 4 && $e['field'] == 'Validation')
+    ); // Row 4 is "Invalid Date"
 })->group('employees');
 
 test('returns errors for unknown foreign keys', function () {
@@ -94,7 +98,9 @@ test('returns errors for unknown foreign keys', function () {
     $response->assertStatus(200);
     $errors = collect($response->json('errors'));
 
-    $this->assertTrue($errors->contains(fn ($e) => $e['field'] == 'department' && str_contains($e['message'], 'Unknown')));
+    $this->assertTrue(
+        $errors->contains(fn ($e) => $e['field'] == 'department' && str_contains($e['message'], 'Unknown'))
+    );
 })->group('employees');
 
 test('skips/upserts existing email', function () {

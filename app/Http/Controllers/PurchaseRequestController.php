@@ -39,7 +39,10 @@ class PurchaseRequestController extends Controller
 
             if (empty($purchaseRequest->pr_number)) {
                 $purchaseRequest->update([
-                    'pr_number' => 'PR-' . now()->format('Y') . '-' . str_pad((string) $purchaseRequest->id, 6, '0', STR_PAD_LEFT),
+                    'pr_number' => 'PR-'
+                        . now()->format('Y')
+                        . '-'
+                        . str_pad((string) $purchaseRequest->id, 6, '0', STR_PAD_LEFT),
                 ]);
             }
 
@@ -48,14 +51,30 @@ class PurchaseRequestController extends Controller
             return $purchaseRequest;
         });
 
-        $purchaseRequest->load(['branch', 'department', 'requester', 'approver', 'creator', 'items.product', 'items.unit']);
+        $purchaseRequest->load([
+            'branch',
+            'department',
+            'requester',
+            'approver',
+            'creator',
+            'items.product',
+            'items.unit',
+        ]);
 
         return (new PurchaseRequestResource($purchaseRequest))->response()->setStatusCode(201);
     }
 
     public function show(PurchaseRequest $purchaseRequest): JsonResponse
     {
-        $purchaseRequest->load(['branch', 'department', 'requester', 'approver', 'creator', 'items.product', 'items.unit']);
+        $purchaseRequest->load([
+            'branch',
+            'department',
+            'requester',
+            'approver',
+            'creator',
+            'items.product',
+            'items.unit',
+        ]);
 
         return (new PurchaseRequestResource($purchaseRequest))->response();
     }
@@ -84,7 +103,15 @@ class PurchaseRequestController extends Controller
             }
         });
 
-        $purchaseRequest->load(['branch', 'department', 'requester', 'approver', 'creator', 'items.product', 'items.unit']);
+        $purchaseRequest->load([
+            'branch',
+            'department',
+            'requester',
+            'approver',
+            'creator',
+            'items.product',
+            'items.unit',
+        ]);
 
         return (new PurchaseRequestResource($purchaseRequest))->response();
     }
