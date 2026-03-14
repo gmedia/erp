@@ -19,8 +19,7 @@ class ApprovalDelegationController extends Controller
     public function index(
         IndexApprovalDelegationRequest $request,
         IndexApprovalDelegationsAction $action,
-    ): ApprovalDelegationCollection
-    {
+    ): ApprovalDelegationCollection {
         $delegations = $action->execute($request->validated());
 
         return new ApprovalDelegationCollection($delegations);
@@ -47,8 +46,7 @@ class ApprovalDelegationController extends Controller
     public function update(
         UpdateApprovalDelegationRequest $request,
         ApprovalDelegation $approvalDelegation,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $dto = UpdateApprovalDelegationData::fromArray($request->validated());
 
         $approvalDelegation->update($dto->toArray());
@@ -70,8 +68,7 @@ class ApprovalDelegationController extends Controller
     public function export(
         ExportApprovalDelegationRequest $request,
         ExportApprovalDelegationsAction $action,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         return $action->execute($request->validated());
     }
 }

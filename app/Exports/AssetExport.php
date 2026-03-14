@@ -38,7 +38,7 @@ class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
             $filterService->applySearch($query, $this->filters[
                 'search'],
                 ['name', 'asset_code', 'serial_number', 'barcode',
-            ]);
+                ]);
         } else {
             $filterService->applyAdvancedFilters($query, [
                 'asset_category_id' => $this->filters['asset_category_id'] ?? null,

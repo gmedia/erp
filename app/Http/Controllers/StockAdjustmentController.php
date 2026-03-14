@@ -77,8 +77,7 @@ class StockAdjustmentController extends Controller
         UpdateStockAdjustmentRequest $request,
         StockAdjustment $stockAdjustment,
         SyncStockAdjustmentItemsAction $syncItems,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);

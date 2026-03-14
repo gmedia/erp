@@ -19,8 +19,7 @@ class AssetDepreciationRunController extends Controller
     public function apiIndex(
         IndexAssetDepreciationRunRequest $request,
         IndexAssetDepreciationRunsAction $action,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $runs = $action->execute($request);
 
         return (new AssetDepreciationRunCollection($runs))->response();
@@ -39,8 +38,7 @@ class AssetDepreciationRunController extends Controller
     public function lines(
         AssetDepreciationRun $assetDepreciationRun,
         IndexAssetDepreciationLinesAction $action,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $lines = $action->execute($assetDepreciationRun);
 
         return (new AssetDepreciationLineCollection($lines))->response();
@@ -49,8 +47,7 @@ class AssetDepreciationRunController extends Controller
     public function postToJournal(
         AssetDepreciationRun $assetDepreciationRun,
         PostDepreciationToJournalAction $action,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $action->execute($assetDepreciationRun);
 
         return response()->json([

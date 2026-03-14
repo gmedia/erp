@@ -79,8 +79,7 @@ class StockTransferController extends Controller
         UpdateStockTransferRequest $request,
         StockTransfer $stockTransfer,
         SyncStockTransferItemsAction $syncItems,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);

@@ -47,8 +47,7 @@ class PipelineTransitionController extends Controller
         UpdatePipelineTransitionRequest $request,
         Pipeline $pipeline,
         PipelineTransition $transition,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $validated = $request->validated();
 
         $transition = DB::transaction(function () use ($validated, $transition, $request) {
