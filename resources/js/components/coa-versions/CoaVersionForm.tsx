@@ -28,7 +28,7 @@ export function CoaVersionForm({
     entity,
     onSubmit,
     isLoading = false,
-}: CoaVersionFormProps) {
+}: Readonly<CoaVersionFormProps>) {
     const activeEntity = coaVersion || entity;
     const [fiscalYears, setFiscalYears] = useState<
         { label: string; value: string }[]

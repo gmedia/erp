@@ -32,7 +32,7 @@ export function InputField({
     suffix,
     children,
     ...props
-}: InputFieldProps) {
+}: Readonly<InputFieldProps>) {
     return (
         <FormField
             name={name}

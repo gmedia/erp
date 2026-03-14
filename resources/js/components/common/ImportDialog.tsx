@@ -40,7 +40,7 @@ export default function ImportDialog({
     templateHeaders,
     sampleData = [],
     onSuccess,
-}: ImportDialogProps) {
+}: Readonly<ImportDialogProps>) {
     const [open, setOpen] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);

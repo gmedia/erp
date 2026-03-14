@@ -28,7 +28,7 @@ export function GenericActions<T>({
     onEdit,
     onDelete,
     extraItems,
-}: GenericActionsProps<T>) {
+}: Readonly<GenericActionsProps<T>>) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>

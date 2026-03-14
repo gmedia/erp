@@ -52,7 +52,18 @@ class JournalEntryExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
 
     public function headings(): array
     {
-        return ['ID', 'Entry Number', 'Date', 'Reference', 'Description', 'Total Amount', 'Fiscal Year', 'Status', 'Created By', 'Created At'];
+        return [
+            'ID',
+            'Entry Number',
+            'Date',
+            'Reference',
+            'Description',
+            'Total Amount',
+            'Fiscal Year',
+            'Status',
+            'Created By',
+            'Created At',
+        ];
     }
 
     public function map($journalEntry): array

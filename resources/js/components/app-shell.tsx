@@ -5,7 +5,7 @@ interface AppShellProps {
     variant?: 'header' | 'sidebar';
 }
 
-export function AppShell({ children, variant = 'header' }: AppShellProps) {
+export function AppShell({ children, variant = 'header' }: Readonly<AppShellProps>) {
     // Rely on Shadcn UI SidebarProvider's internal localStorage state
     const isOpen = true;
 

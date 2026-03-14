@@ -59,7 +59,14 @@ class StockAdjustmentExport implements FromQuery, WithHeadings, WithMapping, Wit
 
         $sortBy = $this->filters['sort_by'] ?? 'created_at';
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
-        $allowedSortColumns = ['adjustment_number', 'warehouse_id', 'adjustment_date', 'adjustment_type', 'status', 'created_at'];
+        $allowedSortColumns = [
+            'adjustment_number',
+            'warehouse_id',
+            'adjustment_date',
+            'adjustment_type',
+            'status',
+            'created_at',
+        ];
 
         if (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);

@@ -43,7 +43,18 @@ class AssetMaintenanceExport implements FromQuery, ShouldAutoSize, WithHeadings,
             $query,
             $this->filters['sort_by'] ?? 'scheduled_at',
             $this->filters['sort_direction'] ?? 'desc',
-            ['id', 'asset', 'maintenance_type', 'status', 'scheduled_at', 'performed_at', 'supplier', 'notes', 'cost', 'created_at']
+            [
+                'id',
+                'asset',
+                'maintenance_type',
+                'status',
+                'scheduled_at',
+                'performed_at',
+                'supplier',
+                'notes',
+                'cost',
+                'created_at',
+            ]
         );
 
         return $query;

@@ -114,7 +114,7 @@ export function DataTable<T>({
     extraActionItems,
     extraToolbarActions,
     entityName,
-}: DataTableProps<T>) {
+}: Readonly<DataTableProps<T>>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({});

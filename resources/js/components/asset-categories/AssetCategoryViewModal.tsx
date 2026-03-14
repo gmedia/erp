@@ -20,7 +20,7 @@ export function AssetCategoryViewModal({
     open,
     onClose,
     item,
-}: AssetCategoryViewModalProps) {
+}: Readonly<AssetCategoryViewModalProps>) {
     if (!item) return null;
 
     return (

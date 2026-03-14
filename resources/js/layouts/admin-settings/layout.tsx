@@ -31,7 +31,7 @@ const sidebarNavItems: NavItem[] = [
 export default function AdminSettingsLayout({
     children,
     currentGroup = 'general',
-}: AdminSettingsLayoutProps) {
+}: Readonly<AdminSettingsLayoutProps>) {
     return (
         <div className="px-4 py-6">
             <Heading

@@ -62,7 +62,7 @@ interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];
 }
 
-export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
+export function AppHeader({ breadcrumbs = [] }: Readonly<AppHeaderProps>) {
     const { user } = useAuth();
     const location = useLocation();
     const getInitials = useInitials();

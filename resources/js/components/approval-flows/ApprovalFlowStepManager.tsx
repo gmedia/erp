@@ -50,7 +50,7 @@ function toStepInput(data: ApprovalFlowStepFormOutput): ApprovalFlowStepInput {
 export function ApprovalFlowStepManager({
     fieldArrayProps,
     errorMessage,
-}: ApprovalFlowStepManagerProps) {
+}: Readonly<ApprovalFlowStepManagerProps>) {
     const { fields, append, remove, update } = fieldArrayProps;
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);

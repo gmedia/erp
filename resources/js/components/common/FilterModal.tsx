@@ -39,7 +39,7 @@ export function FilterModal({
     onApply,
     onReset,
     onClearAll,
-}: FilterModalProps) {
+}: Readonly<FilterModalProps>) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="flex max-h-[90vh] flex-col overflow-hidden border-border bg-background p-0 text-foreground sm:max-w-[425px]">

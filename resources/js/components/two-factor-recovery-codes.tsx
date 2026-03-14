@@ -28,7 +28,7 @@ export default function TwoFactorRecoveryCodes({
     recoveryCodesList,
     fetchRecoveryCodes,
     errors,
-}: TwoFactorRecoveryCodesProps) {
+}: Readonly<TwoFactorRecoveryCodesProps>) {
     const [codesAreVisible, setCodesAreVisible] = useState<boolean>(false);
     const [processing, setProcessing] = useState(false);
     const codesSectionRef = useRef<HTMLDivElement | null>(null);

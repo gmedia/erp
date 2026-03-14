@@ -30,7 +30,7 @@ export function CalculateFormModal({
     onClose,
     onSubmit,
     loading,
-}: CalculateFormModalProps) {
+}: Readonly<CalculateFormModalProps>) {
     const form = useForm<AssetDepreciationCalculationFormData>({
         defaultValues: {
             fiscal_year_id: '',

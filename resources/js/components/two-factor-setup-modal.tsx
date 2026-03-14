@@ -146,7 +146,7 @@ function TwoFactorVerificationStep({
         }, 0);
     }, []);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: Readonly<React.FormEvent>) => {
         e.preventDefault();
         setProcessing(true);
         setError('');
@@ -260,7 +260,7 @@ export default function TwoFactorSetupModal({
     clearSetupData,
     fetchSetupData,
     errors,
-}: TwoFactorSetupModalProps) {
+}: Readonly<TwoFactorSetupModalProps>) {
     const [showVerificationStep, setShowVerificationStep] =
         useState<boolean>(false);
 

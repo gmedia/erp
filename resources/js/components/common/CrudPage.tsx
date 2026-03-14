@@ -96,7 +96,7 @@ export function CrudPage<
     T extends object,
     FormData,
     FilterType extends FilterState = FilterState,
->({ config }: CrudPageProps<T, FormData, FilterType>) {
+>({ config }: Readonly<CrudPageProps<T, FormData, FilterType>>) {
     // Use the custom hook to manage all CRUD state and logic
     const crudState = useCrudPage<T, FormData, FilterType>({
         entityName: config.entityName,

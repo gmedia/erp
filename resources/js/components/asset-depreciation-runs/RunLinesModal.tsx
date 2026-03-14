@@ -25,7 +25,7 @@ interface RunLinesModalProps {
     onClose: () => void;
 }
 
-export function RunLinesModal({ runId, open, onClose }: RunLinesModalProps) {
+export function RunLinesModal({ runId, open, onClose }: Readonly<RunLinesModalProps>) {
     const { data: lines, isLoading } = useQuery<AssetDepreciationLine[]>({
         queryKey: ['asset-depreciation-run-lines', runId],
         queryFn: async () => {
@@ -37,7 +37,7 @@ export function RunLinesModal({ runId, open, onClose }: RunLinesModalProps) {
         enabled: !!runId && open,
     });
 
-    const formatCurrency = (val: number) => {
+    const formatCurrency = (val: Readonly<number>) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',

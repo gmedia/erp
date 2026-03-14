@@ -30,7 +30,7 @@ export function PaginationControls({
         from: number;
         to: number;
     };
-    onPageChange: (page: number) => void;
+    onPageChange: (page: Readonly<number>) => void;
     onPageSizeChange: (per_page: string) => void;
     renderPageNumbers: () => React.ReactNode;
 }) {

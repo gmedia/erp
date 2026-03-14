@@ -24,7 +24,7 @@ export default function FilterField({
     placeholder = '',
     className,
     children,
-}: FilterFieldProps) {
+}: Readonly<FilterFieldProps>) {
     return (
         <FormField
             name={name}

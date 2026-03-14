@@ -23,7 +23,7 @@ export function FilterDatePicker({
     onChange,
     placeholder = 'Pick a date',
     className,
-}: FilterDatePickerProps) {
+}: Readonly<FilterDatePickerProps>) {
     // Safely parse date
     const parsedDate = value ? Date.parse(value) : Number.NaN;
     const date =

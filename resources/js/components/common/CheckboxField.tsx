@@ -22,7 +22,7 @@ export default function CheckboxField({
     label,
     className,
     description,
-}: CheckboxFieldProps) {
+}: Readonly<CheckboxFieldProps>) {
     return (
         <FormField
             name={name}

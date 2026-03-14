@@ -24,7 +24,7 @@ function formatNumber(value: string | number): string {
     return new Intl.NumberFormat().format(Number(value));
 }
 
-function TopSummaryList({ items }: { items: SummaryBucket[] }) {
+function TopSummaryList({ items }: Readonly<{ items: SummaryBucket[] }>) {
     if (items.length === 0) {
         return <p className="text-sm text-muted-foreground">No data</p>;
     }
@@ -46,7 +46,7 @@ function TopSummaryList({ items }: { items: SummaryBucket[] }) {
     );
 }
 
-export function StockMonitorSummaryCards({ summary }: SummaryCardsProps) {
+export function StockMonitorSummaryCards({ summary }: Readonly<SummaryCardsProps>) {
     return (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <Card>

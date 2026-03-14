@@ -20,7 +20,7 @@ export function AssetMovementViewModal({
     open,
     onClose,
     item,
-}: AssetMovementViewModalProps) {
+}: Readonly<AssetMovementViewModalProps>) {
     if (!item) return null;
 
     return (

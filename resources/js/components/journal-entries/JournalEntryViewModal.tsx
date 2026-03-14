@@ -31,7 +31,7 @@ export function JournalEntryViewModal({
     item,
     open,
     onClose,
-}: JournalEntryViewModalProps) {
+}: Readonly<JournalEntryViewModalProps>) {
     if (!item) return null;
 
     return (

@@ -6,7 +6,7 @@ interface StateSummaryCardsProps {
     isLoading: boolean;
 }
 
-export function StateSummaryCards({ data, isLoading }: StateSummaryCardsProps) {
+export function StateSummaryCards({ data, isLoading }: Readonly<StateSummaryCardsProps>) {
     if (isLoading) {
         return (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

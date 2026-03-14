@@ -66,7 +66,7 @@ export function ApprovalFlowStepFormDialog({
     onOpenChange,
     step,
     onSave,
-}: ApprovalFlowStepFormDialogProps) {
+}: Readonly<ApprovalFlowStepFormDialogProps>) {
     const defaultValues = useMemo<ApprovalFlowStepFormInput>(() => {
         if (!step) {
             return {

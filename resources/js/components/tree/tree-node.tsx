@@ -22,7 +22,7 @@ export function TreeNode({
     selectedIds,
     onToggle,
     level = 0,
-}: TreeNodeProps) {
+}: Readonly<TreeNodeProps>) {
     const [isExpanded, setIsExpanded] = React.useState(true);
     const hasChildren = node.children && node.children.length > 0;
     const isSelected = selectedIds.includes(node.id);

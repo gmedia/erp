@@ -55,7 +55,14 @@ class InventoryStocktakeExport implements FromQuery, WithHeadings, WithMapping, 
 
         $sortBy = $this->filters['sort_by'] ?? 'created_at';
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
-        $allowedSortColumns = ['stocktake_number', 'warehouse_id', 'stocktake_date', 'status', 'product_category_id', 'created_at'];
+        $allowedSortColumns = [
+            'stocktake_number',
+            'warehouse_id',
+            'stocktake_date',
+            'status',
+            'product_category_id',
+            'created_at',
+        ];
 
         if (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);

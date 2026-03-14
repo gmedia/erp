@@ -19,7 +19,7 @@ interface OverdueApprovalsListProps {
 export function OverdueApprovalsList({
     data,
     isLoading,
-}: OverdueApprovalsListProps) {
+}: Readonly<OverdueApprovalsListProps>) {
     if (isLoading) {
         return (
             <Card>

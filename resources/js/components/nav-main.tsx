@@ -21,7 +21,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
 
-export function NavMain({ items = [] }: { items: NavItem[] }) {
+export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
     const { pendingApprovalsCount } = useAuth();
     const location = useLocation();
     const pendingCount = pendingApprovalsCount || 0;

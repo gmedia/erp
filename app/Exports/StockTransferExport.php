@@ -55,7 +55,15 @@ class StockTransferExport implements FromQuery, WithHeadings, WithMapping, WithS
 
         $sortBy = $this->filters['sort_by'] ?? 'created_at';
         $sortDirection = $this->filters['sort_direction'] ?? 'desc';
-        $allowedSortColumns = ['transfer_number', 'from_warehouse_id', 'to_warehouse_id', 'transfer_date', 'expected_arrival_date', 'status', 'created_at'];
+        $allowedSortColumns = [
+            'transfer_number',
+            'from_warehouse_id',
+            'to_warehouse_id',
+            'transfer_date',
+            'expected_arrival_date',
+            'status',
+            'created_at',
+        ];
 
         if (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);

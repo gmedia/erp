@@ -20,7 +20,7 @@ interface PipelineTransitionManagerProps {
 
 export function PipelineTransitionManager({
     pipelineId,
-}: PipelineTransitionManagerProps) {
+}: Readonly<PipelineTransitionManagerProps>) {
     const { transitions, loading, fetchTransitions, deleteTransition } =
         usePipelineTransition(pipelineId);
 

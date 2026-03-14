@@ -27,7 +27,7 @@ interface PipelineStateManagerProps {
 
 export function PipelineStateManager({
     pipelineId,
-}: PipelineStateManagerProps) {
+}: Readonly<PipelineStateManagerProps>) {
     const {
         states,
         loading,

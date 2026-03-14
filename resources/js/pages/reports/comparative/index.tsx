@@ -177,7 +177,7 @@ function Section({
     const changeValue = change || 0;
     const changeTextClass = getChangeTextClass(changeValue);
 
-    const setExpanded = (value: boolean) => {
+    const setExpanded = (value: Readonly<boolean>) => {
         setExpandAll(value);
         setExpandKey((k) => k + 1);
     };

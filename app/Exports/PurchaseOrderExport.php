@@ -52,7 +52,15 @@ class PurchaseOrderExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
 
         $sortBy = $this->filters['sort_by'] ?? 'created_at';
         $sortDirection = strtolower($this->filters['sort_direction'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
-        if (in_array($sortBy, ['po_number', 'order_date', 'expected_delivery_date', 'currency', 'status', 'grand_total', 'created_at'], true)) {
+        if (in_array($sortBy, [
+            'po_number',
+            'order_date',
+            'expected_delivery_date',
+            'currency',
+            'status',
+            'grand_total',
+            'created_at',
+        ], true)) {
             $query->orderBy($sortBy, $sortDirection);
         }
 

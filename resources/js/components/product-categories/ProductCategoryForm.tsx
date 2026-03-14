@@ -36,7 +36,7 @@ export function ProductCategoryForm({
     entity,
     onSubmit,
     isLoading = false,
-}: ProductCategoryFormProps) {
+}: Readonly<ProductCategoryFormProps>) {
     const form = useForm<ProductCategoryFormData>({
         resolver: zodResolver(productCategoryFormSchema),
         defaultValues: {

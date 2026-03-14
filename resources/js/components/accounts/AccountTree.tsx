@@ -38,7 +38,7 @@ function AccountTreeNode({
     onAddChild,
     onEdit,
     onDelete,
-}: AccountTreeNodeProps) {
+}: Readonly<AccountTreeNodeProps>) {
     const [isOpen, setIsOpen] = useState(true);
     const hasChildren = childAccounts.length > 0;
 
@@ -176,7 +176,7 @@ export function AccountTree({
     onEdit,
     onDelete,
     onAddRoot,
-}: AccountTreeProps) {
+}: Readonly<AccountTreeProps>) {
     const rootAccounts = useMemo(() => {
         return accounts
             .filter((a) => a.parent_id === null)

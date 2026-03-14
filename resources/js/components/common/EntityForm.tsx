@@ -166,7 +166,7 @@ export function SimpleEntityForm({
     onSubmit,
     isLoading = false,
     entityName,
-}: SimpleEntityFormProps) {
+}: Readonly<SimpleEntityFormProps>) {
     const form = useForm<SimpleEntityFormData>({
         resolver: zodResolver(simpleEntitySchema),
         defaultValues: entity ? { name: entity.name } : { name: '' },

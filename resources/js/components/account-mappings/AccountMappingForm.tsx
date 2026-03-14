@@ -40,7 +40,7 @@ export function AccountMappingForm({
     item,
     onSubmit,
     isLoading = false,
-}: AccountMappingFormProps) {
+}: Readonly<AccountMappingFormProps>) {
     const activeEntity = accountMapping || entity || item;
 
     const defaultValues = useMemo<AccountMappingFormData>(

@@ -29,7 +29,7 @@ export function FiscalYearForm({
     entity,
     onSubmit,
     isLoading = false,
-}: FiscalYearFormProps) {
+}: Readonly<FiscalYearFormProps>) {
     const activeEntity = fiscalYear || entity;
 
     const form = useForm<z.input<typeof fiscalYearFormSchema>>({

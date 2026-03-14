@@ -15,11 +15,11 @@ interface UserMenuContentProps {
     user: User;
 }
 
-export function UserMenuContent({ user }: UserMenuContentProps) {
+export function UserMenuContent({ user }: Readonly<UserMenuContentProps>) {
     const cleanup = useMobileNavigation();
     const { logout } = useAuth();
 
-    const handleLogout = (e: React.MouseEvent) => {
+    const handleLogout = (e: Readonly<React.MouseEvent>) => {
         e.preventDefault();
         cleanup();
         logout();

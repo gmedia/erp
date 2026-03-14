@@ -26,7 +26,10 @@ class BookValueDepreciationReportController extends Controller
     /**
      * Export the Book Value & Depreciation report to Excel/CSV structure.
      */
-    public function export(ExportBookValueDepreciationRequest $request, ExportBookValueDepreciationReportAction $action): JsonResponse
+    public function export(
+        ExportBookValueDepreciationRequest $request,
+        ExportBookValueDepreciationReportAction $action,
+    ): JsonResponse
     {
         return $action->execute($request);
     }

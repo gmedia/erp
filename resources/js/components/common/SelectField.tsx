@@ -41,7 +41,7 @@ export default function SelectField({
     className,
     children,
     disabled,
-}: SelectFieldProps) {
+}: Readonly<SelectFieldProps>) {
     return (
         <FormField
             name={name}

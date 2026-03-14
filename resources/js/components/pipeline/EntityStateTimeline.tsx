@@ -18,7 +18,7 @@ interface Props {
     entityId: string | number;
 }
 
-export function EntityStateTimeline({ entityType, entityId }: Props) {
+export function EntityStateTimeline({ entityType, entityId }: Readonly<Props>) {
     const { timeline, timelineLoading, fetchTimeline } = useEntityPipeline(
         entityType,
         entityId,

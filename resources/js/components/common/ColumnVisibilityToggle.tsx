@@ -11,7 +11,7 @@ import { ChevronDown } from 'lucide-react';
 
 import { Table } from '@tanstack/react-table';
 
-export function ColumnVisibilityToggle<T>({ table }: { table: Table<T> }) {
+export function ColumnVisibilityToggle<T>({ table }: Readonly<{ table: Table<T> }>) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>

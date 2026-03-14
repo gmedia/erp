@@ -51,7 +51,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
+function GeneralSettings({ settings }: Readonly<{ settings: SettingsData['general'] }>) {
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -232,7 +232,7 @@ function RegionalSettings({
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: Readonly<React.FormEvent<HTMLFormElement>>) => {
         e.preventDefault();
         setProcessing(true);
         setErrors({});
@@ -386,7 +386,7 @@ function RegionalSettings({
     );
 }
 
-function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
+function SmtpSettings({ settings }: Readonly<{ settings: SettingsData['smtp'] }>) {
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});

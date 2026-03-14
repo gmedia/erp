@@ -33,7 +33,7 @@ export function DataTablePagination({
     pagination,
     onPageChange,
     onPageSizeChange,
-}: DataTablePaginationProps) {
+}: Readonly<DataTablePaginationProps>) {
     const renderPageNumbers = () => {
         const pages = [];
         const maxPages = 5;

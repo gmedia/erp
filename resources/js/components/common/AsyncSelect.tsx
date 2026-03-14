@@ -34,7 +34,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
     url,
     placeholder = 'Select...',
     className,
-    labelFn = (item: T) => (item as unknown as { name: string }).name,
+    labelFn = (item: Readonly<T>) => (item as unknown as { name: string }).name,
     valueFn = (item: T) =>
         (item as unknown as { id: number | string }).id.toString(),
     initialLabel,

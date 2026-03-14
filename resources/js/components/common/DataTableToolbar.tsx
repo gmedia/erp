@@ -74,7 +74,7 @@ export function DataTableToolbar<T>({
     exporting,
     hasData,
     table,
-}: DataTableToolbarProps<T>) {
+}: Readonly<DataTableToolbarProps<T>>) {
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         onSearchChange(e.target.value);
     };
