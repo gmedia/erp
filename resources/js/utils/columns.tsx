@@ -160,7 +160,9 @@ export function createCurrencyColumn<T = Record<string, unknown>>(
         cell: ({ row }) => {
             const value = row.getValue(accessorKey as string);
             const numValue =
-                typeof value === 'number' ? value : Number.parseFloat(String(value));
+                typeof value === 'number'
+                    ? value
+                    : Number.parseFloat(String(value));
             if (Number.isNaN(numValue)) {
                 return <div className={className}>-</div>;
             }

@@ -100,7 +100,11 @@ export function PipelineStateManager({
     };
 
     const handleDelete = async (stateId: number) => {
-        if (globalThis.window.confirm('Are you sure you want to delete this state?')) {
+        if (
+            globalThis.window.confirm(
+                'Are you sure you want to delete this state?',
+            )
+        ) {
             await deleteState(stateId);
         }
     };

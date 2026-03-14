@@ -159,12 +159,12 @@ export default function TwoFactorRecoveryCodes({
                                                 'code-skeleton-7',
                                                 'code-skeleton-8',
                                             ].map((key) => (
-                                                    <div
-                                                        key={key}
-                                                        className="h-4 animate-pulse rounded bg-muted-foreground/20"
-                                                        aria-hidden="true"
-                                                    />
-                                                ))}
+                                                <div
+                                                    key={key}
+                                                    className="h-4 animate-pulse rounded bg-muted-foreground/20"
+                                                    aria-hidden="true"
+                                                />
+                                            ))}
                                         </div>
                                     )}
                                 </div>
