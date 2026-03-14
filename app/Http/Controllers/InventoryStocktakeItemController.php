@@ -42,8 +42,7 @@ class InventoryStocktakeItemController extends Controller
         UpdateInventoryStocktakeItemsRequest $request,
         InventoryStocktake $inventoryStocktake,
         SyncInventoryStocktakeItemsAction $action,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $action->execute($inventoryStocktake, $request->validated()['items']);
 
         $inventoryStocktake->load(['items.product', 'items.unit', 'items.countedBy']);

@@ -36,8 +36,7 @@ class StockTransferItemController extends Controller
         UpdateStockTransferItemsRequest $request,
         StockTransfer $stockTransfer,
         SyncStockTransferItemsAction $action,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $action->execute($stockTransfer, $request->validated()['items']);
 
         $stockTransfer->load(['items.product', 'items.unit']);

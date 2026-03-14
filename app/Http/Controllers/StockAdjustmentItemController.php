@@ -38,8 +38,7 @@ class StockAdjustmentItemController extends Controller
         UpdateStockAdjustmentItemsRequest $request,
         StockAdjustment $stockAdjustment,
         SyncStockAdjustmentItemsAction $action,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $action->execute($stockAdjustment, $request->validated()['items']);
 
         $stockAdjustment->load(['items.product', 'items.unit']);
