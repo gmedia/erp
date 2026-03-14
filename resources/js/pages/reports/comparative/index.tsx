@@ -130,20 +130,10 @@ const AccountRow = ({
                             <div className="w-32 text-muted-foreground">
                                 {formatCurrency(node.comparison_balance || 0)}
                             </div>
-                            <div
-                                className={cn(
-                                    'w-28',
-                                    changeTextClass,
-                                )}
-                            >
+                            <div className={cn('w-28', changeTextClass)}>
                                 {formatCurrency(changeValue)}
                             </div>
-                            <div
-                                className={cn(
-                                    'w-16',
-                                    changeTextClass,
-                                )}
-                            >
+                            <div className={cn('w-16', changeTextClass)}>
                                 {(node.change_percentage || 0).toFixed(1)}%
                             </div>
                         </>
