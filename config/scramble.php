@@ -126,8 +126,8 @@ return [
      * `{"name":"foo[bar]", "schema":{"type":"int"}, "required":true}`.
      *
      * When `flatten_deep_query_parameters` is `false`, Scramble will document the parameter like so:
-    *  `{"name":"foo", "schema": {"type":"object", "properties":{"bar":
-    *   {"type": "int"}}, "required": ["bar"]}, "required":true}`.
+     *  `{"name":"foo", "schema": {"type":"object", "properties":{"bar":
+     *   {"type": "int"}}, "required": ["bar"]}, "required":true}`.
      */
     'flatten_deep_query_parameters' => true,
 
