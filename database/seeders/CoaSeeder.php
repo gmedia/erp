@@ -412,7 +412,7 @@ class CoaSeeder extends Seeder
                         'normal_balance' => 'debit',
                         'level' => 2,
                         'children' => [
-                        // CHANGE 1: Split Cash into Cash in Bank and Petty Cash
+                            // CHANGE 1: Split Cash into Cash in Bank and Petty Cash
                             [
                                 'code' => '11110',
                                 'name' => 'Cash in Banks',
