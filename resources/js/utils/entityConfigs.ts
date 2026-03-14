@@ -177,16 +177,9 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
 
 // Factory to create a bound SimpleEntityViewModal for a specific entity
 function createSimpleEntityViewModal(entityName: string) {
-    return function BoundSimpleEntityViewModal(props: {
-        open: boolean;
-        onClose: () => void;
-        item: {
-            id: number;
-            name: string;
-            created_at: string;
-            updated_at: string;
-        } | null;
-    }) {
+    return function BoundSimpleEntityViewModal(
+        props: React.ComponentProps<typeof SimpleEntityViewModal>,
+    ) {
         return React.createElement(SimpleEntityViewModal, {
             ...props,
             entityName,

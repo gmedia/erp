@@ -30,6 +30,31 @@ interface MyApprovalsResponse {
     all: ApprovalRequestStep[];
 }
 
+function StatusBadge({ status }: Readonly<{ status: string }>) {
+    switch (status) {
+        case 'pending':
+            return (
+                <Badge variant="secondary">
+                    <Clock className="mr-1 h-3 w-3" /> Pending
+                </Badge>
+            );
+        case 'approved':
+            return (
+                <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                    <Check className="mr-1 h-3 w-3" /> Approved
+                </Badge>
+            );
+        case 'rejected':
+            return (
+                <Badge variant="destructive">
+                    <X className="mr-1 h-3 w-3" /> Rejected
+                </Badge>
+            );
+        default:
+            return <Badge variant="outline">{status}</Badge>;
+    }
+}
+
 export default function MyApprovalsPage() {
     const queryClient = useQueryClient();
     const [actionDialog, setActionDialog] = useState<{
@@ -106,34 +131,6 @@ export default function MyApprovalsPage() {
     } else if (actionDialog.type === 'approve') {
         actionConfirmText = 'Confirm Approval';
     }
-
-    const StatusBadge = ({ status }: { status: string }) => {
-        switch (status) {
-            case 'pending':
-                return (
-                    <Badge variant="secondary">
-                        <Clock className="mr-1 h-3 w-3" /> Pending
-                    </Badge>
-                );
-            case 'approved':
-                return (
-                    <Badge
-                        variant="default"
-                        className="bg-green-600 hover:bg-green-700"
-                    >
-                        <Check className="mr-1 h-3 w-3" /> Approved
-                    </Badge>
-                );
-            case 'rejected':
-                return (
-                    <Badge variant="destructive">
-                        <X className="mr-1 h-3 w-3" /> Rejected
-                    </Badge>
-                );
-            default:
-                return <Badge variant="outline">{status}</Badge>;
-        }
-    };
 
     const renderList = (
         items: ApprovalRequestStep[],

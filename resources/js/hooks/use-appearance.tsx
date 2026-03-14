@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 export type Appearance = 'light' | 'dark' | 'system';
 
 const prefersDark = () => {
-    if (typeof globalThis.window === 'undefined') {
+    if (globalThis.window === undefined) {
         return false;
     }
 
@@ -28,7 +28,7 @@ const applyTheme = (appearance: Appearance) => {
 };
 
 const mediaQuery = () => {
-    if (typeof globalThis.window === 'undefined') {
+    if (globalThis.window === undefined) {
         return null;
     }
 

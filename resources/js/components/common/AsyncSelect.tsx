@@ -184,28 +184,33 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                                         <li
                                             key={itemValue}
                                             aria-selected={itemValue === value}
-                                            className={cn(
-                                                'relative flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-                                                itemValue === value
-                                                    ? 'bg-accent text-accent-foreground'
-                                                    : '',
-                                            )}
-                                            onClick={() => {
-                                                onValueChange?.(itemValue);
-                                                onItemSelect?.(item);
-                                                setSelectedLabel(itemLabel);
-                                                setOpen(false);
-                                            }}
+                                            className="list-none"
                                         >
-                                            <Check
+                                            <button
+                                                type="button"
                                                 className={cn(
-                                                    'mr-2 h-4 w-4',
-                                                    value === itemValue
-                                                        ? 'opacity-100'
-                                                        : 'opacity-0',
+                                                    'relative flex w-full cursor-pointer items-center rounded-sm px-2 py-1.5 text-left text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+                                                    itemValue === value
+                                                        ? 'bg-accent text-accent-foreground'
+                                                        : '',
                                                 )}
-                                            />
-                                            {itemLabel}
+                                                onClick={() => {
+                                                    onValueChange?.(itemValue);
+                                                    onItemSelect?.(item);
+                                                    setSelectedLabel(itemLabel);
+                                                    setOpen(false);
+                                                }}
+                                            >
+                                                <Check
+                                                    className={cn(
+                                                        'mr-2 h-4 w-4',
+                                                        value === itemValue
+                                                            ? 'opacity-100'
+                                                            : 'opacity-0',
+                                                    )}
+                                                />
+                                                {itemLabel}
+                                            </button>
                                         </li>
                                     );
                                 })}

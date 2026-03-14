@@ -271,14 +271,14 @@ export function DataTable<T>({
         tableContent = loadingRows.map((rowKey) => (
             <TableRow key={rowKey}>
                 {columns.map((column) => {
-                    const columnKey =
-                        'id' in column && column.id
-                            ? String(column.id)
-                            : 'accessorKey' in column && column.accessorKey
-                              ? String(column.accessorKey)
-                              : typeof column.header === 'string'
-                                ? column.header
-                                : 'loading-column';
+                    let columnKey = 'loading-column';
+                    if ('id' in column && column.id) {
+                        columnKey = String(column.id);
+                    } else if ('accessorKey' in column && column.accessorKey) {
+                        columnKey = String(column.accessorKey);
+                    } else if (typeof column.header === 'string') {
+                        columnKey = column.header;
+                    }
 
                     return (
                         <TableCell

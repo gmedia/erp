@@ -110,8 +110,9 @@ const AccountRow = ({
                     hasChildren && 'bg-muted/20 font-semibold',
                 )}
             >
-                <div
-                    className="flex flex-1 cursor-pointer items-center gap-2"
+                <button
+                    type="button"
+                    className="flex flex-1 cursor-pointer items-center gap-2 text-left"
                     onClick={() => hasChildren && setExpanded(!expanded)}
                     style={{ paddingLeft: `${(node.level - 1) * 1.5}rem` }}
                 >
@@ -120,7 +121,7 @@ const AccountRow = ({
                         {node.code}
                     </span>
                     <span className="truncate">{node.name}</span>
-                </div>
+                </button>
                 <div className="flex gap-4 text-right tabular-nums">
                     <div className="w-32">{formatCurrency(node.balance)}</div>
                     {showComparison && (

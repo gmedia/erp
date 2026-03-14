@@ -38,9 +38,10 @@ export function TreeNode({
 
     return (
         <div className="select-none">
-            <div
+            <button
+                type="button"
                 className={cn(
-                    'flex cursor-pointer items-center rounded-sm px-2 py-1 hover:bg-muted/50',
+                    'flex w-full cursor-pointer items-center rounded-sm px-2 py-1 text-left hover:bg-muted/50',
                 )}
                 style={{ paddingLeft: `${level * 20 + 8}px` }}
                 onClick={handleCheckChange}
@@ -70,7 +71,7 @@ export function TreeNode({
                 />
 
                 <span className="text-sm font-medium">{node.name}</span>
-            </div>
+            </button>
 
             {hasChildren && isExpanded && (
                 <div>
