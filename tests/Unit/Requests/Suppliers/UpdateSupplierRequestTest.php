@@ -19,7 +19,10 @@ test('rules returns correct validation rules', function () {
     $request->setRouteResolver(function () use ($supplier) {
         return new class($supplier)
         {
-            public function __construct(public $supplier) {}
+            public function __construct(public $supplier)
+            {
+                // No-op constructor for promoted property in anonymous route model stub.
+            }
 
             public function parameter($key, $default = null)
             {
