@@ -39,17 +39,19 @@ test('it can fetch book value report data via json', function () {
         ->assertJson(
             fn (AssertableJson $json) => $json
                 ->has('data', 1)
-                ->has('data.0', fn ($json) => $json
-                    ->where('asset_code', 'IT-001')
-                    ->where('name', 'Server X')
-                    ->where('category_name', 'IT Equipment')
-                    ->where('branch_name', 'HQ')
-                    ->where('purchase_cost', 10000)
-                    ->where('salvage_value', 1000)
-                    ->where('useful_life_months', 48)
-                    ->where('accumulated_depreciation', 2000)
-                    ->where('book_value', 8000)
-                    ->etc()
+                ->has(
+                    'data.0',
+                    fn ($json) => $json
+                        ->where('asset_code', 'IT-001')
+                        ->where('name', 'Server X')
+                        ->where('category_name', 'IT Equipment')
+                        ->where('branch_name', 'HQ')
+                        ->where('purchase_cost', 10000)
+                        ->where('salvage_value', 1000)
+                        ->where('useful_life_months', 48)
+                        ->where('accumulated_depreciation', 2000)
+                        ->where('book_value', 8000)
+                        ->etc(),
                 )
                 ->has('meta')
                 ->has('links')

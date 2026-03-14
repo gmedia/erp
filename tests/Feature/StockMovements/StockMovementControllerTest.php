@@ -42,12 +42,14 @@ test('it can fetch stock movements data via json', function () {
         ->assertJson(
             fn (AssertableJson $json) => $json
                 ->has('data', 1)
-                ->has('data.0', fn (AssertableJson $m) => $m
-                    ->where('movement_type', 'adjustment_in')
-                    ->where('reference_number', 'SA-2026-000001')
-                    ->where('product.name', 'Kertas A4')
-                    ->where('warehouse.name', 'Gudang Utama')
-                    ->etc()
+                ->has(
+                    'data.0',
+                    fn (AssertableJson $m) => $m
+                        ->where('movement_type', 'adjustment_in')
+                        ->where('reference_number', 'SA-2026-000001')
+                        ->where('product.name', 'Kertas A4')
+                        ->where('warehouse.name', 'Gudang Utama')
+                        ->etc(),
                 )
                 ->has('meta')
                 ->has('links')
