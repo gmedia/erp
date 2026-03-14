@@ -77,9 +77,7 @@ export const employeeFormSchema = z.object({
     salary: z
         .string()
         .optional()
-        .transform(
-            (val) => val?.replaceAll(',', '').replaceAll(' ', '') || '',
-        )
+        .transform((val) => val?.replaceAll(',', '').replaceAll(' ', '') || '')
         .pipe(
             z.union([
                 z.literal(''),
@@ -480,9 +478,7 @@ export const pipelineStateFormSchema = z.object({
     color: z.string().nullable().optional(),
     icon: z.string().nullable().optional(),
     description: z.string().nullable().optional(),
-    sort_order: z
-        .union([z.number(), z.string()])
-        .transform(Number),
+    sort_order: z.union([z.number(), z.string()]).transform(Number),
 });
 
 export type PipelineStateFormData = z.infer<typeof pipelineStateFormSchema>;
@@ -498,9 +494,7 @@ export const pipelineTransitionActionFormSchema = z.object({
         'webhook',
         'custom',
     ]),
-    execution_order: z
-        .union([z.number(), z.string()])
-        .transform(Number),
+    execution_order: z.union([z.number(), z.string()]).transform(Number),
     config: z
         .string()
         .optional()
@@ -567,9 +561,7 @@ export const pipelineTransitionFormSchema = z.object({
         .union([z.boolean(), z.string()])
         .default(false)
         .transform((val) => val === 'true' || val === true),
-    sort_order: z
-        .union([z.number(), z.string()])
-        .transform(Number),
+    sort_order: z.union([z.number(), z.string()]).transform(Number),
     is_active: z
         .union([z.boolean(), z.string()])
         .default(true)
