@@ -45,7 +45,12 @@ class ExecuteTransitionAction
         }
 
         // 3. Check specific permission if defined
-        if ($transition->required_permission && ! auth()->user()?->employee?->hasPermission($transition->required_permission)) {
+        if (
+            $transition->required_permission
+            && ! auth()->user()?->employee?->hasPermission(
+                $transition->required_permission,
+            )
+        ) {
             // Should be a 403 conceptually, but throwing as validation simplifies controller
             throw ValidationException::withMessages([
                 'transition_id' => 'You do not have permission to execute this transition.',

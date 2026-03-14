@@ -6,11 +6,13 @@ use App\Http\Requests\PipelineAuditTrail\IndexPipelineAuditTrailRequest;
 use App\Models\PipelineStateLog;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class IndexPipelineAuditTrailAction
 {
-    public function execute(IndexPipelineAuditTrailRequest $request): LengthAwarePaginator|\Illuminate\Database\Eloquent\Collection
-    {
+    public function execute(
+        IndexPipelineAuditTrailRequest $request
+    ): LengthAwarePaginator|Collection {
         $query = PipelineStateLog::query()
             ->with([
                 'pipelineEntityState.pipeline',

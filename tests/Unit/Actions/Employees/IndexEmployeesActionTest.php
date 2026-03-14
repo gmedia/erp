@@ -88,8 +88,11 @@ test('execute applies search filter when provided', function () {
     // Mock filter service calls
     $filterService->shouldReceive('applySearch')
         ->once()
-        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'john',
-            ['name', 'email', 'phone', 'employee_id']);
+        ->with(
+            Mockery::type('Illuminate\Database\Eloquent\Builder'),
+            'john',
+            ['name', 'email', 'phone', 'employee_id'],
+        );
 
     $filterService->shouldReceive('applyAdvancedFilters')
         ->once()

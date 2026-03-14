@@ -20,7 +20,13 @@ class ExportInventoryStocktakeVarianceReportAction
         $extension = $format === 'csv' ? 'csv' : 'xlsx';
         $writerType = $format === 'csv' ? ExcelExcel::CSV : ExcelExcel::XLSX;
 
-        $filename = 'inventory_stocktake_variance_report_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.' . $extension;
+        $filename =
+            'inventory_stocktake_variance_report_'
+            . now()->format('Y-m-d_H-i-s')
+            . '_'
+            . Str::ulid()
+            . '.'
+            . $extension;
         $filePath = 'exports/' . $filename;
 
         Excel::store(new InventoryStocktakeVarianceReportExport($filters), $filePath, 'public', $writerType);

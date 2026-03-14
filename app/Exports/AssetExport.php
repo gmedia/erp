@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Domain\Assets\AssetFilterService;
 use App\Models\Asset;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -32,13 +33,14 @@ class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
             'supplier',
         ]);
 
-        $filterService = app(\App\Domain\Assets\AssetFilterService::class);
+        $filterService = app(AssetFilterService::class);
 
         if (! empty($this->filters['search'])) {
-            $filterService->applySearch($query, $this->filters[
-                'search'],
-                ['name', 'asset_code', 'serial_number', 'barcode',
-                ]);
+            $filterService->applySearch(
+                $query,
+                $this->filters['search'],
+                ['name', 'asset_code', 'serial_number', 'barcode'],
+            );
         } else {
             $filterService->applyAdvancedFilters($query, [
                 'asset_category_id' => $this->filters['asset_category_id'] ?? null,
@@ -56,7 +58,17 @@ class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
             $query,
             $this->filters['sort_by'] ?? 'created_at',
             $this->filters['sort_direction'] ?? 'desc',
-            ['id', 'asset_code', 'name', 'purchase_date', 'purchase_cost', 'status', 'created_at', 'category', 'branch']
+            [
+                'id',
+                'asset_code',
+                'name',
+                'purchase_date',
+                'purchase_cost',
+                'status',
+                'created_at',
+                'category',
+                'branch',
+            ],
         );
 
         return $query;

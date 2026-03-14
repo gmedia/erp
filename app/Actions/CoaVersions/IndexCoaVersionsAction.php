@@ -34,7 +34,11 @@ class IndexCoaVersionsAction extends SimpleCrudIndexAction
         }
 
         $sortBy = $request->get('sort_by', $this->getDefaultSortBy());
-        $sortDirection = strtolower($request->get('sort_direction', $this->getDefaultSortDirection())) === 'asc' ? 'asc' : 'desc';
+        $sortDirection = strtolower(
+            $request->get('sort_direction', $this->getDefaultSortDirection()),
+        ) === 'asc'
+            ? 'asc'
+            : 'desc';
 
         if ($sortBy === 'fiscal_year.name' || $sortBy === 'fiscal_year_name') {
             $query

@@ -5,6 +5,8 @@ namespace App\Actions\AssetCategories;
 use App\Actions\Concerns\SimpleCrudExportAction;
 use App\Exports\AssetCategoryExport;
 use App\Models\AssetCategory;
+use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\FromQuery;
 
 class ExportAssetCategoriesAction extends SimpleCrudExportAction
 {
@@ -13,7 +15,7 @@ class ExportAssetCategoriesAction extends SimpleCrudExportAction
         return AssetCategory::class;
     }
 
-    protected function getExportInstance(array $filters, ?\Illuminate\Database\Eloquent\Builder $query): \Maatwebsite\Excel\Concerns\FromQuery
+    protected function getExportInstance(array $filters, ?Builder $query): FromQuery
     {
         return new AssetCategoryExport($filters, $query);
     }

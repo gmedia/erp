@@ -100,7 +100,18 @@ class IndexInventoryStocktakeVarianceReportAction
         $sortBy = $request->string('sort_by', 'counted_at')->toString();
         $sortDirection = $request->string('sort_direction', 'desc')->toString();
 
-        if (in_array($sortBy, ['stocktake_number', 'stocktake_date', 'product_name', 'product_code', 'category_name', 'warehouse_name', 'branch_name', 'result', 'counted_at', 'counted_by_name'], true)) {
+        if (in_array($sortBy, [
+            'stocktake_number',
+            'stocktake_date',
+            'product_name',
+            'product_code',
+            'category_name',
+            'warehouse_name',
+            'branch_name',
+            'result',
+            'counted_at',
+            'counted_by_name',
+        ], true)) {
             $query->orderBy($sortBy, $sortDirection);
         } elseif (in_array($sortBy, ['system_quantity', 'counted_quantity', 'variance'], true)) {
             $query->orderByRaw($sortBy . ' ' . $sortDirection);

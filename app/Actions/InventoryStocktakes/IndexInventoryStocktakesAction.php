@@ -38,8 +38,19 @@ class IndexInventoryStocktakesAction
         $this->filterService->applySorting(
             $query,
             $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'stocktake_number', 'warehouse_id', 'stocktake_date', 'status', 'product_category_id', 'created_at', 'updated_at']
+            strtolower($request->get('sort_direction', 'desc')) === 'asc'
+                ? 'asc'
+                : 'desc',
+            [
+                'id',
+                'stocktake_number',
+                'warehouse_id',
+                'stocktake_date',
+                'status',
+                'product_category_id',
+                'created_at',
+                'updated_at',
+            ],
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);

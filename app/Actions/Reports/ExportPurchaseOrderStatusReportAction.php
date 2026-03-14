@@ -20,7 +20,13 @@ class ExportPurchaseOrderStatusReportAction
         $extension = $format === 'csv' ? 'csv' : 'xlsx';
         $writerType = $format === 'csv' ? ExcelExcel::CSV : ExcelExcel::XLSX;
 
-        $filename = 'purchase_order_status_report_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.' . $extension;
+        $filename =
+            'purchase_order_status_report_'
+            . now()->format('Y-m-d_H-i-s')
+            . '_'
+            . Str::ulid()
+            . '.'
+            . $extension;
         $filePath = 'exports/' . $filename;
 
         Excel::store(new PurchaseOrderStatusReportExport($filters), $filePath, 'public', $writerType);

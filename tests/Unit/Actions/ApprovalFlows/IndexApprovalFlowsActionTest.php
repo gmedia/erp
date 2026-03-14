@@ -40,8 +40,20 @@ test('execute calls filter service with correct parameters', function () {
 
     $filterService->shouldReceive('applySorting')
         ->once()
-        ->with(Mockery::type(Builder::class), 'created_at', 'desc',
-            ['id', 'name', 'code', 'approvable_type', 'is_active', 'created_at', 'updated_at']);
+        ->with(
+            Mockery::type(Builder::class),
+            'created_at',
+            'desc',
+            [
+                'id',
+                'name',
+                'code',
+                'approvable_type',
+                'is_active',
+                'created_at',
+                'updated_at',
+            ],
+        );
 
     $result = $action->execute($request);
 

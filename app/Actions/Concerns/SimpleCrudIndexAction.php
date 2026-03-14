@@ -3,6 +3,8 @@
 namespace App\Actions\Concerns;
 
 use App\Domain\Concerns\BaseFilterService;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -18,7 +20,7 @@ abstract class SimpleCrudIndexAction
     /**
      * Execute the action to retrieve paginated entities with filters.
      */
-    public function execute(FormRequest $request): \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Database\Eloquent\Collection
+    public function execute(FormRequest $request): LengthAwarePaginator|Collection
     {
         $modelClass = $this->getModelClass();
         $query = $modelClass::query();
@@ -30,8 +32,10 @@ abstract class SimpleCrudIndexAction
         $this->applySorting(
             $query,
             $request->get('sort_by', $this->getDefaultSortBy()),
-            strtolower($request->get('sort_direction', $this->getDefaultSortDirection())) === 'asc' ? 'asc' : 'desc',
-            $this->getSortableFields()
+            strtolower($request->get('sort_direction', $this->getDefaultSortDirection())) === 'asc'
+                ? 'asc'
+                : 'desc',
+            $this->getSortableFields(),
         );
 
         return $query->paginate($request->get('per_page', $this->getDefaultPerPage()));
