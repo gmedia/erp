@@ -28,7 +28,9 @@ class ProductPriceFactory extends Factory
             'customer_category_id' => CustomerCategory::factory(),
             'price' => fake()->randomFloat(2, 50, 5000),
             'effective_from' => $effectiveFrom,
-            'effective_until' => $effectiveFrom ? fake()->optional(0.5)->dateTimeBetween($effectiveFrom, '+1 year') : null,
+            'effective_until' => $effectiveFrom
+                ? fake()->optional(0.5)->dateTimeBetween($effectiveFrom, '+1 year')
+                : null,
         ];
     }
 }

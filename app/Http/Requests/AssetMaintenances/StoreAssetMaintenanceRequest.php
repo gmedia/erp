@@ -16,7 +16,11 @@ class StoreAssetMaintenanceRequest extends FormRequest
     {
         return [
             'asset_id' => ['required', 'exists:assets,id'],
-            'maintenance_type' => ['required', 'string', Rule::in(['preventive', 'corrective', 'calibration', 'other'])],
+            'maintenance_type' => [
+                'required',
+                'string',
+                Rule::in(['preventive', 'corrective', 'calibration', 'other']),
+            ],
             'status' => ['required', 'string', Rule::in(['scheduled', 'in_progress', 'completed', 'cancelled'])],
             'scheduled_at' => ['nullable', 'date'],
             'performed_at' => ['nullable', 'date'],

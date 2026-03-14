@@ -40,7 +40,9 @@ class EmployeeFactory extends Factory
             // Random hire date within the last 10 years
             'hire_date' => $this->faker->dateTimeBetween('-10 years', 'now')->format('Y-m-d'),
             'employment_status' => $this->faker->randomElement(['regular', 'intern']),
-            'termination_date' => $this->faker->boolean(20) ? $this->faker->dateTimeBetween('-1 years', 'now')->format('Y-m-d') : null,
+            'termination_date' => $this->faker->boolean(20)
+                ? $this->faker->dateTimeBetween('-1 years', 'now')->format('Y-m-d')
+                : null,
         ];
     }
 }

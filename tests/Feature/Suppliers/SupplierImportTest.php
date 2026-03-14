@@ -90,7 +90,9 @@ test('returns errors for unknown foreign keys', function () {
     $response->assertStatus(200);
     $errors = collect($response->json('errors'));
 
-    $this->assertTrue($errors->contains(fn ($e) => $e['field'] == 'category' && str_contains($e['message'], 'Unknown')));
+    $this->assertTrue(
+        $errors->contains(fn ($e) => $e['field'] == 'category' && str_contains($e['message'], 'Unknown'))
+    );
 })->group('suppliers');
 
 test('skips/upserts existing supplier by email', function () {

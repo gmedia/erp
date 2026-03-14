@@ -23,7 +23,8 @@ class SettingSampleDataSeeder extends Seeder
             [
                 'group' => 'general',
                 'key' => 'company_address',
-                'value' => 'Jl. Siliwangi No.32G, Nogotirto, Kec. Gamping, Kab. Sleman, Daerah Istimewa Yogyakarta, 55592',
+                'value' => 'Jl. Siliwangi No.32G, Nogotirto, Kec. Gamping, '
+                    . 'Kab. Sleman, Daerah Istimewa Yogyakarta, 55592',
                 'type' => 'string',
             ],
             [

@@ -19,7 +19,11 @@ class IndexMaintenanceCostRequest extends FormRequest
             'asset_category_id' => ['nullable', 'integer', 'exists:asset_categories,id'],
             'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
             'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
-            'maintenance_type' => ['nullable', 'string', Rule::in(['preventive', 'corrective', 'calibration', 'other'])],
+            'maintenance_type' => [
+                'nullable',
+                'string',
+                Rule::in(['preventive', 'corrective', 'calibration', 'other']),
+            ],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'sort_by' => [

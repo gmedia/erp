@@ -39,7 +39,11 @@ class JournalEntryController extends Controller
         return (new JournalEntryResource($journalEntry))->response();
     }
 
-    public function update(UpdateJournalEntryRequest $request, JournalEntry $journalEntry, UpdateJournalEntryAction $action): JsonResponse
+    public function update(
+        UpdateJournalEntryRequest $request,
+        JournalEntry $journalEntry,
+        UpdateJournalEntryAction $action,
+    ): JsonResponse
     {
         $journalEntry = $action->execute($journalEntry, $request->validated());
 

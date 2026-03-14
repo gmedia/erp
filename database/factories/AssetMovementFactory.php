@@ -19,7 +19,14 @@ class AssetMovementFactory extends Factory
     {
         return [
             'asset_id' => Asset::factory(),
-            'movement_type' => $this->faker->randomElement(['acquired', 'transfer', 'assign', 'return', 'dispose', 'adjustment']),
+            'movement_type' => $this->faker->randomElement([
+                'acquired',
+                'transfer',
+                'assign',
+                'return',
+                'dispose',
+                'adjustment',
+            ]),
             'moved_at' => $this->faker->dateTimeBetween('-2 years', 'now'),
             'from_branch_id' => Branch::factory(),
             'to_branch_id' => Branch::factory(),

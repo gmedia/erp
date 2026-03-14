@@ -20,7 +20,12 @@ class PipelineFactory extends Factory
         return [
             'name' => 'Pipeline ' . $this->faker->words(2, true),
             'code' => $this->faker->unique()->slug(),
-            'entity_type' => $this->faker->randomElement(['App\Models\Asset', 'App\Models\PurchaseOrder', 'App\Models\PurchaseRequest', 'App\Models\JournalEntry']),
+            'entity_type' => $this->faker->randomElement([
+                'App\Models\Asset',
+                'App\Models\PurchaseOrder',
+                'App\Models\PurchaseRequest',
+                'App\Models\JournalEntry',
+            ]),
             'description' => $this->faker->sentence(),
             'version' => 1,
             'is_active' => $this->faker->boolean(80),

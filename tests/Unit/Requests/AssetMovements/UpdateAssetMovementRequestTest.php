@@ -39,7 +39,9 @@ function assertUpdateValidationPasses($data, $model = null)
     }
     $request = createUpdateRequest($model, $data);
     $validator = validator($data, $request->rules());
-    expect($validator->fails())->toBeFalse('Validation should have passed but failed: ' . implode(', ', $validator->errors()->all()));
+    expect($validator->fails())->toBeFalse(
+        'Validation should have passed but failed: ' . implode(', ', $validator->errors()->all())
+    );
 }
 
 test('it authorizes request', function () {

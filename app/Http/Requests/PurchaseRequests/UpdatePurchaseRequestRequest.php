@@ -28,7 +28,12 @@ class UpdatePurchaseRequestRequest extends FormRequest
             'request_date' => ['sometimes', 'required', 'date'],
             'required_date' => ['sometimes', 'nullable', 'date'],
             'priority' => ['sometimes', 'required', 'string', 'in:low,normal,high,urgent'],
-            'status' => ['sometimes', 'required', 'string', 'in:draft,pending_approval,approved,rejected,partially_ordered,fully_ordered,cancelled'],
+            'status' => [
+                'sometimes',
+                'required',
+                'string',
+                'in:draft,pending_approval,approved,rejected,partially_ordered,fully_ordered,cancelled',
+            ],
             'estimated_amount' => ['sometimes', 'nullable', 'numeric', 'min:0'],
             'notes' => ['sometimes', 'nullable', 'string'],
             'approved_by' => ['sometimes', 'nullable', 'integer', 'exists:users,id'],

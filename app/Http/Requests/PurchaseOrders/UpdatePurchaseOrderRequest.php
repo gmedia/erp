@@ -32,7 +32,12 @@ class UpdatePurchaseOrderRequest extends FormRequest
             'tax_amount' => ['sometimes', 'nullable', 'numeric', 'min:0'],
             'discount_amount' => ['sometimes', 'nullable', 'numeric', 'min:0'],
             'grand_total' => ['sometimes', 'nullable', 'numeric', 'min:0'],
-            'status' => ['sometimes', 'required', 'string', 'in:draft,pending_approval,confirmed,rejected,partially_received,fully_received,cancelled,closed'],
+            'status' => [
+                'sometimes',
+                'required',
+                'string',
+                'in:draft,pending_approval,confirmed,rejected,partially_received,fully_received,cancelled,closed',
+            ],
             'notes' => ['sometimes', 'nullable', 'string'],
             'shipping_address' => ['sometimes', 'nullable', 'string'],
             'approved_by' => ['sometimes', 'nullable', 'integer', 'exists:users,id'],

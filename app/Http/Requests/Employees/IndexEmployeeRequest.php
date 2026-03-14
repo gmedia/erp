@@ -29,7 +29,12 @@ class IndexEmployeeRequest extends FormRequest
             'salary_max' => ['nullable', 'numeric', 'min:0'],
             'hire_date_from' => ['nullable', 'date'],
             'hire_date_to' => ['nullable', 'date'],
-            'sort_by' => ['nullable', 'string', 'in:id,employee_id,name,email,phone,department_id,position_id,branch_id,salary,employment_status,hire_date,created_at,updated_at'],
+            'sort_by' => [
+                'nullable',
+                'string',
+                'in:id,employee_id,name,email,phone,department_id,position_id,' .
+                    'branch_id,salary,employment_status,hire_date,created_at,updated_at',
+            ],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],

@@ -22,7 +22,12 @@ class IndexStockTransferRequest extends FormRequest
             'transfer_date_to' => ['nullable', 'date'],
             'expected_arrival_date_from' => ['nullable', 'date'],
             'expected_arrival_date_to' => ['nullable', 'date'],
-            'sort_by' => ['nullable', 'string', 'in:id,transfer_number,from_warehouse_id,to_warehouse_id,transfer_date,expected_arrival_date,status,created_at,updated_at'],
+            'sort_by' => [
+                'nullable',
+                'string',
+                'in:id,transfer_number,from_warehouse_id,to_warehouse_id,transfer_date,' .
+                    'expected_arrival_date,status,created_at,updated_at',
+            ],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],

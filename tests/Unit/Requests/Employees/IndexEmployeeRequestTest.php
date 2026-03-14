@@ -147,7 +147,18 @@ describe('IndexEmployeeRequest', function () {
     });
 
     test('rules validation passes with valid sort_by values', function () {
-        $validSortByValues = ['id', 'name', 'email', 'department_id', 'position_id', 'branch_id', 'salary', 'hire_date', 'created_at', 'updated_at'];
+        $validSortByValues = [
+            'id',
+            'name',
+            'email',
+            'department_id',
+            'position_id',
+            'branch_id',
+            'salary',
+            'hire_date',
+            'created_at',
+            'updated_at',
+        ];
 
         foreach ($validSortByValues as $value) {
             $data = ['sort_by' => $value];

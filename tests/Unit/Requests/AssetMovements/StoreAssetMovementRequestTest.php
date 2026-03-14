@@ -23,7 +23,9 @@ function createStoreRequest(array $data = []): StoreAssetMovementRequest
 function assertStoreValidationPasses($data)
 {
     $validator = validator($data, createStoreRequest($data)->rules());
-    expect($validator->fails())->toBeFalse('Validation should have passed but failed: ' . implode(', ', $validator->errors()->all()));
+    expect($validator->fails())->toBeFalse(
+        'Validation should have passed but failed: ' . implode(', ', $validator->errors()->all())
+    );
 }
 
 function assertStoreValidationFails($data, $expectedErrors = [])

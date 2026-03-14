@@ -44,7 +44,11 @@ class ProductFactory extends Factory
             'allow_one_time_purchase' => fake()->boolean(80),
             'is_manufactured' => $type === 'finished_good' ? fake()->boolean(50) : false,
             'is_purchasable' => in_array($type, ['raw_material', 'purchased_good']) ? true : fake()->boolean(80),
-            'is_sellable' => in_array($type, ['finished_good', 'purchased_good', 'service']) ? true : fake()->boolean(20),
+            'is_sellable' => in_array($type, [
+                'finished_good',
+                'purchased_good',
+                'service',
+            ]) ? true : fake()->boolean(20),
             'is_taxable' => fake()->boolean(90),
             'status' => fake()->randomElement(['active', 'inactive', 'discontinued']),
             'notes' => fake()->optional()->sentence(),

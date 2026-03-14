@@ -135,7 +135,10 @@ test('store creates goods receipt with items', function () {
 
     $id = $response->json('data.id');
     assertDatabaseHas('goods_receipts', ['id' => $id, 'purchase_order_id' => $purchaseOrder->id]);
-    assertDatabaseHas('goods_receipt_items', ['goods_receipt_id' => $id, 'purchase_order_item_id' => $purchaseOrderItem->id]);
+    assertDatabaseHas('goods_receipt_items', [
+        'goods_receipt_id' => $id,
+        'purchase_order_item_id' => $purchaseOrderItem->id,
+    ]);
 });
 
 test('show returns goods receipt detail', function () {

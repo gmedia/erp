@@ -17,7 +17,11 @@ class StoreStockAdjustmentRequest extends FormRequest
             'adjustment_number' => ['nullable', 'string', 'max:255', 'unique:stock_adjustments,adjustment_number'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'adjustment_date' => ['required', 'date'],
-            'adjustment_type' => ['required', 'string', 'in:damage,expired,shrinkage,correction,stocktake_result,initial_stock,other'],
+            'adjustment_type' => [
+                'required',
+                'string',
+                'in:damage,expired,shrinkage,correction,stocktake_result,initial_stock,other',
+            ],
             'status' => ['required', 'string', 'in:draft,pending_approval,approved,cancelled'],
             'inventory_stocktake_id' => ['nullable', 'exists:inventory_stocktakes,id'],
             'notes' => ['nullable', 'string'],

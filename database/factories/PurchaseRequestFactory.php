@@ -36,7 +36,11 @@ class PurchaseRequestFactory extends Factory
             'status' => $status,
             'estimated_amount' => $this->faker->randomFloat(2, 1000, 50000),
             'notes' => $this->faker->optional()->sentence(),
-            'approved_by' => in_array($status, ['approved', 'partially_ordered', 'fully_ordered'], true) ? User::factory() : null,
+            'approved_by' => in_array($status, [
+                'approved',
+                'partially_ordered',
+                'fully_ordered',
+            ], true) ? User::factory() : null,
             'approved_at' => in_array($status, ['approved', 'partially_ordered', 'fully_ordered'], true) ? now() : null,
             'rejection_reason' => $status === 'rejected' ? $this->faker->sentence() : null,
             'created_by' => User::factory(),

@@ -21,7 +21,11 @@ class StorePurchaseRequestRequest extends FormRequest
             'request_date' => ['required', 'date'],
             'required_date' => ['nullable', 'date', 'after_or_equal:request_date'],
             'priority' => ['required', 'string', 'in:low,normal,high,urgent'],
-            'status' => ['required', 'string', 'in:draft,pending_approval,approved,rejected,partially_ordered,fully_ordered,cancelled'],
+            'status' => [
+                'required',
+                'string',
+                'in:draft,pending_approval,approved,rejected,partially_ordered,fully_ordered,cancelled',
+            ],
             'estimated_amount' => ['nullable', 'numeric', 'min:0'],
             'notes' => ['nullable', 'string'],
             'approved_by' => ['nullable', 'integer', 'exists:users,id'],

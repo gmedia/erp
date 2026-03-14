@@ -36,7 +36,9 @@ class StockMovementResource extends JsonResource
             'quantity_out' => (string) $this->resource->quantity_out,
             'balance_after' => (string) $this->resource->balance_after,
             'unit_cost' => $this->resource->unit_cost !== null ? (string) $this->resource->unit_cost : null,
-            'average_cost_after' => $this->resource->average_cost_after !== null ? (string) $this->resource->average_cost_after : null,
+            'average_cost_after' => $this->resource->average_cost_after !== null
+                ? (string) $this->resource->average_cost_after
+                : null,
             'reference_type' => $this->resource->reference_type,
             'reference_id' => $this->resource->reference_id,
             'reference_number' => $this->resource->reference_number,

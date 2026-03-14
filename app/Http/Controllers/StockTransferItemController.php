@@ -32,7 +32,11 @@ class StockTransferItemController extends Controller
         ]);
     }
 
-    public function syncItems(UpdateStockTransferItemsRequest $request, StockTransfer $stockTransfer, SyncStockTransferItemsAction $action): JsonResponse
+    public function syncItems(
+        UpdateStockTransferItemsRequest $request,
+        StockTransfer $stockTransfer,
+        SyncStockTransferItemsAction $action,
+    ): JsonResponse
     {
         $action->execute($stockTransfer, $request->validated()['items']);
 

@@ -34,7 +34,11 @@ class StockAdjustmentItemController extends Controller
         ]);
     }
 
-    public function syncItems(UpdateStockAdjustmentItemsRequest $request, StockAdjustment $stockAdjustment, SyncStockAdjustmentItemsAction $action): JsonResponse
+    public function syncItems(
+        UpdateStockAdjustmentItemsRequest $request,
+        StockAdjustment $stockAdjustment,
+        SyncStockAdjustmentItemsAction $action,
+    ): JsonResponse
     {
         $action->execute($stockAdjustment, $request->validated()['items']);
 

@@ -17,7 +17,12 @@ use function Pest\Laravel\putJson;
 uses(RefreshDatabase::class)->group('asset-maintenances');
 
 beforeEach(function () {
-    $user = createTestUserWithPermissions(['asset_maintenance', 'asset_maintenance.create', 'asset_maintenance.edit', 'asset_maintenance.delete']);
+    $user = createTestUserWithPermissions([
+        'asset_maintenance',
+        'asset_maintenance.create',
+        'asset_maintenance.edit',
+        'asset_maintenance.delete',
+    ]);
     actingAs($user);
 });
 

@@ -21,7 +21,11 @@ class UpdateProductRequest extends FormRequest
             ],
             'name' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['sometimes', 'nullable', 'string'],
-            'type' => ['sometimes', 'required', 'in:raw_material,work_in_progress,finished_good,purchased_good,service'],
+            'type' => [
+                'sometimes',
+                'required',
+                'in:raw_material,work_in_progress,finished_good,purchased_good,service',
+            ],
             'category_id' => ['sometimes', 'required', 'exists:product_categories,id'],
             'unit_id' => ['sometimes', 'required', 'exists:units,id'],
             'branch_id' => ['sometimes', 'nullable', 'exists:branches,id'],
