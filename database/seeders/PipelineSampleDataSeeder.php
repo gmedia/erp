@@ -31,7 +31,8 @@ class PipelineSampleDataSeeder extends Seeder
                 'name' => 'Asset Lifecycle',
                 'code' => 'asset_lifecycle',
                 'entity_type' => 'App\Models\Asset',
-                'description' => 'Mengelola siklus hidup aset perusahaan — dari draft, aktif, maintenance, hingga disposed atau lost.',
+                'description' => 'Mengelola siklus hidup aset perusahaan — dari draft, aktif, maintenance, '
+                    . 'hingga disposed atau lost.',
                 'version' => 1,
                 'is_active' => true,
                 'conditions' => null,
@@ -121,7 +122,11 @@ class PipelineSampleDataSeeder extends Seeder
                 'sort_order' => 10,
                 'actions' => [
                     ['action_type' => 'trigger_approval', 'execution_order' => 5, 'config' => []],
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'active']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => ['field' => 'status', 'value' => 'active'],
+                    ],
                 ],
             ],
             [
@@ -137,7 +142,11 @@ class PipelineSampleDataSeeder extends Seeder
                 'requires_approval' => false,
                 'sort_order' => 20,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'cancelled']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => ['field' => 'status', 'value' => 'cancelled'],
+                    ],
                 ],
             ],
             [
@@ -153,7 +162,11 @@ class PipelineSampleDataSeeder extends Seeder
                 'requires_approval' => false,
                 'sort_order' => 10,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'maintenance']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => ['field' => 'status', 'value' => 'maintenance'],
+                    ],
                 ],
             ],
             [
@@ -169,7 +182,11 @@ class PipelineSampleDataSeeder extends Seeder
                 'requires_approval' => false,
                 'sort_order' => 10,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'active']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => ['field' => 'status', 'value' => 'active'],
+                    ],
                 ],
             ],
             [
@@ -185,7 +202,11 @@ class PipelineSampleDataSeeder extends Seeder
                 'requires_approval' => false,
                 'sort_order' => 20,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'disposed']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => ['field' => 'status', 'value' => 'disposed'],
+                    ],
                 ],
             ],
             [
@@ -201,7 +222,11 @@ class PipelineSampleDataSeeder extends Seeder
                 'requires_approval' => false,
                 'sort_order' => 30,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'lost']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => ['field' => 'status', 'value' => 'lost'],
+                    ],
                 ],
             ],
         ];

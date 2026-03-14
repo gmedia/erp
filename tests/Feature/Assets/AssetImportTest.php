@@ -20,19 +20,32 @@ beforeEach(function () {
     Sanctum::actingAs($this->user, ['*']);
 
     $this->category = AssetCategory::factory()->create(['name' => 'IT Equipment']);
-    $this->model = AssetModel::factory()->create(['model_name' => 'MacBook Pro', 'asset_category_id' => $this->category->id]);
+    $this->model = AssetModel::factory()->create([
+        'model_name' => 'MacBook Pro',
+        'asset_category_id' => $this->category->id,
+    ]);
     $this->branch = Branch::factory()->create(['name' => 'Head Office']);
     $this->location = AssetLocation::factory()->create(['name' => 'Room 101', 'branch_id' => $this->branch->id]);
     $this->department = Department::factory()->create(['name' => 'IT Support']);
     $this->employee = Employee::factory()->create(['name' => 'John Doe']);
     $this->supplier = Supplier::factory()->create(['name' => 'Apple Store']);
+
+    $this->csvHeader = implode('', [
+        'asset_code,name,asset_category,asset_model,branch,location,department,employee,supplier,',
+        'serial_number,barcode,purchase_date,purchase_cost,currency,warranty_end_date,status,condition,notes',
+    ]);
+
+    $this->csvRowValid = implode('', [
+        'AST-001,Laptop Mac,IT Equipment,MacBook Pro,Head Office,Room 101,IT Support,John Doe,',
+        'Apple Store,SN12345,BC123,2023-01-01,15000000,IDR,2024-01-01,active,good,Good condition',
+    ]);
 });
 
 test('can import assets from csv file', function () {
     // Header + 1 row
     $csvContent = implode("\n", [
-        'asset_code,name,asset_category,asset_model,branch,location,department,employee,supplier,serial_number,barcode,purchase_date,purchase_cost,currency,warranty_end_date,status,condition,notes',
-        'AST-001,Laptop Mac,IT Equipment,MacBook Pro,Head Office,Room 101,IT Support,John Doe,Apple Store,SN12345,BC123,2023-01-01,15000000,IDR,2024-01-01,active,good,Good condition',
+        $this->csvHeader,
+        $this->csvRowValid,
     ]);
 
     $file = UploadedFile::fake()->createWithContent('assets.csv', $csvContent);
@@ -61,10 +74,16 @@ test('can import assets from csv file', function () {
 
 test('returns validation errors for invalid rows', function () {
     $csvContent = implode("\n", [
-        'asset_code,name,asset_category,asset_model,branch,location,department,employee,supplier,serial_number,barcode,purchase_date,purchase_cost,currency,warranty_end_date,status,condition,notes',
-        'AST-002,Laptop Mac,IT Equipment,MacBook Pro,Head Office,Room 101,IT Support,John Doe,Apple Store,SN12345,BC123,2023-01-01,15000000,IDR,2024-01-01,active,good,Good condition',
-        ',No Code,IT Equipment,MacBook Pro,Head Office,Room 101,IT Support,John Doe,Apple Store,SN12345,BC123,2023-01-01,15000000,IDR,2024-01-01,active,good,Good condition',
-        'AST-004,Invalid Status,IT Equipment,MacBook Pro,Head Office,Room 101,IT Support,John Doe,Apple Store,SN12345,BC123,2023-01-01,15000000,IDR,2024-01-01,invalid_status,good,Good condition',
+        $this->csvHeader,
+        str_replace('AST-001', 'AST-002', $this->csvRowValid),
+        implode('', [
+            ',No Code,IT Equipment,MacBook Pro,Head Office,Room 101,IT Support,John Doe,',
+            'Apple Store,SN12345,BC123,2023-01-01,15000000,IDR,2024-01-01,active,good,Good condition',
+        ]),
+        implode('', [
+            'AST-004,Invalid Status,IT Equipment,MacBook Pro,Head Office,Room 101,IT Support,John Doe,',
+            'Apple Store,SN12345,BC123,2023-01-01,15000000,IDR,2024-01-01,invalid_status,good,Good condition',
+        ]),
     ]);
 
     $file = UploadedFile::fake()->createWithContent('assets_invalid.csv', $csvContent);
@@ -88,8 +107,11 @@ test('returns validation errors for invalid rows', function () {
 
 test('returns errors for unknown foreign keys', function () {
     $csvContent = implode("\n", [
-        'asset_code,name,asset_category,asset_model,branch,location,department,employee,supplier,serial_number,barcode,purchase_date,purchase_cost,currency,warranty_end_date,status,condition,notes',
-        'AST-005,Laptop Mac,Unknown Category,MacBook Pro,Head Office,Room 101,IT Support,John Doe,Apple Store,SN12345,BC123,2023-01-01,15000000,IDR,2024-01-01,active,good,Good condition',
+        $this->csvHeader,
+        implode('', [
+            'AST-005,Laptop Mac,Unknown Category,MacBook Pro,Head Office,Room 101,IT Support,John Doe,',
+            'Apple Store,SN12345,BC123,2023-01-01,15000000,IDR,2024-01-01,active,good,Good condition',
+        ]),
     ]);
 
     $file = UploadedFile::fake()->createWithContent('assets_fk.csv', $csvContent);
@@ -101,7 +123,9 @@ test('returns errors for unknown foreign keys', function () {
     $response->assertStatus(200);
     $errors = collect($response->json('errors'));
 
-    $this->assertTrue($errors->contains(fn ($e) => $e['field'] == 'asset_category' && str_contains($e['message'], 'not found')));
+    $this->assertTrue($errors->contains(
+        fn ($e) => $e['field'] == 'asset_category' && str_contains($e['message'], 'not found')
+    ));
 })->group('assets');
 
 test('upserts existing asset by asset code', function () {
@@ -112,8 +136,11 @@ test('upserts existing asset by asset code', function () {
     ]);
 
     $csvContent = implode("\n", [
-        'asset_code,name,asset_category,asset_model,branch,location,department,employee,supplier,serial_number,barcode,purchase_date,purchase_cost,currency,warranty_end_date,status,condition,notes',
-        'AST-EXIST,New Name,IT Equipment,MacBook Pro,Head Office,Room 101,IT Support,John Doe,Apple Store,SN12345,BC123,2023-01-01,15000000,IDR,2024-01-01,active,good,Good condition',
+        $this->csvHeader,
+        implode('', [
+            'AST-EXIST,New Name,IT Equipment,MacBook Pro,Head Office,Room 101,IT Support,John Doe,',
+            'Apple Store,SN12345,BC123,2023-01-01,15000000,IDR,2024-01-01,active,good,Good condition',
+        ]),
     ]);
 
     $file = UploadedFile::fake()->createWithContent('assets_upsert.csv', $csvContent);

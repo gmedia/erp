@@ -18,7 +18,8 @@ class FinancialReportService
         $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
         // Assuming there is an active COA version for this fiscal year,
         // OR we just get all accounts that have transactions in this FY.
-        // Based on design doc, accounts are linked to coa_version, which is linked to fiscal_year via coa_versions table.
+        // Based on design doc, accounts are linked to coa_version,
+        // which is linked to fiscal_year via coa_versions table.
         // However, a simpler approach for now is to find the active COA version for this fiscal year.
 
         $coaVersion = $this->resolveCoaVersionForFiscalYear($fiscalYear);
@@ -177,7 +178,9 @@ class FinancialReportService
             $comparisonFiscalYear = FiscalYear::find($comparisonFiscalYearId);
             // Ideally we should find the COA version used in that year.
             // Simplification: Assume logic allows finding it.
-            $comparisonCoaVersion = $comparisonFiscalYear ? $this->resolveCoaVersionForFiscalYear($comparisonFiscalYear) : null;
+            $comparisonCoaVersion = $comparisonFiscalYear
+                ? $this->resolveCoaVersionForFiscalYear($comparisonFiscalYear)
+                : null;
             if ($comparisonCoaVersion) {
                 $comparisonNetIncome = $this->calculateNetIncome($comparisonFiscalYearId, $comparisonCoaVersion->id);
             }
@@ -212,7 +215,11 @@ class FinancialReportService
 
         $comparisonBalanceByCurrentAccountId = [];
         if ($comparisonFiscalYearId && $comparisonCoaVersion) {
-            $comparisonBalanceByCurrentAccountId = $this->buildComparisonBalanceMap($accounts, $comparisonFiscalYearId, $comparisonCoaVersion);
+            $comparisonBalanceByCurrentAccountId = $this->buildComparisonBalanceMap(
+                $accounts,
+                $comparisonFiscalYearId,
+                $comparisonCoaVersion
+            );
         }
 
         $assets = [];
@@ -282,13 +289,19 @@ class FinancialReportService
         $totals['comparison_equity'] += $comparisonNetIncome;
 
         $totals['change_assets'] = $totals['assets'] - $totals['comparison_assets'];
-        $totals['change_percentage_assets'] = $totals['comparison_assets'] != 0 ? ($totals['change_assets'] / abs($totals['comparison_assets'])) * 100 : 0;
+        $totals['change_percentage_assets'] = $totals['comparison_assets'] != 0
+            ? ($totals['change_assets'] / abs($totals['comparison_assets'])) * 100
+            : 0;
 
         $totals['change_liabilities'] = $totals['liabilities'] - $totals['comparison_liabilities'];
-        $totals['change_percentage_liabilities'] = $totals['comparison_liabilities'] != 0 ? ($totals['change_liabilities'] / abs($totals['comparison_liabilities'])) * 100 : 0;
+        $totals['change_percentage_liabilities'] = $totals['comparison_liabilities'] != 0
+            ? ($totals['change_liabilities'] / abs($totals['comparison_liabilities'])) * 100
+            : 0;
 
         $totals['change_equity'] = $totals['equity'] - $totals['comparison_equity'];
-        $totals['change_percentage_equity'] = $totals['comparison_equity'] != 0 ? ($totals['change_equity'] / abs($totals['comparison_equity'])) * 100 : 0;
+        $totals['change_percentage_equity'] = $totals['comparison_equity'] != 0
+            ? ($totals['change_equity'] / abs($totals['comparison_equity'])) * 100
+            : 0;
 
         return [
             'assets' => $this->buildTree($assets),
@@ -310,7 +323,9 @@ class FinancialReportService
         $comparisonCoaVersion = null;
         if ($comparisonFiscalYearId) {
             $comparisonFiscalYear = FiscalYear::find($comparisonFiscalYearId);
-            $comparisonCoaVersion = $comparisonFiscalYear ? $this->resolveCoaVersionForFiscalYear($comparisonFiscalYear) : null;
+            $comparisonCoaVersion = $comparisonFiscalYear
+                ? $this->resolveCoaVersionForFiscalYear($comparisonFiscalYear)
+                : null;
         }
 
         $accounts = Account::where('coa_version_id', $coaVersion->id)
@@ -330,7 +345,11 @@ class FinancialReportService
 
         $comparisonBalanceByCurrentAccountId = [];
         if ($comparisonFiscalYearId && $comparisonCoaVersion) {
-            $comparisonBalanceByCurrentAccountId = $this->buildComparisonBalanceMap($accounts, $comparisonFiscalYearId, $comparisonCoaVersion);
+            $comparisonBalanceByCurrentAccountId = $this->buildComparisonBalanceMap(
+                $accounts,
+                $comparisonFiscalYearId,
+                $comparisonCoaVersion
+            );
         }
 
         $revenues = [];
@@ -382,13 +401,19 @@ class FinancialReportService
         $totals['comparison_net_income'] = $totals['comparison_revenue'] - $totals['comparison_expense'];
 
         $totals['change_revenue'] = $totals['revenue'] - $totals['comparison_revenue'];
-        $totals['change_percentage_revenue'] = $totals['comparison_revenue'] != 0 ? ($totals['change_revenue'] / abs($totals['comparison_revenue'])) * 100 : 0;
+        $totals['change_percentage_revenue'] = $totals['comparison_revenue'] != 0
+            ? ($totals['change_revenue'] / abs($totals['comparison_revenue'])) * 100
+            : 0;
 
         $totals['change_expense'] = $totals['expense'] - $totals['comparison_expense'];
-        $totals['change_percentage_expense'] = $totals['comparison_expense'] != 0 ? ($totals['change_expense'] / abs($totals['comparison_expense'])) * 100 : 0;
+        $totals['change_percentage_expense'] = $totals['comparison_expense'] != 0
+            ? ($totals['change_expense'] / abs($totals['comparison_expense'])) * 100
+            : 0;
 
         $totals['change_net_income'] = $totals['net_income'] - $totals['comparison_net_income'];
-        $totals['change_percentage_net_income'] = $totals['comparison_net_income'] != 0 ? ($totals['change_net_income'] / abs($totals['comparison_net_income'])) * 100 : 0;
+        $totals['change_percentage_net_income'] = $totals['comparison_net_income'] != 0
+            ? ($totals['change_net_income'] / abs($totals['comparison_net_income'])) * 100
+            : 0;
 
         return [
             'revenues' => $this->buildTree($revenues),
@@ -430,12 +455,18 @@ class FinancialReportService
         $comparisonCoaVersion = null;
         if ($comparisonFiscalYearId) {
             $comparisonFiscalYear = FiscalYear::find($comparisonFiscalYearId);
-            $comparisonCoaVersion = $comparisonFiscalYear ? $this->resolveCoaVersionForFiscalYear($comparisonFiscalYear) : null;
+            $comparisonCoaVersion = $comparisonFiscalYear
+                ? $this->resolveCoaVersionForFiscalYear($comparisonFiscalYear)
+                : null;
         }
 
         $comparisonBalanceByCurrentAccountId = [];
         if ($comparisonFiscalYearId && $comparisonCoaVersion) {
-            $comparisonBalanceByCurrentAccountId = $this->buildComparisonBalanceMap($accounts, $comparisonFiscalYearId, $comparisonCoaVersion);
+            $comparisonBalanceByCurrentAccountId = $this->buildComparisonBalanceMap(
+                $accounts,
+                $comparisonFiscalYearId,
+                $comparisonCoaVersion
+            );
         }
 
         $assets = [];
@@ -573,8 +604,11 @@ class FinancialReportService
         return $normalBalance === 'debit' ? ($debit - $credit) : ($credit - $debit);
     }
 
-    private function buildComparisonBalanceMap(Collection $currentAccounts, int $comparisonFiscalYearId, CoaVersion $comparisonCoaVersion): array
-    {
+    private function buildComparisonBalanceMap(
+        Collection $currentAccounts,
+        int $comparisonFiscalYearId,
+        CoaVersion $comparisonCoaVersion
+    ): array {
         $currentAccounts = $currentAccounts->values();
         $currentIds = $currentAccounts->pluck('id')->all();
         $codes = $currentAccounts->pluck('code')->unique()->values()->all();
@@ -645,7 +679,8 @@ class FinancialReportService
                 continue;
             }
 
-            $mappingSumByTargetId[$mapping->target_account_id] = ($mappingSumByTargetId[$mapping->target_account_id] ?? 0)
+            $mappingSumByTargetId[$mapping->target_account_id] =
+                ($mappingSumByTargetId[$mapping->target_account_id] ?? 0)
                 + ($sourceBalanceById[$mapping->source_account_id] ?? 0);
         }
 
@@ -672,7 +707,9 @@ class FinancialReportService
                 $lcaTargetId = $targetIds[0];
             }
 
-            $comparisonBalanceByCurrentId[$lcaTargetId] = ($comparisonBalanceByCurrentId[$lcaTargetId] ?? 0) + $sourceBalance;
+            $comparisonBalanceByCurrentId[$lcaTargetId] =
+                ($comparisonBalanceByCurrentId[$lcaTargetId] ?? 0)
+                + $sourceBalance;
         }
 
         return $comparisonBalanceByCurrentId;
