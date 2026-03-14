@@ -7,11 +7,11 @@ export function ExportButton({
     exporting,
     onClick,
     disabled,
-}: {
+}: Readonly<{
     exporting: boolean;
     onClick: () => void;
     disabled?: boolean;
-}) {
+}>) {
     return (
         <Button
             variant="outline"

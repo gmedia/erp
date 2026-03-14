@@ -122,7 +122,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         localStorage.removeItem('api_token');
         setUser(null);
-        window.location.href = '/login';
+        globalThis.window.location.href = '/login';
     };
 
     return (

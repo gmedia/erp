@@ -43,7 +43,7 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
         accessorKey: 'total_debit',
         ...createSortingHeader('Total Amount'),
         cell: ({ row }) => {
-            const amount = parseFloat(row.getValue('total_debit'));
+            const amount = Number.parseFloat(row.getValue('total_debit'));
             return (
                 <div className="text-right font-medium">
                     {new Intl.NumberFormat('id-ID', {

@@ -27,10 +27,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Profile({
     mustVerifyEmail = true,
     status,
-}: {
+}: Readonly<{
     mustVerifyEmail?: boolean;
     status?: string;
-}) {
+}>) {
     const { user, refreshAuth } = useAuth();
     const [searchParams] = useSearchParams();
     const [processing, setProcessing] = useState(false);

@@ -40,7 +40,7 @@ export function useExport({
                 // Convert absolute URL to relative path if it's the same hostname.
                 // This prevents cross-origin issues in testing (Playwright) while keeping it working locally on different ports.
                 const urlObj = new URL(downloadUrl);
-                if (urlObj.hostname === window.location.hostname) {
+                if (urlObj.hostname === globalThis.window.location.hostname) {
                     downloadUrl = urlObj.pathname + urlObj.search;
                 }
             } catch {

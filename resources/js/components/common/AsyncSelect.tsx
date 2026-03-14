@@ -39,7 +39,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
         (item as unknown as { id: number | string }).id.toString(),
     initialLabel,
     label,
-}: AsyncSelectProps<T>) {
+}: Readonly<AsyncSelectProps<T>>) {
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState('');
     const [items, setItems] = React.useState<T[]>([]);
@@ -165,7 +165,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                         />
                     </div>
                     <ScrollArea className="max-h-[200px]">
-                        <div className="p-1" role="listbox" aria-busy={loading}>
+                        <ul className="p-1" aria-busy={loading}>
                             {loading && (
                                 <div className="flex items-center justify-center p-4">
                                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -181,9 +181,8 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                                     const itemValue = valueFn(item);
                                     const itemLabel = labelFn(item);
                                     return (
-                                        <div
+                                        <li
                                             key={itemValue}
-                                            role="option"
                                             aria-selected={itemValue === value}
                                             className={cn(
                                                 'relative flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
@@ -207,10 +206,10 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                                                 )}
                                             />
                                             {itemLabel}
-                                        </div>
+                                        </li>
                                     );
                                 })}
-                        </div>
+                        </ul>
                     </ScrollArea>
                 </div>
             </PopoverContent>

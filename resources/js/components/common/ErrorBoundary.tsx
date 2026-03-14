@@ -115,10 +115,10 @@ export function withErrorBoundary<P extends object>(
 export function ErrorFallback({
     error,
     retry,
-}: {
+}: Readonly<{
     error?: Error;
     retry?: () => void;
-}) {
+}>) {
     return (
         <div className="flex flex-col items-center justify-center p-8 text-center">
             <AlertTriangle className="mb-4 h-12 w-12 text-destructive" />

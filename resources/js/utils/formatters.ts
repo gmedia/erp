@@ -11,8 +11,8 @@ export function formatCurrency(
     currency: string = 'USD',
     locale: string = 'en-US',
 ): string {
-    const numValue = typeof value === 'number' ? value : parseFloat(value);
-    if (isNaN(numValue)) return '-';
+    const numValue = typeof value === 'number' ? value : Number.parseFloat(value);
+    if (Number.isNaN(numValue)) return '-';
 
     return new Intl.NumberFormat(locale, {
         style: 'currency',

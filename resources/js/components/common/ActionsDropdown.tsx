@@ -38,9 +38,7 @@ export function GenericActions<T>({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                {extraItems?.map((node, idx) => (
-                    <React.Fragment key={idx}>{node}</React.Fragment>
-                ))}
+                {extraItems && React.Children.toArray(extraItems)}
                 {viewUrl && (
                     <DropdownMenuItem asChild data-view-url={viewUrl}>
                         <Link to={viewUrl} className="w-full">

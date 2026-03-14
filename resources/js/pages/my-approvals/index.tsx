@@ -100,6 +100,13 @@ export default function MyApprovalsPage() {
         }
     };
 
+    let actionConfirmText = 'Confirm Rejection';
+    if (processing) {
+        actionConfirmText = 'Processing...';
+    } else if (actionDialog.type === 'approve') {
+        actionConfirmText = 'Confirm Approval';
+    }
+
     const StatusBadge = ({ status }: { status: string }) => {
         switch (status) {
             case 'pending':
@@ -390,11 +397,7 @@ export default function MyApprovalsPage() {
                                     comments.trim() === '')
                             }
                         >
-                            {processing
-                                ? 'Processing...'
-                                : actionDialog.type === 'approve'
-                                  ? 'Confirm Approval'
-                                  : 'Confirm Rejection'}
+                            {actionConfirmText}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

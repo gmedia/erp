@@ -160,8 +160,8 @@ export function createCurrencyColumn<T = Record<string, unknown>>(
         cell: ({ row }) => {
             const value = row.getValue(accessorKey as string);
             const numValue =
-                typeof value === 'number' ? value : parseFloat(String(value));
-            if (isNaN(numValue)) {
+                typeof value === 'number' ? value : Number.parseFloat(String(value));
+            if (Number.isNaN(numValue)) {
                 return <div className={className}>-</div>;
             }
 
@@ -207,10 +207,10 @@ export function createNumberColumn<T = Record<string, unknown>>(
     const baseColumn: ColumnDef<T> = {
         accessorKey: accessorKey as string,
         cell: ({ row }) => {
-            const value = parseFloat(
+            const value = Number.parseFloat(
                 row.getValue(accessorKey as string) as string,
             );
-            if (isNaN(value)) {
+            if (Number.isNaN(value)) {
                 return <div className={className}>-</div>;
             }
 

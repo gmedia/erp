@@ -161,7 +161,7 @@ function Section({
     change,
     changePercentage,
     showComparison,
-}: {
+}: Readonly<{
     title: string;
     nodes: AccountNode[];
     total: number;
@@ -169,7 +169,7 @@ function Section({
     change?: number;
     changePercentage?: number;
     showComparison?: boolean;
-}) {
+}>) {
     const [expandAll, setExpandAll] = useState(true);
     const [expandKey, setExpandKey] = useState(0);
     const changeValue = change || 0;

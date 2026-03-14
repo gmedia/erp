@@ -53,13 +53,13 @@ function TwoFactorSetupStep({
     buttonText,
     onNextStep,
     errors,
-}: {
+}: Readonly<{
     qrCodeSvg: string | null;
     manualSetupKey: string | null;
     buttonText: string;
     onNextStep: () => void;
     errors: string[];
-}) {
+}>) {
     const [copiedText, copy] = useClipboard();
     const IconComponent = copiedText === manualSetupKey ? Check : Copy;
 
@@ -131,10 +131,10 @@ function TwoFactorSetupStep({
 function TwoFactorVerificationStep({
     onClose,
     onBack,
-}: {
+}: Readonly<{
     onClose: () => void;
     onBack: () => void;
-}) {
+}>) {
     const [code, setCode] = useState<string>('');
     const [processing, setProcessing] = useState<boolean>(false);
     const [error, setError] = useState<string>('');

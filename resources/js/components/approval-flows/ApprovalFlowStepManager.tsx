@@ -173,8 +173,7 @@ export function ApprovalFlowStepManager({
                 <ApprovalFlowStepFormDialog
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
-                    step={
-                        step={selectedStep}
+                    step={selectedStep}
                     onSave={(data) => {
                         const nextStep = toStepInput(data);
 

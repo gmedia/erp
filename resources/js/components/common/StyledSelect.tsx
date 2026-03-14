@@ -8,7 +8,7 @@ import { type ReactNode } from 'react';
 export function StyledSelectTrigger({
     className,
     ...props
-}: React.ComponentProps<'button'>) {
+}: Readonly<React.ComponentProps<'button'>>) {
     return (
         <SelectTrigger
             className={cn('w-full border-input bg-background', className)}
@@ -23,7 +23,7 @@ export function StyledSelectTrigger({
 export function StyledSelectContent({
     className,
     ...props
-}: React.ComponentProps<'div'>) {
+}: Readonly<React.ComponentProps<'div'>>) {
     return (
         <SelectContent
             className={cn(
@@ -43,11 +43,11 @@ export default function StyledSelect({
     children,
     triggerClassName,
     contentClassName,
-}: {
+}: Readonly<{
     children: ReactNode;
     triggerClassName?: string;
     contentClassName?: string;
-}) {
+}>) {
     return (
         <>
             <StyledSelectTrigger className={triggerClassName} />

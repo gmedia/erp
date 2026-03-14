@@ -257,6 +257,58 @@ export function DataTable<T>({
         setIsFilterModalOpen(false);
     };
 
+    const loadingRows = ['loading-row-1', 'loading-row-2', 'loading-row-3', 'loading-row-4', 'loading-row-5'];
+    const visibleRows = table.getRowModel().rows;
+
+    let tableContent: React.ReactNode;
+    if (isLoading) {
+        tableContent = loadingRows.map((rowKey) => (
+            <TableRow key={rowKey}>
+                {columns.map((column) => {
+                    const columnKey =
+                        'id' in column && column.id
+                            ? String(column.id)
+                            : 'accessorKey' in column && column.accessorKey
+                              ? String(column.accessorKey)
+                              : typeof column.header === 'string'
+                                ? column.header
+                                : 'loading-column';
+
+                    return (
+                        <TableCell key={`${rowKey}-${columnKey}`} className="border-border">
+                            <Skeleton className="h-4 w-full bg-muted" />
+                        </TableCell>
+                    );
+                })}
+            </TableRow>
+        ));
+    } else if (visibleRows.length > 0) {
+        tableContent = visibleRows.map((row) => (
+            <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && 'selected'}
+                className="hover:bg-muted/50"
+            >
+                {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="border-border">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                ))}
+            </TableRow>
+        ));
+    } else {
+        tableContent = (
+            <TableRow>
+                <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center text-muted-foreground"
+                >
+                    No results.
+                </TableCell>
+            </TableRow>
+        );
+    }
+
     return (
         <div className="w-full bg-background text-foreground">
             <DataTableToolbar
@@ -318,55 +370,7 @@ export function DataTable<T>({
                             </TableRow>
                         ))}
                     </TableHeader>
-                    <TableBody>
-                        {isLoading ? (
-                            Array.from({ length: 5 }).map((_, idx) => (
-                                <TableRow key={idx}>
-                                    {Array.from({ length: columns.length }).map(
-                                        (_, cellIdx) => (
-                                            <TableCell
-                                                key={cellIdx}
-                                                className="border-border"
-                                            >
-                                                <Skeleton className="h-4 w-full bg-muted" />
-                                            </TableCell>
-                                        ),
-                                    )}
-                                </TableRow>
-                            ))
-                        ) : table.getRowModel().rows.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={
-                                        row.getIsSelected() && 'selected'
-                                    }
-                                    className="hover:bg-muted/50"
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell
-                                            key={cell.id}
-                                            className="border-border"
-                                        >
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext(),
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center text-muted-foreground"
-                                >
-                                    No results.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
+                    <TableBody>{tableContent}</TableBody>
                 </Table>
             </div>
 

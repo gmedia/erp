@@ -13,8 +13,8 @@ export function StateSummaryCards({
     if (isLoading) {
         return (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {[...Array(4)].map((_, i) => (
-                    <Card key={i} className="animate-pulse">
+                {['state-1', 'state-2', 'state-3', 'state-4'].map((key) => (
+                    <Card key={key} className="animate-pulse">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="rounded bg-muted text-sm font-medium text-transparent">
                                 Loading State...

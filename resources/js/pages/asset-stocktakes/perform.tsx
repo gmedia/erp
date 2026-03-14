@@ -71,25 +71,34 @@ export default function PerformAssetStocktakePage() {
                         )}
                     </CardHeader>
                     <CardContent>
-                        {isStocktakeLoading ||
-                        (loading && items.length === 0) ? (
-                            <div className="flex h-32 items-center justify-center">
-                                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                            </div>
-                        ) : stocktake ? (
-                            <StocktakeItemManager
-                                stocktakeBranchId={stocktake.branch_id}
-                                items={items}
-                                loading={loading}
-                                onSave={(data) =>
-                                    saveItems(stocktake.ulid, data)
-                                }
-                            />
-                        ) : (
-                            <div className="text-center text-muted-foreground">
-                                Stocktake not found
-                            </div>
-                        )}
+                        {(() => {
+                            if (isStocktakeLoading || (loading && items.length === 0)) {
+                                return (
+                                    <div className="flex h-32 items-center justify-center">
+                                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                                    </div>
+                                );
+                            }
+
+                            if (stocktake) {
+                                return (
+                                    <StocktakeItemManager
+                                        stocktakeBranchId={stocktake.branch_id}
+                                        items={items}
+                                        loading={loading}
+                                        onSave={(data) =>
+                                            saveItems(stocktake.ulid, data)
+                                        }
+                                    />
+                                );
+                            }
+
+                            return (
+                                <div className="text-center text-muted-foreground">
+                                    Stocktake not found
+                                </div>
+                            );
+                        })()}
                     </CardContent>
                 </Card>
             </div>

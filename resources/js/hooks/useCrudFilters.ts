@@ -40,9 +40,9 @@ export function useCrudFilters<T extends FilterState = FilterState>({
     resetPageOnFilterChange = true,
 }: UseCrudFiltersOptions<T> = {}): UseCrudFiltersResult<T> {
     const [filters, setFiltersState] = useState<T>(() => {
-        if (typeof window === 'undefined') return initialFilters;
+        if (typeof globalThis.window === 'undefined') return initialFilters;
 
-        const params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(globalThis.window.location.search);
         const merged = { ...(initialFilters as Record<string, unknown>) };
 
         for (const key of Object.keys(initialFilters)) {
@@ -59,9 +59,9 @@ export function useCrudFilters<T extends FilterState = FilterState>({
     });
 
     const [pagination, setPaginationState] = useState(() => {
-        if (typeof window === 'undefined') return initialPagination;
+        if (typeof globalThis.window === 'undefined') return initialPagination;
 
-        const params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(globalThis.window.location.search);
         const pageParam = params.get('page');
         const perPageParam = params.get('per_page');
 

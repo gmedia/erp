@@ -227,9 +227,9 @@ function GeneralSettings({
 
 function RegionalSettings({
     settings,
-}: {
+}: Readonly<{
     settings: SettingsData['regional'];
-}) {
+}>) {
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});

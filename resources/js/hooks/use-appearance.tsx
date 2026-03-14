@@ -3,11 +3,11 @@ import { useCallback, useEffect, useState } from 'react';
 export type Appearance = 'light' | 'dark' | 'system';
 
 const prefersDark = () => {
-    if (typeof window === 'undefined') {
+    if (typeof globalThis.window === 'undefined') {
         return false;
     }
 
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return globalThis.window.matchMedia('(prefers-color-scheme: dark)').matches;
 };
 
 const setCookie = (name: string, value: string, days = 365) => {
@@ -28,11 +28,11 @@ const applyTheme = (appearance: Appearance) => {
 };
 
 const mediaQuery = () => {
-    if (typeof window === 'undefined') {
+    if (typeof globalThis.window === 'undefined') {
         return null;
     }
 
-    return window.matchMedia('(prefers-color-scheme: dark)');
+    return globalThis.window.matchMedia('(prefers-color-scheme: dark)');
 };
 
 const handleSystemThemeChange = () => {
