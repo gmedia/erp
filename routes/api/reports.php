@@ -20,14 +20,18 @@ Route::prefix('reports')->group(function () {
         ->middleware('permission:balance_sheet_report');
     Route::get('income-statement', [ReportController::class, 'incomeStatement'])
         ->middleware('permission:income_statement_report');
-    Route::get('cash-flow', [ReportController::class, 'cashFlow'])->middleware('permission:cash_flow_report');
-    Route::get('comparative', [ReportController::class, 'comparative'])->middleware('permission:comparative_report');
-    Route::get('assets/register', [AssetReportController::class, 'register'])->middleware('permission:asset');
+    Route::get('cash-flow', [ReportController::class, 'cashFlow'])
+        ->middleware('permission:cash_flow_report');
+    Route::get('comparative', [ReportController::class, 'comparative'])
+        ->middleware('permission:comparative_report');
+    Route::get('assets/register', [AssetReportController::class, 'register'])
+        ->middleware('permission:asset');
     Route::get('book-value-depreciation', [BookValueDepreciationReportController::class, 'index'])
         ->middleware('permission:asset');
     Route::post('book-value-depreciation/export', [BookValueDepreciationReportController::class, 'export'])
         ->middleware('permission:asset');
-    Route::get('maintenance-cost', [MaintenanceCostReportController::class, 'index'])->middleware('permission:asset');
+    Route::get('maintenance-cost', [MaintenanceCostReportController::class, 'index'])
+        ->middleware('permission:asset');
     Route::post('maintenance-cost/export', [MaintenanceCostReportController::class, 'export'])
         ->middleware('permission:asset');
     Route::get('inventory-valuation', [InventoryValuationReportController::class, 'index'])
