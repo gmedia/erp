@@ -12,6 +12,17 @@ import {
 import { type ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
 
+function getJournalStatusVariant(status: string) {
+    if (status === 'posted') {
+        return 'default';
+    }
+    if (status === 'draft') {
+        return 'secondary';
+    }
+
+    return 'destructive';
+}
+
 export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
     createSelectColumn<JournalEntry>(),
     createTextColumn<JournalEntry>({
@@ -60,15 +71,7 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
             return (
-                <Badge
-                    variant={
-                        status === 'posted'
-                            ? 'default'
-                            : status === 'draft'
-                              ? 'secondary'
-                              : 'destructive'
-                    }
-                >
+                <Badge variant={getJournalStatusVariant(status)}>
                     {status.toUpperCase()}
                 </Badge>
             );

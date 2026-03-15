@@ -1,8 +1,16 @@
 import { type FormComponentType } from '@/components/common/EntityCrudPage';
-import { type FieldDescriptor } from '@/components/common/filters';
+import {
+    createSimpleEntityFilterFields,
+    type FieldDescriptor,
+} from '@/components/common/filters';
 import { type FilterState } from '@/hooks/useCrudFilters';
 import { type BreadcrumbItem } from '@/types';
-import { type EntityWithId, type Warehouse } from '@/types/entity';
+import {
+    type EntityWithId,
+    type FiscalYear,
+    type Pipeline,
+    type Warehouse,
+} from '@/types/entity';
 import { type ColumnDef } from '@tanstack/react-table';
 import * as React from 'react';
 
@@ -68,7 +76,6 @@ import { createAssetFilterFields } from '@/components/assets/AssetFilters';
 import { AssetForm } from '@/components/assets/AssetForm';
 import { AssetViewModal } from '@/components/assets/AssetViewModal';
 import { SimpleEntityForm } from '@/components/common/EntityForm';
-import { createSimpleEntityFilterFields } from '@/components/common/filters';
 import { SimpleEntityViewModal } from '@/components/common/SimpleEntityViewModal';
 import { customerColumns } from '@/components/customers/CustomerColumns';
 import { createCustomerFilterFields } from '@/components/customers/CustomerFilters';
@@ -641,7 +648,6 @@ import { fiscalYearColumns } from '@/components/fiscal-years/FiscalYearColumns';
 import { createFiscalYearFilterFields } from '@/components/fiscal-years/FiscalYearFilters';
 import { FiscalYearForm } from '@/components/fiscal-years/FiscalYearForm';
 import { FiscalYearViewModal } from '@/components/fiscal-years/FiscalYearViewModal';
-import { type FiscalYear } from '@/types/entity';
 
 export const fiscalYearConfig = createComplexEntityConfig<FiscalYear>({
     entityName: 'Fiscal Year',
@@ -903,7 +909,6 @@ import { pipelineColumns } from '@/components/pipelines/PipelineColumns';
 import { createPipelineFilterFields } from '@/components/pipelines/PipelineFilters';
 import { PipelineForm } from '@/components/pipelines/PipelineForm';
 import { PipelineViewModal } from '@/components/pipelines/PipelineViewModal';
-import { type Pipeline } from '@/types/entity';
 
 export const pipelineConfig = createComplexEntityConfig<Pipeline>({
     entityName: 'Pipeline',

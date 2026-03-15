@@ -2,7 +2,7 @@
 
 namespace App\Actions\Reports;
 
-use App\Exports\InventoryStocktakeVarianceReportExport;
+use App\Exports\InventoryStocktakeVarianceExport;
 use App\Http\Requests\Reports\ExportInventoryStocktakeVarianceReportRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -29,7 +29,7 @@ class ExportInventoryStocktakeVarianceReportAction
             . $extension;
         $filePath = 'exports/' . $filename;
 
-        Excel::store(new InventoryStocktakeVarianceReportExport($filters), $filePath, 'public', $writerType);
+        Excel::store(new InventoryStocktakeVarianceExport($filters), $filePath, 'public', $writerType);
 
         return response()->json([
             'url' => Storage::disk('public')->url($filePath),

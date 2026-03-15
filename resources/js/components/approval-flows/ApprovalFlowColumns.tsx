@@ -26,7 +26,7 @@ export const approvalFlowColumns: ColumnDef<ApprovalFlow>[] = [
             const type = row.getValue('approvable_type') as string;
             if (!type) return '';
             const parts = type.split('\\');
-            return parts[parts.length - 1];
+            return parts.at(-1) ?? '';
         },
     },
     {

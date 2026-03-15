@@ -27,6 +27,17 @@ interface JournalEntryViewModalProps {
     onClose: () => void;
 }
 
+function getJournalStatusVariant(status: JournalEntry['status']) {
+    if (status === 'posted') {
+        return 'default';
+    }
+    if (status === 'draft') {
+        return 'secondary';
+    }
+
+    return 'destructive';
+}
+
 export function JournalEntryViewModal({
     item,
     open,
@@ -75,13 +86,9 @@ export function JournalEntryViewModal({
                                     Status
                                 </p>
                                 <Badge
-                                    variant={
-                                        item.status === 'posted'
-                                            ? 'default'
-                                            : item.status === 'draft'
-                                              ? 'secondary'
-                                              : 'destructive'
-                                    }
+                                    variant={getJournalStatusVariant(
+                                        item.status,
+                                    )}
                                 >
                                     {item.status.toUpperCase()}
                                 </Badge>
