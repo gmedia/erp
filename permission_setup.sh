@@ -27,7 +27,7 @@ safe_chmod() {
 }
 
 safe_chown() {
-    if [ "$IS_WINDOWS" = false ] && command -v chown >/dev/null 2>&1; then
+    if [[ "$IS_WINDOWS" == false ]] && command -v chown >/dev/null 2>&1; then
         chown "$@" 2>/dev/null || true
     fi
 
@@ -141,7 +141,7 @@ safe_chown -R 1000:1000 "database"
 
 # Fix agent skill script permissions
 for agent_dir in .agent .trae .kilocode .roo .cline .claude; do
-    if [ -d "$agent_dir" ]; then
+    if [[ -d "$agent_dir" ]]; then
         safe_chmod +x \
             "$agent_dir/skills/wizard.sh" \
             "$agent_dir/skills/feature-crud-simple/scripts/scaffold.sh" \

@@ -154,7 +154,7 @@ export function ApprovalFlowStepManager({
                     </TableHeader>
                     <TableBody>
                         {fields.map((field, index) => renderRow(field, index))}
-                        {!fields.length && (
+                        {fields.length === 0 && (
                             <TableRow>
                                 <TableCell
                                     colSpan={6}
