@@ -46,6 +46,29 @@ function getPlaceholderFromFilterFields(
     return 'Search...';
 }
 
+type ActionCellOptions<T> = {
+    onView?: (item: T) => void;
+    onEdit?: (item: T) => void;
+    onDelete?: (item: T) => void;
+    extraActionItems?: React.ReactNode[];
+    viewPath?: (item: T) => string;
+};
+
+function createActionsCell<T>(options: ActionCellOptions<T>) {
+    const { onView, onEdit, onDelete, extraActionItems, viewPath } = options;
+
+    return ({ row }: { row: { original: T } }) => (
+        <GenericActions<T>
+            item={row.original}
+            onView={onView}
+            onEdit={onEdit!}
+            onDelete={onDelete!}
+            extraItems={extraActionItems}
+            viewUrl={viewPath ? viewPath(row.original) : undefined}
+        />
+    );
+}
+
 export interface DataTableProps<T> {
     columns: ColumnDef<T>[];
     data: T[];
@@ -184,18 +207,13 @@ export function DataTable<T>({
                     ?.viewPath;
                 return {
                     ...col,
-                    cell: ({ row }: { row: { original: T } }) => (
-                        <GenericActions<T>
-                            item={row.original}
-                            onView={onView}
-                            onEdit={onEdit!}
-                            onDelete={onDelete!}
-                            extraItems={extraActionItems}
-                            viewUrl={
-                                viewPath ? viewPath(row.original) : undefined
-                            }
-                        />
-                    ),
+                    cell: createActionsCell<T>({
+                        onView,
+                        onEdit,
+                        onDelete,
+                        extraActionItems,
+                        viewPath,
+                    }),
                 };
             }
             return col;
