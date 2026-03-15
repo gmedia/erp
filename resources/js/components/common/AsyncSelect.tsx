@@ -183,7 +183,6 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                                     return (
                                         <li
                                             key={itemValue}
-                                            aria-selected={itemValue === value}
                                             className="list-none"
                                         >
                                             <button

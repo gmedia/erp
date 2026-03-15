@@ -60,7 +60,15 @@ export default function ImportDialog({
                       templateHeaders
                           .map((header) => {
                               const value = row[header];
-                              return value == null ? '' : String(value);
+                              if (value == null) {
+                                  return '';
+                              }
+
+                              if (typeof value === 'object') {
+                                  return JSON.stringify(value);
+                              }
+
+                              return String(value);
                           })
                           .join(','),
                   )
