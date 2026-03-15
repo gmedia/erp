@@ -16,6 +16,8 @@ case "$OS_NAME" in
     CYGWIN*|MINGW*|MSYS*)
         IS_WINDOWS=true
         ;;
+    *)
+        ;;
 esac
 
 safe_chmod() {
