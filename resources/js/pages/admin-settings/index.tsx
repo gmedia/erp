@@ -418,15 +418,6 @@ function SmtpSettings({
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        await submitJsonAdminSettings(
-            e,
-            setProcessing,
-            setErrors,
-            setRecentlySuccessful,
-        );
-    };
-
     const [testProcessing, setTestProcessing] = useState(false);
     const [testRecentlySuccessful, setTestRecentlySuccessful] = useState(false);
     const [testErrors, setTestErrors] = useState<Record<string, string>>({});
@@ -474,7 +465,14 @@ function SmtpSettings({
             />
 
             <form
-                onSubmit={handleSubmit}
+                onSubmit={(e) =>
+                    submitJsonAdminSettings(
+                        e,
+                        setProcessing,
+                        setErrors,
+                        setRecentlySuccessful,
+                    )
+                }
                 data-testid="smtp-settings-form"
                 className="space-y-6"
             >
