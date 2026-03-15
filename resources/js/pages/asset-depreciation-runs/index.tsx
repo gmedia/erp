@@ -128,7 +128,8 @@ export default function Index() {
                             {format(new Date(item.period_start), 'dd MMM yyyy')}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                            to {format(new Date(item.period_end), 'dd MMM yyyy')}
+                            to{' '}
+                            {format(new Date(item.period_end), 'dd MMM yyyy')}
                         </span>
                     </div>
                 </TableCell>
@@ -256,9 +257,7 @@ export default function Index() {
                                     </TableRow>
                                 </TableHeader>
 
-                                <TableBody>
-                                    {tableBodyContent}
-                                </TableBody>
+                                <TableBody>{tableBodyContent}</TableBody>
                             </Table>
                         </div>
 

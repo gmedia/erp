@@ -183,7 +183,10 @@ export default function Index() {
                                     {item.entry_number}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
-                                    {format(new Date(item.entry_date), 'dd MMM yyyy')}
+                                    {format(
+                                        new Date(item.entry_date),
+                                        'dd MMM yyyy',
+                                    )}
                                 </span>
                             </div>
                             <div className="line-clamp-2 text-sm text-muted-foreground">
@@ -396,9 +399,7 @@ export default function Index() {
                                     </TableRow>
                                 </TableHeader>
 
-                                <TableBody>
-                                    {tableBodyContent}
-                                </TableBody>
+                                <TableBody>{tableBodyContent}</TableBody>
                             </Table>
                         </div>
 

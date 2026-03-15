@@ -128,9 +128,7 @@ export function RunLinesModal({
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
-                        <TableBody>
-                            {tableBodyContent}
-                        </TableBody>
+                        <TableBody>{tableBodyContent}</TableBody>
                     </Table>
                 </ScrollArea>
             </DialogContent>
