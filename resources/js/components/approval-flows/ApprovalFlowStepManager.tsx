@@ -177,10 +177,10 @@ export function ApprovalFlowStepManager({
                     onSave={(data) => {
                         const nextStep = toStepInput(data);
 
-                        if (editingIndex !== null) {
-                            update(editingIndex, nextStep);
-                        } else {
+                        if (editingIndex === null) {
                             append(nextStep);
+                        } else {
+                            update(editingIndex, nextStep);
                         }
                         setIsDialogOpen(false);
                     }}
