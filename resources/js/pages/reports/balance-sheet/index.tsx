@@ -331,7 +331,7 @@ export default function BalanceSheet() {
     const totalAssets = report.totals?.assets || 0;
     const totalLiabilitiesAndEquity =
         (report.totals?.liabilities || 0) + (report.totals?.equity || 0);
-    const isBalanced = Math.abs(totalAssets - totalLiabilitiesAndEquity) < 1.0;
+    const isBalanced = Math.abs(totalAssets - totalLiabilitiesAndEquity) < 1;
     const difference = Math.abs(totalAssets - totalLiabilitiesAndEquity);
 
     if (isLoading) {

@@ -214,8 +214,8 @@ export function I18nProvider({
             if (params) {
                 return Object.entries(params).reduce(
                     (str, [paramKey, paramValue]) => {
-                        return str.replace(
-                            new RegExp(`\\{${paramKey}\\}`, 'g'),
+                        return str.replaceAll(
+                            String.raw`{${paramKey}}`,
                             paramValue,
                         );
                     },

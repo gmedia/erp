@@ -92,7 +92,6 @@ echo ""
 generate_file() {
     local template="$1"
     local output="$2"
-    local description="$3"
     
     if [[ ! -f "$template" ]]; then
         echo "  ⚠️  Template not found: $template"
@@ -124,8 +123,7 @@ if [[ "$GEN_ACTION" == true ]]; then
     echo "📁 Actions:"
     generate_file \
         "$RESOURCES_DIR/IndexAction.php.template" \
-        "app/Actions/${FEATURE_PLURAL}/Index${FEATURE_PLURAL}Action.php" \
-        "Index Action"
+        "app/Actions/${FEATURE_PLURAL}/Index${FEATURE_PLURAL}Action.php"
 fi
 
 # Generate FilterService
@@ -134,8 +132,7 @@ if [[ "$GEN_FILTER" == true ]]; then
     echo "📁 Domain:"
     generate_file \
         "$RESOURCES_DIR/FilterService.php.template" \
-        "app/Domain/${FEATURE_PLURAL}/${FEATURE}FilterService.php" \
-        "Filter Service"
+        "app/Domain/${FEATURE_PLURAL}/${FEATURE}FilterService.php"
 fi
 
 # Generate Routes
@@ -144,8 +141,7 @@ if [[ "$GEN_ROUTES" == true ]]; then
     echo "📁 Routes:"
     generate_file \
         "$RESOURCES_DIR/routes.php.template" \
-        "routes/${FEATURE_LOWER}.php" \
-        "Routes"
+        "routes/${FEATURE_LOWER}.php"
 fi
 
 echo ""

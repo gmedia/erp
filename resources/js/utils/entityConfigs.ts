@@ -148,8 +148,12 @@ import { createSimpleEntityColumns } from '@/utils/columns';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
-    (entityName: string) => (item: { name?: string }) =>
-        `This action cannot be undone. This will permanently delete ${item.name || `this ${entityName.toLowerCase()}`}'s ${entityName.toLowerCase()} record.`;
+    (entityName: string) => (item: { name?: string }) => {
+        const normalizedName = entityName.toLowerCase();
+        const subject = item.name || `this ${normalizedName}`;
+
+        return `This action cannot be undone. This will permanently delete ${subject}'s ${normalizedName} record.`;
+    };
 
 // Configuration builder options
 export interface SimpleEntityConfigOptions<T = unknown> {

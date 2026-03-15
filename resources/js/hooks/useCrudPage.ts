@@ -118,8 +118,8 @@ export function useCrudPage<
         resetFilters,
     } = useCrudFilters<FilterType>({
         initialFilters:
-            config.initialFilters || ({ search: '' } as unknown as FilterType),
-        initialPagination: config.initialPagination || {
+            config.initialFilters ?? ({ search: '' } as unknown as FilterType),
+        initialPagination: config.initialPagination ?? {
             page: 1,
             per_page: 15,
         },

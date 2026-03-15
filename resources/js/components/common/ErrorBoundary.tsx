@@ -41,7 +41,7 @@ export class ErrorBoundary extends Component<Props, State> {
         this.props.onError?.(error, errorInfo);
     }
 
-    private handleRetry = () => {
+    private readonly handleRetry = () => {
         this.setState({ hasError: false, error: undefined });
     };
 
