@@ -31,10 +31,7 @@ export function ApprovalDelegationFilters() {
                     { label: 'Inactive', value: 'false' },
                 ]}
             />
-            <DatePickerField
-                name="start_date_from"
-                label="Start Date From"
-            />
+            <DatePickerField name="start_date_from" label="Start Date From" />
             <DatePickerField name="start_date_to" label="Start Date To" />
         </div>
     );
