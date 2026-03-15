@@ -78,7 +78,10 @@ async function submitJsonAdminSettings(
 
     try {
         const formData = new FormData(e.currentTarget);
-        await axiosInstance.put('/api/admin-settings', Object.fromEntries(formData));
+        await axiosInstance.put(
+            '/api/admin-settings',
+            Object.fromEntries(formData),
+        );
         setRecentlySuccessful(true);
         setTimeout(() => setRecentlySuccessful(false), 3000);
     } catch (error: unknown) {
