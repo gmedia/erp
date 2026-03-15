@@ -25,7 +25,7 @@ export type InventoryStocktakeVarianceReportItem = {
     system_quantity: string;
     counted_quantity: string;
     variance: string;
-    result: 'surplus' | 'deficit' | string;
+    result: string;
     counted_at: string | null;
     counted_by: { id: number; name: string } | null;
 };

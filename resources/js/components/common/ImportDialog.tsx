@@ -74,7 +74,7 @@ export default function ImportDialog({
         link.setAttribute('download', 'import_template.csv');
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
+        link.remove();
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
