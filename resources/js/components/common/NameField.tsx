@@ -24,7 +24,7 @@ export default function NameField({
     placeholder = '',
     className,
     children,
-}: NameFieldProps) {
+}: Readonly<NameFieldProps>) {
     return (
         <FormField
             name={name}

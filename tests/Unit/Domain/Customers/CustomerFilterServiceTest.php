@@ -94,7 +94,15 @@ test('applySorting applies ascending sort when allowed', function () {
     Customer::factory()->create(['name' => 'A Customer']);
 
     $query = Customer::query();
-    $service->applySorting($query, 'name', 'asc', ['id', 'name', 'email', 'branch_id', 'category_id', 'status', 'created_at']);
+    $service->applySorting($query, 'name', 'asc', [
+        'id',
+        'name',
+        'email',
+        'branch_id',
+        'category_id',
+        'status',
+        'created_at',
+    ]);
 
     $results = $query->get();
 
@@ -109,7 +117,15 @@ test('applySorting applies descending sort when allowed', function () {
     Customer::factory()->create(['name' => 'Z Customer']);
 
     $query = Customer::query();
-    $service->applySorting($query, 'name', 'desc', ['id', 'name', 'email', 'branch_id', 'category_id', 'status', 'created_at']);
+    $service->applySorting($query, 'name', 'desc', [
+        'id',
+        'name',
+        'email',
+        'branch_id',
+        'category_id',
+        'status',
+        'created_at',
+    ]);
 
     $results = $query->get();
 

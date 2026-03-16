@@ -41,11 +41,15 @@ type PaginationLinkProps = {
   React.ComponentProps<"a">
 
 function PaginationLink({
+  children,
   className,
   isActive,
   size = "icon",
   ...props
 }: PaginationLinkProps) {
+  const hasChildren = React.Children.count(children) > 0
+  const fallbackLabel = props["aria-label"] ?? "Pagination link"
+
   return (
     <a
       aria-current={isActive ? "page" : undefined}
@@ -59,7 +63,9 @@ function PaginationLink({
         className
       )}
       {...props}
-    />
+    >
+      {hasChildren ? children : <span className="sr-only">{fallbackLabel}</span>}
+    </a>
   )
 }
 

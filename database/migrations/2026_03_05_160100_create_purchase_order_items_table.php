@@ -11,7 +11,10 @@ return new class extends Migration
         Schema::create('purchase_order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('purchase_order_id')->constrained('purchase_orders')->cascadeOnDelete();
-            $table->foreignId('purchase_request_item_id')->nullable()->constrained('purchase_request_items')->nullOnDelete();
+            $table->foreignId('purchase_request_item_id')
+                ->nullable()
+                ->constrained('purchase_request_items')
+                ->nullOnDelete();
             $table->foreignId('product_id')->constrained('products');
             $table->foreignId('unit_id')->constrained('units');
             $table->decimal('quantity', 15, 2);

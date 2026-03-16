@@ -42,8 +42,23 @@ test('execute calls filter service with correct parameters', function () {
 
     $filterService->shouldReceive('applySorting')
         ->once()
-        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
-            ['id', 'name', 'email', 'phone', 'address', 'branch_id', 'category_id', 'status', 'created_at', 'updated_at']);
+        ->with(
+            Mockery::type('Illuminate\Database\Eloquent\Builder'),
+            'created_at',
+            'desc',
+            [
+                'id',
+                'name',
+                'email',
+                'phone',
+                'address',
+                'branch_id',
+                'category_id',
+                'status',
+                'created_at',
+                'updated_at',
+            ]
+        );
 
     // Mock pagination
     $builder = Mockery::mock('Illuminate\Database\Eloquent\Builder');
@@ -53,14 +68,15 @@ test('execute calls filter service with correct parameters', function () {
     // We can't easily mock the static query() call on the model without alias mocking,
     // so we'll test the service interaction via a real instance or partial mock if needed.
     // However, since IndexSuppliersAction uses Supplier::query(), it's hard to mock that without Facades.
-    // Instead, let's just create real filter service interaction or rely on the fact that we passed the mock to the constructor.
-    // But wait, the Action calls methods on the service.
+    // Instead, let's rely on interaction expectations against the mock service.
+    // The Action itself still calls methods on the injected service.
 
     // The issue is $query sent to service methods is created inside execute(): Supplier::query()
     // To test this properly without a real DB hit or complex mocking, we might just use real objects for what we can.
 
     // Actually, let's keep it simple and just verify the filter service methods are called.
-    // But since we can't inject the query builder into the action, we can't easily verify the *arguments* passed to it match our expectations
+    // We cannot inject the query builder directly into the action, so argument
+    // verification is limited to type checks and expected values.
     // unless we spy on the service and the service is injected.
 
     // The previous test for Customer used Mockery on the service, which is good.

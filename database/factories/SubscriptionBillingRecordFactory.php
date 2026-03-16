@@ -55,7 +55,11 @@ class SubscriptionBillingRecordFactory extends Factory
             'amount_paid' => $amountPaid,
             'status' => $status,
             'paid_date' => $paidDate,
-            'payment_method' => $status === 'paid' ? fake()->randomElement(['credit_card', 'bank_transfer', 'cash']) : null,
+            'payment_method' => $status === 'paid' ? fake()->randomElement([
+                'credit_card',
+                'bank_transfer',
+                'cash',
+            ]) : null,
             'payment_reference' => $status === 'paid' ? fake()->uuid() : null,
             'retry_count' => $status === 'overdue' ? fake()->numberBetween(0, 3) : 0,
             'next_retry_date' => $status === 'overdue' ? fake()->dateTimeBetween('now', '+7 days') : null,

@@ -37,6 +37,8 @@ show_help() {
     echo "Examples:"
     echo "  ./generate.sh Employee --dry-run"
     echo "  ./generate.sh Employee --request"
+
+    return 0
 }
 
 if [[ "$1" == "--help" || -z "$1" ]]; then

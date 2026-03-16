@@ -8,11 +8,15 @@ Route::middleware('permission:supplier_category,true')->group(function () {
 
     Route::get('supplier-categories/{supplier_category}', [SupplierCategoryController::class, 'show']);
 
-    Route::post('supplier-categories', [SupplierCategoryController::class, 'store'])->middleware('permission:supplier_category.create,true');
+    Route::post('supplier-categories', [SupplierCategoryController::class, 'store'])
+        ->middleware('permission:supplier_category.create,true');
 
-    Route::put('supplier-categories/{supplier_category}', [SupplierCategoryController::class, 'update'])->middleware('permission:supplier_category.edit,true');
+    Route::put('supplier-categories/{supplier_category}', [SupplierCategoryController::class, 'update'])
+        ->middleware('permission:supplier_category.edit,true');
 
-    Route::delete('supplier-categories/{supplier_category}', [SupplierCategoryController::class, 'destroy'])->middleware('permission:supplier_category.delete,true');
+    Route::delete('supplier-categories/{supplier_category}', [SupplierCategoryController::class, 'destroy'])
+        ->middleware('permission:supplier_category.delete,true');
     Route::post('supplier-categories/export', [SupplierCategoryController::class, 'export']);
-    Route::post('supplier-categories/import', [SupplierCategoryController::class, 'import'])->middleware('permission:supplier_category.create,true');
+    Route::post('supplier-categories/import', [SupplierCategoryController::class, 'import'])
+        ->middleware('permission:supplier_category.create,true');
 });

@@ -84,7 +84,7 @@ const getPipelineFormDefaults = (
         return {
             name: '',
             code: '',
-            entity_type: 'App\\Models\\Asset',
+            entity_type: String.raw`App\Models\Asset`,
             description: '',
             version: '1',
             is_active: true,

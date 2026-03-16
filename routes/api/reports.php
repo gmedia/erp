@@ -14,24 +14,42 @@ use App\Http\Controllers\StockMovementReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('reports')->group(function () {
-    Route::get('trial-balance', [ReportController::class, 'trialBalance'])->middleware('permission:trial_balance_report');
-    Route::get('balance-sheet', [ReportController::class, 'balanceSheet'])->middleware('permission:balance_sheet_report');
-    Route::get('income-statement', [ReportController::class, 'incomeStatement'])->middleware('permission:income_statement_report');
-    Route::get('cash-flow', [ReportController::class, 'cashFlow'])->middleware('permission:cash_flow_report');
-    Route::get('comparative', [ReportController::class, 'comparative'])->middleware('permission:comparative_report');
-    Route::get('assets/register', [AssetReportController::class, 'register'])->middleware('permission:asset');
-    Route::get('book-value-depreciation', [BookValueDepreciationReportController::class, 'index'])->middleware('permission:asset');
-    Route::post('book-value-depreciation/export', [BookValueDepreciationReportController::class, 'export'])->middleware('permission:asset');
-    Route::get('maintenance-cost', [MaintenanceCostReportController::class, 'index'])->middleware('permission:asset');
-    Route::post('maintenance-cost/export', [MaintenanceCostReportController::class, 'export'])->middleware('permission:asset');
-    Route::get('inventory-valuation', [InventoryValuationReportController::class, 'index'])->middleware('permission:inventory_valuation_report');
-    Route::post('inventory-valuation/export', [InventoryValuationReportController::class, 'export'])->middleware('permission:inventory_valuation_report');
-    Route::get('stock-movement', [StockMovementReportController::class, 'index'])->middleware('permission:stock_movement_report');
-    Route::post('stock-movement/export', [StockMovementReportController::class, 'export'])->middleware('permission:stock_movement_report');
-    Route::get('stock-adjustment', [StockAdjustmentReportController::class, 'index'])->middleware('permission:stock_adjustment_report');
-    Route::post('stock-adjustment/export', [StockAdjustmentReportController::class, 'export'])->middleware('permission:stock_adjustment_report');
-    Route::get('inventory-stocktake-variance', [InventoryStocktakeVarianceReportController::class, 'index'])->middleware('permission:inventory_stocktake_variance_report');
-    Route::post('inventory-stocktake-variance/export', [InventoryStocktakeVarianceReportController::class, 'export'])->middleware('permission:inventory_stocktake_variance_report');
+    Route::get('trial-balance', [ReportController::class, 'trialBalance'])
+        ->middleware('permission:trial_balance_report');
+    Route::get('balance-sheet', [ReportController::class, 'balanceSheet'])
+        ->middleware('permission:balance_sheet_report');
+    Route::get('income-statement', [ReportController::class, 'incomeStatement'])
+        ->middleware('permission:income_statement_report');
+    Route::get('cash-flow', [ReportController::class, 'cashFlow'])
+        ->middleware('permission:cash_flow_report');
+    Route::get('comparative', [ReportController::class, 'comparative'])
+        ->middleware('permission:comparative_report');
+    Route::get('assets/register', [AssetReportController::class, 'register'])
+        ->middleware('permission:asset');
+    Route::get('book-value-depreciation', [BookValueDepreciationReportController::class, 'index'])
+        ->middleware('permission:asset');
+    Route::post('book-value-depreciation/export', [BookValueDepreciationReportController::class, 'export'])
+        ->middleware('permission:asset');
+    Route::get('maintenance-cost', [MaintenanceCostReportController::class, 'index'])
+        ->middleware('permission:asset');
+    Route::post('maintenance-cost/export', [MaintenanceCostReportController::class, 'export'])
+        ->middleware('permission:asset');
+    Route::get('inventory-valuation', [InventoryValuationReportController::class, 'index'])
+        ->middleware('permission:inventory_valuation_report');
+    Route::post('inventory-valuation/export', [InventoryValuationReportController::class, 'export'])
+        ->middleware('permission:inventory_valuation_report');
+    Route::get('stock-movement', [StockMovementReportController::class, 'index'])
+        ->middleware('permission:stock_movement_report');
+    Route::post('stock-movement/export', [StockMovementReportController::class, 'export'])
+        ->middleware('permission:stock_movement_report');
+    Route::get('stock-adjustment', [StockAdjustmentReportController::class, 'index'])
+        ->middleware('permission:stock_adjustment_report');
+    Route::post('stock-adjustment/export', [StockAdjustmentReportController::class, 'export'])
+        ->middleware('permission:stock_adjustment_report');
+    Route::get('inventory-stocktake-variance', [InventoryStocktakeVarianceReportController::class, 'index'])
+        ->middleware('permission:inventory_stocktake_variance_report');
+    Route::post('inventory-stocktake-variance/export', [InventoryStocktakeVarianceReportController::class, 'export'])
+        ->middleware('permission:inventory_stocktake_variance_report');
     Route::get('purchase-history', [PurchaseHistoryReportController::class, 'index'])
         ->middleware('permission:purchase_history_report');
     Route::post('purchase-history/export', [PurchaseHistoryReportController::class, 'export'])

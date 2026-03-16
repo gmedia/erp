@@ -40,7 +40,7 @@ export default function ImportDialog({
     templateHeaders,
     sampleData = [],
     onSuccess,
-}: ImportDialogProps) {
+}: Readonly<ImportDialogProps>) {
     const [open, setOpen] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
@@ -60,7 +60,31 @@ export default function ImportDialog({
                       templateHeaders
                           .map((header) => {
                               const value = row[header];
-                              return value == null ? '' : String(value);
+                              if (value == null) {
+                                  return '';
+                              }
+
+                              if (typeof value === 'string') {
+                                  return value;
+                              }
+
+                              if (
+                                  typeof value === 'number' ||
+                                  typeof value === 'boolean' ||
+                                  typeof value === 'bigint'
+                              ) {
+                                  return value.toString();
+                              }
+
+                              if (value instanceof Date) {
+                                  return value.toISOString();
+                              }
+
+                              if (typeof value === 'object') {
+                                  return JSON.stringify(value);
+                              }
+
+                              return '';
                           })
                           .join(','),
                   )
@@ -74,7 +98,7 @@ export default function ImportDialog({
         link.setAttribute('download', 'import_template.csv');
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
+        link.remove();
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -17,7 +17,15 @@ return new class extends Migration
             $table->date('request_date');
             $table->date('required_date')->nullable();
             $table->enum('priority', ['low', 'normal', 'high', 'urgent'])->default('normal');
-            $table->enum('status', ['draft', 'pending_approval', 'approved', 'rejected', 'partially_ordered', 'fully_ordered', 'cancelled'])->default('draft');
+            $table->enum('status', [
+                'draft',
+                'pending_approval',
+                'approved',
+                'rejected',
+                'partially_ordered',
+                'fully_ordered',
+                'cancelled',
+            ])->default('draft');
             $table->decimal('estimated_amount', 15, 2)->nullable();
             $table->text('notes')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();

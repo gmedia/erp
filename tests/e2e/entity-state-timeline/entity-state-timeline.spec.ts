@@ -18,7 +18,7 @@ async function setupPipelineViaApi(page: Page) {
   if (pipelinesRes.ok()) {
       const existingPipelines = (await pipelinesRes.json()).data;
       for (const p of existingPipelines) {
-          if (p.entity_type === 'App\\Models\\Asset') {
+          if (p.entity_type === String.raw`App\Models\Asset`) {
               await page.request.delete(`/api/pipelines/${p.id}`, { headers });
           }
       }
@@ -30,7 +30,7 @@ async function setupPipelineViaApi(page: Page) {
     data: {
       name: `E2E Timeline Pipeline ${Date.now()}`,
       code: `e2e_timeline_pipeline_${Date.now()}`,
-      entity_type: 'App\\Models\\Asset',
+      entity_type: String.raw`App\Models\Asset`,
       description: 'Pipeline for E2E testing timeline module',
       version: 1,
       is_active: true

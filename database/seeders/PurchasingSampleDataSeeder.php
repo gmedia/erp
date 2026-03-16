@@ -138,13 +138,62 @@ class PurchasingSampleDataSeeder extends Seeder
         );
 
         $prStates = $this->seedPipelineStates($prPipeline, [
-            ['code' => 'draft', 'name' => 'Draft', 'type' => 'initial', 'color' => '#6B7280', 'icon' => 'FileEdit', 'sort_order' => 0],
-            ['code' => 'pending_approval', 'name' => 'Pending Approval', 'type' => 'intermediate', 'color' => '#F59E0B', 'icon' => 'Clock', 'sort_order' => 10],
-            ['code' => 'approved', 'name' => 'Approved', 'type' => 'intermediate', 'color' => '#10B981', 'icon' => 'CircleCheck', 'sort_order' => 20],
-            ['code' => 'rejected', 'name' => 'Rejected', 'type' => 'intermediate', 'color' => '#EF4444', 'icon' => 'CircleX', 'sort_order' => 30],
-            ['code' => 'partially_ordered', 'name' => 'Partially Ordered', 'type' => 'intermediate', 'color' => '#3B82F6', 'icon' => 'Boxes', 'sort_order' => 40],
-            ['code' => 'fully_ordered', 'name' => 'Fully Ordered', 'type' => 'final', 'color' => '#22C55E', 'icon' => 'CheckCheck', 'sort_order' => 50],
-            ['code' => 'cancelled', 'name' => 'Cancelled', 'type' => 'final', 'color' => '#9CA3AF', 'icon' => 'Ban', 'sort_order' => 60],
+            [
+                'code' => 'draft',
+                'name' => 'Draft',
+                'type' => 'initial',
+                'color' => '#6B7280',
+                'icon' => 'FileEdit',
+                'sort_order' => 0,
+            ],
+            [
+                'code' => 'pending_approval',
+                'name' => 'Pending Approval',
+                'type' => 'intermediate',
+                'color' => '#F59E0B',
+                'icon' => 'Clock',
+                'sort_order' => 10,
+            ],
+            [
+                'code' => 'approved',
+                'name' => 'Approved',
+                'type' => 'intermediate',
+                'color' => '#10B981',
+                'icon' => 'CircleCheck',
+                'sort_order' => 20,
+            ],
+            [
+                'code' => 'rejected',
+                'name' => 'Rejected',
+                'type' => 'intermediate',
+                'color' => '#EF4444',
+                'icon' => 'CircleX',
+                'sort_order' => 30,
+            ],
+            [
+                'code' => 'partially_ordered',
+                'name' => 'Partially Ordered',
+                'type' => 'intermediate',
+                'color' => '#3B82F6',
+                'icon' => 'Boxes',
+                'sort_order' => 40,
+            ],
+            [
+                'code' => 'fully_ordered',
+                'name' => 'Fully Ordered',
+                'type' => 'final',
+                'color' => '#22C55E',
+                'icon' => 'CheckCheck',
+                'sort_order' => 50,
+            ],
+            [
+                'code' => 'cancelled',
+                'name' => 'Cancelled',
+                'type' => 'final',
+                'color' => '#9CA3AF',
+                'icon' => 'Ban',
+                'sort_order' => 60,
+            ],
         ]);
 
         $prTransitions = $this->seedPipelineTransitions($prPipeline, $prStates, [
@@ -157,8 +206,21 @@ class PurchasingSampleDataSeeder extends Seeder
                 'requires_approval' => true,
                 'sort_order' => 10,
                 'actions' => [
-                    ['action_type' => 'trigger_approval', 'execution_order' => 5, 'config' => ['approval_flow_code' => 'purchase_request_default']],
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'pending_approval']],
+                    [
+                        'action_type' => 'trigger_approval',
+                        'execution_order' => 5,
+                        'config' => [
+                            'approval_flow_code' => 'purchase_request_default',
+                        ],
+                    ],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'pending_approval',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -170,7 +232,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'requires_approval' => false,
                 'sort_order' => 20,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'approved']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'approved',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -182,7 +251,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'requires_comment' => true,
                 'sort_order' => 30,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'rejected']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'rejected',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -193,7 +269,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'required_permission' => 'purchase_request.edit',
                 'sort_order' => 40,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'draft']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'draft',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -204,7 +287,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'required_permission' => 'purchase_order.create',
                 'sort_order' => 50,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'partially_ordered']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'partially_ordered',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -215,7 +305,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'required_permission' => 'purchase_order.create',
                 'sort_order' => 60,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'fully_ordered']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'fully_ordered',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -226,7 +323,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'required_permission' => 'purchase_order.create',
                 'sort_order' => 70,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'fully_ordered']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'fully_ordered',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -238,7 +342,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'requires_confirmation' => true,
                 'sort_order' => 80,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'cancelled']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'cancelled',
+                        ],
+                    ],
                 ],
             ],
         ]);
@@ -257,14 +368,70 @@ class PurchasingSampleDataSeeder extends Seeder
         );
 
         $poStates = $this->seedPipelineStates($poPipeline, [
-            ['code' => 'draft', 'name' => 'Draft', 'type' => 'initial', 'color' => '#6B7280', 'icon' => 'FileEdit', 'sort_order' => 0],
-            ['code' => 'pending_approval', 'name' => 'Pending Approval', 'type' => 'intermediate', 'color' => '#F59E0B', 'icon' => 'Clock', 'sort_order' => 10],
-            ['code' => 'confirmed', 'name' => 'Confirmed', 'type' => 'intermediate', 'color' => '#10B981', 'icon' => 'CircleCheck', 'sort_order' => 20],
-            ['code' => 'rejected', 'name' => 'Rejected', 'type' => 'intermediate', 'color' => '#EF4444', 'icon' => 'CircleX', 'sort_order' => 30],
-            ['code' => 'partially_received', 'name' => 'Partially Received', 'type' => 'intermediate', 'color' => '#3B82F6', 'icon' => 'Package', 'sort_order' => 40],
-            ['code' => 'fully_received', 'name' => 'Fully Received', 'type' => 'intermediate', 'color' => '#22C55E', 'icon' => 'PackageCheck', 'sort_order' => 50],
-            ['code' => 'cancelled', 'name' => 'Cancelled', 'type' => 'final', 'color' => '#9CA3AF', 'icon' => 'Ban', 'sort_order' => 60],
-            ['code' => 'closed', 'name' => 'Closed', 'type' => 'final', 'color' => '#111827', 'icon' => 'Archive', 'sort_order' => 70],
+            [
+                'code' => 'draft',
+                'name' => 'Draft',
+                'type' => 'initial',
+                'color' => '#6B7280',
+                'icon' => 'FileEdit',
+                'sort_order' => 0,
+            ],
+            [
+                'code' => 'pending_approval',
+                'name' => 'Pending Approval',
+                'type' => 'intermediate',
+                'color' => '#F59E0B',
+                'icon' => 'Clock',
+                'sort_order' => 10,
+            ],
+            [
+                'code' => 'confirmed',
+                'name' => 'Confirmed',
+                'type' => 'intermediate',
+                'color' => '#10B981',
+                'icon' => 'CircleCheck',
+                'sort_order' => 20,
+            ],
+            [
+                'code' => 'rejected',
+                'name' => 'Rejected',
+                'type' => 'intermediate',
+                'color' => '#EF4444',
+                'icon' => 'CircleX',
+                'sort_order' => 30,
+            ],
+            [
+                'code' => 'partially_received',
+                'name' => 'Partially Received',
+                'type' => 'intermediate',
+                'color' => '#3B82F6',
+                'icon' => 'Package',
+                'sort_order' => 40,
+            ],
+            [
+                'code' => 'fully_received',
+                'name' => 'Fully Received',
+                'type' => 'intermediate',
+                'color' => '#22C55E',
+                'icon' => 'PackageCheck',
+                'sort_order' => 50,
+            ],
+            [
+                'code' => 'cancelled',
+                'name' => 'Cancelled',
+                'type' => 'final',
+                'color' => '#9CA3AF',
+                'icon' => 'Ban',
+                'sort_order' => 60,
+            ],
+            [
+                'code' => 'closed',
+                'name' => 'Closed',
+                'type' => 'final',
+                'color' => '#111827',
+                'icon' => 'Archive',
+                'sort_order' => 70,
+            ],
         ]);
 
         $poTransitions = $this->seedPipelineTransitions($poPipeline, $poStates, [
@@ -277,8 +444,21 @@ class PurchasingSampleDataSeeder extends Seeder
                 'requires_approval' => true,
                 'sort_order' => 10,
                 'actions' => [
-                    ['action_type' => 'trigger_approval', 'execution_order' => 5, 'config' => ['approval_flow_code' => 'purchase_order_default']],
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'pending_approval']],
+                    [
+                        'action_type' => 'trigger_approval',
+                        'execution_order' => 5,
+                        'config' => [
+                            'approval_flow_code' => 'purchase_order_default',
+                        ],
+                    ],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'pending_approval',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -289,7 +469,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'required_permission' => 'purchase_order.edit',
                 'sort_order' => 20,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'confirmed']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'confirmed',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -300,7 +487,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'required_permission' => 'purchase_order.edit',
                 'sort_order' => 30,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'confirmed']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'confirmed',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -312,7 +506,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'requires_comment' => true,
                 'sort_order' => 40,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'rejected']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'rejected',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -323,7 +524,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'required_permission' => 'purchase_order.edit',
                 'sort_order' => 50,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'draft']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'draft',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -334,7 +542,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'required_permission' => 'goods_receipt.edit',
                 'sort_order' => 60,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'partially_received']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'partially_received',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -345,7 +560,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'required_permission' => 'goods_receipt.edit',
                 'sort_order' => 70,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'fully_received']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'fully_received',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -356,7 +578,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'required_permission' => 'goods_receipt.edit',
                 'sort_order' => 80,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'fully_received']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'fully_received',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -368,7 +597,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'requires_confirmation' => true,
                 'sort_order' => 90,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'cancelled']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'cancelled',
+                        ],
+                    ],
                 ],
             ],
             [
@@ -379,7 +615,14 @@ class PurchasingSampleDataSeeder extends Seeder
                 'required_permission' => 'purchase_order.edit',
                 'sort_order' => 100,
                 'actions' => [
-                    ['action_type' => 'update_field', 'execution_order' => 10, 'config' => ['field' => 'status', 'value' => 'closed']],
+                    [
+                        'action_type' => 'update_field',
+                        'execution_order' => 10,
+                        'config' => [
+                            'field' => 'status',
+                            'value' => 'closed',
+                        ],
+                    ],
                 ],
             ],
         ]);
@@ -516,8 +759,17 @@ class PurchasingSampleDataSeeder extends Seeder
             'pending_approval' => [['draft', 'pending_approval']],
             'approved' => [['draft', 'pending_approval'], ['pending_approval', 'approved']],
             'rejected' => [['draft', 'pending_approval'], ['pending_approval', 'rejected']],
-            'partially_ordered' => [['draft', 'pending_approval'], ['pending_approval', 'approved'], ['approved', 'partially_ordered']],
-            'fully_ordered' => [['draft', 'pending_approval'], ['pending_approval', 'approved'], ['approved', 'partially_ordered'], ['partially_ordered', 'fully_ordered']],
+            'partially_ordered' => [
+                ['draft', 'pending_approval'],
+                ['pending_approval', 'approved'],
+                ['approved', 'partially_ordered'],
+            ],
+            'fully_ordered' => [
+                ['draft', 'pending_approval'],
+                ['pending_approval', 'approved'],
+                ['approved', 'partially_ordered'],
+                ['partially_ordered', 'fully_ordered'],
+            ],
             'cancelled' => [['draft', 'cancelled']],
         ];
 
@@ -669,9 +921,18 @@ class PurchasingSampleDataSeeder extends Seeder
             'confirmed' => [['draft', 'confirmed']],
             'rejected' => [['draft', 'pending_approval'], ['pending_approval', 'rejected']],
             'partially_received' => [['draft', 'confirmed'], ['confirmed', 'partially_received']],
-            'fully_received' => [['draft', 'confirmed'], ['confirmed', 'partially_received'], ['partially_received', 'fully_received']],
+            'fully_received' => [
+                ['draft', 'confirmed'],
+                ['confirmed', 'partially_received'],
+                ['partially_received', 'fully_received'],
+            ],
             'cancelled' => [['draft', 'confirmed'], ['confirmed', 'cancelled']],
-            'closed' => [['draft', 'confirmed'], ['confirmed', 'partially_received'], ['partially_received', 'fully_received'], ['fully_received', 'closed']],
+            'closed' => [
+                ['draft', 'confirmed'],
+                ['confirmed', 'partially_received'],
+                ['partially_received', 'fully_received'],
+                ['fully_received', 'closed'],
+            ],
         ];
 
         $purchaseOrders = [];

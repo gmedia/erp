@@ -86,7 +86,13 @@ class IndexStockAdjustmentReportAction
         $sortBy = $request->string('sort_by', 'adjustment_date')->toString();
         $sortDirection = $request->string('sort_direction', 'desc')->toString();
 
-        if (in_array($sortBy, ['adjustment_date', 'adjustment_type', 'status', 'warehouse_name', 'branch_name'], true)) {
+        if (in_array($sortBy, [
+            'adjustment_date',
+            'adjustment_type',
+            'status',
+            'warehouse_name',
+            'branch_name',
+        ], true)) {
             $query->orderBy($sortBy, $sortDirection);
         } elseif (in_array($sortBy, ['total_quantity_adjusted', 'total_adjustment_value', 'adjustment_count'], true)) {
             $query->orderByRaw($sortBy . ' ' . $sortDirection);

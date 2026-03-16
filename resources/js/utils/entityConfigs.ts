@@ -1,8 +1,16 @@
 import { type FormComponentType } from '@/components/common/EntityCrudPage';
-import { type FieldDescriptor } from '@/components/common/filters';
+import {
+    createSimpleEntityFilterFields,
+    type FieldDescriptor,
+} from '@/components/common/filters';
 import { type FilterState } from '@/hooks/useCrudFilters';
 import { type BreadcrumbItem } from '@/types';
-import { type EntityWithId, type Warehouse } from '@/types/entity';
+import {
+    type EntityWithId,
+    type FiscalYear,
+    type Pipeline,
+    type Warehouse,
+} from '@/types/entity';
 import { type ColumnDef } from '@tanstack/react-table';
 import * as React from 'react';
 
@@ -68,7 +76,6 @@ import { createAssetFilterFields } from '@/components/assets/AssetFilters';
 import { AssetForm } from '@/components/assets/AssetForm';
 import { AssetViewModal } from '@/components/assets/AssetViewModal';
 import { SimpleEntityForm } from '@/components/common/EntityForm';
-import { createSimpleEntityFilterFields } from '@/components/common/filters';
 import { SimpleEntityViewModal } from '@/components/common/SimpleEntityViewModal';
 import { customerColumns } from '@/components/customers/CustomerColumns';
 import { createCustomerFilterFields } from '@/components/customers/CustomerFilters';
@@ -141,8 +148,12 @@ import { createSimpleEntityColumns } from '@/utils/columns';
 
 // Helper function to create generic delete messages
 const createGenericDeleteMessage =
-    (entityName: string) => (item: { name?: string }) =>
-        `This action cannot be undone. This will permanently delete ${item.name || `this ${entityName.toLowerCase()}`}'s ${entityName.toLowerCase()} record.`;
+    (entityName: string) => (item: { name?: string }) => {
+        const normalizedName = entityName.toLowerCase();
+        const subject = item.name || `this ${normalizedName}`;
+
+        return `This action cannot be undone. This will permanently delete ${subject}'s ${normalizedName} record.`;
+    };
 
 // Configuration builder options
 export interface SimpleEntityConfigOptions<T = unknown> {
@@ -177,16 +188,9 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
 
 // Factory to create a bound SimpleEntityViewModal for a specific entity
 function createSimpleEntityViewModal(entityName: string) {
-    return function BoundSimpleEntityViewModal(props: {
-        open: boolean;
-        onClose: () => void;
-        item: {
-            id: number;
-            name: string;
-            created_at: string;
-            updated_at: string;
-        } | null;
-    }) {
+    return function BoundSimpleEntityViewModal(
+        props: React.ComponentProps<typeof SimpleEntityViewModal>,
+    ) {
         return React.createElement(SimpleEntityViewModal, {
             ...props,
             entityName,
@@ -648,7 +652,6 @@ import { fiscalYearColumns } from '@/components/fiscal-years/FiscalYearColumns';
 import { createFiscalYearFilterFields } from '@/components/fiscal-years/FiscalYearFilters';
 import { FiscalYearForm } from '@/components/fiscal-years/FiscalYearForm';
 import { FiscalYearViewModal } from '@/components/fiscal-years/FiscalYearViewModal';
-import { type FiscalYear } from '@/types/entity';
 
 export const fiscalYearConfig = createComplexEntityConfig<FiscalYear>({
     entityName: 'Fiscal Year',
@@ -910,7 +913,6 @@ import { pipelineColumns } from '@/components/pipelines/PipelineColumns';
 import { createPipelineFilterFields } from '@/components/pipelines/PipelineFilters';
 import { PipelineForm } from '@/components/pipelines/PipelineForm';
 import { PipelineViewModal } from '@/components/pipelines/PipelineViewModal';
-import { type Pipeline } from '@/types/entity';
 
 export const pipelineConfig = createComplexEntityConfig<Pipeline>({
     entityName: 'Pipeline',

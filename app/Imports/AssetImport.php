@@ -208,7 +208,9 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                         'serial_number' => $rowData['serial_number'] ?? null,
                         'barcode' => $rowData['barcode'] ?? null,
                         'purchase_date' => $rowData['purchase_date'],
-                        'purchase_cost' => is_array($rowData['purchase_cost']) ? reset($rowData['purchase_cost']) : $rowData['purchase_cost'],
+                        'purchase_cost' => is_array($rowData['purchase_cost'])
+                            ? reset($rowData['purchase_cost'])
+                            : $rowData['purchase_cost'],
                         'currency' => strtoupper($rowData['currency']),
                         'warranty_end_date' => $rowData['warranty_end_date'] ?? null,
                         'status' => strtolower($rowData['status']),

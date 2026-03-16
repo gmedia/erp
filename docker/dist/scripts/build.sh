@@ -8,7 +8,7 @@ PUSH_FLAG="--load"
 
 # Check for --push flag
 for arg in "$@"; do
-    if [ "$arg" == "--push" ]; then
+    if [[ "$arg" == "--push" ]]; then
         PUSH=true
         PUSH_FLAG="--push"
         break

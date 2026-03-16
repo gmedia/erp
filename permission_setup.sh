@@ -4,6 +4,11 @@
 
 set -e
 
+JS_ACTIONS_DIR="resources/js/actions"
+JS_ROUTES_DIR="resources/js/routes"
+JS_WAYFINDER_DIR="resources/js/wayfinder"
+COVERAGE_HTML_DIR="coverage-html"
+
 OS_NAME="$(uname -s 2>/dev/null || echo unknown)"
 IS_WINDOWS=false
 
@@ -11,18 +16,24 @@ case "$OS_NAME" in
     CYGWIN*|MINGW*|MSYS*)
         IS_WINDOWS=true
         ;;
+    *)
+        ;;
 esac
 
 safe_chmod() {
     if command -v chmod >/dev/null 2>&1; then
         chmod "$@" 2>/dev/null || true
     fi
+
+    return 0
 }
 
 safe_chown() {
-    if [ "$IS_WINDOWS" = false ] && command -v chown >/dev/null 2>&1; then
+    if [[ "$IS_WINDOWS" == false ]] && command -v chown >/dev/null 2>&1; then
         chown "$@" 2>/dev/null || true
     fi
+
+    return 0
 }
 
 mkdir -p "storage/framework"
@@ -47,20 +58,20 @@ safe_chown 1000:1000 "package.json"
 
 # Required by wayfinder
 
-rm -rf "resources/js/actions"
-mkdir -p "resources/js/actions"
-safe_chmod -R ugo+rw "resources/js/actions"
-safe_chown -R 1000:1000 "resources/js/actions"
+rm -rf "$JS_ACTIONS_DIR"
+mkdir -p "$JS_ACTIONS_DIR"
+safe_chmod -R ugo+rw "$JS_ACTIONS_DIR"
+safe_chown -R 1000:1000 "$JS_ACTIONS_DIR"
 
-rm -rf "resources/js/routes"
-mkdir -p "resources/js/routes"
-safe_chmod -R ugo+rw "resources/js/routes"
-safe_chown -R 1000:1000 "resources/js/routes"
+rm -rf "$JS_ROUTES_DIR"
+mkdir -p "$JS_ROUTES_DIR"
+safe_chmod -R ugo+rw "$JS_ROUTES_DIR"
+safe_chown -R 1000:1000 "$JS_ROUTES_DIR"
 
-rm -rf "resources/js/wayfinder"
-mkdir -p "resources/js/wayfinder"
-safe_chmod -R ugo+rw "resources/js/wayfinder"
-safe_chown -R 1000:1000 "resources/js/wayfinder"
+rm -rf "$JS_WAYFINDER_DIR"
+mkdir -p "$JS_WAYFINDER_DIR"
+safe_chmod -R ugo+rw "$JS_WAYFINDER_DIR"
+safe_chown -R 1000:1000 "$JS_WAYFINDER_DIR"
 
 # Required by eslint
 
@@ -94,10 +105,10 @@ safe_chown -R 1000:1000 "e2e"
 
 # Required by test
 
-rm -rf "coverage-html"
-mkdir -p "coverage-html"
-safe_chmod -R ugo+rw "coverage-html"
-safe_chown -R 1000:1000 "coverage-html"
+rm -rf "$COVERAGE_HTML_DIR"
+mkdir -p "$COVERAGE_HTML_DIR"
+safe_chmod -R ugo+rw "$COVERAGE_HTML_DIR"
+safe_chown -R 1000:1000 "$COVERAGE_HTML_DIR"
 
 touch "coverage.xml"
 safe_chmod ugo+rw "coverage.xml"
@@ -132,7 +143,7 @@ safe_chown -R 1000:1000 "database"
 
 # Fix agent skill script permissions
 for agent_dir in .agent .trae .kilocode .roo .cline .claude; do
-    if [ -d "$agent_dir" ]; then
+    if [[ -d "$agent_dir" ]]; then
         safe_chmod +x \
             "$agent_dir/skills/wizard.sh" \
             "$agent_dir/skills/feature-crud-simple/scripts/scaffold.sh" \

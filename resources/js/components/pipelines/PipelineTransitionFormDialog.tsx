@@ -42,7 +42,7 @@ export function PipelineTransitionFormDialog({
     transition,
     states,
     onSuccess,
-}: PipelineTransitionFormDialogProps) {
+}: Readonly<PipelineTransitionFormDialogProps>) {
     const { createTransition, updateTransition } =
         usePipelineTransition(pipelineId);
 

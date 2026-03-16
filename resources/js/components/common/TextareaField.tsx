@@ -28,7 +28,7 @@ export function TextareaField({
     children,
     rows = 3,
     ...props
-}: TextareaFieldProps) {
+}: Readonly<TextareaFieldProps>) {
     return (
         <FormField
             name={name}

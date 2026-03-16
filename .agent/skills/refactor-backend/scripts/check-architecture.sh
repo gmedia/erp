@@ -29,6 +29,8 @@ show_help() {
     echo ""
     echo "Example:"
     echo "  ./check-architecture.sh Employee"
+
+    return 0
 }
 
 if [[ "$1" == "--help" || -z "$1" ]]; then

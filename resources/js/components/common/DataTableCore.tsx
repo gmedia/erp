@@ -46,6 +46,29 @@ function getPlaceholderFromFilterFields(
     return 'Search...';
 }
 
+type ActionCellOptions<T> = {
+    onView?: (item: T) => void;
+    onEdit?: (item: T) => void;
+    onDelete?: (item: T) => void;
+    extraActionItems?: React.ReactNode[];
+    viewPath?: (item: T) => string;
+};
+
+function createActionsCell<T>(options: ActionCellOptions<T>) {
+    const { onView, onEdit, onDelete, extraActionItems, viewPath } = options;
+
+    return ({ row }: { row: { original: T } }) => (
+        <GenericActions<T>
+            item={row.original}
+            onView={onView}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            extraItems={extraActionItems}
+            viewUrl={viewPath ? viewPath(row.original) : undefined}
+        />
+    );
+}
+
 export interface DataTableProps<T> {
     columns: ColumnDef<T>[];
     data: T[];
@@ -114,7 +137,7 @@ export function DataTable<T>({
     extraActionItems,
     extraToolbarActions,
     entityName,
-}: DataTableProps<T>) {
+}: Readonly<DataTableProps<T>>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({});
@@ -184,18 +207,13 @@ export function DataTable<T>({
                     ?.viewPath;
                 return {
                     ...col,
-                    cell: ({ row }: { row: { original: T } }) => (
-                        <GenericActions<T>
-                            item={row.original}
-                            onView={onView}
-                            onEdit={onEdit!}
-                            onDelete={onDelete!}
-                            extraItems={extraActionItems}
-                            viewUrl={
-                                viewPath ? viewPath(row.original) : undefined
-                            }
-                        />
-                    ),
+                    cell: createActionsCell<T>({
+                        onView,
+                        onEdit,
+                        onDelete,
+                        extraActionItems,
+                        viewPath,
+                    }),
                 };
             }
             return col;
@@ -256,6 +274,70 @@ export function DataTable<T>({
         onFilterChange(tempFilters as Record<string, string | undefined>);
         setIsFilterModalOpen(false);
     };
+
+    const loadingRows = [
+        'loading-row-1',
+        'loading-row-2',
+        'loading-row-3',
+        'loading-row-4',
+        'loading-row-5',
+    ];
+    const visibleRows = table.getRowModel().rows;
+
+    let tableContent: React.ReactNode;
+    if (isLoading) {
+        tableContent = loadingRows.map((rowKey) => (
+            <TableRow key={rowKey}>
+                {columns.map((column) => {
+                    let columnKey = 'loading-column';
+                    if ('id' in column && column.id) {
+                        columnKey = String(column.id);
+                    } else if ('accessorKey' in column && column.accessorKey) {
+                        columnKey = String(column.accessorKey);
+                    } else if (typeof column.header === 'string') {
+                        columnKey = column.header;
+                    }
+
+                    return (
+                        <TableCell
+                            key={`${rowKey}-${columnKey}`}
+                            className="border-border"
+                        >
+                            <Skeleton className="h-4 w-full bg-muted" />
+                        </TableCell>
+                    );
+                })}
+            </TableRow>
+        ));
+    } else if (visibleRows.length > 0) {
+        tableContent = visibleRows.map((row) => (
+            <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && 'selected'}
+                className="hover:bg-muted/50"
+            >
+                {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="border-border">
+                        {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                        )}
+                    </TableCell>
+                ))}
+            </TableRow>
+        ));
+    } else {
+        tableContent = (
+            <TableRow>
+                <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center text-muted-foreground"
+                >
+                    No results.
+                </TableCell>
+            </TableRow>
+        );
+    }
 
     return (
         <div className="w-full bg-background text-foreground">
@@ -318,55 +400,7 @@ export function DataTable<T>({
                             </TableRow>
                         ))}
                     </TableHeader>
-                    <TableBody>
-                        {isLoading ? (
-                            Array.from({ length: 5 }).map((_, idx) => (
-                                <TableRow key={idx}>
-                                    {Array.from({ length: columns.length }).map(
-                                        (_, cellIdx) => (
-                                            <TableCell
-                                                key={cellIdx}
-                                                className="border-border"
-                                            >
-                                                <Skeleton className="h-4 w-full bg-muted" />
-                                            </TableCell>
-                                        ),
-                                    )}
-                                </TableRow>
-                            ))
-                        ) : table.getRowModel().rows.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={
-                                        row.getIsSelected() && 'selected'
-                                    }
-                                    className="hover:bg-muted/50"
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell
-                                            key={cell.id}
-                                            className="border-border"
-                                        >
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext(),
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center text-muted-foreground"
-                                >
-                                    No results.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
+                    <TableBody>{tableContent}</TableBody>
                 </Table>
             </div>
 

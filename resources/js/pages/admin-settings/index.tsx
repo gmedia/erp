@@ -65,7 +65,52 @@ const CURRENCY_OPTIONS = [
     { value: 'CNY', label: 'CNY - Chinese Yuan' },
 ] as const;
 
-function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
+function mapValidationErrors(error: unknown): Record<string, string> {
+    if (!axios.isAxiosError(error) || error.response?.status !== 422) {
+        return {};
+    }
+
+    const newErrors: Record<string, string> = {};
+    const serverErrors = error.response.data.errors as Record<string, string[]>;
+    Object.keys(serverErrors).forEach((key) => {
+        newErrors[key] = serverErrors[key][0];
+    });
+
+    return newErrors;
+}
+
+async function submitJsonAdminSettings(
+    e: React.FormEvent<HTMLFormElement>,
+    setProcessing: (value: boolean) => void,
+    setErrors: (value: Record<string, string>) => void,
+    setRecentlySuccessful: (value: boolean) => void,
+) {
+    e.preventDefault();
+    setProcessing(true);
+    setErrors({});
+    setRecentlySuccessful(false);
+
+    try {
+        const formData = new FormData(e.currentTarget);
+        await axiosInstance.put(
+            '/api/admin-settings',
+            Object.fromEntries(formData),
+        );
+        setRecentlySuccessful(true);
+        setTimeout(() => setRecentlySuccessful(false), 3000);
+    } catch (error: unknown) {
+        const newErrors = mapValidationErrors(error);
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+        }
+    } finally {
+        setProcessing(false);
+    }
+}
+
+function GeneralSettings({
+    settings,
+}: Readonly<{ settings: SettingsData['general'] }>) {
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -239,9 +284,9 @@ function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
 
 function RegionalSettings({
     settings,
-}: {
+}: Readonly<{
     settings: SettingsData['regional'];
-}) {
+}>) {
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -467,41 +512,12 @@ function RegionalSettings({
     );
 }
 
-function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
+function SmtpSettings({
+    settings,
+}: Readonly<{ settings: SettingsData['smtp'] }>) {
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setProcessing(true);
-        setErrors({});
-        setRecentlySuccessful(false);
-
-        try {
-            const formData = new FormData(e.currentTarget);
-            await axiosInstance.put(
-                '/api/admin-settings',
-                Object.fromEntries(formData),
-            );
-            setRecentlySuccessful(true);
-            setTimeout(() => setRecentlySuccessful(false), 3000);
-        } catch (error: unknown) {
-            if (axios.isAxiosError(error) && error.response?.status === 422) {
-                const newErrors: Record<string, string> = {};
-                const serverErrors = error.response.data.errors as Record<
-                    string,
-                    string[]
-                >;
-                Object.keys(serverErrors).forEach((key) => {
-                    newErrors[key] = serverErrors[key][0];
-                });
-                setErrors(newErrors);
-            }
-        } finally {
-            setProcessing(false);
-        }
-    };
 
     const [testProcessing, setTestProcessing] = useState(false);
     const [testRecentlySuccessful, setTestRecentlySuccessful] = useState(false);
@@ -550,7 +566,14 @@ function SmtpSettings({ settings }: { settings: SettingsData['smtp'] }) {
             />
 
             <form
-                onSubmit={handleSubmit}
+                onSubmit={(e) =>
+                    submitJsonAdminSettings(
+                        e,
+                        setProcessing,
+                        setErrors,
+                        setRecentlySuccessful,
+                    )
+                }
                 data-testid="smtp-settings-form"
                 className="space-y-6"
             >

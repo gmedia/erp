@@ -123,6 +123,126 @@ export default function Index() {
         to,
     };
 
+    let tableBodyContent: React.ReactNode;
+    if (isLoading) {
+        tableBodyContent = (
+            <TableRow>
+                <TableCell colSpan={7} className="h-56 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-muted-foreground">
+                            Loading journals...
+                        </p>
+                    </div>
+                </TableCell>
+            </TableRow>
+        );
+    } else if (data.length === 0) {
+        tableBodyContent = (
+            <TableRow>
+                <TableCell colSpan={7} className="h-56 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2 opacity-70">
+                        <AlertCircle className="h-10 w-10 text-muted-foreground" />
+                        <p className="text-lg font-medium">
+                            No draft journals found
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                            All journal entries are already posted or voided.
+                        </p>
+                    </div>
+                </TableCell>
+            </TableRow>
+        );
+    } else {
+        tableBodyContent = data.map((item) => {
+            const preview = item.lines
+                .slice(0, 2)
+                .map((l) => l.account_name || l.account_code || 'Line')
+                .filter(Boolean)
+                .join(' • ');
+
+            return (
+                <TableRow key={item.id} className="hover:bg-muted/50">
+                    <TableCell className="pt-4 align-top">
+                        <Checkbox
+                            checked={selectedIds.includes(item.id)}
+                            onCheckedChange={() => toggleSelection(item.id)}
+                            aria-label={`Select ${item.entry_number}`}
+                        />
+                    </TableCell>
+
+                    <TableCell>
+                        <div className="flex flex-col gap-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-mono font-semibold text-primary">
+                                    {item.entry_number}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                    {format(
+                                        new Date(item.entry_date),
+                                        'dd MMM yyyy',
+                                    )}
+                                </span>
+                            </div>
+                            <div className="line-clamp-2 text-sm text-muted-foreground">
+                                {item.description}
+                            </div>
+                        </div>
+                    </TableCell>
+
+                    <TableCell className="pt-4 align-top">
+                        <div className="flex flex-col gap-1">
+                            <div className="text-sm font-medium">
+                                {formatNumberByRegionalSettings(item.lines.length)} line(s)
+                            </div>
+                            {preview.length > 0 && (
+                                <div className="line-clamp-2 text-xs text-muted-foreground">
+                                    {preview}
+                                </div>
+                            )}
+                        </div>
+                    </TableCell>
+
+                    <TableCell className="pt-4 text-right align-top">
+                        {formatCurrencyByRegionalSettings(item.total_debit, {
+                            locale: 'id-ID',
+                            currency: 'IDR',
+                        })}
+                    </TableCell>
+                    <TableCell className="pt-4 text-right align-top">
+                        {formatCurrencyByRegionalSettings(item.total_credit, {
+                            locale: 'id-ID',
+                            currency: 'IDR',
+                        })}
+                    </TableCell>
+
+                    <TableCell className="pt-4 text-center align-top">
+                        <Badge
+                            variant={getStatusBadgeVariant(item.status)}
+                            className="capitalize"
+                        >
+                            {item.status}
+                        </Badge>
+                    </TableCell>
+
+                    <TableCell className="pt-3 text-right align-top">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                                setViewItem(item);
+                                setViewOpen(true);
+                            }}
+                            aria-label={`View ${item.entry_number}`}
+                        >
+                            <Eye className="h-4 w-4" />
+                        </Button>
+                    </TableCell>
+                </TableRow>
+            );
+        });
+    }
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Helmet>
@@ -306,168 +426,7 @@ export default function Index() {
                                         <TableHead className="w-[60px]"></TableHead>
                                     </TableRow>
                                 </TableHeader>
-
-                                <TableBody>
-                                    {isLoading ? (
-                                        <TableRow>
-                                            <TableCell
-                                                colSpan={7}
-                                                className="h-56 text-center"
-                                            >
-                                                <div className="flex flex-col items-center justify-center gap-2">
-                                                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                                    <p className="text-muted-foreground">
-                                                        Loading journals...
-                                                    </p>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : data.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell
-                                                colSpan={7}
-                                                className="h-56 text-center"
-                                            >
-                                                <div className="flex flex-col items-center justify-center gap-2 opacity-70">
-                                                    <AlertCircle className="h-10 w-10 text-muted-foreground" />
-                                                    <p className="text-lg font-medium">
-                                                        No draft journals found
-                                                    </p>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        All journal entries are
-                                                        already posted or
-                                                        voided.
-                                                    </p>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        data.map((item) => {
-                                            const preview = item.lines
-                                                .slice(0, 2)
-                                                .map(
-                                                    (l) =>
-                                                        l.account_name ||
-                                                        l.account_code ||
-                                                        'Line',
-                                                )
-                                                .filter(Boolean)
-                                                .join(' • ');
-
-                                            return (
-                                                <TableRow
-                                                    key={item.id}
-                                                    className="hover:bg-muted/50"
-                                                >
-                                                    <TableCell className="pt-4 align-top">
-                                                        <Checkbox
-                                                            checked={selectedIds.includes(
-                                                                item.id,
-                                                            )}
-                                                            onCheckedChange={() =>
-                                                                toggleSelection(
-                                                                    item.id,
-                                                                )
-                                                            }
-                                                            aria-label={`Select ${item.entry_number}`}
-                                                        />
-                                                    </TableCell>
-
-                                                    <TableCell>
-                                                        <div className="flex flex-col gap-1">
-                                                            <div className="flex flex-wrap items-center gap-2">
-                                                                <span className="font-mono font-semibold text-primary">
-                                                                    {
-                                                                        item.entry_number
-                                                                    }
-                                                                </span>
-                                                                <span className="text-xs text-muted-foreground">
-                                                                    {format(
-                                                                        new Date(
-                                                                            item.entry_date,
-                                                                        ),
-                                                                        'dd MMM yyyy',
-                                                                    )}
-                                                                </span>
-                                                            </div>
-                                                            <div className="line-clamp-2 text-sm text-muted-foreground">
-                                                                {
-                                                                    item.description
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                    </TableCell>
-
-                                                    <TableCell className="pt-4 align-top">
-                                                        <div className="flex flex-col gap-1">
-                                                            <div className="text-sm font-medium">
-                                                                {formatNumberByRegionalSettings(
-                                                                    item.lines
-                                                                        .length,
-                                                                )}{' '}
-                                                                line(s)
-                                                            </div>
-                                                            {preview.length >
-                                                                0 && (
-                                                                <div className="line-clamp-2 text-xs text-muted-foreground">
-                                                                    {preview}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </TableCell>
-
-                                                    <TableCell className="pt-4 text-right align-top font-mono">
-                                                        {formatCurrencyByRegionalSettings(
-                                                            item.total_debit,
-                                                            {
-                                                                locale: 'id-ID',
-                                                                currency: 'IDR',
-                                                            },
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell className="pt-4 text-right align-top font-mono">
-                                                        {formatCurrencyByRegionalSettings(
-                                                            item.total_credit,
-                                                            {
-                                                                locale: 'id-ID',
-                                                                currency: 'IDR',
-                                                            },
-                                                        )}
-                                                    </TableCell>
-
-                                                    <TableCell className="pt-4 text-center align-top">
-                                                        <Badge
-                                                            variant={getStatusBadgeVariant(
-                                                                item.status,
-                                                            )}
-                                                            className="capitalize"
-                                                        >
-                                                            {item.status}
-                                                        </Badge>
-                                                    </TableCell>
-
-                                                    <TableCell className="pt-3 text-right align-top">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => {
-                                                                setViewItem(
-                                                                    item,
-                                                                );
-                                                                setViewOpen(
-                                                                    true,
-                                                                );
-                                                            }}
-                                                            aria-label={`View ${item.entry_number}`}
-                                                        >
-                                                            <Eye className="h-4 w-4" />
-                                                        </Button>
-                                                    </TableCell>
-                                                </TableRow>
-                                            );
-                                        })
-                                    )}
-                                </TableBody>
+                                <TableBody>{tableBodyContent}</TableBody>
                             </Table>
                         </div>
 

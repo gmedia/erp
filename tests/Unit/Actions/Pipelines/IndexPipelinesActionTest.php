@@ -53,7 +53,10 @@ it('sorts pipelines by created_by', function () {
     Pipeline::factory()->create(['created_by' => $user2->id, 'name' => 'Pipeline Z']);
     Pipeline::factory()->create(['created_by' => $user1->id, 'name' => 'Pipeline A']);
 
-    $request = IndexPipelineRequest::create('/api/pipelines', 'GET', ['sort_by' => 'created_by', 'sort_direction' => 'asc']);
+    $request = IndexPipelineRequest::create('/api/pipelines', 'GET', [
+        'sort_by' => 'created_by',
+        'sort_direction' => 'asc',
+    ]);
     $action = new IndexPipelinesAction(app(PipelineFilterService::class));
     $result = $action->execute($request);
 

@@ -9,20 +9,22 @@ interface SummaryCardsProps {
     isLoading: boolean;
 }
 
-export function SummaryCards({ data, isLoading }: SummaryCardsProps) {
+export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
     if (isLoading || !data) {
         return (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-                {[...Array(4)].map((_, i) => (
-                    <Card key={i} className="animate-pulse">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="h-4 w-24 rounded bg-muted text-sm font-medium text-transparent"></CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="mt-1 h-8 w-24 rounded bg-muted text-2xl font-bold text-transparent"></div>
-                        </CardContent>
-                    </Card>
-                ))}
+                {['summary-1', 'summary-2', 'summary-3', 'summary-4'].map(
+                    (key) => (
+                        <Card key={key} className="animate-pulse">
+                            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                <CardTitle className="h-4 w-24 rounded bg-muted text-sm font-medium text-transparent"></CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="mt-1 h-8 w-24 rounded bg-muted text-2xl font-bold text-transparent"></div>
+                            </CardContent>
+                        </Card>
+                    ),
+                )}
             </div>
         );
     }

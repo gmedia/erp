@@ -11,7 +11,15 @@ return new class extends Migration
         Schema::create('pipeline_transition_actions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pipeline_transition_id')->constrained()->cascadeOnDelete();
-            $table->enum('action_type', ['update_field', 'create_record', 'send_notification', 'dispatch_job', 'trigger_approval', 'webhook', 'custom']);
+            $table->enum('action_type', [
+                'update_field',
+                'create_record',
+                'send_notification',
+                'dispatch_job',
+                'trigger_approval',
+                'webhook',
+                'custom',
+            ]);
             $table->integer('execution_order');
             $table->json('config');
             $table->boolean('is_async')->default(false);

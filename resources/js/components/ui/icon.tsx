@@ -5,7 +5,7 @@ interface IconProps {
     className?: string;
 }
 
-export function Icon({ iconNode: IconComponent, className }: IconProps) {
+export function Icon({ iconNode: IconComponent, className }: Readonly<IconProps>) {
     if (!IconComponent) {
         return null;
     }

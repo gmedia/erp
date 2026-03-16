@@ -145,68 +145,66 @@ export default function AssetProfile() {
 
         const qrSvg = document.querySelector('.qr-code-svg');
         const qrSvgHtml = qrSvg ? qrSvg.outerHTML : '';
+        const printDocument = printWindow.document;
 
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Print QR Code - ${item.asset_code}</title>
-                    <style>
-                        body {
-                            font-family: system-ui, -apple-system, sans-serif;
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                            justify-content: center;
-                            height: 100vh;
-                            margin: 0;
-                            text-align: center;
-                        }
-                        .container {
-                            border: 2px solid #eee;
-                            padding: 40px;
-                            border-radius: 20px;
-                        }
-                        .qr-wrapper svg {
-                            width: 250px;
-                            height: 250px;
-                        }
-                        .info {
-                            margin-top: 20px;
-                        }
-                        .code {
-                            font-size: 24px;
-                            font-weight: bold;
-                            font-family: monospace;
-                            margin: 10px 0;
-                        }
-                        .name {
-                            font-size: 18px;
-                            color: #666;
-                        }
-                        @media print {
-                            body { height: auto; }
-                            .container { border: none; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="qr-wrapper">${qrSvgHtml}</div>
-                        <div class="info">
-                            <div class="code">${item.asset_code}</div>
-                            <div class="name">${item.name}</div>
-                        </div>
-                    </div>
-                    <script>
-                        setTimeout(() => {
-                            window.print();
-                            window.close();
-                        }, 500);
-                    </script>
-                </body>
-            </html>
-        `);
-        printWindow.document.close();
+        printDocument.title = `Print QR Code - ${item.asset_code}`;
+
+        const style = printDocument.createElement('style');
+        style.textContent = `
+            body {
+                font-family: system-ui, -apple-system, sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+                text-align: center;
+            }
+            .container {
+                border: 2px solid #eee;
+                padding: 40px;
+                border-radius: 20px;
+            }
+            .qr-wrapper svg {
+                width: 250px;
+                height: 250px;
+            }
+            .info {
+                margin-top: 20px;
+            }
+            .code {
+                font-size: 24px;
+                font-weight: bold;
+                font-family: monospace;
+                margin: 10px 0;
+            }
+            .name {
+                font-size: 18px;
+                color: #666;
+            }
+            @media print {
+                body { height: auto; }
+                .container { border: none; }
+            }
+        `;
+
+        printDocument.head.innerHTML = '';
+        printDocument.head.append(style);
+        printDocument.body.innerHTML = `
+            <div class="container">
+                <div class="qr-wrapper">${qrSvgHtml}</div>
+                <div class="info">
+                    <div class="code">${item.asset_code}</div>
+                    <div class="name">${item.name}</div>
+                </div>
+            </div>
+        `;
+
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 500);
     };
 
     const breadcrumbs = [

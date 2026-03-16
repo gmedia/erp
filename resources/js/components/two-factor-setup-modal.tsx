@@ -53,13 +53,13 @@ function TwoFactorSetupStep({
     buttonText,
     onNextStep,
     errors,
-}: {
+}: Readonly<{
     qrCodeSvg: string | null;
     manualSetupKey: string | null;
     buttonText: string;
     onNextStep: () => void;
     errors: string[];
-}) {
+}>) {
     const [copiedText, copy] = useClipboard();
     const IconComponent = copiedText === manualSetupKey ? Check : Copy;
 
@@ -100,11 +100,7 @@ function TwoFactorSetupStep({
 
                     <div className="flex w-full space-x-2">
                         <div className="flex w-full items-stretch overflow-hidden rounded-xl border border-border">
-                            {!manualSetupKey ? (
-                                <div className="flex h-full w-full items-center justify-center bg-muted p-3">
-                                    <Loader2 className="size-4 animate-spin" />
-                                </div>
-                            ) : (
+                            {manualSetupKey ? (
                                 <>
                                     <input
                                         type="text"
@@ -119,6 +115,10 @@ function TwoFactorSetupStep({
                                         <IconComponent className="w-4" />
                                     </button>
                                 </>
+                            ) : (
+                                <div className="flex h-full w-full items-center justify-center bg-muted p-3">
+                                    <Loader2 className="size-4 animate-spin" />
+                                </div>
                             )}
                         </div>
                     </div>
@@ -131,10 +131,10 @@ function TwoFactorSetupStep({
 function TwoFactorVerificationStep({
     onClose,
     onBack,
-}: {
+}: Readonly<{
     onClose: () => void;
     onBack: () => void;
-}) {
+}>) {
     const [code, setCode] = useState<string>('');
     const [processing, setProcessing] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
@@ -146,7 +146,7 @@ function TwoFactorVerificationStep({
         }, 0);
     }, []);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: Readonly<React.FormEvent>) => {
         e.preventDefault();
         setProcessing(true);
         setError('');
@@ -260,7 +260,7 @@ export default function TwoFactorSetupModal({
     clearSetupData,
     fetchSetupData,
     errors,
-}: TwoFactorSetupModalProps) {
+}: Readonly<TwoFactorSetupModalProps>) {
     const [showVerificationStep, setShowVerificationStep] =
         useState<boolean>(false);
 

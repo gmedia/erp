@@ -36,12 +36,15 @@ class EvaluateGuardAction
                     $operator = $check['operator'] ?? 'equals';
                     $expectedValue = $check['value'] ?? 'unknown';
                     $actualValue = $entity->$field;
-                    $failures[] = "Field check failed: {$field} must " . str_replace('_', ' ', $operator) . " '{$expectedValue}' (current value: '{$actualValue}')";
+                    $failures[] = "Field check failed: {$field} must "
+                        . str_replace('_', ' ', $operator)
+                        . " '{$expectedValue}' (current value: '{$actualValue}')";
                 }
             }
         }
 
-        // 2. Evaluate relation_checks: [ {"relation": "category", "field": "code", "operator": "equals", "value": "IT"} ]
+        // 2. Evaluate relation_checks:
+        // [ {"relation": "category", "field": "code", "operator": "equals", "value": "IT"} ]
         if (isset($guards['relation_checks']) && is_array($guards['relation_checks'])) {
             foreach ($guards['relation_checks'] as $check) {
                 if (! $this->evaluateRelationCheck($check, $entity)) {
@@ -56,7 +59,9 @@ class EvaluateGuardAction
                     $relatedModel = $entity->getRelation($relation);
                     $actualValue = $relatedModel ? $relatedModel->$field : 'null';
 
-                    $failures[] = "Relation check failed: {$relation}.{$field} must " . str_replace('_', ' ', $operator) . " '{$expectedValue}' (current value: '{$actualValue}')";
+                    $failures[] = "Relation check failed: {$relation}.{$field} must "
+                        . str_replace('_', ' ', $operator)
+                        . " '{$expectedValue}' (current value: '{$actualValue}')";
                 }
             }
         }
@@ -74,7 +79,9 @@ class EvaluateGuardAction
                         }
                     }
                 } catch (Exception $e) {
-                    Log::error("Failed to evaluate custom pipeline guard rule: {$ruleClass}. Error: {$e->getMessage()}");
+                    Log::error(
+                        "Failed to evaluate custom pipeline guard rule: {$ruleClass}. Error: {$e->getMessage()}"
+                    );
                     $failures[] = "Custom rule execution failed: {$ruleClass}";
                 }
             } else {

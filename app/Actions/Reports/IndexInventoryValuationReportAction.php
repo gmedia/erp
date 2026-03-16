@@ -13,6 +13,8 @@ class IndexInventoryValuationReportAction
 {
     public function execute(IndexInventoryValuationReportRequest $request): LengthAwarePaginator|Collection
     {
+        $stockValueExpr = 'stock_movements.balance_after * COALESCE(stock_movements.average_cost_after, products.cost)';
+
         $latestMovements = StockMovement::query()
             ->selectRaw('MAX(id) as id')
             ->groupBy('product_id', 'warehouse_id');
@@ -32,7 +34,7 @@ class IndexInventoryValuationReportAction
                 'stock_movements.*',
                 DB::raw('stock_movements.balance_after as quantity_on_hand'),
                 DB::raw('COALESCE(stock_movements.average_cost_after, products.cost) as average_cost'),
-                DB::raw('(stock_movements.balance_after * COALESCE(stock_movements.average_cost_after, products.cost)) as stock_value'),
+                DB::raw('(' . $stockValueExpr . ') as stock_value'),
                 DB::raw('products.name as product_name'),
                 DB::raw('warehouses.name as warehouse_name'),
                 DB::raw('branches.name as branch_name'),
@@ -84,7 +86,7 @@ class IndexInventoryValuationReportAction
         } elseif ($sortBy === 'category_name') {
             $query->orderBy('product_categories.name', $sortDirection);
         } elseif ($sortBy === 'stock_value') {
-            $query->orderByRaw('(stock_movements.balance_after * COALESCE(stock_movements.average_cost_after, products.cost)) ' . $sortDirection);
+            $query->orderByRaw($stockValueExpr . ' ' . $sortDirection);
         } elseif ($sortBy === 'quantity_on_hand') {
             $query->orderBy('stock_movements.balance_after', $sortDirection);
         } elseif ($sortBy === 'average_cost') {

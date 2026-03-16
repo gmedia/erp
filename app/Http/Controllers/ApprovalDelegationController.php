@@ -16,8 +16,10 @@ use Illuminate\Http\JsonResponse;
 
 class ApprovalDelegationController extends Controller
 {
-    public function index(IndexApprovalDelegationRequest $request, IndexApprovalDelegationsAction $action): ApprovalDelegationCollection
-    {
+    public function index(
+        IndexApprovalDelegationRequest $request,
+        IndexApprovalDelegationsAction $action,
+    ): ApprovalDelegationCollection {
         $delegations = $action->execute($request->validated());
 
         return new ApprovalDelegationCollection($delegations);
@@ -41,8 +43,10 @@ class ApprovalDelegationController extends Controller
         return new ApprovalDelegationResource($approvalDelegation);
     }
 
-    public function update(UpdateApprovalDelegationRequest $request, ApprovalDelegation $approvalDelegation): JsonResponse
-    {
+    public function update(
+        UpdateApprovalDelegationRequest $request,
+        ApprovalDelegation $approvalDelegation,
+    ): JsonResponse {
         $dto = UpdateApprovalDelegationData::fromArray($request->validated());
 
         $approvalDelegation->update($dto->toArray());
@@ -61,8 +65,10 @@ class ApprovalDelegationController extends Controller
         return response()->json(null, 204);
     }
 
-    public function export(ExportApprovalDelegationRequest $request, ExportApprovalDelegationsAction $action): JsonResponse
-    {
+    public function export(
+        ExportApprovalDelegationRequest $request,
+        ExportApprovalDelegationsAction $action,
+    ): JsonResponse {
         return $action->execute($request->validated());
     }
 }

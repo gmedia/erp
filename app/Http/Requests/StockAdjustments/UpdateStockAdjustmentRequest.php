@@ -16,10 +16,21 @@ class UpdateStockAdjustmentRequest extends FormRequest
         $adjustmentId = $this->route('stockAdjustment')->id ?? $this->route('id');
 
         return [
-            'adjustment_number' => ['sometimes', 'nullable', 'string', 'max:255', 'unique:stock_adjustments,adjustment_number,' . $adjustmentId],
+            'adjustment_number' => [
+                'sometimes',
+                'nullable',
+                'string',
+                'max:255',
+                'unique:stock_adjustments,adjustment_number,' . $adjustmentId,
+            ],
             'warehouse_id' => ['sometimes', 'required', 'exists:warehouses,id'],
             'adjustment_date' => ['sometimes', 'required', 'date'],
-            'adjustment_type' => ['sometimes', 'required', 'string', 'in:damage,expired,shrinkage,correction,stocktake_result,initial_stock,other'],
+            'adjustment_type' => [
+                'sometimes',
+                'required',
+                'string',
+                'in:damage,expired,shrinkage,correction,stocktake_result,initial_stock,other',
+            ],
             'status' => ['sometimes', 'required', 'string', 'in:draft,pending_approval,approved,cancelled'],
             'inventory_stocktake_id' => ['sometimes', 'nullable', 'exists:inventory_stocktakes,id'],
             'notes' => ['sometimes', 'nullable', 'string'],

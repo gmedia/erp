@@ -20,7 +20,15 @@ return new class extends Migration
             $table->text('description')->nullable();
 
             // Billing cycle
-            $table->enum('billing_interval', ['daily', 'weekly', 'monthly', 'quarterly', 'semi_annual', 'annual', 'biennial'])
+            $table->enum('billing_interval', [
+                'daily',
+                'weekly',
+                'monthly',
+                'quarterly',
+                'semi_annual',
+                'annual',
+                'biennial',
+            ])
                 ->comment('How often customer is billed');
             $table->integer('billing_interval_count')->default(1)
                 ->comment('Multiplier for interval (e.g., 3 months = interval:monthly, count:3)');

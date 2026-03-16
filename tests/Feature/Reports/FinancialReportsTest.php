@@ -281,11 +281,21 @@ test('balance sheet comparison works', function () {
 
     // Current Year txn
     $jeCurr = JournalEntry::factory()->create(['fiscal_year_id' => $this->fiscalYear->id, 'status' => 'posted']);
-    JournalEntryLine::factory()->create(['journal_entry_id' => $jeCurr->id, 'account_id' => $assetAccount->id, 'debit' => 500, 'credit' => 0]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $jeCurr->id,
+        'account_id' => $assetAccount->id,
+        'debit' => 500,
+        'credit' => 0,
+    ]);
 
     // Prev Year txn
     $jePrev = JournalEntry::factory()->create(['fiscal_year_id' => $prevFiscalYear->id, 'status' => 'posted']);
-    JournalEntryLine::factory()->create(['journal_entry_id' => $jePrev->id, 'account_id' => $prevAssetAccount->id, 'debit' => 300, 'credit' => 0]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $jePrev->id,
+        'account_id' => $prevAssetAccount->id,
+        'debit' => 300,
+        'credit' => 0,
+    ]);
 
     Sanctum::actingAs($this->user, ['*']);
     $this->getJson(

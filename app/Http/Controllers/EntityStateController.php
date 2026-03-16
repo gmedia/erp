@@ -32,12 +32,16 @@ class EntityStateController extends Controller
             abort(400, "Entity type {$entityType} does not support pipelines.");
         }
 
-        $entityState = $entity->pipelineEntityState()->with(['pipeline', 'currentState', 'lastTransitionedBy'])->first();
+        $entityState = $entity->pipelineEntityState()
+            ->with(['pipeline', 'currentState', 'lastTransitionedBy'])
+            ->first();
 
         if (! $entityState) {
             $entityState = $this->assignPipelineAction->execute($entity);
             if (! $entityState) {
-                return response()->json(['message' => 'No active pipeline configuration found for this entity type.'], 404);
+                return response()->json([
+                    'message' => 'No active pipeline configuration found for this entity type.',
+                ], 404);
             }
             $entityState->load(['pipeline', 'currentState', 'lastTransitionedBy']);
         }
@@ -52,7 +56,8 @@ class EntityStateController extends Controller
         // Check guards and permissions for each transition
         $availableTransitions = $transitions->map(function ($transition) use ($entity) {
             // Check permission
-            $hasPermission = ! $transition->required_permission || auth()->user()?->employee?->hasPermission($transition->required_permission);
+            $hasPermission = ! $transition->required_permission
+                || auth()->user()?->employee?->hasPermission($transition->required_permission);
 
             // Evaluate Guards
             $guardFailures = [];
@@ -73,7 +78,9 @@ class EntityStateController extends Controller
                 'requires_comment' => $transition->requires_comment,
                 'requires_confirmation' => $transition->requires_confirmation,
                 'is_allowed' => $hasPermission && empty($guardFailures),
-                'rejection_reasons' => $hasPermission ? $guardFailures : ['You do not have permission to execute this transition.'],
+                'rejection_reasons' => $hasPermission
+                    ? $guardFailures
+                    : ['You do not have permission to execute this transition.'],
             ];
         });
 
@@ -86,8 +93,11 @@ class EntityStateController extends Controller
     /**
      * Execute a transition on an entity.
      */
-    public function executeTransition(ExecuteTransitionRequest $request, string $entityType, string $entityId): JsonResponse
-    {
+    public function executeTransition(
+        ExecuteTransitionRequest $request,
+        string $entityType,
+        string $entityId
+    ): JsonResponse {
         $entity = $this->resolveEntity($entityType, $entityId);
 
         $entityState = $entity->pipelineEntityState()->first();

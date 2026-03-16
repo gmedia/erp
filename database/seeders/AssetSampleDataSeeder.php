@@ -66,14 +66,54 @@ class AssetSampleDataSeeder extends Seeder
 
         // ── Asset Models ────────────────────────────────────────────
         $models = [
-            ['asset_category_id' => $itCategory?->id, 'manufacturer' => 'Dell', 'model_name' => 'Laptop Latitude 5430', 'specs' => ['cpu' => 'i5', 'ram_gb' => 16, 'storage_gb' => 512]],
-            ['asset_category_id' => $itCategory?->id, 'manufacturer' => 'HP', 'model_name' => 'Printer LaserJet Pro', 'specs' => ['type' => 'printer', 'connection' => 'network']],
-            ['asset_category_id' => $vehCategory?->id, 'manufacturer' => 'Toyota', 'model_name' => 'Avanza 1.5 G', 'specs' => ['fuel' => 'gasoline']],
-            ['asset_category_id' => $offCategory?->id, 'manufacturer' => 'IKEA', 'model_name' => 'Office Desk Standard', 'specs' => ['material' => 'wood']],
-            ['asset_category_id' => $mchCategory?->id, 'manufacturer' => 'Generic', 'model_name' => 'Packing Machine', 'specs' => ['power' => '220V']],
-            ['asset_category_id' => $itCategory?->id, 'manufacturer' => 'Lenovo', 'model_name' => 'ThinkPad X1 Carbon', 'specs' => ['cpu' => 'i7', 'ram_gb' => 16, 'storage_gb' => 256]],
-            ['asset_category_id' => $itCategory?->id, 'manufacturer' => 'Epson', 'model_name' => 'Proyektor EB-X51', 'specs' => ['type' => 'projector', 'lumens' => 3800]],
-            ['asset_category_id' => $offCategory?->id, 'manufacturer' => 'Krisbow', 'model_name' => 'Filing Cabinet 4 Drawer', 'specs' => ['material' => 'steel']],
+            [
+                'asset_category_id' => $itCategory?->id,
+                'manufacturer' => 'Dell',
+                'model_name' => 'Laptop Latitude 5430',
+                'specs' => ['cpu' => 'i5', 'ram_gb' => 16, 'storage_gb' => 512],
+            ],
+            [
+                'asset_category_id' => $itCategory?->id,
+                'manufacturer' => 'HP',
+                'model_name' => 'Printer LaserJet Pro',
+                'specs' => ['type' => 'printer', 'connection' => 'network'],
+            ],
+            [
+                'asset_category_id' => $vehCategory?->id,
+                'manufacturer' => 'Toyota',
+                'model_name' => 'Avanza 1.5 G',
+                'specs' => ['fuel' => 'gasoline'],
+            ],
+            [
+                'asset_category_id' => $offCategory?->id,
+                'manufacturer' => 'IKEA',
+                'model_name' => 'Office Desk Standard',
+                'specs' => ['material' => 'wood'],
+            ],
+            [
+                'asset_category_id' => $mchCategory?->id,
+                'manufacturer' => 'Generic',
+                'model_name' => 'Packing Machine',
+                'specs' => ['power' => '220V'],
+            ],
+            [
+                'asset_category_id' => $itCategory?->id,
+                'manufacturer' => 'Lenovo',
+                'model_name' => 'ThinkPad X1 Carbon',
+                'specs' => ['cpu' => 'i7', 'ram_gb' => 16, 'storage_gb' => 256],
+            ],
+            [
+                'asset_category_id' => $itCategory?->id,
+                'manufacturer' => 'Epson',
+                'model_name' => 'Proyektor EB-X51',
+                'specs' => ['type' => 'projector', 'lumens' => 3800],
+            ],
+            [
+                'asset_category_id' => $offCategory?->id,
+                'manufacturer' => 'Krisbow',
+                'model_name' => 'Filing Cabinet 4 Drawer',
+                'specs' => ['material' => 'steel'],
+            ],
         ];
 
         foreach ($models as $data) {
@@ -552,7 +592,9 @@ class AssetSampleDataSeeder extends Seeder
                             ],
                             [
                                 'step_order' => $step->step_order,
-                                'status' => $approvalStatus === 'approved' ? 'approved' : ($step->step_order === 1 ? 'pending' : 'pending'),
+                                'status' => $approvalStatus === 'approved'
+                                    ? 'approved'
+                                    : ($step->step_order === 1 ? 'pending' : 'pending'),
                                 'acted_by' => $approvalStatus === 'approved' ? $step->approver_user_id : null,
                                 'action' => $approvalStatus === 'approved' ? 'approve' : null,
                                 'comments' => $approvalStatus === 'approved' ? 'Approved via seeder' : null,
@@ -650,12 +692,24 @@ class AssetSampleDataSeeder extends Seeder
             // FA-000007: draft → active → disposed
             'FA-000007' => [
                 ['draft', 'active', null, 1440],
-                ['active', 'disposed', 'Laptop sudah melewati masa manfaat 3 tahun, layar retak dan keyboard tidak berfungsi. Disetujui untuk dihapusbukukan.', 60],
+                [
+                    'active',
+                    'disposed',
+                    'Laptop sudah melewati masa manfaat 3 tahun, layar retak dan keyboard tidak berfungsi. '
+                        . 'Disetujui untuk dihapusbukukan.',
+                    60,
+                ],
             ],
             // FA-000008: draft → active → lost
             'FA-000008' => [
                 ['draft', 'active', null, 700],
-                ['active', 'lost', 'Filing cabinet tidak ditemukan setelah proses pindah kantor dari Gedung A ke Gedung B. Sudah dicari selama 2 minggu.', 30],
+                [
+                    'active',
+                    'lost',
+                    'Filing cabinet tidak ditemukan setelah proses pindah kantor dari Gedung A ke Gedung B. '
+                        . 'Sudah dicari selama 2 minggu.',
+                    30,
+                ],
             ],
             // FA-000009: draft → cancelled
             'FA-000009' => [

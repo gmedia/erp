@@ -26,7 +26,11 @@ class ExportAssetMaintenanceRequest extends FormRequest
             'performed_to' => ['nullable', 'date'],
             'cost_min' => ['nullable', 'numeric', 'min:0'],
             'cost_max' => ['nullable', 'numeric', 'min:0'],
-            'sort_by' => ['nullable', 'string', 'in:id,asset,maintenance_type,status,scheduled_at,performed_at,supplier,cost,created_at'],
+            'sort_by' => [
+                'nullable',
+                'string',
+                'in:id,asset,maintenance_type,status,scheduled_at,performed_at,supplier,cost,created_at',
+            ],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
         ];
     }

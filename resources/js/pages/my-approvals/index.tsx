@@ -30,6 +30,34 @@ interface MyApprovalsResponse {
     all: ApprovalRequestStep[];
 }
 
+function StatusBadge({ status }: Readonly<{ status: string }>) {
+    switch (status) {
+        case 'pending':
+            return (
+                <Badge variant="secondary">
+                    <Clock className="mr-1 h-3 w-3" /> Pending
+                </Badge>
+            );
+        case 'approved':
+            return (
+                <Badge
+                    variant="default"
+                    className="bg-green-600 hover:bg-green-700"
+                >
+                    <Check className="mr-1 h-3 w-3" /> Approved
+                </Badge>
+            );
+        case 'rejected':
+            return (
+                <Badge variant="destructive">
+                    <X className="mr-1 h-3 w-3" /> Rejected
+                </Badge>
+            );
+        default:
+            return <Badge variant="outline">{status}</Badge>;
+    }
+}
+
 export default function MyApprovalsPage() {
     const queryClient = useQueryClient();
     const [actionDialog, setActionDialog] = useState<{
@@ -92,41 +120,19 @@ export default function MyApprovalsPage() {
         const id = request.approvable_id;
         const ulid = request.approvable?.ulid;
 
-        switch (type) {
-            case 'Asset':
-                return `/assets/${ulid || id}`;
-            default:
-                return '#';
+        if (type === 'Asset') {
+            return `/assets/${ulid || id}`;
         }
+
+        return '#';
     };
 
-    const StatusBadge = ({ status }: { status: string }) => {
-        switch (status) {
-            case 'pending':
-                return (
-                    <Badge variant="secondary">
-                        <Clock className="mr-1 h-3 w-3" /> Pending
-                    </Badge>
-                );
-            case 'approved':
-                return (
-                    <Badge
-                        variant="default"
-                        className="bg-green-600 hover:bg-green-700"
-                    >
-                        <Check className="mr-1 h-3 w-3" /> Approved
-                    </Badge>
-                );
-            case 'rejected':
-                return (
-                    <Badge variant="destructive">
-                        <X className="mr-1 h-3 w-3" /> Rejected
-                    </Badge>
-                );
-            default:
-                return <Badge variant="outline">{status}</Badge>;
-        }
-    };
+    let actionConfirmText = 'Confirm Rejection';
+    if (processing) {
+        actionConfirmText = 'Processing...';
+    } else if (actionDialog.type === 'approve') {
+        actionConfirmText = 'Confirm Approval';
+    }
 
     const renderList = (
         items: ApprovalRequestStep[],
@@ -152,100 +158,108 @@ export default function MyApprovalsPage() {
                         className="transition-all hover:shadow-md"
                     >
                         <CardContent className="p-4 sm:p-6">
-                            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                                <div className="flex-1 space-y-1">
-                                    <div className="flex items-center gap-2">
-                                        <Badge
-                                            variant="outline"
-                                            className="text-[10px] tracking-wider text-muted-foreground uppercase"
-                                        >
-                                            {step.request.approvable_type
-                                                .split('\\')
-                                                .pop()}
-                                        </Badge>
-                                        <span className="text-sm font-medium text-muted-foreground">
-                                            Ref #{step.request.approvable_id}
-                                        </span>
-                                        <StatusBadge status={step.status} />
-                                    </div>
-                                    <h4 className="text-md mt-2 font-semibold">
-                                        {step.flowStep?.name || 'Approval Step'}
-                                    </h4>
-                                    {step.request.approvable && (
-                                        <div className="text-sm font-medium">
-                                            {step.request.approvable
-                                                .asset_code && (
-                                                <span className="mr-2 rounded bg-muted px-1 font-mono text-xs">
-                                                    {
-                                                        step.request.approvable
-                                                            .asset_code
-                                                    }
-                                                </span>
-                                            )}
-                                            {step.request.approvable.name ||
-                                                step.request.approvable
-                                                    .description}
+                            <div className="flex flex-col gap-4">
+                                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                                    <div className="min-w-0 flex-1 space-y-1">
+                                        <div className="flex items-center gap-2">
+                                            <Badge
+                                                variant="outline"
+                                                className="text-[10px] tracking-wider text-muted-foreground uppercase"
+                                            >
+                                                {step.request.approvable_type
+                                                    .split('\\')
+                                                    .pop()}
+                                            </Badge>
+                                            <span className="text-sm font-medium text-muted-foreground">
+                                                Ref #
+                                                {step.request.approvable_id}
+                                            </span>
+                                            <StatusBadge status={step.status} />
                                         </div>
-                                    )}
-                                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                                        <span>
-                                            Submitted by{' '}
-                                            {step.request.submitter?.name ||
-                                                'Unknown'}
-                                        </span>
-                                        <span>•</span>
-                                        <span>
-                                            {step.request.submitted_at
-                                                ? formatDistanceToNow(
-                                                      new Date(
-                                                          step.request.submitted_at,
-                                                      ),
-                                                      { addSuffix: true },
-                                                  )
-                                                : ''}
-                                        </span>
+                                        <h4 className="text-md mt-2 font-semibold">
+                                            {step.flowStep?.name ||
+                                                'Approval Step'}
+                                        </h4>
+                                        {step.request.approvable && (
+                                            <div className="text-sm font-medium">
+                                                {step.request.approvable
+                                                    .asset_code && (
+                                                    <span className="mr-2 rounded bg-muted px-1 font-mono text-xs">
+                                                        {
+                                                            step.request
+                                                                .approvable
+                                                                .asset_code
+                                                        }
+                                                    </span>
+                                                )}
+                                                {step.request.approvable.name ||
+                                                    step.request.approvable
+                                                        .description}
+                                            </div>
+                                        )}
+                                        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                                            <span>
+                                                Submitted by{' '}
+                                                {step.request.submitter?.name ||
+                                                    'Unknown'}
+                                            </span>
+                                            <span>•</span>
+                                            <span>
+                                                {step.request.submitted_at
+                                                    ? formatDistanceToNow(
+                                                          new Date(
+                                                              step.request.submitted_at,
+                                                          ),
+                                                          { addSuffix: true },
+                                                      )
+                                                    : ''}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="w-full sm:w-auto sm:shrink-0">
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            className="w-full sm:w-auto"
+                                            asChild
+                                        >
+                                            <Link to={getDocUrl(step.request)}>
+                                                <Eye className="mr-2 h-4 w-4" />{' '}
+                                                View Doc
+                                            </Link>
+                                        </Button>
                                     </div>
                                 </div>
-                                <div className="mt-4 flex w-full items-center gap-2 sm:mt-0 sm:w-auto">
-                                    {isPendingTab && (
-                                        <>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                className="flex-1 border-green-200 bg-green-50 text-green-700 hover:bg-green-100 hover:text-green-800 sm:flex-none"
-                                                onClick={() =>
-                                                    openActionDialog(
-                                                        'approve',
-                                                        step,
-                                                    )
-                                                }
-                                            >
-                                                <Check className="mr-1 h-4 w-4" />{' '}
-                                                Approve
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                className="flex-1 border-red-200 bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 sm:flex-none"
-                                                onClick={() =>
-                                                    openActionDialog(
-                                                        'reject',
-                                                        step,
-                                                    )
-                                                }
-                                            >
-                                                <X className="mr-1 h-4 w-4" />{' '}
-                                                Reject
-                                            </Button>
-                                        </>
-                                    )}
-                                    <Button size="sm" variant="ghost" asChild>
-                                        <Link to={getDocUrl(step.request)}>
-                                            <Eye className="mr-2 h-4 w-4" />{' '}
-                                            View Doc
-                                        </Link>
-                                    </Button>
-                                </div>
+
+                                {isPendingTab && (
+                                    <div className="flex w-full flex-wrap items-center gap-2 border-t pt-3">
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="w-full border-green-200 bg-green-50 text-green-700 hover:bg-green-100 hover:text-green-800 sm:w-auto"
+                                            onClick={() =>
+                                                openActionDialog(
+                                                    'approve',
+                                                    step,
+                                                )
+                                            }
+                                        >
+                                            <Check className="mr-1 h-4 w-4" />{' '}
+                                            Approve
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="w-full border-red-200 bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 sm:w-auto"
+                                            onClick={() =>
+                                                openActionDialog('reject', step)
+                                            }
+                                        >
+                                            <X className="mr-1 h-4 w-4" />{' '}
+                                            Reject
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
@@ -382,11 +396,7 @@ export default function MyApprovalsPage() {
                                     comments.trim() === '')
                             }
                         >
-                            {processing
-                                ? 'Processing...'
-                                : actionDialog.type === 'approve'
-                                  ? 'Confirm Approval'
-                                  : 'Confirm Rejection'}
+                            {actionConfirmText}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

@@ -13,7 +13,10 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class StockMonitorExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
-    public function __construct(private readonly array $filters = []) {}
+    public function __construct(private readonly array $filters = [])
+    {
+        // No-op constructor; filters are stored via promoted property.
+    }
 
     public function collection()
     {

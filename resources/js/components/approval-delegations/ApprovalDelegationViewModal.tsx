@@ -32,7 +32,7 @@ export const ApprovalDelegationViewModal =
             const formatApprovableType = (type: string | null) => {
                 if (!type) return 'All Types';
                 const parts = type.split('\\');
-                return parts[parts.length - 1];
+                return parts.at(-1) ?? 'All Types';
             };
 
             return (

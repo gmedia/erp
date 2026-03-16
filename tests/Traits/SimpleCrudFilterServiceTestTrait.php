@@ -11,7 +11,7 @@ namespace Tests\Traits;
  */
 trait SimpleCrudFilterServiceTestTrait
 {
-    public function test_apply_search_adds_where_clause_for_search_term(): void
+    public function testApplySearchAddsWhereClauseForSearchTerm(): void
     {
         $serviceClass = $this->getFilterServiceClass();
         $modelClass = $this->getModelClass();
@@ -30,7 +30,7 @@ trait SimpleCrudFilterServiceTestTrait
         $this->assertEquals('Alpha Item', $results->first()->name);
     }
 
-    public function test_apply_search_searches_across_multiple_fields(): void
+    public function testApplySearchSearchesAcrossMultipleFields(): void
     {
         $serviceClass = $this->getFilterServiceClass();
         $modelClass = $this->getModelClass();
@@ -47,7 +47,7 @@ trait SimpleCrudFilterServiceTestTrait
         $this->assertCount(2, $results);
     }
 
-    public function test_apply_sorting_applies_ascending_sort_when_allowed(): void
+    public function testApplySortingAppliesAscendingSortWhenAllowed(): void
     {
         $serviceClass = $this->getFilterServiceClass();
         $modelClass = $this->getModelClass();
@@ -65,7 +65,7 @@ trait SimpleCrudFilterServiceTestTrait
         $this->assertEquals('Zeta Item', $results->last()->name);
     }
 
-    public function test_apply_sorting_applies_descending_sort_when_allowed(): void
+    public function testApplySortingAppliesDescendingSortWhenAllowed(): void
     {
         $serviceClass = $this->getFilterServiceClass();
         $modelClass = $this->getModelClass();
@@ -83,7 +83,7 @@ trait SimpleCrudFilterServiceTestTrait
         $this->assertEquals('Alpha Item', $results->last()->name);
     }
 
-    public function test_apply_sorting_does_not_apply_sort_when_field_not_allowed(): void
+    public function testApplySortingDoesNotApplySortWhenFieldNotAllowed(): void
     {
         $serviceClass = $this->getFilterServiceClass();
         $modelClass = $this->getModelClass();

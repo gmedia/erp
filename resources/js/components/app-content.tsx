@@ -9,7 +9,7 @@ export function AppContent({
     variant = 'header',
     children,
     ...props
-}: AppContentProps) {
+}: Readonly<AppContentProps>) {
     if (variant === 'sidebar') {
         return <SidebarInset {...props}>{children}</SidebarInset>;
     }

@@ -6,11 +6,13 @@ use App\Http\Requests\ApprovalAuditTrail\IndexApprovalAuditTrailRequest;
 use App\Models\ApprovalAuditLog;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class IndexApprovalAuditTrailAction
 {
-    public function execute(IndexApprovalAuditTrailRequest $request): LengthAwarePaginator|\Illuminate\Database\Eloquent\Collection
-    {
+    public function execute(
+        IndexApprovalAuditTrailRequest $request
+    ): LengthAwarePaginator|Collection {
         $query = ApprovalAuditLog::query()
             ->with([
                 'actor',

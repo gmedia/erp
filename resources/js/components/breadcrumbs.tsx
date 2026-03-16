@@ -12,9 +12,9 @@ import { Link } from 'react-router-dom';
 
 export function Breadcrumbs({
     breadcrumbs,
-}: {
+}: Readonly<{
     breadcrumbs: BreadcrumbItemType[];
-}) {
+}>) {
     return (
         <>
             {breadcrumbs.length > 0 && (
@@ -23,7 +23,7 @@ export function Breadcrumbs({
                         {breadcrumbs.map((item, index) => {
                             const isLast = index === breadcrumbs.length - 1;
                             return (
-                                <Fragment key={index}>
+                                <Fragment key={`${item.href}-${item.title}`}>
                                     <BreadcrumbItem>
                                         {isLast ? (
                                             <BreadcrumbPage>

@@ -39,10 +39,10 @@ export function useCrudFilters<T extends FilterState = FilterState>({
     initialPagination = { page: 1, per_page: 15 },
     resetPageOnFilterChange = true,
 }: UseCrudFiltersOptions<T> = {}): UseCrudFiltersResult<T> {
-    const [filters, setFiltersState] = useState<T>(() => {
-        if (typeof window === 'undefined') return initialFilters;
+    const [filters, setFilters] = useState<T>(() => {
+        if (globalThis.window === undefined) return initialFilters;
 
-        const params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(globalThis.window.location.search);
         const merged = { ...(initialFilters as Record<string, unknown>) };
 
         for (const key of Object.keys(initialFilters)) {
@@ -58,10 +58,10 @@ export function useCrudFilters<T extends FilterState = FilterState>({
         return merged as T;
     });
 
-    const [pagination, setPaginationState] = useState(() => {
-        if (typeof window === 'undefined') return initialPagination;
+    const [pagination, setPagination] = useState(() => {
+        if (globalThis.window === undefined) return initialPagination;
 
-        const params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(globalThis.window.location.search);
         const pageParam = params.get('page');
         const perPageParam = params.get('per_page');
 
@@ -82,23 +82,23 @@ export function useCrudFilters<T extends FilterState = FilterState>({
         };
     });
 
-    const setFilters = useCallback(
+    const setFiltersWithReset = useCallback(
         (newFilters: Partial<T>) => {
-            setFiltersState((prev) => ({
+            setFilters((prev) => ({
                 ...prev,
                 ...newFilters,
             }));
 
             if (resetPageOnFilterChange) {
-                setPaginationState((prev) => ({ ...prev, page: 1 }));
+                setPagination((prev) => ({ ...prev, page: 1 }));
             }
         },
         [resetPageOnFilterChange],
     );
 
-    const setPagination = useCallback(
+    const setPaginationWithMerge = useCallback(
         (newPagination: Partial<{ page: number; per_page: number }>) => {
-            setPaginationState((prev) => ({
+            setPagination((prev) => ({
                 ...prev,
                 ...newPagination,
             }));
@@ -107,49 +107,49 @@ export function useCrudFilters<T extends FilterState = FilterState>({
     );
 
     const resetFilters = useCallback(() => {
-        setFiltersState(initialFilters);
+        setFilters(initialFilters);
         if (resetPageOnFilterChange) {
-            setPaginationState((prev) => ({ ...prev, page: 1 }));
+            setPagination((prev) => ({ ...prev, page: 1 }));
         }
     }, [initialFilters, resetPageOnFilterChange]);
 
     const resetPagination = useCallback(() => {
-        setPaginationState(initialPagination);
+        setPagination(initialPagination);
     }, [initialPagination]);
 
     const handleFilterChange = useCallback(
         (newFilters: Partial<T>) => {
-            setFilters(newFilters);
+            setFiltersWithReset(newFilters);
         },
-        [setFilters],
+        [setFiltersWithReset],
     );
 
     const handleSearchChange = useCallback(
         (search: string) => {
-            setFilters({ ...filters, search } as Partial<T>);
+            setFiltersWithReset({ ...filters, search } as Partial<T>);
         },
-        [filters, setFilters],
+        [filters, setFiltersWithReset],
     );
 
     const handlePageChange = useCallback(
         (page: number) => {
-            setPagination({ page });
+            setPaginationWithMerge({ page });
         },
-        [setPagination],
+        [setPaginationWithMerge],
     );
 
     const handlePageSizeChange = useCallback(
         (per_page: number) => {
-            setPagination({ page: 1, per_page });
+            setPaginationWithMerge({ page: 1, per_page });
         },
-        [setPagination],
+        [setPaginationWithMerge],
     );
 
     return {
         filters,
         pagination,
-        setFilters,
-        setPagination,
+        setFilters: setFiltersWithReset,
+        setPagination: setPaginationWithMerge,
         resetFilters,
         resetPagination,
         handleFilterChange,

@@ -457,10 +457,10 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                             : watchedItems?.[editingIndex] || null
                     }
                     onSave={(data) => {
-                        if (editingIndex !== null) {
-                            update(editingIndex, data);
-                        } else {
+                        if (editingIndex === null) {
                             append(data);
+                        } else {
+                            update(editingIndex, data);
                         }
                         setIsItemDialogOpen(false);
                         setEditingIndex(null);

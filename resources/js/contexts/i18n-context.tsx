@@ -181,7 +181,7 @@ export function I18nProvider({
             // or we handle this differently if purely SPA.
             // For now, reload to fetch new translations from /api/v1/me
             await fetch(`/locale/${newLocale}`, { method: 'POST' });
-            window.location.reload();
+            globalThis.window.location.reload();
         } catch (e) {
             console.error(e);
         }
@@ -214,8 +214,8 @@ export function I18nProvider({
             if (params) {
                 return Object.entries(params).reduce(
                     (str, [paramKey, paramValue]) => {
-                        return str.replace(
-                            new RegExp(`\\{${paramKey}\\}`, 'g'),
+                        return str.replaceAll(
+                            String.raw`{${paramKey}}`,
                             paramValue,
                         );
                     },

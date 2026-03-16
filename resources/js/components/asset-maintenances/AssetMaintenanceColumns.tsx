@@ -11,6 +11,17 @@ import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 
+function getMaintenanceStatusVariant(status: string) {
+    if (status === 'completed') {
+        return 'default';
+    }
+    if (status === 'cancelled') {
+        return 'destructive';
+    }
+
+    return 'secondary';
+}
+
 export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
     createSelectColumn<AssetMaintenance>(),
     {
@@ -43,12 +54,7 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
         ...createSortingHeader('Status'),
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
-            const variant =
-                status === 'completed'
-                    ? 'default'
-                    : status === 'cancelled'
-                      ? 'destructive'
-                      : 'secondary';
+            const variant = getMaintenanceStatusVariant(status);
 
             return (
                 <Badge variant={variant} className="capitalize">

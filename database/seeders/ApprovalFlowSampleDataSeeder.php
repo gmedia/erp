@@ -31,7 +31,11 @@ class ApprovalFlowSampleDataSeeder extends Seeder
                 'name' => 'High Value Asset Registration',
                 'approvable_type' => Asset::class,
                 'description' => 'Approval for registering assets with cost > 100M',
-                'conditions' => ['field_checks' => [['field' => 'purchase_cost', 'operator' => '>', 'value' => 100000000]]],
+                'conditions' => [
+                    'field_checks' => [
+                        ['field' => 'purchase_cost', 'operator' => '>', 'value' => 100000000],
+                    ],
+                ],
                 'steps' => [
                     [
                         'step_order' => 1,

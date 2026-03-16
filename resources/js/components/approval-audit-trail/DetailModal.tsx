@@ -15,7 +15,11 @@ interface DetailModalProps {
     onOpenChange: (open: boolean) => void;
 }
 
-export function DetailModal({ item, open, onOpenChange }: DetailModalProps) {
+export function DetailModal({
+    item,
+    open,
+    onOpenChange,
+}: Readonly<DetailModalProps>) {
     if (!item) return null;
 
     const eventFormatted = item.event

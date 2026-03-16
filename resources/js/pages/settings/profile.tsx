@@ -27,10 +27,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Profile({
     mustVerifyEmail = true,
     status,
-}: {
+}: Readonly<{
     mustVerifyEmail?: boolean;
     status?: string;
-}) {
+}>) {
     const { user, refreshAuth } = useAuth();
     const [searchParams] = useSearchParams();
     const [processing, setProcessing] = useState(false);
@@ -39,7 +39,9 @@ export default function Profile({
     const verificationStatus =
         status ?? searchParams.get('status') ?? undefined;
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (
+        e: Readonly<React.FormEvent<HTMLFormElement>>,
+    ) => {
         e.preventDefault();
         setProcessing(true);
         setErrors({});

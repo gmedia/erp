@@ -57,7 +57,7 @@ export function AccountForm({
     account,
     onSubmit,
     isLoading = false,
-}: AccountFormProps) {
+}: Readonly<AccountFormProps>) {
     const form = useForm<z.input<typeof accountSchema>>({
         resolver: zodResolver(accountSchema),
         defaultValues: {

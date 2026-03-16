@@ -42,7 +42,7 @@ export function StocktakeItemManager({
     items,
     onSave,
     loading,
-}: StocktakeItemManagerProps) {
+}: Readonly<StocktakeItemManagerProps>) {
     const form = useForm<FormValues>({
         defaultValues: { items: [] },
     });

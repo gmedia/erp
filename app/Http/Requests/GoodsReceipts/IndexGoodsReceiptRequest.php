@@ -21,7 +21,12 @@ class IndexGoodsReceiptRequest extends FormRequest
             'received_by' => ['nullable', 'integer', 'exists:employees,id'],
             'receipt_date_from' => ['nullable', 'date'],
             'receipt_date_to' => ['nullable', 'date', 'after_or_equal:receipt_date_from'],
-            'sort_by' => ['nullable', 'string', 'in:id,gr_number,purchase_order,purchase_order_id,warehouse,warehouse_id,receipt_date,supplier_delivery_note,status,created_at,updated_at'],
+            'sort_by' => [
+                'nullable',
+                'string',
+                'in:id,gr_number,purchase_order,purchase_order_id,warehouse,warehouse_id,' .
+                    'receipt_date,supplier_delivery_note,status,created_at,updated_at',
+            ],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],

@@ -30,7 +30,7 @@ export function DeleteConfirmationDialog<T>({
     isLoading = false,
     getDeleteMessage,
     title,
-}: DeleteConfirmationDialogProps<T>) {
+}: Readonly<DeleteConfirmationDialogProps<T>>) {
     const { t } = useTranslation();
 
     return (

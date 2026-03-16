@@ -12,9 +12,24 @@ return new class extends Migration
             ['group' => 'smtp', 'key' => 'mail_port', 'value' => env('MAIL_PORT', '2525'), 'type' => 'string'],
             ['group' => 'smtp', 'key' => 'mail_username', 'value' => env('MAIL_USERNAME', ''), 'type' => 'string'],
             ['group' => 'smtp', 'key' => 'mail_password', 'value' => env('MAIL_PASSWORD', ''), 'type' => 'string'],
-            ['group' => 'smtp', 'key' => 'mail_encryption', 'value' => env('MAIL_ENCRYPTION', 'tls'), 'type' => 'string'],
-            ['group' => 'smtp', 'key' => 'mail_from_address', 'value' => env('MAIL_FROM_ADDRESS', 'hello@example.com'), 'type' => 'string'],
-            ['group' => 'smtp', 'key' => 'mail_from_name', 'value' => env('MAIL_FROM_NAME', config('app.name')), 'type' => 'string'],
+            [
+                'group' => 'smtp',
+                'key' => 'mail_encryption',
+                'value' => env('MAIL_ENCRYPTION', 'tls'),
+                'type' => 'string',
+            ],
+            [
+                'group' => 'smtp',
+                'key' => 'mail_from_address',
+                'value' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+                'type' => 'string',
+            ],
+            [
+                'group' => 'smtp',
+                'key' => 'mail_from_name',
+                'value' => env('MAIL_FROM_NAME', config('app.name')),
+                'type' => 'string',
+            ],
         ];
 
         foreach ($settings as $setting) {

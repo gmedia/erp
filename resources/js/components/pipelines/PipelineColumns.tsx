@@ -26,7 +26,7 @@ export const pipelineColumns: ColumnDef<Pipeline>[] = [
         ...createSortingHeader('Entity'),
         cell: ({ row }: { row: { original: Pipeline } }) => {
             const parts = row.original.entity_type.split('\\');
-            return parts[parts.length - 1];
+            return parts.at(-1) ?? '';
         },
     },
     {

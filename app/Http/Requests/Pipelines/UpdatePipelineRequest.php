@@ -16,7 +16,13 @@ class UpdatePipelineRequest extends FormRequest
     {
         return [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'code' => ['sometimes', 'required', 'string', 'max:255', Rule::unique('pipelines')->ignore($this->pipeline)],
+            'code' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('pipelines')->ignore($this->pipeline),
+            ],
             'entity_type' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['sometimes', 'nullable', 'string'],
             'version' => ['sometimes', 'nullable', 'integer', 'min:1'],

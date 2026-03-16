@@ -44,7 +44,19 @@ class IndexAssetMaintenancesAction
             $query,
             $request->get('sort_by', 'scheduled_at'),
             $request->get('sort_direction', 'desc'),
-            ['id', 'asset', 'maintenance_type', 'status', 'scheduled_at', 'performed_at', 'supplier', 'notes', 'cost', 'created_at', 'updated_at']
+            [
+                'id',
+                'asset',
+                'maintenance_type',
+                'status',
+                'scheduled_at',
+                'performed_at',
+                'supplier',
+                'notes',
+                'cost',
+                'created_at',
+                'updated_at',
+            ],
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);

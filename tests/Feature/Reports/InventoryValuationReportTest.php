@@ -76,8 +76,18 @@ test('it can filter by product, warehouse, branch, category and search', functio
     $categoryA = ProductCategory::factory()->create(['name' => 'Kategori A']);
     $categoryB = ProductCategory::factory()->create(['name' => 'Kategori B']);
     $unit = Unit::factory()->create(['name' => 'PCS']);
-    $productA = Product::factory()->create(['name' => 'Produk A', 'code' => 'PA-01', 'category_id' => $categoryA->id, 'unit_id' => $unit->id]);
-    $productB = Product::factory()->create(['name' => 'Produk B', 'code' => 'PB-01', 'category_id' => $categoryB->id, 'unit_id' => $unit->id]);
+    $productA = Product::factory()->create([
+        'name' => 'Produk A',
+        'code' => 'PA-01',
+        'category_id' => $categoryA->id,
+        'unit_id' => $unit->id,
+    ]);
+    $productB = Product::factory()->create([
+        'name' => 'Produk B',
+        'code' => 'PB-01',
+        'category_id' => $categoryB->id,
+        'unit_id' => $unit->id,
+    ]);
 
     StockMovement::factory()->create([
         'product_id' => $productA->id,

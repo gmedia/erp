@@ -44,7 +44,10 @@ class GoodsReceiptController extends Controller
 
             if (empty($goodsReceipt->gr_number)) {
                 $goodsReceipt->update([
-                    'gr_number' => 'GR-' . now()->format('Y') . '-' . str_pad((string) $goodsReceipt->id, 6, '0', STR_PAD_LEFT),
+                    'gr_number' => 'GR-'
+                        . now()->format('Y')
+                        . '-'
+                        . str_pad((string) $goodsReceipt->id, 6, '0', STR_PAD_LEFT),
                 ]);
             }
 
@@ -53,14 +56,30 @@ class GoodsReceiptController extends Controller
             return $goodsReceipt;
         });
 
-        $goodsReceipt->load(['purchaseOrder.supplier', 'warehouse', 'receiver', 'confirmer', 'creator', 'items.product', 'items.unit']);
+        $goodsReceipt->load([
+            'purchaseOrder.supplier',
+            'warehouse',
+            'receiver',
+            'confirmer',
+            'creator',
+            'items.product',
+            'items.unit',
+        ]);
 
         return (new GoodsReceiptResource($goodsReceipt))->response()->setStatusCode(201);
     }
 
     public function show(GoodsReceipt $goodsReceipt): JsonResponse
     {
-        $goodsReceipt->load(['purchaseOrder.supplier', 'warehouse', 'receiver', 'confirmer', 'creator', 'items.product', 'items.unit']);
+        $goodsReceipt->load([
+            'purchaseOrder.supplier',
+            'warehouse',
+            'receiver',
+            'confirmer',
+            'creator',
+            'items.product',
+            'items.unit',
+        ]);
 
         return (new GoodsReceiptResource($goodsReceipt))->response();
     }
@@ -89,7 +108,15 @@ class GoodsReceiptController extends Controller
             }
         });
 
-        $goodsReceipt->load(['purchaseOrder.supplier', 'warehouse', 'receiver', 'confirmer', 'creator', 'items.product', 'items.unit']);
+        $goodsReceipt->load([
+            'purchaseOrder.supplier',
+            'warehouse',
+            'receiver',
+            'confirmer',
+            'creator',
+            'items.product',
+            'items.unit',
+        ]);
 
         return (new GoodsReceiptResource($goodsReceipt))->response();
     }

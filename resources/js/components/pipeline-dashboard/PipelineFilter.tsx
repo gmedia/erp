@@ -22,7 +22,7 @@ export function PipelineFilter({
     onChange,
     staleDays,
     onStaleDaysChange,
-}: PipelineFilterProps) {
+}: Readonly<PipelineFilterProps>) {
     return (
         <Card className="shadow-sm">
             <CardContent className="flex flex-col items-end gap-6 p-4 sm:flex-row">

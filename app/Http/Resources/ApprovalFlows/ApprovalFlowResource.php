@@ -44,7 +44,10 @@ class ApprovalFlowResource extends JsonResource
                         'escalation_user_id' => $step->escalation_user_id,
                         'can_reject' => $step->can_reject,
                         'user' => $step->user ? ['id' => $step->user->id, 'name' => $step->user->name] : null,
-                        'department' => $step->department ? ['id' => $step->department->id, 'name' => $step->department->name] : null,
+                        'department' => $step->department ? [
+                            'id' => $step->department->id,
+                            'name' => $step->department->name,
+                        ] : null,
                     ];
                 });
             }),

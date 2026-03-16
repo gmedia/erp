@@ -34,12 +34,12 @@ const renderPriorityCell = ({
     row: { original: PurchaseRequest };
 }) => {
     const priority = row.original.priority;
-    const variant =
-        priority === 'urgent'
-            ? 'destructive'
-            : priority === 'high'
-              ? 'default'
-              : 'secondary';
+    let variant: 'default' | 'secondary' | 'destructive' = 'secondary';
+    if (priority === 'urgent') {
+        variant = 'destructive';
+    } else if (priority === 'high') {
+        variant = 'default';
+    }
 
     return <Badge variant={variant}>{priority.replace('_', ' ')}</Badge>;
 };

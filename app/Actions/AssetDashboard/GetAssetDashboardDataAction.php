@@ -114,7 +114,12 @@ class GetAssetDashboardDataAction
                     'asset_code' => $asset->asset_code,
                     'name' => $asset->name,
                     'warranty_end_date' => Carbon::parse($asset->warranty_end_date)->toISOString(),
-                    'days_remaining' => (int) Carbon::now()->startOfDay()->diffInDays(Carbon::parse($asset->warranty_end_date)->startOfDay()),
+                    'days_remaining' => (int) Carbon::now()
+                        ->startOfDay()
+                        ->diffInDays(
+                            Carbon::parse($asset->warranty_end_date)
+                                ->startOfDay(),
+                        ),
                 ];
             });
 

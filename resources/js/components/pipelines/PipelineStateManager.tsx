@@ -27,7 +27,7 @@ interface PipelineStateManagerProps {
 
 export function PipelineStateManager({
     pipelineId,
-}: PipelineStateManagerProps) {
+}: Readonly<PipelineStateManagerProps>) {
     const {
         states,
         loading,
@@ -100,7 +100,11 @@ export function PipelineStateManager({
     };
 
     const handleDelete = async (stateId: number) => {
-        if (window.confirm('Are you sure you want to delete this state?')) {
+        if (
+            globalThis.window.confirm(
+                'Are you sure you want to delete this state?',
+            )
+        ) {
             await deleteState(stateId);
         }
     };

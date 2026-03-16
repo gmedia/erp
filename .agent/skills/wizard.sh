@@ -10,6 +10,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_DIR="$SCRIPT_DIR"
+CHOICE_PROMPT="Pilihan: "
 
 # Colors
 RED='\033[0;31m'
@@ -27,6 +28,8 @@ print_header() {
     echo -e "${BLUE}${BOLD}║       🧙 Agent Skills Wizard               ║${NC}"
     echo -e "${BLUE}${BOLD}╚════════════════════════════════════════════╝${NC}"
     echo ""
+
+    return 0
 }
 
 print_menu() {
@@ -40,6 +43,8 @@ print_menu() {
     echo ""
     echo -e "  ${RED}0)${NC} Exit"
     echo ""
+
+    return 0
 }
 
 print_crud_menu() {
@@ -52,6 +57,8 @@ print_crud_menu() {
     echo ""
     echo -e "  ${YELLOW}b)${NC} Kembali"
     echo ""
+
+    return 0
 }
 
 print_refactor_menu() {
@@ -63,6 +70,8 @@ print_refactor_menu() {
     echo ""
     echo -e "  ${YELLOW}b)${NC} Kembali"
     echo ""
+
+    return 0
 }
 
 print_docs_menu() {
@@ -81,6 +90,8 @@ print_docs_menu() {
     echo ""
     echo -e "  ${YELLOW}b)${NC} Kembali"
     echo ""
+
+    return 0
 }
 
 ask_feature_name() {
@@ -115,6 +126,8 @@ run_script() {
     echo -e "${CYAN}Running: bash $script $feature $action${NC}"
     echo ""
     bash "$script" "$feature" "$action"
+
+    return 0
 }
 
 handle_crud_simple() {
@@ -125,7 +138,7 @@ handle_crud_simple() {
     echo -e "  ${GREEN}2)${NC} Generate (buat files dari template)"
     echo -e "  ${GREEN}3)${NC} Scaffold + Generate"
     echo ""
-    read -p "Pilihan: " action
+    read -p "$CHOICE_PROMPT" action
     
     case $action in
         1)
@@ -152,7 +165,7 @@ handle_crud_complex() {
     echo -e "  ${GREEN}2)${NC} Generate (buat files dari template)"
     echo -e "  ${GREEN}3)${NC} Scaffold + Generate"
     echo ""
-    read -p "Pilihan: " action
+    read -p "$CHOICE_PROMPT" action
     
     case $action in
         1)
@@ -179,7 +192,7 @@ handle_refactor_backend() {
     echo -e "  ${GREEN}2)${NC} Generate refactor files"
     echo -e "  ${GREEN}3)${NC} Check + Generate"
     echo ""
-    read -p "Pilihan: " action
+    read -p "$CHOICE_PROMPT" action
     
     case $action in
         1)
@@ -210,6 +223,8 @@ show_doc() {
     else
         echo -e "${RED}File tidak ditemukan: $file${NC}"
     fi
+
+    return 0
 }
 
 # Main menu loop
@@ -217,13 +232,13 @@ main_menu() {
     while true; do
         print_header
         print_menu
-        read -p "Pilihan: " choice
+        read -p "$CHOICE_PROMPT" choice
         
         case $choice in
             1) # CRUD
                 while true; do
                     print_crud_menu
-                    read -p "Pilihan: " crud_choice
+                    read -p "$CHOICE_PROMPT" crud_choice
                     case $crud_choice in
                         1) handle_crud_simple ;;
                         2) handle_crud_complex ;;
@@ -239,7 +254,7 @@ main_menu() {
             2) # Refactor
                 while true; do
                     print_refactor_menu
-                    read -p "Pilihan: " refactor_choice
+                    read -p "$CHOICE_PROMPT" refactor_choice
                     case $refactor_choice in
                         1) handle_refactor_backend ;;
                         2) 
@@ -262,7 +277,7 @@ main_menu() {
             5) # Docs
                 while true; do
                     print_docs_menu
-                    read -p "Pilihan: " doc_choice
+                    read -p "$CHOICE_PROMPT" doc_choice
                     case $doc_choice in
                         1) show_doc "$SKILLS_DIR/DECISION.md" ;;
                         2) show_doc "$SKILLS_DIR/README.md" ;;
@@ -287,6 +302,8 @@ main_menu() {
                 ;;
         esac
     done
+
+    return 0
 }
 
 # Run main menu

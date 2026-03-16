@@ -112,9 +112,22 @@ class IndexGoodsReceiptReportAction
             $sortBy = 'po_number';
         }
 
-        if (in_array($sortBy, ['gr_number', 'receipt_date', 'status', 'po_number', 'supplier_name', 'warehouse_name'], true)) {
+        if (in_array($sortBy, [
+            'gr_number',
+            'receipt_date',
+            'status',
+            'po_number',
+            'supplier_name',
+            'warehouse_name',
+        ], true)) {
             $query->orderBy($sortBy, $sortDirection);
-        } elseif (in_array($sortBy, ['item_count', 'total_received_quantity', 'total_accepted_quantity', 'total_rejected_quantity', 'total_receipt_value'], true)) {
+        } elseif (in_array($sortBy, [
+            'item_count',
+            'total_received_quantity',
+            'total_accepted_quantity',
+            'total_rejected_quantity',
+            'total_receipt_value',
+        ], true)) {
             $query->orderByRaw($sortBy . ' ' . $sortDirection);
         } else {
             $query->orderBy('receipt_date', 'desc');

@@ -21,7 +21,7 @@ export function AssetMaintenanceViewModal({
     open,
     onClose,
     item,
-}: AssetMaintenanceViewModalProps) {
+}: Readonly<AssetMaintenanceViewModalProps>) {
     if (!item) return null;
 
     return (

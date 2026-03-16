@@ -182,9 +182,24 @@ class StockTransferSampleDataSeeder extends Seeder
         $unitId = Unit::query()->value('id');
 
         $samples = [
-            ['code' => 'INV-SMP-001', 'name' => 'Inventory Sample Product A', 'type' => 'raw_material', 'cost' => 10000],
-            ['code' => 'INV-SMP-002', 'name' => 'Inventory Sample Product B', 'type' => 'raw_material', 'cost' => 15000],
-            ['code' => 'INV-SMP-003', 'name' => 'Inventory Sample Product C', 'type' => 'finished_good', 'cost' => 25000],
+            [
+                'code' => 'INV-SMP-001',
+                'name' => 'Inventory Sample Product A',
+                'type' => 'raw_material',
+                'cost' => 10000,
+            ],
+            [
+                'code' => 'INV-SMP-002',
+                'name' => 'Inventory Sample Product B',
+                'type' => 'raw_material',
+                'cost' => 15000,
+            ],
+            [
+                'code' => 'INV-SMP-003',
+                'name' => 'Inventory Sample Product C',
+                'type' => 'finished_good',
+                'cost' => 25000,
+            ],
         ];
 
         foreach ($samples as $sample) {

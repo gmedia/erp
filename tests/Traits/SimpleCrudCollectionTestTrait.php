@@ -11,7 +11,7 @@ namespace Tests\Traits;
  */
 trait SimpleCrudCollectionTestTrait
 {
-    public function test_collects_property_is_set_correctly(): void
+    public function testCollectsPropertyIsSetCorrectly(): void
     {
         $collectionClass = $this->getCollectionClass();
         $collection = new $collectionClass([]);
@@ -19,7 +19,7 @@ trait SimpleCrudCollectionTestTrait
         $this->assertEquals($this->getResourceClass(), $collection->collects);
     }
 
-    public function test_collection_transforms_multiple_items_correctly(): void
+    public function testCollectionTransformsMultipleItemsCorrectly(): void
     {
         $modelClass = $this->getModelClass();
         $models = $modelClass::factory()->count(3)->create();
@@ -45,7 +45,7 @@ trait SimpleCrudCollectionTestTrait
         }
     }
 
-    public function test_collection_returns_empty_array_when_no_items(): void
+    public function testCollectionReturnsEmptyArrayWhenNoItems(): void
     {
         $collectionClass = $this->getCollectionClass();
         $collection = new $collectionClass(collect());

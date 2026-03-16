@@ -7,7 +7,14 @@ import {
     setRegionalNumberFormatSettings,
     type RegionalNumberFormatSettings,
 } from '@/utils/number-format';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 
 interface Employee {
     id: number;
@@ -94,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    const refreshAuth = async () => {
+    const refreshAuth = useCallback(async () => {
         const token = localStorage.getItem('api_token');
         if (!token) {
             setIsLoading(false);
@@ -130,19 +137,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         refreshAuth();
-    }, []);
+    }, [refreshAuth]);
 
-    const login = (token: string, data: { user: User; employee: Employee }) => {
-        localStorage.setItem('api_token', token);
-        if (data.user) setUser(data.user);
-        refreshAuth();
-    };
+    const login = useCallback(
+        (token: string, data: { user: User; employee: Employee }) => {
+            localStorage.setItem('api_token', token);
+            if (data.user) setUser(data.user);
+            refreshAuth();
+        },
+        [refreshAuth],
+    );
 
-    const logout = async () => {
+    const logout = useCallback(async () => {
         try {
             await axiosInstance.post('/api/logout');
         } catch (e) {
@@ -150,27 +160,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         localStorage.removeItem('api_token');
         setUser(null);
-        window.location.href = '/login';
-    };
+        globalThis.window.location.href = '/login';
+    }, []);
+
+    const authContextValue = useMemo(
+        () => ({
+            user,
+            employee,
+            menus,
+            companyName,
+            companyLogoUrl,
+            translations,
+            locale,
+            regionalSettings,
+            pendingApprovalsCount,
+            isLoading,
+            login,
+            logout,
+            refreshAuth,
+        }),
+        [
+            user,
+            employee,
+            menus,
+            companyName,
+            companyLogoUrl,
+            regionalSettings,
+            translations,
+            locale,
+            pendingApprovalsCount,
+            isLoading,
+            login,
+            logout,
+            refreshAuth,
+        ],
+    );
 
     return (
-        <AuthContext.Provider
-            value={{
-                user,
-                employee,
-                menus,
-                companyName,
-                companyLogoUrl,
-                translations,
-                locale,
-                regionalSettings,
-                pendingApprovalsCount,
-                isLoading,
-                login,
-                logout,
-                refreshAuth,
-            }}
-        >
+        <AuthContext.Provider value={authContextValue}>
             {children}
         </AuthContext.Provider>
     );

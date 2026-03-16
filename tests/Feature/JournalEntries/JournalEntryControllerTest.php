@@ -18,7 +18,12 @@ uses(RefreshDatabase::class)->group('journal-entries');
 describe('Journal Entry API Endpoints', function () {
     beforeEach(function () {
         // Create user with all journal entry permissions
-        $user = createTestUserWithPermissions(['journal_entry', 'journal_entry.create', 'journal_entry.edit', 'journal_entry.delete']);
+        $user = createTestUserWithPermissions([
+            'journal_entry',
+            'journal_entry.create',
+            'journal_entry.edit',
+            'journal_entry.delete',
+        ]);
         actingAs($user);
     });
 
@@ -55,7 +60,11 @@ describe('Journal Entry API Endpoints', function () {
     });
 
     test('store creates journal entry with lines', function () {
-        $fiscalYear = FiscalYear::factory()->create(['status' => 'open', 'start_date' => '2023-01-01', 'end_date' => '2023-12-31']);
+        $fiscalYear = FiscalYear::factory()->create([
+            'status' => 'open',
+            'start_date' => '2023-01-01',
+            'end_date' => '2023-12-31',
+        ]);
         $account1 = Account::factory()->create();
         $account2 = Account::factory()->create();
 
@@ -95,8 +104,15 @@ describe('Journal Entry API Endpoints', function () {
     });
 
     test('update modifies journal entry', function () {
-        $fiscalYear = FiscalYear::factory()->create(['status' => 'open', 'start_date' => '2023-01-01', 'end_date' => '2023-12-31']);
-        $journalEntry = JournalEntry::factory()->create(['entry_date' => '2023-01-10', 'fiscal_year_id' => $fiscalYear->id]);
+        $fiscalYear = FiscalYear::factory()->create([
+            'status' => 'open',
+            'start_date' => '2023-01-01',
+            'end_date' => '2023-12-31',
+        ]);
+        $journalEntry = JournalEntry::factory()->create([
+            'entry_date' => '2023-01-10',
+            'fiscal_year_id' => $fiscalYear->id,
+        ]);
         $account1 = Account::factory()->create();
         $account2 = Account::factory()->create();
 

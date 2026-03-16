@@ -46,24 +46,27 @@ test('it can fetch maintenance cost report data via json', function () {
     Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/maintenance-cost')
         ->assertOk()
-        ->assertJson(fn (AssertableJson $json) => $json
-            ->has('data', 1)
-            ->has('data.0', fn ($json) => $json
-                ->where('asset_code', 'IT-001')
-                ->where('asset_name', 'Server X')
-                ->where('category_name', 'IT Equipment')
-                ->where('branch_name', 'HQ')
-                ->where('maintenance_type', 'preventive')
-                ->where('status', 'completed')
-                ->has('scheduled_at')
-                ->has('performed_at')
-                ->where('supplier_name', 'IT Vendor Inc')
-                ->where('cost', 500)
-                ->where('notes', 'Regular server cleaning')
-                ->etc()
-            )
-            ->has('meta')
-            ->has('links')
+        ->assertJson(
+            fn (AssertableJson $json) => $json
+                ->has('data', 1)
+                ->has(
+                    'data.0',
+                    fn ($json) => $json
+                        ->where('asset_code', 'IT-001')
+                        ->where('asset_name', 'Server X')
+                        ->where('category_name', 'IT Equipment')
+                        ->where('branch_name', 'HQ')
+                        ->where('maintenance_type', 'preventive')
+                        ->where('status', 'completed')
+                        ->has('scheduled_at')
+                        ->has('performed_at')
+                        ->where('supplier_name', 'IT Vendor Inc')
+                        ->where('cost', 500)
+                        ->where('notes', 'Regular server cleaning')
+                        ->etc(),
+                )
+                ->has('meta')
+                ->has('links')
         );
 });
 

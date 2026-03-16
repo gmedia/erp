@@ -308,7 +308,7 @@ export default function AccountIndex() {
                                 {accountToDelete?.code} -{' '}
                                 {accountToDelete?.name}
                             </strong>
-                            . This action cannot be undone.
+                            {' This action cannot be undone.'}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

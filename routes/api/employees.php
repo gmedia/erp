@@ -8,13 +8,17 @@ Route::middleware('permission:employee,true')->group(function () {
 
     Route::get('employees/{employee}', [EmployeeController::class, 'show']);
 
-    Route::post('employees', [EmployeeController::class, 'store'])->middleware('permission:employee.create,true');
+    Route::post('employees', [EmployeeController::class, 'store'])
+        ->middleware('permission:employee.create,true');
 
-    Route::put('employees/{employee}', [EmployeeController::class, 'update'])->middleware('permission:employee.edit,true');
+    Route::put('employees/{employee}', [EmployeeController::class, 'update'])
+        ->middleware('permission:employee.edit,true');
 
-    Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->middleware('permission:employee.delete,true');
+    Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])
+        ->middleware('permission:employee.delete,true');
     Route::post('employees/export', [EmployeeController::class, 'export']);
-    Route::post('employees/import', [EmployeeController::class, 'import'])->middleware('permission:employee.create,true');
+    Route::post('employees/import', [EmployeeController::class, 'import'])
+        ->middleware('permission:employee.create,true');
 });
 
 Route::middleware('permission:user,true')->group(function () {

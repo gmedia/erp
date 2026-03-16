@@ -87,7 +87,14 @@ test('applySorting applies descending sort when allowed', function () {
     ApprovalFlow::factory()->create(['name' => 'Z Flow']);
 
     $query = ApprovalFlow::query();
-    $service->applySorting($query, 'name', 'desc', ['id', 'name', 'code', 'approvable_type', 'is_active', 'created_at']);
+    $service->applySorting($query, 'name', 'desc', [
+        'id',
+        'name',
+        'code',
+        'approvable_type',
+        'is_active',
+        'created_at',
+    ]);
 
     $results = $query->get();
 

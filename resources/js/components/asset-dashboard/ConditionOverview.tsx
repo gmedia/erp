@@ -8,7 +8,10 @@ interface ConditionOverviewProps {
     isLoading: boolean;
 }
 
-export function ConditionOverview({ data, isLoading }: ConditionOverviewProps) {
+export function ConditionOverview({
+    data,
+    isLoading,
+}: Readonly<ConditionOverviewProps>) {
     if (isLoading) {
         return (
             <Card className="flex h-full min-h-[300px] flex-col">
@@ -20,9 +23,9 @@ export function ConditionOverview({ data, isLoading }: ConditionOverviewProps) {
                 </CardHeader>
                 <CardContent className="flex-1">
                     <div className="flex flex-col space-y-4 pt-4">
-                        {[...Array(3)].map((_, i) => (
+                        {['loading-1', 'loading-2', 'loading-3'].map((key) => (
                             <div
-                                key={i}
+                                key={key}
                                 className="flex items-center justify-between"
                             >
                                 <div className="flex items-center space-x-3">

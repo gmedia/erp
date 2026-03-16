@@ -18,7 +18,16 @@ readonly class UpdateCustomerData
     /**
      * Create DTO from request array.
      *
-     * @param  array{name?: string, email?: string, phone?: string, address?: string, branch_id?: int, category_id?: int, status?: string, notes?: string|null}  $data
+     * @param  array{
+     *     name?: string,
+     *     email?: string,
+     *     phone?: string,
+     *     address?: string,
+     *     branch_id?: int,
+     *     category_id?: int,
+     *     status?: string,
+     *     notes?: string|null
+     * }  $data
      */
     public static function fromArray(array $data): self
     {

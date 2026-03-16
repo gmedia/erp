@@ -21,7 +21,16 @@ return new class extends Migration
             $table->decimal('tax_amount', 15, 2)->default(0);
             $table->decimal('discount_amount', 15, 2)->default(0);
             $table->decimal('grand_total', 15, 2)->default(0);
-            $table->enum('status', ['draft', 'pending_approval', 'confirmed', 'rejected', 'partially_received', 'fully_received', 'cancelled', 'closed'])->default('draft');
+            $table->enum('status', [
+                'draft',
+                'pending_approval',
+                'confirmed',
+                'rejected',
+                'partially_received',
+                'fully_received',
+                'cancelled',
+                'closed',
+            ])->default('draft');
             $table->text('notes')->nullable();
             $table->text('shipping_address')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();

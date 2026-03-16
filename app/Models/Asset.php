@@ -43,7 +43,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Account|null $accumulatedDepreciationAccount
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PipelineEntityState> $allPipelineEntityStates
+ * @property-read \Illuminate\Database\Eloquent\Collection<int,
+ *     \App\Models\PipelineEntityState> $allPipelineEntityStates
  * @property-read int|null $all_pipeline_entity_states_count
  * @property-read \App\Models\Branch $branch
  * @property-read \App\Models\AssetCategory $category

@@ -10,13 +10,13 @@ namespace Tests\Traits;
  */
 trait SimpleCrudExportRequestTestTrait
 {
-    public function test_authorize_returns_true(): void
+    public function testAuthorizeReturnsTrue(): void
     {
         $request = $this->createExportRequest();
         $this->assertTrue($request->authorize());
     }
 
-    public function test_rules_returns_validation_rules(): void
+    public function testRulesReturnsValidationRules(): void
     {
         $request = $this->createExportRequest();
         $rules = $request->rules();
@@ -27,7 +27,7 @@ trait SimpleCrudExportRequestTestTrait
         $this->assertArrayHasKey('sort_direction', $rules);
     }
 
-    public function test_rules_validation_passes_with_valid_data(): void
+    public function testRulesValidationPassesWithValidData(): void
     {
         $data = [
             'search' => 'test',
@@ -40,7 +40,7 @@ trait SimpleCrudExportRequestTestTrait
         $this->assertFalse($validator->fails());
     }
 
-    public function test_rules_validation_passes_with_empty_data(): void
+    public function testRulesValidationPassesWithEmptyData(): void
     {
         $data = [];
 
@@ -49,7 +49,7 @@ trait SimpleCrudExportRequestTestTrait
         $this->assertFalse($validator->fails());
     }
 
-    public function test_rules_validation_fails_with_invalid_sort_by(): void
+    public function testRulesValidationFailsWithInvalidSortBy(): void
     {
         $data = ['sort_by' => 'invalid_field'];
 
@@ -59,7 +59,7 @@ trait SimpleCrudExportRequestTestTrait
         $this->assertTrue($validator->errors()->has('sort_by'));
     }
 
-    public function test_rules_validation_fails_with_invalid_sort_direction(): void
+    public function testRulesValidationFailsWithInvalidSortDirection(): void
     {
         $data = ['sort_direction' => 'invalid'];
 
@@ -69,7 +69,7 @@ trait SimpleCrudExportRequestTestTrait
         $this->assertTrue($validator->errors()->has('sort_direction'));
     }
 
-    public function test_rules_validation_passes_with_valid_sort_by_values(): void
+    public function testRulesValidationPassesWithValidSortByValues(): void
     {
         $validSortByValues = ['id', 'name', 'created_at', 'updated_at'];
 
@@ -80,7 +80,7 @@ trait SimpleCrudExportRequestTestTrait
         }
     }
 
-    public function test_rules_validation_passes_with_valid_sort_direction_values(): void
+    public function testRulesValidationPassesWithValidSortDirectionValues(): void
     {
         $validSortDirectionValues = ['asc', 'desc'];
 

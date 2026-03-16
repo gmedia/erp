@@ -18,7 +18,12 @@ use function Pest\Laravel\putJson;
 uses(RefreshDatabase::class)->group('asset-movements');
 
 beforeEach(function () {
-    $user = createTestUserWithPermissions(['asset_movement', 'asset_movement.create', 'asset_movement.edit', 'asset_movement.delete']);
+    $user = createTestUserWithPermissions([
+        'asset_movement',
+        'asset_movement.create',
+        'asset_movement.edit',
+        'asset_movement.delete',
+    ]);
     actingAs($user);
 });
 

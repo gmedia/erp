@@ -20,7 +20,7 @@ export function AccountViewModal({
     open,
     onOpenChange,
     account,
-}: AccountViewModalProps) {
+}: Readonly<AccountViewModalProps>) {
     if (!account) return null;
 
     return (

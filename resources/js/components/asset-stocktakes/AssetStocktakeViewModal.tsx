@@ -20,7 +20,7 @@ export function AssetStocktakeViewModal({
     open,
     onClose,
     item,
-}: AssetStocktakeViewModalProps) {
+}: Readonly<AssetStocktakeViewModalProps>) {
     if (!item) return null;
 
     return (

@@ -39,8 +39,23 @@ class IndexStockAdjustmentsAction
         $this->filterService->applySorting(
             $query,
             $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'adjustment_number', 'warehouse_id', 'adjustment_date', 'adjustment_type', 'status', 'inventory_stocktake_id', 'journal_entry_id', 'approved_by', 'approved_at', 'created_at', 'updated_at']
+            strtolower($request->get('sort_direction', 'desc')) === 'asc'
+                ? 'asc'
+                : 'desc',
+            [
+                'id',
+                'adjustment_number',
+                'warehouse_id',
+                'adjustment_date',
+                'adjustment_type',
+                'status',
+                'inventory_stocktake_id',
+                'journal_entry_id',
+                'approved_by',
+                'approved_at',
+                'created_at',
+                'updated_at',
+            ],
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);

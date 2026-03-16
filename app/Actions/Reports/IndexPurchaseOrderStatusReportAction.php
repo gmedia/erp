@@ -130,9 +130,23 @@ class IndexPurchaseOrderStatusReportAction
             $sortBy = 'status_category';
         }
 
-        if (in_array($sortBy, ['po_number', 'supplier_name', 'warehouse_name', 'order_date', 'expected_delivery_date', 'status', 'status_category'], true)) {
+        if (in_array($sortBy, [
+            'po_number',
+            'supplier_name',
+            'warehouse_name',
+            'order_date',
+            'expected_delivery_date',
+            'status',
+            'status_category',
+        ], true)) {
             $query->orderBy($sortBy, $sortDirection);
-        } elseif (in_array($sortBy, ['ordered_quantity', 'received_quantity', 'outstanding_quantity', 'receipt_progress_percent', 'grand_total'], true)) {
+        } elseif (in_array($sortBy, [
+            'ordered_quantity',
+            'received_quantity',
+            'outstanding_quantity',
+            'receipt_progress_percent',
+            'grand_total',
+        ], true)) {
             $query->orderByRaw($sortBy . ' ' . $sortDirection);
         } else {
             $query->orderBy('order_date', 'desc');

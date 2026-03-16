@@ -16,12 +16,23 @@ class UpdateStockTransferRequest extends FormRequest
         $transferId = $this->route('stockTransfer')->id ?? $this->route('id');
 
         return [
-            'transfer_number' => ['sometimes', 'nullable', 'string', 'max:255', 'unique:stock_transfers,transfer_number,' . $transferId],
+            'transfer_number' => [
+                'sometimes',
+                'nullable',
+                'string',
+                'max:255',
+                'unique:stock_transfers,transfer_number,' . $transferId,
+            ],
             'from_warehouse_id' => ['sometimes', 'required', 'exists:warehouses,id', 'different:to_warehouse_id'],
             'to_warehouse_id' => ['sometimes', 'required', 'exists:warehouses,id'],
             'transfer_date' => ['sometimes', 'required', 'date'],
             'expected_arrival_date' => ['sometimes', 'nullable', 'date'],
-            'status' => ['sometimes', 'required', 'string', 'in:draft,pending_approval,approved,in_transit,received,cancelled'],
+            'status' => [
+                'sometimes',
+                'required',
+                'string',
+                'in:draft,pending_approval,approved,in_transit,received,cancelled',
+            ],
             'notes' => ['sometimes', 'nullable', 'string'],
             'requested_by' => ['sometimes', 'nullable', 'exists:employees,id'],
             'approved_by' => ['sometimes', 'nullable', 'exists:users,id'],

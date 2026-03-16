@@ -80,6 +80,39 @@ function getElementContent(props: Record<string, unknown>): string | undefined {
     return content === '' ? undefined : content;
 }
 
+function getMetaDiscriminator(props: Record<string, unknown>): string | null {
+    const discriminator =
+        props.name ??
+        props.property ??
+        props.httpEquiv ??
+        props.charSet ??
+        props.itemProp;
+
+    return typeof discriminator === 'string' ? discriminator : null;
+}
+
+function computeLinkKey(props: Record<string, unknown>, index: number): string {
+    const rel = typeof props.rel === 'string' ? props.rel : 'link';
+    const href = typeof props.href === 'string' ? props.href : index.toString();
+    return `link:${rel}:${href}`;
+}
+
+function computeBaseKey(props: Record<string, unknown>): string {
+    const href = typeof props.href === 'string' ? props.href : '';
+    const target = typeof props.target === 'string' ? props.target : '';
+    return `base:${href}:${target}`;
+}
+
+function computeScriptKey(
+    props: Record<string, unknown>,
+    index: number,
+    content?: string,
+): string {
+    const src = typeof props.src === 'string' ? props.src : '';
+    const type = typeof props.type === 'string' ? props.type : '';
+    return `script:${src}:${type}:${content ?? index}`;
+}
+
 function computeElementKey(
     tagName: HeadTagName,
     props: Record<string, unknown>,
@@ -92,35 +125,22 @@ function computeElementKey(
         return `${tagName}:key:${explicitKey}`;
     }
 
-    if (tagName === 'meta') {
-        const discriminator =
-            props.name ??
-            props.property ??
-            props.httpEquiv ??
-            props.charSet ??
-            props.itemProp;
-        if (typeof discriminator === 'string') {
-            return `meta:${discriminator}`;
+    switch (tagName) {
+        case 'meta': {
+            const discriminator = getMetaDiscriminator(props);
+            if (discriminator !== null) {
+                return `meta:${discriminator}`;
+            }
+            break;
         }
-    }
-
-    if (tagName === 'link') {
-        const rel = typeof props.rel === 'string' ? props.rel : 'link';
-        const href =
-            typeof props.href === 'string' ? props.href : index.toString();
-        return `link:${rel}:${href}`;
-    }
-
-    if (tagName === 'base') {
-        const href = typeof props.href === 'string' ? props.href : '';
-        const target = typeof props.target === 'string' ? props.target : '';
-        return `base:${href}:${target}`;
-    }
-
-    if (tagName === 'script') {
-        const src = typeof props.src === 'string' ? props.src : '';
-        const type = typeof props.type === 'string' ? props.type : '';
-        return `script:${src}:${type}:${content ?? index}`;
+        case 'link':
+            return computeLinkKey(props, index);
+        case 'base':
+            return computeBaseKey(props);
+        case 'script':
+            return computeScriptKey(props, index, content);
+        default:
+            break;
     }
 
     return `${tagName}:${content ?? index}`;

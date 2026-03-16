@@ -124,7 +124,12 @@ test('applySorting applies ascending sort when allowed', function () {
     Employee::factory()->create(['name' => 'A Employee']);
 
     $query = Employee::query();
-    $service->applySorting($query, 'name', 'asc', ['id', 'name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']);
+    $service->applySorting(
+        $query,
+        'name',
+        'asc',
+        ['id', 'name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']
+    );
 
     $results = $query->get();
 
@@ -139,7 +144,12 @@ test('applySorting applies descending sort when allowed', function () {
     Employee::factory()->create(['name' => 'Z Employee']);
 
     $query = Employee::query();
-    $service->applySorting($query, 'name', 'desc', ['id', 'name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']);
+    $service->applySorting(
+        $query,
+        'name',
+        'desc',
+        ['id', 'name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']
+    );
 
     $results = $query->get();
 
@@ -155,7 +165,12 @@ test('applySorting does not apply sort when field not allowed', function () {
     $query = Employee::query();
     $originalSql = $query->toSql();
 
-    $service->applySorting($query, 'invalid_field', 'asc', ['id', 'name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']);
+    $service->applySorting(
+        $query,
+        'invalid_field',
+        'asc',
+        ['id', 'name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']
+    );
 
     // SQL should remain unchanged since invalid field
     expect($query->toSql())->toBe($originalSql);

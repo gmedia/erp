@@ -8,11 +8,15 @@ Route::middleware('permission:supplier,true')->group(function () {
 
     Route::get('suppliers/{supplier}', [SupplierController::class, 'show']);
 
-    Route::post('suppliers', [SupplierController::class, 'store'])->middleware('permission:supplier.create,true');
+    Route::post('suppliers', [SupplierController::class, 'store'])
+        ->middleware('permission:supplier.create,true');
 
-    Route::put('suppliers/{supplier}', [SupplierController::class, 'update'])->middleware('permission:supplier.edit,true');
+    Route::put('suppliers/{supplier}', [SupplierController::class, 'update'])
+        ->middleware('permission:supplier.edit,true');
 
-    Route::delete('suppliers/{supplier}', [SupplierController::class, 'destroy'])->middleware('permission:supplier.delete,true');
+    Route::delete('suppliers/{supplier}', [SupplierController::class, 'destroy'])
+        ->middleware('permission:supplier.delete,true');
     Route::post('suppliers/export', [SupplierController::class, 'export']);
-    Route::post('suppliers/import', [SupplierController::class, 'import'])->middleware('permission:supplier.create,true');
+    Route::post('suppliers/import', [SupplierController::class, 'import'])
+        ->middleware('permission:supplier.create,true');
 });

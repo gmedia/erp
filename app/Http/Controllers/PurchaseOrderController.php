@@ -39,7 +39,10 @@ class PurchaseOrderController extends Controller
 
             if (empty($purchaseOrder->po_number)) {
                 $purchaseOrder->update([
-                    'po_number' => 'PO-' . now()->format('Y') . '-' . str_pad((string) $purchaseOrder->id, 6, '0', STR_PAD_LEFT),
+                    'po_number' => 'PO-'
+                        . now()->format('Y')
+                        . '-'
+                        . str_pad((string) $purchaseOrder->id, 6, '0', STR_PAD_LEFT),
                 ]);
             }
 

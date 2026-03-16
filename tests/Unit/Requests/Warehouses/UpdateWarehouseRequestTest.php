@@ -17,7 +17,10 @@ test('rules returns correct validation rules', function () {
     $request->setRouteResolver(function () use ($warehouse) {
         return new class($warehouse)
         {
-            public function __construct(private Warehouse $warehouse) {}
+            public function __construct(private Warehouse $warehouse)
+            {
+                // No-op constructor for promoted property in anonymous route model stub.
+            }
 
             public function parameter($name)
             {
@@ -42,7 +45,10 @@ test('rules validation passes with valid partial data', function () {
     $request->setRouteResolver(function () use ($warehouse) {
         return new class($warehouse)
         {
-            public function __construct(private Warehouse $warehouse) {}
+            public function __construct(private Warehouse $warehouse)
+            {
+                // No-op constructor for promoted property in anonymous route model stub.
+            }
 
             public function parameter($name)
             {

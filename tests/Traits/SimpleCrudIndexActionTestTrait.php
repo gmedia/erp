@@ -15,7 +15,7 @@ use Mockery;
  */
 trait SimpleCrudIndexActionTestTrait
 {
-    public function test_execute_returns_paginated_results(): void
+    public function testExecuteReturnsPaginatedResults(): void
     {
         $modelClass = $this->getModelClass();
         $modelClass::factory()->count(3)->create();
@@ -30,7 +30,7 @@ trait SimpleCrudIndexActionTestTrait
         $this->assertEquals(3, $result->count());
     }
 
-    public function test_execute_filters_by_search_term(): void
+    public function testExecuteFiltersBySearchTerm(): void
     {
         $modelClass = $this->getModelClass();
         $modelClass::factory()->create(['name' => 'Alpha Item']);
@@ -51,7 +51,7 @@ trait SimpleCrudIndexActionTestTrait
         $this->assertEquals('Alpha Item', $result->first()->name);
     }
 
-    public function test_execute_sorts_results(): void
+    public function testExecuteSortsResults(): void
     {
         $modelClass = $this->getModelClass();
         $modelClass::factory()->create(['name' => 'A Item']);

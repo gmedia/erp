@@ -39,17 +39,20 @@ test('it can fetch stock movements data via json', function () {
     Sanctum::actingAs($this->user, ['*']);
     getJson('/api/stock-movements?per_page=10')
         ->assertOk()
-        ->assertJson(fn (AssertableJson $json) => $json
-            ->has('data', 1)
-            ->has('data.0', fn (AssertableJson $m) => $m
-                ->where('movement_type', 'adjustment_in')
-                ->where('reference_number', 'SA-2026-000001')
-                ->where('product.name', 'Kertas A4')
-                ->where('warehouse.name', 'Gudang Utama')
-                ->etc()
-            )
-            ->has('meta')
-            ->has('links')
+        ->assertJson(
+            fn (AssertableJson $json) => $json
+                ->has('data', 1)
+                ->has(
+                    'data.0',
+                    fn (AssertableJson $m) => $m
+                        ->where('movement_type', 'adjustment_in')
+                        ->where('reference_number', 'SA-2026-000001')
+                        ->where('product.name', 'Kertas A4')
+                        ->where('warehouse.name', 'Gudang Utama')
+                        ->etc(),
+                )
+                ->has('meta')
+                ->has('links')
         );
 });
 
@@ -100,8 +103,16 @@ test('it can sort by product name', function () {
     $pB = Product::factory()->create(['name' => 'BBB']);
     $w = Warehouse::factory()->create();
 
-    StockMovement::factory()->create(['product_id' => $pB->id, 'warehouse_id' => $w->id, 'moved_at' => '2026-01-01 00:00:00']);
-    StockMovement::factory()->create(['product_id' => $pA->id, 'warehouse_id' => $w->id, 'moved_at' => '2026-01-01 00:00:00']);
+    StockMovement::factory()->create([
+        'product_id' => $pB->id,
+        'warehouse_id' => $w->id,
+        'moved_at' => '2026-01-01 00:00:00',
+    ]);
+    StockMovement::factory()->create([
+        'product_id' => $pA->id,
+        'warehouse_id' => $w->id,
+        'moved_at' => '2026-01-01 00:00:00',
+    ]);
 
     Sanctum::actingAs($this->user, ['*']);
     $response = getJson('/api/stock-movements?sort_by=product_name&sort_direction=asc')

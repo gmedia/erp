@@ -16,5 +16,13 @@ test('collection wraps data correctly', function () {
     $result = $collection->toArray($request);
 
     expect($result)->toHaveCount(2);
-    expect($result[0])->toHaveKeys(['id', 'stocktake_number', 'warehouse', 'stocktake_date', 'status', 'created_at', 'updated_at']);
+    expect($result[0])->toHaveKeys([
+        'id',
+        'stocktake_number',
+        'warehouse',
+        'stocktake_date',
+        'status',
+        'created_at',
+        'updated_at',
+    ]);
 });

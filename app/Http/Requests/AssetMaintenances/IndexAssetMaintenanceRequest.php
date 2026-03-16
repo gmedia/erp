@@ -26,7 +26,12 @@ class IndexAssetMaintenanceRequest extends FormRequest
             'performed_to' => ['nullable', 'date'],
             'cost_min' => ['nullable', 'numeric', 'min:0'],
             'cost_max' => ['nullable', 'numeric', 'min:0'],
-            'sort_by' => ['nullable', 'string', 'in:id,asset,maintenance_type,status,scheduled_at,performed_at,supplier,notes,cost,created_at,updated_at'],
+            'sort_by' => [
+                'nullable',
+                'string',
+                'in:id,asset,maintenance_type,status,scheduled_at,performed_at,' .
+                    'supplier,notes,cost,created_at,updated_at',
+            ],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],

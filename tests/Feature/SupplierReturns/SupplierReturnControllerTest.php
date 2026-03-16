@@ -105,7 +105,15 @@ test('index supports search and filters', function () {
 });
 
 test('store creates supplier return with items', function () {
-    [$purchaseOrder, $goodsReceipt, $goodsReceiptItem, $supplier, $warehouse, $product, $unit] = createGoodsReceiptItemForSupplierReturn();
+    [
+        $purchaseOrder,
+        $goodsReceipt,
+        $goodsReceiptItem,
+        $supplier,
+        $warehouse,
+        $product,
+        $unit,
+    ] = createGoodsReceiptItemForSupplierReturn();
 
     $payload = [
         'purchase_order_id' => $purchaseOrder->id,
@@ -134,11 +142,22 @@ test('store creates supplier return with items', function () {
 
     $id = $response->json('data.id');
     assertDatabaseHas('supplier_returns', ['id' => $id, 'supplier_id' => $supplier->id]);
-    assertDatabaseHas('supplier_return_items', ['supplier_return_id' => $id, 'goods_receipt_item_id' => $goodsReceiptItem->id]);
+    assertDatabaseHas('supplier_return_items', [
+        'supplier_return_id' => $id,
+        'goods_receipt_item_id' => $goodsReceiptItem->id,
+    ]);
 });
 
 test('show returns supplier return detail', function () {
-    [$purchaseOrder, $goodsReceipt, $goodsReceiptItem, $supplier, $warehouse, $product, $unit] = createGoodsReceiptItemForSupplierReturn();
+    [
+        $purchaseOrder,
+        $goodsReceipt,
+        $goodsReceiptItem,
+        $supplier,
+        $warehouse,
+        $product,
+        $unit,
+    ] = createGoodsReceiptItemForSupplierReturn();
     $supplierReturn = SupplierReturn::factory()->create([
         'purchase_order_id' => $purchaseOrder->id,
         'goods_receipt_id' => $goodsReceipt->id,
@@ -160,7 +179,15 @@ test('show returns supplier return detail', function () {
 });
 
 test('update modifies supplier return and items', function () {
-    [$purchaseOrder, $goodsReceipt, $goodsReceiptItem, $supplier, $warehouse, $product, $unit] = createGoodsReceiptItemForSupplierReturn();
+    [
+        $purchaseOrder,
+        $goodsReceipt,
+        $goodsReceiptItem,
+        $supplier,
+        $warehouse,
+        $product,
+        $unit,
+    ] = createGoodsReceiptItemForSupplierReturn();
     $supplierReturn = SupplierReturn::factory()->create([
         'purchase_order_id' => $purchaseOrder->id,
         'goods_receipt_id' => $goodsReceipt->id,

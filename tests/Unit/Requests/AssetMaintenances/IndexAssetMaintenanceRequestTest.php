@@ -35,7 +35,19 @@ test('it validates valid data', function () {
 });
 
 test('it validates sort by columns', function () {
-    $validColumns = ['id', 'asset', 'maintenance_type', 'status', 'scheduled_at', 'performed_at', 'supplier', 'notes', 'cost', 'created_at', 'updated_at'];
+    $validColumns = [
+        'id',
+        'asset',
+        'maintenance_type',
+        'status',
+        'scheduled_at',
+        'performed_at',
+        'supplier',
+        'notes',
+        'cost',
+        'created_at',
+        'updated_at',
+    ];
 
     foreach ($validColumns as $column) {
         $validator = validator(['sort_by' => $column], createIndexRequest()->rules());

@@ -136,7 +136,9 @@ it('evaluates permissions and guards in available transitions', function () {
     // We expect 1 transition (Approve) but it should be disabled due to lack of permission
     $this->assertCount(1, $transitions);
     $this->assertFalse($transitions[0]['is_allowed']);
-    $this->assertEquals(['You do not have permission to execute this transition.'], $transitions[0]['rejection_reasons']);
+    $this->assertEquals([
+        'You do not have permission to execute this transition.',
+    ], $transitions[0]['rejection_reasons']);
 
     // Now request with authorized user
     $adminUser = createTestUserWithPermissions(['pipeline', 'asset.approve']);
@@ -153,7 +155,10 @@ it('evaluates permissions and guards in available transitions', function () {
     $transitionsFailed = $responseFailedGuard->json('data.available_transitions');
 
     $this->assertFalse($transitionsFailed[0]['is_allowed']);
-    $this->assertStringContainsString('Field check failed: status must equals', $transitionsFailed[0]['rejection_reasons'][0]);
+    $this->assertStringContainsString(
+        'Field check failed: status must equals',
+        $transitionsFailed[0]['rejection_reasons'][0],
+    );
 });
 
 it('rejects execution if guards fail', function () {

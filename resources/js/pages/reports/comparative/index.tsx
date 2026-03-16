@@ -73,6 +73,18 @@ interface ComparativeReportResponse {
     };
 }
 
+const getChangeTextClass = (changeValue: number): string => {
+    if (changeValue < 0) {
+        return 'text-red-500';
+    }
+
+    if (changeValue > 0) {
+        return 'text-green-600';
+    }
+
+    return 'text-muted-foreground';
+};
+
 const AccountRow = ({
     node,
     isExpanded = true,
@@ -85,6 +97,12 @@ const AccountRow = ({
     const [expanded, setExpanded] = useState(isExpanded);
     const hasChildren = node.children && node.children.length > 0;
     const changeValue = node.change || 0;
+    const changeTextClass = getChangeTextClass(changeValue);
+    const expandIcon = expanded ? (
+        <ChevronDown className="h-4 w-4 text-muted-foreground" />
+    ) : (
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+    );
 
     return (
         <div className="flex flex-col">
@@ -94,56 +112,29 @@ const AccountRow = ({
                     hasChildren && 'bg-muted/20 font-semibold',
                 )}
             >
-                <div
-                    className="flex flex-1 cursor-pointer items-center gap-2"
+                <button
+                    type="button"
+                    className="flex flex-1 cursor-pointer items-center gap-2 text-left"
                     onClick={() => hasChildren && setExpanded(!expanded)}
                     style={{ paddingLeft: `${(node.level - 1) * 1.5}rem` }}
                 >
-                    {hasChildren ? (
-                        expanded ? (
-                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                        ) : (
-                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                        )
-                    ) : (
-                        <div className="w-4" />
-                    )}
+                    {hasChildren ? expandIcon : <div className="w-4" />}
                     <span className="font-mono text-xs text-muted-foreground">
                         {node.code}
                     </span>
                     <span className="truncate">{node.name}</span>
-                </div>
+                </button>
                 <div className="flex gap-4 text-right tabular-nums">
-                    <div className="w-32 font-mono">
-                        {formatCurrency(node.balance)}
-                    </div>
+                    <div className="w-32">{formatCurrency(node.balance)}</div>
                     {showComparison && (
                         <>
-                            <div className="w-32 font-mono text-muted-foreground">
+                            <div className="w-32 text-muted-foreground">
                                 {formatCurrency(node.comparison_balance || 0)}
                             </div>
-                            <div
-                                className={cn(
-                                    'w-28 font-mono',
-                                    changeValue < 0
-                                        ? 'text-red-500'
-                                        : changeValue > 0
-                                          ? 'text-green-600'
-                                          : 'text-muted-foreground',
-                                )}
-                            >
+                            <div className={cn('w-28', changeTextClass)}>
                                 {formatCurrency(changeValue)}
                             </div>
-                            <div
-                                className={cn(
-                                    'w-16 font-mono',
-                                    changeValue < 0
-                                        ? 'text-red-500'
-                                        : changeValue > 0
-                                          ? 'text-green-600'
-                                          : 'text-muted-foreground',
-                                )}
-                            >
+                            <div className={cn('w-16', changeTextClass)}>
                                 {(node.change_percentage || 0).toFixed(1)}%
                             </div>
                         </>
@@ -173,7 +164,7 @@ function Section({
     change,
     changePercentage,
     showComparison,
-}: {
+}: Readonly<{
     title: string;
     nodes: AccountNode[];
     total: number;
@@ -181,12 +172,13 @@ function Section({
     change?: number;
     changePercentage?: number;
     showComparison?: boolean;
-}) {
+}>) {
     const [expandAll, setExpandAll] = useState(true);
     const [expandKey, setExpandKey] = useState(0);
     const changeValue = change || 0;
+    const changeTextClass = getChangeTextClass(changeValue);
 
-    const setExpanded = (value: boolean) => {
+    const setExpanded = (value: Readonly<boolean>) => {
         setExpandAll(value);
         setExpandKey((k) => k + 1);
     };
@@ -228,11 +220,7 @@ function Section({
                                 <span
                                     className={cn(
                                         'w-28 text-lg font-bold',
-                                        changeValue < 0
-                                            ? 'text-red-500'
-                                            : changeValue > 0
-                                              ? 'text-green-600'
-                                              : 'text-muted-foreground',
+                                        changeTextClass,
                                     )}
                                 >
                                     {formatCurrency(changeValue)}
@@ -240,11 +228,7 @@ function Section({
                                 <span
                                     className={cn(
                                         'w-16 text-lg font-bold',
-                                        changeValue < 0
-                                            ? 'text-red-500'
-                                            : changeValue > 0
-                                              ? 'text-green-600'
-                                              : 'text-muted-foreground',
+                                        changeTextClass,
                                     )}
                                 >
                                     {(changePercentage || 0).toFixed(1)}%

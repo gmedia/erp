@@ -41,7 +41,9 @@ class IndexProductsAction
         ]);
 
         $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc'
+            ? 'asc'
+            : 'desc';
 
         if ($sortBy === 'category') {
             $query
@@ -53,7 +55,19 @@ class IndexProductsAction
                 $query,
                 $sortBy,
                 $sortDirection,
-                ['id', 'code', 'name', 'type', 'category_id', 'unit_id', 'cost', 'selling_price', 'status', 'created_at', 'updated_at']
+                [
+                    'id',
+                    'code',
+                    'name',
+                    'type',
+                    'category_id',
+                    'unit_id',
+                    'cost',
+                    'selling_price',
+                    'status',
+                    'created_at',
+                    'updated_at',
+                ],
             );
         }
 

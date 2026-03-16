@@ -35,6 +35,8 @@ show_help() {
     echo "  ./generate.sh Product --dry-run"
     echo "  ./generate.sh Product --all"
     echo "  ./generate.sh Product --filter --dto"
+
+    return 0
 }
 
 if [[ "$1" == "--help" || -z "$1" ]]; then

@@ -21,7 +21,15 @@ test('goods receipt resource returns expected structure', function () {
         'quantity_rejected' => 0,
         'unit_price' => 5000,
     ]);
-    $goodsReceipt->load(['purchaseOrder.supplier', 'warehouse', 'receiver', 'confirmer', 'creator', 'items.product', 'items.unit']);
+    $goodsReceipt->load([
+        'purchaseOrder.supplier',
+        'warehouse',
+        'receiver',
+        'confirmer',
+        'creator',
+        'items.product',
+        'items.unit',
+    ]);
 
     $data = (new GoodsReceiptResource($goodsReceipt))->toArray(new Request);
 

@@ -41,12 +41,24 @@ readonly class UpdateProductData
             selling_price: $data['selling_price'] ?? null,
             markup_percentage: $data['markup_percentage'] ?? null,
             billing_model: $data['billing_model'] ?? null,
-            is_recurring: isset($data['is_recurring']) ? (bool) $data['is_recurring'] : null,
-            trial_period_days: isset($data['trial_period_days']) ? (int) $data['trial_period_days'] : null,
-            allow_one_time_purchase: isset($data['allow_one_time_purchase']) ? (bool) $data['allow_one_time_purchase'] : null,
-            is_manufactured: isset($data['is_manufactured']) ? (bool) $data['is_manufactured'] : null,
-            is_purchasable: isset($data['is_purchasable']) ? (bool) $data['is_purchasable'] : null,
-            is_sellable: isset($data['is_sellable']) ? (bool) $data['is_sellable'] : null,
+            is_recurring: isset($data['is_recurring'])
+                ? (bool) $data['is_recurring']
+                : null,
+            trial_period_days: isset($data['trial_period_days'])
+                ? (int) $data['trial_period_days']
+                : null,
+            allow_one_time_purchase: isset($data['allow_one_time_purchase'])
+                ? (bool) $data['allow_one_time_purchase']
+                : null,
+            is_manufactured: isset($data['is_manufactured'])
+                ? (bool) $data['is_manufactured']
+                : null,
+            is_purchasable: isset($data['is_purchasable'])
+                ? (bool) $data['is_purchasable']
+                : null,
+            is_sellable: isset($data['is_sellable'])
+                ? (bool) $data['is_sellable']
+                : null,
             is_taxable: isset($data['is_taxable']) ? (bool) $data['is_taxable'] : null,
             status: $data['status'] ?? null,
             notes: $data['notes'] ?? null,

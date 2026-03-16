@@ -37,8 +37,21 @@ class IndexAssetStocktakesAction
         $this->filterService->applySorting(
             $query,
             $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'ulid', 'reference', 'branch', 'planned_at', 'performed_at', 'status', 'created_by', 'created_at', 'updated_at']
+            strtolower($request->get('sort_direction', 'desc')) === 'asc'
+                ? 'asc'
+                : 'desc',
+            [
+                'id',
+                'ulid',
+                'reference',
+                'branch',
+                'planned_at',
+                'performed_at',
+                'status',
+                'created_by',
+                'created_at',
+                'updated_at',
+            ],
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);

@@ -83,6 +83,116 @@ export default function Index() {
         to,
     };
 
+    let tableBodyContent: React.ReactNode;
+    if (isLoading) {
+        tableBodyContent = (
+            <TableRow>
+                <TableCell colSpan={7} className="h-56 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-muted-foreground">Loading runs...</p>
+                    </div>
+                </TableCell>
+            </TableRow>
+        );
+    } else if (data.length === 0) {
+        tableBodyContent = (
+            <TableRow>
+                <TableCell colSpan={7} className="h-56 text-center">
+                    <div className="flex flex-col items-center justify-center gap-2 opacity-70">
+                        <Calculator className="h-10 w-10 text-muted-foreground" />
+                        <p className="text-lg font-medium">No runs found</p>
+                        <p className="text-sm text-muted-foreground">
+                            Start by running a new calculation.
+                        </p>
+                        <Button
+                            variant="outline"
+                            className="mt-4"
+                            onClick={() => setIsCalcOpen(true)}
+                        >
+                            <Plus className="mr-2 h-4 w-4" /> Calculate Now
+                        </Button>
+                    </div>
+                </TableCell>
+            </TableRow>
+        );
+    } else {
+        tableBodyContent = data.map((item) => (
+            <TableRow key={item.id} className="hover:bg-muted/50">
+                <TableCell className="font-medium">
+                    {item.fiscal_year?.name || '-'}
+                </TableCell>
+                <TableCell>
+                    <div className="flex flex-col gap-1">
+                        <span className="text-sm">
+                            {format(new Date(item.period_start), 'dd MMM yyyy')}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                            to{' '}
+                            {format(new Date(item.period_end), 'dd MMM yyyy')}
+                        </span>
+                    </div>
+                </TableCell>
+                <TableCell>
+                    <Badge variant="outline">
+                        {item.lines_count || 0} Assets
+                    </Badge>
+                </TableCell>
+                <TableCell>
+                    <Badge
+                        variant={getStatusBadgeVariant(item.status)}
+                        className="capitalize"
+                    >
+                        {item.status}
+                    </Badge>
+                </TableCell>
+                <TableCell>
+                    {item.journal_entry ? (
+                        <span className="font-mono text-sm">
+                            {item.journal_entry.entry_number}
+                        </span>
+                    ) : (
+                        '-'
+                    )}
+                </TableCell>
+                <TableCell>
+                    <span className="text-sm">
+                        {item.created_by_user?.name || '-'}
+                    </span>
+                </TableCell>
+                <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            title="View Lines"
+                            onClick={() => setViewRunId(item.id)}
+                        >
+                            <Eye className="h-4 w-4" />
+                        </Button>
+
+                        {item.status === 'calculated' && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 px-2"
+                                disabled={isPosting === item.id}
+                                onClick={() => postToJournal(item.id)}
+                            >
+                                {isPosting === item.id ? (
+                                    <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                                ) : (
+                                    <CheckCircle2 className="mr-1 h-4 w-4 text-green-600" />
+                                )}
+                                Post
+                            </Button>
+                        )}
+                    </div>
+                </TableCell>
+            </TableRow>
+        ));
+    }
+
     const handleCalculateSubmit = async (
         formData: AssetDepreciationCalculationFormData,
     ): Promise<{ success: boolean; errors?: Record<string, string[]> }> => {
@@ -147,161 +257,7 @@ export default function Index() {
                                     </TableRow>
                                 </TableHeader>
 
-                                <TableBody>
-                                    {isLoading ? (
-                                        <TableRow>
-                                            <TableCell
-                                                colSpan={7}
-                                                className="h-56 text-center"
-                                            >
-                                                <div className="flex flex-col items-center justify-center gap-2">
-                                                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                                    <p className="text-muted-foreground">
-                                                        Loading runs...
-                                                    </p>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : data.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell
-                                                colSpan={7}
-                                                className="h-56 text-center"
-                                            >
-                                                <div className="flex flex-col items-center justify-center gap-2 opacity-70">
-                                                    <Calculator className="h-10 w-10 text-muted-foreground" />
-                                                    <p className="text-lg font-medium">
-                                                        No runs found
-                                                    </p>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        Start by running a new
-                                                        calculation.
-                                                    </p>
-                                                    <Button
-                                                        variant="outline"
-                                                        className="mt-4"
-                                                        onClick={() =>
-                                                            setIsCalcOpen(true)
-                                                        }
-                                                    >
-                                                        <Plus className="mr-2 h-4 w-4" />{' '}
-                                                        Calculate Now
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        data.map((item) => (
-                                            <TableRow
-                                                key={item.id}
-                                                className="hover:bg-muted/50"
-                                            >
-                                                <TableCell className="font-medium">
-                                                    {item.fiscal_year?.name ||
-                                                        '-'}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="flex flex-col gap-1">
-                                                        <span className="text-sm">
-                                                            {format(
-                                                                new Date(
-                                                                    item.period_start,
-                                                                ),
-                                                                'dd MMM yyyy',
-                                                            )}
-                                                        </span>
-                                                        <span className="text-xs text-muted-foreground">
-                                                            to{' '}
-                                                            {format(
-                                                                new Date(
-                                                                    item.period_end,
-                                                                ),
-                                                                'dd MMM yyyy',
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge variant="outline">
-                                                        {item.lines_count || 0}{' '}
-                                                        Assets
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Badge
-                                                        variant={getStatusBadgeVariant(
-                                                            item.status,
-                                                        )}
-                                                        className="capitalize"
-                                                    >
-                                                        {item.status}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {item.journal_entry ? (
-                                                        <span className="font-mono text-sm">
-                                                            {
-                                                                item
-                                                                    .journal_entry
-                                                                    .entry_number
-                                                            }
-                                                        </span>
-                                                    ) : (
-                                                        '-'
-                                                    )}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <span className="text-sm">
-                                                        {item.created_by_user
-                                                            ?.name || '-'}
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            title="View Lines"
-                                                            onClick={() =>
-                                                                setViewRunId(
-                                                                    item.id,
-                                                                )
-                                                            }
-                                                        >
-                                                            <Eye className="h-4 w-4" />
-                                                        </Button>
-
-                                                        {item.status ===
-                                                            'calculated' && (
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="h-8 px-2"
-                                                                disabled={
-                                                                    isPosting ===
-                                                                    item.id
-                                                                }
-                                                                onClick={() =>
-                                                                    postToJournal(
-                                                                        item.id,
-                                                                    )
-                                                                }
-                                                            >
-                                                                {isPosting ===
-                                                                item.id ? (
-                                                                    <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                                                                ) : (
-                                                                    <CheckCircle2 className="mr-1 h-4 w-4 text-green-600" />
-                                                                )}
-                                                                Post
-                                                            </Button>
-                                                        )}
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
+                                <TableBody>{tableBodyContent}</TableBody>
                             </Table>
                         </div>
 

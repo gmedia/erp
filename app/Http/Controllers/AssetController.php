@@ -50,7 +50,15 @@ class AssetController extends Controller
 
     public function show(Asset $asset): AssetResource
     {
-        return new AssetResource($asset->load(['category', 'model', 'branch', 'location', 'department', 'employee', 'supplier']));
+        return new AssetResource($asset->load([
+            'category',
+            'model',
+            'branch',
+            'location',
+            'department',
+            'employee',
+            'supplier',
+        ]));
     }
 
     public function update(UpdateAssetRequest $request, Asset $asset): JsonResponse

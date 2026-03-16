@@ -17,6 +17,19 @@ class InventoryStocktakeItemFactory extends Factory
     {
         $systemQuantity = $this->faker->randomFloat(2, 0, 1000);
         $countedQuantity = $this->faker->boolean(70) ? $this->faker->randomFloat(2, 0, 1000) : null;
+        $result = 'uncounted';
+
+        if ($countedQuantity !== null) {
+            $variance = $countedQuantity - $systemQuantity;
+
+            if ($variance === 0.0) {
+                $result = 'match';
+            } elseif ($variance > 0.0) {
+                $result = 'surplus';
+            } else {
+                $result = 'deficit';
+            }
+        }
 
         return [
             'inventory_stocktake_id' => InventoryStocktake::factory(),
@@ -25,7 +38,7 @@ class InventoryStocktakeItemFactory extends Factory
             'system_quantity' => $systemQuantity,
             'counted_quantity' => $countedQuantity,
             'variance' => $countedQuantity === null ? null : $countedQuantity - $systemQuantity,
-            'result' => $countedQuantity === null ? 'uncounted' : (($countedQuantity - $systemQuantity) === 0.0 ? 'match' : (($countedQuantity - $systemQuantity) > 0.0 ? 'surplus' : 'deficit')),
+            'result' => $result,
             'notes' => $this->faker->optional()->sentence(),
             'counted_by' => $countedQuantity === null ? null : User::factory(),
             'counted_at' => $countedQuantity === null ? null : now(),

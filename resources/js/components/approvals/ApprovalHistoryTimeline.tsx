@@ -26,7 +26,10 @@ interface Props {
     entityId: string | number;
 }
 
-export function ApprovalHistoryTimeline({ entityType, entityId }: Props) {
+export function ApprovalHistoryTimeline({
+    entityType,
+    entityId,
+}: Readonly<Props>) {
     const { history, loading, fetchHistory } = useEntityApprovalHistory({
         entityType,
         entityId,

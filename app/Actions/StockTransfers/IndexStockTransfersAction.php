@@ -40,8 +40,20 @@ class IndexStockTransfersAction
         $this->filterService->applySorting(
             $query,
             $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
-            ['id', 'transfer_number', 'from_warehouse_id', 'to_warehouse_id', 'transfer_date', 'expected_arrival_date', 'status', 'created_at', 'updated_at']
+            strtolower($request->get('sort_direction', 'desc')) === 'asc'
+                ? 'asc'
+                : 'desc',
+            [
+                'id',
+                'transfer_number',
+                'from_warehouse_id',
+                'to_warehouse_id',
+                'transfer_date',
+                'expected_arrival_date',
+                'status',
+                'created_at',
+                'updated_at',
+            ],
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);

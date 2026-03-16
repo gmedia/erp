@@ -38,8 +38,11 @@ class InventoryStocktakeItemController extends Controller
         ]);
     }
 
-    public function syncItems(UpdateInventoryStocktakeItemsRequest $request, InventoryStocktake $inventoryStocktake, SyncInventoryStocktakeItemsAction $action): JsonResponse
-    {
+    public function syncItems(
+        UpdateInventoryStocktakeItemsRequest $request,
+        InventoryStocktake $inventoryStocktake,
+        SyncInventoryStocktakeItemsAction $action,
+    ): JsonResponse {
         $action->execute($inventoryStocktake, $request->validated()['items']);
 
         $inventoryStocktake->load(['items.product', 'items.unit', 'items.countedBy']);

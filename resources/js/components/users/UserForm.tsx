@@ -20,7 +20,7 @@ export function UserForm({
     userExists,
     errors,
     onSave,
-}: UserFormProps) {
+}: Readonly<UserFormProps>) {
     const { register } = useFormContext();
 
     return (

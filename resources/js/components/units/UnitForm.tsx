@@ -29,7 +29,7 @@ export function UnitForm({
     entity,
     onSubmit,
     isLoading = false,
-}: UnitFormProps) {
+}: Readonly<UnitFormProps>) {
     const activeEntity = unit || entity;
 
     const form = useForm<UnitFormData>({

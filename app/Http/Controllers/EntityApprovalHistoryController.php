@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\ApprovalRequest;
+use App\Models\Asset;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class EntityApprovalHistoryController extends Controller
 {
@@ -15,7 +16,7 @@ class EntityApprovalHistoryController extends Controller
     public function index(string $entityType, string $entityId): JsonResponse
     {
         $entityMap = [
-            'asset' => \App\Models\Asset::class,
+            'asset' => Asset::class,
             // Add more as needed, like: 'purchase-request' => \App\Models\PurchaseRequest::class
         ];
 
@@ -27,7 +28,10 @@ class EntityApprovalHistoryController extends Controller
         $resolvedId = $entityId;
 
         // If the model uses ULID and the provided ID is not numeric, resolve it
-        if (! is_numeric($entityId) && in_array(\Illuminate\Database\Eloquent\Concerns\HasUlids::class, class_uses_recursive($modelClass))) {
+        if (
+            ! is_numeric($entityId)
+            && in_array(HasUlids::class, class_uses_recursive($modelClass))
+        ) {
             $instance = $modelClass::where('ulid', $entityId)->first();
             if ($instance) {
                 $resolvedId = $instance->id;

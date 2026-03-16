@@ -50,7 +50,7 @@ function toStepInput(data: ApprovalFlowStepFormOutput): ApprovalFlowStepInput {
 export function ApprovalFlowStepManager({
     fieldArrayProps,
     errorMessage,
-}: ApprovalFlowStepManagerProps) {
+}: Readonly<ApprovalFlowStepManagerProps>) {
     const { fields, append, remove, update } = fieldArrayProps;
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -66,8 +66,15 @@ export function ApprovalFlowStepManager({
         setIsDialogOpen(true);
     };
 
+    const selectedStep =
+        editingIndex === null ? null : (fields[editingIndex] ?? null);
+
     const handleDelete = (index: number) => {
-        if (window.confirm('Are you sure you want to delete this step?')) {
+        if (
+            globalThis.window.confirm(
+                'Are you sure you want to delete this step?',
+            )
+        ) {
             remove(index);
         }
     };
@@ -151,7 +158,7 @@ export function ApprovalFlowStepManager({
                     </TableHeader>
                     <TableBody>
                         {fields.map((field, index) => renderRow(field, index))}
-                        {!fields.length && (
+                        {fields.length === 0 && (
                             <TableRow>
                                 <TableCell
                                     colSpan={6}
@@ -170,18 +177,14 @@ export function ApprovalFlowStepManager({
                 <ApprovalFlowStepFormDialog
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
-                    step={
-                        editingIndex !== null && fields[editingIndex]
-                            ? fields[editingIndex]
-                            : null
-                    }
+                    step={selectedStep}
                     onSave={(data) => {
                         const nextStep = toStepInput(data);
 
-                        if (editingIndex !== null) {
-                            update(editingIndex, nextStep);
-                        } else {
+                        if (editingIndex === null) {
                             append(nextStep);
+                        } else {
+                            update(editingIndex, nextStep);
                         }
                         setIsDialogOpen(false);
                     }}

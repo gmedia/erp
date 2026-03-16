@@ -26,7 +26,11 @@ interface RunLinesModalProps {
     onClose: () => void;
 }
 
-export function RunLinesModal({ runId, open, onClose }: RunLinesModalProps) {
+export function RunLinesModal({
+    runId,
+    open,
+    onClose,
+}: Readonly<RunLinesModalProps>) {
     const { data: lines, isLoading } = useQuery<AssetDepreciationLine[]>({
         queryKey: ['asset-depreciation-run-lines', runId],
         queryFn: async () => {
@@ -44,6 +48,56 @@ export function RunLinesModal({ runId, open, onClose }: RunLinesModalProps) {
             currency: 'IDR',
         });
     };
+
+    let tableBodyContent: React.ReactNode;
+    if (isLoading) {
+        tableBodyContent = (
+            <TableRow>
+                <TableCell colSpan={5} className="h-40 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="text-muted-foreground">
+                            Loading lines...
+                        </span>
+                    </div>
+                </TableCell>
+            </TableRow>
+        );
+    } else if (!lines || lines.length === 0) {
+        tableBodyContent = (
+            <TableRow>
+                <TableCell
+                    colSpan={5}
+                    className="h-40 text-center text-muted-foreground"
+                >
+                    No lines found.
+                </TableCell>
+            </TableRow>
+        );
+    } else {
+        tableBodyContent = lines.map((line) => (
+            <TableRow key={line.id}>
+                <TableCell>
+                    <div className="font-medium">{line.asset?.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                        {line.asset?.asset_code}
+                    </div>
+                </TableCell>
+                <TableCell className="text-right">
+                    {formatCurrency(line.amount)}
+                </TableCell>
+                <TableCell className="text-right">
+                    {formatCurrency(line.accumulated_before)}
+                </TableCell>
+                <TableCell className="text-right">
+                    {formatCurrency(line.accumulated_after)}
+                </TableCell>
+                <TableCell className="text-right">
+                    {formatCurrency(line.book_value_after)}
+                </TableCell>
+            </TableRow>
+        ));
+    }
 
     return (
         <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
@@ -75,63 +129,7 @@ export function RunLinesModal({ runId, open, onClose }: RunLinesModalProps) {
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
-                        <TableBody>
-                            {isLoading ? (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={5}
-                                        className="h-40 text-center"
-                                    >
-                                        <div className="flex items-center justify-center gap-2">
-                                            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                                            <span className="text-muted-foreground">
-                                                Loading lines...
-                                            </span>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ) : !lines || lines.length === 0 ? (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={5}
-                                        className="h-40 text-center text-muted-foreground"
-                                    >
-                                        No lines found.
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                lines.map((line) => (
-                                    <TableRow key={line.id}>
-                                        <TableCell>
-                                            <div className="font-medium">
-                                                {line.asset?.name}
-                                            </div>
-                                            <div className="text-xs text-muted-foreground">
-                                                {line.asset?.asset_code}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-right font-mono">
-                                            {formatCurrency(line.amount)}
-                                        </TableCell>
-                                        <TableCell className="text-right font-mono">
-                                            {formatCurrency(
-                                                line.accumulated_before,
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="text-right font-mono">
-                                            {formatCurrency(
-                                                line.accumulated_after,
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="text-right font-mono">
-                                            {formatCurrency(
-                                                line.book_value_after,
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
+                        <TableBody>{tableBodyContent}</TableBody>
                     </Table>
                 </ScrollArea>
             </DialogContent>

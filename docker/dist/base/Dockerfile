@@ -5,7 +5,7 @@ LABEL maintainer="GMEDIA"
 # Set working directory
 WORKDIR /var/www/html
 
-# Install system dependencies
+# Install system dependencies, PHP extensions, and PECL extensions
 RUN apk add --no-cache \
     curl \
     libpng-dev \
@@ -19,27 +19,21 @@ RUN apk add --no-cache \
     postgresql-dev \
     openldap-dev \
     brotli-dev \
-    $PHPIZE_DEPS
-
-# Install PHP extensions
-RUN docker-php-ext-install \
-    bcmath \
-    gd \
-    intl \
-    ldap \
-    mbstring \
-    pcntl \
-    pdo_mysql \
-    pdo_pgsql \
-    soap \
-    zip
-
-# Install PECL extensions
-RUN pecl install redis igbinary msgpack \
-    && docker-php-ext-enable redis igbinary msgpack
-
-# Install Swoole
-RUN pecl install swoole \
+    $PHPIZE_DEPS \
+    && docker-php-ext-install \
+        bcmath \
+        gd \
+        intl \
+        ldap \
+        mbstring \
+        pcntl \
+        pdo_mysql \
+        pdo_pgsql \
+        soap \
+        zip \
+    && pecl install redis igbinary msgpack \
+    && docker-php-ext-enable redis igbinary msgpack \
+    && pecl install swoole \
     && docker-php-ext-enable swoole
 
 # Install Composer

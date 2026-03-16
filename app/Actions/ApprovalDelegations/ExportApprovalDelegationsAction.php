@@ -39,7 +39,16 @@ class ExportApprovalDelegationsAction
             $query,
             $filters['sort_by'] ?? 'created_at',
             $filters['sort_direction'] ?? 'desc',
-            ['id', 'delegator_user_id', 'delegate_user_id', 'approvable_type', 'start_date', 'end_date', 'is_active', 'created_at']
+            [
+                'id',
+                'delegator_user_id',
+                'delegate_user_id',
+                'approvable_type',
+                'start_date',
+                'end_date',
+                'is_active',
+                'created_at',
+            ],
         );
 
         // Generate filename with timestamp

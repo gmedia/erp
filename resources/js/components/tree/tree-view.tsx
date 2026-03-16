@@ -18,7 +18,7 @@ export function TreeView({
     data,
     selectedIds,
     onSelectionChange,
-}: TreeViewProps) {
+}: Readonly<TreeViewProps>) {
     const treeData = useMemo(() => {
         const buildTree = (
             items: TreeItem[],

@@ -11,7 +11,7 @@ namespace Tests\Traits;
  */
 trait SimpleCrudResourceTestTrait
 {
-    public function test_to_array_transforms_model_correctly(): void
+    public function testToArrayTransformsModelCorrectly(): void
     {
         $modelClass = $this->getModelClass();
         $model = $modelClass::factory()->create([
@@ -34,7 +34,7 @@ trait SimpleCrudResourceTestTrait
         $this->assertIsString($result['updated_at']);
     }
 
-    public function test_to_array_includes_all_required_fields(): void
+    public function testToArrayIncludesAllRequiredFields(): void
     {
         $modelClass = $this->getModelClass();
         $model = $modelClass::factory()->create();
@@ -53,7 +53,7 @@ trait SimpleCrudResourceTestTrait
         $this->assertEquals($model->name, $result['name']);
     }
 
-    public function test_to_array_handles_null_timestamps(): void
+    public function testToArrayHandlesNullTimestamps(): void
     {
         $modelClass = $this->getModelClass();
         $model = $modelClass::factory()->create();

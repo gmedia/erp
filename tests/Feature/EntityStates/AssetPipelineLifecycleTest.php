@@ -69,12 +69,72 @@ beforeEach(function () {
     ]);
 
     // Transitions (with update_field actions)
-    $this->transActivate = createTransitionWithAction($this->pipeline, $this->stateDraft, $this->stateActive, 'Activate', 'activate', 'assets.activate', false, false, 'active');
-    $this->transCancel = createTransitionWithAction($this->pipeline, $this->stateDraft, $this->stateCancelled, 'Cancel', 'cancel', 'assets.cancel', true, false, 'draft'); // DB enum has no 'cancelled'
-    $this->transSendMaint = createTransitionWithAction($this->pipeline, $this->stateActive, $this->stateMaintenance, 'Send to Maintenance', 'send_maintenance', 'assets.manage', false, false, 'maintenance');
-    $this->transReturnMaint = createTransitionWithAction($this->pipeline, $this->stateMaintenance, $this->stateActive, 'Return from Maintenance', 'return_maintenance', 'assets.manage', false, false, 'active');
-    $this->transDispose = createTransitionWithAction($this->pipeline, $this->stateActive, $this->stateDisposed, 'Dispose', 'dispose', 'assets.dispose', true, true, 'disposed');
-    $this->transMarkLost = createTransitionWithAction($this->pipeline, $this->stateActive, $this->stateLost, 'Mark as Lost', 'mark_lost', 'assets.manage', true, true, 'lost');
+    $this->transActivate = createTransitionWithAction(
+        $this->pipeline,
+        $this->stateDraft,
+        $this->stateActive,
+        'Activate',
+        'activate',
+        'assets.activate',
+        false,
+        false,
+        'active'
+    );
+    $this->transCancel = createTransitionWithAction(
+        $this->pipeline,
+        $this->stateDraft,
+        $this->stateCancelled,
+        'Cancel',
+        'cancel',
+        'assets.cancel',
+        true,
+        false,
+        'draft'
+    ); // DB enum has no 'cancelled'
+    $this->transSendMaint = createTransitionWithAction(
+        $this->pipeline,
+        $this->stateActive,
+        $this->stateMaintenance,
+        'Send to Maintenance',
+        'send_maintenance',
+        'assets.manage',
+        false,
+        false,
+        'maintenance'
+    );
+    $this->transReturnMaint = createTransitionWithAction(
+        $this->pipeline,
+        $this->stateMaintenance,
+        $this->stateActive,
+        'Return from Maintenance',
+        'return_maintenance',
+        'assets.manage',
+        false,
+        false,
+        'active'
+    );
+    $this->transDispose = createTransitionWithAction(
+        $this->pipeline,
+        $this->stateActive,
+        $this->stateDisposed,
+        'Dispose',
+        'dispose',
+        'assets.dispose',
+        true,
+        true,
+        'disposed'
+    );
+    $this->transMarkLost = createTransitionWithAction(
+        $this->pipeline,
+        $this->stateActive,
+        $this->stateLost,
+        'Mark as Lost',
+        'mark_lost',
+        'assets.manage',
+        true,
+        true,
+        'lost'
+    );
 
     $this->asset = Asset::factory()->create(['status' => 'draft']);
 });
@@ -83,9 +143,14 @@ beforeEach(function () {
  * Helper: create transition with an update_field action
  */
 function createTransitionWithAction(
-    Pipeline $pipeline, PipelineState $from, PipelineState $to,
-    string $name, string $code, ?string $permission,
-    bool $confirmation, bool $comment,
+    Pipeline $pipeline,
+    PipelineState $from,
+    PipelineState $to,
+    string $name,
+    string $code,
+    ?string $permission,
+    bool $confirmation,
+    bool $comment,
     string $statusValue
 ): PipelineTransition {
     $transition = PipelineTransition::factory()->create([

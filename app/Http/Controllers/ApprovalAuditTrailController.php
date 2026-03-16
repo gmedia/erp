@@ -26,8 +26,10 @@ class ApprovalAuditTrailController extends Controller
     /**
      * Export the Approval Audit Trail to Excel/CSV.
      */
-    public function export(ExportApprovalAuditTrailRequest $request, ExportApprovalAuditTrailAction $action): JsonResponse
-    {
+    public function export(
+        ExportApprovalAuditTrailRequest $request,
+        ExportApprovalAuditTrailAction $action,
+    ): JsonResponse {
         return $action->execute($request);
     }
 }

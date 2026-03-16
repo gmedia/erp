@@ -15,7 +15,11 @@ test('AccountMappingFilterService can search notes and account fields', function
     $targetVersion = CoaVersion::factory()->create(['status' => 'active']);
 
     $source = Account::factory()->create(['coa_version_id' => $sourceVersion->id, 'code' => '11100', 'name' => 'Cash']);
-    $target = Account::factory()->create(['coa_version_id' => $targetVersion->id, 'code' => '11110', 'name' => 'Cash In Bank']);
+    $target = Account::factory()->create([
+        'coa_version_id' => $targetVersion->id,
+        'code' => '11110',
+        'name' => 'Cash In Bank',
+    ]);
 
     AccountMapping::create([
         'source_account_id' => $source->id,

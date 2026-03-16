@@ -16,7 +16,13 @@ class UpdateInventoryStocktakeRequest extends FormRequest
         $stocktakeId = $this->route('inventoryStocktake')->id ?? $this->route('id');
 
         return [
-            'stocktake_number' => ['sometimes', 'nullable', 'string', 'max:255', 'unique:inventory_stocktakes,stocktake_number,' . $stocktakeId],
+            'stocktake_number' => [
+                'sometimes',
+                'nullable',
+                'string',
+                'max:255',
+                'unique:inventory_stocktakes,stocktake_number,' . $stocktakeId,
+            ],
             'warehouse_id' => ['sometimes', 'required', 'exists:warehouses,id'],
             'stocktake_date' => ['sometimes', 'required', 'date'],
             'status' => ['sometimes', 'required', 'string', 'in:draft,in_progress,completed,cancelled'],

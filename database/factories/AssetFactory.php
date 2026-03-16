@@ -39,9 +39,15 @@ class AssetFactory extends Factory
             'purchase_date' => $purchaseDate->format('Y-m-d'),
             'purchase_cost' => $purchaseCost,
             'currency' => 'IDR',
-            'warranty_end_date' => $this->faker->boolean(50) ? $this->faker->dateTimeBetween($purchaseDate, '+2 years')->format('Y-m-d') : null,
+            'warranty_end_date' => $this->faker->boolean(50)
+                ? $this->faker->dateTimeBetween($purchaseDate, '+2 years')->format('Y-m-d')
+                : null,
             'status' => $this->faker->randomElement(['draft', 'active', 'maintenance']),
-            'condition' => $this->faker->boolean(70) ? $this->faker->randomElement(['good', 'needs_repair', 'damaged']) : null,
+            'condition' => $this->faker->boolean(70) ? $this->faker->randomElement([
+                'good',
+                'needs_repair',
+                'damaged',
+            ]) : null,
             'notes' => $this->faker->optional()->sentence(),
             'depreciation_method' => 'straight_line',
             'depreciation_start_date' => $this->faker->boolean(80) ? $purchaseDate->format('Y-m-d') : null,

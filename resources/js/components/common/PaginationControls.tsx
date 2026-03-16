@@ -21,7 +21,7 @@ export function PaginationControls({
     onPageChange,
     onPageSizeChange,
     renderPageNumbers,
-}: {
+}: Readonly<{
     pagination: {
         page: number;
         per_page: number;
@@ -30,10 +30,10 @@ export function PaginationControls({
         from: number;
         to: number;
     };
-    onPageChange: (page: number) => void;
+    onPageChange: (page: Readonly<number>) => void;
     onPageSizeChange: (per_page: string) => void;
     renderPageNumbers: () => React.ReactNode;
-}) {
+}>) {
     return (
         <div className="flex items-center justify-between py-4 text-sm text-muted-foreground">
             <div className="flex items-center space-x-2">

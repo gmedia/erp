@@ -38,7 +38,19 @@ class UpdatePipelineTransitionRequest extends FormRequest
             // Nested actions validation
             'actions' => ['nullable', 'array'],
             'actions.*.id' => ['nullable', 'integer', 'exists:pipeline_transition_actions,id'],
-            'actions.*.action_type' => ['required', 'string', Rule::in(['update_field', 'create_record', 'send_notification', 'dispatch_job', 'trigger_approval', 'webhook', 'custom'])],
+            'actions.*.action_type' => [
+                'required',
+                'string',
+                Rule::in([
+                    'update_field',
+                    'create_record',
+                    'send_notification',
+                    'dispatch_job',
+                    'trigger_approval',
+                    'webhook',
+                    'custom',
+                ]),
+            ],
             'actions.*.execution_order' => ['required', 'integer', 'min:1'],
             'actions.*.config' => ['required', 'array'],
             'actions.*.is_async' => ['boolean'],

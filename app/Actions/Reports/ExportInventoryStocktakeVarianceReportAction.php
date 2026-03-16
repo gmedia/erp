@@ -2,7 +2,7 @@
 
 namespace App\Actions\Reports;
 
-use App\Exports\InventoryStocktakeVarianceReportExport;
+use App\Exports\InventoryStocktakeVarianceExport;
 use App\Http\Requests\Reports\ExportInventoryStocktakeVarianceReportRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -20,10 +20,16 @@ class ExportInventoryStocktakeVarianceReportAction
         $extension = $format === 'csv' ? 'csv' : 'xlsx';
         $writerType = $format === 'csv' ? ExcelExcel::CSV : ExcelExcel::XLSX;
 
-        $filename = 'inventory_stocktake_variance_report_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.' . $extension;
+        $filename =
+            'inventory_stocktake_variance_report_'
+            . now()->format('Y-m-d_H-i-s')
+            . '_'
+            . Str::ulid()
+            . '.'
+            . $extension;
         $filePath = 'exports/' . $filename;
 
-        Excel::store(new InventoryStocktakeVarianceReportExport($filters), $filePath, 'public', $writerType);
+        Excel::store(new InventoryStocktakeVarianceExport($filters), $filePath, 'public', $writerType);
 
         return response()->json([
             'url' => Storage::disk('public')->url($filePath),

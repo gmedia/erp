@@ -32,7 +32,7 @@ export function DatePickerField({
     placeholder = 'Pick a date',
     disabled,
     className,
-}: DatePickerFieldProps) {
+}: Readonly<DatePickerFieldProps>) {
     return (
         <FormField
             name={name}

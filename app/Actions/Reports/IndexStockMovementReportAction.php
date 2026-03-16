@@ -115,7 +115,13 @@ class IndexStockMovementReportAction
             $sortBy = 'category_name';
         }
 
-        if (in_array($sortBy, ['product_name', 'warehouse_name', 'branch_name', 'category_name', 'last_moved_at'], true)) {
+        if (in_array($sortBy, [
+            'product_name',
+            'warehouse_name',
+            'branch_name',
+            'category_name',
+            'last_moved_at',
+        ], true)) {
             $query->orderBy($sortBy, $sortDirection);
         } elseif (in_array($sortBy, ['total_in', 'total_out', 'ending_balance'], true)) {
             $query->orderByRaw($sortBy . ' ' . $sortDirection);

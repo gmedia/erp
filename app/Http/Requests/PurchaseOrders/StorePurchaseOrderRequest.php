@@ -21,7 +21,11 @@ class StorePurchaseOrderRequest extends FormRequest
             'expected_delivery_date' => ['nullable', 'date', 'after_or_equal:order_date'],
             'payment_terms' => ['nullable', 'string', 'max:255'],
             'currency' => ['required', 'string', 'max:3'],
-            'status' => ['required', 'string', 'in:draft,pending_approval,confirmed,rejected,partially_received,fully_received,cancelled,closed'],
+            'status' => [
+                'required',
+                'string',
+                'in:draft,pending_approval,confirmed,rejected,partially_received,fully_received,cancelled,closed',
+            ],
             'notes' => ['nullable', 'string'],
             'shipping_address' => ['nullable', 'string'],
             'approved_by' => ['nullable', 'integer', 'exists:users,id'],

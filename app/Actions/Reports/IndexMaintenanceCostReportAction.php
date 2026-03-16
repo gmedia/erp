@@ -6,11 +6,13 @@ use App\Http\Requests\Reports\IndexMaintenanceCostRequest;
 use App\Models\AssetMaintenance;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class IndexMaintenanceCostReportAction
 {
-    public function execute(IndexMaintenanceCostRequest $request): LengthAwarePaginator|\Illuminate\Database\Eloquent\Collection
-    {
+    public function execute(
+        IndexMaintenanceCostRequest $request
+    ): LengthAwarePaginator|Collection {
         $query = AssetMaintenance::query()
             ->with(['asset.category', 'asset.branch', 'supplier']);
 
@@ -60,7 +62,10 @@ class IndexMaintenanceCostReportAction
 
         if (in_array($sortBy, ['asset_code', 'asset_name'])) {
             $query->join('assets', 'asset_maintenances.asset_id', '=', 'assets.id')
-                ->orderBy($sortBy === 'asset_name' ? 'assets.name' : 'assets.asset_code', $sortDirection)
+                ->orderBy(
+                    $sortBy === 'asset_name' ? 'assets.name' : 'assets.asset_code',
+                    $sortDirection,
+                )
                 ->select('asset_maintenances.*');
         } elseif ($sortBy === 'supplier_name') {
             $query->leftJoin('suppliers', 'asset_maintenances.supplier_id', '=', 'suppliers.id')

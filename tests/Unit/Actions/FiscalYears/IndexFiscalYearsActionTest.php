@@ -29,8 +29,12 @@ test('execute returns paginated fiscal years', function () {
 
     $filterService->shouldReceive('applySorting')
         ->once()
-        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'created_at', 'desc',
-            ['id', 'name', 'start_date', 'end_date', 'status', 'created_at', 'updated_at']);
+        ->with(
+            Mockery::type('Illuminate\Database\Eloquent\Builder'),
+            'created_at',
+            'desc',
+            ['id', 'name', 'start_date', 'end_date', 'status', 'created_at', 'updated_at'],
+        );
 
     $result = $action->execute($request);
 

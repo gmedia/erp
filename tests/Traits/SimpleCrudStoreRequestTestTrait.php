@@ -11,13 +11,13 @@ namespace Tests\Traits;
  */
 trait SimpleCrudStoreRequestTestTrait
 {
-    public function test_authorize_returns_true(): void
+    public function testAuthorizeReturnsTrue(): void
     {
         $request = $this->createStoreRequest();
         $this->assertTrue($request->authorize());
     }
 
-    public function test_rules_validation_passes_with_valid_data(): void
+    public function testRulesValidationPassesWithValidData(): void
     {
         $data = ['name' => 'Valid Name'];
 
@@ -26,7 +26,7 @@ trait SimpleCrudStoreRequestTestTrait
         $this->assertFalse($validator->fails());
     }
 
-    public function test_rules_validation_fails_with_missing_name(): void
+    public function testRulesValidationFailsWithMissingName(): void
     {
         $data = [];
 
@@ -36,7 +36,7 @@ trait SimpleCrudStoreRequestTestTrait
         $this->assertTrue($validator->errors()->has('name'));
     }
 
-    public function test_rules_validation_fails_with_empty_name(): void
+    public function testRulesValidationFailsWithEmptyName(): void
     {
         $data = ['name' => ''];
 
@@ -46,7 +46,7 @@ trait SimpleCrudStoreRequestTestTrait
         $this->assertTrue($validator->errors()->has('name'));
     }
 
-    public function test_rules_validation_fails_with_name_too_long(): void
+    public function testRulesValidationFailsWithNameTooLong(): void
     {
         $data = ['name' => str_repeat('a', 256)];
 
@@ -56,7 +56,7 @@ trait SimpleCrudStoreRequestTestTrait
         $this->assertTrue($validator->errors()->has('name'));
     }
 
-    public function test_rules_validation_passes_with_unique_name(): void
+    public function testRulesValidationPassesWithUniqueName(): void
     {
         $modelClass = $this->getModelClass();
         $modelClass::factory()->create(['name' => 'Existing Name']);

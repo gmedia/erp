@@ -236,48 +236,158 @@ class CoaSeeder extends Seeder
         return [
             // Assets
             [
-                'code' => '10000', 'name' => 'Assets', 'type' => 'asset', 'normal_balance' => 'debit', 'level' => 1,
+                'code' => '10000',
+                'name' => 'Assets',
+                'type' => 'asset',
+                'normal_balance' => 'debit',
+                'level' => 1,
                 'children' => [
-                    ['code' => '11000', 'name' => 'Current Assets', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 2, 'children' => [
-                        ['code' => '11100', 'name' => 'Cash', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 3, 'is_cash_flow' => true],
-                        ['code' => '11200', 'name' => 'Accounts Receivable', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 3],
-                        ['code' => '11300', 'name' => 'Inventory', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 3],
-                    ]],
-                    ['code' => '12000', 'name' => 'Non-Current Assets', 'type' => 'asset', 'sub_type' => 'non_current_asset', 'normal_balance' => 'debit', 'level' => 2, 'children' => [
-                        ['code' => '12100', 'name' => 'Equipment', 'type' => 'asset', 'sub_type' => 'non_current_asset', 'normal_balance' => 'debit', 'level' => 3],
-                    ]],
+                    [
+                        'code' => '11000',
+                        'name' => 'Current Assets',
+                        'type' => 'asset',
+                        'sub_type' => 'current_asset',
+                        'normal_balance' => 'debit',
+                        'level' => 2,
+                        'children' => [
+                            [
+                                'code' => '11100',
+                                'name' => 'Cash',
+                                'type' => 'asset',
+                                'sub_type' => 'current_asset',
+                                'normal_balance' => 'debit',
+                                'level' => 3,
+                                'is_cash_flow' => true,
+                            ],
+                            [
+                                'code' => '11200',
+                                'name' => 'Accounts Receivable',
+                                'type' => 'asset',
+                                'sub_type' => 'current_asset',
+                                'normal_balance' => 'debit',
+                                'level' => 3,
+                            ],
+                            [
+                                'code' => '11300',
+                                'name' => 'Inventory',
+                                'type' => 'asset',
+                                'sub_type' => 'current_asset',
+                                'normal_balance' => 'debit',
+                                'level' => 3,
+                            ],
+                        ],
+                    ],
+                    [
+                        'code' => '12000',
+                        'name' => 'Non-Current Assets',
+                        'type' => 'asset',
+                        'sub_type' => 'non_current_asset',
+                        'normal_balance' => 'debit',
+                        'level' => 2,
+                        'children' => [
+                            [
+                                'code' => '12100',
+                                'name' => 'Equipment',
+                                'type' => 'asset',
+                                'sub_type' => 'non_current_asset',
+                                'normal_balance' => 'debit',
+                                'level' => 3,
+                            ],
+                        ],
+                    ],
                 ],
             ],
             // Liabilities
             [
-                'code' => '20000', 'name' => 'Liabilities', 'type' => 'liability', 'normal_balance' => 'credit', 'level' => 1,
+                'code' => '20000',
+                'name' => 'Liabilities',
+                'type' => 'liability',
+                'normal_balance' => 'credit',
+                'level' => 1,
                 'children' => [
-                    ['code' => '21000', 'name' => 'Current Liabilities', 'type' => 'liability', 'sub_type' => 'current_liability', 'normal_balance' => 'credit', 'level' => 2, 'children' => [
-                        ['code' => '21100', 'name' => 'Accounts Payable', 'type' => 'liability', 'sub_type' => 'current_liability', 'normal_balance' => 'credit', 'level' => 3],
-                    ]],
+                    [
+                        'code' => '21000',
+                        'name' => 'Current Liabilities',
+                        'type' => 'liability',
+                        'sub_type' => 'current_liability',
+                        'normal_balance' => 'credit',
+                        'level' => 2,
+                        'children' => [
+                            [
+                                'code' => '21100',
+                                'name' => 'Accounts Payable',
+                                'type' => 'liability',
+                                'sub_type' => 'current_liability',
+                                'normal_balance' => 'credit',
+                                'level' => 3,
+                            ],
+                        ],
+                    ],
                 ],
             ],
             // Equity
             [
-                'code' => '30000', 'name' => 'Equity', 'type' => 'equity', 'normal_balance' => 'credit', 'level' => 1,
+                'code' => '30000',
+                'name' => 'Equity',
+                'type' => 'equity',
+                'normal_balance' => 'credit',
+                'level' => 1,
                 'children' => [
-                    ['code' => '31000', 'name' => 'Owner Capital', 'type' => 'equity', 'normal_balance' => 'credit', 'level' => 2],
-                    ['code' => '32000', 'name' => 'Retained Earnings', 'type' => 'equity', 'normal_balance' => 'credit', 'level' => 2],
+                    [
+                        'code' => '31000',
+                        'name' => 'Owner Capital',
+                        'type' => 'equity',
+                        'normal_balance' => 'credit',
+                        'level' => 2,
+                    ],
+                    [
+                        'code' => '32000',
+                        'name' => 'Retained Earnings',
+                        'type' => 'equity',
+                        'normal_balance' => 'credit',
+                        'level' => 2,
+                    ],
                 ],
             ],
             // Revenue
             [
-                'code' => '40000', 'name' => 'Revenue', 'type' => 'revenue', 'normal_balance' => 'credit', 'level' => 1,
+                'code' => '40000',
+                'name' => 'Revenue',
+                'type' => 'revenue',
+                'normal_balance' => 'credit',
+                'level' => 1,
                 'children' => [
-                    ['code' => '41000', 'name' => 'Sales Revenue', 'type' => 'revenue', 'normal_balance' => 'credit', 'level' => 2],
+                    [
+                        'code' => '41000',
+                        'name' => 'Sales Revenue',
+                        'type' => 'revenue',
+                        'normal_balance' => 'credit',
+                        'level' => 2,
+                    ],
                 ],
             ],
             // Expense
             [
-                'code' => '50000', 'name' => 'Expense', 'type' => 'expense', 'normal_balance' => 'debit', 'level' => 1,
+                'code' => '50000',
+                'name' => 'Expense',
+                'type' => 'expense',
+                'normal_balance' => 'debit',
+                'level' => 1,
                 'children' => [
-                    ['code' => '51000', 'name' => 'Cost of Goods Sold', 'type' => 'expense', 'normal_balance' => 'debit', 'level' => 2],
-                    ['code' => '52000', 'name' => 'Operating Expense', 'type' => 'expense', 'normal_balance' => 'debit', 'level' => 2],
+                    [
+                        'code' => '51000',
+                        'name' => 'Cost of Goods Sold',
+                        'type' => 'expense',
+                        'normal_balance' => 'debit',
+                        'level' => 2,
+                    ],
+                    [
+                        'code' => '52000',
+                        'name' => 'Operating Expense',
+                        'type' => 'expense',
+                        'normal_balance' => 'debit',
+                        'level' => 2,
+                    ],
                 ],
             ],
         ];
@@ -288,52 +398,169 @@ class CoaSeeder extends Seeder
         return [
             // Assets
             [
-                'code' => '10000', 'name' => 'Assets', 'type' => 'asset', 'normal_balance' => 'debit', 'level' => 1,
+                'code' => '10000',
+                'name' => 'Assets',
+                'type' => 'asset',
+                'normal_balance' => 'debit',
+                'level' => 1,
                 'children' => [
-                    ['code' => '11000', 'name' => 'Current Assets', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 2, 'children' => [
-                        // CHANGE 1: Split Cash into Cash in Bank and Petty Cash
-                        ['code' => '11110', 'name' => 'Cash in Banks', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 3, 'is_cash_flow' => true],
-                        ['code' => '11120', 'name' => 'Petty Cash', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 3, 'is_cash_flow' => true],
-
-                        ['code' => '11200', 'name' => 'Accounts Receivable', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 3],
-                        ['code' => '11300', 'name' => 'Inventory', 'type' => 'asset', 'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'level' => 3],
-                    ]],
-                    ['code' => '12000', 'name' => 'Non-Current Assets', 'type' => 'asset', 'sub_type' => 'non_current_asset', 'normal_balance' => 'debit', 'level' => 2, 'children' => [
-                        ['code' => '12100', 'name' => 'Equipment', 'type' => 'asset', 'sub_type' => 'non_current_asset', 'normal_balance' => 'debit', 'level' => 3],
-                    ]],
+                    [
+                        'code' => '11000',
+                        'name' => 'Current Assets',
+                        'type' => 'asset',
+                        'sub_type' => 'current_asset',
+                        'normal_balance' => 'debit',
+                        'level' => 2,
+                        'children' => [
+                            // CHANGE 1: Split Cash into Cash in Bank and Petty Cash
+                            [
+                                'code' => '11110',
+                                'name' => 'Cash in Banks',
+                                'type' => 'asset',
+                                'sub_type' => 'current_asset',
+                                'normal_balance' => 'debit',
+                                'level' => 3,
+                                'is_cash_flow' => true,
+                            ],
+                            [
+                                'code' => '11120',
+                                'name' => 'Petty Cash',
+                                'type' => 'asset',
+                                'sub_type' => 'current_asset',
+                                'normal_balance' => 'debit',
+                                'level' => 3,
+                                'is_cash_flow' => true,
+                            ],
+                            [
+                                'code' => '11200',
+                                'name' => 'Accounts Receivable',
+                                'type' => 'asset',
+                                'sub_type' => 'current_asset',
+                                'normal_balance' => 'debit',
+                                'level' => 3,
+                            ],
+                            [
+                                'code' => '11300',
+                                'name' => 'Inventory',
+                                'type' => 'asset',
+                                'sub_type' => 'current_asset',
+                                'normal_balance' => 'debit',
+                                'level' => 3,
+                            ],
+                        ],
+                    ],
+                    [
+                        'code' => '12000',
+                        'name' => 'Non-Current Assets',
+                        'type' => 'asset',
+                        'sub_type' => 'non_current_asset',
+                        'normal_balance' => 'debit',
+                        'level' => 2,
+                        'children' => [
+                            [
+                                'code' => '12100',
+                                'name' => 'Equipment',
+                                'type' => 'asset',
+                                'sub_type' => 'non_current_asset',
+                                'normal_balance' => 'debit',
+                                'level' => 3,
+                            ],
+                        ],
+                    ],
                 ],
             ],
             // Liabilities
             [
-                'code' => '20000', 'name' => 'Liabilities', 'type' => 'liability', 'normal_balance' => 'credit', 'level' => 1,
+                'code' => '20000',
+                'name' => 'Liabilities',
+                'type' => 'liability',
+                'normal_balance' => 'credit',
+                'level' => 1,
                 'children' => [
-                    ['code' => '21000', 'name' => 'Current Liabilities', 'type' => 'liability', 'sub_type' => 'current_liability', 'normal_balance' => 'credit', 'level' => 2, 'children' => [
-                        ['code' => '21100', 'name' => 'Accounts Payable', 'type' => 'liability', 'sub_type' => 'current_liability', 'normal_balance' => 'credit', 'level' => 3],
-                    ]],
+                    [
+                        'code' => '21000',
+                        'name' => 'Current Liabilities',
+                        'type' => 'liability',
+                        'sub_type' => 'current_liability',
+                        'normal_balance' => 'credit',
+                        'level' => 2,
+                        'children' => [
+                            [
+                                'code' => '21100',
+                                'name' => 'Accounts Payable',
+                                'type' => 'liability',
+                                'sub_type' => 'current_liability',
+                                'normal_balance' => 'credit',
+                                'level' => 3,
+                            ],
+                        ],
+                    ],
                 ],
             ],
             // Equity
             [
-                'code' => '30000', 'name' => 'Equity', 'type' => 'equity', 'normal_balance' => 'credit', 'level' => 1,
+                'code' => '30000',
+                'name' => 'Equity',
+                'type' => 'equity',
+                'normal_balance' => 'credit',
+                'level' => 1,
                 'children' => [
-                    ['code' => '31000', 'name' => 'Owner Capital', 'type' => 'equity', 'normal_balance' => 'credit', 'level' => 2],
-                    ['code' => '32000', 'name' => 'Retained Earnings', 'type' => 'equity', 'normal_balance' => 'credit', 'level' => 2],
+                    [
+                        'code' => '31000',
+                        'name' => 'Owner Capital',
+                        'type' => 'equity',
+                        'normal_balance' => 'credit',
+                        'level' => 2,
+                    ],
+                    [
+                        'code' => '32000',
+                        'name' => 'Retained Earnings',
+                        'type' => 'equity',
+                        'normal_balance' => 'credit',
+                        'level' => 2,
+                    ],
                 ],
             ],
             // Revenue
             [
-                'code' => '40000', 'name' => 'Revenue', 'type' => 'revenue', 'normal_balance' => 'credit', 'level' => 1,
+                'code' => '40000',
+                'name' => 'Revenue',
+                'type' => 'revenue',
+                'normal_balance' => 'credit',
+                'level' => 1,
                 'children' => [
-                    ['code' => '41000', 'name' => 'Sales Revenue', 'type' => 'revenue', 'normal_balance' => 'credit', 'level' => 2],
+                    [
+                        'code' => '41000',
+                        'name' => 'Sales Revenue',
+                        'type' => 'revenue',
+                        'normal_balance' => 'credit',
+                        'level' => 2,
+                    ],
                 ],
             ],
             // Expense
             [
-                'code' => '50000', 'name' => 'Expense', 'type' => 'expense', 'normal_balance' => 'debit', 'level' => 1,
+                'code' => '50000',
+                'name' => 'Expense',
+                'type' => 'expense',
+                'normal_balance' => 'debit',
+                'level' => 1,
                 'children' => [
-                    ['code' => '51000', 'name' => 'Cost of Goods Sold', 'type' => 'expense', 'normal_balance' => 'debit', 'level' => 2],
+                    [
+                        'code' => '51000',
+                        'name' => 'Cost of Goods Sold',
+                        'type' => 'expense',
+                        'normal_balance' => 'debit',
+                        'level' => 2,
+                    ],
                     // CHANGE 2: Renamed Operating Expense to General & Admin Expense
-                    ['code' => '52000', 'name' => 'General & Admin Expense', 'type' => 'expense', 'normal_balance' => 'debit', 'level' => 2],
+                    [
+                        'code' => '52000',
+                        'name' => 'General & Admin Expense',
+                        'type' => 'expense',
+                        'normal_balance' => 'debit',
+                        'level' => 2,
+                    ],
                 ],
             ],
         ];

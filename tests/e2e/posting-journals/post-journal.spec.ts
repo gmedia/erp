@@ -76,8 +76,6 @@ test.describe('Posting Journal End-to-End', () => {
         // Verify button text updates
         const postButton = page.getByRole('button', { name: /Post Selected/i });
         await expect(postButton).toContainText(`(${checkboxCount})`);
-    } else {
-        // console.log('Skipping "Select All" test as no draft journals are available.');
     }
   });
 });

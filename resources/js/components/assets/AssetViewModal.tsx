@@ -19,10 +19,14 @@ interface AssetViewModalProps {
     item: Asset | null;
 }
 
-export function AssetViewModal({ open, onClose, item }: AssetViewModalProps) {
+export function AssetViewModal({
+    open,
+    onClose,
+    item,
+}: Readonly<AssetViewModalProps>) {
     if (!item) return null;
 
-    const formatDate = (dateString: string | null) => {
+    const formatDate = (dateString: Readonly<string | null>) => {
         if (!dateString) return 'N/A';
         try {
             return format(new Date(dateString), 'PPP');

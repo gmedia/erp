@@ -11,7 +11,7 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class InventoryStocktakeVarianceReportExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class InventoryStocktakeVarianceExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
     protected array $filters;
 

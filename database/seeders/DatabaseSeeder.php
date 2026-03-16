@@ -169,7 +169,12 @@ class DatabaseSeeder extends Seeder
 
         // Assign all permissions to sample users for easy testing
         $allPermissions = Permission::all();
-        foreach ([config('app.admin'), 'manager.hr@dokfin.id', 'director.finance@dokfin.id', 'staff.it@dokfin.id'] as $email) {
+        foreach ([
+            config('app.admin'),
+            'manager.hr@dokfin.id',
+            'director.finance@dokfin.id',
+            'staff.it@dokfin.id',
+        ] as $email) {
             $employee = Employee::where('email', $email)->first();
             if ($employee) {
                 $employee->permissions()->sync($allPermissions);

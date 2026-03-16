@@ -13,9 +13,20 @@ return new class extends Migration
             $table->string('adjustment_number')->nullable()->unique();
             $table->foreignId('warehouse_id')->constrained('warehouses')->cascadeOnDelete();
             $table->date('adjustment_date');
-            $table->enum('adjustment_type', ['damage', 'expired', 'shrinkage', 'correction', 'stocktake_result', 'initial_stock', 'other']);
+            $table->enum('adjustment_type', [
+                'damage',
+                'expired',
+                'shrinkage',
+                'correction',
+                'stocktake_result',
+                'initial_stock',
+                'other',
+            ]);
             $table->enum('status', ['draft', 'pending_approval', 'approved', 'cancelled'])->default('draft');
-            $table->foreignId('inventory_stocktake_id')->nullable()->constrained('inventory_stocktakes')->nullOnDelete();
+            $table->foreignId('inventory_stocktake_id')
+                ->nullable()
+                ->constrained('inventory_stocktakes')
+                ->nullOnDelete();
             $table->text('notes')->nullable();
             $table->foreignId('journal_entry_id')->nullable()->constrained('journal_entries')->nullOnDelete();
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
