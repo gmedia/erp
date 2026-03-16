@@ -285,12 +285,12 @@ export function generateModuleTests(config: ModuleTestConfig) {
                 if (filterTest.filterType === 'combobox' || filterTest.filterType === 'select') {
                     const combobox = container.getByRole('combobox').first();
                     await combobox.click();
-                    await page
-                        .getByRole('option', {
-                            name: new RegExp(filterTest.filterValue, 'i'),
-                        })
-                        .first()
-                        .click();
+                    const option = page
+                        .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+                        .filter({ hasText: new RegExp(filterTest.filterValue, 'i') })
+                        .first();
+                    await expect(option).toBeVisible();
+                    await option.click({ force: true });
                 }
             }
 

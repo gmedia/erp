@@ -1,6 +1,15 @@
 import { Page, expect } from '@playwright/test';
 import { login } from '../helpers';
 
+async function pickAsyncOption(page: Page, label: string): Promise<void> {
+  const option = page
+    .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+    .filter({ hasText: new RegExp(`^${label}`, 'i') })
+    .first();
+  await expect(option).toBeVisible({ timeout: 10000 });
+  await option.click({ force: true });
+}
+
 /**
  * Create a new asset via the UI.
  */
@@ -47,12 +56,10 @@ export async function createAsset(
   // Strict check might fail if 'IT' matches multiple. distinct name is better.
   // Using generic first option if strict match fails is a pattern used elsewhere.
   try {
-      const categoryOption = page.getByRole('option', { name: new RegExp(`^${categoryName}`, 'i') }).first();
-      await expect(categoryOption).toBeVisible({ timeout: 2000 });
-      await categoryOption.click();
+      await pickAsyncOption(page, categoryName);
   } catch {
       // Fallback
-      await page.getByRole('option').first().click();
+      await page.locator('[role="option"]:visible, ul[aria-busy]:visible button:visible').first().click({ force: true });
   }
 
   // Select Branch (AsyncSelect)
@@ -64,11 +71,9 @@ export async function createAsset(
   await branchSearchInput.fill(branchName);
   
   try {
-    const branchOption = page.getByRole('option', { name: new RegExp(`^${branchName}`, 'i') }).first();
-    await expect(branchOption).toBeVisible({ timeout: 2000 });
-    await branchOption.click();
+     await pickAsyncOption(page, branchName);
   } catch {
-     await page.getByRole('option').first().click();
+      await page.locator('[role="option"]:visible, ul[aria-busy]:visible button:visible').first().click({ force: true });
   }
 
   // Purchase Information

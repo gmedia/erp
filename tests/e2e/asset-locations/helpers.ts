@@ -32,11 +32,14 @@ export async function createAssetLocation(
   await dialog.locator('input[name="name"]').fill(name);
 
   // Select branch (Mandatory)
-  await dialog.locator('button:has-text("Select a branch")').click();
-  // Wait for the popover/dropdown to be visible
-  await page.waitForSelector('[role="option"]', { state: 'visible' });
-  const branchOption = page.getByRole('option').first();
-  await branchOption.click();
+  await dialog.getByRole('combobox', { name: /Branch/i }).click();
+  const listbox = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
+  await expect(listbox).toBeVisible({ timeout: 10000 });
+  const branchOption = page
+    .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+    .first();
+  await expect(branchOption).toBeVisible({ timeout: 10000 });
+  await branchOption.click({ force: true });
 
   // Submit
   const submitButton = dialog.getByRole('button', { name: /Add/i });

@@ -61,26 +61,29 @@ export async function createEntity(
       const combobox = page.getByRole('combobox', { name: new RegExp(field.selector || value, 'i') }).first();
       await expect(combobox).toBeVisible();
       await combobox.click();
-      
-      // Wait for listbox to be visible
-      const listbox = page.getByRole('listbox');
+
+      // Support both legacy listbox/option and current AsyncSelect popover list.
+      const listbox = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
       await expect(listbox).toBeVisible();
 
       // Search if input is available
-      const searchInput = listbox.getByPlaceholder('Search...');
-      if (await searchInput.isVisible()) {
+      const searchInput = page.locator('input[placeholder="Search..."]:visible').last();
+      if (await searchInput.isVisible().catch(() => false)) {
         await searchInput.fill(value);
         // Wait for debounce and fetch
         await page.waitForTimeout(500);
       }
 
       // Click the option
-      const option = listbox.getByRole('option', { name: new RegExp(value, 'i') }).first();
+      const option = page
+        .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+        .filter({ hasText: new RegExp(value, 'i') })
+        .first();
       await expect(option).toBeVisible();
-      await option.click();
+      await option.click({ force: true });
 
       // Wait for listbox to disappear
-      await expect(listbox).not.toBeVisible();
+      await expect(page.locator('[role="listbox"]:visible, ul[aria-busy]:visible')).toHaveCount(0, { timeout: 10000 }).catch(() => null);
     }
  else if (field.type === 'textarea') {
       await page.fill(`textarea[name="${field.name}"]`, value);

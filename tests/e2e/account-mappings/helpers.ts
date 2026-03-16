@@ -7,15 +7,17 @@ async function fillVisibleSearch(page: Page, value: string): Promise<void> {
 }
 
 async function clickFirstMatchingOption(page: Page, name: RegExp): Promise<void> {
-  const options = page.locator('[role="option"]:visible').filter({ hasText: name });
+  const options = page
+    .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+    .filter({ hasText: name });
   await expect(options.first()).toBeVisible({ timeout: 15000 });
   
   const option = options.first();
   await option.scrollIntoViewIfNeeded();
-  await option.click();
+  await option.click({ force: true });
   
   // Wait for the listbox/dropdown to disappear after selection
-  await expect(page.locator('[role="listbox"]:visible')).toHaveCount(0, { timeout: 15000 });
+  await expect(page.locator('[role="listbox"]:visible, ul[aria-busy]:visible')).toHaveCount(0, { timeout: 15000 });
 }
 
 
@@ -57,11 +59,11 @@ export async function createAccountMapping(page: Page): Promise<{
       for (let i = 0; i < retries; i++) {
           try {
               // Wait for listbox to finish loading
-              const listbox = page.locator('[role="listbox"]:visible');
+              const listbox = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
               await expect(listbox).toBeVisible({ timeout: 10000 });
               await expect(listbox).not.toHaveAttribute('aria-busy', 'true', { timeout: 10000 });
               
-              const options = listbox.locator('[role="option"]');
+              const options = listbox.locator('[role="option"], button');
               await expect(options.first()).toBeVisible({ timeout: 5000 });
               
               const firstOption = options.first();

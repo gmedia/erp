@@ -1,6 +1,24 @@
 import { Page, expect } from '@playwright/test';
 import { login } from '../helpers';
 
+async function pickAsyncOption(page: Page, value: string): Promise<void> {
+  const listbox = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
+  await expect(listbox).toBeVisible({ timeout: 10000 });
+
+  const searchInput = page.locator('input[placeholder="Search..."]:visible').last();
+  if (await searchInput.isVisible().catch(() => false)) {
+    await searchInput.fill(value);
+    await page.waitForTimeout(500);
+  }
+
+  const option = page
+    .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+    .filter({ hasText: new RegExp(value, 'i') })
+    .first();
+  await expect(option).toBeVisible({ timeout: 15000 });
+  await option.click({ force: true });
+}
+
 /**
  * Create a new approval delegation via the UI.
  *
@@ -51,28 +69,12 @@ export async function createApprovalDelegation(
   // Handle AsyncSelect for Delegator
   const delegatorTrigger = dialog.getByRole('combobox', { name: /Delegator/i }).first();
   await delegatorTrigger.click();
-  const delegatorListbox = page.getByRole('listbox').last();
-  await expect(delegatorListbox).toBeVisible();
-  
-  const delegatorSearch = page.getByPlaceholder('Search...').last();
-  if (await delegatorSearch.isVisible()) {
-    await delegatorSearch.fill(delegator);
-    await page.waitForTimeout(500); // Wait for debounce
-  }
-  await delegatorListbox.getByRole('option', { name: new RegExp(delegator, 'i') }).first().click();
+  await pickAsyncOption(page, delegator);
 
   // Handle AsyncSelect for Delegate
   const delegateTrigger = dialog.getByRole('combobox', { name: /Delegate/i }).first();
   await delegateTrigger.click();
-  const delegateListbox = page.getByRole('listbox').last();
-  await expect(delegateListbox).toBeVisible();
-
-  const delegateSearch = page.getByPlaceholder('Search...').last();
-  if (await delegateSearch.isVisible()) {
-    await delegateSearch.fill(delegate);
-    await page.waitForTimeout(500);
-  }
-  await delegateListbox.getByRole('option', { name: new RegExp(delegate, 'i') }).first().click();
+  await pickAsyncOption(page, delegate);
 
   // Fill text fields
   await page.fill('input[name="approvable_type"]', type);
@@ -85,7 +87,12 @@ export async function createApprovalDelegation(
   if (status !== 'Active') {
       const statusTrigger = dialog.getByRole('combobox', { name: /Status/i }).first();
       await statusTrigger.click();
-      await page.getByRole('listbox').getByRole('option', { name: new RegExp(status, 'i') }).click();
+      const statusOption = page
+        .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+        .filter({ hasText: new RegExp(status, 'i') })
+        .first();
+      await expect(statusOption).toBeVisible();
+      await statusOption.click({ force: true });
   }
 
   const submitButton = dialog.getByRole('button', { name: /Add|Create|Submit|Buat/i }).first();
@@ -136,7 +143,12 @@ export async function editApprovalDelegation(
   if (updates.status) {
     const statusTrigger = dialog.getByRole('combobox', { name: /Status/i }).first();
     await statusTrigger.click();
-    await page.getByRole('listbox').getByRole('option', { name: new RegExp(updates.status, 'i') }).click();
+    const statusOption = page
+      .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+      .filter({ hasText: new RegExp(updates.status, 'i') })
+      .first();
+    await expect(statusOption).toBeVisible();
+    await statusOption.click({ force: true });
   }
 
   const updateBtn = dialog.getByRole('button', { name: /Update|Save/i });

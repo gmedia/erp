@@ -15,9 +15,9 @@ export async function createAssetMaintenance(
 
   const assetTrigger = dialog.locator('button').filter({ hasText: /Select asset/i });
   await assetTrigger.click();
-  const assetOption = page.getByRole('option').first();
+  const assetOption = page.locator('[role="option"]:visible, ul[aria-busy]:visible button:visible').first();
   await expect(assetOption).toBeVisible();
-  await assetOption.click();
+  await assetOption.click({ force: true });
 
   const typeTrigger = dialog.locator('button').filter({ hasText: /Preventive|Corrective|Calibration|Other/i }).first();
   await typeTrigger.click();
