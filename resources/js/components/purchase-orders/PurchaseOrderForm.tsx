@@ -502,9 +502,9 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                         setEditingIndex(null);
                     }}
                     item={
-                        editingIndex !== null
-                            ? (watchedItems?.[editingIndex] ?? null)
-                            : null
+                        editingIndex === null
+                            ? null
+                            : (watchedItems?.[editingIndex] ?? null)
                     }
                     onSave={(data) => {
                         if (editingIndex === null) {
