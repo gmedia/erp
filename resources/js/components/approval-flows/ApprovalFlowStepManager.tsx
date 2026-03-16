@@ -70,7 +70,11 @@ export function ApprovalFlowStepManager({
         editingIndex === null ? null : (fields[editingIndex] ?? null);
 
     const handleDelete = (index: number) => {
-        if (window.confirm('Are you sure you want to delete this step?')) {
+        if (
+            globalThis.window.confirm(
+                'Are you sure you want to delete this step?',
+            )
+        ) {
             remove(index);
         }
     };

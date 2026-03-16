@@ -61,8 +61,8 @@ function createActionsCell<T>(options: ActionCellOptions<T>) {
         <GenericActions<T>
             item={row.original}
             onView={onView}
-            onEdit={onEdit!}
-            onDelete={onDelete!}
+            onEdit={onEdit}
+            onDelete={onDelete}
             extraItems={extraActionItems}
             viewUrl={viewPath ? viewPath(row.original) : undefined}
         />

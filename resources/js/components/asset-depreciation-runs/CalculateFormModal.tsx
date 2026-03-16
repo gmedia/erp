@@ -52,7 +52,7 @@ export function CalculateFormModal({
     ) => {
         const result = await onSubmit(data);
 
-        if (result && result.errors) {
+        if (result?.errors) {
             const errors = result.errors;
             Object.keys(errors).forEach((key) => {
                 setError(key as keyof AssetDepreciationCalculationFormData, {

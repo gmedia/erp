@@ -52,7 +52,7 @@ export function useExport({
             a.download = response.data.filename || filename || 'export.xlsx';
             document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
+            a.remove();
 
             toast.success('Export completed successfully');
         } catch (error) {

@@ -120,12 +120,11 @@ export default function MyApprovalsPage() {
         const id = request.approvable_id;
         const ulid = request.approvable?.ulid;
 
-        switch (type) {
-            case 'Asset':
-                return `/assets/${ulid || id}`;
-            default:
-                return '#';
+        if (type === 'Asset') {
+            return `/assets/${ulid || id}`;
         }
+
+        return '#';
     };
 
     let actionConfirmText = 'Confirm Rejection';
