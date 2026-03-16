@@ -55,7 +55,7 @@ export function StockAdjustmentItemFormDialog({
     onOpenChange,
     item,
     onSave,
-}: StockAdjustmentItemFormDialogProps) {
+}: Readonly<StockAdjustmentItemFormDialogProps>) {
     const defaultValues = useMemo<StockAdjustmentItemFormData>(() => {
         if (!item) {
             return {

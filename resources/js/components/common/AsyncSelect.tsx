@@ -178,16 +178,18 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                         />
                     </div>
                     <ScrollArea className="max-h-[200px]">
-                        <ul className="p-1" role="listbox" aria-busy={loading}>
+                        <ul className="p-1" aria-busy={loading}>
                             {loading && (
-                                <div className="flex items-center justify-center p-4">
+                                <li className="list-none p-4">
+                                    <div className="flex items-center justify-center">
                                     <Loader2 className="h-4 w-4 animate-spin" />
-                                </div>
+                                    </div>
+                                </li>
                             )}
                             {!loading && items.length === 0 && (
-                                <div className="py-6 text-center text-sm text-muted-foreground">
+                                <li className="list-none py-6 text-center text-sm text-muted-foreground">
                                     No results found.
-                                </div>
+                                </li>
                             )}
                             {!loading &&
                                 items.map((item) => {
@@ -198,12 +200,11 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                                             key={itemValue}
                                             className="list-none"
                                         >
-                                            <div
-                                                role="option"
-                                                aria-selected={
+                                            <button
+                                                type="button"
+                                                aria-pressed={
                                                     itemValue === value
                                                 }
-                                                tabIndex={0}
                                                 className={cn(
                                                     'relative flex w-full cursor-pointer items-center rounded-sm px-2 py-1.5 text-left text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
                                                     itemValue === value
@@ -211,15 +212,6 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                                                         : '',
                                                 )}
                                                 onClick={() => selectItem(item)}
-                                                onKeyDown={(event) => {
-                                                    if (
-                                                        event.key === 'Enter' ||
-                                                        event.key === ' '
-                                                    ) {
-                                                        event.preventDefault();
-                                                        selectItem(item);
-                                                    }
-                                                }}
                                             >
                                                 <Check
                                                     className={cn(
@@ -230,7 +222,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                                                     )}
                                                 />
                                                 {itemLabel}
-                                            </div>
+                                            </button>
                                         </li>
                                     );
                                 })}

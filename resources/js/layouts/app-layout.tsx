@@ -7,7 +7,11 @@ interface AppLayoutProps {
     breadcrumbs?: BreadcrumbItem[];
 }
 
-function AppLayout({ children, breadcrumbs, ...props }: AppLayoutProps) {
+function AppLayout({
+    children,
+    breadcrumbs,
+    ...props
+}: Readonly<AppLayoutProps>) {
     return (
         <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
             {children}

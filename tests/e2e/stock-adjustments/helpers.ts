@@ -10,7 +10,7 @@ async function selectAsyncOption(
         await expect(trigger).toBeVisible();
         await trigger.click();
 
-        const listbox = page.locator('[role="listbox"]:visible').last();
+        const listbox = page.locator('ul[aria-busy]:visible').last();
         await expect(listbox).toBeVisible();
 
         if (searchText) {
@@ -22,7 +22,8 @@ async function selectAsyncOption(
         }
 
         const option = listbox
-            .getByRole('option', { name: new RegExp(optionText, 'i') })
+            .locator('button')
+            .filter({ hasText: new RegExp(optionText, 'i') })
             .first();
 
         try {
