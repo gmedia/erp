@@ -24,6 +24,8 @@ interface PurchaseOrderViewModalProps {
     item: PurchaseOrder | null;
 }
 
+type FormatValueInput = string | number | null | undefined;
+
 const ViewField = ({
     label,
     value,
@@ -41,7 +43,7 @@ export const PurchaseOrderViewModal = React.memo(
     ({ item, open, onClose }: PurchaseOrderViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = (value: string | number | null | undefined) =>
+        const formatAmount = (value: FormatValueInput) =>
             formatCurrencyByRegionalSettings(value ?? 0, {
                 locale: 'id-ID',
                 currency: item.currency || undefined,
@@ -49,14 +51,14 @@ export const PurchaseOrderViewModal = React.memo(
                 maximumFractionDigits: 2,
             });
 
-        const formatQuantity = (value: string | number | null | undefined) =>
+        const formatQuantity = (value: FormatValueInput) =>
             formatNumberByRegionalSettings(value ?? 0, {
                 locale: 'id-ID',
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 2,
             });
 
-        const formatPercent = (value: string | number | null | undefined) =>
+        const formatPercent = (value: FormatValueInput) =>
             `${formatNumberByRegionalSettings(value ?? 0, {
                 locale: 'id-ID',
                 minimumFractionDigits: 0,

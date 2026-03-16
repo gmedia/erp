@@ -372,7 +372,7 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                             <TableBody>
                                 {fields.map((field, index) => {
                                     const purchaseOrderItem =
-                                        watchedItems?.[index] ||
+                                        watchedItems?.[index] ??
                                         createEmptyPurchaseOrderItem();
 
                                     return (
@@ -476,7 +476,7 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                         </TableRow>
                                     );
                                 })}
-                                {!fields.length && (
+                                {fields.length === 0 && (
                                     <TableRow>
                                         <TableCell
                                             colSpan={8}
@@ -502,9 +502,9 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                         setEditingIndex(null);
                     }}
                     item={
-                        editingIndex === null
-                            ? null
-                            : watchedItems?.[editingIndex] || null
+                        editingIndex !== null
+                            ? (watchedItems?.[editingIndex] ?? null)
+                            : null
                     }
                     onSave={(data) => {
                         if (editingIndex === null) {

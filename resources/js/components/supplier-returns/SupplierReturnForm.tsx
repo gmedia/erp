@@ -382,7 +382,7 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                             <TableBody>
                                 {fields.map((field, index) => {
                                     const supplierReturnItem =
-                                        watchedItems?.[index] ||
+                                        watchedItems?.[index] ??
                                         createEmptySupplierReturnItem();
 
                                     return (
@@ -446,7 +446,7 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                                         </TableRow>
                                     );
                                 })}
-                                {!fields.length && (
+                                {fields.length === 0 && (
                                     <TableRow>
                                         <TableCell
                                             colSpan={7}
@@ -472,9 +472,9 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                         setEditingIndex(null);
                     }}
                     item={
-                        editingIndex === null
-                            ? null
-                            : watchedItems?.[editingIndex] || null
+                        editingIndex !== null
+                            ? (watchedItems?.[editingIndex] ?? null)
+                            : null
                     }
                     onSave={(data) => {
                         if (editingIndex === null) {

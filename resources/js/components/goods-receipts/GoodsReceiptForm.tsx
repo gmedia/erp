@@ -355,7 +355,7 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                             <TableBody>
                                 {fields.map((field, index) => {
                                     const goodsReceiptItem =
-                                        watchedItems?.[index] ||
+                                        watchedItems?.[index] ??
                                         createEmptyGoodsReceiptItem();
 
                                     return (
@@ -426,7 +426,7 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                                         </TableRow>
                                     );
                                 })}
-                                {!fields.length && (
+                                {fields.length === 0 && (
                                     <TableRow>
                                         <TableCell
                                             colSpan={9}
@@ -452,9 +452,9 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                         setEditingIndex(null);
                     }}
                     item={
-                        editingIndex === null
-                            ? null
-                            : watchedItems?.[editingIndex] || null
+                        editingIndex !== null
+                            ? (watchedItems?.[editingIndex] ?? null)
+                            : null
                     }
                     onSave={(data) => {
                         if (editingIndex === null) {

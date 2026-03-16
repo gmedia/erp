@@ -87,11 +87,11 @@ function setGlobalSettings(
 }
 
 function readStorageSettings(): RegionalNumberFormatSettings | null {
-    if (typeof window === 'undefined') {
+    if (globalThis.window === undefined) {
         return null;
     }
 
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = globalThis.localStorage.getItem(STORAGE_KEY);
     if (!raw) {
         return null;
     }
@@ -105,11 +105,11 @@ function readStorageSettings(): RegionalNumberFormatSettings | null {
 }
 
 function writeStorageSettings(settings: RegionalNumberFormatSettings): void {
-    if (typeof window === 'undefined') {
+    if (globalThis.window === undefined) {
         return;
     }
 
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    globalThis.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 }
 
 export function getRegionalNumberFormatSettings(): RegionalNumberFormatSettings {
