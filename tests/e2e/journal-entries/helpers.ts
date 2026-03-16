@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Page, expect } from '@playwright/test';
 
 /**
@@ -22,7 +23,7 @@ export async function createJournalEntry(
   }> = {}
 ): Promise<string> {
   const timestamp = Date.now();
-  const random = Math.floor(Math.random() * 10000);
+  const random = randomUUID().slice(0, 8);
   const defaultRef = `REF-${timestamp}-${random}`;
   const defaultDesc = `Journal Entry ${timestamp}`;
 

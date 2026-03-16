@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Page, expect } from '@playwright/test';
 
 /**
@@ -37,7 +38,7 @@ export async function createFiscalYear(
   }> = {}
 ): Promise<string> {
   const timestamp = Date.now();
-  const random = Math.floor(Math.random() * 10000);
+  const random = randomUUID().slice(0, 8);
   const name = overrides.name ?? `FY ${timestamp}-${random}`;
 
 
