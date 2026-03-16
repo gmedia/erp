@@ -160,7 +160,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         localStorage.removeItem('api_token');
         setUser(null);
-        globalThis.window.location.href = '/login';
+        globalThis.location.href = '/login';
     }, []);
 
     const authContextValue = useMemo(

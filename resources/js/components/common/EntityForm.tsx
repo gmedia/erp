@@ -67,7 +67,7 @@ export default function EntityForm<
     submitDisabled = false,
     className,
     submitLabel,
-}: EntityFormProps<TFieldValues, TTransformedValues>) {
+}: Readonly<EntityFormProps<TFieldValues, TTransformedValues>>) {
     const { t } = useTranslation();
 
     const handleSubmit = React.useCallback(

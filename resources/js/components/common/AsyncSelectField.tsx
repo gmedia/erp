@@ -36,7 +36,7 @@ export default function AsyncSelectField<
     valueFn,
     initialLabel,
     onItemSelect,
-}: AsyncSelectFieldProps<T>) {
+}: Readonly<AsyncSelectFieldProps<T>>) {
     return (
         <FormField
             name={name}

@@ -1,6 +1,20 @@
 import { Page, expect } from '@playwright/test';
 import * as fs from 'node:fs';
 
+async function clickDropdownOption(
+  page: Page,
+  text: string | RegExp,
+): Promise<void> {
+  const matcher = text instanceof RegExp ? text : new RegExp(text, 'i');
+  const option = page
+    .locator('[role="option"]:visible, ul[aria-busy]:visible button')
+    .filter({ hasText: matcher })
+    .first();
+
+  await expect(option).toBeVisible();
+  await option.click({ force: true });
+}
+
 export async function createApprovalFlow(
   page: Page,
   overrides: Record<string, string> = {}
@@ -30,13 +44,13 @@ export async function createApprovalFlow(
   const typeCombobox = page.getByRole('combobox', { name: /Approvable Type/i });
   await expect(typeCombobox).toBeVisible();
   await typeCombobox.click();
-  await page.getByRole('option', { name: 'Asset Movement' }).click();
+  await clickDropdownOption(page, 'Asset Movement');
 
   // Status
   const statusCombobox = page.getByRole('combobox', { name: /Status/i });
   await expect(statusCombobox).toBeVisible();
   await statusCombobox.click();
-  await page.getByRole('option', { name: 'Active', exact: true }).click();
+  await clickDropdownOption(page, /^Active$/i);
 
   // Description
   await page.fill('textarea[name="description"]', 'E2E testing description');
@@ -72,12 +86,7 @@ export async function createApprovalFlow(
     )
     .catch(() => null);
 
-  const approverOption = page
-    .locator('div[role="option"]')
-    .filter({ hasText: 'Admin User' })
-    .first();
-  await expect(approverOption).toBeVisible();
-  await approverOption.click();
+  await clickDropdownOption(page, 'Admin User');
   await expect(approverCombobox).toHaveText(/Admin User/);
 
   const saveStepButton = stepDialog.getByRole('button', { name: /Save Step/i });
@@ -164,7 +173,7 @@ export async function editApprovalFlow(
   if (updates.is_active !== undefined) {
     const statusTrigger = dialog.getByRole('combobox', { name: 'Status' });
     await statusTrigger.click();
-    await page.getByRole('option', { name: updates.is_active ? 'Active' : 'Inactive', exact: true }).click();
+    await clickDropdownOption(page, updates.is_active ? /^Active$/i : /^Inactive$/i);
   }
 
   const updateBtn = dialog.getByRole('button', { name: /Update|Save|Create|Submit/i });

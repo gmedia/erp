@@ -47,7 +47,7 @@ export function StockTransferItemFormDialog({
     onOpenChange,
     item,
     onSave,
-}: StockTransferItemFormDialogProps) {
+}: Readonly<StockTransferItemFormDialogProps>) {
     const defaultValues = useMemo<StockTransferItemFormData>(() => {
         if (!item) {
             return {

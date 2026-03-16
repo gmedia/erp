@@ -51,7 +51,7 @@ export function InventoryStocktakeItemFormDialog({
     onOpenChange,
     item,
     onSave,
-}: InventoryStocktakeItemFormDialogProps) {
+}: Readonly<InventoryStocktakeItemFormDialogProps>) {
     const defaultValues = useMemo<InventoryStocktakeItemFormData>(() => {
         if (!item) {
             return {
