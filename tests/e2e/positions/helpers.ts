@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Page, expect } from '@playwright/test';
 
 /**
@@ -6,7 +7,7 @@ import { Page, expect } from '@playwright/test';
  */
 export async function createPosition(page: Page): Promise<string> {
     const timestamp = Date.now();
-    const name = `${Math.random().toString(36).substring(2, 7)}${timestamp}`;
+    const name = `${randomUUID().slice(0, 5)}${timestamp}`;
 
     const addButton = page.getByRole('button', { name: /Add/i });
     await expect(addButton).toBeVisible();

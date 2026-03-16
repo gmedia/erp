@@ -13,7 +13,7 @@ test.describe('Asset Dashboard', () => {
     await page.getByRole('link', { name: 'Asset Dashboard' }).click();
 
     // 2. Wait for navigation
-    await expect(page).toHaveURL(/.*\/asset-dashboard/);
+    await page.waitForURL('**/asset-dashboard', { timeout: 15000 });
     await expect(page.getByRole('heading', { name: 'Asset Management Overview' })).toBeVisible();
 
     // 3. Verify cards exist and load data (or show 0/Rp0 if empty database)

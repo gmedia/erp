@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Page, expect } from '@playwright/test';
 import { createEntity, EntityConfig } from '../helpers';
 
@@ -21,7 +22,7 @@ export async function createEmployee(
   }> = {}
 ): Promise<string> {
   const timestamp = Date.now();
-  const defaultEmail = `${Math.random().toString(36).substring(2,7)}${timestamp}@example.com`;
+  const defaultEmail = `${randomUUID().slice(0, 5)}${timestamp}@example.com`;
 
   const config: EntityConfig = {
     route: '/employees',

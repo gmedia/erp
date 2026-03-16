@@ -1,6 +1,12 @@
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 export default async function globalSetup() {
-    execSync('php artisan migrate:fresh --force', { stdio: 'inherit' });
-    execSync('php artisan db:seed --force', { stdio: 'inherit' });
+    const phpBinary = '/usr/bin/php';
+
+    execFileSync(phpBinary, ['artisan', 'migrate:fresh', '--force'], {
+        stdio: 'inherit',
+    });
+    execFileSync(phpBinary, ['artisan', 'db:seed', '--force'], {
+        stdio: 'inherit',
+    });
 }
