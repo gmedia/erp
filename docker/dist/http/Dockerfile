@@ -3,7 +3,16 @@ ARG BASE_IMAGE=ghcr.io/gmedia/erp/base:8.4
 # Stage 0: Composer dependencies
 FROM ${BASE_IMAGE} AS composer
 WORKDIR /app
-COPY . .
+COPY artisan composer.json composer.lock package.json package-lock.json tsconfig.json vite.config.ts components.json ./
+COPY app ./app
+COPY bootstrap ./bootstrap
+COPY config ./config
+COPY database ./database
+COPY lang ./lang
+COPY public ./public
+COPY resources ./resources
+COPY routes ./routes
+COPY storage ./storage
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Stage 1: Build assets
@@ -11,9 +20,7 @@ FROM ${BASE_IMAGE} AS asset-builder
 # Install Node.js and NPM
 RUN apk add --no-cache nodejs npm
 WORKDIR /app
-COPY . .
-# We need vendor for Wayfinder to run php artisan
-COPY --from=composer /app/vendor /app/vendor
+COPY --from=composer /app /app
 RUN npm ci
 RUN npm run build
 
@@ -23,8 +30,7 @@ ENV APPDIR=/var/www/html
 WORKDIR ${APPDIR}
 
 # Copy application code and vendor from composer stage
-COPY . .
-COPY --from=composer /app/vendor ${APPDIR}/vendor
+COPY --from=composer /app ${APPDIR}
 
 # Copy built assets from asset-builder stage
 COPY --from=asset-builder /app/public/build ${APPDIR}/public/build
