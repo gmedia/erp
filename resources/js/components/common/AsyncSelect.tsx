@@ -51,6 +51,19 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
 
     const debouncedSearch = useDebounce(search, 300);
 
+    const selectItem = React.useCallback(
+        (item: T) => {
+            const itemValue = valueFn(item);
+            const itemLabel = labelFn(item);
+
+            onValueChange?.(itemValue);
+            onItemSelect?.(item);
+            setSelectedLabel(itemLabel);
+            setOpen(false);
+        },
+        [labelFn, onItemSelect, onValueChange, valueFn],
+    );
+
     const fetchItems = React.useCallback(
         async (query: string) => {
             setLoading(true);
@@ -165,7 +178,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                         />
                     </div>
                     <ScrollArea className="max-h-[200px]">
-                        <ul className="p-1" aria-busy={loading}>
+                        <ul className="p-1" role="listbox" aria-busy={loading}>
                             {loading && (
                                 <div className="flex items-center justify-center p-4">
                                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -183,22 +196,27 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                                     return (
                                         <li
                                             key={itemValue}
-                                            aria-selected={itemValue === value}
                                             className="list-none"
                                         >
-                                            <button
-                                                type="button"
+                                            <div
+                                                role="option"
+                                                aria-selected={itemValue === value}
+                                                tabIndex={0}
                                                 className={cn(
                                                     'relative flex w-full cursor-pointer items-center rounded-sm px-2 py-1.5 text-left text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
                                                     itemValue === value
                                                         ? 'bg-accent text-accent-foreground'
                                                         : '',
                                                 )}
-                                                onClick={() => {
-                                                    onValueChange?.(itemValue);
-                                                    onItemSelect?.(item);
-                                                    setSelectedLabel(itemLabel);
-                                                    setOpen(false);
+                                                onClick={() => selectItem(item)}
+                                                onKeyDown={(event) => {
+                                                    if (
+                                                        event.key === 'Enter' ||
+                                                        event.key === ' '
+                                                    ) {
+                                                        event.preventDefault();
+                                                        selectItem(item);
+                                                    }
                                                 }}
                                             >
                                                 <Check
@@ -210,7 +228,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                                                     )}
                                                 />
                                                 {itemLabel}
-                                            </button>
+                                            </div>
                                         </li>
                                     );
                                 })}
