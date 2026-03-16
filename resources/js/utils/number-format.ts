@@ -44,7 +44,11 @@ function normalizeSeparator(
 }
 
 function normalizeCurrency(value: unknown, fallback: string): string {
-    return typeof value === 'string' && value.length > 0 ? value : fallback;
+    if (typeof value === 'string' && value.length > 0) {
+        return value.toUpperCase();
+    }
+
+    return fallback;
 }
 
 export function normalizeRegionalNumberFormatSettings(
@@ -218,6 +222,24 @@ export interface RegionalCurrencyFormatOptions
     currencyDisplay?: Intl.NumberFormatOptions['currencyDisplay'];
 }
 
+function resolveCurrencyCode(
+    currency: string | undefined,
+    settings: RegionalNumberFormatSettings,
+): string {
+    const normalized = currency?.trim().toUpperCase();
+
+    if (!normalized) {
+        return settings.currency;
+    }
+
+    // Backward-compatible: old modules hardcode IDR; treat it as app setting.
+    if (normalized === DEFAULT_REGIONAL_NUMBER_FORMAT_SETTINGS.currency) {
+        return settings.currency;
+    }
+
+    return normalized;
+}
+
 export function formatNumberByRegionalSettings(
     value: string | number,
     {
@@ -264,6 +286,7 @@ export function formatCurrencyByRegionalSettings(
     }
 
     const settings = getRegionalNumberFormatSettings();
+    const resolvedCurrency = resolveCurrencyCode(currency, settings);
     const fractionDigits = resolveFractionDigits(
         settings.number_format_hide_decimal,
         minimumFractionDigits,
@@ -272,7 +295,7 @@ export function formatCurrencyByRegionalSettings(
 
     const formatter = new Intl.NumberFormat(locale, {
         style: 'currency',
-        currency: currency ?? settings.currency,
+        currency: resolvedCurrency,
         currencyDisplay,
         useGrouping,
         ...fractionDigits,

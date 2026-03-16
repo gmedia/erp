@@ -13,7 +13,6 @@ export const formatDate = (value: string | Date) =>
 export const formatCurrency = (value: number) =>
     formatCurrencyByRegionalSettings(value, {
         locale: 'id-ID',
-        currency: 'IDR',
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     });

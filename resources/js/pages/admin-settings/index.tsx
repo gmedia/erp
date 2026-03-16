@@ -53,6 +53,18 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const CURRENCY_OPTIONS = [
+    { value: 'IDR', label: 'IDR - Indonesian Rupiah' },
+    { value: 'USD', label: 'USD - US Dollar' },
+    { value: 'EUR', label: 'EUR - Euro' },
+    { value: 'SGD', label: 'SGD - Singapore Dollar' },
+    { value: 'MYR', label: 'MYR - Malaysian Ringgit' },
+    { value: 'JPY', label: 'JPY - Japanese Yen' },
+    { value: 'GBP', label: 'GBP - British Pound' },
+    { value: 'AUD', label: 'AUD - Australian Dollar' },
+    { value: 'CNY', label: 'CNY - Chinese Yuan' },
+] as const;
+
 function GeneralSettings({ settings }: { settings: SettingsData['general'] }) {
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
@@ -233,9 +245,14 @@ function RegionalSettings({
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [currency, setCurrency] = useState<string>(settings?.currency ?? 'IDR');
     const [hideDecimal, setHideDecimal] = useState<boolean>(
         Boolean(settings?.number_format_hide_decimal),
     );
+
+    useEffect(() => {
+        setCurrency(settings?.currency ?? 'IDR');
+    }, [settings?.currency]);
 
     useEffect(() => {
         setHideDecimal(Boolean(settings?.number_format_hide_decimal));
@@ -249,6 +266,7 @@ function RegionalSettings({
 
         try {
             const formData = new FormData(e.currentTarget);
+            formData.set('currency', currency);
             formData.set('number_format_hide_decimal', hideDecimal ? '1' : '0');
 
             const payload = Object.fromEntries(formData) as Record<
@@ -261,7 +279,7 @@ function RegionalSettings({
             );
 
             setRegionalNumberFormatSettings({
-                currency: payload.currency,
+                currency,
                 number_format_decimal: payload.number_format_decimal,
                 number_format_thousand: payload.number_format_thousand,
                 number_format_hide_decimal: hideDecimal,
@@ -316,13 +334,19 @@ function RegionalSettings({
 
                 <div className="grid gap-2">
                     <Label htmlFor="currency">Currency</Label>
-                    <Input
+                    <select
                         id="currency"
                         name="currency"
-                        defaultValue={settings?.currency ?? 'IDR'}
-                        placeholder="e.g. IDR"
-                        className="mt-1 block w-full"
-                    />
+                        value={currency}
+                        onChange={(event) => setCurrency(event.target.value)}
+                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 block h-9 w-full rounded-md border px-3 py-2 text-sm shadow-xs focus-visible:ring-2 focus-visible:outline-none"
+                    >
+                        {CURRENCY_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
                     {errors.currency && (
                         <p className="text-sm text-destructive">
                             {errors.currency}

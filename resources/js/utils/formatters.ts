@@ -7,14 +7,14 @@ import {
  * Format a numeric value as currency.
  *
  * @param value - The value to format (string or number)
- * @param currency - The currency code (default: 'USD')
- * @param locale - The locale for formatting (default: 'en-US')
+ * @param currency - Optional currency code override
+ * @param locale - The locale for formatting (default: 'id-ID')
  * @returns Formatted currency string, or '-' if invalid
  */
 export function formatCurrency(
     value: string | number,
-    currency: string = 'USD',
-    locale: string = 'en-US',
+    currency?: string,
+    locale: string = 'id-ID',
 ): string {
     return formatCurrencyByRegionalSettings(value, {
         currency,
@@ -24,7 +24,6 @@ export function formatCurrency(
 
 export function formatRupiah(value: string | number): string {
     return formatCurrencyByRegionalSettings(value, {
-        currency: 'IDR',
         locale: 'id-ID',
     });
 }
