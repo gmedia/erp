@@ -30,10 +30,16 @@ async function getFirstAsyncOption(page: Page, url: string) {
 
 async function selectAsyncOption(page: Page, container: Page | Locator, label: string, optionName: string) {
     await container.getByRole('combobox', { name: label }).click();
-    await page
-    .getByRole('option', { name: new RegExp(optionName.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`), 'i') })
-        .first()
-        .click();
+    const escapedOptionName = optionName.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+    const optionPattern = new RegExp(escapedOptionName, 'i');
+
+    const option = page
+        .locator('[role="option"]:visible, ul[aria-busy]:visible button')
+        .filter({ hasText: optionPattern })
+        .first();
+
+    await expect(option).toBeVisible();
+    await option.click();
 }
 
 const config: ModuleTestConfig = {
