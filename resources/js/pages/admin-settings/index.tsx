@@ -1,7 +1,15 @@
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import AdminSettingsLayout from '@/layouts/admin-settings/layout';
 import AppLayout from '@/layouts/app-layout';
@@ -379,19 +387,27 @@ function RegionalSettings({
 
                 <div className="grid gap-2">
                     <Label htmlFor="currency">Currency</Label>
-                    <select
-                        id="currency"
-                        name="currency"
-                        value={currency}
-                        onChange={(event) => setCurrency(event.target.value)}
-                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 block h-9 w-full rounded-md border px-3 py-2 text-sm shadow-xs focus-visible:ring-2 focus-visible:outline-none"
+                    <Select value={currency} onValueChange={setCurrency}
                     >
-                        {CURRENCY_OPTIONS.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
+                        <SelectTrigger
+                            id="currency"
+                            className="mt-1 w-full"
+                            data-testid="currency-select-trigger"
+                        >
+                            <SelectValue placeholder="Select currency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {CURRENCY_OPTIONS.map((option) => (
+                                <SelectItem
+                                    key={option.value}
+                                    value={option.value}
+                                >
+                                    {option.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <input type="hidden" name="currency" value={currency} />
                     {errors.currency && (
                         <p className="text-sm text-destructive">
                             {errors.currency}
@@ -452,27 +468,29 @@ function RegionalSettings({
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="number_format_hide_decimal">
-                        Hide Decimal Separator
-                    </Label>
-                    <label
-                        htmlFor="number_format_hide_decimal"
-                        className="flex items-center gap-3 rounded-md border px-3 py-2"
-                    >
-                        <input
+                    <div className="flex items-start gap-3 rounded-md border px-3 py-2">
+                        <Checkbox
                             id="number_format_hide_decimal"
-                            type="checkbox"
                             checked={hideDecimal}
-                            onChange={(event) =>
-                                setHideDecimal(event.target.checked)
+                            onCheckedChange={(checked) =>
+                                setHideDecimal(checked === true)
                             }
-                            className="h-4 w-4"
+                            data-testid="hide-decimal-checkbox"
+                            className="mt-0.5"
                         />
-                        <span className="text-sm text-muted-foreground">
-                            Jika aktif, semua modul menampilkan angka tanpa
-                            desimal.
-                        </span>
-                    </label>
+                        <div className="space-y-1">
+                            <Label
+                                htmlFor="number_format_hide_decimal"
+                                className="cursor-pointer"
+                            >
+                                Hide Decimal Separator
+                            </Label>
+                            <p className="text-sm text-muted-foreground">
+                                Jika aktif, semua modul menampilkan angka tanpa
+                                desimal.
+                            </p>
+                        </div>
+                    </div>
                     <input
                         type="hidden"
                         name="number_format_hide_decimal"
