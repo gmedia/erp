@@ -200,7 +200,9 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                                         >
                                             <div
                                                 role="option"
-                                                aria-selected={itemValue === value}
+                                                aria-selected={
+                                                    itemValue === value
+                                                }
                                                 tabIndex={0}
                                                 className={cn(
                                                     'relative flex w-full cursor-pointer items-center rounded-sm px-2 py-1.5 text-left text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
