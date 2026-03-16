@@ -236,7 +236,7 @@ export default function MyApprovalsPage() {
                                         <Button
                                             size="sm"
                                             variant="outline"
-                                            className="w-full border-green-200 bg-green-50 text-green-700 hover:bg-green-100 hover:text-green-800 sm:w-auto"
+                                            className="w-full border-emerald-600 bg-emerald-600 text-white transition-colors hover:border-emerald-700 hover:bg-emerald-700 hover:text-white focus-visible:ring-emerald-300 dark:border-emerald-500 dark:bg-emerald-500 dark:hover:border-emerald-400 dark:hover:bg-emerald-400 sm:w-auto"
                                             onClick={() =>
                                                 openActionDialog(
                                                     'approve',
@@ -250,7 +250,7 @@ export default function MyApprovalsPage() {
                                         <Button
                                             size="sm"
                                             variant="outline"
-                                            className="w-full border-red-200 bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 sm:w-auto"
+                                            className="w-full border-rose-600 bg-rose-600 text-white transition-colors hover:border-rose-700 hover:bg-rose-700 hover:text-white focus-visible:ring-rose-300 dark:border-rose-500 dark:bg-rose-500 dark:hover:border-rose-400 dark:hover:bg-rose-400 sm:w-auto"
                                             onClick={() =>
                                                 openActionDialog('reject', step)
                                             }
