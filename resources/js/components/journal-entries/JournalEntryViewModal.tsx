@@ -19,6 +19,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { JournalEntry } from '@/types/journal-entry';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { format } from 'date-fns';
 
 interface JournalEntryViewModalProps {
@@ -118,22 +119,22 @@ export function JournalEntryViewModal({
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                {new Intl.NumberFormat(
-                                                    'id-ID',
+                                                {formatCurrencyByRegionalSettings(
+                                                    line.debit,
                                                     {
-                                                        style: 'currency',
+                                                        locale: 'id-ID',
                                                         currency: 'IDR',
                                                     },
-                                                ).format(line.debit)}
+                                                )}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                {new Intl.NumberFormat(
-                                                    'id-ID',
+                                                {formatCurrencyByRegionalSettings(
+                                                    line.credit,
                                                     {
-                                                        style: 'currency',
+                                                        locale: 'id-ID',
                                                         currency: 'IDR',
                                                     },
-                                                ).format(line.credit)}
+                                                )}
                                             </TableCell>
                                             <TableCell>{line.memo}</TableCell>
                                         </TableRow>
@@ -145,16 +146,22 @@ export function JournalEntryViewModal({
                                             Total
                                         </TableCell>
                                         <TableCell className="text-right font-bold">
-                                            {new Intl.NumberFormat('id-ID', {
-                                                style: 'currency',
-                                                currency: 'IDR',
-                                            }).format(item.total_debit)}
+                                            {formatCurrencyByRegionalSettings(
+                                                item.total_debit,
+                                                {
+                                                    locale: 'id-ID',
+                                                    currency: 'IDR',
+                                                },
+                                            )}
                                         </TableCell>
                                         <TableCell className="text-right font-bold">
-                                            {new Intl.NumberFormat('id-ID', {
-                                                style: 'currency',
-                                                currency: 'IDR',
-                                            }).format(item.total_credit)}
+                                            {formatCurrencyByRegionalSettings(
+                                                item.total_credit,
+                                                {
+                                                    locale: 'id-ID',
+                                                    currency: 'IDR',
+                                                },
+                                            )}
                                         </TableCell>
                                         <TableCell></TableCell>
                                     </TableRow>

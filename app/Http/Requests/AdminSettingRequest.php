@@ -32,6 +32,7 @@ class AdminSettingRequest extends FormRequest
             'date_format' => ['nullable', 'string', 'max:20'],
             'number_format_decimal' => ['nullable', 'string', 'max:5'],
             'number_format_thousand' => ['nullable', 'string', 'max:5'],
+            'number_format_hide_decimal' => ['nullable', 'boolean'],
             'mail_host' => ['nullable', 'string', 'max:255'],
             'mail_port' => ['nullable', 'string', 'max:10'],
             'mail_username' => ['nullable', 'string', 'max:255'],

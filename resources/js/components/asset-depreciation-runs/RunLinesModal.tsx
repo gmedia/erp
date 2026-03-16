@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/table';
 import axios from '@/lib/axios';
 import { AssetDepreciationLine } from '@/types/asset-depreciation-run';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
@@ -38,10 +39,10 @@ export function RunLinesModal({ runId, open, onClose }: RunLinesModalProps) {
     });
 
     const formatCurrency = (val: number) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
+        return formatCurrencyByRegionalSettings(val, {
+            locale: 'id-ID',
             currency: 'IDR',
-        }).format(val);
+        });
     };
 
     return (

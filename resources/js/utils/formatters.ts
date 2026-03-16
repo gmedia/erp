@@ -1,3 +1,8 @@
+import {
+    formatCurrencyByRegionalSettings,
+    formatNumberByRegionalSettings,
+} from '@/utils/number-format';
+
 /**
  * Format a numeric value as currency.
  *
@@ -11,15 +16,22 @@ export function formatCurrency(
     currency: string = 'USD',
     locale: string = 'en-US',
 ): string {
-    const numValue = typeof value === 'number' ? value : parseFloat(value);
-    if (isNaN(numValue)) return '-';
-
-    return new Intl.NumberFormat(locale, {
-        style: 'currency',
+    return formatCurrencyByRegionalSettings(value, {
         currency,
-    }).format(numValue);
+        locale,
+    });
 }
 
 export function formatRupiah(value: string | number): string {
-    return formatCurrency(value, 'IDR', 'id-ID');
+    return formatCurrencyByRegionalSettings(value, {
+        currency: 'IDR',
+        locale: 'id-ID',
+    });
+}
+
+export function formatNumber(
+    value: string | number,
+    locale: string = 'id-ID',
+): string {
+    return formatNumberByRegionalSettings(value, { locale });
 }

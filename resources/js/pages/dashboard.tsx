@@ -3,6 +3,7 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { type BreadcrumbItem } from '@/types';
+import { formatNumberByRegionalSettings } from '@/utils/number-format';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
@@ -55,7 +56,11 @@ export default function Dashboard() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-2xl font-semibold tabular-nums">
-                            {loading ? '—' : totals?.customers.toLocaleString()}
+                            {loading
+                                ? '—'
+                                : formatNumberByRegionalSettings(
+                                      totals?.customers ?? 0,
+                                  )}
                         </CardContent>
                     </Card>
 
@@ -66,7 +71,11 @@ export default function Dashboard() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-2xl font-semibold tabular-nums">
-                            {loading ? '—' : totals?.employees.toLocaleString()}
+                            {loading
+                                ? '—'
+                                : formatNumberByRegionalSettings(
+                                      totals?.employees ?? 0,
+                                  )}
                         </CardContent>
                     </Card>
 
@@ -77,7 +86,11 @@ export default function Dashboard() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-2xl font-semibold tabular-nums">
-                            {loading ? '—' : totals?.suppliers.toLocaleString()}
+                            {loading
+                                ? '—'
+                                : formatNumberByRegionalSettings(
+                                      totals?.suppliers ?? 0,
+                                  )}
                         </CardContent>
                     </Card>
 
@@ -88,7 +101,11 @@ export default function Dashboard() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="text-2xl font-semibold tabular-nums">
-                            {loading ? '—' : totals?.assets.toLocaleString()}
+                            {loading
+                                ? '—'
+                                : formatNumberByRegionalSettings(
+                                      totals?.assets ?? 0,
+                                  )}
                         </CardContent>
                     </Card>
                 </div>

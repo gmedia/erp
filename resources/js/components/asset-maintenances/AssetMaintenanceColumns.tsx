@@ -7,6 +7,7 @@ import {
     createSelectColumn,
     createSortingHeader,
 } from '@/utils/columns';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 
@@ -92,11 +93,11 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
         cell: ({ row }) => {
             const cost = Number(row.original.cost);
             if (Number.isNaN(cost)) return '-';
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
+            return formatCurrencyByRegionalSettings(cost, {
+                locale: 'id-ID',
                 currency: 'IDR',
                 minimumFractionDigits: 0,
-            }).format(cost);
+            });
         },
     },
     createActionsColumn<AssetMaintenance>(),

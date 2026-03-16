@@ -2,7 +2,7 @@
 
 use App\Mail\TestSmtpMail;
 use App\Models\Setting;
-use Exception;
+use Database\Seeders\SettingSampleDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
@@ -12,7 +12,7 @@ use Laravel\Sanctum\Sanctum;
 uses(RefreshDatabase::class)->group('admin-settings');
 
 beforeEach(function () {
-    $this->seed(\Database\Seeders\SettingSampleDataSeeder::class);
+    $this->seed(SettingSampleDataSeeder::class);
 });
 
 describe('AdminSettingController@index', function () {
@@ -66,6 +66,7 @@ describe('AdminSettingController@index', function () {
                     'date_format',
                     'number_format_decimal',
                     'number_format_thousand',
+                    'number_format_hide_decimal',
                 ],
             ],
         ]);
@@ -109,6 +110,7 @@ describe('AdminSettingController@update', function () {
             'date_format' => 'Y-m-d',
             'number_format_decimal' => '.',
             'number_format_thousand' => ',',
+            'number_format_hide_decimal' => true,
         ]);
 
         $response->assertOk();
@@ -118,6 +120,7 @@ describe('AdminSettingController@update', function () {
         expect(Setting::get('date_format'))->toBe('Y-m-d');
         expect(Setting::get('number_format_decimal'))->toBe('.');
         expect(Setting::get('number_format_thousand'))->toBe(',');
+        expect(Setting::get('number_format_hide_decimal'))->toBeTrue();
     });
 
     test('update validates email format', function () {

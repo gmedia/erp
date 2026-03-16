@@ -7,11 +7,12 @@ import AdminSettingsLayout from '@/layouts/admin-settings/layout';
 import AppLayout from '@/layouts/app-layout';
 import axiosInstance from '@/lib/axios';
 import { type BreadcrumbItem } from '@/types';
+import { setRegionalNumberFormatSettings } from '@/utils/number-format';
 import { Transition } from '@headlessui/react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 interface SettingsData {
@@ -28,6 +29,7 @@ interface SettingsData {
         date_format?: string;
         number_format_decimal?: string;
         number_format_thousand?: string;
+        number_format_hide_decimal?: boolean;
     };
     smtp?: {
         mail_host?: string;
@@ -231,6 +233,13 @@ function RegionalSettings({
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [hideDecimal, setHideDecimal] = useState<boolean>(
+        Boolean(settings?.number_format_hide_decimal),
+    );
+
+    useEffect(() => {
+        setHideDecimal(Boolean(settings?.number_format_hide_decimal));
+    }, [settings?.number_format_hide_decimal]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -240,10 +249,24 @@ function RegionalSettings({
 
         try {
             const formData = new FormData(e.currentTarget);
+            formData.set('number_format_hide_decimal', hideDecimal ? '1' : '0');
+
+            const payload = Object.fromEntries(formData) as Record<
+                string,
+                string
+            >;
             await axiosInstance.put(
                 '/api/admin-settings',
-                Object.fromEntries(formData),
+                payload,
             );
+
+            setRegionalNumberFormatSettings({
+                currency: payload.currency,
+                number_format_decimal: payload.number_format_decimal,
+                number_format_thousand: payload.number_format_thousand,
+                number_format_hide_decimal: hideDecimal,
+            });
+
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
         } catch (error: unknown) {
@@ -355,6 +378,40 @@ function RegionalSettings({
                     {errors.number_format_thousand && (
                         <p className="text-sm text-destructive">
                             {errors.number_format_thousand}
+                        </p>
+                    )}
+                </div>
+
+                <div className="grid gap-2">
+                    <Label htmlFor="number_format_hide_decimal">
+                        Hide Decimal Separator
+                    </Label>
+                    <label
+                        htmlFor="number_format_hide_decimal"
+                        className="flex items-center gap-3 rounded-md border px-3 py-2"
+                    >
+                        <input
+                            id="number_format_hide_decimal"
+                            type="checkbox"
+                            checked={hideDecimal}
+                            onChange={(event) =>
+                                setHideDecimal(event.target.checked)
+                            }
+                            className="h-4 w-4"
+                        />
+                        <span className="text-sm text-muted-foreground">
+                            Jika aktif, semua modul menampilkan angka tanpa
+                            desimal.
+                        </span>
+                    </label>
+                    <input
+                        type="hidden"
+                        name="number_format_hide_decimal"
+                        value={hideDecimal ? '1' : '0'}
+                    />
+                    {errors.number_format_hide_decimal && (
+                        <p className="text-sm text-destructive">
+                            {errors.number_format_hide_decimal}
                         </p>
                     )}
                 </div>

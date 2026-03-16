@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Setting;
+use Database\Seeders\SettingSampleDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('admin-settings');
@@ -8,7 +9,7 @@ uses(RefreshDatabase::class)->group('admin-settings');
 describe('Setting Model', function () {
     beforeEach(function () {
         // Seed default settings
-        $this->seed(\Database\Seeders\SettingSampleDataSeeder::class);
+        $this->seed(SettingSampleDataSeeder::class);
     });
 
     test('get returns default value when key does not exist', function () {
@@ -33,7 +34,7 @@ describe('Setting Model', function () {
 
     test('set throws exception for non-existent key', function () {
         expect(fn () => Setting::set('non_existent_key', 'value'))
-            ->toThrow(\InvalidArgumentException::class);
+            ->toThrow(InvalidArgumentException::class);
     });
 
     test('getGrouped returns settings grouped by group', function () {
@@ -47,6 +48,8 @@ describe('Setting Model', function () {
         expect($grouped['general']['company_name'])->toBe('Test Company');
         expect($grouped['regional'])->toHaveKey('timezone');
         expect($grouped['regional']['timezone'])->toBe('Asia/Jakarta');
+        expect($grouped['regional'])->toHaveKey('number_format_hide_decimal');
+        expect($grouped['regional']['number_format_hide_decimal'])->toBeFalse();
     });
 
     test('getByGroup returns settings for a specific group', function () {
@@ -54,6 +57,9 @@ describe('Setting Model', function () {
 
         expect($general)->toBeArray()
             ->toHaveKeys(['company_name', 'company_address', 'company_phone', 'company_email', 'company_logo_path']);
+
+        $regional = Setting::getByGroup('regional');
+        expect($regional)->toHaveKey('number_format_hide_decimal', false);
     });
 
     test('castValue handles integer type', function () {

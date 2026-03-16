@@ -41,6 +41,7 @@ test.describe('Admin Settings', () => {
         await expect(page.locator('input[name="date_format"]')).toBeVisible();
         await expect(page.locator('input[name="number_format_decimal"]')).toBeVisible();
         await expect(page.locator('input[name="number_format_thousand"]')).toBeVisible();
+        await expect(page.locator('#number_format_hide_decimal')).toBeVisible();
     });
 
     test('can update general settings', async ({ page }) => {
@@ -74,6 +75,10 @@ test.describe('Admin Settings', () => {
         await currencyInput.clear();
         await currencyInput.fill('USD');
 
+        // Enable hide decimal
+        const hideDecimalInput = page.locator('#number_format_hide_decimal');
+        await hideDecimalInput.check();
+
         // Save
         const saveButton = page.getByTestId('save-regional-settings');
         await saveButton.click();
@@ -84,10 +89,12 @@ test.describe('Admin Settings', () => {
         // Verify persistence
         await page.reload();
         await expect(page.locator('input[name="currency"]')).toHaveValue('USD');
+        await expect(page.locator('#number_format_hide_decimal')).toBeChecked();
 
-        // Reset back to IDR to not affect other tests
+        // Reset back to defaults to not affect other tests
         await currencyInput.clear();
         await currencyInput.fill('IDR');
+        await hideDecimalInput.uncheck();
         await saveButton.click();
         await page.waitForTimeout(1000);
     });

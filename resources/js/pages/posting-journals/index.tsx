@@ -26,6 +26,10 @@ import { usePostingJournal } from '@/hooks/usePostingJournal';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { JournalEntry } from '@/types/journal-entry';
+import {
+    formatCurrencyByRegionalSettings,
+    formatNumberByRegionalSettings,
+} from '@/utils/number-format';
 import { format } from 'date-fns';
 import {
     AlertCircle,
@@ -74,15 +78,6 @@ export default function Index() {
 
     const [viewItem, setViewItem] = useState<JournalEntry | null>(null);
     const [viewOpen, setViewOpen] = useState(false);
-
-    const idr = useMemo(
-        () =>
-            new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-            }),
-        [],
-    );
 
     const allSelected = data.length > 0 && selectedIds.length === data.length;
 
@@ -198,7 +193,9 @@ export default function Index() {
                                         Draft journals
                                     </span>{' '}
                                     <span className="font-medium text-foreground">
-                                        {meta.total.toLocaleString()}
+                                        {formatNumberByRegionalSettings(
+                                            meta.total,
+                                        )}
                                     </span>
                                 </div>
                                 <div>
@@ -206,8 +203,8 @@ export default function Index() {
                                         Showing
                                     </span>{' '}
                                     <span className="font-medium text-foreground">
-                                        {from.toLocaleString()}–
-                                        {to.toLocaleString()}
+                                        {formatNumberByRegionalSettings(from)}–
+                                        {formatNumberByRegionalSettings(to)}
                                     </span>
                                 </div>
                                 <div>
@@ -215,8 +212,21 @@ export default function Index() {
                                         Page totals
                                     </span>{' '}
                                     <span className="font-medium text-foreground">
-                                        {idr.format(pageTotals.totals.debit)} /{' '}
-                                        {idr.format(pageTotals.totals.credit)}
+                                        {formatCurrencyByRegionalSettings(
+                                            pageTotals.totals.debit,
+                                            {
+                                                locale: 'id-ID',
+                                                currency: 'IDR',
+                                            },
+                                        )}{' '}
+                                        /{' '}
+                                        {formatCurrencyByRegionalSettings(
+                                            pageTotals.totals.credit,
+                                            {
+                                                locale: 'id-ID',
+                                                currency: 'IDR',
+                                            },
+                                        )}
                                     </span>
                                 </div>
                             </div>
@@ -227,7 +237,9 @@ export default function Index() {
                                         Selected
                                     </span>{' '}
                                     <span className="font-medium text-foreground">
-                                        {selectedIds.length.toLocaleString()}
+                                        {formatNumberByRegionalSettings(
+                                            selectedIds.length,
+                                        )}
                                     </span>
                                 </div>
                                 <div>
@@ -235,12 +247,20 @@ export default function Index() {
                                         Selected totals
                                     </span>{' '}
                                     <span className="font-medium text-foreground">
-                                        {idr.format(
+                                        {formatCurrencyByRegionalSettings(
                                             pageTotals.selectedTotals.debit,
+                                            {
+                                                locale: 'id-ID',
+                                                currency: 'IDR',
+                                            },
                                         )}{' '}
                                         /{' '}
-                                        {idr.format(
+                                        {formatCurrencyByRegionalSettings(
                                             pageTotals.selectedTotals.credit,
+                                            {
+                                                locale: 'id-ID',
+                                                currency: 'IDR',
+                                            },
                                         )}
                                     </span>
                                 </div>
@@ -251,8 +271,10 @@ export default function Index() {
                             <Alert>
                                 <AlertTitle>Selection active</AlertTitle>
                                 <AlertDescription>
-                                    {selectedIds.length.toLocaleString()} draft
-                                    journal(s) selected in this page.
+                                    {formatNumberByRegionalSettings(
+                                        selectedIds.length,
+                                    )}{' '}
+                                    draft journal(s) selected in this page.
                                 </AlertDescription>
                             </Alert>
                         )}
@@ -379,7 +401,10 @@ export default function Index() {
                                                     <TableCell className="pt-4 align-top">
                                                         <div className="flex flex-col gap-1">
                                                             <div className="text-sm font-medium">
-                                                                {item.lines.length.toLocaleString()}{' '}
+                                                                {formatNumberByRegionalSettings(
+                                                                    item.lines
+                                                                        .length,
+                                                                )}{' '}
                                                                 line(s)
                                                             </div>
                                                             {preview.length >
@@ -392,13 +417,21 @@ export default function Index() {
                                                     </TableCell>
 
                                                     <TableCell className="pt-4 text-right align-top font-mono">
-                                                        {idr.format(
+                                                        {formatCurrencyByRegionalSettings(
                                                             item.total_debit,
+                                                            {
+                                                                locale: 'id-ID',
+                                                                currency: 'IDR',
+                                                            },
                                                         )}
                                                     </TableCell>
                                                     <TableCell className="pt-4 text-right align-top font-mono">
-                                                        {idr.format(
+                                                        {formatCurrencyByRegionalSettings(
                                                             item.total_credit,
+                                                            {
+                                                                locale: 'id-ID',
+                                                                currency: 'IDR',
+                                                            },
                                                         )}
                                                     </TableCell>
 

@@ -2,6 +2,11 @@ import axiosInstance from '@/lib/axios';
 import { type Translations } from '@/types/i18n';
 import { type Permission } from '@/types/permission';
 import { type User } from '@/types/user';
+import {
+    getRegionalNumberFormatSettings,
+    setRegionalNumberFormatSettings,
+    type RegionalNumberFormatSettings,
+} from '@/utils/number-format';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface Employee {
@@ -22,6 +27,18 @@ interface MenuItem {
     children?: MenuItem[];
 }
 
+interface AuthMeResponse {
+    user: User;
+    employee: Employee | null;
+    menus?: MenuItem[];
+    companyName: string;
+    companyLogoUrl: string | null;
+    translations?: Translations | Record<string, never>;
+    locale?: string;
+    pendingApprovalsCount?: number;
+    regionalSettings?: Partial<RegionalNumberFormatSettings>;
+}
+
 interface AuthContextType {
     user: User | null;
     employee: Employee | null;
@@ -30,6 +47,7 @@ interface AuthContextType {
     companyLogoUrl: string | null;
     translations: Translations | Record<string, never>;
     locale: string;
+    regionalSettings: RegionalNumberFormatSettings;
     pendingApprovalsCount: number;
     isLoading: boolean;
     login: (
@@ -40,6 +58,8 @@ interface AuthContextType {
     refreshAuth: () => Promise<void>;
 }
 
+const defaultRegionalSettings = getRegionalNumberFormatSettings();
+
 const AuthContext = createContext<AuthContextType>({
     user: null,
     employee: null,
@@ -48,6 +68,7 @@ const AuthContext = createContext<AuthContextType>({
     companyLogoUrl: null,
     translations: {},
     locale: 'en',
+    regionalSettings: defaultRegionalSettings,
     pendingApprovalsCount: 0,
     isLoading: true,
     login: () => {},
@@ -67,6 +88,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         Translations | Record<string, never>
     >({});
     const [locale, setLocale] = useState<string>('en');
+    const [regionalSettings, setRegionalSettings] =
+        useState<RegionalNumberFormatSettings>(defaultRegionalSettings);
     const [pendingApprovalsCount, setPendingApprovalsCount] =
         useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -79,7 +102,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
 
         try {
-            const { data } = await axiosInstance.get('/api/me');
+            const { data } = await axiosInstance.get<AuthMeResponse>('/api/me');
+            const syncedRegionalSettings = setRegionalNumberFormatSettings(
+                data.regionalSettings ?? {},
+            );
+
             setUser(data.user);
             setEmployee(data.employee);
             setMenus(data.menus || []);
@@ -87,6 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             setCompanyLogoUrl(data.companyLogoUrl);
             setTranslations(data.translations || {});
             setLocale(data.locale || 'en');
+            setRegionalSettings(syncedRegionalSettings);
             setPendingApprovalsCount(data.pendingApprovalsCount || 0);
 
             // Make translations available globally if needed by unhandled context cases
@@ -135,6 +163,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                 companyLogoUrl,
                 translations,
                 locale,
+                regionalSettings,
                 pendingApprovalsCount,
                 isLoading,
                 login,
