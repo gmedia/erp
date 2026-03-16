@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { type Asset } from '@/types/asset';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { format } from 'date-fns';
 
 interface AssetViewModalProps {
@@ -35,10 +36,10 @@ export function AssetViewModal({
     };
 
     const formatCurrency = (value: string | number) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
+        return formatCurrencyByRegionalSettings(value, {
+            locale: 'en-US',
             currency: item.currency || 'USD',
-        }).format(Number(value));
+        });
     };
 
     const getStatusVariant = (status: Asset['status']) => {

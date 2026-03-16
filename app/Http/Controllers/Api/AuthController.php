@@ -66,6 +66,13 @@ class AuthController extends Controller
             ? null
             : Storage::disk(config('filesystems.default'))->url($logoPath);
 
+        $regionalSettings = [
+            'currency' => Setting::get('currency', 'IDR'),
+            'number_format_decimal' => Setting::get('number_format_decimal', ','),
+            'number_format_thousand' => Setting::get('number_format_thousand', '.'),
+            'number_format_hide_decimal' => (bool) Setting::get('number_format_hide_decimal', false),
+        ];
+
         // Get Pending Approvals
         $pendingApprovalsCount = 0;
         if ($user->id) {
@@ -115,6 +122,7 @@ class AuthController extends Controller
             'employee' => $employee,
             'companyName' => $companyName,
             'companyLogoUrl' => $companyLogoUrl,
+            'regionalSettings' => $regionalSettings,
             'menus' => $menus,
             'pendingApprovalsCount' => $pendingApprovalsCount,
             'translations' => $translations,

@@ -3,9 +3,25 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AdminSettingRequest extends FormRequest
 {
+    /**
+     * @var list<string>
+     */
+    private const SUPPORTED_CURRENCIES = [
+        'IDR',
+        'USD',
+        'EUR',
+        'SGD',
+        'MYR',
+        'JPY',
+        'GBP',
+        'AUD',
+        'CNY',
+    ];
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -28,10 +44,11 @@ class AdminSettingRequest extends FormRequest
             'company_email' => ['nullable', 'string', 'email', 'max:255'],
             'company_logo' => ['nullable', 'file', 'mimetypes:image/svg+xml', 'max:2048'],
             'timezone' => ['nullable', 'string', 'max:100', 'timezone:all'],
-            'currency' => ['nullable', 'string', 'max:10'],
+            'currency' => ['nullable', 'string', 'max:10', Rule::in(self::SUPPORTED_CURRENCIES)],
             'date_format' => ['nullable', 'string', 'max:20'],
             'number_format_decimal' => ['nullable', 'string', 'max:5'],
             'number_format_thousand' => ['nullable', 'string', 'max:5'],
+            'number_format_hide_decimal' => ['nullable', 'boolean'],
             'mail_host' => ['nullable', 'string', 'max:255'],
             'mail_port' => ['nullable', 'string', 'max:10'],
             'mail_username' => ['nullable', 'string', 'max:255'],

@@ -1,26 +1,36 @@
+import {
+    formatCurrencyByRegionalSettings,
+    formatNumberByRegionalSettings,
+} from '@/utils/number-format';
+
 /**
  * Format a numeric value as currency.
  *
  * @param value - The value to format (string or number)
- * @param currency - The currency code (default: 'USD')
- * @param locale - The locale for formatting (default: 'en-US')
+ * @param currency - Optional currency code override
+ * @param locale - The locale for formatting (default: 'id-ID')
  * @returns Formatted currency string, or '-' if invalid
  */
 export function formatCurrency(
     value: string | number,
-    currency: string = 'USD',
-    locale: string = 'en-US',
+    currency?: string,
+    locale: string = 'id-ID',
 ): string {
-    const numValue =
-        typeof value === 'number' ? value : Number.parseFloat(value);
-    if (Number.isNaN(numValue)) return '-';
-
-    return new Intl.NumberFormat(locale, {
-        style: 'currency',
+    return formatCurrencyByRegionalSettings(value, {
         currency,
-    }).format(numValue);
+        locale,
+    });
 }
 
 export function formatRupiah(value: string | number): string {
-    return formatCurrency(value, 'IDR', 'id-ID');
+    return formatCurrencyByRegionalSettings(value, {
+        locale: 'id-ID',
+    });
+}
+
+export function formatNumber(
+    value: string | number,
+    locale: string = 'id-ID',
+): string {
+    return formatNumberByRegionalSettings(value, { locale });
 }

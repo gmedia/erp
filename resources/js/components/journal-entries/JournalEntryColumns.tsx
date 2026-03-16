@@ -9,6 +9,7 @@ import {
     createTextColumn,
     type CustomTableMeta,
 } from '@/utils/columns';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
 
@@ -57,10 +58,10 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
             const amount = Number.parseFloat(row.getValue('total_debit'));
             return (
                 <div className="text-right font-medium">
-                    {new Intl.NumberFormat('id-ID', {
-                        style: 'currency',
+                    {formatCurrencyByRegionalSettings(amount, {
+                        locale: 'id-ID',
                         currency: 'IDR',
-                    }).format(amount)}
+                    })}
                 </div>
             );
         },

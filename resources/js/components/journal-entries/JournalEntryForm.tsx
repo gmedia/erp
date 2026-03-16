@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/table';
 
 import { JournalEntry } from '@/types/journal-entry';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { JournalEntryFormData, journalEntryFormSchema } from '@/utils/schemas';
 
 interface JournalEntryFormProps {
@@ -262,16 +263,22 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                         </Button>
                                     </TableCell>
                                     <TableCell className="text-right font-bold">
-                                        {new Intl.NumberFormat('id-ID', {
-                                            style: 'currency',
-                                            currency: 'IDR',
-                                        }).format(totalDebit)}
+                                        {formatCurrencyByRegionalSettings(
+                                            totalDebit,
+                                            {
+                                                locale: 'id-ID',
+                                                currency: 'IDR',
+                                            },
+                                        )}
                                     </TableCell>
                                     <TableCell className="text-right font-bold">
-                                        {new Intl.NumberFormat('id-ID', {
-                                            style: 'currency',
-                                            currency: 'IDR',
-                                        }).format(totalCredit)}
+                                        {formatCurrencyByRegionalSettings(
+                                            totalCredit,
+                                            {
+                                                locale: 'id-ID',
+                                                currency: 'IDR',
+                                            },
+                                        )}
                                     </TableCell>
                                     <TableCell
                                         colSpan={2}
@@ -285,10 +292,13 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                             }
                                         >
                                             Diff:{' '}
-                                            {new Intl.NumberFormat('id-ID', {
-                                                style: 'currency',
-                                                currency: 'IDR',
-                                            }).format(difference)}
+                                            {formatCurrencyByRegionalSettings(
+                                                difference,
+                                                {
+                                                    locale: 'id-ID',
+                                                    currency: 'IDR',
+                                                },
+                                            )}
                                         </span>
                                     </TableCell>
                                 </TableRow>

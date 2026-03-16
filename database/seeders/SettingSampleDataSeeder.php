@@ -77,6 +77,12 @@ class SettingSampleDataSeeder extends Seeder
                 'value' => '.',
                 'type' => 'string',
             ],
+            [
+                'group' => 'regional',
+                'key' => 'number_format_hide_decimal',
+                'value' => '0',
+                'type' => 'boolean',
+            ],
         ];
 
         foreach ($settings as $setting) {

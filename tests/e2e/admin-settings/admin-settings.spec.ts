@@ -37,10 +37,11 @@ test.describe('Admin Settings', () => {
 
         // Regional form fields should be visible
         await expect(page.locator('input[name="timezone"]')).toBeVisible();
-        await expect(page.locator('input[name="currency"]')).toBeVisible();
+        await expect(page.locator('select[name="currency"]')).toBeVisible();
         await expect(page.locator('input[name="date_format"]')).toBeVisible();
         await expect(page.locator('input[name="number_format_decimal"]')).toBeVisible();
         await expect(page.locator('input[name="number_format_thousand"]')).toBeVisible();
+        await expect(page.locator('#number_format_hide_decimal')).toBeVisible();
     });
 
     test('can update general settings', async ({ page }) => {
@@ -70,9 +71,12 @@ test.describe('Admin Settings', () => {
         await page.goto('/admin-settings?group=regional');
 
         // Update currency
-        const currencyInput = page.locator('input[name="currency"]');
-        await currencyInput.clear();
-        await currencyInput.fill('USD');
+        const currencySelect = page.locator('select[name="currency"]');
+        await currencySelect.selectOption('USD');
+
+        // Enable hide decimal
+        const hideDecimalInput = page.locator('#number_format_hide_decimal');
+        await hideDecimalInput.check();
 
         // Save
         const saveButton = page.getByTestId('save-regional-settings');
@@ -83,11 +87,12 @@ test.describe('Admin Settings', () => {
 
         // Verify persistence
         await page.reload();
-        await expect(page.locator('input[name="currency"]')).toHaveValue('USD');
+        await expect(page.locator('select[name="currency"]')).toHaveValue('USD');
+        await expect(page.locator('#number_format_hide_decimal')).toBeChecked();
 
-        // Reset back to IDR to not affect other tests
-        await currencyInput.clear();
-        await currencyInput.fill('IDR');
+        // Reset back to defaults to not affect other tests
+        await currencySelect.selectOption('IDR');
+        await hideDecimalInput.uncheck();
         await saveButton.click();
         await page.waitForTimeout(1000);
     });

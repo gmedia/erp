@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
+import { formatNumberByRegionalSettings } from '@/utils/number-format';
 import { BarChart, Calculator, History, Package } from 'lucide-react';
 import { AssetDashboardSummary } from '../../hooks/useAssetDashboard';
 
@@ -39,7 +40,7 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
                 </CardHeader>
                 <CardContent>
                     <div className="text-3xl font-bold">
-                        {data.total_assets.toLocaleString()}
+                        {formatNumberByRegionalSettings(data.total_assets)}
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">
                         registered assets

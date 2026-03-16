@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatNumberByRegionalSettings } from '@/utils/number-format';
 
 type SummaryBucket = {
     name: string;
@@ -21,7 +22,7 @@ type SummaryCardsProps = {
 };
 
 function formatNumber(value: string | number): string {
-    return new Intl.NumberFormat().format(Number(value));
+    return formatNumberByRegionalSettings(value);
 }
 
 function TopSummaryList({ items }: Readonly<{ items: SummaryBucket[] }>) {

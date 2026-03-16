@@ -4,6 +4,10 @@ import { GenericActions } from '@/components/common/ActionsDropdown';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate } from '@/lib/utils';
+import {
+    formatCurrencyByRegionalSettings,
+    formatNumberByRegionalSettings,
+} from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
 
@@ -148,8 +152,8 @@ export function createCurrencyColumn<T = Record<string, unknown>>(
         accessorKey,
         label,
         enableSorting = true,
-        currency = 'USD',
-        locale = 'en-US',
+        currency,
+        locale = 'id-ID',
         minimumFractionDigits = 2,
         maximumFractionDigits = 2,
         className = 'font-medium',
@@ -167,12 +171,12 @@ export function createCurrencyColumn<T = Record<string, unknown>>(
                 return <div className={className}>-</div>;
             }
 
-            const formatted = new Intl.NumberFormat(locale, {
-                style: 'currency',
+            const formatted = formatCurrencyByRegionalSettings(numValue, {
+                locale,
                 currency,
                 minimumFractionDigits,
                 maximumFractionDigits,
-            }).format(numValue);
+            });
 
             return <div className={className}>{formatted}</div>;
         },
@@ -216,10 +220,11 @@ export function createNumberColumn<T = Record<string, unknown>>(
                 return <div className={className}>-</div>;
             }
 
-            const formatted = new Intl.NumberFormat(locale, {
+            const formatted = formatNumberByRegionalSettings(value, {
+                locale,
                 minimumFractionDigits,
                 maximumFractionDigits,
-            }).format(value);
+            });
 
             return <div className={className}>{formatted}</div>;
         },

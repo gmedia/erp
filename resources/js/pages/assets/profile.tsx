@@ -26,6 +26,7 @@ import {
     AssetStocktakeItem,
 } from '@/types/asset';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import {
@@ -92,11 +93,11 @@ export default function AssetProfile() {
     };
 
     const formatCurrency = (value: string | number) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
+        return formatCurrencyByRegionalSettings(value, {
+            locale: 'id-ID',
             currency: item?.currency || 'IDR',
             minimumFractionDigits: 0,
-        }).format(Number(value));
+        });
     };
 
     if (isLoading || !item) {

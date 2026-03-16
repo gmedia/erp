@@ -8,6 +8,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { format } from 'date-fns';
 
 interface AssetMaintenanceViewModalProps {
@@ -90,11 +91,14 @@ export function AssetMaintenanceViewModal({
                                 Cost
                             </span>
                             <span>
-                                {new Intl.NumberFormat('id-ID', {
-                                    style: 'currency',
-                                    currency: 'IDR',
-                                    minimumFractionDigits: 0,
-                                }).format(Number(item.cost || 0))}
+                                {formatCurrencyByRegionalSettings(
+                                    Number(item.cost || 0),
+                                    {
+                                        locale: 'id-ID',
+                                        currency: 'IDR',
+                                        minimumFractionDigits: 0,
+                                    },
+                                )}
                             </span>
                         </div>
                         <div>

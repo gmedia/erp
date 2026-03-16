@@ -7,11 +7,12 @@ import AdminSettingsLayout from '@/layouts/admin-settings/layout';
 import AppLayout from '@/layouts/app-layout';
 import axiosInstance from '@/lib/axios';
 import { type BreadcrumbItem } from '@/types';
+import { setRegionalNumberFormatSettings } from '@/utils/number-format';
 import { Transition } from '@headlessui/react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 interface SettingsData {
@@ -28,6 +29,7 @@ interface SettingsData {
         date_format?: string;
         number_format_decimal?: string;
         number_format_thousand?: string;
+        number_format_hide_decimal?: boolean;
     };
     smtp?: {
         mail_host?: string;
@@ -50,6 +52,18 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/admin-settings',
     },
 ];
+
+const CURRENCY_OPTIONS = [
+    { value: 'IDR', label: 'IDR - Indonesian Rupiah' },
+    { value: 'USD', label: 'USD - US Dollar' },
+    { value: 'EUR', label: 'EUR - Euro' },
+    { value: 'SGD', label: 'SGD - Singapore Dollar' },
+    { value: 'MYR', label: 'MYR - Malaysian Ringgit' },
+    { value: 'JPY', label: 'JPY - Japanese Yen' },
+    { value: 'GBP', label: 'GBP - British Pound' },
+    { value: 'AUD', label: 'AUD - Australian Dollar' },
+    { value: 'CNY', label: 'CNY - Chinese Yuan' },
+] as const;
 
 function mapValidationErrors(error: unknown): Record<string, string> {
     if (!axios.isAxiosError(error) || error.response?.status !== 422) {
@@ -276,16 +290,63 @@ function RegionalSettings({
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [currency, setCurrency] = useState<string>(settings?.currency ?? 'IDR');
+    const [hideDecimal, setHideDecimal] = useState<boolean>(
+        Boolean(settings?.number_format_hide_decimal),
+    );
 
-    const handleSubmit = async (
-        e: Readonly<React.FormEvent<HTMLFormElement>>,
-    ) => {
-        await submitJsonAdminSettings(
-            e,
-            setProcessing,
-            setErrors,
-            setRecentlySuccessful,
-        );
+    useEffect(() => {
+        setCurrency(settings?.currency ?? 'IDR');
+    }, [settings?.currency]);
+
+    useEffect(() => {
+        setHideDecimal(Boolean(settings?.number_format_hide_decimal));
+    }, [settings?.number_format_hide_decimal]);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setProcessing(true);
+        setErrors({});
+        setRecentlySuccessful(false);
+
+        try {
+            const formData = new FormData(e.currentTarget);
+            formData.set('currency', currency);
+            formData.set('number_format_hide_decimal', hideDecimal ? '1' : '0');
+
+            const payload = Object.fromEntries(formData) as Record<
+                string,
+                string
+            >;
+            await axiosInstance.put(
+                '/api/admin-settings',
+                payload,
+            );
+
+            setRegionalNumberFormatSettings({
+                currency,
+                number_format_decimal: payload.number_format_decimal,
+                number_format_thousand: payload.number_format_thousand,
+                number_format_hide_decimal: hideDecimal,
+            });
+
+            setRecentlySuccessful(true);
+            setTimeout(() => setRecentlySuccessful(false), 3000);
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
+                const newErrors: Record<string, string> = {};
+                const serverErrors = error.response.data.errors as Record<
+                    string,
+                    string[]
+                >;
+                Object.keys(serverErrors).forEach((key) => {
+                    newErrors[key] = serverErrors[key][0];
+                });
+                setErrors(newErrors);
+            }
+        } finally {
+            setProcessing(false);
+        }
     };
 
     return (
@@ -318,13 +379,19 @@ function RegionalSettings({
 
                 <div className="grid gap-2">
                     <Label htmlFor="currency">Currency</Label>
-                    <Input
+                    <select
                         id="currency"
                         name="currency"
-                        defaultValue={settings?.currency ?? 'IDR'}
-                        placeholder="e.g. IDR"
-                        className="mt-1 block w-full"
-                    />
+                        value={currency}
+                        onChange={(event) => setCurrency(event.target.value)}
+                        className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring mt-1 block h-9 w-full rounded-md border px-3 py-2 text-sm shadow-xs focus-visible:ring-2 focus-visible:outline-none"
+                    >
+                        {CURRENCY_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
                     {errors.currency && (
                         <p className="text-sm text-destructive">
                             {errors.currency}
@@ -380,6 +447,40 @@ function RegionalSettings({
                     {errors.number_format_thousand && (
                         <p className="text-sm text-destructive">
                             {errors.number_format_thousand}
+                        </p>
+                    )}
+                </div>
+
+                <div className="grid gap-2">
+                    <Label htmlFor="number_format_hide_decimal">
+                        Hide Decimal Separator
+                    </Label>
+                    <label
+                        htmlFor="number_format_hide_decimal"
+                        className="flex items-center gap-3 rounded-md border px-3 py-2"
+                    >
+                        <input
+                            id="number_format_hide_decimal"
+                            type="checkbox"
+                            checked={hideDecimal}
+                            onChange={(event) =>
+                                setHideDecimal(event.target.checked)
+                            }
+                            className="h-4 w-4"
+                        />
+                        <span className="text-sm text-muted-foreground">
+                            Jika aktif, semua modul menampilkan angka tanpa
+                            desimal.
+                        </span>
+                    </label>
+                    <input
+                        type="hidden"
+                        name="number_format_hide_decimal"
+                        value={hideDecimal ? '1' : '0'}
+                    />
+                    {errors.number_format_hide_decimal && (
+                        <p className="text-sm text-destructive">
+                            {errors.number_format_hide_decimal}
                         </p>
                     )}
                 </div>
