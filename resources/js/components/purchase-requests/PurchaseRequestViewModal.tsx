@@ -9,6 +9,10 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+    formatCurrencyByRegionalSettings,
+    formatNumberByRegionalSettings,
+} from '@/utils/number-format';
 import { format } from 'date-fns';
 import React from 'react';
 
@@ -32,6 +36,20 @@ const ViewField = ({
         <div className="text-sm font-medium">{value || '-'}</div>
     </div>
 );
+
+const formatAmount = (value: string | number | null | undefined): string =>
+    formatCurrencyByRegionalSettings(value ?? 0, {
+        locale: 'id-ID',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+
+const formatQuantity = (value: string | number | null | undefined): string =>
+    formatNumberByRegionalSettings(value ?? 0, {
+        locale: 'id-ID',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    });
 
 export const PurchaseRequestViewModal = React.memo(
     ({ item, open, onClose }: PurchaseRequestViewModalProps) => {
@@ -102,7 +120,7 @@ export const PurchaseRequestViewModal = React.memo(
                                 />
                                 <ViewField
                                     label="Estimated Amount"
-                                    value={item.estimated_amount ?? '0'}
+                                    value={formatAmount(item.estimated_amount)}
                                 />
                                 <ViewField
                                     label="Notes"
@@ -147,15 +165,19 @@ export const PurchaseRequestViewModal = React.memo(
                                                         {it.unit?.name || '-'}
                                                     </td>
                                                     <td className="p-2 text-right">
-                                                        {it.quantity}
+                                                        {formatQuantity(
+                                                            it.quantity,
+                                                        )}
                                                     </td>
                                                     <td className="p-2 text-right">
-                                                        {it.estimated_unit_price ||
-                                                            '0'}
+                                                        {formatAmount(
+                                                            it.estimated_unit_price,
+                                                        )}
                                                     </td>
                                                     <td className="p-2 text-right">
-                                                        {it.estimated_total ||
-                                                            '0'}
+                                                        {formatAmount(
+                                                            it.estimated_total,
+                                                        )}
                                                     </td>
                                                 </tr>
                                             ))}

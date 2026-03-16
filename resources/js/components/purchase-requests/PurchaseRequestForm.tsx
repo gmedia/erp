@@ -29,6 +29,10 @@ import {
     type PurchaseRequest,
     type PurchaseRequestFormData,
 } from '@/types/purchase-request';
+import {
+    formatCurrencyByRegionalSettings,
+    formatNumberByRegionalSettings,
+} from '@/utils/number-format';
 import { purchaseRequestFormSchema } from '@/utils/schemas';
 import { PurchaseRequestItemFormDialog } from './PurchaseRequestItemFormDialog';
 
@@ -402,12 +406,30 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
                                                 )}
                                             </TableCell>
                                             <TableCell>
-                                                {purchaseRequestItem.quantity ??
-                                                    0}
+                                                {formatNumberByRegionalSettings(
+                                                    purchaseRequestItem.quantity ??
+                                                        0,
+                                                    {
+                                                        locale: 'id-ID',
+                                                        minimumFractionDigits:
+                                                            0,
+                                                        maximumFractionDigits:
+                                                            2,
+                                                    },
+                                                )}
                                             </TableCell>
                                             <TableCell>
-                                                {purchaseRequestItem.estimated_unit_price ??
-                                                    0}
+                                                {formatCurrencyByRegionalSettings(
+                                                    purchaseRequestItem.estimated_unit_price ??
+                                                        0,
+                                                    {
+                                                        locale: 'id-ID',
+                                                        minimumFractionDigits:
+                                                            2,
+                                                        maximumFractionDigits:
+                                                            2,
+                                                    },
+                                                )}
                                             </TableCell>
                                             <TableCell>
                                                 {purchaseRequestItem.notes ||

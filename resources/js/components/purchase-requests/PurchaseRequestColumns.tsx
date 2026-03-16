@@ -4,8 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { PurchaseRequest } from '@/types/purchase-request';
 import {
     createActionsColumn,
+    createCurrencyColumn,
     createDateColumn,
-    createNumberColumn,
     createSelectColumn,
     createSortingHeader,
     createTextColumn,
@@ -87,9 +87,11 @@ export const purchaseRequestColumns: ColumnDef<PurchaseRequest>[] = [
         ...createSortingHeader('Status'),
         cell: renderStatusCell,
     },
-    createNumberColumn<PurchaseRequest>({
+    createCurrencyColumn<PurchaseRequest>({
         accessorKey: 'estimated_amount',
         label: 'Estimated Amount',
+        currency: 'IDR',
+        locale: 'id-ID',
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     }),

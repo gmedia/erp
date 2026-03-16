@@ -9,6 +9,10 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+    formatCurrencyByRegionalSettings,
+    formatNumberByRegionalSettings,
+} from '@/utils/number-format';
 import { format } from 'date-fns';
 import React from 'react';
 
@@ -36,6 +40,28 @@ const ViewField = ({
 export const PurchaseOrderViewModal = React.memo(
     ({ item, open, onClose }: PurchaseOrderViewModalProps) => {
         if (!item) return null;
+
+        const formatAmount = (value: string | number | null | undefined) =>
+            formatCurrencyByRegionalSettings(value ?? 0, {
+                locale: 'id-ID',
+                currency: item.currency || undefined,
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
+
+        const formatQuantity = (value: string | number | null | undefined) =>
+            formatNumberByRegionalSettings(value ?? 0, {
+                locale: 'id-ID',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+            });
+
+        const formatPercent = (value: string | number | null | undefined) =>
+            `${formatNumberByRegionalSettings(value ?? 0, {
+                locale: 'id-ID',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+            })}%`;
 
         return (
             <Dialog open={open} onOpenChange={onClose}>
@@ -104,19 +130,19 @@ export const PurchaseOrderViewModal = React.memo(
                                 />
                                 <ViewField
                                     label="Subtotal"
-                                    value={item.subtotal}
+                                    value={formatAmount(item.subtotal)}
                                 />
                                 <ViewField
                                     label="Tax Amount"
-                                    value={item.tax_amount}
+                                    value={formatAmount(item.tax_amount)}
                                 />
                                 <ViewField
                                     label="Discount Amount"
-                                    value={item.discount_amount}
+                                    value={formatAmount(item.discount_amount)}
                                 />
                                 <ViewField
                                     label="Grand Total"
-                                    value={item.grand_total}
+                                    value={formatAmount(item.grand_total)}
                                 />
                                 <ViewField
                                     label="Shipping Address"
@@ -171,19 +197,29 @@ export const PurchaseOrderViewModal = React.memo(
                                                         {it.unit?.name || '-'}
                                                     </td>
                                                     <td className="p-2 text-right">
-                                                        {it.quantity}
+                                                        {formatQuantity(
+                                                            it.quantity,
+                                                        )}
                                                     </td>
                                                     <td className="p-2 text-right">
-                                                        {it.unit_price}
+                                                        {formatAmount(
+                                                            it.unit_price,
+                                                        )}
                                                     </td>
                                                     <td className="p-2 text-right">
-                                                        {it.discount_percent}
+                                                        {formatPercent(
+                                                            it.discount_percent,
+                                                        )}
                                                     </td>
                                                     <td className="p-2 text-right">
-                                                        {it.tax_percent}
+                                                        {formatPercent(
+                                                            it.tax_percent,
+                                                        )}
                                                     </td>
                                                     <td className="p-2 text-right">
-                                                        {it.line_total}
+                                                        {formatAmount(
+                                                            it.line_total,
+                                                        )}
                                                     </td>
                                                 </tr>
                                             ))}

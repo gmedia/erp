@@ -29,6 +29,10 @@ import {
     type PurchaseOrder,
     type PurchaseOrderFormData,
 } from '@/types/purchase-order';
+import {
+    formatCurrencyByRegionalSettings,
+    formatNumberByRegionalSettings,
+} from '@/utils/number-format';
 import { purchaseOrderFormSchema } from '@/utils/schemas';
 import { PurchaseOrderItemFormDialog } from './PurchaseOrderItemFormDialog';
 
@@ -173,6 +177,7 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
         const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
         const [editingIndex, setEditingIndex] = useState<number | null>(null);
         const watchedItems = form.watch('items');
+        const selectedCurrency = form.watch('currency');
 
         const handleCreateNewItem = () => {
             setEditingIndex(null);
@@ -385,20 +390,59 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                                 )}
                                             </TableCell>
                                             <TableCell>
-                                                {purchaseOrderItem.quantity ??
-                                                    0}
+                                                {formatNumberByRegionalSettings(
+                                                    purchaseOrderItem.quantity ??
+                                                        0,
+                                                    {
+                                                        locale: 'id-ID',
+                                                        minimumFractionDigits:
+                                                            0,
+                                                        maximumFractionDigits:
+                                                            2,
+                                                    },
+                                                )}
                                             </TableCell>
                                             <TableCell>
-                                                {purchaseOrderItem.unit_price ??
-                                                    0}
+                                                {formatCurrencyByRegionalSettings(
+                                                    purchaseOrderItem.unit_price ??
+                                                        0,
+                                                    {
+                                                        locale: 'id-ID',
+                                                        currency:
+                                                            selectedCurrency ||
+                                                            undefined,
+                                                        minimumFractionDigits:
+                                                            2,
+                                                        maximumFractionDigits:
+                                                            2,
+                                                    },
+                                                )}
                                             </TableCell>
                                             <TableCell>
-                                                {purchaseOrderItem.discount_percent ??
-                                                    0}
+                                                {formatNumberByRegionalSettings(
+                                                    purchaseOrderItem.discount_percent ??
+                                                        0,
+                                                    {
+                                                        locale: 'id-ID',
+                                                        minimumFractionDigits:
+                                                            0,
+                                                        maximumFractionDigits:
+                                                            2,
+                                                    },
+                                                )}
                                             </TableCell>
                                             <TableCell>
-                                                {purchaseOrderItem.tax_percent ??
-                                                    0}
+                                                {formatNumberByRegionalSettings(
+                                                    purchaseOrderItem.tax_percent ??
+                                                        0,
+                                                    {
+                                                        locale: 'id-ID',
+                                                        minimumFractionDigits:
+                                                            0,
+                                                        maximumFractionDigits:
+                                                            2,
+                                                    },
+                                                )}
                                             </TableCell>
                                             <TableCell>
                                                 {purchaseOrderItem.notes || '-'}

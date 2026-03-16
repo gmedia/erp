@@ -1,6 +1,10 @@
 'use client';
 
-import { createNumberColumn, createSortingHeader } from '@/utils/columns';
+import {
+    createCurrencyColumn,
+    createNumberColumn,
+    createSortingHeader,
+} from '@/utils/columns';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type InventoryValuationItem = {
@@ -79,17 +83,23 @@ export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     }),
-    createNumberColumn<InventoryValuationItem>({
+    createCurrencyColumn<InventoryValuationItem>({
         accessorKey: 'average_cost',
         label: 'Avg Cost',
+        currency: 'IDR',
+        locale: 'id-ID',
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
+        className: 'text-right',
     }),
-    createNumberColumn<InventoryValuationItem>({
+    createCurrencyColumn<InventoryValuationItem>({
         accessorKey: 'stock_value',
         label: 'Stock Value',
+        currency: 'IDR',
+        locale: 'id-ID',
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
+        className: 'text-right',
     }),
     {
         accessorKey: 'moved_at',

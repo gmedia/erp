@@ -5,11 +5,11 @@ import { PurchaseOrder } from '@/types/purchase-order';
 import {
     createActionsColumn,
     createDateColumn,
-    createNumberColumn,
     createSelectColumn,
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
 
 const renderSupplierCell = ({ row }: { row: { original: PurchaseOrder } }) => (
@@ -57,11 +57,19 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
         ...createSortingHeader('Status'),
         cell: renderStatusCell,
     },
-    createNumberColumn<PurchaseOrder>({
+    {
         accessorKey: 'grand_total',
-        label: 'Grand Total',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }),
+        ...createSortingHeader('Grand Total'),
+        cell: ({ row }) => (
+            <div className="text-right">
+                {formatCurrencyByRegionalSettings(row.original.grand_total, {
+                    locale: 'id-ID',
+                    currency: row.original.currency || undefined,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                })}
+            </div>
+        ),
+    },
     createActionsColumn<PurchaseOrder>(),
 ];
