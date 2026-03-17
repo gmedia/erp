@@ -1,5 +1,6 @@
 import { formatCurrency } from '@/lib/utils';
 import { createSortingHeader } from '@/utils/columns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
 
 export interface BookValueDepreciationReportItem {
@@ -48,7 +49,11 @@ export const bookValueDepreciationColumns: ColumnDef<BookValueDepreciationReport
             accessorKey: 'purchase_date',
             ...createSortingHeader('Purchase Date'),
             cell: ({ row }) => (
-                <div>{row.getValue('purchase_date') || '-'}</div>
+                <div>
+                    {formatDateByRegionalSettings(
+                        row.getValue('purchase_date') as string,
+                    )}
+                </div>
             ),
         },
         {

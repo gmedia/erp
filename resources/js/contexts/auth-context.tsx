@@ -3,6 +3,11 @@ import { type Translations } from '@/types/i18n';
 import { type Permission } from '@/types/permission';
 import { type User } from '@/types/user';
 import {
+    getRegionalDateFormatSettings,
+    setRegionalDateFormatSettings,
+    type RegionalDateFormatSettings,
+} from '@/utils/date-format';
+import {
     getRegionalNumberFormatSettings,
     setRegionalNumberFormatSettings,
     type RegionalNumberFormatSettings,
@@ -43,8 +48,13 @@ interface AuthMeResponse {
     translations?: Translations | Record<string, never>;
     locale?: string;
     pendingApprovalsCount?: number;
-    regionalSettings?: Partial<RegionalNumberFormatSettings>;
+    regionalSettings?: Partial<
+        RegionalNumberFormatSettings & RegionalDateFormatSettings
+    >;
 }
+
+type RegionalSettings =
+    RegionalNumberFormatSettings & RegionalDateFormatSettings;
 
 interface AuthContextType {
     user: User | null;
@@ -54,7 +64,7 @@ interface AuthContextType {
     companyLogoUrl: string | null;
     translations: Translations | Record<string, never>;
     locale: string;
-    regionalSettings: RegionalNumberFormatSettings;
+    regionalSettings: RegionalSettings;
     pendingApprovalsCount: number;
     isLoading: boolean;
     login: (
@@ -65,7 +75,10 @@ interface AuthContextType {
     refreshAuth: () => Promise<void>;
 }
 
-const defaultRegionalSettings = getRegionalNumberFormatSettings();
+const defaultRegionalSettings: RegionalSettings = {
+    ...getRegionalNumberFormatSettings(),
+    ...getRegionalDateFormatSettings(),
+};
 
 const AuthContext = createContext<AuthContextType>({
     user: null,
@@ -96,7 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     >({});
     const [locale, setLocale] = useState<string>('en');
     const [regionalSettings, setRegionalSettings] =
-        useState<RegionalNumberFormatSettings>(defaultRegionalSettings);
+        useState<RegionalSettings>(defaultRegionalSettings);
     const [pendingApprovalsCount, setPendingApprovalsCount] =
         useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -110,9 +123,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         try {
             const { data } = await axiosInstance.get<AuthMeResponse>('/api/me');
-            const syncedRegionalSettings = setRegionalNumberFormatSettings(
+            const syncedRegionalNumberSettings = setRegionalNumberFormatSettings(
                 data.regionalSettings ?? {},
             );
+            const syncedRegionalDateSettings = setRegionalDateFormatSettings(
+                data.regionalSettings ?? {},
+            );
+            const syncedRegionalSettings: RegionalSettings = {
+                ...syncedRegionalNumberSettings,
+                ...syncedRegionalDateSettings,
+            };
 
             setUser(data.user);
             setEmployee(data.employee);

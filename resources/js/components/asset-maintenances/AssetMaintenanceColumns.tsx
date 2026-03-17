@@ -7,9 +7,9 @@ import {
     createSelectColumn,
     createSortingHeader,
 } from '@/utils/columns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
-import { format } from 'date-fns';
 
 function getMaintenanceStatusVariant(status: string) {
     if (status === 'completed') {
@@ -68,7 +68,7 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
         ...createSortingHeader('Scheduled'),
         cell: ({ row }) => {
             const date = row.getValue('scheduled_at') as string | null;
-            return date ? format(new Date(date), 'PPP') : '-';
+            return formatDateByRegionalSettings(date);
         },
     },
     {
@@ -76,7 +76,7 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
         ...createSortingHeader('Performed'),
         cell: ({ row }) => {
             const date = row.getValue('performed_at') as string | null;
-            return date ? format(new Date(date), 'PPP') : '-';
+            return formatDateByRegionalSettings(date);
         },
     },
     {

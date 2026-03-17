@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { createSortingHeader } from '@/utils/columns';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
 
 export interface AssetStocktakeVarianceItem {
@@ -95,7 +96,7 @@ export const varianceColumns: ColumnDef<AssetStocktakeVarianceItem>[] = [
         ...createSortingHeader('Checked At'),
         cell: ({ row }) => {
             const date = row.getValue('checked_at') as string;
-            return <div>{date ? new Date(date).toLocaleString() : '-'}</div>;
+            return <div>{formatDateTimeByRegionalSettings(date)}</div>;
         },
     },
     {

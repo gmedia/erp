@@ -13,7 +13,7 @@ import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
-import { format } from 'date-fns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
 import { PurchaseOrder } from '@/types/purchase-order';
@@ -92,27 +92,15 @@ export const PurchaseOrderViewModal = React.memo(
                                 />
                                 <ViewField
                                     label="Order Date"
-                                    value={
-                                        item.order_date
-                                            ? format(
-                                                  new Date(item.order_date),
-                                                  'PPP',
-                                              )
-                                            : '-'
-                                    }
+                                    value={formatDateByRegionalSettings(
+                                        item.order_date,
+                                    )}
                                 />
                                 <ViewField
                                     label="Expected Delivery"
-                                    value={
-                                        item.expected_delivery_date
-                                            ? format(
-                                                  new Date(
-                                                      item.expected_delivery_date,
-                                                  ),
-                                                  'PPP',
-                                              )
-                                            : '-'
-                                    }
+                                    value={formatDateByRegionalSettings(
+                                        item.expected_delivery_date,
+                                    )}
                                 />
                                 <ViewField
                                     label="Payment Terms"

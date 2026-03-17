@@ -9,7 +9,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { format } from 'date-fns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
 import { GoodsReceipt } from '@/types/goods-receipt';
@@ -68,14 +68,9 @@ export const GoodsReceiptViewModal = React.memo(
                                 />
                                 <ViewField
                                     label="Receipt Date"
-                                    value={
-                                        item.receipt_date
-                                            ? format(
-                                                  new Date(item.receipt_date),
-                                                  'PPP',
-                                              )
-                                            : '-'
-                                    }
+                                    value={formatDateByRegionalSettings(
+                                        item.receipt_date,
+                                    )}
                                 />
                                 <ViewField
                                     label="Supplier Delivery Note"

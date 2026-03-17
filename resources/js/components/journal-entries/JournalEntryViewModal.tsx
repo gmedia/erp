@@ -19,8 +19,8 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { JournalEntry } from '@/types/journal-entry';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
-import { format } from 'date-fns';
 
 interface JournalEntryViewModalProps {
     item: JournalEntry | null;
@@ -70,10 +70,7 @@ export function JournalEntryViewModal({
                                     Date
                                 </p>
                                 <p>
-                                    {format(
-                                        new Date(item.entry_date),
-                                        'dd MMMM yyyy',
-                                    )}
+                                    {formatDateByRegionalSettings(item.entry_date)}
                                 </p>
                             </div>
                             <div>

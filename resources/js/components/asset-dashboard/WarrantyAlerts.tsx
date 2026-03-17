@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format } from 'date-fns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { AlertTriangle, Calendar, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { WarrantyAlertItem } from '../../hooks/useAssetDashboard';
@@ -128,11 +128,8 @@ export function WarrantyAlerts({
                                             title="Warranty End Date"
                                         >
                                             <Calendar className="mr-1 h-3 w-3 opacity-70" />
-                                            {format(
-                                                new Date(
-                                                    asset.warranty_end_date,
-                                                ),
-                                                'MMM dd, yyyy',
+                                            {formatDateByRegionalSettings(
+                                                asset.warranty_end_date,
                                             )}
                                         </div>
                                     </div>

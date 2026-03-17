@@ -15,6 +15,7 @@ import AdminSettingsLayout from '@/layouts/admin-settings/layout';
 import AppLayout from '@/layouts/app-layout';
 import axiosInstance from '@/lib/axios';
 import { type BreadcrumbItem } from '@/types';
+import { setRegionalDateFormatSettings } from '@/utils/date-format';
 import { setRegionalNumberFormatSettings } from '@/utils/number-format';
 import { Transition } from '@headlessui/react';
 import { useQuery } from '@tanstack/react-query';
@@ -336,6 +337,9 @@ function RegionalSettings({
                 number_format_decimal: payload.number_format_decimal,
                 number_format_thousand: payload.number_format_thousand,
                 number_format_hide_decimal: hideDecimal,
+            });
+            setRegionalDateFormatSettings({
+                date_format: payload.date_format,
             });
 
             setRecentlySuccessful(true);

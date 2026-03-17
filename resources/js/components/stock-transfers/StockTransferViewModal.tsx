@@ -18,7 +18,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import axios from '@/lib/axios';
-import { format } from 'date-fns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
 import { useTranslation } from '@/contexts/i18n-context';
@@ -107,29 +107,15 @@ export const StockTransferViewModal = React.memo(
                                 />
                                 <ViewField
                                     label="Transfer Date"
-                                    value={
-                                        current.transfer_date
-                                            ? format(
-                                                  new Date(
-                                                      current.transfer_date,
-                                                  ),
-                                                  'PPP',
-                                              )
-                                            : '-'
-                                    }
+                                    value={formatDateByRegionalSettings(
+                                        current.transfer_date,
+                                    )}
                                 />
                                 <ViewField
                                     label="Expected Arrival"
-                                    value={
-                                        current.expected_arrival_date
-                                            ? format(
-                                                  new Date(
-                                                      current.expected_arrival_date,
-                                                  ),
-                                                  'PPP',
-                                              )
-                                            : '-'
-                                    }
+                                    value={formatDateByRegionalSettings(
+                                        current.expected_arrival_date,
+                                    )}
                                 />
                                 <ViewField
                                     label="Requested By"

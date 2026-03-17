@@ -8,8 +8,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
-import { format } from 'date-fns';
 
 interface AssetMaintenanceViewModalProps {
     open: boolean;
@@ -71,9 +71,7 @@ export function AssetMaintenanceViewModal({
                                 Scheduled At
                             </span>
                             <span>
-                                {item.scheduled_at
-                                    ? format(new Date(item.scheduled_at), 'PPP')
-                                    : '-'}
+                                {formatDateByRegionalSettings(item.scheduled_at)}
                             </span>
                         </div>
                         <div>
@@ -81,9 +79,7 @@ export function AssetMaintenanceViewModal({
                                 Performed At
                             </span>
                             <span>
-                                {item.performed_at
-                                    ? format(new Date(item.performed_at), 'PPP')
-                                    : '-'}
+                                {formatDateByRegionalSettings(item.performed_at)}
                             </span>
                         </div>
                         <div>

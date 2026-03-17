@@ -24,8 +24,8 @@ import { useAssetDepreciationRuns } from '@/hooks/useAssetDepreciationRuns';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { type AssetDepreciationCalculationFormData } from '@/utils/schemas';
-import { format } from 'date-fns';
 import { Calculator, CheckCircle2, Eye, Loader2, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -125,11 +125,11 @@ export default function Index() {
                 <TableCell>
                     <div className="flex flex-col gap-1">
                         <span className="text-sm">
-                            {format(new Date(item.period_start), 'dd MMM yyyy')}
+                            {formatDateByRegionalSettings(item.period_start)}
                         </span>
                         <span className="text-xs text-muted-foreground">
                             to{' '}
-                            {format(new Date(item.period_end), 'dd MMM yyyy')}
+                            {formatDateByRegionalSettings(item.period_end)}
                         </span>
                     </div>
                 </TableCell>

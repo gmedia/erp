@@ -1,6 +1,10 @@
 'use client';
 
 import { createNumberColumn, createSortingHeader } from '@/utils/columns';
+import {
+    formatDateByRegionalSettings,
+    formatDateTimeByRegionalSettings,
+} from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type InventoryStocktakeVarianceReportItem = {
@@ -31,8 +35,7 @@ export type InventoryStocktakeVarianceReportItem = {
 };
 
 function formatDate(value: string | null | undefined): string {
-    if (!value) return '-';
-    return new Date(value).toLocaleString();
+    return formatDateTimeByRegionalSettings(value);
 }
 
 export const inventoryStocktakeVarianceColumns: ColumnDef<InventoryStocktakeVarianceReportItem>[] =
@@ -50,7 +53,11 @@ export const inventoryStocktakeVarianceColumns: ColumnDef<InventoryStocktakeVari
             accessorKey: 'stocktake.stocktake_date',
             ...createSortingHeader('Stocktake Date'),
             cell: ({ row }) => (
-                <div>{row.original.stocktake?.stocktake_date ?? '-'}</div>
+                <div>
+                    {formatDateByRegionalSettings(
+                        row.original.stocktake?.stocktake_date,
+                    )}
+                </div>
             ),
         },
         {

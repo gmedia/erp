@@ -5,6 +5,7 @@ import {
     createNumberColumn,
     createSortingHeader,
 } from '@/utils/columns';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type InventoryValuationItem = {
@@ -29,8 +30,7 @@ export type InventoryValuationItem = {
 };
 
 function formatDate(value: string | null | undefined): string {
-    if (!value) return '-';
-    return new Date(value).toLocaleString();
+    return formatDateTimeByRegionalSettings(value);
 }
 
 export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [

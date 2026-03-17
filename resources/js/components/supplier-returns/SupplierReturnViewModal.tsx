@@ -9,7 +9,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { format } from 'date-fns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
 import { SupplierReturn } from '@/types/supplier-return';
@@ -72,14 +72,9 @@ export const SupplierReturnViewModal = React.memo(
                                 />
                                 <ViewField
                                     label="Return Date"
-                                    value={
-                                        item.return_date
-                                            ? format(
-                                                  new Date(item.return_date),
-                                                  'PPP',
-                                              )
-                                            : '-'
-                                    }
+                                    value={formatDateByRegionalSettings(
+                                        item.return_date,
+                                    )}
                                 />
                                 <ViewField label="Reason" value={item.reason} />
                                 <ViewField

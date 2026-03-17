@@ -7,6 +7,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { PipelineAuditTrailItem } from './Columns';
 
 interface DetailModalProps {
@@ -149,7 +150,9 @@ export function DetailModal({
                                     Date & Time
                                 </p>
                                 <p className="text-sm font-medium">
-                                    {new Date(item.created_at).toLocaleString()}
+                                    {formatDateTimeByRegionalSettings(
+                                        item.created_at,
+                                    )}
                                 </p>
                             </div>
                             <div className="space-y-1">

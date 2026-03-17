@@ -6,6 +6,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { type Pipeline } from '@/types/entity';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 
 interface PipelineViewModalProps {
     readonly open: boolean;
@@ -75,7 +76,7 @@ export function PipelineViewModal({
                                 Created At
                             </span>
                             <span>
-                                {new Date(item.created_at).toLocaleDateString()}
+                                {formatDateByRegionalSettings(item.created_at)}
                             </span>
                         </div>
                     </div>

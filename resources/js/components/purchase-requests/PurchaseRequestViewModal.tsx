@@ -13,7 +13,7 @@ import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
-import { format } from 'date-fns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
 import { PurchaseRequest } from '@/types/purchase-request';
@@ -86,25 +86,15 @@ export const PurchaseRequestViewModal = React.memo(
                                 />
                                 <ViewField
                                     label="Request Date"
-                                    value={
-                                        item.request_date
-                                            ? format(
-                                                  new Date(item.request_date),
-                                                  'PPP',
-                                              )
-                                            : '-'
-                                    }
+                                    value={formatDateByRegionalSettings(
+                                        item.request_date,
+                                    )}
                                 />
                                 <ViewField
                                     label="Required Date"
-                                    value={
-                                        item.required_date
-                                            ? format(
-                                                  new Date(item.required_date),
-                                                  'PPP',
-                                              )
-                                            : '-'
-                                    }
+                                    value={formatDateByRegionalSettings(
+                                        item.required_date,
+                                    )}
                                 />
                                 <ViewField
                                     label="Priority"

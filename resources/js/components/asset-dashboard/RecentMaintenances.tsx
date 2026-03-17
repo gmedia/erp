@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format } from 'date-fns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { Calendar as CalendarIcon, ChevronRight, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RecentMaintenanceItem } from '../../hooks/useAssetDashboard';
@@ -108,9 +108,8 @@ export function RecentMaintenances({
                     <div className="divide-y pr-4">
                         {data.map((maintenance) => {
                             const dateFormatted = maintenance.scheduled_at
-                                ? format(
-                                      new Date(maintenance.scheduled_at),
-                                      'MMM dd, yyyy',
+                                ? formatDateByRegionalSettings(
+                                      maintenance.scheduled_at,
                                   )
                                 : 'Not scheduled';
 

@@ -15,7 +15,7 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { CalendarIcon } from 'lucide-react';
 
 interface DatePickerFieldProps {
@@ -50,9 +50,8 @@ export function DatePickerField({
                                     )}
                                 >
                                     {field.value ? (
-                                        format(
+                                        formatDateByRegionalSettings(
                                             field.value as unknown as Date,
-                                            'PPP',
                                         )
                                     ) : (
                                         <span>{placeholder}</span>

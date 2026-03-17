@@ -6,6 +6,7 @@ import {
     createNumberColumn,
     createSortingHeader,
 } from '@/utils/columns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type GoodsReceiptReportItem = {
@@ -36,8 +37,7 @@ export type GoodsReceiptReportItem = {
 };
 
 function formatDate(value: string | null | undefined): string {
-    if (!value) return '-';
-    return new Date(value).toLocaleDateString();
+    return formatDateByRegionalSettings(value);
 }
 
 function formatLabel(value: string | null | undefined): string {

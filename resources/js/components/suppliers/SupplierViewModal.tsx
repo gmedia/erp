@@ -8,7 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { format } from 'date-fns';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
 import { useTranslation } from '@/contexts/i18n-context';
@@ -84,7 +84,9 @@ export const SupplierViewModal = React.memo(
 
                         <ViewField
                             label="Created At"
-                            value={format(new Date(item.created_at), 'PPP p')}
+                            value={formatDateTimeByRegionalSettings(
+                                item.created_at,
+                            )}
                         />
                     </div>
 

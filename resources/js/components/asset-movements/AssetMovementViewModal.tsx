@@ -8,7 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { format } from 'date-fns';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 
 interface AssetMovementViewModalProps {
     open: boolean;
@@ -57,7 +57,9 @@ export function AssetMovementViewModal({
                                 Date
                             </span>
                             <span>
-                                {format(new Date(item.moved_at), 'PPP p')}
+                                {formatDateTimeByRegionalSettings(
+                                    item.moved_at,
+                                )}
                             </span>
                         </div>
                         <div>

@@ -26,9 +26,9 @@ import {
     AssetStocktakeItem,
 } from '@/types/asset';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import {
     Activity,
     AlertCircle,
@@ -84,12 +84,9 @@ export default function AssetProfile() {
     }, [queryClient, id]);
 
     const formatDate = (dateString: string | null) => {
-        if (!dateString) return 'N/A';
-        try {
-            return format(new Date(dateString), 'PPP');
-        } catch {
-            return dateString;
-        }
+        return formatDateByRegionalSettings(dateString, {
+            fallback: 'N/A',
+        });
     };
 
     const formatCurrency = (value: string | number) => {

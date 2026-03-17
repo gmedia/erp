@@ -18,7 +18,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import axios from '@/lib/axios';
-import { format } from 'date-fns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
 import { useTranslation } from '@/contexts/i18n-context';
@@ -111,16 +111,9 @@ export const InventoryStocktakeViewModal = React.memo(
                                 />
                                 <ViewField
                                     label="Stocktake Date"
-                                    value={
-                                        current.stocktake_date
-                                            ? format(
-                                                  new Date(
-                                                      current.stocktake_date,
-                                                  ),
-                                                  'PPP',
-                                              )
-                                            : '-'
-                                    }
+                                    value={formatDateByRegionalSettings(
+                                        current.stocktake_date,
+                                    )}
                                 />
                                 <ViewField
                                     label="Notes"

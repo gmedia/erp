@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { type Asset } from '@/types/asset';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
-import { format } from 'date-fns';
 
 interface AssetViewModalProps {
     open: boolean;
@@ -27,12 +27,9 @@ export function AssetViewModal({
     if (!item) return null;
 
     const formatDate = (dateString: Readonly<string | null>) => {
-        if (!dateString) return 'N/A';
-        try {
-            return format(new Date(dateString), 'PPP');
-        } catch {
-            return dateString;
-        }
+        return formatDateByRegionalSettings(dateString, {
+            fallback: 'N/A',
+        });
     };
 
     const formatCurrency = (value: string | number) => {
