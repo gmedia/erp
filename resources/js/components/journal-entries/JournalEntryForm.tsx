@@ -2,8 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { Plus, Trash } from 'lucide-react';
-import { memo, useEffect, useMemo } from 'react';
+import { Pencil, Plus, Trash } from 'lucide-react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import {
     useFieldArray,
     useForm,
@@ -12,7 +12,6 @@ import {
 } from 'react-hook-form';
 import * as z from 'zod';
 
-import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
@@ -30,6 +29,7 @@ import {
 import { JournalEntry } from '@/types/journal-entry';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { JournalEntryFormData, journalEntryFormSchema } from '@/utils/schemas';
+import { JournalEntryLineFormDialog } from './JournalEntryLineFormDialog';
 
 interface JournalEntryFormProps {
     open: boolean;
@@ -47,24 +47,23 @@ const getJournalEntryFormDefaults = (
 ): JournalEntryFormData => {
     if (!journalEntry) {
         return {
-            entry_date: new Date(),
+            entry_date: new Date() as any, // Cast to any to satisfy type temporarily or use proper Date type handling if needed
             reference: '',
             description: '',
-            lines: [
-                { account_id: '', debit: 0, credit: 0, memo: '' },
-                { account_id: '', debit: 0, credit: 0, memo: '' },
-            ],
+            lines: [],
         };
     }
 
     return {
-        entry_date: new Date(journalEntry.entry_date),
+        entry_date: new Date(journalEntry.entry_date) as any,
         reference: journalEntry.reference || '',
         description: journalEntry.description || '',
         lines: journalEntry.lines.map((line) => ({
             account_id: String(line.account_id),
-            debit: Number(line.debit),
-            credit: Number(line.credit),
+            account_name: line.account_name || '',
+            account_code: line.account_code || '',
+            debit: Number(line.debit) || 0,
+            credit: Number(line.credit) || 0,
             memo: line.memo || '',
         })),
     };
@@ -94,7 +93,15 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
             defaultValues,
         });
 
-        const { fields, append, remove } = useFieldArray({
+        const { fields, append, update, remove } = useFieldArray({
+            control: form.control,
+            name: 'lines',
+        });
+
+        const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
+        const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+        const lines = useWatch({
             control: form.control,
             name: 'lines',
         });
@@ -106,10 +113,15 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
             }
         }, [open, defaultValues, form]);
 
-        const lines = useWatch({
-            control: form.control,
-            name: 'lines',
-        });
+        const handleCreateNewLine = () => {
+            setEditingIndex(null);
+            setIsItemDialogOpen(true);
+        };
+
+        const handleEditLine = (index: number) => {
+            setEditingIndex(index);
+            setIsItemDialogOpen(true);
+        };
 
         const totalDebit =
             lines?.reduce((acc, line) => acc + (Number(line.debit) || 0), 0) ||
@@ -172,150 +184,179 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                     </div>
 
                     {/* Lines Section */}
-                    <div className="rounded-md border">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[30%]">
-                                        Account
-                                    </TableHead>
-                                    <TableHead className="w-[20%]">
-                                        Debit
-                                    </TableHead>
-                                    <TableHead className="w-[20%]">
-                                        Credit
-                                    </TableHead>
-                                    <TableHead className="w-[25%]">
-                                        Memo
-                                    </TableHead>
-                                    <TableHead className="w-[5%]"></TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {fields.map((field, index) => (
-                                    <TableRow key={field.id}>
-                                        <TableCell>
-                                            <AsyncSelectField
-                                                name={`lines.${index}.account_id`}
-                                                label=""
-                                                url="/api/accounts?is_active=1&has_children=0"
-                                                placeholder="Select Account"
-                                                labelFn={(item) =>
-                                                    `${item.code} - ${item.name} (${item.normal_balance})`
-                                                }
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <InputField
-                                                name={`lines.${index}.debit`}
-                                                label=""
-                                                type="number"
-                                                step="0.01"
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <InputField
-                                                name={`lines.${index}.credit`}
-                                                label=""
-                                                type="number"
-                                                step="0.01"
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <InputField
-                                                name={`lines.${index}.memo`}
-                                                label=""
-                                                placeholder="Memo"
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => remove(index)}
-                                                disabled={fields.length <= 2}
-                                            >
-                                                <Trash className="h-4 w-4 text-red-500" />
-                                            </Button>
-                                        </TableCell>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-medium">Journal Lines</h3>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={handleCreateNewLine}
+                            >
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Line
+                            </Button>
+                        </div>
+                        <div className="rounded-md border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[30%]">
+                                            Account
+                                        </TableHead>
+                                        <TableHead className="w-[20%] text-right">
+                                            Debit
+                                        </TableHead>
+                                        <TableHead className="w-[20%] text-right">
+                                            Credit
+                                        </TableHead>
+                                        <TableHead className="w-[20%]">
+                                            Memo
+                                        </TableHead>
+                                        <TableHead className="w-[10%] text-right"></TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                            <TableFooter>
-                                <TableRow>
-                                    <TableCell>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() =>
-                                                append({
-                                                    account_id: '',
-                                                    debit: 0,
-                                                    credit: 0,
-                                                    memo: '',
-                                                })
-                                            }
-                                        >
-                                            <Plus className="mr-2 h-4 w-4" />{' '}
-                                            Add Line
-                                        </Button>
-                                    </TableCell>
-                                    <TableCell className="text-right font-bold">
-                                        {formatCurrencyByRegionalSettings(
-                                            totalDebit,
-                                            {
-                                                locale: 'id-ID',
-                                                currency: 'IDR',
-                                            },
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="text-right font-bold">
-                                        {formatCurrencyByRegionalSettings(
-                                            totalCredit,
-                                            {
-                                                locale: 'id-ID',
-                                                currency: 'IDR',
-                                            },
-                                        )}
-                                    </TableCell>
-                                    <TableCell
-                                        colSpan={2}
-                                        className="text-right"
-                                    >
-                                        <span
-                                            className={
-                                                Math.abs(difference) > 0.01
-                                                    ? 'font-bold text-red-500'
-                                                    : 'font-bold text-green-500'
-                                            }
-                                        >
-                                            Diff:{' '}
+                                </TableHeader>
+                                <TableBody>
+                                    {fields.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={5}
+                                                className="h-24 text-center text-muted-foreground"
+                                            >
+                                                No lines added yet.
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        fields.map((field, index) => {
+                                            const currentLine = lines?.[index] || field;
+                                            return (
+                                                <TableRow key={field.id}>
+                                                    <TableCell>
+                                                        {currentLine.account_code ? `${currentLine.account_code} - ` : ''}
+                                                        {currentLine.account_name || 'Selected Account'}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {formatCurrencyByRegionalSettings(
+                                                            Number(currentLine.debit) || 0,
+                                                            { locale: 'id-ID', currency: 'IDR' }
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {formatCurrencyByRegionalSettings(
+                                                            Number(currentLine.credit) || 0,
+                                                            { locale: 'id-ID', currency: 'IDR' }
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {currentLine.memo || '-'}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <div className="flex justify-end gap-2">
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => handleEditLine(index)}
+                                                            >
+                                                                <Pencil className="h-4 w-4 text-muted-foreground" />
+                                                            </Button>
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => remove(index)}
+                                                                disabled={fields.length <= 2 && fields.length > 0}
+                                                            >
+                                                                <Trash className="h-4 w-4 text-red-500" />
+                                                            </Button>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        })
+                                    )}
+                                </TableBody>
+                                <TableFooter>
+                                    <TableRow>
+                                        <TableCell className="font-bold">Total</TableCell>
+                                        <TableCell className="text-right font-bold">
                                             {formatCurrencyByRegionalSettings(
-                                                difference,
+                                                totalDebit,
                                                 {
                                                     locale: 'id-ID',
                                                     currency: 'IDR',
                                                 },
                                             )}
-                                        </span>
-                                    </TableCell>
-                                </TableRow>
-                            </TableFooter>
-                        </Table>
-                        {form.formState.errors.root && (
-                            <p className="p-4 text-sm text-red-500">
-                                {form.formState.errors.root.message}
-                            </p>
-                        )}
-                        {form.formState.errors.lines && (
-                            <p className="p-4 text-sm text-red-500">
-                                {JSON.stringify(form.formState.errors.lines)}
-                            </p>
-                        )}
+                                        </TableCell>
+                                        <TableCell className="text-right font-bold">
+                                            {formatCurrencyByRegionalSettings(
+                                                totalCredit,
+                                                {
+                                                    locale: 'id-ID',
+                                                    currency: 'IDR',
+                                                },
+                                            )}
+                                        </TableCell>
+                                        <TableCell
+                                            colSpan={2}
+                                            className="text-right"
+                                        >
+                                            <span
+                                                className={
+                                                    Math.abs(difference) > 0.01
+                                                        ? 'font-bold text-red-500'
+                                                        : 'font-bold text-green-500'
+                                                }
+                                            >
+                                                Diff:{' '}
+                                                {formatCurrencyByRegionalSettings(
+                                                    difference,
+                                                    {
+                                                        locale: 'id-ID',
+                                                        currency: 'IDR',
+                                                    },
+                                                )}
+                                            </span>
+                                        </TableCell>
+                                    </TableRow>
+                                </TableFooter>
+                            </Table>
+                            {form.formState.errors.root && (
+                                <p className="p-4 text-sm text-red-500">
+                                    {form.formState.errors.root.message}
+                                </p>
+                            )}
+                            {form.formState.errors.lines && (
+                                <p className="p-4 text-sm text-red-500">
+                                    {JSON.stringify(form.formState.errors.lines)}
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
+
+                <JournalEntryLineFormDialog
+                    open={isItemDialogOpen}
+                    onOpenChange={(nextOpen) => {
+                        setIsItemDialogOpen(nextOpen);
+                        if (!nextOpen) {
+                            setEditingIndex(null);
+                        }
+                    }}
+                    item={
+                        editingIndex === null
+                            ? null
+                            : (lines?.[editingIndex] as NonNullable<JournalEntryFormData['lines']>[number] ?? null)
+                    }
+                    onSave={(data) => {
+                        if (editingIndex === null) {
+                            append(data);
+                        } else {
+                            update(editingIndex, data);
+                        }
+                        setIsItemDialogOpen(false);
+                    }}
+                />
             </EntityForm>
         );
     },

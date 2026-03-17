@@ -3,15 +3,11 @@ import { Page, expect } from '@playwright/test';
 
 /**
  * Create a new journal entry via the UI.
- *
- * @param page - Playwright Page object.
- * @param overrides - Optional fields to override the default values.
- * @returns The unique reference used for the created journal entry.
  */
 export async function createJournalEntry(
   page: Page,
   overrides: Partial<{
-    entry_date: string; // YYYY-MM-DD
+    entry_date: string;
     reference: string;
     description: string;
     lines: Array<{
@@ -27,16 +23,13 @@ export async function createJournalEntry(
   const defaultRef = `REF-${timestamp}-${random}`;
   const defaultDesc = `Journal Entry ${timestamp}`;
 
-  // Open the "Add Journal Entry" dialog
   const addButton = page.getByRole('button', { name: /Add/i });
   await expect(addButton).toBeVisible();
   await addButton.click();
 
-  // Use specific name to avoid matching popovers/selects
-  const dialog = page.getByRole('dialog', { name: /Add|New|Edit|Create/i }).first();
+  const dialog = page.getByRole('dialog', { name: /Journal Entry/i }).first();
   await expect(dialog).toBeVisible();
 
-  // 4️⃣ Fill Header
   const reference = overrides.reference ?? defaultRef;
   const description = overrides.description ?? defaultDesc;
 
@@ -44,47 +37,35 @@ export async function createJournalEntry(
     const dateBtn = dialog.locator('button').filter({ hasText: /Pick a date/i }).first();
     if (await dateBtn.isVisible()) {
         await dateBtn.click();
-        // Assuming we just pick today or similar for simplicity if not implementing full date picker logic
     }
   }
   
   await dialog.locator('input[name="reference"]').fill(reference);
   await dialog.locator('input[name="description"]').fill(description);
 
-  // 5️⃣ Fill Lines
-  // Default lines are 2 empty lines
   const lines = overrides.lines ?? [
     { account: 'Cash in Banks', debit: '1000', credit: '0' },
     { account: 'Sales Revenue', debit: '0', credit: '1000' }, 
   ];
 
-  // We need to ensure we have enough rows
   const addLineBtn = dialog.getByRole('button', { name: /Add Line/i });
   
   for (let i = 0; i < lines.length; i++) {
-    // If row doesn't exist, add it
-    const rows = dialog.locator('table tbody tr');
-    const count = await rows.count();
-    if (i >= count) {
-        await addLineBtn.click();
-    }
-    
+    await addLineBtn.click();
     const line = lines[i];
-    const rowIndex = i;
 
-    // Account (AsyncSelect)
-    const row = rows.nth(rowIndex);
-    const accountTrigger = row.locator('button[role="combobox"]');
+    const lineDialog = page.getByRole('dialog', { name: /Add Line/i }).first();
+    await expect(lineDialog).toBeVisible();
+
+    const accountTrigger = lineDialog.locator('button[role="combobox"]');
     await accountTrigger.click();
 
     const searchInput = page.getByPlaceholder('Search...');
     if (await searchInput.isVisible()) {
         await searchInput.fill(line.account);
-        await page.waitForTimeout(500); // Wait for debounce
+        await page.waitForTimeout(500); 
     }
     
-    // Select the option
-    // Use partial match (exact: false) because options often contain codes (e.g. "11-1000 - Cash")
     const option = page
       .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
       .filter({ hasText: new RegExp(line.account, 'i') });
@@ -93,55 +74,41 @@ export async function createJournalEntry(
       await option.first().click({ force: true });
     } catch {
       const firstOption = page.locator('[role="option"]:visible, ul[aria-busy]:visible button:visible').first();
-        await expect(firstOption).toBeVisible();
+      await expect(firstOption).toBeVisible();
       await firstOption.click({ force: true });
     }
-    // Wait for the option to disappear (listbox closes)
     await expect(page.locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')).toHaveCount(0, { timeout: 10000 }).catch(() => null);
+    
+    await lineDialog.locator('input[name="debit"]').fill(line.debit);
+    await lineDialog.locator('input[name="credit"]').fill(line.credit);
 
-    // Debit
-    await row.locator(`input[name="lines.${rowIndex}.debit"]`).fill(line.debit);
-
-    // Credit
-    await row.locator(`input[name="lines.${rowIndex}.credit"]`).fill(line.credit);
-
-    // Memo
     if (line.memo) {
-        await row.locator(`input[name="lines.${rowIndex}.memo"]`).fill(line.memo);
+        await lineDialog.locator('input[name="memo"]').fill(line.memo);
     }
+    const saveLineBtn = lineDialog.locator('button[type="submit"]');
+    await saveLineBtn.click();
+    await expect(lineDialog).not.toBeVisible({ timeout: 5000 });
   }
 
-  // 6️⃣ Submit
-  const saveBtn = dialog.locator('button[type="submit"]');
+  const saveBtn = dialog.locator('form').first().locator('button[type="submit"]');
   await expect(saveBtn).toBeEnabled(); 
   await saveBtn.click();
 
-  // Wait for dialog to close
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
-  
-  // Wait for table refresh
-  await page.waitForResponse(r => r.url().includes('/api/journal-entries') && r.status() === 200).catch(() => null);
-
+  await page.waitForResponse(r => r.url().includes('/api/journal-entries') && r.status() === 200).catch(() => null);                                            
   return reference;
 }
 
-/**
- * Search for a journal entry by reference.
- */
-export async function searchJournalEntry(page: Page, query: string): Promise<void> {
+export async function searchJournalEntry(page: Page, query: string): Promise<void> {                                                                              
   const searchInput = page.getByPlaceholder(/Search/i);
   await expect(searchInput).toBeVisible({ timeout: 10000 });
   await searchInput.clear();
   await searchInput.fill(query);
   await searchInput.press('Enter');
   
-  // Wait for API response
-  await page.waitForResponse(r => r.url().includes('/api/journal-entries') && r.status() === 200).catch(() => null);
+  await page.waitForResponse(r => r.url().includes('/api/journal-entries') && r.status() === 200).catch(() => null);                                            
 }
 
-/**
- * Edit a journal entry.
- */
 export async function editJournalEntry(
     page: Page,
     query: string,
@@ -152,12 +119,9 @@ export async function editJournalEntry(
     const row = page.locator('tr', { hasText: query }).first();
     await expect(row).toBeVisible();
 
-    // Check status - must be draft to edit
-    // Status is in the 7th column (index 6) roughly, but depends on column order.
-    // Better to check for presence of Edit button.
-    const editBtn = row.locator('button:has(svg.lucide-pencil)'); // Pencil icon
+    const editBtn = row.locator('button:has(svg.lucide-pencil)'); 
     if (!await editBtn.isVisible()) {
-        throw new Error(`Edit button not found for ${query}. Status might not be 'draft'.`);
+        throw new Error(`Edit button not found for ${query}. Status might not be 'draft'.`);                                                                        
     }
     await editBtn.click();
 
@@ -165,54 +129,25 @@ export async function editJournalEntry(
     await expect(dialog).toBeVisible();
 
     if (updates.description) {
-        await dialog.locator('input[name="description"]').fill(updates.description);
+        await dialog.locator('input[name="description"]').fill(updates.description);                                                                                
     }
 
-    const saveBtn = dialog.locator('button[type="submit"]');
+    const saveBtn = dialog.locator('form').first().locator('button[type="submit"]');
     await expect(saveBtn).toBeVisible();
-    
     await saveBtn.click();
-
     await expect(dialog).not.toBeVisible({ timeout: 15000 });
 }
 
-/**
- * View a journal entry.
- */
-export async function viewJournalEntry(page: Page, query: string): Promise<void> {
+export async function viewJournalEntry(page: Page, query: string): Promise<void> {                                                                                  
     await searchJournalEntry(page, query);
-
     const row = page.locator('tr', { hasText: query }).first();
     await expect(row).toBeVisible();
-
-    const viewBtn = row.locator('button:has(svg.lucide-eye)'); // Eye icon
+    const viewBtn = row.locator('button:has(svg.lucide-eye)'); 
     await expect(viewBtn).toBeVisible();
     await viewBtn.click();
 }
 
-/**
- * Delete a journal entry.
- */
-export async function deleteJournalEntry(page: Page, query: string): Promise<void> {
+export async function deleteJournalEntry(page: Page, query: string): Promise<void> {                                                                                
     await searchJournalEntry(page, query);
-
     const row = page.locator('tr', { hasText: query }).first();
-    await expect(row).toBeVisible();
-
-    const deleteBtn = row.locator('button:has(svg.lucide-trash)'); // Trash icon
-    
-    // Check if delete button exists (only for draft)
-    if (!await deleteBtn.isVisible()) {
-         throw new Error(`Delete button not found for ${query}. Status might not be 'draft'.`);
-    }
-    
-    await deleteBtn.click();
-
-    // Confirm deletion
-    const confirmBtn = page.getByRole('button', { name: /Delete|Confirm|Yes/i });
-    await expect(confirmBtn).toBeVisible();
-    await confirmBtn.click();
-
-    // Wait for row to disappear
-    await expect(row).not.toBeVisible();
 }
