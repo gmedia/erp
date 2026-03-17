@@ -100,7 +100,7 @@ export function JournalEntryViewModal({
                         </div>
 
                         <div className="overflow-x-auto rounded-md border">
-                            <Table>
+                            <Table className="min-w-[600px]">
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Account</TableHead>

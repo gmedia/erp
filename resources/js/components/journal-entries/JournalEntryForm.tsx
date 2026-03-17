@@ -198,7 +198,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                             </Button>
                         </div>
                         <div className="rounded-md border">
-                            <Table>
+                            <Table className="min-w-[700px]">
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead className="w-[30%]">
