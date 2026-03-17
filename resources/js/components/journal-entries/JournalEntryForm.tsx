@@ -197,7 +197,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                 Add Line
                             </Button>
                         </div>
-                        <div className="rounded-md border">
+                        <div className="rounded-md border min-w-0 overflow-x-auto max-w-[calc(100vw-3rem)] sm:max-w-none">
                             <Table className="min-w-[700px]">
                                 <TableHeader>
                                     <TableRow>
