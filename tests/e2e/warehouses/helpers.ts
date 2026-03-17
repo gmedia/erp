@@ -18,9 +18,10 @@ export async function createWarehouse(page: Page): Promise<string> {
     const submitButton = dialog.getByRole('button', { name: /Add/i });
     await expect(submitButton).toBeVisible();
 
-    await dialog.locator('button:has-text("Select a branch")').click();
-    await page.waitForSelector('[role="option"]', { state: 'visible' });
-    await page.getByRole('option').first().click();
+    await dialog.getByRole('combobox', { name: /Branch/i }).click();
+    const branchOption = page.locator('[role="option"]:visible, ul[aria-busy]:visible button:visible').first();
+    await expect(branchOption).toBeVisible({ timeout: 10000 });
+    await branchOption.click({ force: true });
 
     const responsePromise = page.waitForResponse(
         (r) => r.url().includes('/api/warehouses') && r.status() < 400,

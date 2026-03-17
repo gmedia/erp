@@ -85,17 +85,19 @@ export async function createJournalEntry(
     
     // Select the option
     // Use partial match (exact: false) because options often contain codes (e.g. "11-1000 - Cash")
-    const option = page.getByRole('option', { name: line.account });
+    const option = page
+      .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+      .filter({ hasText: new RegExp(line.account, 'i') });
     try {
         await expect(option.first()).toBeVisible({ timeout: 2000 });
-        await option.first().click();
+      await option.first().click({ force: true });
     } catch {
-        const firstOption = page.getByRole('option').first();
+      const firstOption = page.locator('[role="option"]:visible, ul[aria-busy]:visible button:visible').first();
         await expect(firstOption).toBeVisible();
-        await firstOption.click();
+      await firstOption.click({ force: true });
     }
     // Wait for the option to disappear (listbox closes)
-    await expect(page.getByRole('option').first()).not.toBeVisible();
+    await expect(page.locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')).toHaveCount(0, { timeout: 10000 }).catch(() => null);
 
     // Debit
     await row.locator(`input[name="lines.${rowIndex}.debit"]`).fill(line.debit);

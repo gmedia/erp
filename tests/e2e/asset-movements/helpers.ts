@@ -1,6 +1,22 @@
 import { Page, expect } from '@playwright/test';
 import { login } from '../helpers';
 
+async function pickFirstAsyncOption(page: Page, searchText?: string): Promise<void> {
+  const list = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
+  await expect(list).toBeVisible({ timeout: 10000 });
+
+  const searchInput = page.locator('input[placeholder="Search..."]:visible').last();
+  if (searchText && (await searchInput.isVisible().catch(() => false))) {
+    await searchInput.fill(searchText);
+    await page.waitForTimeout(500);
+  }
+
+  const option = list.locator('[role="option"], button').first();
+  await expect(option).toBeVisible({ timeout: 10000 });
+  await option.click({ force: true });
+  await expect(list).toBeHidden({ timeout: 5000 }).catch(() => null);
+}
+
 // ---------------------------------------------------
 // Asset Movement helpers
 // ---------------------------------------------------
@@ -32,14 +48,7 @@ export async function createAssetMovement(
   // Select Asset (AsyncSelect)
   const assetTrigger = dialog.locator('button').filter({ hasText: /Select asset/i });
   await assetTrigger.click();
-  if (overrides.asset_id) {
-    const assetSearchInput = page.getByPlaceholder('Search...').last();
-    await assetSearchInput.fill(overrides.asset_id);
-    await page.waitForTimeout(1000); // Wait for results
-  }
-  const assetOption = page.getByRole('option').first();
-  await expect(assetOption).toBeVisible();
-  await assetOption.click();
+  await pickFirstAsyncOption(page, overrides.asset_id);
 
   // Select Movement Type (Select)
   // Default is usually 'Transfer'
@@ -61,50 +70,23 @@ export async function createAssetMovement(
     // Branch
     const branchTrigger = dialog.locator('button').filter({ hasText: /Select destination branch/i });
     await branchTrigger.click();
-    if (overrides.to_branch_id) {
-      const branchSearchInput = page.getByPlaceholder('Search...').last();
-      await branchSearchInput.fill(overrides.to_branch_id);
-      await page.waitForTimeout(500);
-    }
-    const branchOption = page.getByRole('option').first();
-    await expect(branchOption).toBeVisible();
-    await branchOption.click();
+    await pickFirstAsyncOption(page, overrides.to_branch_id);
 
     // Location
     const locationTrigger = dialog.locator('button').filter({ hasText: /Select destination location/i });
     await locationTrigger.click();
-    if (overrides.to_location_id) {
-      const locationSearchInput = page.getByPlaceholder('Search...').last();
-      await locationSearchInput.fill(overrides.to_location_id);
-      await page.waitForTimeout(500);
-    }
-    const locationOption = page.getByRole('option').first();
-    await expect(locationOption).toBeVisible();
-    await locationOption.click();
+    await pickFirstAsyncOption(page, overrides.to_location_id);
+    await expect(dialog.getByRole('combobox', { name: /To Location/i })).not.toContainText(/Select destination location/i);
   } else if (targetType.toLowerCase() === 'assign') {
     // Department
     const deptTrigger = dialog.locator('button').filter({ hasText: /Select department/i });
     await deptTrigger.click();
-    if (overrides.to_department_id) {
-      const deptSearchInput = page.getByPlaceholder('Search...').last();
-      await deptSearchInput.fill(overrides.to_department_id);
-      await page.waitForTimeout(500);
-    }
-    const deptOption = page.getByRole('option').first();
-    await expect(deptOption).toBeVisible();
-    await deptOption.click();
+    await pickFirstAsyncOption(page, overrides.to_department_id);
 
     // Employee
     const empTrigger = dialog.locator('button').filter({ hasText: /Select employee/i });
     await empTrigger.click();
-    if (overrides.to_employee_id) {
-      const empSearchInput = page.getByPlaceholder('Search...').last();
-      await empSearchInput.fill(overrides.to_employee_id);
-      await page.waitForTimeout(500);
-    }
-    const empOption = page.getByRole('option').first();
-    await expect(empOption).toBeVisible();
-    await empOption.click();
+    await pickFirstAsyncOption(page, overrides.to_employee_id);
   }
 
   const reference = overrides.reference ?? `MOV-${Date.now()}`;

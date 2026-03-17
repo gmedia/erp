@@ -22,9 +22,9 @@ export async function createAssetStocktake(page: Page) {
         .click();
     
     // Wait for options and select first
-    const option = page.getByRole('option').first();
+    const option = page.locator('[role="option"]:visible, ul[aria-busy]:visible button:visible').first();
     await expect(option).toBeVisible();
-    await option.click();
+    await option.click({ force: true });
 
     // 2. Reference
     await page.getByLabel('Reference').fill(reference);

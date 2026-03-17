@@ -1,6 +1,16 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import { login } from '../helpers';
 import { createEmployee } from '../employees/helpers';
+
+async function selectAsyncOption(page: Page, text: string): Promise<void> {
+    const option = page
+        .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+        .filter({ hasText: new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
+        .first();
+
+    await expect(option).toBeVisible({ timeout: 10000 });
+    await option.click({ force: true });
+}
 
 test.describe('Employee Permissions', () => {
     test.beforeEach(async ({ page }) => {
@@ -30,9 +40,7 @@ test.describe('Employee Permissions', () => {
 
         // Select option
         // AsyncSelectField renders options with checks.
-        const option = page.locator('div[role="option"]').filter({ hasText: uniqueName }).first();
-        await expect(option).toBeVisible();
-        await option.click();
+        await selectAsyncOption(page, uniqueName);
         
         // Wait for selection to reflect in the button (confirms state update)
         await expect(selectTrigger).toHaveText(uniqueName);
@@ -64,8 +72,7 @@ test.describe('Employee Permissions', () => {
         // Re-select employee (state is reset on reload)
         await selectTrigger.click();
         await searchInput.fill(uniqueName);
-        await expect(option).toBeVisible();
-        await option.click();
+        await selectAsyncOption(page, uniqueName);
 
         // Verify "Create Department" is checked
         // The checkbox parent div has the click handler.

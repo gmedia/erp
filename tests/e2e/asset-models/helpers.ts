@@ -55,8 +55,12 @@ export async function createAssetModel(
     await searchInput.fill(categoryName);
   }
   await page.waitForTimeout(500);
-  const categoryOption = page.getByRole('option', { name: categoryName, exact: true }).first();
-  await categoryOption.click();
+  const categoryOption = page
+    .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+    .filter({ hasText: new RegExp(`^${categoryName}$`, 'i') })
+    .first();
+  await expect(categoryOption).toBeVisible({ timeout: 10000 });
+  await categoryOption.click({ force: true });
 
   // Specs (JSON)
   if (overrides.specs) {

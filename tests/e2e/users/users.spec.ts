@@ -1,9 +1,19 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import { login } from '../helpers';
 import { createEmployee } from '../employees/helpers';
 
 function createUserAccessCode(seed: number): string {
     return `User-${seed}-Aa1!`;
+}
+
+async function selectAsyncOption(page: Page, text: string): Promise<void> {
+    const option = page
+        .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+        .filter({ hasText: new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
+        .first();
+
+    await expect(option).toBeVisible({ timeout: 10000 });
+    await option.click({ force: true });
 }
 
 test.describe('User Management', () => {
@@ -32,9 +42,7 @@ test.describe('User Management', () => {
         await searchInput.fill(uniqueName);
 
         // Select option
-        const option = page.locator('div[role="option"]').filter({ hasText: uniqueName }).first();
-        await expect(option).toBeVisible();
-        await option.click();
+        await selectAsyncOption(page, uniqueName);
         
         // Wait for selection to reflect in the button
         await expect(selectTrigger).toHaveText(uniqueName);
@@ -72,8 +80,7 @@ test.describe('User Management', () => {
         // Re-select employee
         await selectTrigger.click();
         await searchInput.fill(uniqueName);
-        await expect(option).toBeVisible();
-        await option.click();
+        await selectAsyncOption(page, uniqueName);
 
         // Verify saved data is displayed
         await expect(page.locator('input#name')).toHaveValue(newUserName);
@@ -97,8 +104,7 @@ test.describe('User Management', () => {
         const searchInput = page.getByPlaceholder('Search...');
         await searchInput.fill(uniqueName);
         
-        const option = page.locator('div[role="option"]').filter({ hasText: uniqueName }).first();
-        await option.click();
+        await selectAsyncOption(page, uniqueName);
 
         // Create user initially
         const initialName = `Initial User ${timestamp}`;
@@ -123,7 +129,7 @@ test.describe('User Management', () => {
         
         await selectTrigger.click();
         await searchInput.fill(uniqueName);
-        await option.click();
+        await selectAsyncOption(page, uniqueName);
 
         // Wait for form to load with existing data
         await expect(page.locator('input#name')).toHaveValue(initialName);
@@ -149,7 +155,7 @@ test.describe('User Management', () => {
         
         await selectTrigger.click();
         await searchInput.fill(uniqueName);
-        await option.click();
+        await selectAsyncOption(page, uniqueName);
 
         await expect(page.locator('input#name')).toHaveValue(updatedName);
         await expect(page.locator('input#email')).toHaveValue(updatedEmail);
@@ -173,8 +179,7 @@ test.describe('User Management', () => {
         const searchInput = page.getByPlaceholder('Search...');
         await searchInput.fill(employee1Name);
         
-        const option1 = page.locator('div[role="option"]').filter({ hasText: employee1Name }).first();
-        await option1.click();
+        await selectAsyncOption(page, employee1Name);
 
         const sharedEmail = `shared${timestamp}@test.com`;
         const accessCode = createUserAccessCode(timestamp);
@@ -196,8 +201,7 @@ test.describe('User Management', () => {
         await selectTrigger.click();
         await searchInput.fill(employee2Name);
         
-        const option2 = page.locator('div[role="option"]').filter({ hasText: employee2Name }).first();
-        await option2.click();
+        await selectAsyncOption(page, employee2Name);
 
         await page.fill('input#name', `User 2 ${timestamp}`);
         await page.fill('input#email', sharedEmail); // Same email as user 1
@@ -224,8 +228,7 @@ test.describe('User Management', () => {
         const searchInput = page.getByPlaceholder('Search...');
         await searchInput.fill(uniqueName);
         
-        const option = page.locator('div[role="option"]').filter({ hasText: uniqueName }).first();
-        await option.click();
+        await selectAsyncOption(page, uniqueName);
 
         // 3. Try to save without password
         await page.fill('input#name', `User ${timestamp}`);

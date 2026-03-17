@@ -47,7 +47,11 @@ export async function createProduct(
         await catSearch.fill(catName);
         await page.waitForResponse(r => r.url().includes('/api/product-categories') && r.status() < 400).catch(() => null);
     }
-    await page.locator('[role="option"]').filter({ hasText: new RegExp(`^${catName}$`) }).first().click({ force: true });
+    await page
+        .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+        .filter({ hasText: new RegExp(`^${catName}$`) })
+        .first()
+        .click({ force: true });
 
     // 4. Unit (Async Select)
     const unitTrigger = dialog.locator('button[role="combobox"]').filter({ hasText: /Select unit/i });
@@ -58,7 +62,11 @@ export async function createProduct(
         await unitSearch.fill(unitName);
         await page.waitForResponse(r => r.url().includes('/api/units') && r.status() < 400).catch(() => null);
     }
-    await page.locator('[role="option"]').filter({ hasText: new RegExp(`^${unitName}$`) }).first().click({ force: true });
+    await page
+        .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+        .filter({ hasText: new RegExp(`^${unitName}$`) })
+        .first()
+        .click({ force: true });
 
     // 5. Pricing
     await dialog.locator('input[name="cost"]').fill(overrides.cost ?? '1000');
