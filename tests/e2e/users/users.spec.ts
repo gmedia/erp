@@ -9,7 +9,7 @@ function createUserAccessCode(seed: number): string {
 async function selectAsyncOption(page: Page, text: string): Promise<void> {
     const option = page
         .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
-        .filter({ hasText: new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
+        .filter({ hasText: new RegExp(text.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`), 'i') })
         .first();
 
     await expect(option).toBeVisible({ timeout: 10000 });
