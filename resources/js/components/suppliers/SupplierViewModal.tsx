@@ -48,7 +48,7 @@ export const SupplierViewModal = React.memo(
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="grid grid-cols-2 gap-6 py-4">
+                    <div className="grid grid-cols-1 gap-6 py-4 sm:grid-cols-2">
                         <ViewField label="Name" value={item.name} />
                         <ViewField label="Email" value={item.email} />
                         <ViewField label="Phone" value={item.phone} />

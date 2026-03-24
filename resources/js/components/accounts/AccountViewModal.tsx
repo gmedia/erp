@@ -35,46 +35,46 @@ export function AccountViewModal({
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
+                    <div className="grid grid-cols-1 gap-1 sm:grid-cols-4 sm:items-center sm:gap-4">
                         <span className="text-sm font-semibold">Type:</span>
-                        <span className="col-span-3 capitalize">
+                        <span className="capitalize sm:col-span-3">
                             {account.type}
                         </span>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
+                    <div className="grid grid-cols-1 gap-1 sm:grid-cols-4 sm:items-center sm:gap-4">
                         <span className="text-sm font-semibold">Balance:</span>
                         <Badge
                             variant="secondary"
-                            className="col-span-3 w-fit capitalize"
+                            className="w-fit capitalize sm:col-span-3"
                         >
                             {account.normal_balance}
                         </Badge>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
+                    <div className="grid grid-cols-1 gap-1 sm:grid-cols-4 sm:items-center sm:gap-4">
                         <span className="text-sm font-semibold">Status:</span>
                         <Badge
                             variant={
                                 account.is_active ? 'default' : 'destructive'
                             }
-                            className="col-span-3 w-fit"
+                            className="w-fit sm:col-span-3"
                         >
                             {account.is_active ? 'Active' : 'Inactive'}
                         </Badge>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
+                    <div className="grid grid-cols-1 gap-1 sm:grid-cols-4 sm:items-center sm:gap-4">
                         <span className="text-sm font-semibold">
                             Cash Flow:
                         </span>
-                        <span className="col-span-3">
+                        <span className="sm:col-span-3">
                             {account.is_cash_flow ? 'Yes' : 'No'}
                         </span>
                     </div>
                     {account.description && (
-                        <div className="grid grid-cols-4 items-start gap-4">
+                        <div className="grid grid-cols-1 gap-1 sm:grid-cols-4 sm:items-start sm:gap-4">
                             <span className="text-sm font-semibold">
                                 Description:
                             </span>
-                            <p className="col-span-3 text-sm text-muted-foreground">
+                            <p className="text-sm text-muted-foreground sm:col-span-3">
                                 {account.description}
                             </p>
                         </div>

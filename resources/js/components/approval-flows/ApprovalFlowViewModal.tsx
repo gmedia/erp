@@ -9,7 +9,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTranslation } from '@/contexts/i18n-context';
 import { type ApprovalFlow } from '@/types/entity';
 import { memo } from 'react';
@@ -27,7 +26,7 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
 
         return (
             <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-                <DialogContent className="flex max-h-[90vh] max-w-3xl flex-col">
+                <DialogContent className="flex max-h-[90vh] max-w-3xl flex-col overflow-hidden">
                     <DialogHeader>
                         <DialogTitle>View Approval Flow</DialogTitle>
                         <DialogDescription>
@@ -35,10 +34,10 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
                         </DialogDescription>
                     </DialogHeader>
 
-                    <ScrollArea className="flex-1 pr-4">
+                    <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
                         <div className="space-y-6 py-4">
                             {/* Basic Info Section */}
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <ViewField label="Code" value={item.code} />
                                 <ViewField label="Name" value={item.name} />
                                 <ViewField
@@ -105,7 +104,7 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
                                             key={step.id || step.step_order}
                                             className="rounded-md border bg-card p-4 shadow-sm"
                                         >
-                                            <div className="mb-2 flex items-center justify-between">
+                                            <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                                 <span className="font-medium">
                                                     Step {step.step_order}:{' '}
                                                     {step.name}
@@ -114,7 +113,7 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
                                                     {step.required_action.toUpperCase()}
                                                 </Badge>
                                             </div>
-                                            <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                                            <div className="grid grid-cols-1 gap-2 text-sm text-muted-foreground sm:grid-cols-2">
                                                 <div>
                                                     Approver Type:{' '}
                                                     <span className="font-medium text-foreground capitalize">
@@ -200,7 +199,7 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
                                 </div>
                             </div>
                         </div>
-                    </ScrollArea>
+                    </div>
 
                     <DialogFooter>
                         <Button type="button" onClick={onClose}>

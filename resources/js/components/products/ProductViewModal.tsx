@@ -11,7 +11,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTranslation } from '@/contexts/i18n-context';
 import { Product } from '@/types/entity';
 import { formatRupiah } from '@/utils/formatters';
@@ -46,14 +45,14 @@ export const ProductViewModal = memo<ProductViewModalProps>(
                         </DialogHeader>
                     </div>
 
-                    <ScrollArea className="flex-1 px-6">
-                        <div className="grid grid-cols-1 gap-x-6 gap-y-4 py-4 pr-6 md:grid-cols-2">
+                    <div className="min-h-0 flex-1 overflow-y-auto px-6">
+                        <div className="grid grid-cols-1 gap-x-6 gap-y-4 py-4 md:grid-cols-2">
                             {/* General Info */}
                             <div className="space-y-4 border-b pb-4 md:col-span-2">
                                 <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
                                     General Information
                                 </h3>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <ViewField label="Code" value={item.code} />
                                     <ViewField label="Name" value={item.name} />
                                     <div className="col-span-2">
@@ -90,7 +89,7 @@ export const ProductViewModal = memo<ProductViewModalProps>(
                                 <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
                                     Pricing
                                 </h3>
-                                <div className="grid grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                     <ViewField
                                         label="Cost"
                                         value={formatRupiah(item.cost)}
@@ -111,7 +110,7 @@ export const ProductViewModal = memo<ProductViewModalProps>(
                                 <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
                                     Configuration
                                 </h3>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <ViewField
                                         label="Billing Model"
                                         value={
@@ -124,7 +123,7 @@ export const ProductViewModal = memo<ProductViewModalProps>(
                                         label="Trial Period"
                                         value={`${item.trial_period_days || 0} Days`}
                                     />
-                                    <div className="col-span-2 grid grid-cols-2 gap-4 md:grid-cols-3">
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:col-span-2 md:grid-cols-3">
                                         <ViewField
                                             label="Recurring"
                                             value={
@@ -201,7 +200,7 @@ export const ProductViewModal = memo<ProductViewModalProps>(
                                 <ViewField label="Notes" value={item.notes} />
                             </div>
                         </div>
-                    </ScrollArea>
+                    </div>
                     <div className="shrink-0 p-6 pt-2">
                         <DialogFooter>
                             <Button type="button" onClick={onClose}>
