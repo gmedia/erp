@@ -5,7 +5,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
     Table,
     TableBody,
@@ -110,8 +109,8 @@ export function RunLinesModal({
                     </DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className="flex-1 rounded-md border">
-                    <Table>
+                <div className="min-h-0 flex-1 overflow-y-auto rounded-md border">
+                    <Table className="min-w-[720px]">
                         <TableHeader className="sticky top-0 bg-muted">
                             <TableRow>
                                 <TableHead>Asset</TableHead>
@@ -131,7 +130,7 @@ export function RunLinesModal({
                         </TableHeader>
                         <TableBody>{tableBodyContent}</TableBody>
                     </Table>
-                </ScrollArea>
+                </div>
             </DialogContent>
         </Dialog>
     );
