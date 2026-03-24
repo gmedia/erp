@@ -185,19 +185,20 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
 
                     {/* Lines Section */}
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <h3 className="text-lg font-medium">Journal Lines</h3>
                             <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
                                 onClick={handleCreateNewLine}
+                                className="w-full sm:w-auto"
                             >
                                 <Plus className="mr-2 h-4 w-4" />
                                 Add Line
                             </Button>
                         </div>
-                        <div className="rounded-md border overflow-hidden max-w-[calc(100vw-3.5rem)] sm:max-w-none">
+                        <div className="min-w-0 rounded-md border">
                             <Table className="min-w-[700px]">
                                 <TableHeader>
                                     <TableRow>
