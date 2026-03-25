@@ -27,12 +27,7 @@ class TriggerApprovalAction
         $flow = $this->resolveFlow($entity, $params);
 
         if (! $flow) {
-            Log::warning(
-                'No matching approval flow found for entity: '
-                . get_class($entity)
-                . ' ID: '
-                . $entity->getKey()
-            );
+            $this->logFlowWarning('No matching approval flow found for entity', $entity);
 
             return null;
         }
@@ -40,13 +35,9 @@ class TriggerApprovalAction
         $flow->loadMissing('steps');
 
         if ($flow->steps->isEmpty()) {
-            Log::warning(
-                'Approval flow has no steps and cannot be triggered. Flow ID: '
-                . $flow->id
-                . ', Entity: '
-                . get_class($entity)
-                . ' ID: '
-                . $entity->getKey()
+            $this->logFlowWarning(
+                'Approval flow has no steps and cannot be triggered. Flow ID: '.$flow->id,
+                $entity,
             );
 
             return null;
@@ -128,5 +119,15 @@ class TriggerApprovalAction
         }
 
         return null;
+    }
+
+    private function logFlowWarning(string $message, Model $entity): void
+    {
+        Log::warning($message.'. '.$this->buildEntityContext($entity));
+    }
+
+    private function buildEntityContext(Model $entity): string
+    {
+        return 'Entity: '.get_class($entity).' ID: '.$entity->getKey();
     }
 }

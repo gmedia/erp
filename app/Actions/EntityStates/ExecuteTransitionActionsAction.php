@@ -91,38 +91,17 @@ class ExecuteTransitionActionsAction
 
     private function handleCreateRecord(Model $entity, array $params): bool
     {
-        // MVP: Not implemented fully. Log a warning
-        Log::warning(
-            "'create_record' transition action requested, "
-            . 'but not fully implemented in MVP. '
-            . "Entity: {$entity->getMorphClass()} ({$entity->getKey()})"
-        );
-
-        return true;
+        return $this->handleNotImplementedAction($entity, 'create_record');
     }
 
     private function handleSendNotification(Model $entity, array $params): bool
     {
-        // MVP: Not implemented fully. Log a warning
-        Log::warning(
-            "'send_notification' transition action requested, "
-            . 'but not fully implemented in MVP. '
-            . "Entity: {$entity->getMorphClass()} ({$entity->getKey()})"
-        );
-
-        return true;
+        return $this->handleNotImplementedAction($entity, 'send_notification');
     }
 
     private function handleDispatchJob(Model $entity, array $params): bool
     {
-        // MVP: Not implemented fully. Log a warning
-        Log::warning(
-            "'dispatch_job' transition action requested, "
-            . 'but not fully implemented in MVP. '
-            . "Entity: {$entity->getMorphClass()} ({$entity->getKey()})"
-        );
-
-        return true;
+        return $this->handleNotImplementedAction($entity, 'dispatch_job');
     }
 
     private function handleTriggerApproval(Model $entity, array $params): bool
@@ -152,5 +131,16 @@ class ExecuteTransitionActionsAction
 
         // Call the custom action, passing the entity and optionally other params
         return $instance->$method($entity, $params['data'] ?? []);
+    }
+
+    private function handleNotImplementedAction(Model $entity, string $actionType): bool
+    {
+        Log::warning(
+            "'{$actionType}' transition action requested, "
+            . 'but not fully implemented in MVP. '
+            . "Entity: {$entity->getMorphClass()} ({$entity->getKey()})"
+        );
+
+        return true;
     }
 }
