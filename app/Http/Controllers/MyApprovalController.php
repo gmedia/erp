@@ -58,17 +58,11 @@ class MyApprovalController extends Controller
 
         $userId = Auth::id();
 
-        $currentStep = $approvalRequest->steps()
-            ->where('status', 'pending')
-            ->where('step_order', $approvalRequest->current_step_order)
-            ->assignedToUser($userId)
-            ->first();
+        $currentStep = $this->findCurrentPendingAssignedStep($approvalRequest, $userId);
 
-        abort_unless(
-            $currentStep,
-            403,
-            'You are not authorized to act on this approval step.',
-        );
+        if (! $currentStep instanceof ApprovalRequestStep) {
+            abort(403, 'You are not authorized to act on this approval step.');
+        }
 
         DB::transaction(function () use ($approvalRequest, $userId, $request, $currentStep) {
             $currentStep->update([
@@ -121,17 +115,11 @@ class MyApprovalController extends Controller
 
         $userId = Auth::id();
 
-        $currentStep = $approvalRequest->steps()
-            ->where('status', 'pending')
-            ->where('step_order', $approvalRequest->current_step_order)
-            ->assignedToUser($userId)
-            ->first();
+        $currentStep = $this->findCurrentPendingAssignedStep($approvalRequest, $userId);
 
-        abort_unless(
-            $currentStep,
-            403,
-            'You are not authorized to act on this approval step.',
-        );
+        if (! $currentStep instanceof ApprovalRequestStep) {
+            abort(403, 'You are not authorized to act on this approval step.');
+        }
 
         DB::transaction(function () use ($approvalRequest, $userId, $request, $currentStep) {
             $currentStep->update([
@@ -156,5 +144,22 @@ class MyApprovalController extends Controller
         });
 
         return response()->json(['message' => 'Request rejected.']);
+    }
+
+    private function findCurrentPendingAssignedStep(
+        ApprovalRequest $approvalRequest,
+        int $userId,
+    ): ?ApprovalRequestStep {
+        /** @var ApprovalRequestStep|null $step */
+        $step = $approvalRequest->steps()
+            ->where('status', 'pending')
+            ->where('step_order', $approvalRequest->current_step_order)
+            ->whereHas('flowStep', function ($flowStepQuery) use ($userId) {
+                $flowStepQuery->where('approver_type', 'user')
+                    ->where('approver_user_id', $userId);
+            })
+            ->first();
+
+        return $step;
     }
 }

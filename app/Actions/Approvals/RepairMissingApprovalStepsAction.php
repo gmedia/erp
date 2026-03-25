@@ -41,7 +41,7 @@ class RepairMissingApprovalStepsAction
 
         foreach ($requests as $request) {
             $flow = $request->flow;
-            $flowSteps = $flow?->steps ?? collect();
+            $flowSteps = $flow ? $flow->steps : collect();
             $skipReason = $this->getSkipReason($request);
 
             if ($skipReason !== null) {

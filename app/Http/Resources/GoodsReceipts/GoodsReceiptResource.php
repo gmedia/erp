@@ -3,6 +3,13 @@
 namespace App\Http\Resources\GoodsReceipts;
 
 use App\Models\GoodsReceipt;
+use App\Models\GoodsReceiptItem;
+use App\Models\Product;
+use App\Models\PurchaseOrder;
+use App\Models\Supplier;
+use App\Models\Unit;
+use App\Models\User;
+use App\Models\Warehouse;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -12,50 +19,69 @@ class GoodsReceiptResource extends JsonResource
 {
     public function toArray($request): array
     {
+        /** @var PurchaseOrder|null $purchaseOrder */
+        $purchaseOrder = $this->resource->purchaseOrder;
+        /** @var Supplier|null $purchaseOrderSupplier */
+        $purchaseOrderSupplier = $purchaseOrder?->supplier;
+        /** @var Warehouse|null $warehouse */
+        $warehouse = $this->resource->warehouse;
+        /** @var User|null $receiver */
+        $receiver = $this->resource->receiver;
+        /** @var User|null $confirmer */
+        $confirmer = $this->resource->confirmer;
+        /** @var User|null $creator */
+        $creator = $this->resource->creator;
+
         return [
             'id' => $this->resource->id,
             'gr_number' => $this->resource->gr_number,
-            'purchase_order' => $this->resource->purchaseOrder ? [
+            'purchase_order' => $purchaseOrder ? [
                 'id' => $this->resource->purchase_order_id,
-                'po_number' => $this->resource->purchaseOrder?->po_number,
+                'po_number' => $purchaseOrder->po_number,
                 'supplier' => [
-                    'id' => $this->resource->purchaseOrder?->supplier_id,
-                    'name' => $this->resource->purchaseOrder?->supplier?->name,
+                    'id' => $purchaseOrder->supplier_id,
+                    'name' => $purchaseOrderSupplier?->name,
                 ],
             ] : null,
             'warehouse' => [
                 'id' => $this->resource->warehouse_id,
-                'name' => $this->resource->warehouse?->name,
+                'name' => $warehouse?->name,
             ],
-            'receipt_date' => $this->resource->receipt_date?->toDateString(),
+            'receipt_date' => $this->resource->receipt_date->toDateString(),
             'supplier_delivery_note' => $this->resource->supplier_delivery_note,
             'status' => $this->resource->status,
             'notes' => $this->resource->notes,
             'received_by' => $this->resource->received_by ? [
                 'id' => $this->resource->received_by,
-                'name' => $this->resource->receiver?->name,
+                'name' => $receiver?->name,
             ] : null,
             'confirmed_by' => $this->resource->confirmed_by ? [
                 'id' => $this->resource->confirmed_by,
-                'name' => $this->resource->confirmer?->name,
+                'name' => $confirmer?->name,
             ] : null,
             'confirmed_at' => $this->resource->confirmed_at?->toIso8601String(),
             'created_by' => $this->resource->created_by ? [
                 'id' => $this->resource->created_by,
-                'name' => $this->resource->creator?->name,
+                'name' => $creator?->name,
             ] : null,
             'items' => $this->resource->relationLoaded('items')
                 ? $this->resource->items->map(static function ($item) {
+                    /** @var GoodsReceiptItem $item */
+                    /** @var Product|null $product */
+                    $product = $item->product;
+                    /** @var Unit|null $unit */
+                    $unit = $item->unit;
+
                     return [
                         'id' => $item->id,
                         'purchase_order_item_id' => $item->purchase_order_item_id,
                         'product' => [
                             'id' => $item->product_id,
-                            'name' => $item->product?->name,
+                            'name' => $product?->name,
                         ],
                         'unit' => [
                             'id' => $item->unit_id,
-                            'name' => $item->unit?->name,
+                            'name' => $unit?->name,
                         ],
                         'quantity_received' => (string) $item->quantity_received,
                         'quantity_accepted' => (string) $item->quantity_accepted,

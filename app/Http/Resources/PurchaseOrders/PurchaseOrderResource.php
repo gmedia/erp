@@ -3,6 +3,12 @@
 namespace App\Http\Resources\PurchaseOrders;
 
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
+use App\Models\Product;
+use App\Models\Supplier;
+use App\Models\Unit;
+use App\Models\User;
+use App\Models\Warehouse;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -12,18 +18,27 @@ class PurchaseOrderResource extends JsonResource
 {
     public function toArray($request): array
     {
+        /** @var Supplier|null $supplier */
+        $supplier = $this->resource->supplier;
+        /** @var Warehouse|null $warehouse */
+        $warehouse = $this->resource->warehouse;
+        /** @var User|null $approver */
+        $approver = $this->resource->approver;
+        /** @var User|null $creator */
+        $creator = $this->resource->creator;
+
         return [
             'id' => $this->resource->id,
             'po_number' => $this->resource->po_number,
             'supplier' => [
                 'id' => $this->resource->supplier_id,
-                'name' => $this->resource->supplier?->name,
+                'name' => $supplier?->name,
             ],
             'warehouse' => [
                 'id' => $this->resource->warehouse_id,
-                'name' => $this->resource->warehouse?->name,
+                'name' => $warehouse?->name,
             ],
-            'order_date' => $this->resource->order_date?->toDateString(),
+            'order_date' => $this->resource->order_date->toDateString(),
             'expected_delivery_date' => $this->resource->expected_delivery_date?->toDateString(),
             'payment_terms' => $this->resource->payment_terms,
             'currency' => $this->resource->currency,
@@ -36,25 +51,31 @@ class PurchaseOrderResource extends JsonResource
             'shipping_address' => $this->resource->shipping_address,
             'approved_by' => $this->resource->approved_by ? [
                 'id' => $this->resource->approved_by,
-                'name' => $this->resource->approver?->name,
+                'name' => $approver?->name,
             ] : null,
             'approved_at' => $this->resource->approved_at?->toIso8601String(),
             'created_by' => $this->resource->created_by ? [
                 'id' => $this->resource->created_by,
-                'name' => $this->resource->creator?->name,
+                'name' => $creator?->name,
             ] : null,
             'items' => $this->resource->relationLoaded('items')
                 ? $this->resource->items->map(static function ($item) {
+                    /** @var PurchaseOrderItem $item */
+                    /** @var Product|null $product */
+                    $product = $item->product;
+                    /** @var Unit|null $unit */
+                    $unit = $item->unit;
+
                     return [
                         'id' => $item->id,
                         'purchase_request_item_id' => $item->purchase_request_item_id,
                         'product' => [
                             'id' => $item->product_id,
-                            'name' => $item->product?->name,
+                            'name' => $product?->name,
                         ],
                         'unit' => [
                             'id' => $item->unit_id,
-                            'name' => $item->unit?->name,
+                            'name' => $unit?->name,
                         ],
                         'quantity' => (string) $item->quantity,
                         'quantity_received' => (string) $item->quantity_received,
