@@ -35,7 +35,7 @@ export function AssetStocktakeViewModal({
                 </DialogHeader>
 
                 <div className="space-y-4 py-2">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
                         <div>
                             <span className="block text-xs text-muted-foreground">
                                 Reference

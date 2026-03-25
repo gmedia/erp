@@ -224,6 +224,8 @@ export const journalEntryFormSchema = z.object({
                 debit: z.coerce.number().min(0),
                 credit: z.coerce.number().min(0),
                 memo: z.string().optional(),
+                account_name: z.string().optional(),
+                account_code: z.string().optional(),
             }),
         )
         .min(2, { message: 'At least 2 lines are required.' })

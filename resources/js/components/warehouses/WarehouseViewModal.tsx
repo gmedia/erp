@@ -32,15 +32,24 @@ export function WarehouseViewModal({
                         View warehouse details
                     </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
-                    <div>
-                        <span className="font-semibold">Code:</span> {item.code}
+                <div className="space-y-4 py-2">
+                    <div className="space-y-1">
+                        <span className="text-sm font-medium text-muted-foreground">
+                            Code
+                        </span>
+                        <div className="break-words text-sm font-medium">
+                            {item.code}
+                        </div>
                     </div>
-                    <div>
-                        <span className="font-semibold">Branch:</span>{' '}
-                        <Badge variant="outline">
-                            {item.branch?.name || 'N/A'}
-                        </Badge>
+                    <div className="space-y-1">
+                        <span className="text-sm font-medium text-muted-foreground">
+                            Branch
+                        </span>
+                        <div>
+                            <Badge variant="outline">
+                                {item.branch?.name || 'N/A'}
+                            </Badge>
+                        </div>
                     </div>
                 </div>
             </DialogContent>
