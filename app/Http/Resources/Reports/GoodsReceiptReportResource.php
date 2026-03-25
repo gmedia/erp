@@ -9,7 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property int $goods_receipt_id
  * @property string $gr_number
- * @property \DateTimeInterface|string|null $receipt_date
+ * @property DateTimeInterface|string|null $receipt_date
  * @property string $status
  * @property int $purchase_order_id
  * @property string $po_number

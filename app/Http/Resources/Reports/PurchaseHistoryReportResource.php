@@ -10,8 +10,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property int $purchase_order_item_id
  * @property int $purchase_order_id
  * @property string $po_number
- * @property \DateTimeInterface|string|null $order_date
- * @property \DateTimeInterface|string|null $expected_delivery_date
+ * @property DateTimeInterface|string|null $order_date
+ * @property DateTimeInterface|string|null $expected_delivery_date
  * @property string $status
  * @property int $supplier_id
  * @property string $supplier_name
@@ -25,7 +25,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property numeric-string|int|float $received_quantity
  * @property numeric-string|int|float $outstanding_quantity
  * @property int $receipt_count
- * @property \DateTimeInterface|string|null $last_receipt_date
+ * @property DateTimeInterface|string|null $last_receipt_date
  * @property numeric-string|int|float $total_purchase_value
  */
 class PurchaseHistoryReportResource extends JsonResource
