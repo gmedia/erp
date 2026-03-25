@@ -6,38 +6,54 @@ use DateTimeInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property int $id
+ * @property string $po_number
+ * @property \DateTimeInterface|string|null $order_date
+ * @property \DateTimeInterface|string|null $expected_delivery_date
+ * @property string $status
+ * @property string $status_category
+ * @property int $supplier_id
+ * @property string $supplier_name
+ * @property int $warehouse_id
+ * @property string $warehouse_code
+ * @property string $warehouse_name
+ * @property int $item_count
+ * @property numeric-string|int|float $ordered_quantity
+ * @property numeric-string|int|float $received_quantity
+ * @property numeric-string|int|float $outstanding_quantity
+ * @property numeric-string|int|float $receipt_progress_percent
+ * @property numeric-string|int|float $grand_total
+ */
 class PurchaseOrderStatusReportResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        /** @var array<string, mixed> $row */
-        $row = (array) $this->resource;
-
         return [
-            'id' => $row['id'] ?? null,
+            'id' => $this->id,
             'purchase_order' => [
-                'id' => $row['id'] ?? null,
-                'po_number' => $row['po_number'] ?? null,
-                'order_date' => $this->formatDate($row['order_date'] ?? null),
-                'expected_delivery_date' => $this->formatDate($row['expected_delivery_date'] ?? null),
-                'status' => $row['status'] ?? null,
-                'status_category' => $row['status_category'] ?? null,
+                'id' => $this->id,
+                'po_number' => $this->po_number,
+                'order_date' => $this->formatDate($this->order_date),
+                'expected_delivery_date' => $this->formatDate($this->expected_delivery_date),
+                'status' => $this->status,
+                'status_category' => $this->status_category,
             ],
             'supplier' => [
-                'id' => $row['supplier_id'] ?? null,
-                'name' => $row['supplier_name'] ?? null,
+                'id' => $this->supplier_id,
+                'name' => $this->supplier_name,
             ],
             'warehouse' => [
-                'id' => $row['warehouse_id'] ?? null,
-                'code' => $row['warehouse_code'] ?? null,
-                'name' => $row['warehouse_name'] ?? null,
+                'id' => $this->warehouse_id,
+                'code' => $this->warehouse_code,
+                'name' => $this->warehouse_name,
             ],
-            'item_count' => $row['item_count'] ?? null,
-            'ordered_quantity' => (string) ($row['ordered_quantity'] ?? '0'),
-            'received_quantity' => (string) ($row['received_quantity'] ?? '0'),
-            'outstanding_quantity' => (string) ($row['outstanding_quantity'] ?? '0'),
-            'receipt_progress_percent' => (string) ($row['receipt_progress_percent'] ?? '0'),
-            'grand_total' => (string) ($row['grand_total'] ?? '0'),
+            'item_count' => $this->item_count,
+            'ordered_quantity' => (string) $this->ordered_quantity,
+            'received_quantity' => (string) $this->received_quantity,
+            'outstanding_quantity' => (string) $this->outstanding_quantity,
+            'receipt_progress_percent' => (string) $this->receipt_progress_percent,
+            'grand_total' => (string) $this->grand_total,
         ];
     }
 

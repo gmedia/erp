@@ -6,42 +6,61 @@ use DateTimeInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property int $purchase_order_item_id
+ * @property int $purchase_order_id
+ * @property string $po_number
+ * @property \DateTimeInterface|string|null $order_date
+ * @property \DateTimeInterface|string|null $expected_delivery_date
+ * @property string $status
+ * @property int $supplier_id
+ * @property string $supplier_name
+ * @property int $warehouse_id
+ * @property string $warehouse_code
+ * @property string $warehouse_name
+ * @property int $product_id
+ * @property string $product_code
+ * @property string $product_name
+ * @property numeric-string|int|float $ordered_quantity
+ * @property numeric-string|int|float $received_quantity
+ * @property numeric-string|int|float $outstanding_quantity
+ * @property int $receipt_count
+ * @property \DateTimeInterface|string|null $last_receipt_date
+ * @property numeric-string|int|float $total_purchase_value
+ */
 class PurchaseHistoryReportResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        /** @var array<string, mixed> $row */
-        $row = (array) $this->resource;
-
         return [
-            'id' => $row['purchase_order_item_id'] ?? null,
+            'id' => $this->purchase_order_item_id,
             'purchase_order' => [
-                'id' => $row['purchase_order_id'] ?? null,
-                'po_number' => $row['po_number'] ?? null,
-                'order_date' => $this->formatDate($row['order_date'] ?? null),
-                'expected_delivery_date' => $this->formatDate($row['expected_delivery_date'] ?? null),
-                'status' => $row['status'] ?? null,
+                'id' => $this->purchase_order_id,
+                'po_number' => $this->po_number,
+                'order_date' => $this->formatDate($this->order_date),
+                'expected_delivery_date' => $this->formatDate($this->expected_delivery_date),
+                'status' => $this->status,
             ],
             'supplier' => [
-                'id' => $row['supplier_id'] ?? null,
-                'name' => $row['supplier_name'] ?? null,
+                'id' => $this->supplier_id,
+                'name' => $this->supplier_name,
             ],
             'warehouse' => [
-                'id' => $row['warehouse_id'] ?? null,
-                'code' => $row['warehouse_code'] ?? null,
-                'name' => $row['warehouse_name'] ?? null,
+                'id' => $this->warehouse_id,
+                'code' => $this->warehouse_code,
+                'name' => $this->warehouse_name,
             ],
             'product' => [
-                'id' => $row['product_id'] ?? null,
-                'code' => $row['product_code'] ?? null,
-                'name' => $row['product_name'] ?? null,
+                'id' => $this->product_id,
+                'code' => $this->product_code,
+                'name' => $this->product_name,
             ],
-            'ordered_quantity' => (string) ($row['ordered_quantity'] ?? '0'),
-            'received_quantity' => (string) ($row['received_quantity'] ?? '0'),
-            'outstanding_quantity' => (string) ($row['outstanding_quantity'] ?? '0'),
-            'receipt_count' => $row['receipt_count'] ?? null,
-            'last_receipt_date' => $this->formatDate($row['last_receipt_date'] ?? null),
-            'total_purchase_value' => (string) ($row['total_purchase_value'] ?? '0'),
+            'ordered_quantity' => (string) $this->ordered_quantity,
+            'received_quantity' => (string) $this->received_quantity,
+            'outstanding_quantity' => (string) $this->outstanding_quantity,
+            'receipt_count' => $this->receipt_count,
+            'last_receipt_date' => $this->formatDate($this->last_receipt_date),
+            'total_purchase_value' => (string) $this->total_purchase_value,
         ];
     }
 
