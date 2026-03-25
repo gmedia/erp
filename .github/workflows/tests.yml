@@ -51,7 +51,7 @@ jobs:
           sed -i "s/^WWWUSER=.*/WWWUSER=$(id -u)/" .env
           sed -i "s/^WWWGROUP=.*/WWWGROUP=$(id -g)/" .env
           mkdir -p storage/tmp
-          chmod 777 storage/tmp
+          chmod -R u+rwX,g+rwX,o-rwx storage/tmp
 
       - name: Bootstrap Sail dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader

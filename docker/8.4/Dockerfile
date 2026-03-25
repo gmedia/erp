@@ -48,7 +48,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
     && mkdir -p $PLAYWRIGHT_BROWSERS_PATH \
     && npx playwright install-deps \
     && npx playwright install chromium chromium-headless-shell \
-    && chmod -R 777 $PLAYWRIGHT_BROWSERS_PATH \
+    && chmod -R u+rwX,g+rwX,o-rwx $PLAYWRIGHT_BROWSERS_PATH \
     && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | tee /etc/apt/keyrings/yarn.gpg >/dev/null \
     && echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
     && curl -sS https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | tee /etc/apt/keyrings/pgdg.gpg >/dev/null \
