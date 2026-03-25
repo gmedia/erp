@@ -69,7 +69,9 @@ export function JournalEntryViewModal({
                                     Date
                                 </p>
                                 <p>
-                                    {formatDateByRegionalSettings(item.entry_date)}
+                                    {formatDateByRegionalSettings(
+                                        item.entry_date,
+                                    )}
                                 </p>
                             </div>
                             <div className="min-w-0">

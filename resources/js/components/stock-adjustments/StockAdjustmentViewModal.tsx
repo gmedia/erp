@@ -1,6 +1,6 @@
+import { ViewField } from '@/components/common/ViewField';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ViewField } from '@/components/common/ViewField';
 import {
     Dialog,
     DialogContent,

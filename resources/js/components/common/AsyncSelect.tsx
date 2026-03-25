@@ -182,7 +182,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                             {loading && (
                                 <li className="list-none p-4">
                                     <div className="flex items-center justify-center">
-                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                        <Loader2 className="h-4 w-4 animate-spin" />
                                     </div>
                                 </li>
                             )}

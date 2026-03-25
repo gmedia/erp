@@ -37,7 +37,7 @@ export function WarehouseViewModal({
                         <span className="text-sm font-medium text-muted-foreground">
                             Code
                         </span>
-                        <div className="break-words text-sm font-medium">
+                        <div className="text-sm font-medium break-words">
                             {item.code}
                         </div>
                     </div>

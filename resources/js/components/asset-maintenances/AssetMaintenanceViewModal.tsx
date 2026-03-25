@@ -71,7 +71,9 @@ export function AssetMaintenanceViewModal({
                                 Scheduled At
                             </span>
                             <span>
-                                {formatDateByRegionalSettings(item.scheduled_at)}
+                                {formatDateByRegionalSettings(
+                                    item.scheduled_at,
+                                )}
                             </span>
                         </div>
                         <div>
@@ -79,7 +81,9 @@ export function AssetMaintenanceViewModal({
                                 Performed At
                             </span>
                             <span>
-                                {formatDateByRegionalSettings(item.performed_at)}
+                                {formatDateByRegionalSettings(
+                                    item.performed_at,
+                                )}
                             </span>
                         </div>
                         <div>

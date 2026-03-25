@@ -37,7 +37,7 @@ export function AssetModelViewModal({
                         <span className="text-sm font-medium text-muted-foreground">
                             Manufacturer
                         </span>
-                        <div className="break-words text-sm font-medium">
+                        <div className="text-sm font-medium break-words">
                             {item.manufacturer || 'N/A'}
                         </div>
                     </div>
@@ -56,7 +56,7 @@ export function AssetModelViewModal({
                             <span className="text-sm font-medium text-muted-foreground">
                                 Specifications:
                             </span>
-                            <pre className="overflow-x-auto rounded bg-muted p-2 text-xs whitespace-pre-wrap break-words">
+                            <pre className="overflow-x-auto rounded bg-muted p-2 text-xs break-words whitespace-pre-wrap">
                                 {JSON.stringify(item.specs, null, 2)}
                             </pre>
                         </div>

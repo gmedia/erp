@@ -128,8 +128,7 @@ export default function Index() {
                             {formatDateByRegionalSettings(item.period_start)}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                            to{' '}
-                            {formatDateByRegionalSettings(item.period_end)}
+                            to {formatDateByRegionalSettings(item.period_end)}
                         </span>
                     </div>
                 </TableCell>

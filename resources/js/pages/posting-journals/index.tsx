@@ -192,7 +192,10 @@ export default function Index() {
                     <TableCell className="pt-4 align-top">
                         <div className="flex flex-col gap-1">
                             <div className="text-sm font-medium">
-                                {formatNumberByRegionalSettings(item.lines.length)} line(s)
+                                {formatNumberByRegionalSettings(
+                                    item.lines.length,
+                                )}{' '}
+                                line(s)
                             </div>
                             {preview.length > 0 && (
                                 <div className="line-clamp-2 text-xs text-muted-foreground">

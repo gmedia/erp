@@ -35,7 +35,8 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
     {
         accessorKey: 'entry_date',
         ...createSortingHeader('Date'),
-        cell: ({ row }) => formatDateByRegionalSettings(row.getValue('entry_date') as string),
+        cell: ({ row }) =>
+            formatDateByRegionalSettings(row.getValue('entry_date') as string),
     },
     createTextColumn<JournalEntry>({
         accessorKey: 'description',

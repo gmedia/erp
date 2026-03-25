@@ -4,7 +4,7 @@ type UseResetFormOnDefaultValuesOptions = {
     enabled?: boolean;
 };
 
-export const useResetFormOnDefaultValues = <TDefaultValues,>(
+export const useResetFormOnDefaultValues = <TDefaultValues>(
     form: { reset: (values: TDefaultValues) => void },
     defaultValues: TDefaultValues,
     options?: UseResetFormOnDefaultValuesOptions,

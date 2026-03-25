@@ -19,27 +19,31 @@ import {
 import { Form } from '@/components/ui/form';
 import { type JournalEntryFormData } from '@/utils/schemas';
 
-const journalEntryLineSchema = z.object({
-    account_id: z.string().min(1, { message: 'Account is required.' }),
-    account_name: z.string().optional(),
-    account_code: z.string().optional(),
-    debit: z.coerce.number().min(0).optional().default(0),
-    credit: z.coerce.number().min(0).optional().default(0),
-    memo: z.string().optional(),
-}).refine(
-    () => {
-        // Can't have both debit and credit be non-zero at the same time usually,
-        // but let's just make sure they are not both zero if you want, 
-        // actually standard entries allow one to be > 0.
-        return true; 
-    },
-    {
-        message: 'Must specify Debit or Credit.',
-        path: ['root'],
-    }
-);
+const journalEntryLineSchema = z
+    .object({
+        account_id: z.string().min(1, { message: 'Account is required.' }),
+        account_name: z.string().optional(),
+        account_code: z.string().optional(),
+        debit: z.coerce.number().min(0).optional().default(0),
+        credit: z.coerce.number().min(0).optional().default(0),
+        memo: z.string().optional(),
+    })
+    .refine(
+        () => {
+            // Can't have both debit and credit be non-zero at the same time usually,
+            // but let's just make sure they are not both zero if you want,
+            // actually standard entries allow one to be > 0.
+            return true;
+        },
+        {
+            message: 'Must specify Debit or Credit.',
+            path: ['root'],
+        },
+    );
 
-type JournalEntryLineFormData = NonNullable<JournalEntryFormData['lines']>[number];
+type JournalEntryLineFormData = NonNullable<
+    JournalEntryFormData['lines']
+>[number];
 
 interface JournalEntryLineFormDialogProps {
     readonly open: boolean;
@@ -116,7 +120,11 @@ export function JournalEntryLineFormDialog({
                         className="space-y-4"
                     >
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
-                            <AsyncSelectField<{ code: string; name: string; normal_balance: string }>
+                            <AsyncSelectField<{
+                                code: string;
+                                name: string;
+                                normal_balance: string;
+                            }>
                                 key={`account-${defaultValues.account_id || 'new'}-${open ? 'open' : 'closed'}`}
                                 name="account_id"
                                 label="Account"
@@ -125,7 +133,11 @@ export function JournalEntryLineFormDialog({
                                 labelFn={(acc) =>
                                     `${acc.code} - ${acc.name} (${acc.normal_balance})`
                                 }
-                                initialLabel={defaultValues.account_code ? `${defaultValues.account_code} - ${defaultValues.account_name}` : ''}
+                                initialLabel={
+                                    defaultValues.account_code
+                                        ? `${defaultValues.account_code} - ${defaultValues.account_name}`
+                                        : ''
+                                }
                                 onItemSelect={(account) => {
                                     form.setValue(
                                         'account_name',

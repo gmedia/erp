@@ -36,7 +36,7 @@ class TriggerApprovalAction
 
         if ($flow->steps->isEmpty()) {
             $this->logFlowWarning(
-                'Approval flow has no steps and cannot be triggered. Flow ID: '.$flow->id,
+                'Approval flow has no steps and cannot be triggered. Flow ID: ' . $flow->id,
                 $entity,
             );
 
@@ -123,11 +123,11 @@ class TriggerApprovalAction
 
     private function logFlowWarning(string $message, Model $entity): void
     {
-        Log::warning($message.'. '.$this->buildEntityContext($entity));
+        Log::warning($message . '. ' . $this->buildEntityContext($entity));
     }
 
     private function buildEntityContext(Model $entity): string
     {
-        return 'Entity: '.get_class($entity).' ID: '.$entity->getKey();
+        return 'Entity: ' . get_class($entity) . ' ID: ' . $entity->getKey();
     }
 }

@@ -25,11 +25,11 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import {
     type PurchaseOrder,
     type PurchaseOrderFormData,
 } from '@/types/purchase-order';
-import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import {
     formatItemReference,
     omitItemDisplayLabels,
@@ -374,10 +374,8 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                                         0,
                                                     {
                                                         locale: 'id-ID',
-                                                        minimumFractionDigits:
-                                                            0,
-                                                        maximumFractionDigits:
-                                                            2,
+                                                        minimumFractionDigits: 0,
+                                                        maximumFractionDigits: 2,
                                                     },
                                                 )}
                                             </TableCell>
@@ -390,10 +388,8 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                                         currency:
                                                             selectedCurrency ||
                                                             undefined,
-                                                        minimumFractionDigits:
-                                                            2,
-                                                        maximumFractionDigits:
-                                                            2,
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2,
                                                     },
                                                 )}
                                             </TableCell>
@@ -403,10 +399,8 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                                         0,
                                                     {
                                                         locale: 'id-ID',
-                                                        minimumFractionDigits:
-                                                            0,
-                                                        maximumFractionDigits:
-                                                            2,
+                                                        minimumFractionDigits: 0,
+                                                        maximumFractionDigits: 2,
                                                     },
                                                 )}
                                             </TableCell>
@@ -416,10 +410,8 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                                         0,
                                                     {
                                                         locale: 'id-ID',
-                                                        minimumFractionDigits:
-                                                            0,
-                                                        maximumFractionDigits:
-                                                            2,
+                                                        minimumFractionDigits: 0,
+                                                        maximumFractionDigits: 2,
                                                     },
                                                 )}
                                             </TableCell>

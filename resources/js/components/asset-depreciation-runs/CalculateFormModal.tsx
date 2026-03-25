@@ -45,11 +45,7 @@ export function CalculateFormModal({
         },
     });
 
-    const {
-        handleSubmit,
-        setError,
-        reset,
-    } = form;
+    const { handleSubmit, setError, reset } = form;
 
     const handleFormSubmit = async (data: CalculateFormValues) => {
         if (!data.period_start) {

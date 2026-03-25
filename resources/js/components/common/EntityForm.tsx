@@ -95,7 +95,7 @@ export default function EntityForm<
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
                 className={cn(
-                    'flex max-h-[calc(100dvh-4rem)] lg:max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-[600px]',
+                    'flex max-h-[calc(100dvh-4rem)] flex-col overflow-hidden p-0 sm:max-w-[600px] lg:max-h-[90vh]',
                     className,
                 )}
             >
@@ -112,7 +112,7 @@ export default function EntityForm<
                         onSubmit={form.handleSubmit(handleSubmit)}
                         className="flex min-h-0 flex-1 flex-col"
                     >
-                        <div className="flex-1 overflow-y-auto min-h-0 px-6">
+                        <div className="min-h-0 flex-1 overflow-y-auto px-6">
                             <div className="space-y-4 py-1 pb-6">
                                 {children}
                             </div>

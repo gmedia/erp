@@ -53,8 +53,8 @@ interface AuthMeResponse {
     >;
 }
 
-type RegionalSettings =
-    RegionalNumberFormatSettings & RegionalDateFormatSettings;
+type RegionalSettings = RegionalNumberFormatSettings &
+    RegionalDateFormatSettings;
 
 interface AuthContextType {
     user: User | null;
@@ -108,8 +108,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         Translations | Record<string, never>
     >({});
     const [locale, setLocale] = useState<string>('en');
-    const [regionalSettings, setRegionalSettings] =
-        useState<RegionalSettings>(defaultRegionalSettings);
+    const [regionalSettings, setRegionalSettings] = useState<RegionalSettings>(
+        defaultRegionalSettings,
+    );
     const [pendingApprovalsCount, setPendingApprovalsCount] =
         useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -123,9 +124,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         try {
             const { data } = await axiosInstance.get<AuthMeResponse>('/api/me');
-            const syncedRegionalNumberSettings = setRegionalNumberFormatSettings(
-                data.regionalSettings ?? {},
-            );
+            const syncedRegionalNumberSettings =
+                setRegionalNumberFormatSettings(data.regionalSettings ?? {});
             const syncedRegionalDateSettings = setRegionalDateFormatSettings(
                 data.regionalSettings ?? {},
             );

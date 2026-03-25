@@ -299,7 +299,9 @@ function RegionalSettings({
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const [currency, setCurrency] = useState<string>(settings?.currency ?? 'IDR');
+    const [currency, setCurrency] = useState<string>(
+        settings?.currency ?? 'IDR',
+    );
     const [hideDecimal, setHideDecimal] = useState<boolean>(
         Boolean(settings?.number_format_hide_decimal),
     );
@@ -327,10 +329,7 @@ function RegionalSettings({
                 string,
                 string
             >;
-            await axiosInstance.put(
-                '/api/admin-settings',
-                payload,
-            );
+            await axiosInstance.put('/api/admin-settings', payload);
 
             setRegionalNumberFormatSettings({
                 currency,
@@ -391,8 +390,7 @@ function RegionalSettings({
 
                 <div className="grid gap-2">
                     <Label htmlFor="currency">Currency</Label>
-                    <Select value={currency} onValueChange={setCurrency}
-                    >
+                    <Select value={currency} onValueChange={setCurrency}>
                         <SelectTrigger
                             id="currency"
                             className="mt-1 w-full"

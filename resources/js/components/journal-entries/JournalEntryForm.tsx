@@ -186,7 +186,9 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                     {/* Lines Section */}
                     <div className="space-y-4">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <h3 className="text-lg font-medium">Journal Lines</h3>
+                            <h3 className="text-lg font-medium">
+                                Journal Lines
+                            </h3>
                             <Button
                                 type="button"
                                 variant="outline"
@@ -229,27 +231,42 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                         </TableRow>
                                     ) : (
                                         fields.map((field, index) => {
-                                            const currentLine = lines?.[index] || field;
+                                            const currentLine =
+                                                lines?.[index] || field;
                                             return (
                                                 <TableRow key={field.id}>
                                                     <TableCell>
-                                                        {currentLine.account_code ? `${currentLine.account_code} - ` : ''}
-                                                        {currentLine.account_name || 'Selected Account'}
+                                                        {currentLine.account_code
+                                                            ? `${currentLine.account_code} - `
+                                                            : ''}
+                                                        {currentLine.account_name ||
+                                                            'Selected Account'}
                                                     </TableCell>
                                                     <TableCell className="text-right">
                                                         {formatCurrencyByRegionalSettings(
-                                                            Number(currentLine.debit) || 0,
-                                                            { locale: 'id-ID', currency: 'IDR' }
+                                                            Number(
+                                                                currentLine.debit,
+                                                            ) || 0,
+                                                            {
+                                                                locale: 'id-ID',
+                                                                currency: 'IDR',
+                                                            },
                                                         )}
                                                     </TableCell>
                                                     <TableCell className="text-right">
                                                         {formatCurrencyByRegionalSettings(
-                                                            Number(currentLine.credit) || 0,
-                                                            { locale: 'id-ID', currency: 'IDR' }
+                                                            Number(
+                                                                currentLine.credit,
+                                                            ) || 0,
+                                                            {
+                                                                locale: 'id-ID',
+                                                                currency: 'IDR',
+                                                            },
                                                         )}
                                                     </TableCell>
                                                     <TableCell>
-                                                        {currentLine.memo || '-'}
+                                                        {currentLine.memo ||
+                                                            '-'}
                                                     </TableCell>
                                                     <TableCell className="text-right">
                                                         <div className="flex justify-end gap-2">
@@ -257,7 +274,11 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                                                 type="button"
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={() => handleEditLine(index)}
+                                                                onClick={() =>
+                                                                    handleEditLine(
+                                                                        index,
+                                                                    )
+                                                                }
                                                             >
                                                                 <Pencil className="h-4 w-4 text-muted-foreground" />
                                                             </Button>
@@ -265,8 +286,17 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                                                 type="button"
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={() => remove(index)}
-                                                                disabled={fields.length <= 2 && fields.length > 0}
+                                                                onClick={() =>
+                                                                    remove(
+                                                                        index,
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    fields.length <=
+                                                                        2 &&
+                                                                    fields.length >
+                                                                        0
+                                                                }
                                                             >
                                                                 <Trash className="h-4 w-4 text-red-500" />
                                                             </Button>
@@ -279,7 +309,9 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                 </TableBody>
                                 <TableFooter>
                                     <TableRow>
-                                        <TableCell className="font-bold">Total</TableCell>
+                                        <TableCell className="font-bold">
+                                            Total
+                                        </TableCell>
                                         <TableCell className="text-right font-bold">
                                             {formatCurrencyByRegionalSettings(
                                                 totalDebit,
@@ -329,7 +361,9 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                             )}
                             {form.formState.errors.lines && (
                                 <p className="p-4 text-sm text-red-500">
-                                    {JSON.stringify(form.formState.errors.lines)}
+                                    {JSON.stringify(
+                                        form.formState.errors.lines,
+                                    )}
                                 </p>
                             )}
                         </div>
@@ -347,7 +381,9 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                     item={
                         editingIndex === null
                             ? null
-                            : (lines?.[editingIndex] as NonNullable<JournalEntryFormData['lines']>[number] ?? null)
+                            : ((lines?.[editingIndex] as NonNullable<
+                                  JournalEntryFormData['lines']
+                              >[number]) ?? null)
                     }
                     onSave={(data) => {
                         if (editingIndex === null) {
