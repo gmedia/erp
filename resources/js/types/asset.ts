@@ -5,6 +5,7 @@ import { AssetModel } from './asset-model';
 import { EntityWithId } from './entity';
 
 export interface AssetMovement extends EntityWithId {
+    asset_id: number | string;
     movement_type: string;
     movement_date: string;
     moved_at?: string;
@@ -16,10 +17,14 @@ export interface AssetMovement extends EntityWithId {
     from_location?: { id: number; name: string } | null;
     from_employee_id?: number | null;
     from_employee?: { id: number; name: string } | null;
+    from_department_id?: number | null;
+    from_department?: { id: number; name: string } | null;
     to_branch_id?: number | null;
     to_location_id?: number | null;
     to_branch?: { id: number; name: string } | null;
     to_location?: { id: number; name: string } | null;
+    to_department_id?: number | null;
+    to_department?: { id: number; name: string } | null;
     to_employee_id?: number | null;
     to_employee?: { id: number; name: string } | null;
     reference: string | null;
