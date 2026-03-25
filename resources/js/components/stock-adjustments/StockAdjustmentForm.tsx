@@ -22,7 +22,12 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type StockAdjustment } from '@/types/stock-adjustment';
+import {
+    formatItemReference,
+    omitItemDisplayLabels,
+} from '@/utils/entity-form-item';
 import {
     stockAdjustmentFormSchema,
     type StockAdjustmentFormData,
@@ -72,30 +77,6 @@ const normalizeStockAdjustmentItem = (
     unit_cost: typeof item?.unit_cost === 'number' ? item.unit_cost : 0,
     reason: typeof item?.reason === 'string' ? item.reason : '',
 });
-
-const formatItemReference = (label?: string, id?: string) => {
-    if (label) {
-        return label;
-    }
-
-    if (id) {
-        return `#${id}`;
-    }
-
-    return '-';
-};
-
-const omitDisplayLabels = <
-    T extends { product_label?: string; unit_label?: string },
->(
-    item: T,
-) => {
-    const nextItem = { ...item };
-    delete nextItem.product_label;
-    delete nextItem.unit_label;
-
-    return nextItem;
-};
 
 const getInventoryStocktakeOptionLabel = (option: Record<string, unknown>) => {
     const stocktakeNumber = option.stocktake_number;
@@ -209,13 +190,11 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
         const handleSubmit = (data: StockAdjustmentFormData) => {
             onSubmit({
                 ...data,
-                items: data.items.map(omitDisplayLabels),
+                items: data.items.map(omitItemDisplayLabels),
             });
         };
 
-        useEffect(() => {
-            form.reset(defaultValues);
-        }, [form, defaultValues]);
+        useResetFormOnDefaultValues(form, defaultValues);
 
         useEffect(() => {
             const loadDetail = async () => {

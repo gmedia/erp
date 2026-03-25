@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import {
     type Resolver,
     Controller,
@@ -29,6 +29,11 @@ import {
     type PurchaseOrder,
     type PurchaseOrderFormData,
 } from '@/types/purchase-order';
+import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
+import {
+    formatItemReference,
+    omitItemDisplayLabels,
+} from '@/utils/entity-form-item';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
@@ -59,30 +64,6 @@ const createEmptyPurchaseOrderItem =
         tax_percent: 0,
         notes: '',
     });
-
-const formatItemReference = (label?: string, id?: string) => {
-    if (label) {
-        return label;
-    }
-
-    if (id) {
-        return `#${id}`;
-    }
-
-    return '-';
-};
-
-const omitDisplayLabels = <
-    T extends { product_label?: string; unit_label?: string },
->(
-    item: T,
-) => {
-    const nextItem = { ...item };
-    delete nextItem.product_label;
-    delete nextItem.unit_label;
-
-    return nextItem;
-};
 
 const getPurchaseOrderFormDefaults = (
     purchaseOrder?: PurchaseOrder | null,
@@ -192,13 +173,11 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
         const handleSubmit = (data: PurchaseOrderFormData) => {
             onSubmit({
                 ...data,
-                items: data.items.map(omitDisplayLabels),
+                items: data.items.map(omitItemDisplayLabels),
             });
         };
 
-        useEffect(() => {
-            form.reset(defaultValues);
-        }, [form, defaultValues]);
+        useResetFormOnDefaultValues(form, defaultValues);
 
         return (
             <EntityForm<PurchaseOrderFormData>

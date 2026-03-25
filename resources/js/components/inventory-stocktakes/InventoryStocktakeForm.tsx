@@ -22,7 +22,12 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type InventoryStocktake } from '@/types/inventory-stocktake';
+import {
+    formatItemReference,
+    omitItemDisplayLabels,
+} from '@/utils/entity-form-item';
 import {
     inventoryStocktakeFormSchema,
     type InventoryStocktakeFormData,
@@ -68,30 +73,6 @@ const normalizeInventoryStocktakeItem = (
         typeof item?.counted_quantity === 'number' ? item.counted_quantity : 0,
     notes: typeof item?.notes === 'string' ? item.notes : '',
 });
-
-const formatItemReference = (label?: string, id?: string) => {
-    if (label) {
-        return label;
-    }
-
-    if (id) {
-        return `#${id}`;
-    }
-
-    return '-';
-};
-
-const omitDisplayLabels = <
-    T extends { product_label?: string; unit_label?: string },
->(
-    item: T,
-) => {
-    const nextItem = { ...item };
-    delete nextItem.product_label;
-    delete nextItem.unit_label;
-
-    return nextItem;
-};
 
 const getInventoryStocktakeFormDefaults = (
     inventoryStocktake?: InventoryStocktake | null,
@@ -187,13 +168,11 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
         const handleSubmit = (data: InventoryStocktakeFormData) => {
             onSubmit({
                 ...data,
-                items: data.items.map(omitDisplayLabels),
+                items: data.items.map(omitItemDisplayLabels),
             });
         };
 
-        useEffect(() => {
-            form.reset(defaultValues);
-        }, [form, defaultValues]);
+        useResetFormOnDefaultValues(form, defaultValues);
 
         useEffect(() => {
             const loadDetail = async () => {
