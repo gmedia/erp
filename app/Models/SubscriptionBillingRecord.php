@@ -42,8 +42,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereAmountPaid($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereBillingDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord
- *     whereCustomerSubscriptionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereCustomerSubscriptionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereDiscountAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereDueDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereId($value)

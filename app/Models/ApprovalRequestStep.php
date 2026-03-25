@@ -109,8 +109,18 @@ class ApprovalRequestStep extends Model
     public function scopePendingInboxForUser(Builder $query, int $userId): Builder
     {
         return $query->where('status', 'pending')
-            ->forActiveRequests()
-            ->currentRequestStep()
-            ->assignedToUser($userId);
+            ->whereHas('request', function (Builder $requestQuery) {
+                $requestQuery->whereIn('status', ['pending', 'in_progress']);
+            })
+            ->whereHas('request', function (Builder $requestQuery) {
+                $requestQuery->whereColumn(
+                    'approval_requests.current_step_order',
+                    'approval_request_steps.step_order',
+                );
+            })
+            ->whereHas('flowStep', function (Builder $flowStepQuery) use ($userId) {
+                $flowStepQuery->where('approver_type', 'user')
+                    ->where('approver_user_id', $userId);
+            });
     }
 }

@@ -30,8 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction whereIsAsync($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction whereOnFailure($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction
- *     wherePipelineTransitionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction wherePipelineTransitionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction whereUpdatedAt($value)
  *
  * @mixin \Eloquent

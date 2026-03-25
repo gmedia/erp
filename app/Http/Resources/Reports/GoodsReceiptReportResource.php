@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Reports;
 
+use DateTimeInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -9,31 +10,43 @@ class GoodsReceiptReportResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        /** @var array<string, mixed> $row */
+        $row = (array) $this->resource;
+
         return [
             'goods_receipt' => [
-                'id' => $this->goods_receipt_id,
-                'gr_number' => $this->gr_number,
-                'receipt_date' => $this->receipt_date?->toDateString(),
-                'status' => $this->status,
+                'id' => $row['goods_receipt_id'] ?? null,
+                'gr_number' => $row['gr_number'] ?? null,
+                'receipt_date' => $this->formatDate($row['receipt_date'] ?? null),
+                'status' => $row['status'] ?? null,
             ],
             'purchase_order' => [
-                'id' => $this->purchase_order_id,
-                'po_number' => $this->po_number,
+                'id' => $row['purchase_order_id'] ?? null,
+                'po_number' => $row['po_number'] ?? null,
             ],
             'supplier' => [
-                'id' => $this->supplier_id,
-                'name' => $this->supplier_name,
+                'id' => $row['supplier_id'] ?? null,
+                'name' => $row['supplier_name'] ?? null,
             ],
             'warehouse' => [
-                'id' => $this->warehouse_id,
-                'code' => $this->warehouse_code,
-                'name' => $this->warehouse_name,
+                'id' => $row['warehouse_id'] ?? null,
+                'code' => $row['warehouse_code'] ?? null,
+                'name' => $row['warehouse_name'] ?? null,
             ],
-            'item_count' => $this->item_count,
-            'total_received_quantity' => (string) $this->total_received_quantity,
-            'total_accepted_quantity' => (string) $this->total_accepted_quantity,
-            'total_rejected_quantity' => (string) $this->total_rejected_quantity,
-            'total_receipt_value' => (string) $this->total_receipt_value,
+            'item_count' => $row['item_count'] ?? null,
+            'total_received_quantity' => (string) ($row['total_received_quantity'] ?? '0'),
+            'total_accepted_quantity' => (string) ($row['total_accepted_quantity'] ?? '0'),
+            'total_rejected_quantity' => (string) ($row['total_rejected_quantity'] ?? '0'),
+            'total_receipt_value' => (string) ($row['total_receipt_value'] ?? '0'),
         ];
+    }
+
+    private function formatDate(mixed $value): ?string
+    {
+        if ($value instanceof DateTimeInterface) {
+            return $value->format('Y-m-d');
+        }
+
+        return is_string($value) ? $value : null;
     }
 }

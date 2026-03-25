@@ -47,8 +47,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereAutoRenew($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereBillingCyclesCompleted($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCancellationDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription
- *     whereCancellationEffectiveDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCancellationEffectiveDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCurrentPeriodEnd($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCurrentPeriodStart($value)
@@ -65,8 +64,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereTrialEndDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereTrialStartDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription
- *     withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription withoutTrashed()
  *
  * @mixin \Eloquent
