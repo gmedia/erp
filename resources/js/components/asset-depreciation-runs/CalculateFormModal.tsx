@@ -46,9 +46,7 @@ export function CalculateFormModal({
     });
 
     const {
-        register,
         handleSubmit,
-        formState: { errors },
         setError,
         reset,
     } = form;

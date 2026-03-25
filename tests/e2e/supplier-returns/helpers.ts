@@ -154,6 +154,15 @@ export async function editSupplierReturn(
 
     const updateResult = await page.evaluate(
         async ({ findBy, nextReturnNumber }) => {
+            type SupplierReturnDetailItem = {
+                goods_receipt_item_id?: number | string;
+                product?: { id?: number | string } | null;
+                unit?: { id?: number | string } | null;
+                quantity_returned?: number | string;
+                unit_price?: number | string;
+                notes?: string | null;
+            };
+
             const apiToken = localStorage.getItem('api_token') || '';
 
             const findResponse = await fetch(
@@ -205,7 +214,7 @@ export async function editSupplierReturn(
                 reason: detail.reason,
                 status: detail.status,
                 notes: detail.notes ?? '',
-                items: (detail.items || []).map((item: any) => ({
+                items: (detail.items as SupplierReturnDetailItem[] || []).map((item) => ({
                     goods_receipt_item_id: item.goods_receipt_item_id,
                     product_id: item.product?.id,
                     unit_id: item.unit?.id,

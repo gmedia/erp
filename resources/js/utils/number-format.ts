@@ -154,7 +154,7 @@ function resolveFractionDigits(
     hideDecimal: boolean,
     minimumFractionDigits?: number,
     maximumFractionDigits?: number,
-): Pick<Intl.NumberFormatOptions, 'minimumFractionDigits' | 'maximumFractionDigits'> | {} {
+): Pick<Intl.NumberFormatOptions, 'minimumFractionDigits' | 'maximumFractionDigits'> | Record<string, never> {
     if (hideDecimal) {
         return {
             minimumFractionDigits: 0,

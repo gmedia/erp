@@ -149,5 +149,29 @@ export async function viewJournalEntry(page: Page, query: string): Promise<void>
 
 export async function deleteJournalEntry(page: Page, query: string): Promise<void> {                                                                                
     await searchJournalEntry(page, query);
-    const row = page.locator('tr', { hasText: query }).first();
+
+  const deleteBtn = page
+    .locator('tr', { hasText: query })
+    .first()
+    .locator('button:has(svg.lucide-trash)');
+  await expect(deleteBtn).toBeVisible();
+  await deleteBtn.click();
+
+  const confirmDialog = page.getByRole('alertdialog').first();
+  if (await confirmDialog.isVisible().catch(() => false)) {
+    const confirmBtn = confirmDialog.getByRole('button', {
+      name: /Delete|Confirm|Yes/i,
+    });
+    await expect(confirmBtn.first()).toBeVisible();
+    await confirmBtn.first().click();
+  }
+
+  await page
+    .waitForResponse(
+      (r) =>
+        r.url().includes('/api/journal-entries') &&
+        [200, 204].includes(r.status()),
+      { timeout: 10000 },
+    )
+    .catch(() => null);
 }

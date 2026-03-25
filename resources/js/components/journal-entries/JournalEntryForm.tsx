@@ -47,7 +47,7 @@ const getJournalEntryFormDefaults = (
 ): JournalEntryFormData => {
     if (!journalEntry) {
         return {
-            entry_date: new Date() as any, // Cast to any to satisfy type temporarily or use proper Date type handling if needed
+            entry_date: new Date(),
             reference: '',
             description: '',
             lines: [],
@@ -55,7 +55,7 @@ const getJournalEntryFormDefaults = (
     }
 
     return {
-        entry_date: new Date(journalEntry.entry_date) as any,
+        entry_date: new Date(journalEntry.entry_date),
         reference: journalEntry.reference || '',
         description: journalEntry.description || '',
         lines: journalEntry.lines.map((line) => ({

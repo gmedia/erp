@@ -27,7 +27,7 @@ const journalEntryLineSchema = z.object({
     credit: z.coerce.number().min(0).optional().default(0),
     memo: z.string().optional(),
 }).refine(
-    (data) => {
+    () => {
         // Can't have both debit and credit be non-zero at the same time usually,
         // but let's just make sure they are not both zero if you want, 
         // actually standard entries allow one to be > 0.
