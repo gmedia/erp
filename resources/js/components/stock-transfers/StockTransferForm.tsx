@@ -22,7 +22,12 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { StockTransfer } from '@/types/stock-transfer';
+import {
+    formatItemReference,
+    omitItemDisplayLabels,
+} from '@/utils/entity-form-item';
 import {
     stockTransferFormSchema,
     type StockTransferFormData,
@@ -71,30 +76,6 @@ const normalizeStockTransferItem = (
     unit_cost: typeof item?.unit_cost === 'number' ? item.unit_cost : 0,
     notes: typeof item?.notes === 'string' ? item.notes : '',
 });
-
-const formatItemReference = (label?: string, id?: string) => {
-    if (label) {
-        return label;
-    }
-
-    if (id) {
-        return `#${id}`;
-    }
-
-    return '-';
-};
-
-const omitDisplayLabels = <
-    T extends { product_label?: string; unit_label?: string },
->(
-    item: T,
-) => {
-    const nextItem = { ...item };
-    delete nextItem.product_label;
-    delete nextItem.unit_label;
-
-    return nextItem;
-};
 
 const getStockTransferFormDefaults = (
     stockTransfer?: StockTransfer | null,
@@ -197,13 +178,11 @@ export const StockTransferForm = memo<StockTransferFormProps>(
         const handleSubmit = (data: StockTransferFormData) => {
             onSubmit({
                 ...data,
-                items: data.items.map(omitDisplayLabels),
+                items: data.items.map(omitItemDisplayLabels),
             });
         };
 
-        useEffect(() => {
-            form.reset(defaultValues);
-        }, [form, defaultValues]);
+        useResetFormOnDefaultValues(form, defaultValues);
 
         useEffect(() => {
             const loadDetail = async () => {
