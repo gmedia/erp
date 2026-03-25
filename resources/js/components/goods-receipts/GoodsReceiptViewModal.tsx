@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ViewField } from '@/components/common/ViewField';
 import {
     Dialog,
     DialogContent,
@@ -18,19 +19,6 @@ interface GoodsReceiptViewModalProps {
     onClose: () => void;
     item: GoodsReceipt | null;
 }
-
-const ViewField = ({
-    label,
-    value,
-}: {
-    label: string;
-    value: React.ReactNode;
-}) => (
-    <div className="min-w-0 space-y-1">
-        <h4 className="text-sm font-medium text-muted-foreground">{label}</h4>
-        <div className="text-sm font-medium">{value || '-'}</div>
-    </div>
-);
 
 export const GoodsReceiptViewModal = React.memo(
     ({ item, open, onClose }: GoodsReceiptViewModalProps) => {
