@@ -1,9 +1,32 @@
 import * as z from 'zod';
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isValidEmailAddress = (value: string): boolean => {
+    if (!value || value.includes(' ')) {
+        return false;
+    }
+
+    const atIndex = value.indexOf('@');
+    if (atIndex <= 0 || atIndex !== value.lastIndexOf('@')) {
+        return false;
+    }
+
+    const localPart = value.slice(0, atIndex);
+    const domainPart = value.slice(atIndex + 1);
+
+    if (!localPart || !domainPart) {
+        return false;
+    }
+
+    const dotIndex = domainPart.lastIndexOf('.');
+    if (dotIndex <= 0 || dotIndex === domainPart.length - 1) {
+        return false;
+    }
+
+    return true;
+};
 
 const emailValidator = () =>
-    z.string().refine((value) => EMAIL_PATTERN.test(value), {
+    z.string().refine((value) => isValidEmailAddress(value), {
         message: 'Please enter a valid email address.',
     });
 
