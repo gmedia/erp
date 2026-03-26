@@ -18,8 +18,10 @@ function ToggleGroup({
   size,
   children,
   ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
-  VariantProps<typeof toggleVariants>) {
+}: Readonly<
+  React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
+    VariantProps<typeof toggleVariants>
+>) {
   const toggleGroupContextValue = React.useMemo(
     () => ({ variant, size }),
     [variant, size]
@@ -49,8 +51,10 @@ function ToggleGroupItem({
   variant,
   size,
   ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive.Item> &
-  VariantProps<typeof toggleVariants>) {
+}: Readonly<
+  React.ComponentProps<typeof ToggleGroupPrimitive.Item> &
+    VariantProps<typeof toggleVariants>
+>) {
   const context = React.useContext(ToggleGroupContext)
 
   return (
