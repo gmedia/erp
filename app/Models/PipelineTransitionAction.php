@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,19 +20,19 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\PipelineTransition $transition
  *
  * @method static \Database\Factories\PipelineTransitionActionFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction whereActionType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction whereConfig($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction whereExecutionOrder($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction whereIsAsync($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction whereOnFailure($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction wherePipelineTransitionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransitionAction whereUpdatedAt($value)
+ * @method static Builder<static>|PipelineTransitionAction newModelQuery()
+ * @method static Builder<static>|PipelineTransitionAction newQuery()
+ * @method static Builder<static>|PipelineTransitionAction query()
+ * @method static Builder<static>|PipelineTransitionAction whereActionType($value)
+ * @method static Builder<static>|PipelineTransitionAction whereConfig($value)
+ * @method static Builder<static>|PipelineTransitionAction whereCreatedAt($value)
+ * @method static Builder<static>|PipelineTransitionAction whereExecutionOrder($value)
+ * @method static Builder<static>|PipelineTransitionAction whereId($value)
+ * @method static Builder<static>|PipelineTransitionAction whereIsActive($value)
+ * @method static Builder<static>|PipelineTransitionAction whereIsAsync($value)
+ * @method static Builder<static>|PipelineTransitionAction whereOnFailure($value)
+ * @method static Builder<static>|PipelineTransitionAction wherePipelineTransitionId($value)
+ * @method static Builder<static>|PipelineTransitionAction whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

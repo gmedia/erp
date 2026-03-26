@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,37 +36,37 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\SubscriptionPlan $subscriptionPlan
  *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription cancelled()
+ * @method static Builder<static>|CustomerSubscription active()
+ * @method static Builder<static>|CustomerSubscription cancelled()
  * @method static \Database\Factories\CustomerSubscriptionFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription pastDue()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription trial()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereAutoRenew($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereBillingCyclesCompleted($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCancellationDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCancellationEffectiveDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCurrentPeriodEnd($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCurrentPeriodStart($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCustomerId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereNotes($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereProductId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereRecurringAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereStartDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereSubscriptionNumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereSubscriptionPlanId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereTrialEndDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereTrialStartDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription withTrashed(bool $withTrashed = true)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription withoutTrashed()
+ * @method static Builder<static>|CustomerSubscription newModelQuery()
+ * @method static Builder<static>|CustomerSubscription newQuery()
+ * @method static Builder<static>|CustomerSubscription onlyTrashed()
+ * @method static Builder<static>|CustomerSubscription pastDue()
+ * @method static Builder<static>|CustomerSubscription query()
+ * @method static Builder<static>|CustomerSubscription trial()
+ * @method static Builder<static>|CustomerSubscription whereAutoRenew($value)
+ * @method static Builder<static>|CustomerSubscription whereBillingCyclesCompleted($value)
+ * @method static Builder<static>|CustomerSubscription whereCancellationDate($value)
+ * @method static Builder<static>|CustomerSubscription whereCancellationEffectiveDate($value)
+ * @method static Builder<static>|CustomerSubscription whereCreatedAt($value)
+ * @method static Builder<static>|CustomerSubscription whereCurrentPeriodEnd($value)
+ * @method static Builder<static>|CustomerSubscription whereCurrentPeriodStart($value)
+ * @method static Builder<static>|CustomerSubscription whereCustomerId($value)
+ * @method static Builder<static>|CustomerSubscription whereDeletedAt($value)
+ * @method static Builder<static>|CustomerSubscription whereId($value)
+ * @method static Builder<static>|CustomerSubscription whereNotes($value)
+ * @method static Builder<static>|CustomerSubscription whereProductId($value)
+ * @method static Builder<static>|CustomerSubscription whereRecurringAmount($value)
+ * @method static Builder<static>|CustomerSubscription whereStartDate($value)
+ * @method static Builder<static>|CustomerSubscription whereStatus($value)
+ * @method static Builder<static>|CustomerSubscription whereSubscriptionNumber($value)
+ * @method static Builder<static>|CustomerSubscription whereSubscriptionPlanId($value)
+ * @method static Builder<static>|CustomerSubscription whereTrialEndDate($value)
+ * @method static Builder<static>|CustomerSubscription whereTrialStartDate($value)
+ * @method static Builder<static>|CustomerSubscription whereUpdatedAt($value)
+ * @method static Builder<static>|CustomerSubscription withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|CustomerSubscription withoutTrashed()
  *
  * @mixin \Eloquent
  */
