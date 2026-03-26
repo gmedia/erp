@@ -6,7 +6,7 @@ import { HTMLAttributes } from 'react';
 export default function AppearanceToggleTab({
     className = '',
     ...props
-}: HTMLAttributes<HTMLDivElement>) {
+}: Readonly<HTMLAttributes<HTMLDivElement>>) {
     const { appearance, updateAppearance } = useAppearance();
 
     const tabs: { value: Appearance; icon: LucideIcon; label: string }[] = [
