@@ -15,6 +15,7 @@ ENV TZ=UTC
 ENV SUPERVISOR_PHP_COMMAND="/usr/bin/php -d variables_order=EGPCS /var/www/html/artisan serve --host=0.0.0.0 --port=80"
 ENV SUPERVISOR_PHP_USER="sail"
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright
+ENV BUN_INSTALL=/opt/bun
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
     echo "Acquire::http::Pipeline-Depth 0;" > /etc/apt/apt.conf.d/99custom && \
@@ -42,12 +43,14 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
     && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_VERSION.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
     && apt-get update \
     && apt-get install -y nodejs \
-    && npm install -g npm \
-    && npm install -g pnpm \
-    && npm install -g bun \
+    && corepack enable \
+    && corepack prepare pnpm@latest --activate \
+    && curl -fsSL https://bun.sh/install | bash \
+    && ln -sf $BUN_INSTALL/bin/bun /usr/local/bin/bun \
+    && ln -sf $BUN_INSTALL/bin/bunx /usr/local/bin/bunx \
     && mkdir -p $PLAYWRIGHT_BROWSERS_PATH \
-    && npx playwright install-deps \
-    && npx playwright install chromium chromium-headless-shell \
+    && pnpm dlx playwright install-deps \
+    && pnpm dlx playwright install chromium chromium-headless-shell \
     && chmod -R u+rwX,g+rwX,o-rwx $PLAYWRIGHT_BROWSERS_PATH \
     && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | tee /etc/apt/keyrings/yarn.gpg >/dev/null \
     && echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
