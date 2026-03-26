@@ -70,7 +70,7 @@ export function DatePickerField({
                                     ) => void
                                 }
                                 disabled={disabled}
-                                initialFocus
+                                autoFocus
                             />
                         </PopoverContent>
                     </Popover>

@@ -272,7 +272,6 @@ export default function AssetProfile() {
                                             value={item.qrcode_url || ''}
                                             size={80}
                                             level="H"
-                                            includeMargin={false}
                                             className="qr-code-svg h-20 w-20"
                                         />
                                     </div>

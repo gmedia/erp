@@ -1,5 +1,14 @@
 import * as z from 'zod';
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const emailValidator = () =>
+    z
+        .string()
+        .refine((value) => EMAIL_PATTERN.test(value), {
+            message: 'Please enter a valid email address.',
+        });
+
 // Schema for approval delegations
 export const approvalDelegationFormSchema = z
     .object({
@@ -62,7 +71,7 @@ export type UnitFormData = z.infer<typeof unitFormSchema>;
 export const employeeFormSchema = z.object({
     employee_id: z.string().min(1, { message: 'Employee ID is required.' }),
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    email: z.string().email({ message: 'Please enter a valid email address.' }),
+    email: emailValidator(),
     phone: z
         .string()
         .min(10, { message: 'Phone number must be at least 10 digits.' })
@@ -99,7 +108,7 @@ export type EmployeeFormData = z.infer<typeof employeeFormSchema>;
 // Schema for customer form data
 export const customerFormSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    email: z.string().email({ message: 'Please enter a valid email address.' }),
+    email: emailValidator(),
     phone: z
         .string()
         .min(10, { message: 'Phone number must be at least 10 digits.' })
@@ -123,11 +132,7 @@ export type CustomerFormData = z.infer<typeof customerFormSchema>;
 // Schema for supplier form data
 export const supplierFormSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    email: z
-        .string()
-        .email({ message: 'Please enter a valid email address.' })
-        .or(z.literal(''))
-        .optional(),
+    email: z.union([emailValidator(), z.literal('')]).optional(),
     phone: z
         .string()
         .min(10, { message: 'Phone number must be at least 10 digits.' })

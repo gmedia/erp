@@ -178,8 +178,10 @@ export interface RegionalDateFormatOptions {
     fallback?: string;
 }
 
+type DateTimeInput = string | Date | number | null | undefined;
+
 export function formatDateByRegionalSettings(
-    value: string | Date | number | null | undefined,
+    value: DateTimeInput,
     {
         dateFormat,
         locale = 'id-ID',
@@ -218,7 +220,7 @@ export interface RegionalTimeFormatOptions {
 }
 
 export function formatTimeByRegionalSettings(
-    value: string | Date | number | null | undefined,
+    value: DateTimeInput,
     {
         locale = 'id-ID',
         fallback = '-',
@@ -244,7 +246,7 @@ export function formatTimeByRegionalSettings(
 }
 
 export function formatDateTimeByRegionalSettings(
-    value: string | Date | number | null | undefined,
+    value: DateTimeInput,
     {
         dateFormat,
         locale = 'id-ID',
