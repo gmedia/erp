@@ -3,11 +3,9 @@ import * as z from 'zod';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const emailValidator = () =>
-    z
-        .string()
-        .refine((value) => EMAIL_PATTERN.test(value), {
-            message: 'Please enter a valid email address.',
-        });
+    z.string().refine((value) => EMAIL_PATTERN.test(value), {
+        message: 'Please enter a valid email address.',
+    });
 
 // Schema for approval delegations
 export const approvalDelegationFormSchema = z
