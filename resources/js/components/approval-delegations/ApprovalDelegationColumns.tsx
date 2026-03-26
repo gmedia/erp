@@ -39,7 +39,7 @@ export const approvalDelegationColumns: ColumnDef<ApprovalDelegation>[] = [
 
             // Format App\Models\PurchaseOrder -> PurchaseOrder
             const parts = type.split('\\');
-            return <span>{parts[parts.length - 1]}</span>;
+            return <span>{parts.at(-1)}</span>;
         },
     },
     {
