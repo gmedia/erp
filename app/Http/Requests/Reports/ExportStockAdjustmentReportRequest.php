@@ -2,20 +2,15 @@
 
 namespace App\Http\Requests\Reports;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ExportStockAdjustmentReportRequest extends FormRequest
+class ExportStockAdjustmentReportRequest extends AbstractReportRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
-        return [
-            'search' => ['nullable', 'string', 'max:255'],
+        return array_merge(
+            $this->searchRules(),
+            [
             'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
             'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
             'adjustment_type' => [
@@ -32,24 +27,20 @@ class ExportStockAdjustmentReportRequest extends FormRequest
                 ]),
             ],
             'status' => ['nullable', 'string', Rule::in(['draft', 'pending_approval', 'approved', 'cancelled'])],
-            'start_date' => ['nullable', 'date'],
-            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
-            'sort_by' => [
-                'nullable',
-                'string',
-                Rule::in([
-                    'adjustment_date',
-                    'adjustment_type',
-                    'status',
-                    'warehouse_name',
-                    'branch_name',
-                    'total_quantity_adjusted',
-                    'total_adjustment_value',
-                    'adjustment_count',
-                ]),
             ],
-            'sort_direction' => ['nullable', 'string', Rule::in(['asc', 'desc'])],
-            'format' => ['nullable', 'string', Rule::in(['xlsx', 'csv'])],
-        ];
+            $this->dateRangeRules(),
+            $this->sortByEnumRules([
+                'adjustment_date',
+                'adjustment_type',
+                'status',
+                'warehouse_name',
+                'branch_name',
+                'total_quantity_adjusted',
+                'total_adjustment_value',
+                'adjustment_count',
+            ]),
+            $this->sortDirectionRules(),
+            $this->exportFormatRules(),
+        );
     }
 }
