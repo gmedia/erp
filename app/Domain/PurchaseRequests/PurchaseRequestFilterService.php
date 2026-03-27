@@ -11,48 +11,21 @@ class PurchaseRequestFilterService
 
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['branch_id'])) {
-            $query->where('branch_id', $filters['branch_id']);
-        }
+        $this->applyExactFilters($query, $filters, [
+            'branch_id' => 'branch_id',
+            'department_id' => 'department_id',
+            'requested_by' => 'requested_by',
+            'priority' => 'priority',
+            'status' => 'status',
+        ]);
 
-        if (! empty($filters['department_id'])) {
-            $query->where('department_id', $filters['department_id']);
-        }
+        $this->applyDateRanges($query, $filters, [
+            'request_date' => ['from' => 'request_date_from', 'to' => 'request_date_to'],
+            'required_date' => ['from' => 'required_date_from', 'to' => 'required_date_to'],
+        ]);
 
-        if (! empty($filters['requested_by'])) {
-            $query->where('requested_by', $filters['requested_by']);
-        }
-
-        if (! empty($filters['priority'])) {
-            $query->where('priority', $filters['priority']);
-        }
-
-        if (! empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-
-        if (! empty($filters['request_date_from'])) {
-            $query->whereDate('request_date', '>=', $filters['request_date_from']);
-        }
-
-        if (! empty($filters['request_date_to'])) {
-            $query->whereDate('request_date', '<=', $filters['request_date_to']);
-        }
-
-        if (! empty($filters['required_date_from'])) {
-            $query->whereDate('required_date', '>=', $filters['required_date_from']);
-        }
-
-        if (! empty($filters['required_date_to'])) {
-            $query->whereDate('required_date', '<=', $filters['required_date_to']);
-        }
-
-        if (! empty($filters['estimated_amount_min'])) {
-            $query->where('estimated_amount', '>=', $filters['estimated_amount_min']);
-        }
-
-        if (! empty($filters['estimated_amount_max'])) {
-            $query->where('estimated_amount', '<=', $filters['estimated_amount_max']);
-        }
+        $this->applyNumericRanges($query, $filters, [
+            'estimated_amount' => ['min' => 'estimated_amount_min', 'max' => 'estimated_amount_max'],
+        ]);
     }
 }

@@ -58,4 +58,66 @@ trait BaseFilterService
             $query->orderBy($sortBy, $sortDirection);
         }
     }
+
+    /**
+     * Apply exact-match filters where request key maps to a database column.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<string, mixed>  $filters
+     * @param  array<string, string>  $fieldMap Request key => column name
+     */
+    public function applyExactFilters(Builder $query, array $filters, array $fieldMap): void
+    {
+        foreach ($fieldMap as $filterKey => $column) {
+            if (! empty($filters[$filterKey])) {
+                $query->where($column, $filters[$filterKey]);
+            }
+        }
+    }
+
+    /**
+     * Apply date range filters with optional from/to keys.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<string, mixed>  $filters
+     * @param  array<string, array{from: string, to: string}>  $dateRanges Column => keys
+     */
+    public function applyDateRanges(Builder $query, array $filters, array $dateRanges): void
+    {
+        foreach ($dateRanges as $column => $rangeKeys) {
+            if (! empty($filters[$rangeKeys['from']])) {
+                $query->whereDate($column, '>=', $filters[$rangeKeys['from']]);
+            }
+
+            if (! empty($filters[$rangeKeys['to']])) {
+                $query->whereDate($column, '<=', $filters[$rangeKeys['to']]);
+            }
+        }
+    }
+
+    /**
+     * Apply numeric min/max filters where request key maps to a database column.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<string, mixed>  $filters
+     * @param  array<string, array{min: string, max: string}>  $numericRanges Column => keys
+     */
+    public function applyNumericRanges(Builder $query, array $filters, array $numericRanges): void
+    {
+        foreach ($numericRanges as $column => $rangeKeys) {
+            if (! empty($filters[$rangeKeys['min']])) {
+                $query->where($column, '>=', $filters[$rangeKeys['min']]);
+            }
+
+            if (! empty($filters[$rangeKeys['max']])) {
+                $query->where($column, '<=', $filters[$rangeKeys['max']]);
+            }
+        }
+    }
 }

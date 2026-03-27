@@ -3,18 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Actions\StockTransfers\SyncStockTransferItemsAction;
+use App\Http\Controllers\Concerns\HandlesNestedItemsResponse;
 use App\Http\Requests\StockTransfers\UpdateStockTransferItemsRequest;
 use App\Models\StockTransfer;
 use Illuminate\Http\JsonResponse;
 
 class StockTransferItemController extends Controller
 {
+    use HandlesNestedItemsResponse;
+
     public function getItems(StockTransfer $stockTransfer): JsonResponse
     {
-        $stockTransfer->load(['items.product', 'items.unit']);
-
-        return response()->json([
-            'data' => $stockTransfer->items->map(fn ($item) => [
+        return $this->nestedItemsResponse($stockTransfer, ['items.product', 'items.unit'], fn ($item) => [
                 'id' => $item->id,
                 'product' => [
                     'id' => $item->product_id,
@@ -28,8 +28,7 @@ class StockTransferItemController extends Controller
                 'quantity_received' => (string) $item->quantity_received,
                 'unit_cost' => (string) $item->unit_cost,
                 'notes' => $item->notes,
-            ])->values(),
-        ]);
+            ]);
     }
 
     public function syncItems(
@@ -39,10 +38,7 @@ class StockTransferItemController extends Controller
     ): JsonResponse {
         $action->execute($stockTransfer, $request->validated()['items']);
 
-        $stockTransfer->load(['items.product', 'items.unit']);
-
-        return response()->json([
-            'data' => $stockTransfer->items->map(fn ($item) => [
+        return $this->nestedItemsResponse($stockTransfer, ['items.product', 'items.unit'], fn ($item) => [
                 'id' => $item->id,
                 'product' => [
                     'id' => $item->product_id,
@@ -56,7 +52,6 @@ class StockTransferItemController extends Controller
                 'quantity_received' => (string) $item->quantity_received,
                 'unit_cost' => (string) $item->unit_cost,
                 'notes' => $item->notes,
-            ])->values(),
-        ]);
+            ]);
     }
 }
