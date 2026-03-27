@@ -51,7 +51,7 @@ const config: ModuleTestConfig = {
     createEntity: createGoodsReceipt,
     searchEntity: searchGoodsReceipt,
     editEntity: editGoodsReceipt,
-    editUpdates: { gr_number: 'GR-E2E-UPDATED-001' },
+    editUpdates: { gr_number: `GR-E2E-UPDATED-${Date.now()}` },
     expectedExportColumns: [
         'ID',
         'GR Number',

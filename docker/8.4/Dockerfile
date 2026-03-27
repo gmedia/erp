@@ -49,8 +49,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
     && ln -sf $BUN_INSTALL/bin/bun /usr/local/bin/bun \
     && ln -sf $BUN_INSTALL/bin/bunx /usr/local/bin/bunx \
     && mkdir -p $PLAYWRIGHT_BROWSERS_PATH \
-    && pnpm dlx playwright install-deps \
-    && pnpm dlx playwright install chromium chromium-headless-shell \
+    && npx playwright install-deps \
+    && npx playwright install chromium chromium-headless-shell \
     && chmod -R u+rwX,g+rwX,o-rwx $PLAYWRIGHT_BROWSERS_PATH \
     && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | tee /etc/apt/keyrings/yarn.gpg >/dev/null \
     && echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
@@ -66,7 +66,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
     && setcap "cap_net_bind_service=+ep" /usr/bin/php8.4 \
     && userdel -r ubuntu \
     && groupadd --force -g $WWWGROUP sail \
-    && useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER sail
+    && useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER sail \
+    && chown -R $WWWUSER:$WWWGROUP $PLAYWRIGHT_BROWSERS_PATH
 
 COPY start-container /usr/local/bin/start-container
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf

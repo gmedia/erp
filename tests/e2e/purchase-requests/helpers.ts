@@ -88,6 +88,14 @@ export async function editPurchaseRequest(
 
     const updateResult = await page.evaluate(
         async ({ findBy, nextPrNumber }) => {
+            type PurchaseRequestDetailItem = {
+                product?: { id?: number | string } | null;
+                unit?: { id?: number | string } | null;
+                quantity?: number | string;
+                estimated_unit_price?: number | string;
+                notes?: string | null;
+            };
+
             const apiToken = localStorage.getItem('api_token') || '';
 
             const findResponse = await fetch(
@@ -102,8 +110,49 @@ export async function editPurchaseRequest(
             const findPayload = await findResponse.json();
             const row = (findPayload.data || [])[0];
             if (!row?.id) {
-                return { ok: false };
+                return { ok: false, step: 'find', status: findResponse.status, body: findPayload };
             }
+
+            const detailResponse = await fetch(`/api/purchase-requests/${row.id}`, {
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Authorization': `Bearer ${apiToken}`,
+                },
+            });
+            const detailPayload = await detailResponse.json().catch(() => ({}));
+            const detail = detailPayload?.data;
+
+            if (!detail?.id) {
+                return {
+                    ok: false,
+                    step: 'show',
+                    status: detailResponse.status,
+                    body: detailPayload,
+                };
+            }
+
+            const payload = {
+                pr_number: nextPrNumber,
+                branch_id: detail.branch?.id,
+                department_id: detail.department?.id ?? null,
+                requested_by: detail.requester?.id ?? null,
+                request_date: detail.request_date,
+                required_date: detail.required_date ?? null,
+                priority: detail.priority,
+                status: detail.status,
+                notes: detail.notes ?? '',
+                approved_by: detail.approved_by?.id ?? null,
+                approved_at: detail.approved_at ?? null,
+                rejection_reason: detail.rejection_reason ?? '',
+                items: (detail.items as PurchaseRequestDetailItem[] || []).map((item) => ({
+                    product_id: item.product?.id,
+                    unit_id: item.unit?.id,
+                    quantity: item.quantity,
+                    estimated_unit_price: item.estimated_unit_price ?? 0,
+                    notes: item.notes ?? '',
+                })),
+            };
 
             const updateResponse = await fetch(`/api/purchase-requests/${row.id}`, {
                 method: 'PUT',
@@ -113,15 +162,22 @@ export async function editPurchaseRequest(
                     'X-Requested-With': 'XMLHttpRequest',
                     'Authorization': `Bearer ${apiToken}`,
                 },
-                body: JSON.stringify({ pr_number: nextPrNumber }),
+                body: JSON.stringify(payload),
             });
 
-            return { ok: updateResponse.ok };
+            const updatePayload = await updateResponse.json().catch(() => ({}));
+
+            return {
+                ok: updateResponse.ok,
+                step: 'update',
+                status: updateResponse.status,
+                body: updatePayload,
+            };
         },
         { findBy: identifier, nextPrNumber: updatedPrNumber },
     );
 
-    expect(updateResult.ok).toBeTruthy();
+    expect(updateResult, JSON.stringify(updateResult)).toMatchObject({ ok: true });
 
     await page.reload();
     await page

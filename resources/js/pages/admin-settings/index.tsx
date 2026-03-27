@@ -13,15 +13,16 @@ import {
 import { Separator } from '@/components/ui/separator';
 import AdminSettingsLayout from '@/layouts/admin-settings/layout';
 import AppLayout from '@/layouts/app-layout';
+import { useAuth } from '@/contexts/auth-context';
 import axiosInstance from '@/lib/axios';
 import { type BreadcrumbItem } from '@/types';
 import { setRegionalDateFormatSettings } from '@/utils/date-format';
 import { setRegionalNumberFormatSettings } from '@/utils/number-format';
 import { Transition } from '@headlessui/react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 interface SettingsData {
@@ -119,7 +120,11 @@ async function submitJsonAdminSettings(
 
 function GeneralSettings({
     settings,
-}: Readonly<{ settings: SettingsData['general'] }>) {
+    onSaved,
+}: Readonly<{
+    settings: SettingsData['general'];
+    onSaved?: () => Promise<void> | void;
+}>) {
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -132,14 +137,12 @@ function GeneralSettings({
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axiosInstance.post('/api/admin-settings', formData, {
+            await axiosInstance.put('/api/admin-settings', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
-                params: {
-                    _method: 'PUT', // Laravel needs _method=PUT for file uploads when using PUT
-                },
             });
+            await onSaved?.();
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
         } catch (error: unknown) {
@@ -807,6 +810,13 @@ interface AdminSettingsResponse {
 export default function AdminSettings() {
     const [searchParams] = useSearchParams();
     const currentGroup = searchParams.get('group') || 'general';
+    const queryClient = useQueryClient();
+    const { refreshAuth } = useAuth();
+
+    const handleGeneralSettingsSaved = useCallback(async () => {
+        await queryClient.invalidateQueries({ queryKey: ['admin-settings'] });
+        await refreshAuth();
+    }, [queryClient, refreshAuth]);
 
     const { data, isLoading, error } = useQuery<AdminSettingsResponse>({
         queryKey: ['admin-settings'],
@@ -851,7 +861,10 @@ export default function AdminSettings() {
 
             <AdminSettingsLayout currentGroup={currentGroup}>
                 {currentGroup === 'general' && (
-                    <GeneralSettings settings={data?.settings?.general} />
+                    <GeneralSettings
+                        settings={data?.settings?.general}
+                        onSaved={handleGeneralSettingsSaved}
+                    />
                 )}
                 {currentGroup === 'regional' && (
                     <RegionalSettings settings={data?.settings?.regional} />

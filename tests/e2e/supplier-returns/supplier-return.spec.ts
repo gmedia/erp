@@ -51,7 +51,7 @@ const config: ModuleTestConfig = {
     createEntity: createSupplierReturn,
     searchEntity: searchSupplierReturn,
     editEntity: editSupplierReturn,
-    editUpdates: { return_number: 'SR-E2E-UPDATED-001' },
+    editUpdates: { return_number: `SR-E2E-UPDATED-${Date.now()}` },
     expectedExportColumns: [
         'ID',
         'Return Number',
