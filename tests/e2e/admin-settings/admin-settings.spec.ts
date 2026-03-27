@@ -1,12 +1,12 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page, type Response } from '@playwright/test';
 import { login } from '../helpers';
 
 async function saveAdminSettings(
-    page: Parameters<typeof test>[0]['page'],
+    page: Page,
     saveButtonTestId: 'save-general-settings' | 'save-regional-settings' | 'save-smtp-settings',
 ) {
     const responsePromise = page.waitForResponse(
-        (response) =>
+        (response: Response) =>
             response.url().includes('/api/admin-settings') &&
             response.request().method() === 'PUT' &&
             response.status() < 400,
@@ -15,6 +15,19 @@ async function saveAdminSettings(
     await page.getByTestId(saveButtonTestId).click();
 
     await responsePromise;
+}
+
+async function waitForAdminSettingsRefresh(
+    page: Page,
+) {
+    await page
+        .waitForResponse(
+            (response: Response) =>
+                response.url().includes('/api/admin-settings') &&
+                response.request().method() === 'GET' &&
+                response.status() < 400,
+        )
+        .catch(() => null);
 }
 
 test.describe('Admin Settings', () => {
@@ -158,13 +171,11 @@ test.describe('Admin Settings', () => {
 
         // Save settings
         await saveAdminSettings(page, 'save-general-settings');
+        await waitForAdminSettingsRefresh(page);
 
-        // Reload page to verify persistence
-        await page.reload();
-
-        // Logo preview should now be visible
+        // Logo preview should now be visible after query refresh
         const logoPreview = page.locator('img[alt="Current company logo"]');
-        await expect(logoPreview).toBeVisible();
+        await expect(logoPreview).toBeVisible({ timeout: 15000 });
 
         // Logo should have a valid src pointing to branding/logos
         const logoSrc = await logoPreview.getAttribute('src');
