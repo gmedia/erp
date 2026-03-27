@@ -30,7 +30,8 @@ Apa yang ingin dilakukan?
 │
 ├── Refactor kode existing
 │   ├── Backend (Laravel)? ─────────→ refactor-backend
-│   └── Frontend (React)? ──────────→ refactor-frontend
+│   ├── Frontend (React)? ──────────→ refactor-frontend
+│   └── Berbasis temuan Sonar? ─────→ workflow refactor-sonar
 │
 ├── Database
 │   └── Migration, seeder? ─────────→ database-migration
@@ -49,6 +50,7 @@ Apa yang ingin dilakukan?
 | Dashboard, Settings | `feature-non-crud` |
 | Perbaiki arsitektur backend | `refactor-backend` |
 | Perbaiki struktur komponen | `refactor-frontend` |
+| Prioritas refactor dari SonarQube | `workflow refactor-sonar` |
 | Migration, seeder | `database-migration` |
 | Buat tests | `testing-strategy` |
 
