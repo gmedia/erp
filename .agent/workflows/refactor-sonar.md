@@ -4,38 +4,42 @@ description: Refactor plan berbasis data SonarQube MCP lintas modul
 
 # Workflow: Refactor Sonar-Driven
 
-## 1. Ambil Baseline SonarQube
+## Fokus Utama
+
+Workflow ini khusus untuk menurunkan duplikasi kode secara terukur tanpa merusak konsistensi antar modul.
+
+## 1. Ambil Baseline SonarQube (WAJIB)
 
 Gunakan MCP Sonar, bukan query manual.
 
 - Cari project key: `mcp_io_github_son_search_my_sonarqube_projects`
-- Ambil metrik utama: `mcp_io_github_son_get_component_measures`
-- Ambil issue prioritas: `mcp_io_github_son_search_sonar_issues_in_projects`
-- Ambil file coverage rendah: `mcp_io_github_son_search_files_by_coverage`
+- Ambil metrik proyek: `mcp_io_github_son_get_component_measures` (minimal: `duplicated_lines`, `duplicated_blocks`, `duplicated_lines_density`, `ncloc`, `coverage`)
+- Ambil daftar file duplikat: `mcp_io_github_son_search_duplicated_files`
+- (Opsional) Ambil issue kritikal: `mcp_io_github_son_search_sonar_issues_in_projects`
 
 ## 2. Mapping ke Modul Registry
 
 Petakan temuan ke modul berdasarkan slug pada `docs/module-registry.md`:
 
-- `app/Http/Controllers/Auth/*` -> `auth`
-- `app/Http/Controllers/Settings/*` -> `settings`
-- `app/Http/Controllers/*ItemController.php` -> modul transaksi terkait (`stock-transfers`, `stock-adjustments`, `inventory-stocktakes`)
-- `app/Actions/{Module}/...` atau `app/Http/Requests/{Module}/...` -> slug modul kebab-case
+- `app/Http/Requests/Reports/*` -> kelompok `reports` (tetap pecah ke slug report saat eksekusi)
+- `app/Http/Requests/{Module}/*` -> slug modul kebab-case
+- `app/Domain/{Module}/*FilterService.php` -> slug modul domain terkait
+- `app/Http/Controllers/*ItemController.php` -> modul transaksi induk (`stock-transfers`, `stock-adjustments`, `inventory-stocktakes`)
 
 ## 3. Kelompokkan Scope Refactor
 
 Prioritaskan urutan berikut:
 
-1. Security/reliability issue (HIGH/BLOCKER)
-2. File 0% coverage pada controller/action utama
-3. File coverage < 60% dengan branch logic kompleks
+1. Cluster dengan duplicated lines terbesar
+2. Cluster dengan duplicated line density tinggi (>= 70%)
+3. Cluster yang punya pola berulang lintas modul (kandidat template/base class)
 
 Batch per modul (jangan acak file lintas domain dalam 1 PR):
 
-- Batch A: `auth`, `settings`, `users`
-- Batch B: `asset-stocktakes`, `asset-depreciation-runs`
-- Batch C: `stock-transfers`, `stock-adjustments`, `stock-movements`
-- Batch D: `approval-flows`, `approval-delegations`, `entity-state-actions`
+- Batch A: `purchase-history-report`, `purchase-order-status-report`, `goods-receipt-report`, `stock-movement-report`, `stock-adjustment-report`, `inventory-valuation-report`, `inventory-stocktake-variance-report`
+- Batch B: `purchase-requests`, `purchase-orders`, `supplier-returns`, `goods-receipts`, `stock-adjustments`, `stock-movements`
+- Batch C: `assets`, `products`, `asset-maintenances`, `asset-movements`, `asset-stocktakes`, `stock-transfers`, `inventory-stocktakes`
+- Batch D: `financial-reporting` (internal service cluster seperti `FinancialReportService`)
 
 ## 4. Guard Konsistensi Antar Modul
 
@@ -47,14 +51,24 @@ Checklist wajib:
 - Assertion API pakai `assertJson*`/`assertOk`
 - Empty wrapper class tetap multiline + komentar intent
 - Hindari FQCN di body executable PHP
+- Untuk pattern yang sama (FilterService / FormRequest), gunakan shared abstraction yang seragam antar modul
+- Untuk refactor style agent guidance, update hanya di folder `.agent` (bukan `.claude`)
 
 ## 5. Eksekusi Refactor per Batch
 
 Untuk tiap batch:
 
-1. Refactor internal tanpa ubah API contract
-2. Tambah/rapikan Feature + Unit test modul tersebut
-3. Jalankan formatter/lint sesuai standar project
+1. Extract pola duplikasi menjadi base class/trait/helper reusable
+2. Terapkan pola yang sama ke seluruh modul dalam batch yang setara
+3. Refactor internal tanpa ubah API contract
+4. Tambah/rapikan Feature + Unit test modul tersebut
+5. Jalankan formatter/lint sesuai standar project
+
+Contoh target extraction:
+
+- `Index*Request` dan `Export*Request` report -> base request dengan daftar field override per modul
+- `*FilterService` dengan pola where/like/date-range -> composable filter map builder
+- Controller item transaksi (`*ItemController`) -> shared service untuk operasi item berulang
 
 ## 6. Verifikasi Wajib Setelah Perubahan
 
@@ -68,13 +82,13 @@ Gunakan Sail:
 Contoh:
 
 ```bash
-./vendor/bin/sail test --group stock-movements --group stock-adjustments --group stock-transfers
-./vendor/bin/sail npx playwright test tests/e2e/stock-movements/ tests/e2e/stock-adjustments/ tests/e2e/stock-transfers/
+./vendor/bin/sail test --group purchase-requests --group purchase-orders --group goods-receipts --group supplier-returns --group stock-adjustments --group stock-movements
+./vendor/bin/sail npx playwright test tests/e2e/purchase-requests/ tests/e2e/purchase-orders/ tests/e2e/goods-receipts/ tests/e2e/supplier-returns/ tests/e2e/stock-adjustments/ tests/e2e/stock-movements/
 ```
 
 ## 7. Exit Criteria
 
-- Tidak ada issue OPEN severity HIGH/BLOCKER pada batch yang dikerjakan
-- Coverage batch naik dan tidak menurunkan quality gate project
+- Metrik `duplicated_lines` dan `duplicated_blocks` turun pada batch yang dikerjakan
+- Metrik `duplicated_lines_density` project tidak naik setelah merge
 - Tidak ada perubahan route/payload API publik
 - Semua test batch (Pest + E2E) pass
