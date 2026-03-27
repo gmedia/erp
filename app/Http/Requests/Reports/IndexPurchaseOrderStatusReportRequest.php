@@ -11,28 +11,28 @@ class IndexPurchaseOrderStatusReportRequest extends AbstractReportRequest
         return array_merge(
             $this->searchRules(),
             [
-            'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
-            'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
-            'product_id' => ['nullable', 'integer', 'exists:products,id'],
-            'status' => [
-                'nullable',
-                'string',
-                Rule::in([
-                    'draft',
-                    'pending_approval',
-                    'confirmed',
-                    'rejected',
-                    'partially_received',
-                    'fully_received',
-                    'cancelled',
-                    'closed',
-                ]),
-            ],
-            'status_category' => [
-                'nullable',
-                'string',
-                Rule::in(['outstanding', 'partially_received', 'closed']),
-            ],
+                'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
+                'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
+                'product_id' => ['nullable', 'integer', 'exists:products,id'],
+                'status' => [
+                    'nullable',
+                    'string',
+                    Rule::in([
+                        'draft',
+                        'pending_approval',
+                        'confirmed',
+                        'rejected',
+                        'partially_received',
+                        'fully_received',
+                        'cancelled',
+                        'closed',
+                    ]),
+                ],
+                'status_category' => [
+                    'nullable',
+                    'string',
+                    Rule::in(['outstanding', 'partially_received', 'closed']),
+                ],
             ],
             $this->dateRangeRules(),
             $this->sortByEnumRules([

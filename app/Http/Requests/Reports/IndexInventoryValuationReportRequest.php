@@ -2,8 +2,6 @@
 
 namespace App\Http\Requests\Reports;
 
-use Illuminate\Validation\Rule;
-
 class IndexInventoryValuationReportRequest extends AbstractReportRequest
 {
     public function rules(): array
@@ -11,10 +9,10 @@ class IndexInventoryValuationReportRequest extends AbstractReportRequest
         return array_merge(
             $this->searchRules(),
             [
-            'product_id' => ['nullable', 'integer', 'exists:products,id'],
-            'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
-            'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
-            'category_id' => ['nullable', 'integer', 'exists:product_categories,id'],
+                'product_id' => ['nullable', 'integer', 'exists:products,id'],
+                'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
+                'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
+                'category_id' => ['nullable', 'integer', 'exists:product_categories,id'],
             ],
             $this->sortByEnumRules([
                 'product_name',

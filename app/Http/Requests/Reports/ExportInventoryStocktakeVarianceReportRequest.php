@@ -11,12 +11,12 @@ class ExportInventoryStocktakeVarianceReportRequest extends AbstractReportReques
         return array_merge(
             $this->searchRules(),
             [
-            'inventory_stocktake_id' => ['nullable', 'integer', 'exists:inventory_stocktakes,id'],
-            'product_id' => ['nullable', 'integer', 'exists:products,id'],
-            'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
-            'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
-            'category_id' => ['nullable', 'integer', 'exists:product_categories,id'],
-            'result' => ['nullable', 'string', Rule::in(['surplus', 'deficit'])],
+                'inventory_stocktake_id' => ['nullable', 'integer', 'exists:inventory_stocktakes,id'],
+                'product_id' => ['nullable', 'integer', 'exists:products,id'],
+                'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
+                'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
+                'category_id' => ['nullable', 'integer', 'exists:product_categories,id'],
+                'result' => ['nullable', 'string', Rule::in(['surplus', 'deficit'])],
             ],
             $this->dateRangeRules(),
             $this->sortByEnumRules([

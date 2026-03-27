@@ -9,9 +9,9 @@ class ExportBookValueDepreciationRequest extends AbstractReportRequest
         return array_merge(
             $this->searchRules(),
             [
-            'asset_category_id' => ['nullable', 'integer', 'exists:asset_categories,id'],
-            'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
-            'sort_by' => ['nullable', 'string'],
+                'asset_category_id' => ['nullable', 'integer', 'exists:asset_categories,id'],
+                'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
+                'sort_by' => ['nullable', 'string'],
             ],
             $this->sortDirectionRules(),
         );
