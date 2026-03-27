@@ -12,16 +12,18 @@ class AssetMovementResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $asset = $this->asset;
+
         return [
             'id' => $this->id,
             'asset_id' => $this->asset_id,
-            'asset' => [
-                'id' => $this->asset_id,
-                'name' => $this->asset->name,
-                'asset_code' => $this->asset->asset_code,
-            ],
+            'asset' => $asset ? [
+                'id' => $asset->id,
+                'name' => $asset->name,
+                'asset_code' => $asset->asset_code,
+            ] : null,
             'movement_type' => $this->movement_type,
-            'moved_at' => $this->moved_at->toIso8601String(),
+            'moved_at' => $this->moved_at?->toIso8601String(),
             'from_branch_id' => $this->from_branch_id,
             'to_branch_id' => $this->to_branch_id,
             'from_location_id' => $this->from_location_id,

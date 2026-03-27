@@ -36,3 +36,17 @@ test('it transforms the resource correctly', function () {
     expect($dataLoaded)->toHaveKey('asset');
     expect($dataLoaded['asset'])->toHaveKey('id', $asset->id);
 });
+
+test('it handles missing asset relation gracefully', function () {
+    $assetMovement = AssetMovement::factory()->make([
+        'asset_id' => 999999,
+        'reference' => 'REF-MISSING-ASSET',
+    ]);
+    $assetMovement->setRelation('asset', null);
+
+    $resource = new AssetMovementResource($assetMovement);
+    $data = $resource->resolve();
+
+    expect($data['asset'])->toBeNull();
+    expect($data)->toHaveKey('reference', 'REF-MISSING-ASSET');
+});

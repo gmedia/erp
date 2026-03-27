@@ -8,7 +8,7 @@ async function saveAdminSettings(
     const responsePromise = page.waitForResponse(
         (response: Response) =>
             response.url().includes('/api/admin-settings') &&
-            response.request().method() === 'PUT' &&
+            ['POST', 'PUT'].includes(response.request().method()) &&
             response.status() < 400,
     );
 

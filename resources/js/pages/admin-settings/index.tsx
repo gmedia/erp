@@ -137,11 +137,25 @@ function GeneralSettings({
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axiosInstance.put('/api/admin-settings', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const logoInput = e.currentTarget.elements.namedItem(
+                'company_logo',
+            );
+            const payload = Object.fromEntries(formData.entries()) as Record<
+                string,
+                FormDataEntryValue
+            >;
+
+            delete payload.company_logo;
+
+            if (
+                logoInput instanceof HTMLInputElement &&
+                logoInput.files?.[0]
+            ) {
+                payload.company_logo_svg = await logoInput.files[0].text();
+            }
+
+            await axiosInstance.post('/api/admin-settings', payload);
+
             await onSaved?.();
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
@@ -815,6 +829,10 @@ export default function AdminSettings() {
 
     const handleGeneralSettingsSaved = useCallback(async () => {
         await queryClient.invalidateQueries({ queryKey: ['admin-settings'] });
+        await queryClient.refetchQueries({
+            queryKey: ['admin-settings'],
+            type: 'active',
+        });
         await refreshAuth();
     }, [queryClient, refreshAuth]);
 
