@@ -137,9 +137,8 @@ function GeneralSettings({
 
         try {
             const formData = new FormData(e.currentTarget);
-            const logoInput = e.currentTarget.elements.namedItem(
-                'company_logo',
-            );
+            const logoInput =
+                e.currentTarget.elements.namedItem('company_logo');
             const payload = Object.fromEntries(formData.entries()) as Record<
                 string,
                 FormDataEntryValue
@@ -147,10 +146,7 @@ function GeneralSettings({
 
             delete payload.company_logo;
 
-            if (
-                logoInput instanceof HTMLInputElement &&
-                logoInput.files?.[0]
-            ) {
+            if (logoInput instanceof HTMLInputElement && logoInput.files?.[0]) {
                 payload.company_logo_svg = await logoInput.files[0].text();
             }
 
