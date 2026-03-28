@@ -66,7 +66,7 @@ trait BaseFilterService
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
      * @param  array<string, mixed>  $filters
-     * @param  array<string, string>  $fieldMap Request key => column name
+     * @param  array<string, string>  $fieldMap  Request key => column name
      */
     public function applyExactFilters(Builder $query, array $filters, array $fieldMap): void
     {
@@ -84,7 +84,7 @@ trait BaseFilterService
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
      * @param  array<string, mixed>  $filters
-     * @param  array<string, array{from: string, to: string}>  $dateRanges Column => keys
+     * @param  array<string, array{from: string, to: string}>  $dateRanges  Column => keys
      */
     public function applyDateRanges(Builder $query, array $filters, array $dateRanges): void
     {
@@ -106,7 +106,7 @@ trait BaseFilterService
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
      * @param  array<string, mixed>  $filters
-     * @param  array<string, array{min: string, max: string}>  $numericRanges Column => keys
+     * @param  array<string, array{min: string, max: string}>  $numericRanges  Column => keys
      */
     public function applyNumericRanges(Builder $query, array $filters, array $numericRanges): void
     {
