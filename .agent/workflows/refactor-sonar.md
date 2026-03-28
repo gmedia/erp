@@ -36,10 +36,11 @@ Prioritaskan urutan berikut:
 
 Batch per modul (jangan acak file lintas domain dalam 1 PR):
 
-- Batch A: `purchase-history-report`, `purchase-order-status-report`, `goods-receipt-report`, `stock-movement-report`, `stock-adjustment-report`, `inventory-valuation-report`, `inventory-stocktake-variance-report`
-- Batch B: `purchase-requests`, `purchase-orders`, `supplier-returns`, `goods-receipts`, `stock-adjustments`, `stock-movements`
-- Batch C: `assets`, `products`, `asset-maintenances`, `asset-movements`, `asset-stocktakes`, `stock-transfers`, `inventory-stocktakes`
-- Batch D: `financial-reporting` (internal service cluster seperti `FinancialReportService`)
+- Batch A (done): `purchase-history-report`, `purchase-order-status-report`, `goods-receipt-report`, `stock-movement-report`, `stock-adjustment-report`, `inventory-valuation-report`, `inventory-stocktake-variance-report`
+- Batch B (done): `purchase-requests`, `purchase-orders`, `supplier-returns`, `goods-receipts`, `stock-adjustments`, `stock-movements`, `stock-transfers`, `inventory-stocktakes`
+- Batch C (next): `assets`, `products`, `asset-movements`, `asset-maintenances`, `asset-stocktakes` (prioritas `AssetFilterService`, `ProductFilterService`, item controllers)
+- Batch D (next): `financial-reporting` (`FinancialReportService` dan query/mapping laporan keuangan)
+- Batch E (next): `account-mappings`, `journal-entries`, `goods-receipts`, `purchase-requests` (pasangan `Store*Request`/`Update*Request` yang masih duplikatif)
 
 ## 4. Guard Konsistensi Antar Modul
 
@@ -79,11 +80,22 @@ Gunakan Sail:
 ./vendor/bin/sail npx playwright test tests/e2e/{modul-names}/
 ```
 
+Catatan environment (penting):
+
+- Jika `./vendor/bin/sail test --group ...` membaca argumen sebagai file test, jalankan fallback setara:
+
+```bash
+./vendor/bin/sail artisan test --group={modul-1} --group={modul-2}
+```
+
 Contoh:
 
 ```bash
 ./vendor/bin/sail test --group purchase-requests --group purchase-orders --group goods-receipts --group supplier-returns --group stock-adjustments --group stock-movements
 ./vendor/bin/sail npx playwright test tests/e2e/purchase-requests/ tests/e2e/purchase-orders/ tests/e2e/goods-receipts/ tests/e2e/supplier-returns/ tests/e2e/stock-adjustments/ tests/e2e/stock-movements/
+
+# fallback bila parser group gagal
+./vendor/bin/sail artisan test --group=purchase-requests --group=purchase-orders --group=goods-receipts --group=supplier-returns --group=stock-adjustments --group=stock-movements
 ```
 
 ## 7. Exit Criteria
