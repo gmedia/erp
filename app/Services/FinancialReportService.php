@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\AccountMapping;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class FinancialReportService
@@ -30,19 +31,7 @@ class FinancialReportService
             return [];
         }
 
-        $accounts = Account::where('coa_version_id', $coaVersion->id)
-            ->withSum(['journalLines as total_debit' => function ($query) use ($fiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)
-                        ->where('status', 'posted');
-                });
-            }], 'debit')
-            ->withSum(['journalLines as total_credit' => function ($query) use ($fiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)
-                        ->where('status', 'posted');
-                });
-            }], 'credit')
+        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId)
             ->orderBy('code')
             ->get();
 
@@ -54,24 +43,11 @@ class FinancialReportService
             // OR we show both Total Debit and Total Credit columns.
             // Often Trial Balance shows Ending Debit OR Ending Credit.
 
-            $netDebit = 0;
-            $netCredit = 0;
-
-            if ($account->normal_balance === 'debit') {
-                $balance = $debit - $credit;
-                if ($balance >= 0) {
-                    $netDebit = $balance;
-                } else {
-                    $netCredit = abs($balance);
-                }
-            } else {
-                $balance = $credit - $debit;
-                if ($balance >= 0) {
-                    $netCredit = $balance;
-                } else {
-                    $netDebit = abs($balance);
-                }
-            }
+            ['debit' => $netDebit, 'credit' => $netCredit] = $this->splitNetByNormalBalance(
+                $account->normal_balance,
+                $debit,
+                $credit
+            );
 
             return [
                 'id' => $account->id,
@@ -100,20 +76,8 @@ class FinancialReportService
             return [];
         }
 
-        $accounts = Account::where('coa_version_id', $coaVersion->id)
+        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId)
             ->where('is_cash_flow', true)
-            ->withSum(['journalLines as total_debit' => function ($query) use ($fiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)
-                        ->where('status', 'posted');
-                });
-            }], 'debit')
-            ->withSum(['journalLines as total_credit' => function ($query) use ($fiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)
-                        ->where('status', 'posted');
-                });
-            }], 'credit')
             ->orderBy('code')
             ->get();
 
@@ -121,24 +85,11 @@ class FinancialReportService
             $debit = $account->total_debit ?? 0;
             $credit = $account->total_credit ?? 0;
 
-            $netDebit = 0;
-            $netCredit = 0;
-
-            if ($account->normal_balance === 'debit') {
-                $balance = $debit - $credit;
-                if ($balance >= 0) {
-                    $netDebit = $balance;
-                } else {
-                    $netCredit = abs($balance);
-                }
-            } else {
-                $balance = $credit - $debit;
-                if ($balance >= 0) {
-                    $netCredit = $balance;
-                } else {
-                    $netDebit = abs($balance);
-                }
-            }
+            ['debit' => $netDebit, 'credit' => $netCredit] = $this->splitNetByNormalBalance(
+                $account->normal_balance,
+                $debit,
+                $credit
+            );
 
             return [
                 'id' => $account->id,
@@ -193,18 +144,8 @@ class FinancialReportService
         // and map previous years data to it IF possible (via mapping or just same code).
         // Design doc says: "Sistem akan mencoba mencocokkan akun berdasarkan kolom code."
 
-        $accounts = Account::where('coa_version_id', $coaVersion->id)
+        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId)
             ->whereIn('type', ['asset', 'liability', 'equity'])
-            ->withSum(['journalLines as total_debit' => function ($query) use ($fiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
-                });
-            }], 'debit')
-            ->withSum(['journalLines as total_credit' => function ($query) use ($fiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
-                });
-            }], 'credit')
             ->orderBy('code')
             ->get();
 
@@ -328,18 +269,8 @@ class FinancialReportService
                 : null;
         }
 
-        $accounts = Account::where('coa_version_id', $coaVersion->id)
+        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId)
             ->whereIn('type', ['revenue', 'expense'])
-            ->withSum(['journalLines as total_debit' => function ($query) use ($fiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
-                });
-            }], 'debit')
-            ->withSum(['journalLines as total_credit' => function ($query) use ($fiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
-                });
-            }], 'credit')
             ->orderBy('code')
             ->get();
 
@@ -438,17 +369,7 @@ class FinancialReportService
             ];
         }
 
-        $accounts = Account::where('coa_version_id', $coaVersion->id)
-            ->withSum(['journalLines as total_debit' => function ($query) use ($fiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
-                });
-            }], 'debit')
-            ->withSum(['journalLines as total_credit' => function ($query) use ($fiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
-                });
-            }], 'credit')
+        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId)
             ->orderBy('code')
             ->get();
 
@@ -552,18 +473,8 @@ class FinancialReportService
 
     private function calculateNetIncome(int $fiscalYearId, int $coaVersionId): float
     {
-        $accounts = Account::where('coa_version_id', $coaVersionId)
+        $accounts = $this->accountsWithPostedSums($coaVersionId, $fiscalYearId)
             ->whereIn('type', ['revenue', 'expense'])
-            ->withSum(['journalLines as total_debit' => function ($query) use ($fiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
-                });
-            }], 'debit')
-            ->withSum(['journalLines as total_credit' => function ($query) use ($fiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
-                    $q->where('fiscal_year_id', $fiscalYearId)->where('status', 'posted');
-                });
-            }], 'credit')
             ->get();
 
         $revenue = 0;
@@ -613,18 +524,8 @@ class FinancialReportService
         $currentIds = $currentAccounts->pluck('id')->all();
         $codes = $currentAccounts->pluck('code')->unique()->values()->all();
 
-        $comparisonByCode = Account::where('coa_version_id', $comparisonCoaVersion->id)
+        $comparisonByCode = $this->accountsWithPostedSums($comparisonCoaVersion->id, $comparisonFiscalYearId)
             ->whereIn('code', $codes)
-            ->withSum(['journalLines as total_debit' => function ($query) use ($comparisonFiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
-                    $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
-                });
-            }], 'debit')
-            ->withSum(['journalLines as total_credit' => function ($query) use ($comparisonFiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
-                    $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
-                });
-            }], 'credit')
             ->get()
             ->keyBy('code');
 
@@ -650,18 +551,8 @@ class FinancialReportService
         }
 
         $sourceIds = $mappings->pluck('source_account_id')->unique()->values()->all();
-        $sourceAccounts = Account::where('coa_version_id', $comparisonCoaVersion->id)
+        $sourceAccounts = $this->accountsWithPostedSums($comparisonCoaVersion->id, $comparisonFiscalYearId)
             ->whereIn('id', $sourceIds)
-            ->withSum(['journalLines as total_debit' => function ($query) use ($comparisonFiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
-                    $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
-                });
-            }], 'debit')
-            ->withSum(['journalLines as total_credit' => function ($query) use ($comparisonFiscalYearId) {
-                $query->whereHas('journalEntry', function ($q) use ($comparisonFiscalYearId) {
-                    $q->where('fiscal_year_id', $comparisonFiscalYearId)->where('status', 'posted');
-                });
-            }], 'credit')
             ->get();
 
         $sourceBalanceById = [];
@@ -745,6 +636,41 @@ class FinancialReportService
         }
 
         return $chain;
+    }
+
+    private function accountsWithPostedSums(int $coaVersionId, int $fiscalYearId): Builder
+    {
+        return Account::where('coa_version_id', $coaVersionId)
+            ->withSum(['journalLines as total_debit' => function ($query) use ($fiscalYearId) {
+                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
+                    $q->where('fiscal_year_id', $fiscalYearId)
+                        ->where('status', 'posted');
+                });
+            }], 'debit')
+            ->withSum(['journalLines as total_credit' => function ($query) use ($fiscalYearId) {
+                $query->whereHas('journalEntry', function ($q) use ($fiscalYearId) {
+                    $q->where('fiscal_year_id', $fiscalYearId)
+                        ->where('status', 'posted');
+                });
+            }], 'credit');
+    }
+
+    /**
+     * @return array{debit: float, credit: float}
+     */
+    private function splitNetByNormalBalance(string $normalBalance, float|int $debit, float|int $credit): array
+    {
+        $balance = $this->computeAccountBalance($normalBalance, $debit, $credit);
+
+        if ($normalBalance === 'debit') {
+            return $balance >= 0
+                ? ['debit' => $balance, 'credit' => 0]
+                : ['debit' => 0, 'credit' => abs($balance)];
+        }
+
+        return $balance >= 0
+            ? ['debit' => 0, 'credit' => $balance]
+            : ['debit' => abs($balance), 'credit' => 0];
     }
 
     private function buildTree(array $elements, $parentId = null): array
