@@ -45,6 +45,37 @@ trait BaseFilterService
     }
 
     /**
+     * Apply search with alias fields that target relation columns.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<int, string>  $searchFields
+     * @param  array<string, array{relation: string, column: string}>  $relationFieldAliases
+     */
+    public function applySearchWithRelationAliases(
+        Builder $query,
+        string $search,
+        array $searchFields,
+        array $relationFieldAliases
+    ): void {
+        $query->where(function ($q) use ($search, $searchFields, $relationFieldAliases) {
+            foreach ($searchFields as $field) {
+                if (isset($relationFieldAliases[$field])) {
+                    $alias = $relationFieldAliases[$field];
+                    $q->orWhereHas($alias['relation'], function ($relationQuery) use ($search, $alias) {
+                        $relationQuery->where($alias['column'], 'like', "%{$search}%");
+                    });
+
+                    continue;
+                }
+
+                $q->orWhere($field, 'like', "%{$search}%");
+            }
+        });
+    }
+
+    /**
      * Apply sorting to query with validation against allowed columns.
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
