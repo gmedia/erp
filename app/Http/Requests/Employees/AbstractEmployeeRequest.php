@@ -36,7 +36,7 @@ abstract class AbstractEmployeeRequest extends FormRequest
     }
 
     /**
-     * @param array<int, string|Rule> $rules
+     * @param  array<int, string|Rule>  $rules
      * @return array<int, string|Rule>
      */
     private function withSometimes(array $rules): array
