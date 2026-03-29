@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\PurchaseRequests;
 
+use App\Http\Requests\Concerns\HasSometimesArrayRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 abstract class AbstractPurchaseRequestRequest extends FormRequest
 {
+    use HasSometimesArrayRules;
+
     public function authorize(): bool
     {
         return true;
@@ -57,34 +60,4 @@ abstract class AbstractPurchaseRequestRequest extends FormRequest
     abstract protected function prNumberUniqueRule(): string|object;
 
     abstract protected function usesSometimes(): bool;
-
-    /**
-     * @param  array<int, string|object>  $rules
-     * @return array<int, string|object>
-     */
-    private function withSometimes(array $rules): array
-    {
-        if (! $this->usesSometimes()) {
-            return $rules;
-        }
-
-        return ['sometimes', ...$rules];
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function itemsRules(): array
-    {
-        if (! $this->usesSometimes()) {
-            return ['required', 'array', 'min:1'];
-        }
-
-        return ['sometimes', 'array', 'min:1'];
-    }
-
-    private function itemRequiredRule(): string
-    {
-        return $this->usesSometimes() ? 'required_with:items' : 'required';
-    }
 }
