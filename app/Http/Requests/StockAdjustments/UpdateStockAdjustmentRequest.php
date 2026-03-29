@@ -2,5 +2,4 @@
 
 namespace App\Http\Requests\StockAdjustments;
 
-class UpdateStockAdjustmentRequest extends AbstractStockAdjustmentRequest
-{}
+class UpdateStockAdjustmentRequest extends AbstractStockAdjustmentRequest {}

@@ -45,7 +45,7 @@ abstract class AbstractStockAdjustmentRequest extends FormRequest
     }
 
     /**
-     * @param array<int, string> $rules
+     * @param  array<int, string>  $rules
      * @return array<int, string>
      */
     private function withSometimes(array $rules): array
