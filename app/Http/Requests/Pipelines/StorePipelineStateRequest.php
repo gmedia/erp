@@ -2,45 +2,14 @@
 
 namespace App\Http\Requests\Pipelines;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StorePipelineStateRequest extends FormRequest
+class StorePipelineStateRequest extends AbstractPipelineStateRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
-    public function rules(): array
+    protected function codeUniqueRule(): object
     {
         $pipeline = $this->route('pipeline');
 
-        return [
-            'code' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('pipeline_states')->where(
-                    'pipeline_id',
-                    $pipeline->id,
-                ),
-            ],
-            'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'in:initial,intermediate,final'],
-            'color' => ['nullable', 'string', 'max:7'],
-            'icon' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'sort_order' => ['integer'],
-            'metadata' => ['nullable', 'array'],
-        ];
+        return Rule::unique('pipeline_states')->where('pipeline_id', $pipeline->id);
     }
 }
