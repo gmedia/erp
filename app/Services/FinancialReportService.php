@@ -35,36 +35,16 @@ class FinancialReportService
             ->orderBy('code')
             ->get();
 
-        $report = $accounts->map(function ($account) {
-            $debit = $account->total_debit ?? 0;
-            $credit = $account->total_credit ?? 0;
-
-            // For Trial Balance, we usually show net Debit or net Credit based on normal balance ??
-            // OR we show both Total Debit and Total Credit columns.
-            // Often Trial Balance shows Ending Debit OR Ending Credit.
-
-            ['debit' => $netDebit, 'credit' => $netCredit] = $this->splitNetByNormalBalance(
-                $account->normal_balance,
-                $debit,
-                $credit
-            );
-
-            return [
-                'id' => $account->id,
-                'code' => $account->code,
-                'name' => $account->name,
-                'type' => $account->type,
-                'normal_balance' => $account->normal_balance,
-                'level' => $account->level,
-                'parent_id' => $account->parent_id,
-                'debit' => $netDebit, // Net Movement
-                'credit' => $netCredit, // Net Movement
-                'raw_debit' => $debit, // Total Debits in period
-                'raw_credit' => $credit, // Total Credits in period
-            ];
-        })->values(); // Remove filter to show all accounts
-
-        return $report->toArray();
+        return $this->mapAccountsWithNetMovement(
+            $accounts,
+            fn (Account $account, float $debit, float $credit, float $netDebit, float $netCredit) => [
+                ...$this->baseAccountPayload($account),
+                'debit' => $netDebit,
+                'credit' => $netCredit,
+                'raw_debit' => $debit,
+                'raw_credit' => $credit,
+            ]
+        );
     }
 
     public function getCashFlow(int $fiscalYearId): array
@@ -81,30 +61,14 @@ class FinancialReportService
             ->orderBy('code')
             ->get();
 
-        $report = $accounts->map(function ($account) {
-            $debit = $account->total_debit ?? 0;
-            $credit = $account->total_credit ?? 0;
-
-            ['debit' => $netDebit, 'credit' => $netCredit] = $this->splitNetByNormalBalance(
-                $account->normal_balance,
-                $debit,
-                $credit
-            );
-
-            return [
-                'id' => $account->id,
-                'code' => $account->code,
-                'name' => $account->name,
-                'type' => $account->type,
-                'normal_balance' => $account->normal_balance,
-                'level' => $account->level,
-                'parent_id' => $account->parent_id,
+        return $this->mapAccountsWithNetMovement(
+            $accounts,
+            fn (Account $account, float $debit, float $credit, float $netDebit, float $netCredit) => [
+                ...$this->baseAccountPayload($account),
                 'inflow' => $netCredit,
                 'outflow' => $netDebit,
-            ];
-        })->values();
-
-        return $report->toArray();
+            ]
+        );
     }
 
     /**
@@ -124,17 +88,9 @@ class FinancialReportService
 
         // 2. Calculate Net Income for Comparison Year (if exists)
         $comparisonNetIncome = 0;
-        $comparisonCoaVersion = null;
-        if ($comparisonFiscalYearId) {
-            $comparisonFiscalYear = FiscalYear::find($comparisonFiscalYearId);
-            // Ideally we should find the COA version used in that year.
-            // Simplification: Assume logic allows finding it.
-            $comparisonCoaVersion = $comparisonFiscalYear
-                ? $this->resolveCoaVersionForFiscalYear($comparisonFiscalYear)
-                : null;
-            if ($comparisonCoaVersion) {
-                $comparisonNetIncome = $this->calculateNetIncome($comparisonFiscalYearId, $comparisonCoaVersion->id);
-            }
+        $comparisonCoaVersion = $this->resolveComparisonCoaVersion($comparisonFiscalYearId);
+        if ($comparisonFiscalYearId && $comparisonCoaVersion) {
+            $comparisonNetIncome = $this->calculateNetIncome($comparisonFiscalYearId, $comparisonCoaVersion->id);
         }
 
         // 3. Get Asset, Liability, Equity Accounts
@@ -154,69 +110,25 @@ class FinancialReportService
         // Let's use separate aliases if possible, OR just separate query.
         // Eloquent `withSum` uses subqueries, so we can add more `withSum` for comparison.
 
-        $comparisonBalanceByCurrentAccountId = [];
-        if ($comparisonFiscalYearId && $comparisonCoaVersion) {
-            $comparisonBalanceByCurrentAccountId = $this->buildComparisonBalanceMap(
-                $accounts,
-                $comparisonFiscalYearId,
-                $comparisonCoaVersion
-            );
-        }
+        $comparisonBalanceByCurrentAccountId = $this->resolveComparisonBalanceMap(
+            $accounts,
+            $comparisonFiscalYearId,
+            $comparisonCoaVersion
+        );
 
-        $assets = [];
-        $liabilities = [];
-        $equity = [];
-
-        // Track totals
-        $totals = [
-            'assets' => 0,
-            'liabilities' => 0,
-            'equity' => 0,
-            'comparison_assets' => 0,
-            'comparison_liabilities' => 0,
-            'comparison_equity' => 0,
-        ];
-
-        foreach ($accounts as $account) {
-            $debit = $account->total_debit ?? 0;
-            $credit = $account->total_credit ?? 0;
-
-            $balance = ($account->normal_balance === 'debit') ? ($debit - $credit) : ($credit - $debit);
-
-            // Get Comparison Balance
-            $compBalance = 0;
-            if ($comparisonFiscalYearId) {
-                $compBalance = $comparisonBalanceByCurrentAccountId[$account->id] ?? 0;
-            }
-
-            $item = [
-                'id' => $account->id,
-                'code' => $account->code,
-                'name' => $account->name,
-                'level' => $account->level,
-                'parent_id' => $account->parent_id,
-                'balance' => $balance,
-                'comparison_balance' => $compBalance,
-                'sub_type' => $account->sub_type,
-            ];
-
-            if ($account->type === 'asset') {
-                $assets[] = $item;
-                $totals['assets'] += $balance;
-                $totals['comparison_assets'] += $compBalance;
-            } elseif ($account->type === 'liability') {
-                $liabilities[] = $item;
-                $totals['liabilities'] += $balance;
-                $totals['comparison_liabilities'] += $compBalance;
-            } elseif ($account->type === 'equity') {
-                $equity[] = $item;
-                $totals['equity'] += $balance;
-                $totals['comparison_equity'] += $compBalance;
-            }
-        }
+        ['buckets' => $buckets, 'totals' => $totals] = $this->collectAccountBuckets(
+            $accounts,
+            $comparisonFiscalYearId,
+            $comparisonBalanceByCurrentAccountId,
+            [
+                'asset' => ['bucket' => 'assets', 'total' => 'assets'],
+                'liability' => ['bucket' => 'liabilities', 'total' => 'liabilities'],
+                'equity' => ['bucket' => 'equity', 'total' => 'equity'],
+            ]
+        );
 
         // Add Current Year Earnings to Equity
-        $equity[] = [
+        $buckets['equity'][] = [
             'id' => 'current_year_earnings',
             'code' => '9999-CYE',
             'name' => 'Current Year Earnings',
@@ -229,25 +141,12 @@ class FinancialReportService
         $totals['equity'] += $netIncome;
         $totals['comparison_equity'] += $comparisonNetIncome;
 
-        $totals['change_assets'] = $totals['assets'] - $totals['comparison_assets'];
-        $totals['change_percentage_assets'] = $totals['comparison_assets'] != 0
-            ? ($totals['change_assets'] / abs($totals['comparison_assets'])) * 100
-            : 0;
-
-        $totals['change_liabilities'] = $totals['liabilities'] - $totals['comparison_liabilities'];
-        $totals['change_percentage_liabilities'] = $totals['comparison_liabilities'] != 0
-            ? ($totals['change_liabilities'] / abs($totals['comparison_liabilities'])) * 100
-            : 0;
-
-        $totals['change_equity'] = $totals['equity'] - $totals['comparison_equity'];
-        $totals['change_percentage_equity'] = $totals['comparison_equity'] != 0
-            ? ($totals['change_equity'] / abs($totals['comparison_equity'])) * 100
-            : 0;
+        $this->appendChangeMetrics($totals, ['assets', 'liabilities', 'equity']);
 
         return [
-            'assets' => $this->buildTree($assets),
-            'liabilities' => $this->buildTree($liabilities),
-            'equity' => $this->buildTree($equity),
+            'assets' => $this->buildTree($buckets['assets']),
+            'liabilities' => $this->buildTree($buckets['liabilities']),
+            'equity' => $this->buildTree($buckets['equity']),
             'totals' => $totals,
         ];
     }
@@ -261,94 +160,37 @@ class FinancialReportService
             return [];
         }
 
-        $comparisonCoaVersion = null;
-        if ($comparisonFiscalYearId) {
-            $comparisonFiscalYear = FiscalYear::find($comparisonFiscalYearId);
-            $comparisonCoaVersion = $comparisonFiscalYear
-                ? $this->resolveCoaVersionForFiscalYear($comparisonFiscalYear)
-                : null;
-        }
+        $comparisonCoaVersion = $this->resolveComparisonCoaVersion($comparisonFiscalYearId);
 
         $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId)
             ->whereIn('type', ['revenue', 'expense'])
             ->orderBy('code')
             ->get();
 
-        $comparisonBalanceByCurrentAccountId = [];
-        if ($comparisonFiscalYearId && $comparisonCoaVersion) {
-            $comparisonBalanceByCurrentAccountId = $this->buildComparisonBalanceMap(
-                $accounts,
-                $comparisonFiscalYearId,
-                $comparisonCoaVersion
-            );
-        }
+        $comparisonBalanceByCurrentAccountId = $this->resolveComparisonBalanceMap(
+            $accounts,
+            $comparisonFiscalYearId,
+            $comparisonCoaVersion
+        );
 
-        $revenues = [];
-        $expenses = [];
-
-        $totals = [
-            'revenue' => 0,
-            'expense' => 0,
-            'net_income' => 0,
-            'comparison_revenue' => 0,
-            'comparison_expense' => 0,
-            'comparison_net_income' => 0,
-        ];
-
-        foreach ($accounts as $account) {
-            $debit = $account->total_debit ?? 0;
-            $credit = $account->total_credit ?? 0;
-
-            $balance = ($account->normal_balance === 'debit') ? ($debit - $credit) : ($credit - $debit);
-
-            $compBalance = 0;
-            if ($comparisonFiscalYearId) {
-                $compBalance = $comparisonBalanceByCurrentAccountId[$account->id] ?? 0;
-            }
-
-            $item = [
-                'id' => $account->id,
-                'code' => $account->code,
-                'name' => $account->name,
-                'level' => $account->level,
-                'parent_id' => $account->parent_id,
-                'balance' => $balance,
-                'comparison_balance' => $compBalance,
-                'sub_type' => $account->sub_type,
-            ];
-
-            if ($account->type === 'revenue') {
-                $revenues[] = $item;
-                $totals['revenue'] += $balance;
-                $totals['comparison_revenue'] += $compBalance;
-            } else {
-                $expenses[] = $item;
-                $totals['expense'] += $balance;
-                $totals['comparison_expense'] += $compBalance;
-            }
-        }
+        ['buckets' => $buckets, 'totals' => $totals] = $this->collectAccountBuckets(
+            $accounts,
+            $comparisonFiscalYearId,
+            $comparisonBalanceByCurrentAccountId,
+            [
+                'revenue' => ['bucket' => 'revenues', 'total' => 'revenue'],
+                'expense' => ['bucket' => 'expenses', 'total' => 'expense'],
+            ]
+        );
 
         $totals['net_income'] = $totals['revenue'] - $totals['expense'];
         $totals['comparison_net_income'] = $totals['comparison_revenue'] - $totals['comparison_expense'];
 
-        $totals['change_revenue'] = $totals['revenue'] - $totals['comparison_revenue'];
-        $totals['change_percentage_revenue'] = $totals['comparison_revenue'] != 0
-            ? ($totals['change_revenue'] / abs($totals['comparison_revenue'])) * 100
-            : 0;
-
-        $totals['change_expense'] = $totals['expense'] - $totals['comparison_expense'];
-        $totals['change_percentage_expense'] = $totals['comparison_expense'] != 0
-            ? ($totals['change_expense'] / abs($totals['comparison_expense'])) * 100
-            : 0;
-
-        $totals['change_net_income'] = $totals['net_income'] - $totals['comparison_net_income'];
-        $totals['change_percentage_net_income'] = $totals['comparison_net_income'] != 0
-            ? ($totals['change_net_income'] / abs($totals['comparison_net_income'])) * 100
-            : 0;
+        $this->appendChangeMetrics($totals, ['revenue', 'expense', 'net_income']);
 
         return [
-            'revenues' => $this->buildTree($revenues),
-            'expenses' => $this->buildTree($expenses),
+            'revenues' => $this->buildTree($buckets['revenues']),
+            'expenses' => $this->buildTree($buckets['expenses']),
             'totals' => $totals,
         ];
     }
@@ -373,100 +215,35 @@ class FinancialReportService
             ->orderBy('code')
             ->get();
 
-        $comparisonCoaVersion = null;
-        if ($comparisonFiscalYearId) {
-            $comparisonFiscalYear = FiscalYear::find($comparisonFiscalYearId);
-            $comparisonCoaVersion = $comparisonFiscalYear
-                ? $this->resolveCoaVersionForFiscalYear($comparisonFiscalYear)
-                : null;
-        }
+        $comparisonCoaVersion = $this->resolveComparisonCoaVersion($comparisonFiscalYearId);
 
-        $comparisonBalanceByCurrentAccountId = [];
-        if ($comparisonFiscalYearId && $comparisonCoaVersion) {
-            $comparisonBalanceByCurrentAccountId = $this->buildComparisonBalanceMap(
-                $accounts,
-                $comparisonFiscalYearId,
-                $comparisonCoaVersion
-            );
-        }
+        $comparisonBalanceByCurrentAccountId = $this->resolveComparisonBalanceMap(
+            $accounts,
+            $comparisonFiscalYearId,
+            $comparisonCoaVersion
+        );
 
-        $assets = [];
-        $liabilities = [];
-        $equity = [];
-        $revenues = [];
-        $expenses = [];
+        ['buckets' => $buckets, 'totals' => $totals] = $this->collectAccountBuckets(
+            $accounts,
+            $comparisonFiscalYearId,
+            $comparisonBalanceByCurrentAccountId,
+            [
+                'asset' => ['bucket' => 'assets', 'total' => 'assets'],
+                'liability' => ['bucket' => 'liabilities', 'total' => 'liabilities'],
+                'equity' => ['bucket' => 'equity', 'total' => 'equity'],
+                'revenue' => ['bucket' => 'revenues', 'total' => 'revenues'],
+                'expense' => ['bucket' => 'expenses', 'total' => 'expenses'],
+            ]
+        );
 
-        $totals = [
-            'assets' => 0,
-            'liabilities' => 0,
-            'equity' => 0,
-            'revenues' => 0,
-            'expenses' => 0,
-            'comparison_assets' => 0,
-            'comparison_liabilities' => 0,
-            'comparison_equity' => 0,
-            'comparison_revenues' => 0,
-            'comparison_expenses' => 0,
-        ];
-
-        foreach ($accounts as $account) {
-            $debit = $account->total_debit ?? 0;
-            $credit = $account->total_credit ?? 0;
-            $balance = $this->computeAccountBalance($account->normal_balance, $debit, $credit);
-
-            $compBalance = 0;
-            if ($comparisonFiscalYearId) {
-                $compBalance = $comparisonBalanceByCurrentAccountId[$account->id] ?? 0;
-            }
-
-            $item = [
-                'id' => $account->id,
-                'code' => $account->code,
-                'name' => $account->name,
-                'level' => $account->level,
-                'parent_id' => $account->parent_id,
-                'balance' => $balance,
-                'comparison_balance' => $compBalance,
-                'sub_type' => $account->sub_type,
-            ];
-
-            if ($account->type === 'asset') {
-                $assets[] = $item;
-                $totals['assets'] += $balance;
-                $totals['comparison_assets'] += $compBalance;
-            } elseif ($account->type === 'liability') {
-                $liabilities[] = $item;
-                $totals['liabilities'] += $balance;
-                $totals['comparison_liabilities'] += $compBalance;
-            } elseif ($account->type === 'equity') {
-                $equity[] = $item;
-                $totals['equity'] += $balance;
-                $totals['comparison_equity'] += $compBalance;
-            } elseif ($account->type === 'revenue') {
-                $revenues[] = $item;
-                $totals['revenues'] += $balance;
-                $totals['comparison_revenues'] += $compBalance;
-            } elseif ($account->type === 'expense') {
-                $expenses[] = $item;
-                $totals['expenses'] += $balance;
-                $totals['comparison_expenses'] += $compBalance;
-            }
-        }
-
-        foreach (['assets', 'liabilities', 'equity', 'revenues', 'expenses'] as $key) {
-            $comparisonKey = "comparison_{$key}";
-            $totals["change_{$key}"] = $totals[$key] - ($totals[$comparisonKey] ?? 0);
-            $totals["change_percentage_{$key}"] = ($totals[$comparisonKey] ?? 0) != 0
-                ? ($totals["change_{$key}"] / abs($totals[$comparisonKey])) * 100
-                : 0;
-        }
+        $this->appendChangeMetrics($totals, ['assets', 'liabilities', 'equity', 'revenues', 'expenses']);
 
         return [
-            'assets' => $this->buildTree($assets),
-            'liabilities' => $this->buildTree($liabilities),
-            'equity' => $this->buildTree($equity),
-            'revenues' => $this->buildTree($revenues),
-            'expenses' => $this->buildTree($expenses),
+            'assets' => $this->buildTree($buckets['assets']),
+            'liabilities' => $this->buildTree($buckets['liabilities']),
+            'equity' => $this->buildTree($buckets['equity']),
+            'revenues' => $this->buildTree($buckets['revenues']),
+            'expenses' => $this->buildTree($buckets['expenses']),
             'totals' => $totals,
         ];
     }
@@ -505,6 +282,144 @@ class FinancialReportService
             ->first();
 
         return $coaVersion;
+    }
+
+    private function resolveComparisonCoaVersion(?int $comparisonFiscalYearId): ?CoaVersion
+    {
+        if (! $comparisonFiscalYearId) {
+            return null;
+        }
+
+        $comparisonFiscalYear = FiscalYear::find($comparisonFiscalYearId);
+
+        return $comparisonFiscalYear
+            ? $this->resolveCoaVersionForFiscalYear($comparisonFiscalYear)
+            : null;
+    }
+
+    private function resolveComparisonBalanceMap(
+        Collection $accounts,
+        ?int $comparisonFiscalYearId,
+        ?CoaVersion $comparisonCoaVersion
+    ): array {
+        if (! $comparisonFiscalYearId || ! $comparisonCoaVersion) {
+            return [];
+        }
+
+        return $this->buildComparisonBalanceMap(
+            $accounts,
+            $comparisonFiscalYearId,
+            $comparisonCoaVersion
+        );
+    }
+
+    private function buildReportItem(Account $account, float $balance, float $comparisonBalance): array
+    {
+        return [
+            'id' => $account->id,
+            'code' => $account->code,
+            'name' => $account->name,
+            'level' => $account->level,
+            'parent_id' => $account->parent_id,
+            'balance' => $balance,
+            'comparison_balance' => $comparisonBalance,
+            'sub_type' => $account->sub_type,
+        ];
+    }
+
+    private function baseAccountPayload(Account $account): array
+    {
+        return [
+            'id' => $account->id,
+            'code' => $account->code,
+            'name' => $account->name,
+            'type' => $account->type,
+            'normal_balance' => $account->normal_balance,
+            'level' => $account->level,
+            'parent_id' => $account->parent_id,
+        ];
+    }
+
+    private function mapAccountsWithNetMovement(Collection $accounts, callable $rowBuilder): array
+    {
+        return $accounts->map(function (Account $account) use ($rowBuilder) {
+            $debit = (float) ($account->total_debit ?? 0);
+            $credit = (float) ($account->total_credit ?? 0);
+
+            ['debit' => $netDebit, 'credit' => $netCredit] = $this->splitNetByNormalBalance(
+                $account->normal_balance,
+                $debit,
+                $credit
+            );
+
+            return $rowBuilder($account, $debit, $credit, $netDebit, $netCredit);
+        })->values()->toArray();
+    }
+
+    /**
+     * @param array<string, array{bucket: string, total: string}> $bucketMap
+     * @return array{buckets: array<string, array<int, array<string, mixed>>>, totals: array<string, float>}
+     */
+    private function collectAccountBuckets(
+        Collection $accounts,
+        ?int $comparisonFiscalYearId,
+        array $comparisonBalanceByCurrentAccountId,
+        array $bucketMap
+    ): array {
+        $buckets = [];
+        $totals = [];
+
+        foreach ($bucketMap as $config) {
+            $bucketKey = $config['bucket'];
+            $totalKey = $config['total'];
+
+            $buckets[$bucketKey] = [];
+            $totals[$totalKey] = 0;
+            $totals["comparison_{$totalKey}"] = 0;
+        }
+
+        foreach ($accounts as $account) {
+            if (! isset($bucketMap[$account->type])) {
+                continue;
+            }
+
+            $debit = $account->total_debit ?? 0;
+            $credit = $account->total_credit ?? 0;
+            $balance = $this->computeAccountBalance($account->normal_balance, $debit, $credit);
+            $comparisonBalance = $comparisonFiscalYearId
+                ? (float) ($comparisonBalanceByCurrentAccountId[$account->id] ?? 0)
+                : 0.0;
+
+            $bucketKey = $bucketMap[$account->type]['bucket'];
+            $totalKey = $bucketMap[$account->type]['total'];
+
+            $buckets[$bucketKey][] = $this->buildReportItem($account, $balance, $comparisonBalance);
+            $totals[$totalKey] += $balance;
+            $totals["comparison_{$totalKey}"] += $comparisonBalance;
+        }
+
+        return [
+            'buckets' => $buckets,
+            'totals' => $totals,
+        ];
+    }
+
+    /**
+     * @param array<string, float|int> $totals
+     * @param array<int, string> $keys
+     */
+    private function appendChangeMetrics(array &$totals, array $keys): void
+    {
+        foreach ($keys as $key) {
+            $comparisonKey = "comparison_{$key}";
+            $comparisonValue = (float) ($totals[$comparisonKey] ?? 0);
+            $changeValue = (float) ($totals[$key] ?? 0) - $comparisonValue;
+
+            $totals["change_{$key}"] = $changeValue;
+            $totals["change_percentage_{$key}"] = $comparisonValue != 0
+                ? ($changeValue / abs($comparisonValue)) * 100
+                : 0;
+        }
     }
 
     private function computeAccountBalance(string $normalBalance, float|int $debit, float|int $credit): float
