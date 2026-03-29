@@ -357,7 +357,7 @@ class FinancialReportService
     }
 
     /**
-     * @param array<string, array{bucket: string, total: string}> $bucketMap
+     * @param  array<string, array{bucket: string, total: string}>  $bucketMap
      * @return array{buckets: array<string, array<int, array<string, mixed>>>, totals: array<string, float>}
      */
     private function collectAccountBuckets(
@@ -405,8 +405,8 @@ class FinancialReportService
     }
 
     /**
-     * @param array<string, float|int> $totals
-     * @param array<int, string> $keys
+     * @param  array<string, float|int>  $totals
+     * @param  array<int, string>  $keys
      */
     private function appendChangeMetrics(array &$totals, array $keys): void
     {
