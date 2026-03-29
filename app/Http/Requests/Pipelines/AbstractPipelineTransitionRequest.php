@@ -61,6 +61,8 @@ abstract class AbstractPipelineTransitionRequest extends FormRequest
         return $rules;
     }
 
+    abstract protected function validateActionId(): bool;
+
     private function fromStateUniqueRule(): object
     {
         $rule = Rule::unique('pipeline_transitions')->where(function ($query) {
@@ -75,6 +77,4 @@ abstract class AbstractPipelineTransitionRequest extends FormRequest
 
         return $rule;
     }
-
-    abstract protected function validateActionId(): bool;
 }

@@ -47,7 +47,7 @@ abstract class AbstractApprovalDelegationRequest extends FormRequest
     abstract protected function useSometimesRules(): bool;
 
     /**
-     * @param array<int, string> $rules
+     * @param  array<int, string>  $rules
      * @return array<int, string>
      */
     private function fieldRules(array $rules): array
