@@ -70,7 +70,7 @@ abstract class AbstractPurchaseOrderRequest extends FormRequest
     }
 
     /**
-     * @param array<int, string|object> $rules
+     * @param  array<int, string|object>  $rules
      * @return array<int, string|object>
      */
     private function withSometimes(array $rules): array

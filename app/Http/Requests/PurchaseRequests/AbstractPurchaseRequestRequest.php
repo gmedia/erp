@@ -59,7 +59,7 @@ abstract class AbstractPurchaseRequestRequest extends FormRequest
     abstract protected function usesSometimes(): bool;
 
     /**
-     * @param array<int, string|object> $rules
+     * @param  array<int, string|object>  $rules
      * @return array<int, string|object>
      */
     private function withSometimes(array $rules): array
