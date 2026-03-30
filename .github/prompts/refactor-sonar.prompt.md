@@ -1,5 +1,5 @@
 ---
-description: Refactor plan berbasis data SonarQube MCP lintas modul
+description: Susun dan jalankan refactor plan berbasis data SonarQube lintas modul
 ---
 
 # Workflow: Refactor Sonar-Driven
@@ -10,12 +10,29 @@ Workflow ini khusus untuk menurunkan duplikasi kode secara terukur tanpa merusak
 
 ## 1. Ambil Baseline SonarQube (WAJIB)
 
-Gunakan MCP Sonar, bukan query manual.
+Selalu cek MCP server yang tersedia lebih dulu.
 
-- Cari project key: `mcp_io_github_son_search_my_sonarqube_projects`
-- Ambil metrik proyek: `mcp_io_github_son_get_component_measures` (minimal: `duplicated_lines`, `duplicated_blocks`, `duplicated_lines_density`, `ncloc`, `coverage`)
-- Ambil daftar file duplikat: `mcp_io_github_son_search_duplicated_files`
-- (Opsional) Ambil issue kritikal: `mcp_io_github_son_search_sonar_issues_in_projects`
+Urutan eksekusi:
+
+1. Jika Sonar MCP tersedia, gunakan tool Sonar untuk ambil metrik duplikasi.
+2. Jika Sonar MCP tidak tersedia, jelaskan alasan singkat lalu gunakan fallback berikut:
+	- Config Sonar: `.sonarcloud.properties`
+	- Laporan coverage: `coverage.xml`
+	- Perubahan file dari Git untuk mendeteksi cluster duplikasi lintas modul
+3. Untuk data aplikasi Laravel, prioritaskan Laravel Boost MCP (schema/routes/log/docs) sesuai kebutuhan.
+
+Metrik minimum yang wajib dikumpulkan (dari Sonar MCP atau laporan setara):
+
+- `duplicated_lines`
+- `duplicated_blocks`
+- `duplicated_lines_density`
+- `ncloc`
+- `coverage`
+
+Catatan hemat token:
+
+- Ambil ringkasan dulu, baru detail file yang masuk top duplicated clusters.
+- Hindari fetch issue/log panjang tanpa filter modul.
 
 ## 2. Mapping ke Modul Registry
 
@@ -36,11 +53,9 @@ Prioritaskan urutan berikut:
 
 Batch per modul (jangan acak file lintas domain dalam 1 PR):
 
-- Batch A (done): `purchase-history-report`, `purchase-order-status-report`, `goods-receipt-report`, `stock-movement-report`, `stock-adjustment-report`, `inventory-valuation-report`, `inventory-stocktake-variance-report`
-- Batch B (done): `purchase-requests`, `purchase-orders`, `supplier-returns`, `goods-receipts`, `stock-adjustments`, `stock-movements`, `stock-transfers`, `inventory-stocktakes`
-- Batch C (next): `assets`, `products`, `asset-movements`, `asset-maintenances`, `asset-stocktakes` (prioritas `AssetFilterService`, `ProductFilterService`, item controllers)
-- Batch D (next): `financial-reporting` (`FinancialReportService` dan query/mapping laporan keuangan)
-- Batch E (next): `account-mappings`, `journal-entries`, `goods-receipts`, `purchase-requests` (pasangan `Store*Request`/`Update*Request` yang masih duplikatif)
+- Gunakan status terbaru dari `docs/refactor-sonar-progress.md`.
+- Jika file progress belum ada, buat baseline progress dulu sebelum eksekusi batch.
+- Pilih 1 batch aktif per PR agar review tetap fokus dan risiko regresi lebih rendah.
 
 ## 4. Guard Konsistensi Antar Modul
 
@@ -53,7 +68,7 @@ Checklist wajib:
 - Empty wrapper class tetap multiline + komentar intent
 - Hindari FQCN di body executable PHP
 - Untuk pattern yang sama (FilterService / FormRequest), gunakan shared abstraction yang seragam antar modul
-- Untuk refactor style agent guidance, update hanya di folder `.agent` (bukan `.claude`)
+- Untuk refactor style agent guidance, update di folder `.github` (source of truth)
 
 ## 5. Eksekusi Refactor per Batch
 
@@ -104,3 +119,4 @@ Contoh:
 - Metrik `duplicated_lines_density` project tidak naik setelah merge
 - Tidak ada perubahan route/payload API publik
 - Semua test batch (Pest + E2E) pass
+- Jika Sonar MCP tidak tersedia, keputusan refactor tetap menyertakan baseline + evidence fallback yang bisa diaudit

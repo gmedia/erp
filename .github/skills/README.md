@@ -46,7 +46,8 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
     ├── create-feature.prompt.md
     ├── create-import.prompt.md
     ├── create-tests.prompt.md
-    └── refactor-module.prompt.md
+    ├── refactor-module.prompt.md
+    └── refactor-sonar.prompt.md
 ```
 
 ---
@@ -91,3 +92,7 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 | `/refactor-module` | Refactor modul existing |
 | `/refactor-sonar` | Susun dan jalankan refactor plan berbasis data SonarQube MCP |
 | `/create-tests` | Buat test untuk fitur |
+
+Catatan `/refactor-sonar`:
+Jika Sonar MCP tidak tersedia, gunakan fallback evidence dari `.sonarcloud.properties`, `coverage.xml`, dan perubahan file Git. Tetap mulai dari ringkasan metrik lalu drill-down ke cluster duplikasi prioritas untuk hemat token.
+Progress batch disimpan terpisah di `docs/refactor-sonar-progress.md`, bukan di prompt utama.
