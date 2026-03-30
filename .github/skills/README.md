@@ -31,6 +31,7 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 
 ```
 .github/
+├── copilot-instructions.md
 ├── skills/
 │   ├── README.md              # Dokumentasi ini
 │   ├── DECISION.md            # Matrix pemilihan skill
@@ -41,10 +42,11 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 │   ├── refactor-frontend/     # Refactor React
 │   ├── database-migration/    # Migration, seeder
 │   └── testing-strategy/      # Tests
-└── workflows/
-    ├── create-feature.md
-    ├── refactor-module.md
-    └── create-tests.md
+└── prompts/
+    ├── create-feature.prompt.md
+    ├── create-import.prompt.md
+    ├── create-tests.prompt.md
+    └── refactor-module.prompt.md
 ```
 
 ---
@@ -70,6 +72,14 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 3. **Gunakan MCP tools** → bukan command manual
 4. **Referensi files existing** → bukan template
 
+## 💡 Hemat Token MCP
+
+1. Mulai dari data paling kecil dulu (summary/list/search), jangan langsung full dump.
+2. Untuk `database-schema`, gunakan `summary: true` sebelum detail table tertentu.
+3. Untuk `search-docs`, gunakan query spesifik + `packages` + `token_limit` minimal.
+4. Baca log/error bertahap (entry kecil dulu), tambah hanya jika perlu.
+5. Hindari multi-call yang overlap; gabungkan kebutuhan dalam 1 call jika bisa.
+
 ---
 
 ## 🔄 Workflows
@@ -77,5 +87,6 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 | Command | Deskripsi |
 |---------|-----------|
 | `/create-feature` | Buat fitur CRUD baru |
+| `/create-import` | Tambahkan fitur import pada modul existing |
 | `/refactor-module` | Refactor modul existing |
 | `/create-tests` | Buat test untuk fitur |

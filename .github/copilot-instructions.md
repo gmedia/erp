@@ -72,3 +72,16 @@ class ExportBranchRequest extends SimpleCrudExportRequest
 - **JANGAN** gunakan fully-qualified class name dengan leading backslash di body code seperti `\App\Models\User::factory()`, `\Laravel\Sanctum\Sanctum::actingAs(...)`, `\Illuminate\Validation\Rule::unique(...)`, `\Carbon\Carbon::setTestNow(...)`, atau `\Illuminate\Support\Facades\Storage::disk(...)`.
 - FQCN tetap boleh dipakai di PHPDoc, generic annotations, dan `::class` metadata jika memang dibutuhkan.
 - Setelah generate atau refactor file PHP, verifikasi dengan `./vendor/bin/sail bin duster fix` agar issue TLint semacam ini tidak lolos.
+
+## 7. MCP Security & Token Efficiency
+
+- **Security**:
+	- Jangan hardcode API key/token/secrets di file repo (termasuk `.vscode/mcp.json`).
+	- Gunakan input variable atau environment variable untuk credential MCP.
+
+- **Token Efficiency (WAJIB)**:
+	- Untuk schema DB, selalu mulai dari mode ringkas: `mcp_laravel-boost_database-schema(summary: true)` lalu filter table spesifik jika perlu.
+	- Untuk docs search, gunakan query spesifik dan batasi package saat memungkinkan (`packages: [...]`).
+	- Gunakan `token_limit` secukupnya; mulai dari kecil lalu naikkan hanya jika hasil terpotong.
+	- Jangan fetch log/error panjang tanpa kebutuhan; mulai dari jumlah entry kecil.
+	- Saat butuh banyak data baca-only, prioritaskan pencarian terarah dulu (search/list), baru baca konten detail yang relevan saja.
