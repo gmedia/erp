@@ -2,6 +2,7 @@
 
 namespace App\Actions\AssetStocktakes;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\AssetStocktakes\AssetStocktakeFilterService;
 use App\Http\Requests\AssetStocktakes\IndexAssetStocktakeRequest;
 use App\Models\AssetStocktake;
@@ -9,14 +10,15 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexAssetStocktakesAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private AssetStocktakeFilterService $filterService
     ) {}
 
     public function execute(IndexAssetStocktakeRequest $request): LengthAwarePaginator
     {
-        $perPage = $request->get('per_page', 15);
-        $page = $request->get('page', 1);
+        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 
         $query = AssetStocktake::query()->with(['branch', 'createdBy']);
 
@@ -37,9 +39,7 @@ class IndexAssetStocktakesAction
         $this->filterService->applySorting(
             $query,
             $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc'
-                ? 'asc'
-                : 'desc',
+            $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
             [
                 'id',
                 'ulid',

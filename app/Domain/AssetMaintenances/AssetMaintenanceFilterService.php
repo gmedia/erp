@@ -11,10 +11,7 @@ class AssetMaintenanceFilterService
 
     public function applySearch(Builder $query, string $search, array $searchFields): void
     {
-        $this->applySearchWithRelationAliases($query, $search, $searchFields, [
-            'asset_name' => ['relation' => 'asset', 'column' => 'name'],
-            'asset_code' => ['relation' => 'asset', 'column' => 'asset_code'],
-        ]);
+        $this->applyAssetAliasSearch($query, $search, $searchFields);
     }
 
     public function applyAdvancedFilters(Builder $query, array $filters): void

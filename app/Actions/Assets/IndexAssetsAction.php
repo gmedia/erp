@@ -2,6 +2,7 @@
 
 namespace App\Actions\Assets;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\Assets\AssetFilterService;
 use App\Http\Requests\Assets\IndexAssetRequest;
 use App\Models\Asset;
@@ -9,6 +10,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexAssetsAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private AssetFilterService $filterService
     ) {}
@@ -51,7 +54,7 @@ class IndexAssetsAction
         $this->filterService->applySorting(
             $query,
             $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
+            $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
             [
                 'id',
                 'asset_code',
@@ -70,13 +73,5 @@ class IndexAssetsAction
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    private function getPaginationParams($request): array
-    {
-        return [
-            'perPage' => $request->get('per_page', 15),
-            'page' => $request->get('page', 1),
-        ];
     }
 }

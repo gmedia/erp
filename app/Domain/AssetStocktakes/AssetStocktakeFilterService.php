@@ -39,15 +39,28 @@ class AssetStocktakeFilterService
 
         $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
 
-        if ($sortBy === 'branch') {
-            $query->join('branches', 'asset_stocktakes.branch_id', '=', 'branches.id')
-                ->orderBy('branches.name', $sortDirection)
-                ->select('asset_stocktakes.*');
-        } elseif ($sortBy === 'created_by') {
-            $query->join('users', 'asset_stocktakes.created_by', '=', 'users.id')
-                ->orderBy('users.name', $sortDirection)
-                ->select('asset_stocktakes.*');
-        } else {
+        $applied = $this->applyMappedRelationSorting(
+            $query,
+            $sortBy,
+            $sortDirection,
+            [
+                'branch' => [
+                    'table' => 'branches',
+                    'local_column' => 'asset_stocktakes.branch_id',
+                    'foreign_column' => 'branches.id',
+                    'order_column' => 'branches.name',
+                ],
+                'created_by' => [
+                    'table' => 'users',
+                    'local_column' => 'asset_stocktakes.created_by',
+                    'foreign_column' => 'users.id',
+                    'order_column' => 'users.name',
+                ],
+            ],
+            'asset_stocktakes'
+        );
+
+        if (! $applied) {
             $query->orderBy($sortBy, $sortDirection);
         }
     }

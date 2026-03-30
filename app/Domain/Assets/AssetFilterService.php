@@ -36,31 +36,56 @@ class AssetFilterService
 
         $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
 
-        if ($sortBy === 'category') {
-            $query->join('asset_categories', 'assets.asset_category_id', '=', 'asset_categories.id')
-                ->orderBy('asset_categories.name', $sortDirection)
-                ->select('assets.*');
-        } elseif ($sortBy === 'branch') {
-            $query->join('branches', 'assets.branch_id', '=', 'branches.id')
-                ->orderBy('branches.name', $sortDirection)
-                ->select('assets.*');
-        } elseif ($sortBy === 'location') {
-            $query->leftJoin('asset_locations', 'assets.asset_location_id', '=', 'asset_locations.id')
-                ->orderBy('asset_locations.name', $sortDirection)
-                ->select('assets.*');
-        } elseif ($sortBy === 'department') {
-            $query->leftJoin('departments', 'assets.department_id', '=', 'departments.id')
-                ->orderBy('departments.name', $sortDirection)
-                ->select('assets.*');
-        } elseif ($sortBy === 'employee') {
-            $query->leftJoin('employees', 'assets.employee_id', '=', 'employees.id')
-                ->orderBy('employees.name', $sortDirection)
-                ->select('assets.*');
-        } elseif ($sortBy === 'supplier') {
-            $query->leftJoin('suppliers', 'assets.supplier_id', '=', 'suppliers.id')
-                ->orderBy('suppliers.name', $sortDirection)
-                ->select('assets.*');
-        } else {
+        $applied = $this->applyMappedRelationSorting(
+            $query,
+            $sortBy,
+            $sortDirection,
+            [
+                'category' => [
+                    'table' => 'asset_categories',
+                    'local_column' => 'assets.asset_category_id',
+                    'foreign_column' => 'asset_categories.id',
+                    'order_column' => 'asset_categories.name',
+                ],
+                'branch' => [
+                    'table' => 'branches',
+                    'local_column' => 'assets.branch_id',
+                    'foreign_column' => 'branches.id',
+                    'order_column' => 'branches.name',
+                ],
+                'location' => [
+                    'table' => 'asset_locations',
+                    'local_column' => 'assets.asset_location_id',
+                    'foreign_column' => 'asset_locations.id',
+                    'order_column' => 'asset_locations.name',
+                    'join' => 'leftJoin',
+                ],
+                'department' => [
+                    'table' => 'departments',
+                    'local_column' => 'assets.department_id',
+                    'foreign_column' => 'departments.id',
+                    'order_column' => 'departments.name',
+                    'join' => 'leftJoin',
+                ],
+                'employee' => [
+                    'table' => 'employees',
+                    'local_column' => 'assets.employee_id',
+                    'foreign_column' => 'employees.id',
+                    'order_column' => 'employees.name',
+                    'join' => 'leftJoin',
+                ],
+                'supplier' => [
+                    'table' => 'suppliers',
+                    'local_column' => 'assets.supplier_id',
+                    'foreign_column' => 'suppliers.id',
+                    'order_column' => 'suppliers.name',
+                    'join' => 'leftJoin',
+                ],
+            ],
+            'assets'
+        );
+
+        if (! $applied) {
             $query->orderBy($sortBy, $sortDirection);
         }
     }

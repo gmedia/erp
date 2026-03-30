@@ -2,6 +2,7 @@
 
 namespace App\Actions\AssetMaintenances;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\AssetMaintenances\AssetMaintenanceFilterService;
 use App\Http\Requests\AssetMaintenances\IndexAssetMaintenanceRequest;
 use App\Models\AssetMaintenance;
@@ -9,6 +10,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexAssetMaintenancesAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private AssetMaintenanceFilterService $filterService
     ) {}
@@ -43,7 +46,7 @@ class IndexAssetMaintenancesAction
         $this->filterService->applySorting(
             $query,
             $request->get('sort_by', 'scheduled_at'),
-            $request->get('sort_direction', 'desc'),
+            $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
             [
                 'id',
                 'asset',
@@ -60,13 +63,5 @@ class IndexAssetMaintenancesAction
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    private function getPaginationParams($request): array
-    {
-        return [
-            'perPage' => $request->get('per_page', 15),
-            'page' => $request->get('page', 1),
-        ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Actions\InventoryStocktakes;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\InventoryStocktakes\InventoryStocktakeFilterService;
 use App\Http\Requests\InventoryStocktakes\IndexInventoryStocktakeRequest;
 use App\Models\InventoryStocktake;
@@ -9,6 +10,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexInventoryStocktakesAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private InventoryStocktakeFilterService $filterService
     ) {}
@@ -38,9 +41,7 @@ class IndexInventoryStocktakesAction
         $this->filterService->applySorting(
             $query,
             $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc'
-                ? 'asc'
-                : 'desc',
+            $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
             [
                 'id',
                 'stocktake_number',
@@ -54,13 +55,5 @@ class IndexInventoryStocktakesAction
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    private function getPaginationParams($request): array
-    {
-        return [
-            'perPage' => $request->get('per_page', 15),
-            'page' => $request->get('page', 1),
-        ];
     }
 }

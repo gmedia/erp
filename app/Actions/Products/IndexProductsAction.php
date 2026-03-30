@@ -2,6 +2,7 @@
 
 namespace App\Actions\Products;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\Products\ProductFilterService;
 use App\Http\Requests\Products\IndexProductRequest;
 use App\Models\Product;
@@ -9,6 +10,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexProductsAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private ProductFilterService $filterService
     ) {}
@@ -41,9 +44,7 @@ class IndexProductsAction
         ]);
 
         $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc'
-            ? 'asc'
-            : 'desc';
+        $sortDirection = $this->normalizeSortDirection($request->get('sort_direction', 'desc'));
 
         if ($sortBy === 'category') {
             $query
@@ -72,13 +73,5 @@ class IndexProductsAction
         }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    private function getPaginationParams($request): array
-    {
-        return [
-            'perPage' => $request->get('per_page', 15),
-            'page' => $request->get('page', 1),
-        ];
     }
 }

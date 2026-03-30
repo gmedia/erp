@@ -76,6 +76,51 @@ trait BaseFilterService
     }
 
     /**
+     * Apply standard asset alias search fields used by asset-related modules.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<int, string>  $searchFields
+     */
+    public function applyAssetAliasSearch(Builder $query, string $search, array $searchFields): void
+    {
+        $this->applySearchWithRelationAliases($query, $search, $searchFields, [
+            'asset_name' => ['relation' => 'asset', 'column' => 'name'],
+            'asset_code' => ['relation' => 'asset', 'column' => 'asset_code'],
+        ]);
+    }
+
+    /**
+     * Apply mapped relation sorting using join metadata.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<string, array{table: string, local_column: string, foreign_column: string, order_column: string, join?: 'join'|'leftJoin'}>  $relationSortMap
+     */
+    public function applyMappedRelationSorting(
+        Builder $query,
+        string $sortBy,
+        string $sortDirection,
+        array $relationSortMap,
+        string $baseTable
+    ): bool {
+        if (! isset($relationSortMap[$sortBy])) {
+            return false;
+        }
+
+        $config = $relationSortMap[$sortBy];
+        $joinMethod = $config['join'] ?? 'join';
+
+        $query->{$joinMethod}($config['table'], $config['local_column'], '=', $config['foreign_column'])
+            ->orderBy($config['order_column'], $sortDirection)
+            ->select($baseTable . '.*');
+
+        return true;
+    }
+
+    /**
      * Apply sorting to query with validation against allowed columns.
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
