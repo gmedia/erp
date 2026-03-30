@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 trait InteractsWithIndexRequest
 {
     /**
-     * @param  Request  $request
      * @return array{perPage: int, page: int}
      */
     private function getPaginationParams(Request $request): array
