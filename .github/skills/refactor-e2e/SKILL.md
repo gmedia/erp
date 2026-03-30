@@ -90,7 +90,7 @@ mcp_filesystem_read_file(path: "tests/e2e/shared-test-factories.ts")
 
 Jika file **belum ada**, buat dulu menggunakan template:
 ```
-mcp_filesystem_read_file(path: ".agent/skills/refactor-e2e/resources/shared-test-factories.ts.template")
+mcp_filesystem_read_file(path: ".github/skills/refactor-e2e/resources/shared-test-factories.ts.template")
 ```
 
 ### Langkah 5: Buat/Update Module Helpers
@@ -123,7 +123,7 @@ Buat file `tests/e2e/{module}/{entity}.spec.ts` menggunakan `generateModuleTests
 
 Gunakan template:
 ```
-mcp_filesystem_read_file(path: ".agent/skills/refactor-e2e/resources/module.spec.ts.template")
+mcp_filesystem_read_file(path: ".github/skills/refactor-e2e/resources/module.spec.ts.template")
 ```
 
 ### Langkah 7: Verifikasi

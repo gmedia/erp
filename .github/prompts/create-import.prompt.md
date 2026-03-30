@@ -41,4 +41,4 @@ Instruksi:
 
 ## Referensi
 
-Untuk melihat aturan arsitektur secara detail, agent akan membaca panduannya di `.agent/skills/feature-import/SKILL.md`.
+Untuk melihat aturan arsitektur secara detail, agent akan membaca panduannya di `.github/skills/feature-import/SKILL.md`.

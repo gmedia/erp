@@ -30,7 +30,7 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 ## 📁 Struktur
 
 ```
-.agent/
+.github/
 ├── skills/
 │   ├── README.md              # Dokumentasi ini
 │   ├── DECISION.md            # Matrix pemilihan skill
@@ -66,7 +66,7 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 ## 🚀 Quick Start
 
 1. **Pilih skill** → lihat [DECISION.md](./DECISION.md)
-2. **Baca SKILL.md** → `mcp_filesystem_read_file(path: ".agent/skills/{skill}/SKILL.md")`
+2. **Baca SKILL.md** → `mcp_filesystem_read_file(path: ".github/skills/{skill}/SKILL.md")`
 3. **Gunakan MCP tools** → bukan command manual
 4. **Referensi files existing** → bukan template
 

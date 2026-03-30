@@ -142,7 +142,7 @@ safe_chmod -R ugo+rw "database"
 safe_chown -R 1000:1000 "database"
 
 # Fix agent skill script permissions
-for agent_dir in .agent .trae .kilocode .roo .cline .claude; do
+for agent_dir in .github .agent .trae .kilocode .roo .cline .claude; do
     if [[ -d "$agent_dir" ]]; then
         safe_chmod +x \
             "$agent_dir/skills/wizard.sh" \

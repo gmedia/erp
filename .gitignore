@@ -26,6 +26,7 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+/.agent*
 task.*
 /.cline*
 /.roo*

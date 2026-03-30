@@ -82,6 +82,6 @@ Apa yang ingin dilakukan?
 ## 🚀 Cara Menggunakan
 
 1. **Pilih skill** dari decision tree
-2. **Baca SKILL.md**: `mcp_filesystem_read_file(path: ".agent/skills/{skill}/SKILL.md")`
+2. **Baca SKILL.md**: `mcp_filesystem_read_file(path: ".github/skills/{skill}/SKILL.md")`
 3. **Gunakan MCP tools** sesuai instruksi di SKILL.md
 4. **Referensi files existing**, bukan template

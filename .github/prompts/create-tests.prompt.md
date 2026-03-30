@@ -16,7 +16,7 @@ description: Membuat test untuk fitur existing
 // turbo
 ```
 ```bash
-cat .agent/skills/testing-strategy/SKILL.md
+cat .github/skills/testing-strategy/SKILL.md
 ```
 
 ## 3. Identifikasi Test Gaps
@@ -35,7 +35,7 @@ Gunakan template:
 // turbo
 ```
 ```bash
-cat .agent/skills/testing-strategy/resources/FeatureTest.php.template
+cat .github/skills/testing-strategy/resources/FeatureTest.php.template
 ```
 
 Lokasi: `tests/Feature/{Module}ControllerTest.php`
@@ -51,7 +51,7 @@ Gunakan template:
 // turbo
 ```
 ```bash
-cat .agent/skills/testing-strategy/resources/UnitTest.php.template
+cat .github/skills/testing-strategy/resources/UnitTest.php.template
 ```
 
 Lokasi: `tests/Unit/Actions/{Module}/`
@@ -63,7 +63,7 @@ Gunakan template:
 // turbo
 ```
 ```bash
-cat .agent/skills/testing-strategy/resources/e2e.spec.ts.template
+cat .github/skills/testing-strategy/resources/e2e.spec.ts.template
 ```
 
 Lokasi: `tests/e2e/{module}/`

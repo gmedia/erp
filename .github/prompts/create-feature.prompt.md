@@ -17,12 +17,12 @@ Analisa requirement user:
 ```
 Untuk Simple:
 ```bash
-cat .agent/skills/feature-crud-simple/SKILL.md
+cat .github/skills/feature-crud-simple/SKILL.md
 ```
 
 Untuk Complex:
 ```bash
-cat .agent/skills/feature-crud-complex/SKILL.md
+cat .github/skills/feature-crud-complex/SKILL.md
 ```
 
 ## 3. Jalankan Scaffold Script
@@ -32,12 +32,12 @@ cat .agent/skills/feature-crud-complex/SKILL.md
 ```
 Simple:
 ```bash
-bash .agent/skills/feature-crud-simple/scripts/scaffold.sh {FeatureName} --dry-run
+bash .github/skills/feature-crud-simple/scripts/scaffold.sh {FeatureName} --dry-run
 ```
 
 Complex:
 ```bash
-bash .agent/skills/feature-crud-complex/scripts/scaffold.sh {FeatureName} --dry-run
+bash .github/skills/feature-crud-complex/scripts/scaffold.sh {FeatureName} --dry-run
 ```
 
 ## 4. Create Scaffold (setelah konfirmasi)
@@ -46,7 +46,7 @@ bash .agent/skills/feature-crud-complex/scripts/scaffold.sh {FeatureName} --dry-
 // turbo
 ```
 ```bash
-bash .agent/skills/feature-crud-simple/scripts/scaffold.sh {FeatureName}
+bash .github/skills/feature-crud-simple/scripts/scaffold.sh {FeatureName}
 ```
 
 ## 5. Implementasi Mengikuti Skill

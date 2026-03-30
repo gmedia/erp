@@ -18,12 +18,12 @@ Analisa request user:
 ```
 Backend:
 ```bash
-cat .agent/skills/refactor-backend/SKILL.md
+cat .github/skills/refactor-backend/SKILL.md
 ```
 
 Frontend:
 ```bash
-cat .agent/skills/refactor-frontend/SKILL.md
+cat .github/skills/refactor-frontend/SKILL.md
 ```
 
 ## 3. Check Architecture (Backend)
@@ -32,7 +32,7 @@ cat .agent/skills/refactor-frontend/SKILL.md
 // turbo
 ```
 ```bash
-bash .agent/skills/refactor-backend/scripts/check-architecture.sh {ModuleName}
+bash .github/skills/refactor-backend/scripts/check-architecture.sh {ModuleName}
 ```
 
 ## 4. Identifikasi Issues
@@ -75,7 +75,7 @@ Backend:
 ```
 
 ```bash
-bash .agent/skills/refactor-backend/scripts/check-architecture.sh {ModuleName}
+bash .github/skills/refactor-backend/scripts/check-architecture.sh {ModuleName}
 ```
 
 E2E:

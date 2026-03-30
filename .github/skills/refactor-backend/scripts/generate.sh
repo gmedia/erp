@@ -159,5 +159,5 @@ else
     echo "   - Adjust Controller imports and dependencies"
     echo ""
     echo "📝 Run architecture check:"
-    echo "   bash .agent/skills/refactor-backend/scripts/check-architecture.sh $FEATURE"
+    echo "   bash .github/skills/refactor-backend/scripts/check-architecture.sh $FEATURE"
 fi
