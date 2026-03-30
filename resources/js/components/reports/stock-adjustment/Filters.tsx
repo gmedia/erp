@@ -1,6 +1,6 @@
-import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     createAsyncSelectFilterField,
+    createDateRangeFilterFields,
     createSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
@@ -50,15 +50,6 @@ export function createStockAdjustmentReportFilterFields(): FieldDescriptor[] {
             ],
             'All statuses',
         ),
-        {
-            name: 'start_date',
-            label: 'Start Date',
-            component: <FilterDatePicker placeholder="Start Date" />,
-        },
-        {
-            name: 'end_date',
-            label: 'End Date',
-            component: <FilterDatePicker placeholder="End Date" />,
-        },
+        ...createDateRangeFilterFields(),
     ];
 }

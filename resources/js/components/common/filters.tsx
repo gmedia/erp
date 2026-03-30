@@ -1,6 +1,7 @@
 'use client';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
+import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 
 import { Input } from '@/components/ui/input';
 import {
@@ -88,4 +89,23 @@ export function createAsyncSelectFilterField(
         label,
         component: <AsyncSelect url={url} placeholder={placeholder} />,
     };
+}
+
+// Shared date-range fields used by report filters.
+export function createDateRangeFilterFields(
+    startPlaceholder = 'Start Date',
+    endPlaceholder = 'End Date',
+): FieldDescriptor[] {
+    return [
+        {
+            name: 'start_date',
+            label: 'Start Date',
+            component: <FilterDatePicker placeholder={startPlaceholder} />,
+        },
+        {
+            name: 'end_date',
+            label: 'End Date',
+            component: <FilterDatePicker placeholder={endPlaceholder} />,
+        },
+    ];
 }
