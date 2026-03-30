@@ -250,6 +250,7 @@ class FinancialReportService
 
     private function calculateNetIncome(int $fiscalYearId, int $coaVersionId): float
     {
+        /** @var Collection<int, Account> $accounts */
         $accounts = $this->accountsWithPostedSums($coaVersionId, $fiscalYearId)
             ->whereIn('type', ['revenue', 'expense'])
             ->get();
@@ -448,6 +449,7 @@ class FinancialReportService
         foreach ($currentAccounts as $account) {
             $comparisonBalanceByCurrentId[$account->id] = 0;
             if (isset($comparisonByCode[$account->code])) {
+                /** @var Account $compAcc */
                 $compAcc = $comparisonByCode[$account->code];
                 $comparisonBalanceByCurrentId[$account->id] = $this->computeAccountBalance(
                     $compAcc->normal_balance,
@@ -472,6 +474,7 @@ class FinancialReportService
 
         $sourceBalanceById = [];
         foreach ($sourceAccounts as $sourceAccount) {
+            /** @var Account $sourceAccount */
             $sourceBalanceById[$sourceAccount->id] = $this->computeAccountBalance(
                 $sourceAccount->normal_balance,
                 $sourceAccount->total_debit ?? 0,

@@ -4,6 +4,7 @@ namespace App\Http\Requests\Products;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
 
 abstract class AbstractProductRequest extends FormRequest
 {
@@ -51,7 +52,7 @@ abstract class AbstractProductRequest extends FormRequest
         return ['sometimes', ...$rules];
     }
 
-    private function codeUniqueRule(): string|Rule
+    private function codeUniqueRule(): string|Unique
     {
         if (! $this->isUpdateRequest()) {
             return 'unique:products,code';

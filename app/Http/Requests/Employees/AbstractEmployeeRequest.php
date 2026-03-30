@@ -4,6 +4,7 @@ namespace App\Http\Requests\Employees;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
 
 abstract class AbstractEmployeeRequest extends FormRequest
 {
@@ -48,7 +49,7 @@ abstract class AbstractEmployeeRequest extends FormRequest
         return ['sometimes', ...$rules];
     }
 
-    private function employeeIdUniqueRule(): string|Rule
+    private function employeeIdUniqueRule(): string|Unique
     {
         if (! $this->isUpdateRequest()) {
             return 'unique:employees,employee_id';
@@ -57,7 +58,7 @@ abstract class AbstractEmployeeRequest extends FormRequest
         return Rule::unique('employees', 'employee_id')->ignore($this->route('employee')->id);
     }
 
-    private function emailUniqueRule(): string|Rule
+    private function emailUniqueRule(): string|Unique
     {
         if (! $this->isUpdateRequest()) {
             return 'unique:employees,email';

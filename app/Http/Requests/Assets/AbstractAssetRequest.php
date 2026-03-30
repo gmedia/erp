@@ -4,6 +4,7 @@ namespace App\Http\Requests\Assets;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
 
 abstract class AbstractAssetRequest extends FormRequest
 {
@@ -55,7 +56,7 @@ abstract class AbstractAssetRequest extends FormRequest
         return ['sometimes', ...$rules];
     }
 
-    private function assetCodeUniqueRule(): string|Rule
+    private function assetCodeUniqueRule(): string|Unique
     {
         if (! $this->isUpdateRequest()) {
             return 'unique:assets,asset_code';
@@ -64,7 +65,7 @@ abstract class AbstractAssetRequest extends FormRequest
         return Rule::unique('assets')->ignore($this->route('asset'));
     }
 
-    private function barcodeUniqueRule(): string|Rule
+    private function barcodeUniqueRule(): string|Unique
     {
         if (! $this->isUpdateRequest()) {
             return 'unique:assets,barcode';
