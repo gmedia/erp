@@ -24,6 +24,7 @@ async function goToAssetProfile(page: Page, assetCode: string) {
   await page.getByRole('menuitem', { name: 'View' }).click();
 
   // Wait for profile page to load
+  await expect(page).toHaveURL(/\/assets\/\w+/, { timeout: 15000 });
   await page.waitForResponse(
     r => r.url().includes('/api/entity-states/') && r.status() < 400
   ).catch(() => null);

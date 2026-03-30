@@ -29,7 +29,9 @@ const sidebarNavItems: NavItem[] = [
     },
 ];
 
-export default function SettingsLayout({ children }: PropsWithChildren) {
+export default function SettingsLayout({
+    children,
+}: Readonly<PropsWithChildren>) {
     // When server-side rendering, we only render the layout on the client...
     if (globalThis.window === undefined) {
         return null;

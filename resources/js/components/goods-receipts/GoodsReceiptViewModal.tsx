@@ -1,3 +1,4 @@
+import { ViewField } from '@/components/common/ViewField';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,8 +9,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { format } from 'date-fns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
 import { GoodsReceipt } from '@/types/goods-receipt';
@@ -19,19 +19,6 @@ interface GoodsReceiptViewModalProps {
     onClose: () => void;
     item: GoodsReceipt | null;
 }
-
-const ViewField = ({
-    label,
-    value,
-}: {
-    label: string;
-    value: React.ReactNode;
-}) => (
-    <div className="space-y-1">
-        <h4 className="text-sm font-medium text-muted-foreground">{label}</h4>
-        <div className="text-sm font-medium">{value || '-'}</div>
-    </div>
-);
 
 export const GoodsReceiptViewModal = React.memo(
     ({ item, open, onClose }: GoodsReceiptViewModalProps) => {
@@ -47,9 +34,9 @@ export const GoodsReceiptViewModal = React.memo(
                         </DialogDescription>
                     </DialogHeader>
 
-                    <ScrollArea className="flex-1 pr-4">
+                    <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
                         <div className="space-y-6 py-2">
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                 <ViewField
                                     label="GR Number"
                                     value={item.gr_number}
@@ -68,14 +55,9 @@ export const GoodsReceiptViewModal = React.memo(
                                 />
                                 <ViewField
                                     label="Receipt Date"
-                                    value={
-                                        item.receipt_date
-                                            ? format(
-                                                  new Date(item.receipt_date),
-                                                  'PPP',
-                                              )
-                                            : '-'
-                                    }
+                                    value={formatDateByRegionalSettings(
+                                        item.receipt_date,
+                                    )}
                                 />
                                 <ViewField
                                     label="Supplier Delivery Note"
@@ -102,7 +84,7 @@ export const GoodsReceiptViewModal = React.memo(
                             <div className="space-y-2">
                                 <h4 className="text-sm font-semibold">Items</h4>
                                 <div className="overflow-x-auto rounded-md border">
-                                    <table className="w-full text-sm">
+                                    <table className="min-w-[840px] text-sm">
                                         <thead>
                                             <tr className="border-b">
                                                 <th className="p-2 text-left">
@@ -165,7 +147,7 @@ export const GoodsReceiptViewModal = React.memo(
                                 </div>
                             </div>
                         </div>
-                    </ScrollArea>
+                    </div>
 
                     <DialogFooter>
                         <Button type="button" onClick={onClose}>

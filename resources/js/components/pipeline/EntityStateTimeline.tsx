@@ -8,7 +8,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEntityPipeline } from '@/hooks/useEntityPipeline';
-import { format } from 'date-fns';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import * as LucideIcons from 'lucide-react';
 import { Activity } from 'lucide-react';
 import { useEffect } from 'react';
@@ -122,9 +122,8 @@ export function EntityStateTimeline({ entityType, entityId }: Readonly<Props>) {
                                                 className="shrink-0 text-xs text-muted-foreground"
                                                 dateTime={entry.created_at}
                                             >
-                                                {format(
-                                                    new Date(entry.created_at),
-                                                    'dd MMM yyyy, HH:mm',
+                                                {formatDateTimeByRegionalSettings(
+                                                    entry.created_at,
                                                 )}
                                             </time>
                                         </div>

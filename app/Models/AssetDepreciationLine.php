@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,19 +21,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\AssetDepreciationRun $run
  *
  * @method static \Database\Factories\AssetDepreciationLineFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereAccumulatedAfter($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereAccumulatedBefore($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine
- *     whereAssetDepreciationRunId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereAssetId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereBookValueAfter($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationLine whereUpdatedAt($value)
+ * @method static Builder<static>|AssetDepreciationLine newModelQuery()
+ * @method static Builder<static>|AssetDepreciationLine newQuery()
+ * @method static Builder<static>|AssetDepreciationLine query()
+ * @method static Builder<static>|AssetDepreciationLine whereAccumulatedAfter($value)
+ * @method static Builder<static>|AssetDepreciationLine whereAccumulatedBefore($value)
+ * @method static Builder<static>|AssetDepreciationLine whereAmount($value)
+ * @method static Builder<static>|AssetDepreciationLine whereAssetDepreciationRunId($value)
+ * @method static Builder<static>|AssetDepreciationLine whereAssetId($value)
+ * @method static Builder<static>|AssetDepreciationLine whereBookValueAfter($value)
+ * @method static Builder<static>|AssetDepreciationLine whereCreatedAt($value)
+ * @method static Builder<static>|AssetDepreciationLine whereId($value)
+ * @method static Builder<static>|AssetDepreciationLine whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */

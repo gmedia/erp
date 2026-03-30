@@ -68,6 +68,7 @@ class AuthController extends Controller
 
         $regionalSettings = [
             'currency' => Setting::get('currency', 'IDR'),
+            'date_format' => Setting::get('date_format', 'd/m/Y'),
             'number_format_decimal' => Setting::get('number_format_decimal', ','),
             'number_format_thousand' => Setting::get('number_format_thousand', '.'),
             'number_format_hide_decimal' => (bool) Setting::get('number_format_hide_decimal', false),

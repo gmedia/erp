@@ -51,7 +51,7 @@ jobs:
           sed -i "s/^WWWUSER=.*/WWWUSER=$(id -u)/" .env
           sed -i "s/^WWWGROUP=.*/WWWGROUP=$(id -g)/" .env
           mkdir -p storage/tmp
-          chmod 777 storage/tmp
+          chmod -R u+rwX,g+rwX,o-rwx storage/tmp
 
       - name: Bootstrap Sail dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -177,8 +177,8 @@ jobs:
         run: ./vendor/bin/sail test --colors=always
 
       - name: Run SonarQube Cloud scan
-        if: ${{ steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
-        uses: SonarSource/sonarqube-scan-action@2f77a1ec69fb1d595b06f35ab27e97605bdef703 # v5
+        if: ${{ always() && steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io

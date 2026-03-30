@@ -43,6 +43,7 @@ class AdminSettingRequest extends FormRequest
             'company_phone' => ['nullable', 'string', 'max:50'],
             'company_email' => ['nullable', 'string', 'email', 'max:255'],
             'company_logo' => ['nullable', 'file', 'mimetypes:image/svg+xml', 'max:2048'],
+            'company_logo_svg' => ['nullable', 'string', 'max:262144'],
             'timezone' => ['nullable', 'string', 'max:100', 'timezone:all'],
             'currency' => ['nullable', 'string', 'max:10', Rule::in(self::SUPPORTED_CURRENCIES)],
             'date_format' => ['nullable', 'string', 'max:20'],

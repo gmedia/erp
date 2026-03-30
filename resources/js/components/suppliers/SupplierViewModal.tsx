@@ -1,3 +1,4 @@
+import { ViewField } from '@/components/common/ViewField';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,7 +9,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { format } from 'date-fns';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
 import { useTranslation } from '@/contexts/i18n-context';
@@ -19,19 +20,6 @@ interface SupplierViewModalProps {
     onClose: () => void;
     item: Supplier | null;
 }
-
-const ViewField = ({
-    label,
-    value,
-}: {
-    label: string;
-    value: React.ReactNode;
-}) => (
-    <div className="space-y-1">
-        <h4 className="text-sm font-medium text-muted-foreground">{label}</h4>
-        <div className="text-sm font-medium">{value || '-'}</div>
-    </div>
-);
 
 export const SupplierViewModal = React.memo(
     ({ item, open, onClose }: SupplierViewModalProps) => {
@@ -48,7 +36,7 @@ export const SupplierViewModal = React.memo(
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="grid grid-cols-2 gap-6 py-4">
+                    <div className="grid grid-cols-1 gap-6 py-4 sm:grid-cols-2">
                         <ViewField label="Name" value={item.name} />
                         <ViewField label="Email" value={item.email} />
                         <ViewField label="Phone" value={item.phone} />
@@ -84,7 +72,9 @@ export const SupplierViewModal = React.memo(
 
                         <ViewField
                             label="Created At"
-                            value={format(new Date(item.created_at), 'PPP p')}
+                            value={formatDateTimeByRegionalSettings(
+                                item.created_at,
+                            )}
                         />
                     </div>
 

@@ -154,6 +154,15 @@ export async function editSupplierReturn(
 
     const updateResult = await page.evaluate(
         async ({ findBy, nextReturnNumber }) => {
+            type SupplierReturnDetailItem = {
+                goods_receipt_item_id?: number | string;
+                product?: { id?: number | string } | null;
+                unit?: { id?: number | string } | null;
+                quantity_returned?: number | string;
+                unit_price?: number | string;
+                notes?: string | null;
+            };
+
             const apiToken = localStorage.getItem('api_token') || '';
 
             const findResponse = await fetch(
@@ -168,8 +177,52 @@ export async function editSupplierReturn(
             const findPayload = await findResponse.json();
             const row = (findPayload.data || [])[0];
             if (!row?.id) {
-                return { ok: false };
+                return {
+                    ok: false,
+                    step: 'find',
+                    status: findResponse.status,
+                    body: findPayload,
+                };
             }
+
+            const detailResponse = await fetch(`/api/supplier-returns/${row.id}`, {
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    Authorization: `Bearer ${apiToken}`,
+                },
+            });
+            const detailPayload = await detailResponse.json().catch(() => ({}));
+            const detail = detailPayload?.data;
+
+            if (!detail?.id) {
+                return {
+                    ok: false,
+                    step: 'show',
+                    status: detailResponse.status,
+                    body: detailPayload,
+                };
+            }
+
+            const payload = {
+                return_number: nextReturnNumber,
+                purchase_order_id: detail.purchase_order?.id,
+                goods_receipt_id: detail.goods_receipt?.id,
+                supplier_id: detail.supplier?.id,
+                warehouse_id: detail.warehouse?.id,
+                return_date: detail.return_date,
+                reason: detail.reason,
+                status: detail.status,
+                notes: detail.notes ?? '',
+                items: (detail.items as SupplierReturnDetailItem[] || []).map((item) => ({
+                    goods_receipt_item_id: item.goods_receipt_item_id,
+                    product_id: item.product?.id,
+                    unit_id: item.unit?.id,
+                    quantity_returned: item.quantity_returned,
+                    unit_price: item.unit_price,
+                    notes: item.notes ?? '',
+                })),
+            };
 
             const updateResponse = await fetch(`/api/supplier-returns/${row.id}`, {
                 method: 'PUT',
@@ -179,15 +232,22 @@ export async function editSupplierReturn(
                     Authorization: `Bearer ${apiToken}`,
                     'X-Requested-With': 'XMLHttpRequest',
                 },
-                body: JSON.stringify({ return_number: nextReturnNumber }),
+                body: JSON.stringify(payload),
             });
 
-            return { ok: updateResponse.ok };
+            const updatePayload = await updateResponse.json().catch(() => ({}));
+
+            return {
+                ok: updateResponse.ok,
+                step: 'update',
+                status: updateResponse.status,
+                body: updatePayload,
+            };
         },
         { findBy: identifier, nextReturnNumber: updatedReturnNumber },
     );
 
-    expect(updateResult.ok).toBeTruthy();
+    expect(updateResult, JSON.stringify(updateResult)).toMatchObject({ ok: true });
 
     const editPromise = page.waitForResponse(
         (r) => r.url().includes('/api/supplier-returns') && r.status() < 400,

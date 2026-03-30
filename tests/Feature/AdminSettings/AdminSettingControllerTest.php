@@ -196,6 +196,43 @@ describe('AdminSettingController@update', function () {
 
         Storage::disk(config('filesystems.default'))->assertExists($storedPath);
     });
+
+    test('user can upload company logo svg via multipart post request', function () {
+        Storage::fake(config('filesystems.default'));
+
+        $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
+
+        Sanctum::actingAs($user, ['*']);
+        $response = $this->post('/api/admin-settings', [
+            'company_logo' => UploadedFile::fake()->create('logo.svg', 10, 'image/svg+xml'),
+        ]);
+
+        $response->assertOk();
+
+        $storedPath = Setting::get('company_logo_path');
+        expect($storedPath)->toBeString();
+
+        Storage::disk(config('filesystems.default'))->assertExists($storedPath);
+    });
+
+    test('user can upload company logo svg content via json payload', function () {
+        Storage::fake(config('filesystems.default'));
+
+        $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
+
+        Sanctum::actingAs($user, ['*']);
+        $response = $this->postJson('/api/admin-settings', [
+            'company_logo_svg' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" height="10" fill="#f97316"/></svg>',
+        ]);
+
+        $response->assertOk();
+
+        $storedPath = Setting::get('company_logo_path');
+        expect($storedPath)->toBeString();
+        expect($storedPath)->toEndWith('.svg');
+
+        Storage::disk(config('filesystems.default'))->assertExists($storedPath);
+    });
 });
 
 describe('AdminSettingController@testSmtp', function () {

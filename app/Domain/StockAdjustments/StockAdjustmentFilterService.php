@@ -15,28 +15,15 @@ class StockAdjustmentFilterService
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['warehouse_id'])) {
-            $query->where('warehouse_id', $filters['warehouse_id']);
-        }
+        $this->applyExactFilters($query, $filters, [
+            'warehouse_id' => 'warehouse_id',
+            'status' => 'status',
+            'adjustment_type' => 'adjustment_type',
+            'inventory_stocktake_id' => 'inventory_stocktake_id',
+        ]);
 
-        if (! empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-
-        if (! empty($filters['adjustment_type'])) {
-            $query->where('adjustment_type', $filters['adjustment_type']);
-        }
-
-        if (! empty($filters['inventory_stocktake_id'])) {
-            $query->where('inventory_stocktake_id', $filters['inventory_stocktake_id']);
-        }
-
-        if (! empty($filters['adjustment_date_from'])) {
-            $query->whereDate('adjustment_date', '>=', $filters['adjustment_date_from']);
-        }
-
-        if (! empty($filters['adjustment_date_to'])) {
-            $query->whereDate('adjustment_date', '<=', $filters['adjustment_date_to']);
-        }
+        $this->applyDateRanges($query, $filters, [
+            'adjustment_date' => ['from' => 'adjustment_date_from', 'to' => 'adjustment_date_to'],
+        ]);
     }
 }

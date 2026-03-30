@@ -15,7 +15,11 @@ type CalendarRootProps = React.ComponentProps<"div"> & {
   rootRef?: React.Ref<HTMLDivElement>
 }
 
-function CalendarRoot({ className, rootRef, ...props }: CalendarRootProps) {
+function CalendarRoot({
+  className,
+  rootRef,
+  ...props
+}: Readonly<CalendarRootProps>) {
   return (
     <div
       data-slot="calendar"
@@ -27,14 +31,14 @@ function CalendarRoot({ className, rootRef, ...props }: CalendarRootProps) {
 }
 
 type CalendarChevronProps = React.ComponentProps<typeof ChevronDownIcon> & {
-  orientation?: "left" | "right"
+  orientation?: "left" | "right" | "up" | "down"
 }
 
 function CalendarChevron({
   className,
   orientation,
   ...props
-}: CalendarChevronProps) {
+}: Readonly<CalendarChevronProps>) {
   if (orientation === "left") {
     return <ChevronLeftIcon className={cn("size-4", className)} {...props} />
   }
@@ -49,7 +53,7 @@ function CalendarChevron({
 function CalendarWeekNumber({
   children,
   ...props
-}: React.ComponentProps<"td">) {
+}: Readonly<React.ComponentProps<"td">>) {
   return (
     <td {...props}>
       <div className="flex size-(--cell-size) items-center justify-center text-center">
@@ -68,9 +72,11 @@ function Calendar({
   formatters,
   components,
   ...props
-}: React.ComponentProps<typeof DayPicker> & {
-  buttonVariant?: React.ComponentProps<typeof Button>["variant"]
-}) {
+}: Readonly<
+  React.ComponentProps<typeof DayPicker> & {
+    buttonVariant?: React.ComponentProps<typeof Button>["variant"]
+  }
+>) {
   const defaultClassNames = getDefaultClassNames()
 
   return (
@@ -189,7 +195,7 @@ function CalendarDayButton({
   day,
   modifiers,
   ...props
-}: React.ComponentProps<typeof DayButton>) {
+}: Readonly<React.ComponentProps<typeof DayButton>>) {
   const defaultClassNames = getDefaultClassNames()
 
   const ref = React.useRef<HTMLButtonElement>(null)

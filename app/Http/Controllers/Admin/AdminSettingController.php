@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * Controller for application-level settings management.
@@ -39,8 +40,10 @@ class AdminSettingController extends Controller
     {
         $validated = $request->validated();
 
-        $uploadedLogo = $validated['company_logo'] ?? null;
+        $uploadedLogo = $request->file('company_logo');
+        $uploadedLogoSvg = $validated['company_logo_svg'] ?? null;
         unset($validated['company_logo']);
+        unset($validated['company_logo_svg']);
 
         foreach ($validated as $key => $value) {
             Setting::set($key, $value ?? '');
@@ -48,6 +51,10 @@ class AdminSettingController extends Controller
 
         if ($uploadedLogo instanceof UploadedFile) {
             $path = $uploadedLogo->store('branding/logos', config('filesystems.default'));
+            Setting::set('company_logo_path', $path);
+        } elseif (is_string($uploadedLogoSvg) && trim($uploadedLogoSvg) !== '') {
+            $path = 'branding/logos/company-logo-' . Str::uuid() . '.svg';
+            Storage::disk(config('filesystems.default'))->put($path, $uploadedLogoSvg);
             Setting::set('company_logo_path', $path);
         }
 

@@ -10,7 +10,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { ApprovalDelegation } from '@/types/approval-delegation';
-import { format } from 'date-fns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { memo } from 'react';
 
 interface ApprovalDelegationViewModalProps {
@@ -25,8 +25,7 @@ export const ApprovalDelegationViewModal =
             if (!item) return null;
 
             const formatDate = (dateString?: string | null) => {
-                if (!dateString) return '-';
-                return format(new Date(dateString), 'dd MMM yyyy');
+                return formatDateByRegionalSettings(dateString);
             };
 
             const formatApprovableType = (type: string | null) => {

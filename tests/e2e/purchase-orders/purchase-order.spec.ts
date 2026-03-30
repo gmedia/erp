@@ -51,7 +51,7 @@ const config: ModuleTestConfig = {
     createEntity: createPurchaseOrder,
     searchEntity: searchPurchaseOrder,
     editEntity: editPurchaseOrder,
-    editUpdates: { po_number: 'PO-E2E-UPDATED-001' },
+    editUpdates: { po_number: `PO-E2E-UPDATED-${Date.now()}` },
     expectedExportColumns: [
         'ID',
         'PO Number',

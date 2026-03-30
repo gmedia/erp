@@ -32,23 +32,31 @@ export function AssetModelViewModal({
                         View asset model details
                     </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
-                    <div>
-                        <span className="font-semibold">Manufacturer:</span>{' '}
-                        {item.manufacturer || 'N/A'}
+                <div className="space-y-4 py-2">
+                    <div className="space-y-1">
+                        <span className="text-sm font-medium text-muted-foreground">
+                            Manufacturer
+                        </span>
+                        <div className="text-sm font-medium break-words">
+                            {item.manufacturer || 'N/A'}
+                        </div>
                     </div>
-                    <div>
-                        <span className="font-semibold">Category:</span>{' '}
-                        <Badge variant="outline">
-                            {item.category?.name || 'N/A'}
-                        </Badge>
+                    <div className="space-y-1">
+                        <span className="text-sm font-medium text-muted-foreground">
+                            Category
+                        </span>
+                        <div>
+                            <Badge variant="outline">
+                                {item.category?.name || 'N/A'}
+                            </Badge>
+                        </div>
                     </div>
                     {item.specs && (
-                        <div>
-                            <span className="font-semibold">
+                        <div className="space-y-1">
+                            <span className="text-sm font-medium text-muted-foreground">
                                 Specifications:
                             </span>
-                            <pre className="mt-1 rounded bg-muted p-2 text-xs">
+                            <pre className="overflow-x-auto rounded bg-muted p-2 text-xs break-words whitespace-pre-wrap">
                                 {JSON.stringify(item.specs, null, 2)}
                             </pre>
                         </div>

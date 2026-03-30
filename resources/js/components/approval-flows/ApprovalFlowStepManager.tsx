@@ -76,7 +76,12 @@ export function ApprovalFlowStepManager({
     };
 
     const renderRow = (step: StepField, index: number) => {
-        const approverLabel = `User ID: ${step.approver_user_id || '-'}`;
+        const approverValue = step.approver_user_id;
+        const approverLabel =
+            typeof approverValue === 'string' ||
+            typeof approverValue === 'number'
+                ? `User ID: ${approverValue}`
+                : 'User ID: -';
 
         return (
             <TableRow key={step.fieldId}>

@@ -5,12 +5,11 @@ import {
     createSelectColumn,
     createSortingHeader,
 } from '@/utils/columns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
-import { format } from 'date-fns';
 
 const formatDate = (dateString?: string | null) => {
-    if (!dateString) return '-';
-    return format(new Date(dateString), 'dd MMM yyyy');
+    return formatDateByRegionalSettings(dateString);
 };
 
 export const approvalDelegationColumns: ColumnDef<ApprovalDelegation>[] = [
@@ -40,7 +39,7 @@ export const approvalDelegationColumns: ColumnDef<ApprovalDelegation>[] = [
 
             // Format App\Models\PurchaseOrder -> PurchaseOrder
             const parts = type.split('\\');
-            return <span>{parts[parts.length - 1]}</span>;
+            return <span>{parts.at(-1)}</span>;
         },
     },
     {

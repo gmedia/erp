@@ -12,7 +12,7 @@ import { HTMLAttributes } from 'react';
 export default function AppearanceToggleDropdown({
     className = '',
     ...props
-}: HTMLAttributes<HTMLDivElement>) {
+}: Readonly<HTMLAttributes<HTMLDivElement>>) {
     const { appearance, updateAppearance } = useAppearance();
 
     const getCurrentIcon = () => {

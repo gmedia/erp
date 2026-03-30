@@ -2,7 +2,13 @@
 
 namespace App\Http\Resources\PurchaseRequests;
 
+use App\Models\Branch;
+use App\Models\Department;
+use App\Models\Product;
 use App\Models\PurchaseRequest;
+use App\Models\PurchaseRequestItem;
+use App\Models\Unit;
+use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -12,22 +18,33 @@ class PurchaseRequestResource extends JsonResource
 {
     public function toArray($request): array
     {
+        /** @var Branch|null $branch */
+        $branch = $this->resource->branch;
+        /** @var Department|null $department */
+        $department = $this->resource->department;
+        /** @var User|null $requester */
+        $requester = $this->resource->requester;
+        /** @var User|null $approver */
+        $approver = $this->resource->approver;
+        /** @var User|null $creator */
+        $creator = $this->resource->creator;
+
         return [
             'id' => $this->resource->id,
             'pr_number' => $this->resource->pr_number,
             'branch' => [
                 'id' => $this->resource->branch_id,
-                'name' => $this->resource->branch?->name,
+                'name' => $branch?->name,
             ],
             'department' => [
                 'id' => $this->resource->department_id,
-                'name' => $this->resource->department?->name,
+                'name' => $department?->name,
             ],
             'requester' => [
                 'id' => $this->resource->requested_by,
-                'name' => $this->resource->requester?->name,
+                'name' => $requester?->name,
             ],
-            'request_date' => $this->resource->request_date?->toDateString(),
+            'request_date' => $this->resource->request_date->toDateString(),
             'required_date' => $this->resource->required_date?->toDateString(),
             'priority' => $this->resource->priority,
             'status' => $this->resource->status,
@@ -36,24 +53,30 @@ class PurchaseRequestResource extends JsonResource
             'rejection_reason' => $this->resource->rejection_reason,
             'approved_by' => $this->resource->approved_by ? [
                 'id' => $this->resource->approved_by,
-                'name' => $this->resource->approver?->name,
+                'name' => $approver?->name,
             ] : null,
             'approved_at' => $this->resource->approved_at?->toIso8601String(),
             'created_by' => $this->resource->created_by ? [
                 'id' => $this->resource->created_by,
-                'name' => $this->resource->creator?->name,
+                'name' => $creator?->name,
             ] : null,
             'items' => $this->resource->relationLoaded('items')
                 ? $this->resource->items->map(static function ($item) {
+                    /** @var PurchaseRequestItem $item */
+                    /** @var Product|null $product */
+                    $product = $item->product;
+                    /** @var Unit|null $unit */
+                    $unit = $item->unit;
+
                     return [
                         'id' => $item->id,
                         'product' => [
                             'id' => $item->product_id,
-                            'name' => $item->product?->name,
+                            'name' => $product?->name,
                         ],
                         'unit' => [
                             'id' => $item->unit_id,
-                            'name' => $item->unit?->name,
+                            'name' => $unit?->name,
                         ],
                         'quantity' => (string) $item->quantity,
                         'quantity_ordered' => (string) $item->quantity_ordered,

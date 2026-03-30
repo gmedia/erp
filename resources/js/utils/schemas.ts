@@ -1,5 +1,35 @@
 import * as z from 'zod';
 
+const isValidEmailAddress = (value: string): boolean => {
+    if (!value || value.includes(' ')) {
+        return false;
+    }
+
+    const atIndex = value.indexOf('@');
+    if (atIndex <= 0 || atIndex !== value.lastIndexOf('@')) {
+        return false;
+    }
+
+    const localPart = value.slice(0, atIndex);
+    const domainPart = value.slice(atIndex + 1);
+
+    if (!localPart || !domainPart) {
+        return false;
+    }
+
+    const dotIndex = domainPart.lastIndexOf('.');
+    if (dotIndex <= 0 || dotIndex === domainPart.length - 1) {
+        return false;
+    }
+
+    return true;
+};
+
+const emailValidator = () =>
+    z.string().refine((value) => isValidEmailAddress(value), {
+        message: 'Please enter a valid email address.',
+    });
+
 // Schema for approval delegations
 export const approvalDelegationFormSchema = z
     .object({
@@ -62,7 +92,7 @@ export type UnitFormData = z.infer<typeof unitFormSchema>;
 export const employeeFormSchema = z.object({
     employee_id: z.string().min(1, { message: 'Employee ID is required.' }),
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    email: z.string().email({ message: 'Please enter a valid email address.' }),
+    email: emailValidator(),
     phone: z
         .string()
         .min(10, { message: 'Phone number must be at least 10 digits.' })
@@ -99,7 +129,7 @@ export type EmployeeFormData = z.infer<typeof employeeFormSchema>;
 // Schema for customer form data
 export const customerFormSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    email: z.string().email({ message: 'Please enter a valid email address.' }),
+    email: emailValidator(),
     phone: z
         .string()
         .min(10, { message: 'Phone number must be at least 10 digits.' })
@@ -123,11 +153,7 @@ export type CustomerFormData = z.infer<typeof customerFormSchema>;
 // Schema for supplier form data
 export const supplierFormSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    email: z
-        .string()
-        .email({ message: 'Please enter a valid email address.' })
-        .or(z.literal(''))
-        .optional(),
+    email: z.union([emailValidator(), z.literal('')]).optional(),
     phone: z
         .string()
         .min(10, { message: 'Phone number must be at least 10 digits.' })
@@ -224,6 +250,8 @@ export const journalEntryFormSchema = z.object({
                 debit: z.coerce.number().min(0),
                 credit: z.coerce.number().min(0),
                 memo: z.string().optional(),
+                account_name: z.string().optional(),
+                account_code: z.string().optional(),
             }),
         )
         .min(2, { message: 'At least 2 lines are required.' })

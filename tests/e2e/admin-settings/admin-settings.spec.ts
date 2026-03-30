@@ -1,5 +1,34 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page, type Response } from '@playwright/test';
 import { login } from '../helpers';
+
+async function saveAdminSettings(
+    page: Page,
+    saveButtonTestId: 'save-general-settings' | 'save-regional-settings' | 'save-smtp-settings',
+) {
+    const responsePromise = page.waitForResponse(
+        (response: Response) =>
+            response.url().includes('/api/admin-settings') &&
+            ['POST', 'PUT'].includes(response.request().method()) &&
+            response.status() < 400,
+    );
+
+    await page.getByTestId(saveButtonTestId).click();
+
+    await responsePromise;
+}
+
+async function waitForAdminSettingsRefresh(
+    page: Page,
+) {
+    await page
+        .waitForResponse(
+            (response: Response) =>
+                response.url().includes('/api/admin-settings') &&
+                response.request().method() === 'GET' &&
+                response.status() < 400,
+        )
+        .catch(() => null);
+}
 
 test.describe('Admin Settings', () => {
     test.beforeEach(async ({ page }) => {
@@ -56,11 +85,7 @@ test.describe('Admin Settings', () => {
         await nameInput.fill(companyName);
 
         // Save
-        const saveButton = page.getByTestId('save-general-settings');
-        await saveButton.click();
-
-        // Wait for page to reload/settle
-        await page.waitForTimeout(1000);
+        await saveAdminSettings(page, 'save-general-settings');
 
         // Verify the value persisted
         await page.reload();
@@ -80,11 +105,7 @@ test.describe('Admin Settings', () => {
         await hideDecimalInput.click();
 
         // Save
-        const saveButton = page.getByTestId('save-regional-settings');
-        await saveButton.click();
-
-        // Wait for page to reload/settle
-        await page.waitForTimeout(1000);
+        await saveAdminSettings(page, 'save-regional-settings');
 
         // Verify persistence
         await page.reload();
@@ -99,8 +120,7 @@ test.describe('Admin Settings', () => {
             .getByRole('option', { name: 'IDR - Indonesian Rupiah' })
             .click();
         await hideDecimalInput.click();
-        await saveButton.click();
-        await page.waitForTimeout(1000);
+        await saveAdminSettings(page, 'save-regional-settings');
     });
 
     test('settings page is accessible from Admin menu in sidebar', async ({ page }) => {
@@ -150,18 +170,12 @@ test.describe('Admin Settings', () => {
         await logoInput.setInputFiles('public/logo.svg');
 
         // Save settings
-        const saveButton = page.getByTestId('save-general-settings');
-        await saveButton.click();
+        await saveAdminSettings(page, 'save-general-settings');
+        await waitForAdminSettingsRefresh(page);
 
-        // Wait for success message or page to settle
-        await page.waitForTimeout(1500);
-
-        // Reload page to verify persistence
-        await page.reload();
-
-        // Logo preview should now be visible
+        // Logo preview should now be visible after query refresh
         const logoPreview = page.locator('img[alt="Current company logo"]');
-        await expect(logoPreview).toBeVisible();
+        await expect(logoPreview).toBeVisible({ timeout: 15000 });
 
         // Logo should have a valid src pointing to branding/logos
         const logoSrc = await logoPreview.getAttribute('src');
@@ -176,9 +190,7 @@ test.describe('Admin Settings', () => {
         const logoInput = page.locator('input[name="company_logo"]');
         await logoInput.setInputFiles('public/logo.svg');
 
-        const saveButton = page.getByTestId('save-general-settings');
-        await saveButton.click();
-        await page.waitForTimeout(1500);
+        await saveAdminSettings(page, 'save-general-settings');
 
         // Navigate to another page to check if logo is loaded globally
         await page.goto('/dashboard');

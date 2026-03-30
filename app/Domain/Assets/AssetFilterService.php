@@ -15,33 +15,17 @@ class AssetFilterService
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['asset_category_id'])) {
-            $query->where('asset_category_id', $filters['asset_category_id']);
-        }
-        if (! empty($filters['asset_model_id'])) {
-            $query->where('asset_model_id', $filters['asset_model_id']);
-        }
-        if (! empty($filters['branch_id'])) {
-            $query->where('branch_id', $filters['branch_id']);
-        }
-        if (! empty($filters['asset_location_id'])) {
-            $query->where('asset_location_id', $filters['asset_location_id']);
-        }
-        if (! empty($filters['department_id'])) {
-            $query->where('department_id', $filters['department_id']);
-        }
-        if (! empty($filters['employee_id'])) {
-            $query->where('employee_id', $filters['employee_id']);
-        }
-        if (! empty($filters['supplier_id'])) {
-            $query->where('supplier_id', $filters['supplier_id']);
-        }
-        if (! empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-        if (! empty($filters['condition'])) {
-            $query->where('condition', $filters['condition']);
-        }
+        $this->applyExactFilters($query, $filters, [
+            'asset_category_id' => 'asset_category_id',
+            'asset_model_id' => 'asset_model_id',
+            'branch_id' => 'branch_id',
+            'asset_location_id' => 'asset_location_id',
+            'department_id' => 'department_id',
+            'employee_id' => 'employee_id',
+            'supplier_id' => 'supplier_id',
+            'status' => 'status',
+            'condition' => 'condition',
+        ]);
     }
 
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void

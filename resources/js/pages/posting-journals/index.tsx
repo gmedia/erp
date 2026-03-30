@@ -26,11 +26,11 @@ import { usePostingJournal } from '@/hooks/usePostingJournal';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { JournalEntry } from '@/types/journal-entry';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
-import { format } from 'date-fns';
 import {
     AlertCircle,
     CheckCircle2,
@@ -178,9 +178,8 @@ export default function Index() {
                                     {item.entry_number}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
-                                    {format(
-                                        new Date(item.entry_date),
-                                        'dd MMM yyyy',
+                                    {formatDateByRegionalSettings(
+                                        item.entry_date,
                                     )}
                                 </span>
                             </div>
@@ -193,7 +192,10 @@ export default function Index() {
                     <TableCell className="pt-4 align-top">
                         <div className="flex flex-col gap-1">
                             <div className="text-sm font-medium">
-                                {formatNumberByRegionalSettings(item.lines.length)} line(s)
+                                {formatNumberByRegionalSettings(
+                                    item.lines.length,
+                                )}{' '}
+                                line(s)
                             </div>
                             {preview.length > 0 && (
                                 <div className="line-clamp-2 text-xs text-muted-foreground">

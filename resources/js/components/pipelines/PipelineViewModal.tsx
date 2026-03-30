@@ -6,6 +6,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { type Pipeline } from '@/types/entity';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 
 interface PipelineViewModalProps {
     readonly open: boolean;
@@ -31,7 +32,7 @@ export function PipelineViewModal({
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <span className="block text-sm font-semibold text-gray-500">
                                 Code
@@ -75,7 +76,7 @@ export function PipelineViewModal({
                                 Created At
                             </span>
                             <span>
-                                {new Date(item.created_at).toLocaleDateString()}
+                                {formatDateByRegionalSettings(item.created_at)}
                             </span>
                         </div>
                     </div>

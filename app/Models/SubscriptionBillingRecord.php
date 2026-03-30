@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,30 +32,30 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\CustomerSubscription $customerSubscription
  * @property-read string $amount_due
  *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord draft()
- * @method static \Database\Factories\SubscriptionBillingRecordFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord overdue()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord paid()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord pending()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereAmountPaid($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereBillingDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord
- *     whereCustomerSubscriptionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereDiscountAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereDueDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereInvoiceNumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereNextRetryDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereNotes($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord wherePaidDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord wherePaymentMethod($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord wherePaymentReference($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord wherePeriodEnd($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord wherePeriodStart($value)
+ * @method static Builder<static>|SubscriptionBillingRecord newModelQuery()
+ * @method static Builder<static>|SubscriptionBillingRecord newQuery()
+ * @method static Builder<static>|SubscriptionBillingRecord query()
+ * @method static Builder<static>|SubscriptionBillingRecord whereAmountPaid($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereBillingDate($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereCreatedAt($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereCustomerSubscriptionId($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereDiscountAmount($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereDueDate($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereId($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereInvoiceNumber($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereNextRetryDate($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereNotes($value)
+ * @method static Builder<static>|SubscriptionBillingRecord wherePaidDate($value)
+ * @method static Builder<static>|SubscriptionBillingRecord wherePaymentMethod($value)
+ * @method static Builder<static>|SubscriptionBillingRecord wherePaymentReference($value)
+ * @method static Builder<static>|SubscriptionBillingRecord wherePeriodEnd($value)
+ * @method static Builder<static>|SubscriptionBillingRecord wherePeriodStart($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereRetryCount($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereStatus($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereSubtotal($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereTaxAmount($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereTotalAmount($value)
+ * @method static Builder<static>|SubscriptionBillingRecord whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereRetryCount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereSubtotal($value)

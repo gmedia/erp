@@ -2,14 +2,16 @@
 
 namespace App\Actions\Reports;
 
+use App\Actions\Reports\Concerns\HandlesReportQuery;
 use App\Http\Requests\Reports\IndexGoodsReceiptReportRequest;
 use App\Models\GoodsReceipt;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class IndexGoodsReceiptReportAction
 {
+    use HandlesReportQuery;
+
     public function execute(IndexGoodsReceiptReportRequest $request): LengthAwarePaginator|Collection
     {
         $query = GoodsReceipt::query()
@@ -59,84 +61,46 @@ class IndexGoodsReceiptReportAction
                 'total_receipt_value' => 'decimal:2',
             ]);
 
-        if ($request->filled('supplier_id')) {
-            $query->where('po.supplier_id', $request->integer('supplier_id'));
-        }
-
-        if ($request->filled('warehouse_id')) {
-            $query->where('gr.warehouse_id', $request->integer('warehouse_id'));
-        }
-
-        if ($request->filled('product_id')) {
-            $query->where('gri.product_id', $request->integer('product_id'));
-        }
-
-        if ($request->filled('status')) {
-            $query->where('gr.status', $request->string('status')->toString());
-        }
-
-        if ($request->filled('start_date')) {
-            $query->whereDate('gr.receipt_date', '>=', $request->string('start_date')->toString());
-        }
-
-        if ($request->filled('end_date')) {
-            $query->whereDate('gr.receipt_date', '<=', $request->string('end_date')->toString());
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->string('search')->toString();
-            $query->where(function (Builder $builder) use ($search) {
-                $builder->where('gr.gr_number', 'like', '%' . $search . '%')
-                    ->orWhere('po.po_number', 'like', '%' . $search . '%')
-                    ->orWhere('s.name', 'like', '%' . $search . '%')
-                    ->orWhere('w.name', 'like', '%' . $search . '%')
-                    ->orWhere('w.code', 'like', '%' . $search . '%')
-                    ->orWhere('p.name', 'like', '%' . $search . '%')
-                    ->orWhere('p.code', 'like', '%' . $search . '%');
-            });
-        }
+        $this->applyIntegerFilter($request, $query, 'supplier_id', 'po.supplier_id');
+        $this->applyIntegerFilter($request, $query, 'warehouse_id', 'gr.warehouse_id');
+        $this->applyIntegerFilter($request, $query, 'product_id', 'gri.product_id');
+        $this->applyStringFilter($request, $query, 'status', 'gr.status');
+        $this->applyDateRangeFilter($request, $query, 'gr.receipt_date');
+        $this->applySearchFilter($request, $query, [
+            'gr.gr_number',
+            'po.po_number',
+            's.name',
+            'w.name',
+            'w.code',
+            'p.name',
+            'p.code',
+        ]);
 
         $sortBy = $request->string('sort_by', 'receipt_date')->toString();
         $sortDirection = $request->string('sort_direction', 'desc')->toString();
 
-        if ($sortBy === 'goods_receipt_gr_number') {
-            $sortBy = 'gr_number';
-        }
-        if ($sortBy === 'goods_receipt_receipt_date') {
-            $sortBy = 'receipt_date';
-        }
-        if ($sortBy === 'goods_receipt_status') {
-            $sortBy = 'status';
-        }
-        if ($sortBy === 'purchase_order_po_number') {
-            $sortBy = 'po_number';
-        }
+        $sortBy = $this->normalizeSortBy($sortBy, [
+            'goods_receipt_gr_number' => 'gr_number',
+            'goods_receipt_receipt_date' => 'receipt_date',
+            'goods_receipt_status' => 'status',
+            'purchase_order_po_number' => 'po_number',
+        ]);
 
-        if (in_array($sortBy, [
-            'gr_number',
+        $this->applySorting(
+            $query,
+            $sortBy,
+            $sortDirection,
+            ['gr_number', 'receipt_date', 'status', 'po_number', 'supplier_name', 'warehouse_name'],
+            [
+                'item_count',
+                'total_received_quantity',
+                'total_accepted_quantity',
+                'total_rejected_quantity',
+                'total_receipt_value',
+            ],
             'receipt_date',
-            'status',
-            'po_number',
-            'supplier_name',
-            'warehouse_name',
-        ], true)) {
-            $query->orderBy($sortBy, $sortDirection);
-        } elseif (in_array($sortBy, [
-            'item_count',
-            'total_received_quantity',
-            'total_accepted_quantity',
-            'total_rejected_quantity',
-            'total_receipt_value',
-        ], true)) {
-            $query->orderByRaw($sortBy . ' ' . $sortDirection);
-        } else {
-            $query->orderBy('receipt_date', 'desc');
-        }
+        );
 
-        if ($request->boolean('export')) {
-            return $query->get();
-        }
-
-        return $query->paginate($request->integer('per_page', 15))->withQueryString();
+        return $this->exportOrPaginate($request, $query);
     }
 }

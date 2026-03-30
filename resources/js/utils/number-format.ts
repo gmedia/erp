@@ -36,10 +36,7 @@ function toBoolean(value: unknown): boolean {
     return false;
 }
 
-function normalizeSeparator(
-    value: unknown,
-    fallback: string,
-): string {
+function normalizeSeparator(value: unknown, fallback: string): string {
     return typeof value === 'string' && value.length > 0 ? value : fallback;
 }
 
@@ -67,7 +64,9 @@ export function normalizeRegionalNumberFormatSettings(
             value?.number_format_thousand,
             DEFAULT_REGIONAL_NUMBER_FORMAT_SETTINGS.number_format_thousand,
         ),
-        number_format_hide_decimal: toBoolean(value?.number_format_hide_decimal),
+        number_format_hide_decimal: toBoolean(
+            value?.number_format_hide_decimal,
+        ),
     };
 }
 
@@ -154,7 +153,12 @@ function resolveFractionDigits(
     hideDecimal: boolean,
     minimumFractionDigits?: number,
     maximumFractionDigits?: number,
-): Pick<Intl.NumberFormatOptions, 'minimumFractionDigits' | 'maximumFractionDigits'> | {} {
+):
+    | Pick<
+          Intl.NumberFormatOptions,
+          'minimumFractionDigits' | 'maximumFractionDigits'
+      >
+    | Record<string, never> {
     if (hideDecimal) {
         return {
             minimumFractionDigits: 0,

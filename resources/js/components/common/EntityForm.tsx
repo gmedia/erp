@@ -14,7 +14,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form, FormMessage } from '@/components/ui/form';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTranslation } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
 import { simpleEntitySchema } from '@/utils/schemas';
@@ -96,7 +95,7 @@ export default function EntityForm<
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
                 className={cn(
-                    'flex max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-[600px]',
+                    'flex max-h-[calc(100dvh-4rem)] flex-col overflow-hidden p-0 sm:max-w-[600px] lg:max-h-[90vh]',
                     className,
                 )}
             >
@@ -113,11 +112,11 @@ export default function EntityForm<
                         onSubmit={form.handleSubmit(handleSubmit)}
                         className="flex min-h-0 flex-1 flex-col"
                     >
-                        <ScrollArea className="flex-1 px-6">
-                            <div className="space-y-4 py-1 pr-6">
+                        <div className="min-h-0 flex-1 overflow-y-auto px-6">
+                            <div className="space-y-4 py-1 pb-6">
                                 {children}
                             </div>
-                        </ScrollArea>
+                        </div>
                         <div className="shrink-0 p-6 pt-2">
                             <DialogFooter className="border-t pt-4">
                                 <Button

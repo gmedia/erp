@@ -3,18 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Actions\InventoryStocktakes\SyncInventoryStocktakeItemsAction;
+use App\Http\Controllers\Concerns\HandlesNestedItemsResponse;
 use App\Http\Requests\InventoryStocktakes\UpdateInventoryStocktakeItemsRequest;
 use App\Models\InventoryStocktake;
 use Illuminate\Http\JsonResponse;
 
 class InventoryStocktakeItemController extends Controller
 {
+    use HandlesNestedItemsResponse;
+
     public function getItems(InventoryStocktake $inventoryStocktake): JsonResponse
     {
-        $inventoryStocktake->load(['items.product', 'items.unit', 'items.countedBy']);
-
-        return response()->json([
-            'data' => $inventoryStocktake->items->map(fn ($item) => [
+        return $this->nestedItemsResponse(
+            $inventoryStocktake,
+            ['items.product', 'items.unit', 'items.countedBy'],
+            fn ($item) => [
                 'id' => $item->id,
                 'product' => [
                     'id' => $item->product_id,
@@ -34,8 +37,8 @@ class InventoryStocktakeItemController extends Controller
                     'name' => $item->countedBy->name,
                 ] : null,
                 'counted_at' => $item->counted_at?->toIso8601String(),
-            ])->values(),
-        ]);
+            ],
+        );
     }
 
     public function syncItems(
@@ -45,10 +48,10 @@ class InventoryStocktakeItemController extends Controller
     ): JsonResponse {
         $action->execute($inventoryStocktake, $request->validated()['items']);
 
-        $inventoryStocktake->load(['items.product', 'items.unit', 'items.countedBy']);
-
-        return response()->json([
-            'data' => $inventoryStocktake->items->map(fn ($item) => [
+        return $this->nestedItemsResponse(
+            $inventoryStocktake,
+            ['items.product', 'items.unit', 'items.countedBy'],
+            fn ($item) => [
                 'id' => $item->id,
                 'product' => [
                     'id' => $item->product_id,
@@ -68,7 +71,7 @@ class InventoryStocktakeItemController extends Controller
                     'name' => $item->countedBy->name,
                 ] : null,
                 'counted_at' => $item->counted_at?->toIso8601String(),
-            ])->values(),
-        ]);
+            ],
+        );
     }
 }

@@ -88,9 +88,7 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
                         {item.termination_date && (
                             <ViewField
                                 label="Termination Date"
-                                value={formatDate(
-                                    item.termination_date as string,
-                                )}
+                                value={formatDate(item.termination_date)}
                             />
                         )}
                     </div>

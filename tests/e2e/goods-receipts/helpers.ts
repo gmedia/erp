@@ -118,6 +118,17 @@ export async function editGoodsReceipt(
 
     const updateResult = await page.evaluate(
         async ({ findBy, nextGrNumber }) => {
+            type GoodsReceiptDetailItem = {
+                purchase_order_item_id?: number | string;
+                product?: { id?: number | string } | null;
+                unit?: { id?: number | string } | null;
+                quantity_received?: number | string;
+                quantity_accepted?: number | string;
+                quantity_rejected?: number | string;
+                unit_price?: number | string;
+                notes?: string | null;
+            };
+
             const apiToken = localStorage.getItem('api_token') || '';
 
             const findResponse = await fetch(
@@ -132,8 +143,50 @@ export async function editGoodsReceipt(
             const findPayload = await findResponse.json();
             const row = (findPayload.data || [])[0];
             if (!row?.id) {
-                return { ok: false };
+                return { ok: false, step: 'find', status: findResponse.status, body: findPayload };
             }
+
+            const detailResponse = await fetch(`/api/goods-receipts/${row.id}`, {
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    Authorization: `Bearer ${apiToken}`,
+                },
+            });
+            const detailPayload = await detailResponse.json().catch(() => ({}));
+            const detail = detailPayload?.data;
+
+            if (!detail?.id) {
+                return {
+                    ok: false,
+                    step: 'show',
+                    status: detailResponse.status,
+                    body: detailPayload,
+                };
+            }
+
+            const payload = {
+                gr_number: nextGrNumber,
+                purchase_order_id: detail.purchase_order?.id,
+                warehouse_id: detail.warehouse?.id,
+                receipt_date: detail.receipt_date,
+                supplier_delivery_note: detail.supplier_delivery_note ?? '',
+                status: detail.status,
+                notes: detail.notes ?? '',
+                received_by: detail.received_by?.id ?? null,
+                confirmed_by: detail.confirmed_by?.id ?? null,
+                confirmed_at: detail.confirmed_at ?? null,
+                items: (detail.items as GoodsReceiptDetailItem[] || []).map((item) => ({
+                    purchase_order_item_id: item.purchase_order_item_id,
+                    product_id: item.product?.id,
+                    unit_id: item.unit?.id,
+                    quantity_received: item.quantity_received,
+                    quantity_accepted: item.quantity_accepted,
+                    quantity_rejected: item.quantity_rejected,
+                    unit_price: item.unit_price,
+                    notes: item.notes ?? '',
+                })),
+            };
 
             const updateResponse = await fetch(`/api/goods-receipts/${row.id}`, {
                 method: 'PUT',
@@ -143,15 +196,22 @@ export async function editGoodsReceipt(
                     Authorization: `Bearer ${apiToken}`,
                     'X-Requested-With': 'XMLHttpRequest',
                 },
-                body: JSON.stringify({ gr_number: nextGrNumber }),
+                body: JSON.stringify(payload),
             });
 
-            return { ok: updateResponse.ok };
+            const updatePayload = await updateResponse.json().catch(() => ({}));
+
+            return {
+                ok: updateResponse.ok,
+                step: 'update',
+                status: updateResponse.status,
+                body: updatePayload,
+            };
         },
         { findBy: identifier, nextGrNumber: updatedGrNumber },
     );
 
-    expect(updateResult.ok).toBeTruthy();
+    expect(updateResult, JSON.stringify(updateResult)).toMatchObject({ ok: true });
 
     await page.reload();
     await page

@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
 import { createSortingHeader } from '@/utils/columns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
 
 export interface MaintenanceCostReportItem {
@@ -67,9 +68,7 @@ export const maintenanceCostColumns: ColumnDef<MaintenanceCostReportItem>[] = [
         ...createSortingHeader('Scheduled At'),
         cell: ({ row }) => {
             const date = row.getValue('scheduled_at') as string;
-            return (
-                <div>{date ? new Date(date).toLocaleDateString() : '-'}</div>
-            );
+            return <div>{formatDateByRegionalSettings(date)}</div>;
         },
     },
     {
@@ -77,9 +76,7 @@ export const maintenanceCostColumns: ColumnDef<MaintenanceCostReportItem>[] = [
         ...createSortingHeader('Performed At'),
         cell: ({ row }) => {
             const date = row.getValue('performed_at') as string;
-            return (
-                <div>{date ? new Date(date).toLocaleDateString() : '-'}</div>
-            );
+            return <div>{formatDateByRegionalSettings(date)}</div>;
         },
     },
     {

@@ -2,38 +2,20 @@
 
 namespace App\Http\Requests\ApprovalFlows;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class StoreApprovalFlowRequest extends FormRequest
+class StoreApprovalFlowRequest extends AbstractApprovalFlowRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    protected function codeRules(): string
     {
-        return true;
+        return 'required|string|max:255|unique:approval_flows,code';
     }
 
-    public function rules(): array
+    protected function includeStepIdRule(): bool
     {
-        return [
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|max:255|unique:approval_flows,code',
-            'approvable_type' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
-            'conditions' => 'nullable|array',
-            'steps' => 'required|array|min:1',
-            'steps.*.name' => 'required|string|max:255',
-            'steps.*.approver_type' => 'required|in:user',
-            'steps.*.approver_user_id' => 'required|exists:users,id',
-            'steps.*.approver_role_id' => 'prohibited',
-            'steps.*.approver_department_id' => 'prohibited',
-            'steps.*.required_action' => 'required|in:approve,review,acknowledge',
-            'steps.*.auto_approve_after_hours' => 'nullable|integer|min:0',
-            'steps.*.escalate_after_hours' => 'nullable|integer|min:0',
-            'steps.*.escalation_user_id' => 'nullable|exists:users,id',
-            'steps.*.can_reject' => 'boolean',
-        ];
+        return false;
+    }
+
+    protected function useSometimes(): bool
+    {
+        return false;
     }
 }

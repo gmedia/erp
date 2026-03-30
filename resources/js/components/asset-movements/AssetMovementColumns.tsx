@@ -6,8 +6,8 @@ import {
     createSelectColumn,
     createSortingHeader,
 } from '@/utils/columns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
-import { format } from 'date-fns';
 
 export interface AssetMovement {
     id: number;
@@ -62,7 +62,7 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
         ...createSortingHeader('Date'),
         cell: ({ row }) => {
             const date = row.getValue('moved_at') as string;
-            return date ? format(new Date(date), 'PPP') : '-';
+            return formatDateByRegionalSettings(date);
         },
     },
     {

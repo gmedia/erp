@@ -1,5 +1,4 @@
 import { Page, expect } from '@playwright/test';
-import { login } from '../helpers';
 
 async function pickFirstAsyncOption(page: Page, searchText?: string): Promise<void> {
   const list = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
@@ -37,7 +36,6 @@ export async function createAssetMovement(
     notes: string;
   }> = {}
 ): Promise<string> {
-  await login(page);
   await page.goto('/asset-movements');
 
   // Open the "Add Movement" dialog
@@ -97,11 +95,21 @@ export async function createAssetMovement(
   }
 
   // Submit
+  const createResponsePromise = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/asset-movements') &&
+      response.request().method() === 'POST' &&
+      response.status() < 400,
+  );
   const submitBtn = dialog.getByRole('button', { name: /Record Movement/i }).last();
   await submitBtn.click();
+  await createResponsePromise;
 
   // Wait for dialog to disappear
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
+
+  await searchAssetMovement(page, reference);
+  await expect(page.getByText(reference).first()).toBeVisible({ timeout: 10000 });
 
   return reference; // Return reference as identifier
 }
@@ -114,8 +122,14 @@ export async function searchAssetMovement(page: Page, query: string): Promise<vo
   const searchInput = page.getByPlaceholder(/Search/i).first();
   await expect(searchInput).toBeVisible();
   await searchInput.fill(query);
+  const responsePromise = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/asset-movements') &&
+      response.request().method() === 'GET' &&
+      response.status() < 400,
+  ).catch(() => null);
   await searchInput.press('Enter');
-  await page.waitForLoadState('networkidle');
+  await responsePromise;
   // Passive wait: don't assert visibility of results here to allow "delete" tests to verify absence
 }
 

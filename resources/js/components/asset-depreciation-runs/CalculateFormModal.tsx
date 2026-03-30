@@ -1,4 +1,5 @@
 import AsyncSelectField from '@/components/common/AsyncSelectField';
+import { DatePickerField } from '@/components/common/DatePickerField';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -9,12 +10,17 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { type FiscalYear } from '@/types/fiscal-year';
 import { type AssetDepreciationCalculationFormData } from '@/utils/schemas';
+import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+
+interface CalculateFormValues {
+    fiscal_year_id: string;
+    period_start?: Date;
+    period_end?: Date;
+}
 
 interface CalculateFormModalProps {
     open: boolean;
@@ -31,31 +37,47 @@ export function CalculateFormModal({
     onSubmit,
     loading,
 }: Readonly<CalculateFormModalProps>) {
-    const form = useForm<AssetDepreciationCalculationFormData>({
+    const form = useForm<CalculateFormValues>({
         defaultValues: {
             fiscal_year_id: '',
-            period_start: '',
-            period_end: '',
+            period_start: undefined,
+            period_end: undefined,
         },
     });
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        setError,
-        reset,
-    } = form;
+    const { handleSubmit, setError, reset } = form;
 
-    const handleFormSubmit = async (
-        data: AssetDepreciationCalculationFormData,
-    ) => {
-        const result = await onSubmit(data);
+    const handleFormSubmit = async (data: CalculateFormValues) => {
+        if (!data.period_start) {
+            setError('period_start', {
+                type: 'required',
+                message: 'Start date is required',
+            });
+
+            return;
+        }
+
+        if (!data.period_end) {
+            setError('period_end', {
+                type: 'required',
+                message: 'End date is required',
+            });
+
+            return;
+        }
+
+        const payload: AssetDepreciationCalculationFormData = {
+            fiscal_year_id: data.fiscal_year_id,
+            period_start: format(data.period_start, 'yyyy-MM-dd'),
+            period_end: format(data.period_end, 'yyyy-MM-dd'),
+        };
+
+        const result = await onSubmit(payload);
 
         if (result?.errors) {
             const errors = result.errors;
             Object.keys(errors).forEach((key) => {
-                setError(key as keyof AssetDepreciationCalculationFormData, {
+                setError(key as keyof CalculateFormValues, {
                     type: 'server',
                     message: errors[key][0],
                 });
@@ -89,64 +111,16 @@ export function CalculateFormModal({
                             />
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label
-                                        htmlFor="period_start"
-                                        className={
-                                            errors.period_start
-                                                ? 'text-destructive'
-                                                : ''
-                                        }
-                                    >
-                                        Period Start
-                                    </Label>
-                                    <Input
-                                        id="period_start"
-                                        type="date"
-                                        {...register('period_start', {
-                                            required: 'Start date is required',
-                                        })}
-                                        className={
-                                            errors.period_start
-                                                ? 'border-destructive'
-                                                : ''
-                                        }
-                                    />
-                                    {errors.period_start && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.period_start.message}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="space-y-2">
-                                    <Label
-                                        htmlFor="period_end"
-                                        className={
-                                            errors.period_end
-                                                ? 'text-destructive'
-                                                : ''
-                                        }
-                                    >
-                                        Period End
-                                    </Label>
-                                    <Input
-                                        id="period_end"
-                                        type="date"
-                                        {...register('period_end', {
-                                            required: 'End date is required',
-                                        })}
-                                        className={
-                                            errors.period_end
-                                                ? 'border-destructive'
-                                                : ''
-                                        }
-                                    />
-                                    {errors.period_end && (
-                                        <p className="text-sm text-destructive">
-                                            {errors.period_end.message}
-                                        </p>
-                                    )}
-                                </div>
+                                <DatePickerField
+                                    name="period_start"
+                                    label="Period Start"
+                                    placeholder="Pick period start"
+                                />
+                                <DatePickerField
+                                    name="period_end"
+                                    label="Period End"
+                                    placeholder="Pick period end"
+                                />
                             </div>
                         </div>
                         <DialogFooter>

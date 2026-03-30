@@ -8,10 +8,9 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { type Asset } from '@/types/asset';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
-import { format } from 'date-fns';
 
 interface AssetViewModalProps {
     open: boolean;
@@ -27,12 +26,9 @@ export function AssetViewModal({
     if (!item) return null;
 
     const formatDate = (dateString: Readonly<string | null>) => {
-        if (!dateString) return 'N/A';
-        try {
-            return format(new Date(dateString), 'PPP');
-        } catch {
-            return dateString;
-        }
+        return formatDateByRegionalSettings(dateString, {
+            fallback: 'N/A',
+        });
     };
 
     const formatCurrency = (value: string | number) => {
@@ -85,7 +81,7 @@ export function AssetViewModal({
                     </DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className="flex-1 pr-4">
+                <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
                     <div className="py-4">
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             {/* General Information */}
@@ -310,7 +306,7 @@ export function AssetViewModal({
                             </div>
                         )}
                     </div>
-                </ScrollArea>
+                </div>
             </DialogContent>
         </Dialog>
     );

@@ -8,7 +8,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
     Table,
     TableBody,
@@ -19,8 +18,8 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { JournalEntry } from '@/types/journal-entry';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
-import { format } from 'date-fns';
 
 interface JournalEntryViewModalProps {
     item: JournalEntry | null;
@@ -56,33 +55,32 @@ export function JournalEntryViewModal({
                     </DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className="flex-1 pr-4">
+                <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
                     <div className="space-y-6 py-2">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div className="min-w-0">
                                 <p className="text-sm font-medium text-gray-500">
                                     Entry Number
                                 </p>
                                 <p>{item.entry_number}</p>
                             </div>
-                            <div>
+                            <div className="min-w-0">
                                 <p className="text-sm font-medium text-gray-500">
                                     Date
                                 </p>
                                 <p>
-                                    {format(
-                                        new Date(item.entry_date),
-                                        'dd MMMM yyyy',
+                                    {formatDateByRegionalSettings(
+                                        item.entry_date,
                                     )}
                                 </p>
                             </div>
-                            <div>
+                            <div className="min-w-0">
                                 <p className="text-sm font-medium text-gray-500">
                                     Reference
                                 </p>
                                 <p>{item.reference || '-'}</p>
                             </div>
-                            <div>
+                            <div className="min-w-0">
                                 <p className="text-sm font-medium text-gray-500">
                                     Status
                                 </p>
@@ -94,7 +92,7 @@ export function JournalEntryViewModal({
                                     {item.status.toUpperCase()}
                                 </Badge>
                             </div>
-                            <div className="col-span-2">
+                            <div className="min-w-0 sm:col-span-2">
                                 <p className="text-sm font-medium text-gray-500">
                                     Description
                                 </p>
@@ -102,8 +100,8 @@ export function JournalEntryViewModal({
                             </div>
                         </div>
 
-                        <div className="overflow-x-auto rounded-md border">
-                            <Table>
+                        <div className="min-w-0 rounded-md border">
+                            <Table className="min-w-[600px]">
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Account</TableHead>
@@ -176,7 +174,7 @@ export function JournalEntryViewModal({
                             </Table>
                         </div>
                     </div>
-                </ScrollArea>
+                </div>
 
                 <DialogFooter>
                     <Button type="button" onClick={onClose}>

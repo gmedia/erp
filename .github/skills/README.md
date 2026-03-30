@@ -89,4 +89,5 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 | `/create-feature` | Buat fitur CRUD baru |
 | `/create-import` | Tambahkan fitur import pada modul existing |
 | `/refactor-module` | Refactor modul existing |
+| `/refactor-sonar` | Susun dan jalankan refactor plan berbasis data SonarQube MCP |
 | `/create-tests` | Buat test untuk fitur |

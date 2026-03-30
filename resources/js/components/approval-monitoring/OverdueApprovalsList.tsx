@@ -8,7 +8,10 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { type OverdueApproval } from '@/hooks/useApprovalMonitoring';
-import { format } from 'date-fns';
+import {
+    formatDateByRegionalSettings,
+    formatTimeByRegionalSettings,
+} from '@/utils/date-format';
 import { AlertCircle } from 'lucide-react';
 
 interface OverdueApprovalsListProps {
@@ -93,15 +96,13 @@ export function OverdueApprovalsList({
                                     <TableCell>
                                         <div className="flex flex-col">
                                             <span>
-                                                {format(
-                                                    new Date(item.due_at),
-                                                    'MMM dd, yyyy',
+                                                {formatDateByRegionalSettings(
+                                                    item.due_at,
                                                 )}
                                             </span>
                                             <span className="text-xs text-muted-foreground">
-                                                {format(
-                                                    new Date(item.due_at),
-                                                    'HH:mm',
+                                                {formatTimeByRegionalSettings(
+                                                    item.due_at,
                                                 )}
                                             </span>
                                         </div>

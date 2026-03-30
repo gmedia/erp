@@ -41,20 +41,18 @@ class RepairMissingApprovalStepsAction
 
         foreach ($requests as $request) {
             $flow = $request->flow;
-            $flowSteps = $flow?->steps ?? collect();
+            $flowSteps = $flow ? $flow->steps : collect();
             $skipReason = $this->getSkipReason($request);
 
             if ($skipReason !== null) {
                 $report['skipped']++;
-                $report['items'][] = [
-                    'approval_request_id' => $request->id,
-                    'approval_flow_id' => $flow?->id,
-                    'approval_flow_code' => $flow?->code,
-                    'status' => $request->status,
-                    'current_step_order' => $request->current_step_order,
-                    'flow_step_count' => $flowSteps->count(),
-                    'outcome' => $skipReason,
-                ];
+                $report['items'][] = $this->buildReportItem(
+                    $request,
+                    $flow?->id,
+                    $flow?->code,
+                    $flowSteps->count(),
+                    $skipReason,
+                );
 
                 continue;
             }
@@ -79,15 +77,13 @@ class RepairMissingApprovalStepsAction
                 $report['repaired']++;
             }
 
-            $report['items'][] = [
-                'approval_request_id' => $request->id,
-                'approval_flow_id' => $flow?->id,
-                'approval_flow_code' => $flow?->code,
-                'status' => $request->status,
-                'current_step_order' => $request->current_step_order,
-                'flow_step_count' => $flowSteps->count(),
-                'outcome' => $dryRun ? 'repairable' : 'repaired',
-            ];
+            $report['items'][] = $this->buildReportItem(
+                $request,
+                $flow?->id,
+                $flow?->code,
+                $flowSteps->count(),
+                $dryRun ? 'repairable' : 'repaired',
+            );
         }
 
         return $report;
@@ -118,5 +114,23 @@ class RepairMissingApprovalStepsAction
         }
 
         return null;
+    }
+
+    private function buildReportItem(
+        ApprovalRequest $request,
+        ?int $flowId,
+        ?string $flowCode,
+        int $flowStepCount,
+        string $outcome,
+    ): array {
+        return [
+            'approval_request_id' => $request->id,
+            'approval_flow_id' => $flowId,
+            'approval_flow_code' => $flowCode,
+            'status' => $request->status,
+            'current_step_order' => $request->current_step_order,
+            'flow_step_count' => $flowStepCount,
+            'outcome' => $outcome,
+        ];
     }
 }

@@ -16,9 +16,33 @@ test.describe('Asset Depreciation Runs', () => {
         await expect(calculateButton).toBeVisible();
         await calculateButton.click();
 
-        const dialog = page.getByRole('dialog');
+        const dialog = page.getByRole('dialog', {
+            name: 'Calculate Depreciation',
+        });
         await expect(dialog).toBeVisible();
         await expect(dialog.getByRole('heading', { name: 'Calculate Depreciation' })).toBeVisible();
+
+        const periodStartButton = dialog.getByRole('button', {
+            name: 'Period Start',
+        });
+        await periodStartButton.click();
+        await page
+            .locator('[data-slot="calendar"] button[data-day]:not([disabled])')
+            .first()
+            .click();
+        await expect(periodStartButton).not.toContainText(
+            /Pick period start|Pick a date/i,
+        );
+
+        const periodEndButton = dialog.getByRole('button', {
+            name: 'Period End',
+        });
+        await periodEndButton.click();
+        await page
+            .locator('[data-slot="calendar"] button[data-day]:not([disabled])')
+            .first()
+            .click();
+        await expect(periodEndButton).not.toContainText(/Pick period end|Pick a date/i);
         
         await dialog.getByRole('button', { name: 'Cancel' }).click();
         await expect(dialog).toBeHidden();

@@ -4,7 +4,7 @@ import { ImgHTMLAttributes } from 'react';
 const defaultLogoPath = '/asset-files/dokfin/logo_orange.svg';
 
 export default function AppLogoIcon(
-    props: ImgHTMLAttributes<HTMLImageElement>,
+    props: Readonly<ImgHTMLAttributes<HTMLImageElement>>,
 ) {
     const { companyLogoUrl } = useAuth();
 

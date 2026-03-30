@@ -9,7 +9,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEntityApprovalHistory } from '@/hooks/useEntityApprovalHistory';
-import { format } from 'date-fns';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import {
     AlertCircle,
     CheckCircle2,
@@ -198,9 +198,8 @@ export function ApprovalHistoryTimeline({
                                                 {request.submitter?.name}
                                             </span>{' '}
                                             on{' '}
-                                            {format(
-                                                new Date(request.submitted_at),
-                                                'dd MMM yyyy, HH:mm',
+                                            {formatDateTimeByRegionalSettings(
+                                                request.submitted_at,
                                             )}
                                         </div>
                                     </div>
@@ -208,9 +207,8 @@ export function ApprovalHistoryTimeline({
                                         <div className="border-l border-border/50 pl-4 text-right text-xs text-muted-foreground">
                                             Completed:
                                             <br />
-                                            {format(
-                                                new Date(request.completed_at),
-                                                'dd MMM yyyy, HH:mm',
+                                            {formatDateTimeByRegionalSettings(
+                                                request.completed_at,
                                             )}
                                         </div>
                                     )}
@@ -257,11 +255,8 @@ export function ApprovalHistoryTimeline({
                                                                     step.acted_at
                                                                 }
                                                             >
-                                                                {format(
-                                                                    new Date(
-                                                                        step.acted_at,
-                                                                    ),
-                                                                    'dd MMM yyyy, HH:mm',
+                                                                {formatDateTimeByRegionalSettings(
+                                                                    step.acted_at,
                                                                 )}
                                                             </time>
                                                         ) : (

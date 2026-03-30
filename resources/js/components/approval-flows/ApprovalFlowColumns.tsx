@@ -4,8 +4,8 @@ import {
     createSelectColumn,
     createSortingHeader,
 } from '@/utils/columns';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { type ColumnDef } from '@tanstack/react-table';
-import { format } from 'date-fns';
 
 import { type ApprovalFlow } from '@/types/entity';
 
@@ -46,9 +46,9 @@ export const approvalFlowColumns: ColumnDef<ApprovalFlow>[] = [
         ...createSortingHeader('Created At'),
         cell: ({ row }) => {
             const dateStr = row.getValue('created_at') as string;
-            return dateStr
-                ? format(new Date(dateStr), 'dd MMM yyyy HH:mm')
-                : '';
+            return formatDateTimeByRegionalSettings(dateStr, {
+                fallback: '',
+            });
         },
     },
     createActionsColumn<ApprovalFlow>(),

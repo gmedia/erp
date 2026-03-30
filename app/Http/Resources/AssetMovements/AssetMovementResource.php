@@ -4,6 +4,7 @@ namespace App\Http\Resources\AssetMovements;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\MissingValue;
 
 /**
  * @mixin \App\Models\AssetMovement
@@ -12,14 +13,21 @@ class AssetMovementResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $asset = $this->whenLoaded('asset');
+        $assetPayload = null;
+
+        if (! $asset instanceof MissingValue && $asset !== null) {
+            $assetPayload = [
+                'id' => $asset->id,
+                'name' => $asset->name,
+                'asset_code' => $asset->asset_code,
+            ];
+        }
+
         return [
             'id' => $this->id,
             'asset_id' => $this->asset_id,
-            'asset' => [
-                'id' => $this->asset_id,
-                'name' => $this->asset?->name ?? 'Unknown Asset',
-                'asset_code' => $this->asset?->asset_code ?? 'N/A',
-            ],
+            'asset' => $assetPayload,
             'movement_type' => $this->movement_type,
             'moved_at' => $this->moved_at->toIso8601String(),
             'from_branch_id' => $this->from_branch_id,

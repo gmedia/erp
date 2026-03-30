@@ -1,3 +1,4 @@
+import { ViewField } from '@/components/common/ViewField';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,7 +9,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
     Table,
     TableBody,
@@ -18,7 +18,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import axios from '@/lib/axios';
-import { format } from 'date-fns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
 import { useTranslation } from '@/contexts/i18n-context';
@@ -29,19 +29,6 @@ interface StockTransferViewModalProps {
     onClose: () => void;
     item: StockTransfer | null;
 }
-
-const ViewField = ({
-    label,
-    value,
-}: {
-    label: string;
-    value: React.ReactNode;
-}) => (
-    <div className="space-y-1">
-        <h4 className="text-sm font-medium text-muted-foreground">{label}</h4>
-        <div className="text-sm font-medium">{value || '-'}</div>
-    </div>
-);
 
 export const StockTransferViewModal = React.memo(
     ({ item, open, onClose }: StockTransferViewModalProps) => {
@@ -82,9 +69,9 @@ export const StockTransferViewModal = React.memo(
                         </DialogDescription>
                     </DialogHeader>
 
-                    <ScrollArea className="flex-1 pr-4">
+                    <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
                         <div className="space-y-6 py-4">
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                 <ViewField
                                     label="Transfer Number"
                                     value={current.transfer_number}
@@ -107,29 +94,15 @@ export const StockTransferViewModal = React.memo(
                                 />
                                 <ViewField
                                     label="Transfer Date"
-                                    value={
-                                        current.transfer_date
-                                            ? format(
-                                                  new Date(
-                                                      current.transfer_date,
-                                                  ),
-                                                  'PPP',
-                                              )
-                                            : '-'
-                                    }
+                                    value={formatDateByRegionalSettings(
+                                        current.transfer_date,
+                                    )}
                                 />
                                 <ViewField
                                     label="Expected Arrival"
-                                    value={
-                                        current.expected_arrival_date
-                                            ? format(
-                                                  new Date(
-                                                      current.expected_arrival_date,
-                                                  ),
-                                                  'PPP',
-                                              )
-                                            : '-'
-                                    }
+                                    value={formatDateByRegionalSettings(
+                                        current.expected_arrival_date,
+                                    )}
                                 />
                                 <ViewField
                                     label="Requested By"
@@ -145,8 +118,8 @@ export const StockTransferViewModal = React.memo(
                                 <div className="text-sm font-semibold">
                                     Items
                                 </div>
-                                <div className="overflow-x-auto rounded-md border">
-                                    <Table>
+                                <div className="min-w-0 rounded-md border">
+                                    <Table className="min-w-[760px]">
                                         <TableHeader>
                                             <TableRow>
                                                 <TableHead>Product</TableHead>
@@ -212,7 +185,7 @@ export const StockTransferViewModal = React.memo(
                                 </div>
                             </div>
                         </div>
-                    </ScrollArea>
+                    </div>
 
                     <DialogFooter>
                         <Button type="button" onClick={onClose}>

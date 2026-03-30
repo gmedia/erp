@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -18,6 +18,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
+import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type SupplierReturnFormData } from '@/types/supplier-return';
 
 const supplierReturnItemSchema = z.object({
@@ -91,11 +92,7 @@ export function SupplierReturnItemFormDialog({
         defaultValues,
     });
 
-    useEffect(() => {
-        if (open) {
-            form.reset(defaultValues);
-        }
-    }, [open, defaultValues, form]);
+    useResetFormOnDefaultValues(form, defaultValues, { enabled: open });
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>

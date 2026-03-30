@@ -45,6 +45,37 @@ trait BaseFilterService
     }
 
     /**
+     * Apply search with alias fields that target relation columns.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<int, string>  $searchFields
+     * @param  array<string, array{relation: string, column: string}>  $relationFieldAliases
+     */
+    public function applySearchWithRelationAliases(
+        Builder $query,
+        string $search,
+        array $searchFields,
+        array $relationFieldAliases
+    ): void {
+        $query->where(function ($q) use ($search, $searchFields, $relationFieldAliases) {
+            foreach ($searchFields as $field) {
+                if (isset($relationFieldAliases[$field])) {
+                    $alias = $relationFieldAliases[$field];
+                    $q->orWhereHas($alias['relation'], function ($relationQuery) use ($search, $alias) {
+                        $relationQuery->where($alias['column'], 'like', "%{$search}%");
+                    });
+
+                    continue;
+                }
+
+                $q->orWhere($field, 'like', "%{$search}%");
+            }
+        });
+    }
+
+    /**
      * Apply sorting to query with validation against allowed columns.
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
@@ -56,6 +87,68 @@ trait BaseFilterService
     {
         if (in_array($sortBy, $allowedSorts)) {
             $query->orderBy($sortBy, $sortDirection);
+        }
+    }
+
+    /**
+     * Apply exact-match filters where request key maps to a database column.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<string, mixed>  $filters
+     * @param  array<string, string>  $fieldMap  Request key => column name
+     */
+    public function applyExactFilters(Builder $query, array $filters, array $fieldMap): void
+    {
+        foreach ($fieldMap as $filterKey => $column) {
+            if (! empty($filters[$filterKey])) {
+                $query->where($column, $filters[$filterKey]);
+            }
+        }
+    }
+
+    /**
+     * Apply date range filters with optional from/to keys.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<string, mixed>  $filters
+     * @param  array<string, array{from: string, to: string}>  $dateRanges  Column => keys
+     */
+    public function applyDateRanges(Builder $query, array $filters, array $dateRanges): void
+    {
+        foreach ($dateRanges as $column => $rangeKeys) {
+            if (! empty($filters[$rangeKeys['from']])) {
+                $query->whereDate($column, '>=', $filters[$rangeKeys['from']]);
+            }
+
+            if (! empty($filters[$rangeKeys['to']])) {
+                $query->whereDate($column, '<=', $filters[$rangeKeys['to']]);
+            }
+        }
+    }
+
+    /**
+     * Apply numeric min/max filters where request key maps to a database column.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<string, mixed>  $filters
+     * @param  array<string, array{min: string, max: string}>  $numericRanges  Column => keys
+     */
+    public function applyNumericRanges(Builder $query, array $filters, array $numericRanges): void
+    {
+        foreach ($numericRanges as $column => $rangeKeys) {
+            if (! empty($filters[$rangeKeys['min']])) {
+                $query->where($column, '>=', $filters[$rangeKeys['min']]);
+            }
+
+            if (! empty($filters[$rangeKeys['max']])) {
+                $query->where($column, '<=', $filters[$rangeKeys['max']]);
+            }
         }
     }
 }

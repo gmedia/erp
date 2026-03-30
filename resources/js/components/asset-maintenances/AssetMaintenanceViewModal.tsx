@@ -8,8 +8,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
-import { format } from 'date-fns';
 
 interface AssetMaintenanceViewModalProps {
     open: boolean;
@@ -36,7 +36,7 @@ export function AssetMaintenanceViewModal({
                 </DialogHeader>
 
                 <div className="space-y-4 py-2">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
                         <div>
                             <span className="block text-xs text-muted-foreground">
                                 Asset
@@ -71,9 +71,9 @@ export function AssetMaintenanceViewModal({
                                 Scheduled At
                             </span>
                             <span>
-                                {item.scheduled_at
-                                    ? format(new Date(item.scheduled_at), 'PPP')
-                                    : '-'}
+                                {formatDateByRegionalSettings(
+                                    item.scheduled_at,
+                                )}
                             </span>
                         </div>
                         <div>
@@ -81,9 +81,9 @@ export function AssetMaintenanceViewModal({
                                 Performed At
                             </span>
                             <span>
-                                {item.performed_at
-                                    ? format(new Date(item.performed_at), 'PPP')
-                                    : '-'}
+                                {formatDateByRegionalSettings(
+                                    item.performed_at,
+                                )}
                             </span>
                         </div>
                         <div>

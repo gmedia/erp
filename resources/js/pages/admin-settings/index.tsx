@@ -11,16 +11,18 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/contexts/auth-context';
 import AdminSettingsLayout from '@/layouts/admin-settings/layout';
 import AppLayout from '@/layouts/app-layout';
 import axiosInstance from '@/lib/axios';
 import { type BreadcrumbItem } from '@/types';
+import { setRegionalDateFormatSettings } from '@/utils/date-format';
 import { setRegionalNumberFormatSettings } from '@/utils/number-format';
 import { Transition } from '@headlessui/react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 interface SettingsData {
@@ -118,7 +120,11 @@ async function submitJsonAdminSettings(
 
 function GeneralSettings({
     settings,
-}: Readonly<{ settings: SettingsData['general'] }>) {
+    onSaved,
+}: Readonly<{
+    settings: SettingsData['general'];
+    onSaved?: () => Promise<void> | void;
+}>) {
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -131,14 +137,22 @@ function GeneralSettings({
 
         try {
             const formData = new FormData(e.currentTarget);
-            await axiosInstance.post('/api/admin-settings', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-                params: {
-                    _method: 'PUT', // Laravel needs _method=PUT for file uploads when using PUT
-                },
-            });
+            const logoInput =
+                e.currentTarget.elements.namedItem('company_logo');
+            const payload = Object.fromEntries(formData.entries()) as Record<
+                string,
+                FormDataEntryValue
+            >;
+
+            delete payload.company_logo;
+
+            if (logoInput instanceof HTMLInputElement && logoInput.files?.[0]) {
+                payload.company_logo_svg = await logoInput.files[0].text();
+            }
+
+            await axiosInstance.post('/api/admin-settings', payload);
+
+            await onSaved?.();
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
         } catch (error: unknown) {
@@ -298,7 +312,9 @@ function RegionalSettings({
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const [currency, setCurrency] = useState<string>(settings?.currency ?? 'IDR');
+    const [currency, setCurrency] = useState<string>(
+        settings?.currency ?? 'IDR',
+    );
     const [hideDecimal, setHideDecimal] = useState<boolean>(
         Boolean(settings?.number_format_hide_decimal),
     );
@@ -326,16 +342,16 @@ function RegionalSettings({
                 string,
                 string
             >;
-            await axiosInstance.put(
-                '/api/admin-settings',
-                payload,
-            );
+            await axiosInstance.put('/api/admin-settings', payload);
 
             setRegionalNumberFormatSettings({
                 currency,
                 number_format_decimal: payload.number_format_decimal,
                 number_format_thousand: payload.number_format_thousand,
                 number_format_hide_decimal: hideDecimal,
+            });
+            setRegionalDateFormatSettings({
+                date_format: payload.date_format,
             });
 
             setRecentlySuccessful(true);
@@ -387,8 +403,7 @@ function RegionalSettings({
 
                 <div className="grid gap-2">
                     <Label htmlFor="currency">Currency</Label>
-                    <Select value={currency} onValueChange={setCurrency}
-                    >
+                    <Select value={currency} onValueChange={setCurrency}>
                         <SelectTrigger
                             id="currency"
                             className="mt-1 w-full"
@@ -805,6 +820,17 @@ interface AdminSettingsResponse {
 export default function AdminSettings() {
     const [searchParams] = useSearchParams();
     const currentGroup = searchParams.get('group') || 'general';
+    const queryClient = useQueryClient();
+    const { refreshAuth } = useAuth();
+
+    const handleGeneralSettingsSaved = useCallback(async () => {
+        await queryClient.invalidateQueries({ queryKey: ['admin-settings'] });
+        await queryClient.refetchQueries({
+            queryKey: ['admin-settings'],
+            type: 'active',
+        });
+        await refreshAuth();
+    }, [queryClient, refreshAuth]);
 
     const { data, isLoading, error } = useQuery<AdminSettingsResponse>({
         queryKey: ['admin-settings'],
@@ -849,7 +875,10 @@ export default function AdminSettings() {
 
             <AdminSettingsLayout currentGroup={currentGroup}>
                 {currentGroup === 'general' && (
-                    <GeneralSettings settings={data?.settings?.general} />
+                    <GeneralSettings
+                        settings={data?.settings?.general}
+                        onSaved={handleGeneralSettingsSaved}
+                    />
                 )}
                 {currentGroup === 'regional' && (
                     <RegionalSettings settings={data?.settings?.regional} />

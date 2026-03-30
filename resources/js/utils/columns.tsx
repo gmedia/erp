@@ -97,7 +97,12 @@ export function createTextColumn<T = Record<string, unknown>>(
         accessorKey: accessorKey as string,
         cell: ({ row }) => {
             const value = row.getValue(accessorKey as string);
-            return <div>{value ? String(value) : '-'}</div>;
+
+            if (typeof value === 'string' || typeof value === 'number') {
+                return <div>{String(value)}</div>;
+            }
+
+            return <div>-</div>;
         },
     };
 
@@ -126,7 +131,16 @@ export function createDateColumn<T = Record<string, unknown>>(
         cell: ({ row }) => {
             const value = row.getValue(accessorKey as string);
             if (!value) return <div>-</div>;
-            return <div>{formatDate(String(value))}</div>;
+
+            if (
+                typeof value === 'string' ||
+                typeof value === 'number' ||
+                value instanceof Date
+            ) {
+                return <div>{formatDate(String(value))}</div>;
+            }
+
+            return <div>-</div>;
         },
     };
 
@@ -352,7 +366,7 @@ export function createActionsColumn<T = Record<string, unknown>>(
             viewPath,
         },
         cell: ({ row }) => {
-            const item = row.original as T;
+            const item = row.original;
             return (
                 <GenericActions
                     item={item}

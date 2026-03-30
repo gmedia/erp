@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { createSortingHeader } from '@/utils/columns';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
 import { Eye } from 'lucide-react';
 
@@ -40,7 +41,7 @@ export const createPipelineAuditTrailColumns = ({
         ...createSortingHeader('Date'),
         cell: ({ row }) => {
             const date = row.getValue('created_at') as string;
-            return <div>{date ? new Date(date).toLocaleString() : '-'}</div>;
+            return <div>{formatDateTimeByRegionalSettings(date)}</div>;
         },
     },
     {

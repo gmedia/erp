@@ -1,3 +1,4 @@
+import { ViewField } from '@/components/common/ViewField';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,7 +9,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
     Table,
     TableBody,
@@ -18,7 +18,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import axios from '@/lib/axios';
-import { format } from 'date-fns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
 import { useTranslation } from '@/contexts/i18n-context';
@@ -29,19 +29,6 @@ interface InventoryStocktakeViewModalProps {
     onClose: () => void;
     item: InventoryStocktake | null;
 }
-
-const ViewField = ({
-    label,
-    value,
-}: {
-    label: string;
-    value: React.ReactNode;
-}) => (
-    <div className="space-y-1">
-        <h4 className="text-sm font-medium text-muted-foreground">{label}</h4>
-        <div className="text-sm font-medium">{value || '-'}</div>
-    </div>
-);
 
 export const InventoryStocktakeViewModal = React.memo(
     ({ item, open, onClose }: InventoryStocktakeViewModalProps) => {
@@ -84,9 +71,9 @@ export const InventoryStocktakeViewModal = React.memo(
                         </DialogDescription>
                     </DialogHeader>
 
-                    <ScrollArea className="flex-1 pr-4">
+                    <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
                         <div className="space-y-6 py-4">
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                 <ViewField
                                     label="Stocktake Number"
                                     value={current.stocktake_number}
@@ -111,16 +98,9 @@ export const InventoryStocktakeViewModal = React.memo(
                                 />
                                 <ViewField
                                     label="Stocktake Date"
-                                    value={
-                                        current.stocktake_date
-                                            ? format(
-                                                  new Date(
-                                                      current.stocktake_date,
-                                                  ),
-                                                  'PPP',
-                                              )
-                                            : '-'
-                                    }
+                                    value={formatDateByRegionalSettings(
+                                        current.stocktake_date,
+                                    )}
                                 />
                                 <ViewField
                                     label="Notes"
@@ -132,8 +112,8 @@ export const InventoryStocktakeViewModal = React.memo(
                                 <div className="text-sm font-semibold">
                                     Items
                                 </div>
-                                <div className="overflow-x-auto rounded-md border">
-                                    <Table>
+                                <div className="min-w-0 rounded-md border">
+                                    <Table className="min-w-[820px]">
                                         <TableHeader>
                                             <TableRow>
                                                 <TableHead>Product</TableHead>
@@ -207,7 +187,7 @@ export const InventoryStocktakeViewModal = React.memo(
                                 </div>
                             </div>
                         </div>
-                    </ScrollArea>
+                    </div>
 
                     <DialogFooter>
                         <Button type="button" onClick={onClose}>

@@ -8,7 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { format } from 'date-fns';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 
 interface AssetMovementViewModalProps {
     open: boolean;
@@ -34,7 +34,7 @@ export function AssetMovementViewModal({
                 </DialogHeader>
 
                 <div className="space-y-4 py-2">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
                         <div>
                             <span className="block text-xs text-muted-foreground">
                                 Asset
@@ -57,7 +57,9 @@ export function AssetMovementViewModal({
                                 Date
                             </span>
                             <span>
-                                {format(new Date(item.moved_at), 'PPP p')}
+                                {formatDateTimeByRegionalSettings(
+                                    item.moved_at,
+                                )}
                             </span>
                         </div>
                         <div>
@@ -70,7 +72,7 @@ export function AssetMovementViewModal({
 
                     <hr />
 
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
                         <div className="space-y-2">
                             <span className="block text-xs font-medium text-muted-foreground">
                                 Origin

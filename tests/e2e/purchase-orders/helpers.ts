@@ -87,6 +87,17 @@ export async function editPurchaseOrder(
 
     const updateResult = await page.evaluate(
         async ({ findBy, nextPoNumber }) => {
+            type PurchaseOrderDetailItem = {
+                purchase_request_item_id?: number | string;
+                product?: { id?: number | string } | null;
+                unit?: { id?: number | string } | null;
+                quantity?: number | string;
+                unit_price?: number | string;
+                discount_percent?: number | string;
+                tax_percent?: number | string;
+                notes?: string | null;
+            };
+
             const apiToken = localStorage.getItem('api_token') || '';
 
             const findResponse = await fetch(
@@ -101,8 +112,52 @@ export async function editPurchaseOrder(
             const findPayload = await findResponse.json();
             const row = (findPayload.data || [])[0];
             if (!row?.id) {
-                return { ok: false };
+                return { ok: false, step: 'find', status: findResponse.status, body: findPayload };
             }
+
+            const detailResponse = await fetch(`/api/purchase-orders/${row.id}`, {
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Authorization': `Bearer ${apiToken}`,
+                },
+            });
+            const detailPayload = await detailResponse.json().catch(() => ({}));
+            const detail = detailPayload?.data;
+
+            if (!detail?.id) {
+                return {
+                    ok: false,
+                    step: 'show',
+                    status: detailResponse.status,
+                    body: detailPayload,
+                };
+            }
+
+            const payload = {
+                po_number: nextPoNumber,
+                supplier_id: detail.supplier?.id,
+                warehouse_id: detail.warehouse?.id,
+                order_date: detail.order_date,
+                expected_delivery_date: detail.expected_delivery_date ?? null,
+                payment_terms: detail.payment_terms ?? '',
+                currency: detail.currency,
+                status: detail.status,
+                notes: detail.notes ?? '',
+                shipping_address: detail.shipping_address ?? '',
+                approved_by: detail.approved_by?.id ?? null,
+                approved_at: detail.approved_at ?? null,
+                items: (detail.items as PurchaseOrderDetailItem[] || []).map((item) => ({
+                    purchase_request_item_id: item.purchase_request_item_id ?? null,
+                    product_id: item.product?.id,
+                    unit_id: item.unit?.id,
+                    quantity: item.quantity,
+                    unit_price: item.unit_price,
+                    discount_percent: item.discount_percent ?? 0,
+                    tax_percent: item.tax_percent ?? 0,
+                    notes: item.notes ?? '',
+                })),
+            };
 
             const updateResponse = await fetch(`/api/purchase-orders/${row.id}`, {
                 method: 'PUT',
@@ -112,15 +167,22 @@ export async function editPurchaseOrder(
                     'X-Requested-With': 'XMLHttpRequest',
                     'Authorization': `Bearer ${apiToken}`,
                 },
-                body: JSON.stringify({ po_number: nextPoNumber }),
+                body: JSON.stringify(payload),
             });
 
-            return { ok: updateResponse.ok };
+            const updatePayload = await updateResponse.json().catch(() => ({}));
+
+            return {
+                ok: updateResponse.ok,
+                step: 'update',
+                status: updateResponse.status,
+                body: updatePayload,
+            };
         },
         { findBy: identifier, nextPoNumber: updatedPoNumber },
     );
 
-    expect(updateResult.ok).toBeTruthy();
+    expect(updateResult, JSON.stringify(updateResult)).toMatchObject({ ok: true });
 
     await page.reload();
     await page

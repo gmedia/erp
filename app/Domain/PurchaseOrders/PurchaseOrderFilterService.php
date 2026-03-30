@@ -11,44 +11,20 @@ class PurchaseOrderFilterService
 
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['supplier_id'])) {
-            $query->where('supplier_id', $filters['supplier_id']);
-        }
+        $this->applyExactFilters($query, $filters, [
+            'supplier_id' => 'supplier_id',
+            'warehouse_id' => 'warehouse_id',
+            'status' => 'status',
+            'currency' => 'currency',
+        ]);
 
-        if (! empty($filters['warehouse_id'])) {
-            $query->where('warehouse_id', $filters['warehouse_id']);
-        }
+        $this->applyDateRanges($query, $filters, [
+            'order_date' => ['from' => 'order_date_from', 'to' => 'order_date_to'],
+            'expected_delivery_date' => ['from' => 'expected_delivery_date_from', 'to' => 'expected_delivery_date_to'],
+        ]);
 
-        if (! empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-
-        if (! empty($filters['currency'])) {
-            $query->where('currency', $filters['currency']);
-        }
-
-        if (! empty($filters['order_date_from'])) {
-            $query->whereDate('order_date', '>=', $filters['order_date_from']);
-        }
-
-        if (! empty($filters['order_date_to'])) {
-            $query->whereDate('order_date', '<=', $filters['order_date_to']);
-        }
-
-        if (! empty($filters['expected_delivery_date_from'])) {
-            $query->whereDate('expected_delivery_date', '>=', $filters['expected_delivery_date_from']);
-        }
-
-        if (! empty($filters['expected_delivery_date_to'])) {
-            $query->whereDate('expected_delivery_date', '<=', $filters['expected_delivery_date_to']);
-        }
-
-        if (! empty($filters['grand_total_min'])) {
-            $query->where('grand_total', '>=', $filters['grand_total_min']);
-        }
-
-        if (! empty($filters['grand_total_max'])) {
-            $query->where('grand_total', '<=', $filters['grand_total_max']);
-        }
+        $this->applyNumericRanges($query, $filters, [
+            'grand_total' => ['min' => 'grand_total_min', 'max' => 'grand_total_max'],
+        ]);
     }
 }

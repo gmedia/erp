@@ -9,6 +9,7 @@ import {
     createTextColumn,
     type CustomTableMeta,
 } from '@/utils/columns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
@@ -34,14 +35,8 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
     {
         accessorKey: 'entry_date',
         ...createSortingHeader('Date'),
-        cell: ({ row }) => {
-            const date = new Date(row.getValue('entry_date'));
-            return new Intl.DateTimeFormat('id-ID', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            }).format(date);
-        },
+        cell: ({ row }) =>
+            formatDateByRegionalSettings(row.getValue('entry_date') as string),
     },
     createTextColumn<JournalEntry>({
         accessorKey: 'description',
