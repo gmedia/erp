@@ -2,14 +2,16 @@
 
 namespace App\Actions\Reports;
 
+use App\Actions\Reports\Concerns\HandlesReportQuery;
 use App\Http\Requests\Reports\IndexPurchaseHistoryReportRequest;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class IndexPurchaseHistoryReportAction
 {
+    use HandlesReportQuery;
+
     public function execute(IndexPurchaseHistoryReportRequest $request): LengthAwarePaginator|Collection
     {
         $query = PurchaseOrderItem::query()
@@ -80,63 +82,35 @@ class IndexPurchaseHistoryReportAction
                 'last_receipt_date' => 'date',
             ]);
 
-        if ($request->filled('supplier_id')) {
-            $query->where('po.supplier_id', $request->integer('supplier_id'));
-        }
-
-        if ($request->filled('warehouse_id')) {
-            $query->where('po.warehouse_id', $request->integer('warehouse_id'));
-        }
-
-        if ($request->filled('product_id')) {
-            $query->where('poi.product_id', $request->integer('product_id'));
-        }
-
-        if ($request->filled('status')) {
-            $query->where('po.status', $request->string('status')->toString());
-        }
-
-        if ($request->filled('start_date')) {
-            $query->whereDate('po.order_date', '>=', $request->string('start_date')->toString());
-        }
-
-        if ($request->filled('end_date')) {
-            $query->whereDate('po.order_date', '<=', $request->string('end_date')->toString());
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->string('search')->toString();
-            $query->where(function (Builder $builder) use ($search) {
-                $builder->where('po.po_number', 'like', '%' . $search . '%')
-                    ->orWhere('s.name', 'like', '%' . $search . '%')
-                    ->orWhere('p.name', 'like', '%' . $search . '%')
-                    ->orWhere('p.code', 'like', '%' . $search . '%')
-                    ->orWhere('w.name', 'like', '%' . $search . '%')
-                    ->orWhere('w.code', 'like', '%' . $search . '%');
-            });
-        }
+        $this->applyIntegerFilter($request, $query, 'supplier_id', 'po.supplier_id');
+        $this->applyIntegerFilter($request, $query, 'warehouse_id', 'po.warehouse_id');
+        $this->applyIntegerFilter($request, $query, 'product_id', 'poi.product_id');
+        $this->applyStringFilter($request, $query, 'status', 'po.status');
+        $this->applyDateRangeFilter($request, $query, 'po.order_date');
+        $this->applySearchFilter($request, $query, [
+            'po.po_number',
+            's.name',
+            'p.name',
+            'p.code',
+            'w.name',
+            'w.code',
+        ]);
 
         $sortBy = $request->string('sort_by', 'order_date')->toString();
         $sortDirection = $request->string('sort_direction', 'desc')->toString();
 
-        if ($sortBy === 'purchase_order_po_number') {
-            $sortBy = 'po_number';
-        }
-        if ($sortBy === 'purchase_order_order_date') {
-            $sortBy = 'order_date';
-        }
-        if ($sortBy === 'purchase_order_expected_delivery_date') {
-            $sortBy = 'expected_delivery_date';
-        }
-        if ($sortBy === 'purchase_order_status') {
-            $sortBy = 'status';
-        }
-        if ($sortBy === 'goods_receipt_last_receipt_date') {
-            $sortBy = 'last_receipt_date';
-        }
+        $sortBy = $this->normalizeSortBy($sortBy, [
+            'purchase_order_po_number' => 'po_number',
+            'purchase_order_order_date' => 'order_date',
+            'purchase_order_expected_delivery_date' => 'expected_delivery_date',
+            'purchase_order_status' => 'status',
+            'goods_receipt_last_receipt_date' => 'last_receipt_date',
+        ]);
 
-        if (in_array(
+        $this->applySorting(
+            $query,
             $sortBy,
+            $sortDirection,
             [
                 'po_number',
                 'supplier_name',
@@ -148,23 +122,16 @@ class IndexPurchaseHistoryReportAction
                 'status',
                 'last_receipt_date',
             ],
-            true
-        )) {
-            $query->orderBy($sortBy, $sortDirection);
-        } elseif (in_array(
-            $sortBy,
-            ['ordered_quantity', 'received_quantity', 'outstanding_quantity', 'receipt_count', 'total_purchase_value'],
-            true
-        )) {
-            $query->orderByRaw($sortBy . ' ' . $sortDirection);
-        } else {
-            $query->orderBy('order_date', 'desc');
-        }
+            [
+                'ordered_quantity',
+                'received_quantity',
+                'outstanding_quantity',
+                'receipt_count',
+                'total_purchase_value',
+            ],
+            'order_date',
+        );
 
-        if ($request->boolean('export')) {
-            return $query->get();
-        }
-
-        return $query->paginate($request->integer('per_page', 15))->withQueryString();
+        return $this->exportOrPaginate($request, $query);
     }
 }
