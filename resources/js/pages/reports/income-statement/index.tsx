@@ -1,9 +1,9 @@
-import { Badge } from '@/components/ui/badge';
 import {
     FinancialReportSection,
     getChangeTextClass,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
+import { Badge } from '@/components/ui/badge';
 import {
     Card,
     CardContent,

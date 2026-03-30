@@ -1,9 +1,9 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import {
     FinancialReportSection,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import {
     Card,
     CardContent,

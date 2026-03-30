@@ -1,8 +1,8 @@
-import { Badge } from '@/components/ui/badge';
 import {
     FinancialReportSection,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
+import { Badge } from '@/components/ui/badge';
 import {
     Select,
     SelectContent,
