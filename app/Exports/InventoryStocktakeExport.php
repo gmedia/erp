@@ -2,15 +2,18 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\InventoryStocktake;
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class InventoryStocktakeExport implements FromQuery, WithHeadings, WithMapping, WithStyles
 {
+    use InteractsWithExportFilters;
+
     protected array $filters;
 
     public function __construct(array $filters = [])
@@ -19,54 +22,29 @@ class InventoryStocktakeExport implements FromQuery, WithHeadings, WithMapping, 
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder<InventoryStocktake>
      */
-    public function query()
+    public function query(): Builder
     {
         $query = InventoryStocktake::query()->with(['warehouse', 'productCategory']);
 
-        if (! empty($this->filters['search'])) {
-            $search = $this->filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('stocktake_number', 'like', "%{$search}%")
-                    ->orWhere('notes', 'like', "%{$search}%");
-            });
-        }
-
-        if (! empty($this->filters['warehouse_id'])) {
-            $query->where('warehouse_id', $this->filters['warehouse_id']);
-        }
-
-        if (! empty($this->filters['product_category_id'])) {
-            $query->where('product_category_id', $this->filters['product_category_id']);
-        }
-
-        if (! empty($this->filters['status'])) {
-            $query->where('status', $this->filters['status']);
-        }
-
-        if (! empty($this->filters['stocktake_date_from'])) {
-            $query->whereDate('stocktake_date', '>=', $this->filters['stocktake_date_from']);
-        }
-
-        if (! empty($this->filters['stocktake_date_to'])) {
-            $query->whereDate('stocktake_date', '<=', $this->filters['stocktake_date_to']);
-        }
-
-        $sortBy = $this->filters['sort_by'] ?? 'created_at';
-        $sortDirection = $this->filters['sort_direction'] ?? 'desc';
-        $allowedSortColumns = [
+        $this->applySearchFilter($query, $this->filters, ['stocktake_number', 'notes']);
+        $this->applyExactFilters($query, $this->filters, [
+            'warehouse_id' => 'warehouse_id',
+            'product_category_id' => 'product_category_id',
+            'status' => 'status',
+        ]);
+        $this->applyDateRangeFilters($query, $this->filters, [
+            'stocktake_date' => ['from' => 'stocktake_date_from', 'to' => 'stocktake_date_to'],
+        ]);
+        $this->applySorting($query, $this->filters, [
             'stocktake_number',
             'warehouse_id',
             'stocktake_date',
             'status',
             'product_category_id',
             'created_at',
-        ];
-
-        if (in_array($sortBy, $allowedSortColumns)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
+        ]);
 
         return $query;
     }
@@ -99,10 +77,4 @@ class InventoryStocktakeExport implements FromQuery, WithHeadings, WithMapping, 
         ];
     }
 
-    public function styles(Worksheet $sheet)
-    {
-        return [
-            1 => ['font' => ['bold' => true]],
-        ];
-    }
 }

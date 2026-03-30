@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Exports\Concerns;
+
+use Illuminate\Database\Eloquent\Builder;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+
+trait InteractsWithExportFilters
+{
+    /**
+     * @param  array<string, mixed>  $filters
+     * @param  array<int, string>  $columns
+     */
+    protected function applySearchFilter(Builder $query, array $filters, array $columns): void
+    {
+        if (empty($filters['search'])) {
+            return;
+        }
+
+        $search = (string) $filters['search'];
+        $query->where(function (Builder $builder) use ($search, $columns): void {
+            foreach ($columns as $column) {
+                $builder->orWhere($column, 'like', "%{$search}%");
+            }
+        });
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @param  array<string, string>  $map
+     */
+    protected function applyExactFilters(Builder $query, array $filters, array $map): void
+    {
+        foreach ($map as $filterKey => $column) {
+            if (! empty($filters[$filterKey])) {
+                $query->where($column, $filters[$filterKey]);
+            }
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @param  array<string, array{from: string, to: string}>  $map
+     */
+    protected function applyDateRangeFilters(Builder $query, array $filters, array $map): void
+    {
+        foreach ($map as $column => $rangeKeys) {
+            if (! empty($filters[$rangeKeys['from']])) {
+                $query->whereDate($column, '>=', $filters[$rangeKeys['from']]);
+            }
+
+            if (! empty($filters[$rangeKeys['to']])) {
+                $query->whereDate($column, '<=', $filters[$rangeKeys['to']]);
+            }
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @param  array<int, string>  $allowedSortColumns
+     */
+    protected function applySorting(Builder $query, array $filters, array $allowedSortColumns): void
+    {
+        $sortBy = (string) ($filters['sort_by'] ?? 'created_at');
+        $sortDirection = strtolower((string) ($filters['sort_direction'] ?? 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        if (in_array($sortBy, $allowedSortColumns)) {
+            $query->orderBy($sortBy, $sortDirection);
+        }
+    }
+
+    /**
+     * @return array<int, array<string, array<string, bool>>>
+     */
+    public function styles(Worksheet $sheet)
+    {
+        return [
+            1 => ['font' => ['bold' => true]],
+        ];
+    }
+}
