@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ -z "${BASH_VERSION:-}" ]; then
+    exec bash "$0" "$@"
+fi
+
 set -euo pipefail
 
 # Source of truth for agent customization is .github
