@@ -8,6 +8,16 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 trait InteractsWithExportFilters
 {
     /**
+     * @return array<int, array<string, array<string, bool>>>
+     */
+    public function styles(Worksheet $sheet)
+    {
+        return [
+            1 => ['font' => ['bold' => true]],
+        ];
+    }
+
+    /**
      * @param  array<string, mixed>  $filters
      * @param  array<int, string>  $columns
      */
@@ -67,15 +77,5 @@ trait InteractsWithExportFilters
         if (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);
         }
-    }
-
-    /**
-     * @return array<int, array<string, array<string, bool>>>
-     */
-    public function styles(Worksheet $sheet)
-    {
-        return [
-            1 => ['font' => ['bold' => true]],
-        ];
     }
 }

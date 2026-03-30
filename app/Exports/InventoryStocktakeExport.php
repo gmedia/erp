@@ -76,5 +76,4 @@ class InventoryStocktakeExport implements FromQuery, WithHeadings, WithMapping, 
             $inventoryStocktake->created_at?->toIso8601String(),
         ];
     }
-
 }

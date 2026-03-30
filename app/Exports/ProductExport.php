@@ -71,5 +71,4 @@ class ProductExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
             $product->created_at?->toIso8601String(),
         ];
     }
-
 }
