@@ -14,7 +14,7 @@ Dokumen ini menyimpan status batch refactor berbasis Sonar agar prompt tetap sta
 |------|------|------|------|------|
 | A | done | purchase-history-report, purchase-order-status-report, goods-receipt-report, stock-movement-report, stock-adjustment-report, inventory-valuation-report, inventory-stocktake-variance-report | report requests/resources | n/a |
 | B | done | purchase-requests, purchase-orders, supplier-returns, goods-receipts, stock-adjustments, stock-movements, stock-transfers, inventory-stocktakes | filter services + item controllers | n/a |
-| C | in-progress | assets, products, asset-movements, asset-maintenances, asset-stocktakes | AssetFilterService, ProductFilterService, item controllers | baseline Sonar diambil 2026-03-30 |
+| C | in-progress | assets, products, asset-movements, asset-maintenances, asset-stocktakes | AssetFilterService, ProductFilterService, item controllers | baseline 2026-03-30; quality gate: ERROR (new_duplicated_lines_density 11.6 > 3.0) |
 | D | next | financial-reporting | FinancialReportService + query/mapping laporan keuangan | pending |
 | E | next | account-mappings, journal-entries, goods-receipts, purchase-requests | pasangan Store*Request/Update*Request | pending |
 
@@ -40,6 +40,7 @@ Isi setelah batch selesai dan sebelum merge.
 
 ## Log Perubahan
 
+- 2026-03-30: [C], cek quality gate Sonar project gmedia_erp: ERROR karena new_duplicated_lines_density = 11.6 (threshold 3.0), hasil test: n/a, link PR: pending.
 - 2026-03-30: [C], refresh snapshot Sonar untuk delta interim (semua metrik belum berubah dari baseline), hasil test: n/a, link PR: pending.
 - 2026-03-30: [C], ambil baseline metrik via Sonar MCP (project: gmedia_erp), hasil test: n/a, link PR: pending.
 - YYYY-MM-DD: [batch], ringkasan perubahan, hasil test, link PR.
