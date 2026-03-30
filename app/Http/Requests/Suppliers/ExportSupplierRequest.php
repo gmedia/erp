@@ -8,6 +8,7 @@ class ExportSupplierRequest extends AbstractSupplierListingRequest
     {
         return $this->supplierListingRules(
             'id,name,email,phone,branch,branch_id,category,category_id,status,created_at,updated_at',
+            false,
         );
     }
 }

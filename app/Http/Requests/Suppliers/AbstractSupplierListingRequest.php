@@ -11,15 +11,21 @@ abstract class AbstractSupplierListingRequest extends FormRequest
         return true;
     }
 
-    protected function supplierListingRules(string $sortBy): array
+    protected function supplierListingRules(string $sortBy, bool $includeStringInSortDirection = true): array
     {
+        $sortDirectionRules = ['nullable', 'in:asc,desc'];
+
+        if ($includeStringInSortDirection) {
+            $sortDirectionRules = ['nullable', 'string', 'in:asc,desc'];
+        }
+
         return [
             'search' => ['nullable', 'string'],
             'branch_id' => ['nullable', 'exists:branches,id'],
             'category_id' => ['nullable', 'exists:supplier_categories,id'],
             'status' => ['nullable', 'string', 'in:active,inactive'],
             'sort_by' => ['nullable', 'string', 'in:' . $sortBy],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
+            'sort_direction' => $sortDirectionRules,
         ];
     }
 }

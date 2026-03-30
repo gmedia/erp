@@ -11,10 +11,11 @@ class ExportApprovalDelegationRequest extends AbstractApprovalDelegationListingR
      */
     public function rules(): array
     {
-        return $this->approvalDelegationListingRules(
-            'delegator',
-            'delegate',
-            'id,delegator_user_id,delegate_user_id,approvable_type,start_date,end_date,is_active,created_at',
+        return array_merge(
+            $this->approvalDelegationBaseRules('delegator', 'delegate'),
+            $this->approvalDelegationSortRules(
+                'id,delegator_user_id,delegate_user_id,approvable_type,start_date,end_date,is_active,created_at',
+            ),
         );
     }
 }

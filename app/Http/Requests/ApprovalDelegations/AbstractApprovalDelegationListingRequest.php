@@ -14,13 +14,22 @@ abstract class AbstractApprovalDelegationListingRequest extends FormRequest
     /**
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    protected function approvalDelegationListingRules(string $delegatorKey, string $delegateKey, string $sortBy): array
+    protected function approvalDelegationBaseRules(string $delegatorKey, string $delegateKey): array
     {
         return [
             'search' => ['nullable', 'string'],
             $delegatorKey => ['nullable', 'exists:users,id'],
             $delegateKey => ['nullable', 'exists:users,id'],
             'is_active' => ['nullable', 'string', 'in:true,false,1,0'],
+        ];
+    }
+
+    /**
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    protected function approvalDelegationSortRules(string $sortBy): array
+    {
+        return [
             'sort_by' => ['nullable', 'string', 'in:' . $sortBy],
             'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
         ];
