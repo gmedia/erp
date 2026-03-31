@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\GoodsReceipt;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -9,10 +10,11 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class GoodsReceiptExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
+    use InteractsWithExportFilters;
+
     public function __construct(
         private readonly array $filters = []
     ) {}
@@ -21,39 +23,17 @@ class GoodsReceiptExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
     {
         $query = GoodsReceipt::query()->with(['purchaseOrder.supplier', 'warehouse', 'receiver']);
 
-        if (! empty($this->filters['search'])) {
-            $search = $this->filters['search'];
-            $query->where(function (Builder $q) use ($search) {
-                $q->where('gr_number', 'like', "%{$search}%")
-                    ->orWhere('supplier_delivery_note', 'like', "%{$search}%")
-                    ->orWhere('notes', 'like', "%{$search}%");
-            });
-        }
-
-        if (! empty($this->filters['purchase_order'])) {
-            $query->where('purchase_order_id', $this->filters['purchase_order']);
-        }
-        if (! empty($this->filters['warehouse'])) {
-            $query->where('warehouse_id', $this->filters['warehouse']);
-        }
-        if (! empty($this->filters['status'])) {
-            $query->where('status', $this->filters['status']);
-        }
-        if (! empty($this->filters['received_by'])) {
-            $query->where('received_by', $this->filters['received_by']);
-        }
-        if (! empty($this->filters['receipt_date_from'])) {
-            $query->whereDate('receipt_date', '>=', $this->filters['receipt_date_from']);
-        }
-        if (! empty($this->filters['receipt_date_to'])) {
-            $query->whereDate('receipt_date', '<=', $this->filters['receipt_date_to']);
-        }
-
-        $sortBy = $this->filters['sort_by'] ?? 'created_at';
-        $sortDirection = strtolower($this->filters['sort_direction'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
-        if (in_array($sortBy, ['gr_number', 'receipt_date', 'status', 'created_at'], true)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
+        $this->applySearchFilter($query, $this->filters, ['gr_number', 'supplier_delivery_note', 'notes']);
+        $this->applyExactFilters($query, $this->filters, [
+            'purchase_order' => 'purchase_order_id',
+            'warehouse' => 'warehouse_id',
+            'status' => 'status',
+            'received_by' => 'received_by',
+        ]);
+        $this->applyDateRangeFilters($query, $this->filters, [
+            'receipt_date' => ['from' => 'receipt_date_from', 'to' => 'receipt_date_to'],
+        ]);
+        $this->applySorting($query, $this->filters, ['gr_number', 'receipt_date', 'status', 'created_at']);
 
         return $query;
     }
@@ -91,13 +71,6 @@ class GoodsReceiptExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
             $goodsReceipt->notes,
             $goodsReceipt->confirmed_at?->toIso8601String(),
             $goodsReceipt->created_at?->toIso8601String(),
-        ];
-    }
-
-    public function styles(Worksheet $sheet): array
-    {
-        return [
-            1 => ['font' => ['bold' => true]],
         ];
     }
 }
