@@ -41,7 +41,7 @@ class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMa
                 ->leftJoin('branches', 'warehouses.branch_id', '=', 'branches.id')
                 ->select('warehouses.*')
                 ->orderBy('branches.name', $sortDirection);
-            } elseif (in_array($sortBy, $allowedSortColumns, true)) {
+        } elseif (in_array($sortBy, $allowedSortColumns, true)) {
             $query->orderBy($sortBy, $sortDirection);
         }
 

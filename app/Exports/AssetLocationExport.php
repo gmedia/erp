@@ -46,7 +46,7 @@ class AssetLocationExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
                 ->leftJoin('asset_locations as parents', 'asset_locations.parent_id', '=', 'parents.id')
                 ->select('asset_locations.*')
                 ->orderBy('parents.name', $sortDirection);
-            } elseif (in_array($sortBy, $allowedSortColumns, true)) {
+        } elseif (in_array($sortBy, $allowedSortColumns, true)) {
             $query->orderBy($sortBy, $sortDirection);
         }
 

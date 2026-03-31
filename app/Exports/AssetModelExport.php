@@ -46,7 +46,7 @@ class AssetModelExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
                 ->leftJoin('asset_categories', 'asset_models.asset_category_id', '=', 'asset_categories.id')
                 ->select('asset_models.*')
                 ->orderBy('asset_categories.name', $sortDirection);
-            } elseif (in_array($sortBy, $allowedSortColumns, true)) {
+        } elseif (in_array($sortBy, $allowedSortColumns, true)) {
             $query->orderBy($sortBy, $sortDirection);
         }
 
