@@ -2,15 +2,18 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\StockTransfer;
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class StockTransferExport implements FromQuery, WithHeadings, WithMapping, WithStyles
 {
+    use InteractsWithExportFilters;
+
     protected array $filters;
 
     public function __construct(array $filters = [])
@@ -18,44 +21,20 @@ class StockTransferExport implements FromQuery, WithHeadings, WithMapping, WithS
         $this->filters = $filters;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function query()
+    public function query(): Builder
     {
         $query = StockTransfer::query()->with(['fromWarehouse', 'toWarehouse']);
 
-        if (! empty($this->filters['search'])) {
-            $search = $this->filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('transfer_number', 'like', "%{$search}%")
-                    ->orWhere('notes', 'like', "%{$search}%");
-            });
-        }
-
-        if (! empty($this->filters['from_warehouse_id'])) {
-            $query->where('from_warehouse_id', $this->filters['from_warehouse_id']);
-        }
-
-        if (! empty($this->filters['to_warehouse_id'])) {
-            $query->where('to_warehouse_id', $this->filters['to_warehouse_id']);
-        }
-
-        if (! empty($this->filters['status'])) {
-            $query->where('status', $this->filters['status']);
-        }
-
-        if (! empty($this->filters['transfer_date_from'])) {
-            $query->whereDate('transfer_date', '>=', $this->filters['transfer_date_from']);
-        }
-
-        if (! empty($this->filters['transfer_date_to'])) {
-            $query->whereDate('transfer_date', '<=', $this->filters['transfer_date_to']);
-        }
-
-        $sortBy = $this->filters['sort_by'] ?? 'created_at';
-        $sortDirection = $this->filters['sort_direction'] ?? 'desc';
-        $allowedSortColumns = [
+        $this->applySearchFilter($query, $this->filters, ['transfer_number', 'notes']);
+        $this->applyExactFilters($query, $this->filters, [
+            'from_warehouse_id' => 'from_warehouse_id',
+            'to_warehouse_id' => 'to_warehouse_id',
+            'status' => 'status',
+        ]);
+        $this->applyDateRangeFilters($query, $this->filters, [
+            'transfer_date' => ['from' => 'transfer_date_from', 'to' => 'transfer_date_to'],
+        ]);
+        $this->applySorting($query, $this->filters, [
             'transfer_number',
             'from_warehouse_id',
             'to_warehouse_id',
@@ -63,11 +42,7 @@ class StockTransferExport implements FromQuery, WithHeadings, WithMapping, WithS
             'expected_arrival_date',
             'status',
             'created_at',
-        ];
-
-        if (in_array($sortBy, $allowedSortColumns)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
+        ]);
 
         return $query;
     }
@@ -97,13 +72,6 @@ class StockTransferExport implements FromQuery, WithHeadings, WithMapping, WithS
             $stockTransfer->expected_arrival_date?->toDateString(),
             $stockTransfer->status,
             $stockTransfer->created_at?->toIso8601String(),
-        ];
-    }
-
-    public function styles(Worksheet $sheet)
-    {
-        return [
-            1 => ['font' => ['bold' => true]],
         ];
     }
 }

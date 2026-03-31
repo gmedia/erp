@@ -2,15 +2,18 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\StockAdjustment;
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class StockAdjustmentExport implements FromQuery, WithHeadings, WithMapping, WithStyles
 {
+    use InteractsWithExportFilters;
+
     protected array $filters;
 
     public function __construct(array $filters = [])
@@ -18,59 +21,28 @@ class StockAdjustmentExport implements FromQuery, WithHeadings, WithMapping, Wit
         $this->filters = $filters;
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function query()
+    public function query(): Builder
     {
         $query = StockAdjustment::query()->with(['warehouse', 'inventoryStocktake']);
 
-        if (! empty($this->filters['search'])) {
-            $search = $this->filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('adjustment_number', 'like', "%{$search}%")
-                    ->orWhere('notes', 'like', "%{$search}%");
-            });
-        }
-
-        if (! empty($this->filters['warehouse_id'])) {
-            $query->where('warehouse_id', $this->filters['warehouse_id']);
-        }
-
-        if (! empty($this->filters['status'])) {
-            $query->where('status', $this->filters['status']);
-        }
-
-        if (! empty($this->filters['adjustment_type'])) {
-            $query->where('adjustment_type', $this->filters['adjustment_type']);
-        }
-
-        if (! empty($this->filters['inventory_stocktake_id'])) {
-            $query->where('inventory_stocktake_id', $this->filters['inventory_stocktake_id']);
-        }
-
-        if (! empty($this->filters['adjustment_date_from'])) {
-            $query->whereDate('adjustment_date', '>=', $this->filters['adjustment_date_from']);
-        }
-
-        if (! empty($this->filters['adjustment_date_to'])) {
-            $query->whereDate('adjustment_date', '<=', $this->filters['adjustment_date_to']);
-        }
-
-        $sortBy = $this->filters['sort_by'] ?? 'created_at';
-        $sortDirection = $this->filters['sort_direction'] ?? 'desc';
-        $allowedSortColumns = [
+        $this->applySearchFilter($query, $this->filters, ['adjustment_number', 'notes']);
+        $this->applyExactFilters($query, $this->filters, [
+            'warehouse_id' => 'warehouse_id',
+            'status' => 'status',
+            'adjustment_type' => 'adjustment_type',
+            'inventory_stocktake_id' => 'inventory_stocktake_id',
+        ]);
+        $this->applyDateRangeFilters($query, $this->filters, [
+            'adjustment_date' => ['from' => 'adjustment_date_from', 'to' => 'adjustment_date_to'],
+        ]);
+        $this->applySorting($query, $this->filters, [
             'adjustment_number',
             'warehouse_id',
             'adjustment_date',
             'adjustment_type',
             'status',
             'created_at',
-        ];
-
-        if (in_array($sortBy, $allowedSortColumns)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
+        ]);
 
         return $query;
     }
@@ -100,13 +72,6 @@ class StockAdjustmentExport implements FromQuery, WithHeadings, WithMapping, Wit
             $stockAdjustment->status,
             $stockAdjustment->inventoryStocktake?->stocktake_number,
             $stockAdjustment->created_at?->toIso8601String(),
-        ];
-    }
-
-    public function styles(Worksheet $sheet)
-    {
-        return [
-            1 => ['font' => ['bold' => true]],
         ];
     }
 }

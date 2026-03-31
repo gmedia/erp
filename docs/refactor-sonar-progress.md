@@ -73,7 +73,7 @@ Isi setelah batch selesai dan sebelum merge.
 	- Standardisasi export non-report (ProductExport, InventoryStocktakeExport, dll.) lewat helper/concern shared untuk header-map + transform pipeline.
 	- Lanjutkan template index action ke modul sibling (StockAdjustments/StockTransfers/Employees) untuk menurunkan clone block lintas actions.
 	- Progress: request dedup sudah diterapkan untuk pasangan Products, InventoryStocktakes, dan AssetStocktakeVariances via abstract listing request.
-	- Progress: export dedup tahap awal sudah diterapkan pada ProductExport + InventoryStocktakeExport via concern InteractsWithExportFilters.
+	- Progress: export dedup sudah diperluas ke ProductExport, InventoryStocktakeExport, AssetStocktakeExport, GoodsReceiptExport, PurchaseOrderExport, SupplierReturnExport, PurchaseRequestExport, StockAdjustmentExport, StockTransferExport, dan SupplierExport via concern InteractsWithExportFilters.
 
 ## Rencana Penyempitan Konfigurasi Sonar (Bertahap)
 
@@ -89,6 +89,7 @@ Isi setelah batch selesai dan sebelum merge.
 
 ## Log Perubahan
 
+- 2026-03-31: [C], wave export dedup lanjutan 2: migrasi PurchaseRequestExport, StockAdjustmentExport, StockTransferExport, dan SupplierExport ke concern InteractsWithExportFilters (shared search/exact/date/sort/styles); test: ./vendor/bin/sail artisan test tests/Feature/PurchaseRequests/PurchaseRequestExportTest.php tests/Feature/StockAdjustments/StockAdjustmentExportTest.php tests/Feature/StockTransfers/StockTransferExportTest.php tests/Feature/Suppliers/SupplierExportTest.php (PASS 13 test).
 - 2026-03-31: [C], post-push d77f5fcb cek Sonar MCP: gate masih ERROR (new_duplicated_lines_density 12.4), namun duplicated_lines turun (7059 -> 6981); metrik terbaru: duplicated_blocks 499, density 7.9, ncloc 73178, coverage 86.9.
 - 2026-03-31: [C], wave export dedup lanjutan: migrasi AssetStocktakeExport, GoodsReceiptExport, PurchaseOrderExport, dan SupplierReturnExport ke concern InteractsWithExportFilters (shared search/exact/date/sort/styles); test: ./vendor/bin/sail artisan test tests/Feature/AssetStocktakes/AssetStocktakeControllerTest.php tests/Feature/GoodsReceipts/GoodsReceiptExportTest.php tests/Feature/PurchaseOrders/PurchaseOrderExportTest.php tests/Feature/SupplierReturns/SupplierReturnExportTest.php (PASS 7 test).
 - 2026-03-31: [C], post-push d1d3c8cf cek ulang Sonar MCP: quality gate tetap ERROR (new_duplicated_lines_density 12.4), metrik inti belum berubah (duplicated_lines 7059, duplicated_blocks 495, density 7.9, ncloc 73197, coverage 87.0).
