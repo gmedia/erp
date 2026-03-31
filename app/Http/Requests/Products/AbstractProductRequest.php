@@ -42,6 +42,11 @@ abstract class AbstractProductRequest extends FormRequest
         ];
     }
 
+    protected function usesSometimes(): bool
+    {
+        return $this->isUpdateRequest();
+    }
+
     private function codeUniqueRule(): string|Unique
     {
         if (! $this->isUpdateRequest()) {
@@ -54,10 +59,5 @@ abstract class AbstractProductRequest extends FormRequest
     private function isUpdateRequest(): bool
     {
         return $this instanceof UpdateProductRequest;
-    }
-
-    protected function usesSometimes(): bool
-    {
-        return $this->isUpdateRequest();
     }
 }

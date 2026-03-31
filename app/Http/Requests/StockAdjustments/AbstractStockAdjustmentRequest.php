@@ -47,6 +47,11 @@ abstract class AbstractStockAdjustmentRequest extends FormRequest
         ];
     }
 
+    protected function usesSometimes(): bool
+    {
+        return $this->isUpdateRequest();
+    }
+
     private function buildAdjustmentNumberUniqueRule(): string
     {
         if (! $this->isUpdateRequest()) {
@@ -61,10 +66,5 @@ abstract class AbstractStockAdjustmentRequest extends FormRequest
     private function isUpdateRequest(): bool
     {
         return $this instanceof UpdateStockAdjustmentRequest;
-    }
-
-    protected function usesSometimes(): bool
-    {
-        return $this->isUpdateRequest();
     }
 }
