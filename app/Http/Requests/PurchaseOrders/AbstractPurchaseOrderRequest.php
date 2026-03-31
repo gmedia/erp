@@ -71,5 +71,4 @@ abstract class AbstractPurchaseOrderRequest extends FormRequest
     {
         return ['nullable', 'date'];
     }
-
 }

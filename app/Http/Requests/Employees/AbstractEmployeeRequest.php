@@ -39,6 +39,11 @@ abstract class AbstractEmployeeRequest extends FormRequest
         ];
     }
 
+    protected function usesSometimes(): bool
+    {
+        return $this->isUpdateRequest();
+    }
+
     private function employeeIdUniqueRule(): string|Unique
     {
         if (! $this->isUpdateRequest()) {
@@ -60,10 +65,5 @@ abstract class AbstractEmployeeRequest extends FormRequest
     private function isUpdateRequest(): bool
     {
         return $this instanceof UpdateEmployeeRequest;
-    }
-
-    protected function usesSometimes(): bool
-    {
-        return $this->isUpdateRequest();
     }
 }

@@ -46,6 +46,11 @@ abstract class AbstractAssetRequest extends FormRequest
         ];
     }
 
+    protected function usesSometimes(): bool
+    {
+        return $this->isUpdateRequest();
+    }
+
     private function assetCodeUniqueRule(): string|Unique
     {
         if (! $this->isUpdateRequest()) {
@@ -67,10 +72,5 @@ abstract class AbstractAssetRequest extends FormRequest
     private function isUpdateRequest(): bool
     {
         return $this instanceof UpdateAssetRequest;
-    }
-
-    protected function usesSometimes(): bool
-    {
-        return $this->isUpdateRequest();
     }
 }
