@@ -89,6 +89,7 @@ Isi setelah batch selesai dan sebelum merge.
 
 ## Log Perubahan
 
+- 2026-03-31: [C], post-push d1d3c8cf cek ulang Sonar MCP: quality gate tetap ERROR (new_duplicated_lines_density 12.4), metrik inti belum berubah (duplicated_lines 7059, duplicated_blocks 495, density 7.9, ncloc 73197, coverage 87.0).
 - 2026-03-31: [C], lanjutan standardisasi index action: migrasi IndexStockAdjustmentsAction, IndexStockTransfersAction, dan IndexEmployeesAction ke InteractsWithIndexRequest; test: ./vendor/bin/sail artisan test tests/Unit/Actions/StockAdjustments/IndexStockAdjustmentsActionTest.php tests/Unit/Actions/StockTransfers/IndexStockTransfersActionTest.php tests/Unit/Actions/Employees/IndexEmployeesActionTest.php tests/Feature/InventoryStocktakes/InventoryStocktakeControllerTest.php (PASS 18 test).
 - 2026-03-31: [C], tarik ulang metrik Sonar MCP dan update Delta final: duplicated_lines 7059, duplicated_blocks 495, duplicated_lines_density 7.9, ncloc 73197, coverage 87.0; quality gate tetap ERROR (new_duplicated_lines_density 12.4).
 - 2026-03-30: [C], eksekusi wave export dedup tahap awal: tambah concern InteractsWithExportFilters lalu migrasi ProductExport + InventoryStocktakeExport; test: ./vendor/bin/sail artisan test tests/Unit/Actions/Products/ExportProductsActionTest.php tests/Unit/Actions/InventoryStocktakes/ExportInventoryStocktakesActionTest.php tests/Feature/InventoryStocktakes/InventoryStocktakeControllerTest.php (PASS 7 test).
