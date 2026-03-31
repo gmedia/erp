@@ -2,15 +2,10 @@
 
 namespace App\Http\Requests\ApprovalDelegations;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseListingRequest;
 
-abstract class AbstractApprovalDelegationListingRequest extends FormRequest
+abstract class AbstractApprovalDelegationListingRequest extends BaseListingRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     /**
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
@@ -29,9 +24,6 @@ abstract class AbstractApprovalDelegationListingRequest extends FormRequest
      */
     protected function approvalDelegationSortRules(string $sortBy): array
     {
-        return [
-            'sort_by' => ['nullable', 'string', 'in:' . $sortBy],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
-        ];
+        return $this->listingSortRules($sortBy);
     }
 }

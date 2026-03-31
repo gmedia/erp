@@ -14,7 +14,7 @@ Dokumen ini menyimpan status batch refactor berbasis Sonar agar prompt tetap sta
 |------|------|------|------|------|
 | A | done | purchase-history-report, purchase-order-status-report, goods-receipt-report, stock-movement-report, stock-adjustment-report, inventory-valuation-report, inventory-stocktake-variance-report | report requests/resources | n/a |
 | B | done | purchase-requests, purchase-orders, supplier-returns, goods-receipts, stock-adjustments, stock-movements, stock-transfers, inventory-stocktakes | filter services + item controllers | n/a |
-| C | in-progress | assets, products, asset-movements, asset-maintenances, asset-stocktakes | AssetFilterService, ProductFilterService, item controllers | snapshot 2026-03-31: quality gate ERROR (new_duplicated_lines_density 12.4 > 3.0) |
+| C | in-progress | assets, products, asset-movements, asset-maintenances, asset-stocktakes | AssetFilterService, ProductFilterService, item controllers | snapshot 2026-03-31: quality gate ERROR (new_duplicated_lines_density 12.0 > 3.0) |
 | D | next | financial-reporting | FinancialReportService + query/mapping laporan keuangan | pending |
 | E | next | account-mappings, journal-entries, goods-receipts, purchase-requests | pasangan Store*Request/Update*Request | pending |
 
@@ -32,17 +32,17 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: +90 (6620 -> 6710, latest snapshot 2026-03-31)
-- duplicated_blocks: +17 (373 -> 390, latest snapshot 2026-03-31)
-- duplicated_lines_density: +0.1 (7.5 -> 7.6, latest snapshot 2026-03-31)
-- ncloc: -210 (73194 -> 72984, latest snapshot 2026-03-31)
-- coverage: -86.5 (86.5 -> 0.0, latest snapshot 2026-03-31; terindikasi anomali pipeline coverage)
+- duplicated_lines: +2 (6620 -> 6622, latest snapshot 2026-03-31)
+- duplicated_blocks: +6 (373 -> 379, latest snapshot 2026-03-31)
+- duplicated_lines_density: +0.0 (7.5 -> 7.5, latest snapshot 2026-03-31)
+- ncloc: -326 (73194 -> 72868, latest snapshot 2026-03-31)
+- coverage: +0.4 (86.5 -> 86.9, latest snapshot 2026-03-31)
 
 ## Snapshot Analisa Sonar (2026-03-31, latest MCP)
 
 - Quality Gate: ERROR
 - Gate blocker utama: new_duplicated_lines_density = 12.0 (threshold: 3.0)
-- Catatan: tren duplikasi terus membaik (duplicated_lines 6710, duplicated_blocks 390, density global 7.6), tetapi snapshot terbaru juga menandai coverage 0.0 yang kemungkinan besar anomali upload/report CI sehingga perlu verifikasi run berikutnya.
+- Catatan: snapshot terbaru menunjukkan coverage kembali normal di 86.9 (anomali 0.0 tidak muncul), namun gate masih tertahan oleh new_duplicated_lines_density.
 
 ### Prioritas Duplikasi Backend (Batch C)
 
@@ -89,6 +89,7 @@ Isi setelah batch selesai dan sebelum merge.
 
 ## Log Perubahan
 
+- 2026-03-31: [C], wave semi-besar terkontrol (request dedup lanjutan): tambah BaseListingRequest dan migrasi sibling abstract listing request pada Assets, AssetMaintenances, Suppliers, PurchaseRequests, Products, InventoryStocktakes, AssetStocktakes Variances, serta ApprovalDelegations untuk konsolidasi authorize + sort rules; test: ./vendor/bin/sail artisan test tests/Unit/Requests/Assets/IndexAssetRequestTest.php tests/Unit/Requests/Assets/ExportAssetRequestTest.php tests/Unit/Requests/AssetMaintenances/IndexAssetMaintenanceRequestTest.php tests/Unit/Requests/AssetMaintenances/ExportAssetMaintenanceRequestTest.php tests/Unit/Requests/Suppliers/IndexSupplierRequestTest.php tests/Unit/Requests/Suppliers/ExportSupplierRequestTest.php tests/Unit/Requests/PurchaseRequests/IndexPurchaseRequestRequestTest.php tests/Unit/Requests/PurchaseRequests/ExportPurchaseRequestRequestTest.php tests/Unit/Requests/Products/IndexProductRequestTest.php tests/Unit/Requests/Products/ExportProductRequestTest.php tests/Unit/Requests/InventoryStocktakes/IndexInventoryStocktakeRequestTest.php tests/Unit/Requests/InventoryStocktakes/ExportInventoryStocktakeRequestTest.php tests/Unit/Requests/ApprovalDelegations/IndexApprovalDelegationRequestTest.php tests/Feature/AssetStocktakes/AssetStocktakeVarianceControllerTest.php (PASS 33 test).
 - 2026-03-31: [C], post-rebase/push 4fe7f6de cek Sonar MCP: snapshot belum berubah dari run sebelumnya (new_duplicated_lines_density 12.0; duplicated_lines 6710; duplicated_blocks 390; density 7.6; ncloc 72984; coverage 0.0/anomali pipeline coverage).
 - 2026-03-31: [C], wave semi-besar terkontrol (export dedup lanjutan 4): migrasi CustomerExport, EmployeeExport, AssetExport, AssetMaintenanceExport, dan AssetMovementExport ke concern InteractsWithExportFilters (shared search/exact/sort/styles + normalisasi sort direction); test: ./vendor/bin/sail artisan test tests/Feature/Customers/CustomerExportTest.php tests/Feature/Employees/EmployeeExportTest.php tests/Feature/AssetMaintenances/AssetMaintenanceExportTest.php tests/Feature/AssetMovements/AssetMovementExportTest.php tests/Unit/Actions/Assets/ExportAssetsActionTest.php tests/Unit/Actions/AssetMaintenances/ExportAssetMaintenancesActionTest.php tests/Unit/Actions/AssetMovements/ExportAssetMovementsActionTest.php (PASS 30 test).
 - 2026-03-31: [C], post-push c563e888 cek Sonar MCP: gate masih ERROR namun membaik (new_duplicated_lines_density 12.0, dari 12.1); metrik inti terbaru: duplicated_lines 6710, duplicated_blocks 390, density 7.6, ncloc 72984, coverage 0.0 (indikasi anomali pipeline coverage).

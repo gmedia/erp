@@ -2,15 +2,10 @@
 
 namespace App\Http\Requests\PurchaseRequests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseListingRequest;
 
-abstract class AbstractPurchaseRequestListingRequest extends FormRequest
+abstract class AbstractPurchaseRequestListingRequest extends BaseListingRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     protected function purchaseRequestListingRules(string $branchKey, string $departmentKey, string $sortBy): array
     {
         return [
@@ -28,8 +23,7 @@ abstract class AbstractPurchaseRequestListingRequest extends FormRequest
             'request_date_to' => ['nullable', 'date', 'after_or_equal:request_date_from'],
             'required_date_from' => ['nullable', 'date'],
             'required_date_to' => ['nullable', 'date', 'after_or_equal:required_date_from'],
-            'sort_by' => ['nullable', 'string', 'in:' . $sortBy],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
+            ...$this->listingSortRules($sortBy),
         ];
     }
 }

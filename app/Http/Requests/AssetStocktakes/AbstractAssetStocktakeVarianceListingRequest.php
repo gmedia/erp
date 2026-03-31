@@ -2,15 +2,10 @@
 
 namespace App\Http\Requests\AssetStocktakes;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseListingRequest;
 
-abstract class AbstractAssetStocktakeVarianceListingRequest extends FormRequest
+abstract class AbstractAssetStocktakeVarianceListingRequest extends BaseListingRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     protected function assetStocktakeVarianceListingRules(): array
     {
         return [
@@ -24,7 +19,10 @@ abstract class AbstractAssetStocktakeVarianceListingRequest extends FormRequest
                 'in:id,stocktake_reference,asset_code,asset_name,expected_branch,' .
                     'expected_location,found_branch,found_location,result,checked_at',
             ],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
+            ...$this->listingSortRules(
+                'id,stocktake_reference,asset_code,asset_name,expected_branch,' .
+                'expected_location,found_branch,found_location,result,checked_at'
+            ),
         ];
     }
 }

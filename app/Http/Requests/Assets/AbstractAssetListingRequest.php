@@ -2,15 +2,10 @@
 
 namespace App\Http\Requests\Assets;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseListingRequest;
 
-abstract class AbstractAssetListingRequest extends FormRequest
+abstract class AbstractAssetListingRequest extends BaseListingRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     protected function assetListingRules(string $sortBy): array
     {
         return [
@@ -24,8 +19,7 @@ abstract class AbstractAssetListingRequest extends FormRequest
             'supplier_id' => ['nullable', 'exists:suppliers,id'],
             'status' => ['nullable', 'string', 'in:draft,active,maintenance,disposed,lost'],
             'condition' => ['nullable', 'string', 'in:good,needs_repair,damaged'],
-            'sort_by' => ['nullable', 'string', 'in:' . $sortBy],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
+            ...$this->listingSortRules($sortBy),
         ];
     }
 }

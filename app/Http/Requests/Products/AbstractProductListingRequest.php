@@ -2,15 +2,10 @@
 
 namespace App\Http\Requests\Products;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseListingRequest;
 
-abstract class AbstractProductListingRequest extends FormRequest
+abstract class AbstractProductListingRequest extends BaseListingRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     protected function productListingRules(string $sortBy): array
     {
         return [
@@ -21,8 +16,7 @@ abstract class AbstractProductListingRequest extends FormRequest
             'type' => ['nullable', 'in:raw_material,work_in_progress,finished_good,purchased_good,service'],
             'status' => ['nullable', 'in:active,inactive,discontinued'],
             'billing_model' => ['nullable', 'in:one_time,subscription,both'],
-            'sort_by' => ['nullable', 'string', 'in:' . $sortBy],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
+            ...$this->listingSortRules($sortBy),
         ];
     }
 }

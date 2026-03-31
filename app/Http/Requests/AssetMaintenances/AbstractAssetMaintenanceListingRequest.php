@@ -2,15 +2,10 @@
 
 namespace App\Http\Requests\AssetMaintenances;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseListingRequest;
 
-abstract class AbstractAssetMaintenanceListingRequest extends FormRequest
+abstract class AbstractAssetMaintenanceListingRequest extends BaseListingRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     protected function assetMaintenanceListingRules(string $sortBy): array
     {
         return [
@@ -26,8 +21,7 @@ abstract class AbstractAssetMaintenanceListingRequest extends FormRequest
             'performed_to' => ['nullable', 'date'],
             'cost_min' => ['nullable', 'numeric', 'min:0'],
             'cost_max' => ['nullable', 'numeric', 'min:0'],
-            'sort_by' => ['nullable', 'string', 'in:' . $sortBy],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
+            ...$this->listingSortRules($sortBy),
         ];
     }
 }
