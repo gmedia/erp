@@ -14,7 +14,7 @@ Dokumen ini menyimpan status batch refactor berbasis Sonar agar prompt tetap sta
 |------|------|------|------|------|
 | A | done | purchase-history-report, purchase-order-status-report, goods-receipt-report, stock-movement-report, stock-adjustment-report, inventory-valuation-report, inventory-stocktake-variance-report | report requests/resources | n/a |
 | B | done | purchase-requests, purchase-orders, supplier-returns, goods-receipts, stock-adjustments, stock-movements, stock-transfers, inventory-stocktakes | filter services + item controllers | n/a |
-| C | in-progress | assets, products, asset-movements, asset-maintenances, asset-stocktakes | AssetFilterService, ProductFilterService, item controllers | snapshot 2026-03-30 terbaru: quality gate ERROR (new_duplicated_lines_density 12.5 > 3.0) |
+| C | in-progress | assets, products, asset-movements, asset-maintenances, asset-stocktakes | AssetFilterService, ProductFilterService, item controllers | snapshot 2026-03-31: quality gate ERROR (new_duplicated_lines_density 12.4 > 3.0) |
 | D | next | financial-reporting | FinancialReportService + query/mapping laporan keuangan | pending |
 | E | next | account-mappings, journal-entries, goods-receipts, purchase-requests | pasangan Store*Request/Update*Request | pending |
 
@@ -32,17 +32,17 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: +615 (6620 -> 7235, interim)
-- duplicated_blocks: +187 (373 -> 560, interim)
-- duplicated_lines_density: +0.6 (7.5 -> 8.1, interim)
-- ncloc: +20 (73194 -> 73214, interim)
-- coverage: +0.5 (86.5 -> 87.0, interim)
+- duplicated_lines: +439 (6620 -> 7059, final snapshot 2026-03-31)
+- duplicated_blocks: +122 (373 -> 495, final snapshot 2026-03-31)
+- duplicated_lines_density: +0.4 (7.5 -> 7.9, final snapshot 2026-03-31)
+- ncloc: +3 (73194 -> 73197, final snapshot 2026-03-31)
+- coverage: +0.5 (86.5 -> 87.0, final snapshot 2026-03-31)
 
-## Snapshot Analisa Sonar (2026-03-30, latest MCP)
+## Snapshot Analisa Sonar (2026-03-31, latest MCP)
 
 - Quality Gate: ERROR
-- Gate blocker utama: new_duplicated_lines_density = 12.5 (threshold: 3.0)
-- Catatan: snapshot terbaru menunjukkan duplikasi naik walau beberapa refactor sudah merge; fokus berikutnya perlu pindah ke request/export/index-action yang masih template-heavy.
+- Gate blocker utama: new_duplicated_lines_density = 12.4 (threshold: 3.0)
+- Catatan: snapshot terbaru menunjukkan sedikit perbaikan dari 12.5 ke 12.4, namun masih jauh di atas threshold gate.
 
 ### Prioritas Duplikasi Backend (Batch C)
 
@@ -64,7 +64,7 @@ Isi setelah batch selesai dan sebelum merge.
 3. Standardisasi template index action.
 	- Introduce trait/helper kecil untuk getPaginationParams + normalize sort direction + apply search/filters skeleton.
 	- Terapkan ke IndexAssetsAction dan IndexAssetModelsAction terlebih dahulu, lalu modul inventory yang satu pola.
-	- Progress: trait InteractsWithIndexRequest sudah dipakai oleh IndexAssetsAction, IndexAssetModelsAction, IndexInventoryStocktakesAction, IndexAssetStocktakesAction, IndexAssetMaintenancesAction, dan IndexProductsAction.
+	- Progress: trait InteractsWithIndexRequest sudah dipakai oleh IndexAssetsAction, IndexAssetModelsAction, IndexInventoryStocktakesAction, IndexAssetStocktakesAction, IndexAssetMaintenancesAction, IndexProductsAction, IndexStockAdjustmentsAction, IndexStockTransfersAction, dan IndexEmployeesAction.
 4. Frontend Batch C quick win (opsional tapi berdampak).
 	- Satukan descriptor select async yang berulang pada AssetFilters.tsx dan ProductFilters.tsx lewat helper factory lokal.
 	- Target: mengurangi duplikasi presentation-level tanpa ubah API backend.
@@ -89,6 +89,8 @@ Isi setelah batch selesai dan sebelum merge.
 
 ## Log Perubahan
 
+- 2026-03-31: [C], lanjutan standardisasi index action: migrasi IndexStockAdjustmentsAction, IndexStockTransfersAction, dan IndexEmployeesAction ke InteractsWithIndexRequest; test: ./vendor/bin/sail artisan test tests/Unit/Actions/StockAdjustments/IndexStockAdjustmentsActionTest.php tests/Unit/Actions/StockTransfers/IndexStockTransfersActionTest.php tests/Unit/Actions/Employees/IndexEmployeesActionTest.php tests/Feature/InventoryStocktakes/InventoryStocktakeControllerTest.php (PASS 18 test).
+- 2026-03-31: [C], tarik ulang metrik Sonar MCP dan update Delta final: duplicated_lines 7059, duplicated_blocks 495, duplicated_lines_density 7.9, ncloc 73197, coverage 87.0; quality gate tetap ERROR (new_duplicated_lines_density 12.4).
 - 2026-03-30: [C], eksekusi wave export dedup tahap awal: tambah concern InteractsWithExportFilters lalu migrasi ProductExport + InventoryStocktakeExport; test: ./vendor/bin/sail artisan test tests/Unit/Actions/Products/ExportProductsActionTest.php tests/Unit/Actions/InventoryStocktakes/ExportInventoryStocktakesActionTest.php tests/Feature/InventoryStocktakes/InventoryStocktakeControllerTest.php (PASS 7 test).
 - 2026-03-30: [C], eksekusi wave request dedup: tambah abstract listing request untuk Products, InventoryStocktakes, dan AssetStocktakeVariances lalu migrasi Index*/Export* request; test: ./vendor/bin/sail artisan test tests/Unit/Requests/Products/IndexProductRequestTest.php tests/Unit/Requests/Products/ExportProductRequestTest.php tests/Feature/AssetStocktakes/AssetStocktakeVarianceControllerTest.php tests/Feature/InventoryStocktakes/InventoryStocktakeControllerTest.php (PASS 14 test).
 - 2026-03-30: [C], refresh analisa Sonar MCP terbaru: quality gate tetap ERROR dan new_duplicated_lines_density naik ke 12.5; update delta metrics + prioritas refactor request/export/index-action.

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Employees;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\Employees\EmployeeFilterService;
 use App\Http\Requests\Employees\IndexEmployeeRequest;
 use App\Models\Employee;
@@ -9,6 +10,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexEmployeesAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private EmployeeFilterService $filterService
     ) {}
@@ -50,7 +53,7 @@ class IndexEmployeesAction
         $this->filterService->applySorting(
             $query,
             $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
+            $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
             [
                 'id',
                 'employee_id',
@@ -69,16 +72,5 @@ class IndexEmployeesAction
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    /**
-     * Get pagination parameters from request
-     */
-    private function getPaginationParams($request): array
-    {
-        return [
-            'perPage' => $request->get('per_page', 15),
-            'page' => $request->get('page', 1),
-        ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Actions\StockTransfers;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\StockTransfers\StockTransferFilterService;
 use App\Http\Requests\StockTransfers\IndexStockTransferRequest;
 use App\Models\StockTransfer;
@@ -9,6 +10,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexStockTransfersAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private StockTransferFilterService $filterService
     ) {}
@@ -40,9 +43,7 @@ class IndexStockTransfersAction
         $this->filterService->applySorting(
             $query,
             $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc'
-                ? 'asc'
-                : 'desc',
+            $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
             [
                 'id',
                 'transfer_number',
@@ -57,13 +58,5 @@ class IndexStockTransfersAction
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    private function getPaginationParams($request): array
-    {
-        return [
-            'perPage' => $request->get('per_page', 15),
-            'page' => $request->get('page', 1),
-        ];
     }
 }

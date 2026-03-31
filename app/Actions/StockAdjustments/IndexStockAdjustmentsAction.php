@@ -2,6 +2,7 @@
 
 namespace App\Actions\StockAdjustments;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\StockAdjustments\StockAdjustmentFilterService;
 use App\Http\Requests\StockAdjustments\IndexStockAdjustmentRequest;
 use App\Models\StockAdjustment;
@@ -9,6 +10,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexStockAdjustmentsAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private StockAdjustmentFilterService $filterService
     ) {}
@@ -39,9 +42,7 @@ class IndexStockAdjustmentsAction
         $this->filterService->applySorting(
             $query,
             $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc'
-                ? 'asc'
-                : 'desc',
+            $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
             [
                 'id',
                 'adjustment_number',
@@ -59,13 +60,5 @@ class IndexStockAdjustmentsAction
         );
 
         return $query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    private function getPaginationParams($request): array
-    {
-        return [
-            'perPage' => $request->get('per_page', 15),
-            'page' => $request->get('page', 1),
-        ];
     }
 }
