@@ -32,17 +32,17 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: +244 (6620 -> 6864, latest snapshot 2026-03-31)
-- duplicated_blocks: +58 (373 -> 431, latest snapshot 2026-03-31)
-- duplicated_lines_density: +0.2 (7.5 -> 7.7, latest snapshot 2026-03-31)
-- ncloc: -112 (73194 -> 73082, latest snapshot 2026-03-31)
-- coverage: +0.5 (86.5 -> 87.0, latest snapshot 2026-03-31)
+- duplicated_lines: +90 (6620 -> 6710, latest snapshot 2026-03-31)
+- duplicated_blocks: +17 (373 -> 390, latest snapshot 2026-03-31)
+- duplicated_lines_density: +0.1 (7.5 -> 7.6, latest snapshot 2026-03-31)
+- ncloc: -210 (73194 -> 72984, latest snapshot 2026-03-31)
+- coverage: -86.5 (86.5 -> 0.0, latest snapshot 2026-03-31; terindikasi anomali pipeline coverage)
 
 ## Snapshot Analisa Sonar (2026-03-31, latest MCP)
 
 - Quality Gate: ERROR
-- Gate blocker utama: new_duplicated_lines_density = 12.1 (threshold: 3.0)
-- Catatan: gate masih ERROR namun tren membaik; snapshot terbaru menunjukkan penurunan pada duplicated_lines (6864), duplicated_blocks (431), dan density global (7.7).
+- Gate blocker utama: new_duplicated_lines_density = 12.0 (threshold: 3.0)
+- Catatan: tren duplikasi terus membaik (duplicated_lines 6710, duplicated_blocks 390, density global 7.6), tetapi snapshot terbaru juga menandai coverage 0.0 yang kemungkinan besar anomali upload/report CI sehingga perlu verifikasi run berikutnya.
 
 ### Prioritas Duplikasi Backend (Batch C)
 
@@ -89,6 +89,7 @@ Isi setelah batch selesai dan sebelum merge.
 
 ## Log Perubahan
 
+- 2026-03-31: [C], post-push c563e888 cek Sonar MCP: gate masih ERROR namun membaik (new_duplicated_lines_density 12.0, dari 12.1); metrik inti terbaru: duplicated_lines 6710, duplicated_blocks 390, density 7.6, ncloc 72984, coverage 0.0 (indikasi anomali pipeline coverage).
 - 2026-03-31: [C], wave export dedup lanjutan 3: perluas InteractsWithExportFilters (normalizeSortDirection + applyPresentFilters) lalu migrasi ApprovalFlowExport, PipelineExport, WarehouseExport, AssetLocationExport, dan AssetModelExport ke concern shared; test: ./vendor/bin/sail artisan test tests/Feature/ApprovalFlows/ApprovalFlowExportTest.php tests/Feature/Pipelines/PipelineExportTest.php tests/Feature/Warehouses/WarehouseExportTest.php tests/Feature/AssetLocations/AssetLocationExportTest.php tests/Feature/AssetModels/AssetModelExportTest.php (PASS 12 test).
 - 2026-03-31: [C], post-push d67b614b cek Sonar MCP: gate masih ERROR tetapi membaik (new_duplicated_lines_density 12.1, dari 12.4); metrik inti terbaru: duplicated_lines 6864, duplicated_blocks 431, density 7.7, ncloc 73082, coverage 87.0.
 - 2026-03-31: [C], wave export dedup lanjutan 2: migrasi PurchaseRequestExport, StockAdjustmentExport, StockTransferExport, dan SupplierExport ke concern InteractsWithExportFilters (shared search/exact/date/sort/styles); test: ./vendor/bin/sail artisan test tests/Feature/PurchaseRequests/PurchaseRequestExportTest.php tests/Feature/StockAdjustments/StockAdjustmentExportTest.php tests/Feature/StockTransfers/StockTransferExportTest.php tests/Feature/Suppliers/SupplierExportTest.php (PASS 13 test).
