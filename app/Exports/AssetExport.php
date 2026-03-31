@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Domain\Assets\AssetFilterService;
+use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\Asset;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -10,10 +11,11 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
+    use InteractsWithExportFilters;
+
     protected $filters;
 
     public function __construct(array $filters = [])
@@ -57,7 +59,7 @@ class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
         $filterService->applySorting(
             $query,
             $this->filters['sort_by'] ?? 'created_at',
-            $this->filters['sort_direction'] ?? 'desc',
+            $this->normalizeSortDirection($this->filters),
             [
                 'id',
                 'asset_code',
@@ -108,13 +110,6 @@ class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
             $asset->depreciation_method,
             $asset->useful_life_months,
             $asset->created_at?->toIso8601String(),
-        ];
-    }
-
-    public function styles(Worksheet $sheet)
-    {
-        return [
-            1 => ['font' => ['bold' => true]],
         ];
     }
 }

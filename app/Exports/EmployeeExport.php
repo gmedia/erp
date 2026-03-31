@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\Employee;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -9,10 +10,11 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
+    use InteractsWithExportFilters;
+
     protected $filters;
 
     public function __construct(array $filters = [])
@@ -24,36 +26,13 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
     {
         $query = Employee::query()->with(['department', 'position', 'branch']);
 
-        // Apply search filter
-        if (! empty($this->filters['search'])) {
-            $search = $this->filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('employee_id', 'like', "%{$search}%")
-                    ->orWhere('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%");
-            });
-        }
-
-        // Apply department filter (by department_id)
-        if (! empty($this->filters['department_id'])) {
-            $query->where('department_id', $this->filters['department_id']);
-        }
-
-        // Apply position filter (by position_id)
-        if (! empty($this->filters['position_id'])) {
-            $query->where('position_id', $this->filters['position_id']);
-        }
-
-        // Apply branch filter (by branch_id)
-        if (! empty($this->filters['branch_id'])) {
-            $query->where('branch_id', $this->filters['branch_id']);
-        }
-
-        // Apply employment status filter
-        if (! empty($this->filters['employment_status'])) {
-            $query->where('employment_status', $this->filters['employment_status']);
-        }
+        $this->applySearchFilter($query, $this->filters, ['employee_id', 'name', 'email', 'phone']);
+        $this->applyExactFilters($query, $this->filters, [
+            'department_id' => 'department_id',
+            'position_id' => 'position_id',
+            'branch_id' => 'branch_id',
+            'employment_status' => 'employment_status',
+        ]);
 
         // Apply salary range filters
         if (! empty($this->filters['min_salary'])) {
@@ -73,12 +52,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             $query->where('hire_date', '<=', $this->filters['hire_date_to']);
         }
 
-        // Apply sorting
-        $sortBy = $this->filters['sort_by'] ?? 'created_at';
-        $sortDirection = $this->filters['sort_direction'] ?? 'desc';
-
-        // Validate sort_by to prevent SQL injection
-        $allowedSortColumns = [
+        $this->applySorting($query, $this->filters, [
             'name',
             'email',
             'phone',
@@ -91,10 +65,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             'hire_date',
             'created_at',
             'updated_at',
-        ];
-        if (in_array($sortBy, $allowedSortColumns)) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
+        ]);
 
         return $query;
     }
@@ -132,13 +103,6 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             $employee->employment_status,
             $employee->hire_date->format('Y-m-d'),
             $employee->created_at?->toIso8601String(),
-        ];
-    }
-
-    public function styles(Worksheet $sheet)
-    {
-        return [
-            1 => ['font' => ['bold' => true]],
         ];
     }
 }

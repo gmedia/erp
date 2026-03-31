@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Domain\AssetMaintenances\AssetMaintenanceFilterService;
+use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\AssetMaintenance;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -10,10 +11,11 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AssetMaintenanceExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
+    use InteractsWithExportFilters;
+
     public function __construct(
         protected array $filters = []
     ) {}
@@ -42,7 +44,7 @@ class AssetMaintenanceExport implements FromQuery, ShouldAutoSize, WithHeadings,
         $filterService->applySorting(
             $query,
             $this->filters['sort_by'] ?? 'scheduled_at',
-            $this->filters['sort_direction'] ?? 'desc',
+            $this->normalizeSortDirection($this->filters),
             [
                 'id',
                 'asset',
@@ -93,13 +95,6 @@ class AssetMaintenanceExport implements FromQuery, ShouldAutoSize, WithHeadings,
             $maintenance->notes,
             $maintenance->createdBy?->name,
             $maintenance->created_at?->toIso8601String(),
-        ];
-    }
-
-    public function styles(Worksheet $sheet)
-    {
-        return [
-            1 => ['font' => ['bold' => true]],
         ];
     }
 }
