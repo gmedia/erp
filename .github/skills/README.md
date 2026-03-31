@@ -9,6 +9,7 @@ Skills adalah panduan terstruktur yang membantu AI dalam menyelesaikan task deng
 | Server | Tools Utama |
 |--------|-------------|
 | **Laravel Boost** | `database-schema`, `list-routes`, `search-docs`, `tinker`, `last-error`, `read-log-entries`, `browser-logs` |
+| **SonarQube MCP** | `get_project_quality_gate_status`, `get_component_measures`, `search_duplicated_files`, `get_duplications` |
 | **Filesystem** | `read_file`, `write_file`, `edit_file`, `directory_tree` |
 | **Shadcn UI** | `get_component`, `get_component_demo`, `list_blocks`, `get_block` |
 
@@ -20,6 +21,10 @@ mcp_laravel-boost_database-schema()
 
 # Cari dokumentasi Laravel
 mcp_laravel-boost_search-docs(queries: ["migration foreign key"])
+
+# Ambil baseline quality gate + metrik duplikasi Sonar
+mcp_io_github_son_get_project_quality_gate_status(projectKey: "...")
+mcp_io_github_son_get_component_measures(projectKey: "...", metricKeys: ["duplicated_lines", "duplicated_blocks", "duplicated_lines_density", "ncloc", "coverage"])
 
 # Ambil komponen UI
 mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
@@ -96,3 +101,4 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 Catatan `/refactor-sonar`:
 Jika Sonar MCP tidak tersedia, gunakan fallback evidence dari `.sonarcloud.properties`, `coverage.xml`, dan perubahan file Git. Tetap mulai dari ringkasan metrik lalu drill-down ke cluster duplikasi prioritas untuk hemat token.
 Progress batch disimpan terpisah di `docs/refactor-sonar-progress.md`, bukan di prompt utama.
+Eksekusi disarankan dalam wave semi-besar terkontrol (4-8 file/pola refactor) untuk menyeimbangkan kecepatan dan risiko regresi.

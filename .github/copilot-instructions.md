@@ -85,3 +85,26 @@ class ExportBranchRequest extends SimpleCrudExportRequest
 	- Gunakan `token_limit` secukupnya; mulai dari kecil lalu naikkan hanya jika hasil terpotong.
 	- Jangan fetch log/error panjang tanpa kebutuhan; mulai dari jumlah entry kecil.
 	- Saat butuh banyak data baca-only, prioritaskan pencarian terarah dulu (search/list), baru baca konten detail yang relevan saja.
+
+## 8. Sonar MCP Refactor Protocol (Duplication)
+
+Untuk task refactor berbasis SonarQube dengan target menurunkan duplikasi dan menjaga konsistensi style antar modul, ikuti protokol ini:
+
+1. **Baseline WAJIB (MCP Sonar)**
+	- Ambil `quality gate` + metrik inti: `duplicated_lines`, `duplicated_blocks`, `duplicated_lines_density`, `ncloc`, `coverage`.
+	- Mulai dari ringkasan; detail file/cluster hanya untuk prioritas tertinggi.
+
+2. **Eksekusi Semi-Besar Terkontrol**
+	- Refactor 4-8 file per wave dengan pola yang sama (jangan campur banyak tipe refactor dalam satu wave).
+	- Utamakan extraction shared concern/trait/helper untuk pola berulang lintas modul setara.
+
+3. **Guard Konsistensi Style Antar Modul**
+	- Saat satu modul dalam family diubah, terapkan pola style/struktur yang sama ke sibling module setara pada wave yang sama.
+	- Pertahankan API contract (route, payload, response keys, query params) dan arsitektur API-only.
+
+4. **Verifikasi dan Tracking**
+	- Jalankan test terfokus modul terdampak via Sail.
+	- Update `docs/refactor-sonar-progress.md` setiap wave: baseline/delta, ringkasan perubahan, evidence test, snapshot Sonar.
+
+5. **Penanganan Anomali Metrik**
+	- Jika `coverage`/metrik lain anomali (mis. `0.0`) namun test lokal lulus, catat sebagai anomali pipeline di progress doc dan lanjutkan verifikasi pada snapshot berikutnya.

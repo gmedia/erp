@@ -14,7 +14,11 @@ Selalu cek MCP server yang tersedia lebih dulu.
 
 Urutan eksekusi:
 
-1. Jika Sonar MCP tersedia, gunakan tool Sonar untuk ambil metrik duplikasi.
+1. Jika Sonar MCP tersedia, gunakan urutan tool berikut:
+	- `mcp_io_github_son_get_project_quality_gate_status`
+	- `mcp_io_github_son_get_component_measures` untuk metrik inti
+	- `mcp_io_github_son_search_duplicated_files` untuk shortlist file cluster prioritas
+	- `mcp_io_github_son_get_duplications` hanya untuk file prioritas (drill-down)
 2. Jika Sonar MCP tidak tersedia, jelaskan alasan singkat lalu gunakan fallback berikut:
 	- Config Sonar: `.sonarcloud.properties`
 	- Laporan coverage: `coverage.xml`
@@ -57,6 +61,12 @@ Batch per modul (jangan acak file lintas domain dalam 1 PR):
 - Jika file progress belum ada, buat baseline progress dulu sebelum eksekusi batch.
 - Pilih 1 batch aktif per PR agar review tetap fokus dan risiko regresi lebih rendah.
 
+Aturan ukuran wave:
+
+- Gunakan **semi-besar terkontrol**: 4-8 file per wave dengan pola refactor yang sama.
+- Jika ada perubahan behavior query kompleks, turunkan ke 2-4 file per wave.
+- Setelah 2 wave stabil (test pass + metrik membaik), boleh naikkan ukuran wave berikutnya.
+
 ## 4. Guard Konsistensi Antar Modul
 
 Checklist wajib:
@@ -79,6 +89,12 @@ Untuk tiap batch:
 3. Refactor internal tanpa ubah API contract
 4. Tambah/rapikan Feature + Unit test modul tersebut
 5. Jalankan formatter/lint sesuai standar project
+
+Checklist anti-regresi wave:
+
+- Tidak ada perubahan route, contract payload, dan response keys.
+- Pola style/konstruksi yang diadopsi pada satu modul harus konsisten ke sibling module yang setara.
+- Hindari campur refactor request + action + export dalam satu wave, kecuali skalanya kecil dan masih satu pola.
 
 Contoh target extraction:
 
@@ -120,3 +136,11 @@ Contoh:
 - Tidak ada perubahan route/payload API publik
 - Semua test batch (Pest + E2E) pass
 - Jika Sonar MCP tidak tersedia, keputusan refactor tetap menyertakan baseline + evidence fallback yang bisa diaudit
+
+## 8. Catatan Anomali Sonar
+
+Jika snapshot Sonar menunjukkan anomali (contoh `coverage = 0.0`) saat test lokal lulus:
+
+1. Catat anomali di `docs/refactor-sonar-progress.md`.
+2. Jangan langsung rollback refactor yang lulus test hanya karena anomali coverage snapshot tunggal.
+3. Verifikasi ulang pada snapshot Sonar berikutnya setelah pipeline stabil.

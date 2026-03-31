@@ -13,6 +13,9 @@ Gunakan tabel ini untuk memilih skill yang tepat berdasarkan kebutuhan task.
 | Cari docs | `mcp_laravel-boost_search-docs(queries: [...])` |
 | Test code | `mcp_laravel-boost_tinker(code: "...")` |
 | Debug error | `mcp_laravel-boost_last-error()` |
+| Quality gate Sonar | `mcp_io_github_son_get_project_quality_gate_status(projectKey: "...")` |
+| Metrik duplikasi Sonar | `mcp_io_github_son_get_component_measures(projectKey: "...", metricKeys: [...])` |
+| Cluster duplikasi Sonar | `mcp_io_github_son_search_duplicated_files(projectKey: "...")` |
 | Ambil komponen UI | `mcp_shadcn-ui-mcp-server_get_component(componentName: "...")` |
 | Baca file referensi | `mcp_filesystem_read_file(path: "...")` |
 
@@ -74,6 +77,11 @@ Apa yang ingin dilakukan?
 ### refactor-backend
 - ✅ Merapikan Controller/Action
 - ✅ TIDAK mengubah API
+
+### workflow refactor-sonar
+- ✅ Berbasis baseline + delta metrik Sonar
+- ✅ Wave semi-besar terkontrol (4-8 file per pola)
+- ✅ Wajib update `docs/refactor-sonar-progress.md` setiap wave
 
 ### refactor-frontend
 - ✅ Merapikan komponen
