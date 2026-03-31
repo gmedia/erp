@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\StockTransfers;
 
+use App\Http\Requests\Concerns\HasSometimesArrayRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 abstract class AbstractStockTransferRequest extends FormRequest
 {
+    use HasSometimesArrayRules;
+
     public function authorize(): bool
     {
         return true;
@@ -51,36 +54,6 @@ abstract class AbstractStockTransferRequest extends FormRequest
         return [];
     }
 
-    /**
-     * @param  array<int, string>  $rules
-     * @return array<int, string>
-     */
-    private function withSometimes(array $rules): array
-    {
-        if (! $this->isUpdateRequest()) {
-            return $rules;
-        }
-
-        return ['sometimes', ...$rules];
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function itemsRules(): array
-    {
-        if (! $this->isUpdateRequest()) {
-            return ['required', 'array', 'min:1'];
-        }
-
-        return ['sometimes', 'array', 'min:1'];
-    }
-
-    private function itemRequiredRule(): string
-    {
-        return $this->isUpdateRequest() ? 'required_with:items' : 'required';
-    }
-
     private function buildTransferNumberUniqueRule(): string
     {
         if (! $this->isUpdateRequest()) {
@@ -95,5 +68,10 @@ abstract class AbstractStockTransferRequest extends FormRequest
     private function isUpdateRequest(): bool
     {
         return $this instanceof UpdateStockTransferRequest;
+    }
+
+    protected function usesSometimes(): bool
+    {
+        return $this->isUpdateRequest();
     }
 }

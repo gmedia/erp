@@ -2,12 +2,15 @@
 
 namespace App\Http\Requests\Assets;
 
+use App\Http\Requests\Concerns\HasSometimesArrayRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Unique;
 
 abstract class AbstractAssetRequest extends FormRequest
 {
+    use HasSometimesArrayRules;
+
     public function authorize(): bool
     {
         return true;
@@ -43,19 +46,6 @@ abstract class AbstractAssetRequest extends FormRequest
         ];
     }
 
-    /**
-     * @param  array<int, string|object>  $rules
-     * @return array<int, string|object>
-     */
-    private function withSometimes(array $rules): array
-    {
-        if (! $this->isUpdateRequest()) {
-            return $rules;
-        }
-
-        return ['sometimes', ...$rules];
-    }
-
     private function assetCodeUniqueRule(): string|Unique
     {
         if (! $this->isUpdateRequest()) {
@@ -77,5 +67,10 @@ abstract class AbstractAssetRequest extends FormRequest
     private function isUpdateRequest(): bool
     {
         return $this instanceof UpdateAssetRequest;
+    }
+
+    protected function usesSometimes(): bool
+    {
+        return $this->isUpdateRequest();
     }
 }

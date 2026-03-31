@@ -35,14 +35,14 @@ Isi setelah batch selesai dan sebelum merge.
 - duplicated_lines: +2 (6620 -> 6622, latest snapshot 2026-03-31)
 - duplicated_blocks: +6 (373 -> 379, latest snapshot 2026-03-31)
 - duplicated_lines_density: +0.0 (7.5 -> 7.5, latest snapshot 2026-03-31)
-- ncloc: -326 (73194 -> 72868, latest snapshot 2026-03-31)
-- coverage: +0.4 (86.5 -> 86.9, latest snapshot 2026-03-31)
+- ncloc: -348 (73194 -> 72846, latest snapshot 2026-03-31)
+- coverage: -86.5 (86.5 -> 0.0, latest snapshot 2026-03-31; terindikasi anomali pipeline coverage)
 
 ## Snapshot Analisa Sonar (2026-03-31, latest MCP)
 
 - Quality Gate: ERROR
 - Gate blocker utama: new_duplicated_lines_density = 12.0 (threshold: 3.0)
-- Catatan: snapshot terbaru menunjukkan coverage kembali normal di 86.9 (anomali 0.0 tidak muncul), namun gate masih tertahan oleh new_duplicated_lines_density.
+- Catatan: metrik duplikasi tetap stabil, namun snapshot terbaru kembali menunjukkan coverage 0.0; indikasi anomali pipeline coverage sehingga perlu verifikasi di snapshot berikutnya.
 
 ### Prioritas Duplikasi Backend (Batch C)
 
@@ -89,6 +89,7 @@ Isi setelah batch selesai dan sebelum merge.
 
 ## Log Perubahan
 
+- 2026-03-31: [C], wave semi-besar terkontrol (request dedup lanjutan 2): migrasi AbstractAssetRequest, AbstractEmployeeRequest, AbstractProductRequest, AbstractStockAdjustmentRequest, AbstractStockTransferRequest, dan AbstractPurchaseOrderRequest ke concern HasSometimesArrayRules untuk konsolidasi helper withSometimes/itemsRules/itemRequired; test: ./vendor/bin/sail artisan test tests/Unit/Requests/Products/StoreProductRequestTest.php tests/Unit/Requests/Products/UpdateProductRequestTest.php tests/Unit/Requests/Employees/StoreEmployeeRequestTest.php tests/Unit/Requests/Employees/UpdateEmployeeRequestTest.php tests/Unit/Requests/Assets/StoreAssetRequestTest.php tests/Unit/Requests/Assets/UpdateAssetRequestTest.php tests/Unit/Requests/StockAdjustments/StoreStockAdjustmentRequestTest.php tests/Unit/Requests/StockAdjustments/UpdateStockAdjustmentRequestTest.php tests/Unit/Requests/StockTransfers/StoreStockTransferRequestTest.php tests/Unit/Requests/StockTransfers/UpdateStockTransferRequestTest.php tests/Unit/Requests/PurchaseOrders/StorePurchaseOrderRequestTest.php tests/Unit/Requests/PurchaseOrders/UpdatePurchaseOrderRequestTest.php (PASS 46 test).
 - 2026-03-31: [C], post-push 592aa718 cek Sonar MCP: snapshot masih sama (new_duplicated_lines_density 12.0; duplicated_lines 6622; duplicated_blocks 379; density 7.5; ncloc 72868; coverage 86.9).
 - 2026-03-31: [C], wave semi-besar terkontrol (request dedup lanjutan): tambah BaseListingRequest dan migrasi sibling abstract listing request pada Assets, AssetMaintenances, Suppliers, PurchaseRequests, Products, InventoryStocktakes, AssetStocktakes Variances, serta ApprovalDelegations untuk konsolidasi authorize + sort rules; test: ./vendor/bin/sail artisan test tests/Unit/Requests/Assets/IndexAssetRequestTest.php tests/Unit/Requests/Assets/ExportAssetRequestTest.php tests/Unit/Requests/AssetMaintenances/IndexAssetMaintenanceRequestTest.php tests/Unit/Requests/AssetMaintenances/ExportAssetMaintenanceRequestTest.php tests/Unit/Requests/Suppliers/IndexSupplierRequestTest.php tests/Unit/Requests/Suppliers/ExportSupplierRequestTest.php tests/Unit/Requests/PurchaseRequests/IndexPurchaseRequestRequestTest.php tests/Unit/Requests/PurchaseRequests/ExportPurchaseRequestRequestTest.php tests/Unit/Requests/Products/IndexProductRequestTest.php tests/Unit/Requests/Products/ExportProductRequestTest.php tests/Unit/Requests/InventoryStocktakes/IndexInventoryStocktakeRequestTest.php tests/Unit/Requests/InventoryStocktakes/ExportInventoryStocktakeRequestTest.php tests/Unit/Requests/ApprovalDelegations/IndexApprovalDelegationRequestTest.php tests/Feature/AssetStocktakes/AssetStocktakeVarianceControllerTest.php (PASS 33 test).
 - 2026-03-31: [C], post-rebase/push 4fe7f6de cek Sonar MCP: snapshot belum berubah dari run sebelumnya (new_duplicated_lines_density 12.0; duplicated_lines 6710; duplicated_blocks 390; density 7.6; ncloc 72984; coverage 0.0/anomali pipeline coverage).

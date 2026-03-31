@@ -2,12 +2,15 @@
 
 namespace App\Http\Requests\Products;
 
+use App\Http\Requests\Concerns\HasSometimesArrayRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Unique;
 
 abstract class AbstractProductRequest extends FormRequest
 {
+    use HasSometimesArrayRules;
+
     public function authorize(): bool
     {
         return true;
@@ -39,19 +42,6 @@ abstract class AbstractProductRequest extends FormRequest
         ];
     }
 
-    /**
-     * @param  array<int, string|Rule>  $rules
-     * @return array<int, string|Rule>
-     */
-    private function withSometimes(array $rules): array
-    {
-        if (! $this->isUpdateRequest()) {
-            return $rules;
-        }
-
-        return ['sometimes', ...$rules];
-    }
-
     private function codeUniqueRule(): string|Unique
     {
         if (! $this->isUpdateRequest()) {
@@ -64,5 +54,10 @@ abstract class AbstractProductRequest extends FormRequest
     private function isUpdateRequest(): bool
     {
         return $this instanceof UpdateProductRequest;
+    }
+
+    protected function usesSometimes(): bool
+    {
+        return $this->isUpdateRequest();
     }
 }

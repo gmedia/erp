@@ -2,12 +2,15 @@
 
 namespace App\Http\Requests\Employees;
 
+use App\Http\Requests\Concerns\HasSometimesArrayRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Unique;
 
 abstract class AbstractEmployeeRequest extends FormRequest
 {
+    use HasSometimesArrayRules;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -36,19 +39,6 @@ abstract class AbstractEmployeeRequest extends FormRequest
         ];
     }
 
-    /**
-     * @param  array<int, string|Rule>  $rules
-     * @return array<int, string|Rule>
-     */
-    private function withSometimes(array $rules): array
-    {
-        if (! $this->isUpdateRequest()) {
-            return $rules;
-        }
-
-        return ['sometimes', ...$rules];
-    }
-
     private function employeeIdUniqueRule(): string|Unique
     {
         if (! $this->isUpdateRequest()) {
@@ -70,5 +60,10 @@ abstract class AbstractEmployeeRequest extends FormRequest
     private function isUpdateRequest(): bool
     {
         return $this instanceof UpdateEmployeeRequest;
+    }
+
+    protected function usesSometimes(): bool
+    {
+        return $this->isUpdateRequest();
     }
 }
