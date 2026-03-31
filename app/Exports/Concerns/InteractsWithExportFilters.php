@@ -50,6 +50,19 @@ trait InteractsWithExportFilters
 
     /**
      * @param  array<string, mixed>  $filters
+     * @param  array<string, string>  $map
+     */
+    protected function applyPresentFilters(Builder $query, array $filters, array $map): void
+    {
+        foreach ($map as $filterKey => $column) {
+            if (array_key_exists($filterKey, $filters) && $filters[$filterKey] !== '') {
+                $query->where($column, $filters[$filterKey]);
+            }
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
      * @param  array<string, array{from: string, to: string}>  $map
      */
     protected function applyDateRangeFilters(Builder $query, array $filters, array $map): void
@@ -72,10 +85,18 @@ trait InteractsWithExportFilters
     protected function applySorting(Builder $query, array $filters, array $allowedSortColumns): void
     {
         $sortBy = (string) ($filters['sort_by'] ?? 'created_at');
-        $sortDirection = strtolower((string) ($filters['sort_direction'] ?? 'desc')) === 'asc' ? 'asc' : 'desc';
+        $sortDirection = $this->normalizeSortDirection($filters);
 
         if (in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function normalizeSortDirection(array $filters): string
+    {
+        return strtolower((string) ($filters['sort_direction'] ?? 'desc')) === 'asc' ? 'asc' : 'desc';
     }
 }

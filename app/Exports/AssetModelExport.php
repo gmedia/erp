@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\AssetModel;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -9,10 +10,11 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AssetModelExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
+    use InteractsWithExportFilters;
+
     protected $filters;
 
     public function __construct(array $filters = [])
@@ -24,20 +26,11 @@ class AssetModelExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
     {
         $query = AssetModel::query()->with(['category']);
 
-        if (! empty($this->filters['search'])) {
-            $search = $this->filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('model_name', 'like', "%{$search}%")
-                    ->orWhere('manufacturer', 'like', "%{$search}%");
-            });
-        }
-
-        if (! empty($this->filters['asset_category_id'])) {
-            $query->where('asset_category_id', $this->filters['asset_category_id']);
-        }
+        $this->applySearchFilter($query, $this->filters, ['model_name', 'manufacturer']);
+        $this->applyExactFilters($query, $this->filters, ['asset_category_id' => 'asset_category_id']);
 
         $sortBy = $this->filters['sort_by'] ?? 'created_at';
-        $sortDirection = $this->filters['sort_direction'] ?? 'desc';
+        $sortDirection = $this->normalizeSortDirection($this->filters);
         $allowedSortColumns = [
             'id',
             'model_name',
@@ -53,7 +46,7 @@ class AssetModelExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
                 ->leftJoin('asset_categories', 'asset_models.asset_category_id', '=', 'asset_categories.id')
                 ->select('asset_models.*')
                 ->orderBy('asset_categories.name', $sortDirection);
-        } elseif (in_array($sortBy, $allowedSortColumns)) {
+            } elseif (in_array($sortBy, $allowedSortColumns, true)) {
             $query->orderBy($sortBy, $sortDirection);
         }
 
@@ -74,13 +67,6 @@ class AssetModelExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
             $assetModel->category?->name,
             $assetModel->specs ? json_encode($assetModel->specs) : '',
             $assetModel->created_at?->toIso8601String(),
-        ];
-    }
-
-    public function styles(Worksheet $sheet)
-    {
-        return [
-            1 => ['font' => ['bold' => true]],
         ];
     }
 }

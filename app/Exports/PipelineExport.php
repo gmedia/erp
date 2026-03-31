@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\Pipeline;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -9,10 +10,11 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class PipelineExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
+    use InteractsWithExportFilters;
+
     protected $filters;
 
     public function __construct(array $filters = [])
@@ -24,14 +26,7 @@ class PipelineExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
     {
         $query = Pipeline::query()->with(['creator']);
 
-        if (! empty($this->filters['search'])) {
-            $search = $this->filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('code', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
+        $this->applySearchFilter($query, $this->filters, ['name', 'code', 'description']);
 
         if (isset($this->filters['entity_type']) && $this->filters['entity_type'] !== '') {
             $query->where('entity_type', $this->filters['entity_type']);
@@ -41,15 +36,15 @@ class PipelineExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         }
 
         $sortBy = $this->filters['sort_by'] ?? 'created_at';
-        $sortDirection = $this->filters['sort_direction'] ?? 'desc';
+        $sortDirection = $this->normalizeSortDirection($this->filters);
         $allowedSortColumns = ['name', 'code', 'entity_type', 'version', 'is_active', 'created_at'];
 
         if ($sortBy === 'created_by') {
             $query->leftJoin('users as creator', 'pipelines.created_by', '=', 'creator.id')
-                ->orderBy('creator.name', $sortDirection === 'asc' ? 'asc' : 'desc')
+                ->orderBy('creator.name', $sortDirection)
                 ->select('pipelines.*');
-        } elseif (in_array($sortBy, $allowedSortColumns)) {
-            $query->orderBy($sortBy, $sortDirection == 'asc' ? 'asc' : 'desc');
+        } elseif (in_array($sortBy, $allowedSortColumns, true)) {
+            $query->orderBy($sortBy, $sortDirection);
         }
 
         return $query;
@@ -71,13 +66,6 @@ class PipelineExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             $pipeline->is_active ? 'Yes' : 'No',
             $pipeline->creator?->name,
             $pipeline->created_at?->toIso8601String(),
-        ];
-    }
-
-    public function styles(Worksheet $sheet)
-    {
-        return [
-            1 => ['font' => ['bold' => true]],
         ];
     }
 }
