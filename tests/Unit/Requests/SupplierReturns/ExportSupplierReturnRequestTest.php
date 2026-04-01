@@ -13,3 +13,10 @@ test('export supplier return validates direction enum', function () {
 
     expect($validator->fails())->toBeTrue();
 });
+
+test('export supplier return accepts legacy relation filter fields', function () {
+    $request = new ExportSupplierReturnRequest;
+    $rules = $request->rules();
+
+    expect($rules)->toHaveKeys(['purchase_order', 'goods_receipt', 'supplier', 'warehouse']);
+});

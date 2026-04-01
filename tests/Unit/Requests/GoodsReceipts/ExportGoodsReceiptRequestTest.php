@@ -13,3 +13,10 @@ test('export goods receipt validates direction enum', function () {
 
     expect($validator->fails())->toBeTrue();
 });
+
+test('export goods receipt accepts legacy relation filter fields', function () {
+    $request = new ExportGoodsReceiptRequest;
+    $rules = $request->rules();
+
+    expect($rules)->toHaveKeys(['purchase_order', 'warehouse']);
+});

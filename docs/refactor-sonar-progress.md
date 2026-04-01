@@ -14,46 +14,54 @@ Dokumen ini menyimpan status batch refactor berbasis Sonar agar prompt tetap sta
 |------|------|------|------|------|
 | A | done | purchase-history-report, purchase-order-status-report, goods-receipt-report, stock-movement-report, stock-adjustment-report, inventory-valuation-report, inventory-stocktake-variance-report | report requests/resources | n/a |
 | B | done | purchase-requests, purchase-orders, supplier-returns, goods-receipts, stock-adjustments, stock-movements, stock-transfers, inventory-stocktakes | filter services + item controllers | n/a |
-| C | in-progress | assets, products, asset-movements, asset-maintenances, asset-stocktakes | asset-family filter services, ProductFilterService, item controllers | snapshot 2026-03-31: quality gate ERROR (new_duplicated_lines_density 12.0 > 3.0); local waves: filter-service dedup PASS 17 test, index-action dedup PASS 9 test, frontend filter descriptor dedup build OK + Playwright 17 passed/1 skipped |
+| C | done | assets, products, asset-movements, asset-maintenances, asset-stocktakes | asset-family filter services, ProductFilterService, item controllers | snapshot 2026-04-01: duplicated_lines 6344, duplicated_blocks 332, duplicated_lines_density 7.2, coverage 87.0, new_duplicated_lines_density 11.8 |
 | D | next | financial-reporting | FinancialReportService + query/mapping laporan keuangan | pending |
 | E | next | account-mappings, journal-entries, goods-receipts, purchase-requests | pasangan Store*Request/Update*Request | pending |
+| F | in-progress | goods-receipts, supplier-returns | pasangan Index*/Export* request listing | local wave request dedup PASS 22 test; menunggu snapshot Sonar pasca-push |
 
-Catatan lokal: wave dedup request untuk `approval-audit-trail` dan `pipeline-audit-trail` sudah tervalidasi di working tree, tetapi berada di luar scope Batch C aktif. Jika ingin tetap disiplin satu batch aktif per PR, pisahkan wave ini ke PR/batch berikutnya.
+Catatan: wave dedup request untuk `approval-audit-trail` dan `pipeline-audit-trail` sudah ikut terdorong di commit sebelumnya, tetapi tetap dicatat terpisah karena berada di luar scope Batch C saat dieksekusi.
 
 ## Baseline Metrics
 
 Isi saat mulai batch baru.
 
-- duplicated_lines: 6599
-- duplicated_blocks: 378
-- duplicated_lines_density: 7.5
-- ncloc: 72803
-- coverage: 86.9
+- duplicated_lines: 6344
+- duplicated_blocks: 332
+- duplicated_lines_density: 7.2
+- ncloc: 72873
+- coverage: 87.0
 
 ## Delta Metrics (setelah batch)
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: pending (menunggu snapshot Sonar pasca-wave; latest pre-wave snapshot 2026-03-31 = 6599)
-- duplicated_blocks: pending (menunggu snapshot Sonar pasca-wave; latest pre-wave snapshot 2026-03-31 = 378)
-- duplicated_lines_density: pending (menunggu snapshot Sonar pasca-wave; latest pre-wave snapshot 2026-03-31 = 7.5)
-- ncloc: pending (menunggu snapshot Sonar pasca-wave; latest pre-wave snapshot 2026-03-31 = 72803)
-- coverage: pending (menunggu snapshot Sonar pasca-wave; latest pre-wave snapshot 2026-03-31 = 86.9)
+- duplicated_lines: pending (menunggu snapshot Sonar pasca-wave Batch F; latest pre-wave snapshot 2026-04-01 = 6344)
+- duplicated_blocks: pending (menunggu snapshot Sonar pasca-wave Batch F; latest pre-wave snapshot 2026-04-01 = 332)
+- duplicated_lines_density: pending (menunggu snapshot Sonar pasca-wave Batch F; latest pre-wave snapshot 2026-04-01 = 7.2)
+- ncloc: pending (menunggu snapshot Sonar pasca-wave Batch F; latest pre-wave snapshot 2026-04-01 = 72873)
+- coverage: pending (menunggu snapshot Sonar pasca-wave Batch F; latest pre-wave snapshot 2026-04-01 = 87.0)
 
-## Snapshot Analisa Sonar (2026-03-31, latest MCP)
+## Snapshot Analisa Sonar (2026-04-01, latest MCP)
 
 - Quality Gate: ERROR
-- Gate blocker utama: new_duplicated_lines_density = 12.0 (threshold: 3.0)
-- Catatan: snapshot MCP terbaru menunjukkan coverage kembali normal di 86.9; anomali coverage 0.0 pada snapshot sebelumnya tetap dicatat sebagai fluktuasi pipeline yang perlu dipantau di analisis berikutnya.
+- Gate blocker utama: new_duplicated_lines_density = 11.8 (threshold: 3.0)
+- Catatan: Batch C berhasil menurunkan duplicated_lines (6599 -> 6344), duplicated_blocks (378 -> 332), dan duplicated_lines_density (7.5 -> 7.2) dengan coverage tetap sehat di 87.0, tetapi gate new code masih perlu diturunkan lebih jauh pada batch berikutnya.
 
-### Prioritas Duplikasi Backend (Batch C)
+### Prioritas Duplikasi Backend (Batch F)
 
-- app/Domain/Assets/AssetFilterService.php <-> app/Domain/AssetStocktakes/AssetStocktakeFilterService.php: duplikasi mapping sorting/filter masih tinggi (blok 27-34 baris).
-- app/Actions/AssetMaintenances/IndexAssetMaintenancesAction.php <-> app/Actions/AssetStocktakes/IndexAssetStocktakesAction.php <-> app/Actions/InventoryStocktakes/IndexInventoryStocktakesAction.php: duplikasi orchestration index action lintas modul (blok ~29-41 baris).
-- app/Http/Requests/* (terutama pasangan Index*/Export*): pola rule request berulang lintas modul.
-- app/Exports/ProductExport.php dan app/Exports/InventoryStocktakeExport.php: duplikasi struktur export map/header terhadap export non-report lain.
+- app/Http/Requests/GoodsReceipts/IndexGoodsReceiptRequest.php <-> app/Http/Requests/GoodsReceipts/ExportGoodsReceiptRequest.php: pola listing/export rules berulang untuk search, relasi, date range, dan sort.
+- app/Http/Requests/SupplierReturns/IndexSupplierReturnRequest.php <-> app/Http/Requests/SupplierReturns/ExportSupplierReturnRequest.php: pola listing/export rules berulang untuk relasi, reason/status, date range, dan sort.
+- app/Http/Requests/JournalEntries/AbstractJournalEntryRequest.php masih berbagi blok validasi dengan export request transaksi lain; kandidat wave berikutnya jika Batch F masih berlanjut.
+- app/Exports/ProductExport.php dan app/Exports/InventoryStocktakeExport.php masih muncul sebagai kandidat eksport non-report lintas modul.
 
-## Rencana Refactor Fokus Duplikasi (Batch C)
+## Rencana Refactor Fokus Duplikasi (Batch F)
+
+1. Dedup pasangan listing/export request transaksi. (in-progress)
+	- Tambah abstract listing request per modul untuk `goods-receipts` dan `supplier-returns` di atas `BaseListingRequest`.
+	- Pertahankan nama field export legacy (`purchase_order`, `warehouse`, dll.) agar contract API tidak berubah.
+	- Progress: `AbstractGoodsReceiptListingRequest` dan `AbstractSupplierReturnListingRequest` sudah dipakai oleh pasangan `Index*`/`Export*`; test terfokus PASS 22 test.
+
+## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
 1. Ekstraksi query builder bersama untuk variances asset stocktake. (done)
 	- Buat service khusus (contoh: AssetStocktakeVarianceQueryService) untuk membangun query dasar, filter request, dan sorting.
@@ -94,6 +102,8 @@ Isi setelah batch selesai dan sebelum merge.
 
 ## Log Perubahan
 
+- 2026-04-01: [F], wave semi-besar terkontrol (transaction listing request dedup): tambah `AbstractGoodsReceiptListingRequest` + `AbstractSupplierReturnListingRequest`, lalu migrasi pasangan `Index*`/`Export*` request untuk goods receipts dan supplier returns ke helper listing rules shared sambil mempertahankan field export legacy; test: `./vendor/bin/sail artisan test tests/Unit/Requests/GoodsReceipts/IndexGoodsReceiptRequestTest.php tests/Unit/Requests/GoodsReceipts/ExportGoodsReceiptRequestTest.php tests/Unit/Requests/SupplierReturns/IndexSupplierReturnRequestTest.php tests/Unit/Requests/SupplierReturns/ExportSupplierReturnRequestTest.php tests/Feature/GoodsReceipts/GoodsReceiptExportTest.php tests/Feature/SupplierReturns/SupplierReturnExportTest.php tests/Feature/GoodsReceipts/GoodsReceiptControllerTest.php tests/Feature/SupplierReturns/SupplierReturnControllerTest.php` (PASS 22 test). Snapshot Sonar pasca-wave: pending analisis CI berikutnya.
+- 2026-04-01: [C], post-push Sonar MCP: quality gate tetap ERROR namun membaik (`new_duplicated_lines_density 11.8`); metrik inti terbaru `duplicated_lines 6344`, `duplicated_blocks 332`, `duplicated_lines_density 7.2`, `ncloc 72873`, `coverage 87.0`.
 - 2026-04-01: [C], frontend quick win (filter descriptor dedup): tambah helper `createAsyncSelectFilterFields`, `createSelectFilterFields`, dan `createDateFilterFields` di `resources/js/components/common/filters.tsx`, lalu migrasi `AssetFilters`, `ProductFilters`, `AssetMaintenanceFilters`, dan `AssetStocktakeFilters` ke config-driven descriptor factory; verifikasi: `./vendor/bin/sail npm run build` (PASS) dan `./vendor/bin/sail npx playwright test tests/e2e/assets/asset.spec.ts tests/e2e/products/product.spec.ts` (17 passed, 1 skipped). Snapshot Sonar pasca-wave: pending analisis CI berikutnya.
 - 2026-04-01: [C], wave semi-besar terkontrol (index action skeleton dedup): tambah helper `applySearchOrPrimaryFilters`, `applyRequestFilters`, dan `applyIndexSorting` di `InteractsWithIndexRequest`, lalu migrasi `IndexAssetsAction`, `IndexProductsAction`, `IndexAssetMaintenancesAction`, dan `IndexAssetStocktakesAction`; tambah unit test `IndexAssetStocktakesActionTest`; test: ./vendor/bin/sail artisan test tests/Unit/Actions/Assets/IndexAssetsActionTest.php tests/Unit/Actions/Products/IndexProductsActionTest.php tests/Unit/Actions/AssetMaintenances/IndexAssetMaintenancesActionTest.php tests/Unit/Actions/AssetStocktakes/IndexAssetStocktakesActionTest.php tests/Feature/AssetStocktakes/AssetStocktakeControllerTest.php (PASS 9 test). Snapshot Sonar pasca-wave: pending analisis CI berikutnya.
 - 2026-03-31: [queued-next], wave request dedup audit trail: tambah `AbstractApprovalAuditTrailListingRequest` + `AbstractPipelineAuditTrailListingRequest`, migrasi pasangan `Index*`/`Export*` request untuk approval audit trail dan pipeline audit trail ke abstract listing request shared; test: ./vendor/bin/sail artisan test tests/Unit/Requests/ApprovalAuditTrail/ApprovalAuditTrailListingRequestTest.php tests/Unit/Requests/PipelineAuditTrail/PipelineAuditTrailListingRequestTest.php tests/Feature/ApprovalAuditTrail/ApprovalAuditTrailControllerTest.php tests/Feature/PipelineAuditTrail/PipelineAuditTrailControllerTest.php (PASS 17 test). Snapshot Sonar pasca-wave: pending analisis CI berikutnya.
