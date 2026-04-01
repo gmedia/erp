@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BuildsAttributeCasts;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,20 +36,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class AssetModel extends Model
 {
-    use HasFactory;
+    use BuildsAttributeCasts, HasFactory;
 
     protected $fillable = [
         'asset_category_id',
         'manufacturer',
         'model_name',
         'specs',
-    ];
-
-    protected $casts = [
-        'asset_category_id' => 'integer',
-        'specs' => 'array',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function category(): BelongsTo
@@ -59,5 +53,14 @@ class AssetModel extends Model
     public function assets(): HasMany
     {
         return $this->hasMany(Asset::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            ...$this->integerCasts(['asset_category_id']),
+            'specs' => 'array',
+            ...$this->datetimeCasts(['created_at', 'updated_at']),
+        ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BuildsAttributeCasts;
 use App\Traits\HasPipeline;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -109,7 +110,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Asset extends Model
 {
-    use HasFactory, HasPipeline, HasUlids, SoftDeletes;
+    use BuildsAttributeCasts, HasFactory, HasPipeline, HasUlids, SoftDeletes;
 
     protected $fillable = [
         'ulid',
@@ -139,26 +140,6 @@ class Asset extends Model
         'book_value',
         'depreciation_expense_account_id',
         'accumulated_depr_account_id',
-    ];
-
-    protected $casts = [
-        'purchase_date' => 'date',
-        'warranty_end_date' => 'date',
-        'purchase_cost' => 'decimal:2',
-        'salvage_value' => 'decimal:2',
-        'accumulated_depreciation' => 'decimal:2',
-        'book_value' => 'decimal:2',
-        'depreciation_start_date' => 'date',
-        'useful_life_months' => 'integer',
-        'asset_model_id' => 'integer',
-        'asset_category_id' => 'integer',
-        'branch_id' => 'integer',
-        'asset_location_id' => 'integer',
-        'department_id' => 'integer',
-        'employee_id' => 'integer',
-        'supplier_id' => 'integer',
-        'depreciation_expense_account_id' => 'integer',
-        'accumulated_depr_account_id' => 'integer',
     ];
 
     public function category(): BelongsTo
@@ -234,5 +215,34 @@ class Asset extends Model
     public function uniqueIds(): array
     {
         return ['ulid'];
+    }
+
+    protected function casts(): array
+    {
+        return [
+            ...$this->dateCasts([
+                'purchase_date',
+                'warranty_end_date',
+                'depreciation_start_date',
+            ]),
+            ...$this->decimalCasts([
+                'purchase_cost',
+                'salvage_value',
+                'accumulated_depreciation',
+                'book_value',
+            ]),
+            ...$this->integerCasts([
+                'useful_life_months',
+                'asset_model_id',
+                'asset_category_id',
+                'branch_id',
+                'asset_location_id',
+                'department_id',
+                'employee_id',
+                'supplier_id',
+                'depreciation_expense_account_id',
+                'accumulated_depr_account_id',
+            ]),
+        ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BuildsAttributeCasts;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -88,7 +89,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Product extends Model
 {
-    use HasFactory;
+    use BuildsAttributeCasts, HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -116,23 +117,6 @@ class Product extends Model
         'is_taxable',
         'status',
         'notes',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'cost' => 'decimal:2',
-        'selling_price' => 'decimal:2',
-        'markup_percentage' => 'decimal:2',
-        'is_recurring' => 'boolean',
-        'allow_one_time_purchase' => 'boolean',
-        'is_manufactured' => 'boolean',
-        'is_purchasable' => 'boolean',
-        'is_sellable' => 'boolean',
-        'is_taxable' => 'boolean',
     ];
 
     /**
@@ -261,5 +245,24 @@ class Product extends Model
     public function scopeManufactured($query)
     {
         return $query->where('is_manufactured', true);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            ...$this->decimalCasts([
+                'cost',
+                'selling_price',
+                'markup_percentage',
+            ]),
+            ...$this->booleanCasts([
+                'is_recurring',
+                'allow_one_time_purchase',
+                'is_manufactured',
+                'is_purchasable',
+                'is_sellable',
+                'is_taxable',
+            ]),
+        ];
     }
 }
