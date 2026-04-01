@@ -25,17 +25,14 @@ class StockAdjustmentExport implements FromQuery, WithHeadings, WithMapping, Wit
     {
         $query = StockAdjustment::query()->with(['warehouse', 'inventoryStocktake']);
 
-        $this->applySearchFilter($query, $this->filters, ['adjustment_number', 'notes']);
-        $this->applyExactFilters($query, $this->filters, [
+        $this->applyConfiguredFilters($query, $this->filters, ['adjustment_number', 'notes'], [
             'warehouse_id' => 'warehouse_id',
             'status' => 'status',
             'adjustment_type' => 'adjustment_type',
             'inventory_stocktake_id' => 'inventory_stocktake_id',
-        ]);
-        $this->applyDateRangeFilters($query, $this->filters, [
+        ], [
             'adjustment_date' => ['from' => 'adjustment_date_from', 'to' => 'adjustment_date_to'],
-        ]);
-        $this->applySorting($query, $this->filters, [
+        ], [
             'adjustment_number',
             'warehouse_id',
             'adjustment_date',
@@ -49,29 +46,28 @@ class StockAdjustmentExport implements FromQuery, WithHeadings, WithMapping, Wit
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'Adjustment Number',
-            'Warehouse',
-            'Adjustment Date',
-            'Adjustment Type',
-            'Status',
-            'Stocktake Number',
-            'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($stockAdjustment): array
     {
+        return $this->mapExportRow($stockAdjustment, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $stockAdjustment->id,
-            $stockAdjustment->adjustment_number,
-            $stockAdjustment->warehouse?->name,
-            $stockAdjustment->adjustment_date?->toDateString(),
-            $stockAdjustment->adjustment_type,
-            $stockAdjustment->status,
-            $stockAdjustment->inventoryStocktake?->stocktake_number,
-            $stockAdjustment->created_at?->toIso8601String(),
+            'ID' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->id,
+            'Adjustment Number' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->adjustment_number,
+            'Warehouse' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->warehouse?->name,
+            'Adjustment Date' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->adjustment_date?->toDateString(),
+            'Adjustment Type' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->adjustment_type,
+            'Status' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->status,
+            'Stocktake Number' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->inventoryStocktake?->stocktake_number,
+            'Created At' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->created_at?->toIso8601String(),
         ];
     }
 }

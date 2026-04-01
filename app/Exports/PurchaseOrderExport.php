@@ -23,17 +23,14 @@ class PurchaseOrderExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
     {
         $query = PurchaseOrder::query()->with(['supplier', 'warehouse']);
 
-        $this->applySearchFilter($query, $this->filters, ['po_number', 'payment_terms', 'notes', 'shipping_address']);
-        $this->applyExactFilters($query, $this->filters, [
+        $this->applyConfiguredFilters($query, $this->filters, ['po_number', 'payment_terms', 'notes', 'shipping_address'], [
             'supplier' => 'supplier_id',
             'warehouse' => 'warehouse_id',
             'status' => 'status',
             'currency' => 'currency',
-        ]);
-        $this->applyDateRangeFilters($query, $this->filters, [
+        ], [
             'order_date' => ['from' => 'order_date_from', 'to' => 'order_date_to'],
-        ]);
-        $this->applySorting($query, $this->filters, [
+        ], [
             'po_number',
             'order_date',
             'expected_delivery_date',
@@ -48,43 +45,35 @@ class PurchaseOrderExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'PO Number',
-            'Supplier',
-            'Warehouse',
-            'Order Date',
-            'Expected Delivery Date',
-            'Payment Terms',
-            'Currency',
-            'Status',
-            'Subtotal',
-            'Tax Amount',
-            'Discount Amount',
-            'Grand Total',
-            'Notes',
-            'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($purchaseOrder): array
     {
+        return $this->mapExportRow($purchaseOrder, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $purchaseOrder->id,
-            $purchaseOrder->po_number,
-            $purchaseOrder->supplier?->name,
-            $purchaseOrder->warehouse?->name,
-            $purchaseOrder->order_date?->format('Y-m-d'),
-            $purchaseOrder->expected_delivery_date?->format('Y-m-d'),
-            $purchaseOrder->payment_terms,
-            $purchaseOrder->currency,
-            $purchaseOrder->status,
-            $purchaseOrder->subtotal,
-            $purchaseOrder->tax_amount,
-            $purchaseOrder->discount_amount,
-            $purchaseOrder->grand_total,
-            $purchaseOrder->notes,
-            $purchaseOrder->created_at?->toIso8601String(),
+            'ID' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->id,
+            'PO Number' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->po_number,
+            'Supplier' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->supplier?->name,
+            'Warehouse' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->warehouse?->name,
+            'Order Date' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->order_date?->format('Y-m-d'),
+            'Expected Delivery Date' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->expected_delivery_date?->format('Y-m-d'),
+            'Payment Terms' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->payment_terms,
+            'Currency' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->currency,
+            'Status' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->status,
+            'Subtotal' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->subtotal,
+            'Tax Amount' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->tax_amount,
+            'Discount Amount' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->discount_amount,
+            'Grand Total' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->grand_total,
+            'Notes' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->notes,
+            'Created At' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->created_at?->toIso8601String(),
         ];
     }
 }

@@ -37,6 +37,27 @@ trait InteractsWithExportFilters
 
     /**
      * @param  array<string, mixed>  $filters
+     * @param  array<int, string>  $searchColumns
+     * @param  array<string, string>  $exactFilters
+     * @param  array<string, array{from: string, to: string}>  $dateRangeFilters
+     * @param  array<int, string>  $allowedSortColumns
+     */
+    protected function applyConfiguredFilters(
+        Builder $query,
+        array $filters,
+        array $searchColumns,
+        array $exactFilters = [],
+        array $dateRangeFilters = [],
+        array $allowedSortColumns = []
+    ): void {
+        $this->applySearchFilter($query, $filters, $searchColumns);
+        $this->applyExactFilters($query, $filters, $exactFilters);
+        $this->applyDateRangeFilters($query, $filters, $dateRangeFilters);
+        $this->applySorting($query, $filters, $allowedSortColumns);
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
      * @param  array<string, string>  $map
      */
     protected function applyExactFilters(Builder $query, array $filters, array $map): void
@@ -98,5 +119,26 @@ trait InteractsWithExportFilters
     protected function normalizeSortDirection(array $filters): string
     {
         return strtolower((string) ($filters['sort_direction'] ?? 'desc')) === 'asc' ? 'asc' : 'desc';
+    }
+
+    /**
+     * @param  array<string, callable(mixed): mixed>  $columns
+     * @return array<int, string>
+     */
+    protected function exportHeadings(array $columns): array
+    {
+        return array_keys($columns);
+    }
+
+    /**
+     * @param  array<string, callable(mixed): mixed>  $columns
+     * @return array<int, mixed>
+     */
+    protected function mapExportRow(mixed $row, array $columns): array
+    {
+        return array_values(array_map(
+            static fn (callable $resolver): mixed => $resolver($row),
+            $columns,
+        ));
     }
 }

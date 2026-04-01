@@ -28,16 +28,13 @@ class InventoryStocktakeExport implements FromQuery, WithHeadings, WithMapping, 
     {
         $query = InventoryStocktake::query()->with(['warehouse', 'productCategory']);
 
-        $this->applySearchFilter($query, $this->filters, ['stocktake_number', 'notes']);
-        $this->applyExactFilters($query, $this->filters, [
+        $this->applyConfiguredFilters($query, $this->filters, ['stocktake_number', 'notes'], [
             'warehouse_id' => 'warehouse_id',
             'product_category_id' => 'product_category_id',
             'status' => 'status',
-        ]);
-        $this->applyDateRangeFilters($query, $this->filters, [
+        ], [
             'stocktake_date' => ['from' => 'stocktake_date_from', 'to' => 'stocktake_date_to'],
-        ]);
-        $this->applySorting($query, $this->filters, [
+        ], [
             'stocktake_number',
             'warehouse_id',
             'stocktake_date',
@@ -51,29 +48,28 @@ class InventoryStocktakeExport implements FromQuery, WithHeadings, WithMapping, 
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'Stocktake Number',
-            'Warehouse',
-            'Stocktake Date',
-            'Status',
-            'Product Category',
-            'Completed At',
-            'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($inventoryStocktake): array
     {
+        return $this->mapExportRow($inventoryStocktake, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $inventoryStocktake->id,
-            $inventoryStocktake->stocktake_number,
-            $inventoryStocktake->warehouse?->name,
-            $inventoryStocktake->stocktake_date?->toDateString(),
-            $inventoryStocktake->status,
-            $inventoryStocktake->productCategory?->name,
-            $inventoryStocktake->completed_at?->toIso8601String(),
-            $inventoryStocktake->created_at?->toIso8601String(),
+            'ID' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->id,
+            'Stocktake Number' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->stocktake_number,
+            'Warehouse' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->warehouse?->name,
+            'Stocktake Date' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->stocktake_date?->toDateString(),
+            'Status' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->status,
+            'Product Category' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->productCategory?->name,
+            'Completed At' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->completed_at?->toIso8601String(),
+            'Created At' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->created_at?->toIso8601String(),
         ];
     }
 }

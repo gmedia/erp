@@ -25,16 +25,13 @@ class StockTransferExport implements FromQuery, WithHeadings, WithMapping, WithS
     {
         $query = StockTransfer::query()->with(['fromWarehouse', 'toWarehouse']);
 
-        $this->applySearchFilter($query, $this->filters, ['transfer_number', 'notes']);
-        $this->applyExactFilters($query, $this->filters, [
+        $this->applyConfiguredFilters($query, $this->filters, ['transfer_number', 'notes'], [
             'from_warehouse_id' => 'from_warehouse_id',
             'to_warehouse_id' => 'to_warehouse_id',
             'status' => 'status',
-        ]);
-        $this->applyDateRangeFilters($query, $this->filters, [
+        ], [
             'transfer_date' => ['from' => 'transfer_date_from', 'to' => 'transfer_date_to'],
-        ]);
-        $this->applySorting($query, $this->filters, [
+        ], [
             'transfer_number',
             'from_warehouse_id',
             'to_warehouse_id',
@@ -49,29 +46,28 @@ class StockTransferExport implements FromQuery, WithHeadings, WithMapping, WithS
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'Transfer Number',
-            'From Warehouse',
-            'To Warehouse',
-            'Transfer Date',
-            'Expected Arrival Date',
-            'Status',
-            'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($stockTransfer): array
     {
+        return $this->mapExportRow($stockTransfer, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $stockTransfer->id,
-            $stockTransfer->transfer_number,
-            $stockTransfer->fromWarehouse?->name,
-            $stockTransfer->toWarehouse?->name,
-            $stockTransfer->transfer_date?->toDateString(),
-            $stockTransfer->expected_arrival_date?->toDateString(),
-            $stockTransfer->status,
-            $stockTransfer->created_at?->toIso8601String(),
+            'ID' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->id,
+            'Transfer Number' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->transfer_number,
+            'From Warehouse' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->fromWarehouse?->name,
+            'To Warehouse' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->toWarehouse?->name,
+            'Transfer Date' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->transfer_date?->toDateString(),
+            'Expected Arrival Date' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->expected_arrival_date?->toDateString(),
+            'Status' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->status,
+            'Created At' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->created_at?->toIso8601String(),
         ];
     }
 }
