@@ -119,13 +119,17 @@ export function createAsyncSelectFilterFields(
     );
 }
 
-export function createSelectFilterFields(configs: SelectFilterConfig[]): FieldDescriptor[] {
+export function createSelectFilterFields(
+    configs: SelectFilterConfig[],
+): FieldDescriptor[] {
     return configs.map(({ name, label, options, placeholder }) =>
         createSelectFilterField(name, label, options, placeholder),
     );
 }
 
-export function createDateFilterFields(configs: DateFilterConfig[]): FieldDescriptor[] {
+export function createDateFilterFields(
+    configs: DateFilterConfig[],
+): FieldDescriptor[] {
     return configs.map(({ name, label, placeholder }) => ({
         name,
         label,
