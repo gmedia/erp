@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Imports\Concerns\InteractsWithImportRows;
 use App\Models\Branch;
 use App\Models\Supplier;
 use App\Models\SupplierCategory;
@@ -14,6 +15,8 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 {
+    use InteractsWithImportRows;
+
     public int $importedCount = 0;
     public int $skippedCount = 0;
     public array $errors = [];
@@ -45,41 +48,20 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
             ]);
 
             if ($validator->fails()) {
-                foreach ($validator->errors()->all() as $error) {
-                    $this->errors[] = [
-                        'row' => $rowNumber,
-                        'field' => 'Validation',
-                        'message' => $error,
-                    ];
-                }
+                $this->recordValidationErrors($validator, $rowNumber);
 
                 continue;
             }
 
             // 2. Resolve Foreign Keys
-            $categoryId = $this->categories->get($row['category']);
-            if (! $categoryId) {
-                $this->errors[] = [
-                    'row' => $rowNumber,
-                    'field' => 'category',
-                    'message' => "Category '{$row['category']}' not found.",
-                ];
-
+            $categoryId = $this->resolveLookupId($this->categories, $row['category'], $rowNumber, 'category', 'Category');
+            if ($categoryId === null) {
                 continue;
             }
 
-            $branchId = null;
-            if (! empty($row['branch'])) {
-                $branchId = $this->branches->get($row['branch']);
-                if (! $branchId) {
-                    $this->errors[] = [
-                        'row' => $rowNumber,
-                        'field' => 'branch',
-                        'message' => "Branch '{$row['branch']}' not found.",
-                    ];
-
-                    continue;
-                }
+            $branchId = $this->resolveLookupId($this->branches, $row['branch'], $rowNumber, 'branch', 'Branch', false);
+            if (! empty($row['branch']) && $branchId === null) {
+                continue;
             }
 
             // 3. Upsert Logic
@@ -111,11 +93,7 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                     $this->importedCount++;
                 }
             } catch (Exception $e) {
-                $this->errors[] = [
-                    'row' => $rowNumber,
-                    'field' => 'System',
-                    'message' => 'Failed to save: ' . $e->getMessage(),
-                ];
+                $this->recordSystemError($rowNumber, $e);
             }
         }
     }

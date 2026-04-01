@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Imports\Concerns\InteractsWithImportRows;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
@@ -15,6 +16,8 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 {
+    use InteractsWithImportRows;
+
     public int $importedCount = 0;
     public int $skippedCount = 0; // Skipped due to duplicates (if we use skip mode) or other non-fatal reasons
     public array $errors = [];
@@ -52,48 +55,24 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
             ]);
 
             if ($validator->fails()) {
-                foreach ($validator->errors()->all() as $error) {
-                    $this->errors[] = [
-                        'row' => $rowNumber,
-                        'field' => 'Validation',
-                        'message' => $error,
-                    ];
-                }
+                $this->recordValidationErrors($validator, $rowNumber);
 
                 continue;
             }
 
             // 2. Resolve Foreign Keys
-            $departmentId = $this->departments->get($row['department']);
-            if (! $departmentId) {
-                $this->errors[] = [
-                    'row' => $rowNumber,
-                    'field' => 'department',
-                    'message' => "Department '{$row['department']}' not found.",
-                ];
-
+            $departmentId = $this->resolveLookupId($this->departments, $row['department'], $rowNumber, 'department', 'Department');
+            if ($departmentId === null) {
                 continue;
             }
 
-            $positionId = $this->positions->get($row['position']);
-            if (! $positionId) {
-                $this->errors[] = [
-                    'row' => $rowNumber,
-                    'field' => 'position',
-                    'message' => "Position '{$row['position']}' not found.",
-                ];
-
+            $positionId = $this->resolveLookupId($this->positions, $row['position'], $rowNumber, 'position', 'Position');
+            if ($positionId === null) {
                 continue;
             }
 
-            $branchId = $this->branches->get($row['branch']);
-            if (! $branchId) {
-                $this->errors[] = [
-                    'row' => $rowNumber,
-                    'field' => 'branch',
-                    'message' => "Branch '{$row['branch']}' not found.",
-                ];
-
+            $branchId = $this->resolveLookupId($this->branches, $row['branch'], $rowNumber, 'branch', 'Branch');
+            if ($branchId === null) {
                 continue;
             }
 
@@ -123,11 +102,7 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                     $this->importedCount++;
                 }
             } catch (Exception $e) {
-                $this->errors[] = [
-                    'row' => $rowNumber,
-                    'field' => 'System',
-                    'message' => 'Failed to save: ' . $e->getMessage(),
-                ];
+                $this->recordSystemError($rowNumber, $e);
             }
         }
     }

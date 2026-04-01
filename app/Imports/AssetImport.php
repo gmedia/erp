@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Imports\Concerns\InteractsWithImportRows;
 use App\Models\Asset;
 use App\Models\AssetCategory;
 use App\Models\AssetLocation;
@@ -19,6 +20,8 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 {
+    use InteractsWithImportRows;
+
     public int $importedCount = 0;
     public int $skippedCount = 0;
     public array $errors = [];
@@ -71,122 +74,60 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
             ]);
 
             if ($validator->fails()) {
-                foreach ($validator->errors()->all() as $error) {
-                    $this->errors[] = [
-                        'row' => $rowNumber,
-                        'field' => 'Validation',
-                        'message' => $error,
-                    ];
-                }
+                $this->recordValidationErrors($validator, $rowNumber);
                 $this->skippedCount++;
 
                 continue;
             }
 
             // 2. Resolve Foreign Keys
-            $categoryId = null;
-            if (! empty($row['asset_category'])) {
-                $categoryId = $this->categories->get($row['asset_category']);
-                if (! $categoryId) {
-                    $this->errors[] = [
-                        'row' => $rowNumber,
-                        'field' => 'asset_category',
-                        'message' => "Category '{$row['asset_category']}' not found.",
-                    ];
-                    $this->skippedCount++;
+            $categoryId = $this->resolveLookupId($this->categories, $row['asset_category'], $rowNumber, 'asset_category', 'Category', false);
+            if (! empty($row['asset_category']) && $categoryId === null) {
+                $this->skippedCount++;
 
-                    continue;
-                }
+                continue;
             }
 
-            $modelId = null;
-            if (! empty($row['asset_model'])) {
-                $modelId = $this->models->get($row['asset_model']);
-                if (! $modelId) {
-                    $this->errors[] = [
-                        'row' => $rowNumber,
-                        'field' => 'asset_model',
-                        'message' => "Model '{$row['asset_model']}' not found.",
-                    ];
-                    $this->skippedCount++;
+            $modelId = $this->resolveLookupId($this->models, $row['asset_model'], $rowNumber, 'asset_model', 'Model', false);
+            if (! empty($row['asset_model']) && $modelId === null) {
+                $this->skippedCount++;
 
-                    continue;
-                }
+                continue;
             }
 
-            $branchId = null;
-            if (! empty($row['branch'])) {
-                $branchId = $this->branches->get($row['branch']);
-                if (! $branchId) {
-                    $this->errors[] = [
-                        'row' => $rowNumber,
-                        'field' => 'branch',
-                        'message' => "Branch '{$row['branch']}' not found.",
-                    ];
-                    $this->skippedCount++;
+            $branchId = $this->resolveLookupId($this->branches, $row['branch'], $rowNumber, 'branch', 'Branch', false);
+            if (! empty($row['branch']) && $branchId === null) {
+                $this->skippedCount++;
 
-                    continue;
-                }
+                continue;
             }
 
-            $locationId = null;
-            if (! empty($row['location'])) {
-                $locationId = $this->locations->get($row['location']);
-                if (! $locationId) {
-                    $this->errors[] = [
-                        'row' => $rowNumber,
-                        'field' => 'location',
-                        'message' => "Location '{$row['location']}' not found.",
-                    ];
-                    $this->skippedCount++;
+            $locationId = $this->resolveLookupId($this->locations, $row['location'], $rowNumber, 'location', 'Location', false);
+            if (! empty($row['location']) && $locationId === null) {
+                $this->skippedCount++;
 
-                    continue;
-                }
+                continue;
             }
 
-            $departmentId = null;
-            if (! empty($row['department'])) {
-                $departmentId = $this->departments->get($row['department']);
-                if (! $departmentId) {
-                    $this->errors[] = [
-                        'row' => $rowNumber,
-                        'field' => 'department',
-                        'message' => "Department '{$row['department']}' not found.",
-                    ];
-                    $this->skippedCount++;
+            $departmentId = $this->resolveLookupId($this->departments, $row['department'], $rowNumber, 'department', 'Department', false);
+            if (! empty($row['department']) && $departmentId === null) {
+                $this->skippedCount++;
 
-                    continue;
-                }
+                continue;
             }
 
-            $employeeId = null;
-            if (! empty($row['employee'])) {
-                $employeeId = $this->employees->get($row['employee']);
-                if (! $employeeId) {
-                    $this->errors[] = [
-                        'row' => $rowNumber,
-                        'field' => 'employee',
-                        'message' => "Employee '{$row['employee']}' not found.",
-                    ];
-                    $this->skippedCount++;
+            $employeeId = $this->resolveLookupId($this->employees, $row['employee'], $rowNumber, 'employee', 'Employee', false);
+            if (! empty($row['employee']) && $employeeId === null) {
+                $this->skippedCount++;
 
-                    continue;
-                }
+                continue;
             }
 
-            $supplierId = null;
-            if (! empty($row['supplier'])) {
-                $supplierId = $this->suppliers->get($row['supplier']);
-                if (! $supplierId) {
-                    $this->errors[] = [
-                        'row' => $rowNumber,
-                        'field' => 'supplier',
-                        'message' => "Supplier '{$row['supplier']}' not found.",
-                    ];
-                    $this->skippedCount++;
+            $supplierId = $this->resolveLookupId($this->suppliers, $row['supplier'], $rowNumber, 'supplier', 'Supplier', false);
+            if (! empty($row['supplier']) && $supplierId === null) {
+                $this->skippedCount++;
 
-                    continue;
-                }
+                continue;
             }
 
             // 3. Upsert Logic
@@ -225,11 +166,7 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                     $this->importedCount++;
                 }
             } catch (Exception $e) {
-                $this->errors[] = [
-                    'row' => $rowNumber,
-                    'field' => 'System',
-                    'message' => 'Failed to save: ' . $e->getMessage(),
-                ];
+                $this->recordSystemError($rowNumber, $e);
                 $this->skippedCount++;
             }
         }
