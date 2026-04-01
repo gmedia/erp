@@ -22,26 +22,20 @@ class IndexProductsAction
 
         $query = Product::query()->with(['category', 'unit', 'branch']);
 
-        // Search OR Advanced Filters (category, unit, branch)
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), ['code', 'name', 'description']);
-        } else {
-            $this->filterService->applyAdvancedFilters($query, [
-                'category_id' => $request->get('category_id'),
-                'unit_id' => $request->get('unit_id'),
-                'branch_id' => $request->get('branch_id'),
-            ]);
-        }
+        $this->applySearchOrPrimaryFilters(
+            $request,
+            $query,
+            $this->filterService,
+            ['code', 'name', 'description'],
+            ['category_id', 'unit_id', 'branch_id'],
+        );
 
-        // Apply remaining advanced filters
-        $this->filterService->applyAdvancedFilters($query, [
-            'type' => $request->get('type'),
-            'status' => $request->get('status'),
-            'billing_model' => $request->get('billing_model'),
-            'is_manufactured' => $request->get('is_manufactured'),
-            'is_purchasable' => $request->get('is_purchasable'),
-            'is_sellable' => $request->get('is_sellable'),
-        ]);
+        $this->applyRequestFilters(
+            $request,
+            $query,
+            $this->filterService,
+            ['type', 'status', 'billing_model', 'is_manufactured', 'is_purchasable', 'is_sellable'],
+        );
 
         $sortBy = $request->get('sort_by', 'created_at');
         $sortDirection = $this->normalizeSortDirection($request->get('sort_direction', 'desc'));

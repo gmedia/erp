@@ -1,8 +1,11 @@
 <?php
 
+namespace Tests\Unit\Domain\AssetStocktakes;
+
 use App\Domain\AssetStocktakes\AssetStocktakeFilterService;
 use App\Models\AssetStocktake;
 use App\Models\Branch;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('asset-stocktakes');
@@ -51,4 +54,34 @@ test('it filters by planned_at range', function () {
 
     expect($query->count())->toBe(1)
         ->and($query->first()->planned_at->format('Y-m-d'))->toBe('2024-02-01');
+});
+
+test('it sorts by branch name using normalized direction', function () {
+    $branchA = Branch::factory()->create(['name' => 'Alpha Branch']);
+    $branchZ = Branch::factory()->create(['name' => 'Zulu Branch']);
+
+    $stocktakeA = AssetStocktake::factory()->create(['branch_id' => $branchA->id]);
+    $stocktakeZ = AssetStocktake::factory()->create(['branch_id' => $branchZ->id]);
+
+    $service = new AssetStocktakeFilterService;
+    $query = AssetStocktake::query();
+
+    $service->applySorting($query, 'branch', 'ASC', ['branch', 'planned_at']);
+
+    expect($query->get()->pluck('id')->all())->toBe([$stocktakeA->id, $stocktakeZ->id]);
+});
+
+test('it sorts by creator name', function () {
+    $userA = User::factory()->create(['name' => 'Alpha User']);
+    $userZ = User::factory()->create(['name' => 'Zulu User']);
+
+    $stocktakeA = AssetStocktake::factory()->create(['created_by' => $userA->id]);
+    $stocktakeZ = AssetStocktake::factory()->create(['created_by' => $userZ->id]);
+
+    $service = new AssetStocktakeFilterService;
+    $query = AssetStocktake::query();
+
+    $service->applySorting($query, 'created_by', 'asc', ['created_by', 'planned_at']);
+
+    expect($query->get()->pluck('id')->all())->toBe([$stocktakeA->id, $stocktakeZ->id]);
 });

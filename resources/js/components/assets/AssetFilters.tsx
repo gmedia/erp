@@ -1,8 +1,8 @@
 'use client';
 
 import {
-    createAsyncSelectFilterField,
-    createSelectFilterField,
+    createAsyncSelectFilterFields,
+    createSelectFilterFields,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
@@ -10,63 +10,67 @@ import {
 export function createAssetFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField('search', 'Search', 'Search assets...'),
-        createAsyncSelectFilterField(
-            'asset_category_id',
-            'Category',
-            '/api/asset-categories',
-            'Select a category',
-        ),
-        createAsyncSelectFilterField(
-            'asset_location_id',
-            'Location',
-            '/api/asset-locations',
-            'Select a location',
-        ),
-        createAsyncSelectFilterField(
-            'department_id',
-            'Department',
-            '/api/departments',
-            'Select a department',
-        ),
-        createAsyncSelectFilterField(
-            'employee_id',
-            'Employee',
-            '/api/employees',
-            'Select an employee',
-        ),
-        createAsyncSelectFilterField(
-            'supplier_id',
-            'Supplier',
-            '/api/suppliers',
-            'Select a supplier',
-        ),
-        createAsyncSelectFilterField(
-            'branch_id',
-            'Branch',
-            '/api/branches',
-            'Select a branch',
-        ),
-        createSelectFilterField(
-            'status',
-            'Status',
-            [
-                { value: 'draft', label: 'Draft' },
-                { value: 'active', label: 'Active' },
-                { value: 'maintenance', label: 'Maintenance' },
-                { value: 'disposed', label: 'Disposed' },
-                { value: 'lost', label: 'Lost' },
-            ],
-            'Select a status',
-        ),
-        createSelectFilterField(
-            'condition',
-            'Condition',
-            [
-                { value: 'good', label: 'Good' },
-                { value: 'needs_repair', label: 'Needs Repair' },
-                { value: 'damaged', label: 'Damaged' },
-            ],
-            'Select a condition',
-        ),
+        ...createAsyncSelectFilterFields([
+            {
+                name: 'asset_category_id',
+                label: 'Category',
+                url: '/api/asset-categories',
+                placeholder: 'Select a category',
+            },
+            {
+                name: 'asset_location_id',
+                label: 'Location',
+                url: '/api/asset-locations',
+                placeholder: 'Select a location',
+            },
+            {
+                name: 'department_id',
+                label: 'Department',
+                url: '/api/departments',
+                placeholder: 'Select a department',
+            },
+            {
+                name: 'employee_id',
+                label: 'Employee',
+                url: '/api/employees',
+                placeholder: 'Select an employee',
+            },
+            {
+                name: 'supplier_id',
+                label: 'Supplier',
+                url: '/api/suppliers',
+                placeholder: 'Select a supplier',
+            },
+            {
+                name: 'branch_id',
+                label: 'Branch',
+                url: '/api/branches',
+                placeholder: 'Select a branch',
+            },
+        ]),
+        ...createSelectFilterFields([
+            {
+                name: 'status',
+                label: 'Status',
+                options: [
+                    { value: 'draft', label: 'Draft' },
+                    { value: 'active', label: 'Active' },
+                    { value: 'maintenance', label: 'Maintenance' },
+                    { value: 'disposed', label: 'Disposed' },
+                    { value: 'lost', label: 'Lost' },
+                ],
+                placeholder: 'Select a status',
+            },
+            {
+                name: 'condition',
+                label: 'Condition',
+                options: [
+                    { value: 'good', label: 'Good' },
+                    { value: 'needs_repair', label: 'Needs Repair' },
+                    { value: 'damaged', label: 'Damaged' },
+                ],
+                placeholder: 'Select a condition',
+            },
+        ]),
     ];
 }

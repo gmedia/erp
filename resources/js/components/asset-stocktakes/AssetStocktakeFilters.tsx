@@ -1,40 +1,47 @@
 import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     type FieldDescriptor,
-    createAsyncSelectFilterField,
-    createSelectFilterField,
+    createAsyncSelectFilterFields,
+    createDateFilterFields,
+    createSelectFilterFields,
     createTextFilterField,
 } from '@/components/common/filters';
 
 export function createAssetStocktakeFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField('search', 'Search', 'Search by reference...'),
-        createAsyncSelectFilterField(
-            'branch_id',
-            'Branch',
-            '/api/branches',
-            'All Branches',
-        ),
-        createSelectFilterField(
-            'status',
-            'Status',
-            [
-                { value: 'draft', label: 'Draft' },
-                { value: 'in_progress', label: 'In Progress' },
-                { value: 'completed', label: 'Completed' },
-                { value: 'cancelled', label: 'Cancelled' },
-            ],
-            'All Statuses',
-        ),
-        {
-            name: 'planned_at_from',
-            label: 'Planned From',
-            component: <FilterDatePicker placeholder="Planned From" />,
-        },
-        {
-            name: 'planned_at_to',
-            label: 'Planned To',
-            component: <FilterDatePicker placeholder="Planned To" />,
-        },
+        ...createAsyncSelectFilterFields([
+            {
+                name: 'branch_id',
+                label: 'Branch',
+                url: '/api/branches',
+                placeholder: 'All Branches',
+            },
+        ]),
+        ...createSelectFilterFields([
+            {
+                name: 'status',
+                label: 'Status',
+                options: [
+                    { value: 'draft', label: 'Draft' },
+                    { value: 'in_progress', label: 'In Progress' },
+                    { value: 'completed', label: 'Completed' },
+                    { value: 'cancelled', label: 'Cancelled' },
+                ],
+                placeholder: 'All Statuses',
+            },
+        ]),
+        ...createDateFilterFields([
+            {
+                name: 'planned_at_from',
+                label: 'Planned From',
+                placeholder: 'Planned From',
+            },
+            {
+                name: 'planned_at_to',
+                label: 'Planned To',
+                placeholder: 'Planned To',
+            },
+        ]),
     ];
 }

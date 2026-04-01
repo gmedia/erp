@@ -22,31 +22,26 @@ class IndexAssetMaintenancesAction
 
         $query = AssetMaintenance::query()->with(['asset', 'supplier', 'createdBy']);
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), ['notes', 'asset_name', 'asset_code']);
-        } else {
-            $this->filterService->applyAdvancedFilters($query, [
-                'asset_id' => $request->get('asset_id'),
-                'maintenance_type' => $request->get('maintenance_type'),
-                'status' => $request->get('status'),
-                'supplier_id' => $request->get('supplier_id'),
-                'created_by' => $request->get('created_by'),
-            ]);
-        }
-
-        $this->filterService->applyAdvancedFilters($query, [
-            'scheduled_from' => $request->get('scheduled_from'),
-            'scheduled_to' => $request->get('scheduled_to'),
-            'performed_from' => $request->get('performed_from'),
-            'performed_to' => $request->get('performed_to'),
-            'cost_min' => $request->get('cost_min'),
-            'cost_max' => $request->get('cost_max'),
-        ]);
-
-        $this->filterService->applySorting(
+        $this->applySearchOrPrimaryFilters(
+            $request,
             $query,
-            $request->get('sort_by', 'scheduled_at'),
-            $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
+            $this->filterService,
+            ['notes', 'asset_name', 'asset_code'],
+            ['asset_id', 'maintenance_type', 'status', 'supplier_id', 'created_by'],
+        );
+
+        $this->applyRequestFilters(
+            $request,
+            $query,
+            $this->filterService,
+            ['scheduled_from', 'scheduled_to', 'performed_from', 'performed_to', 'cost_min', 'cost_max'],
+        );
+
+        $this->applyIndexSorting(
+            $request,
+            $query,
+            $this->filterService,
+            'scheduled_at',
             [
                 'id',
                 'asset',

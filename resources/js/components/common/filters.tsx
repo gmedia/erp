@@ -24,6 +24,26 @@ export type SelectOption = {
     label: string;
 };
 
+export type AsyncSelectFilterConfig = {
+    name: string;
+    label: string;
+    url: string;
+    placeholder: string;
+};
+
+export type SelectFilterConfig = {
+    name: string;
+    label: string;
+    options: SelectOption[];
+    placeholder: string;
+};
+
+export type DateFilterConfig = {
+    name: string;
+    label: string;
+    placeholder: string;
+};
+
 // Generic filter fields for simple entities
 export function createSimpleEntityFilterFields(
     placeholder: string,
@@ -89,6 +109,28 @@ export function createAsyncSelectFilterField(
         label,
         component: <AsyncSelect url={url} placeholder={placeholder} />,
     };
+}
+
+export function createAsyncSelectFilterFields(
+    configs: AsyncSelectFilterConfig[],
+): FieldDescriptor[] {
+    return configs.map(({ name, label, url, placeholder }) =>
+        createAsyncSelectFilterField(name, label, url, placeholder),
+    );
+}
+
+export function createSelectFilterFields(configs: SelectFilterConfig[]): FieldDescriptor[] {
+    return configs.map(({ name, label, options, placeholder }) =>
+        createSelectFilterField(name, label, options, placeholder),
+    );
+}
+
+export function createDateFilterFields(configs: DateFilterConfig[]): FieldDescriptor[] {
+    return configs.map(({ name, label, placeholder }) => ({
+        name,
+        label,
+        component: <FilterDatePicker placeholder={placeholder} />,
+    }));
 }
 
 // Shared date-range fields used by report filters.

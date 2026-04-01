@@ -12,6 +12,11 @@ use Illuminate\Database\Eloquent\Builder;
  */
 trait BaseFilterService
 {
+    public function normalizeSortDirection(string $sortDirection): string
+    {
+        return strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
+    }
+
     /**
      * Apply search filters to query across multiple fields and optionally relationships.
      *
@@ -130,7 +135,35 @@ trait BaseFilterService
      */
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
     {
-        if (in_array($sortBy, $allowedSorts)) {
+        if (in_array($sortBy, $allowedSorts, true)) {
+            $query->orderBy($sortBy, $this->normalizeSortDirection($sortDirection));
+        }
+    }
+
+    /**
+     * Apply sorting with relation map fallback while preserving base-table ordering behavior.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<int, string>  $allowedSorts
+     * @param  array<string, array{table: string, local_column: string, foreign_column: string, order_column: string, join?: 'join'|'leftJoin'}>  $relationSortMap
+     */
+    public function applySortingWithRelationFallback(
+        Builder $query,
+        string $sortBy,
+        string $sortDirection,
+        array $allowedSorts,
+        array $relationSortMap,
+        string $baseTable
+    ): void {
+        if (! in_array($sortBy, $allowedSorts, true)) {
+            return;
+        }
+
+        $sortDirection = $this->normalizeSortDirection($sortDirection);
+
+        if (! $this->applyMappedRelationSorting($query, $sortBy, $sortDirection, $relationSortMap, $baseTable)) {
             $query->orderBy($sortBy, $sortDirection);
         }
     }

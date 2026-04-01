@@ -22,24 +22,26 @@ class IndexAssetStocktakesAction
 
         $query = AssetStocktake::query()->with(['branch', 'createdBy']);
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), ['reference']);
-        } else {
-            $this->filterService->applyAdvancedFilters($query, [
-                'branch_id' => $request->get('branch_id'),
-                'status' => $request->get('status'),
-            ]);
-        }
-
-        $this->filterService->applyAdvancedFilters($query, [
-            'planned_at_from' => $request->get('planned_at_from'),
-            'planned_at_to' => $request->get('planned_at_to'),
-        ]);
-
-        $this->filterService->applySorting(
+        $this->applySearchOrPrimaryFilters(
+            $request,
             $query,
-            $request->get('sort_by', 'created_at'),
-            $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
+            $this->filterService,
+            ['reference'],
+            ['branch_id', 'status'],
+        );
+
+        $this->applyRequestFilters(
+            $request,
+            $query,
+            $this->filterService,
+            ['planned_at_from', 'planned_at_to'],
+        );
+
+        $this->applyIndexSorting(
+            $request,
+            $query,
+            $this->filterService,
+            'created_at',
             [
                 'id',
                 'ulid',

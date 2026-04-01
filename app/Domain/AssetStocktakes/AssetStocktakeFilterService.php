@@ -14,35 +14,23 @@ class AssetStocktakeFilterService
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['branch_id'])) {
-            $query->where('branch_id', $filters['branch_id']);
-        }
+        $this->applyExactFilters($query, $filters, [
+            'branch_id' => 'branch_id',
+            'status' => 'status',
+        ]);
 
-        if (! empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-
-        if (! empty($filters['planned_at_from'])) {
-            $query->whereDate('planned_at', '>=', $filters['planned_at_from']);
-        }
-
-        if (! empty($filters['planned_at_to'])) {
-            $query->whereDate('planned_at', '<=', $filters['planned_at_to']);
-        }
+        $this->applyDateRanges($query, $filters, [
+            'planned_at' => ['from' => 'planned_at_from', 'to' => 'planned_at_to'],
+        ]);
     }
 
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
     {
-        if (! in_array($sortBy, $allowedSorts)) {
-            return;
-        }
-
-        $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
-
-        $applied = $this->applyMappedRelationSorting(
+        $this->applySortingWithRelationFallback(
             $query,
             $sortBy,
             $sortDirection,
+            $allowedSorts,
             [
                 'branch' => [
                     'table' => 'branches',
@@ -59,9 +47,5 @@ class AssetStocktakeFilterService
             ],
             'asset_stocktakes'
         );
-
-        if (! $applied) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
     }
 }

@@ -30,16 +30,11 @@ class AssetFilterService
 
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
     {
-        if (! in_array($sortBy, $allowedSorts)) {
-            return;
-        }
-
-        $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
-
-        $applied = $this->applyMappedRelationSorting(
+        $this->applySortingWithRelationFallback(
             $query,
             $sortBy,
             $sortDirection,
+            $allowedSorts,
             [
                 'category' => [
                     'table' => 'asset_categories',
@@ -84,9 +79,5 @@ class AssetFilterService
             ],
             'assets'
         );
-
-        if (! $applied) {
-            $query->orderBy($sortBy, $sortDirection);
-        }
     }
 }

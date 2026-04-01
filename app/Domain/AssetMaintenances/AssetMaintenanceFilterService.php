@@ -36,28 +36,27 @@ class AssetMaintenanceFilterService
 
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
     {
-        if (! in_array($sortBy, $allowedSorts)) {
-            return;
-        }
-
-        $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
-
-        if ($sortBy === 'asset') {
-            $query->join('assets', 'asset_maintenances.asset_id', '=', 'assets.id')
-                ->orderBy('assets.asset_code', $sortDirection)
-                ->select('asset_maintenances.*');
-
-            return;
-        }
-
-        if ($sortBy === 'supplier') {
-            $query->leftJoin('suppliers', 'asset_maintenances.supplier_id', '=', 'suppliers.id')
-                ->orderBy('suppliers.name', $sortDirection)
-                ->select('asset_maintenances.*');
-
-            return;
-        }
-
-        $query->orderBy($sortBy, $sortDirection);
+        $this->applySortingWithRelationFallback(
+            $query,
+            $sortBy,
+            $sortDirection,
+            $allowedSorts,
+            [
+                'asset' => [
+                    'table' => 'assets',
+                    'local_column' => 'asset_maintenances.asset_id',
+                    'foreign_column' => 'assets.id',
+                    'order_column' => 'assets.asset_code',
+                ],
+                'supplier' => [
+                    'table' => 'suppliers',
+                    'local_column' => 'asset_maintenances.supplier_id',
+                    'foreign_column' => 'suppliers.id',
+                    'order_column' => 'suppliers.name',
+                    'join' => 'leftJoin',
+                ],
+            ],
+            'asset_maintenances'
+        );
     }
 }
