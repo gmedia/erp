@@ -54,16 +54,16 @@ class ProductExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
     protected function columns(): array
     {
         return [
-            'ID' => static fn (Product $product): mixed => $product->id,
-            'Code' => static fn (Product $product): mixed => $product->code,
-            'Name' => static fn (Product $product): mixed => $product->name,
-            'Type' => static fn (Product $product): mixed => $product->type,
-            'Category' => static fn (Product $product): mixed => $product->category?->name,
-            'Unit' => static fn (Product $product): mixed => $product->unit?->name,
-            'Cost' => static fn (Product $product): mixed => $product->cost,
-            'Selling Price' => static fn (Product $product): mixed => $product->selling_price,
-            'Status' => static fn (Product $product): mixed => $product->status,
-            'Created At' => static fn (Product $product): mixed => $product->created_at?->toIso8601String(),
+            'ID' => fn (Product $product): mixed => $product->id,
+            'Code' => fn (Product $product): mixed => $product->code,
+            'Name' => fn (Product $product): mixed => $product->name,
+            'Type' => fn (Product $product): mixed => $product->type,
+            'Category' => fn (Product $product): mixed => $this->relatedAttribute($product, 'category', 'name'),
+            'Unit' => fn (Product $product): mixed => $this->relatedAttribute($product, 'unit', 'name'),
+            'Cost' => fn (Product $product): mixed => $product->cost,
+            'Selling Price' => fn (Product $product): mixed => $product->selling_price,
+            'Status' => fn (Product $product): mixed => $product->status,
+            'Created At' => fn (Product $product): mixed => $this->formatIso8601($product->created_at),
         ];
     }
 }

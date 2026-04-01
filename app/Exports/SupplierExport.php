@@ -50,15 +50,15 @@ class SupplierExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     protected function columns(): array
     {
         return [
-            'ID' => static fn (Supplier $supplier): mixed => $supplier->id,
-            'Name' => static fn (Supplier $supplier): mixed => $supplier->name,
-            'Email' => static fn (Supplier $supplier): mixed => $supplier->email,
-            'Phone' => static fn (Supplier $supplier): mixed => $supplier->phone,
-            'Address' => static fn (Supplier $supplier): mixed => $supplier->address,
-            'Branch' => static fn (Supplier $supplier): mixed => $supplier->branch?->name,
-            'Category' => static fn (Supplier $supplier): mixed => $supplier->category?->name,
-            'Status' => static fn (Supplier $supplier): mixed => ucfirst($supplier->status),
-            'Created At' => static fn (Supplier $supplier): mixed => $supplier->created_at?->toIso8601String(),
+            'ID' => fn (Supplier $supplier): mixed => $supplier->id,
+            'Name' => fn (Supplier $supplier): mixed => $supplier->name,
+            'Email' => fn (Supplier $supplier): mixed => $supplier->email,
+            'Phone' => fn (Supplier $supplier): mixed => $supplier->phone,
+            'Address' => fn (Supplier $supplier): mixed => $supplier->address,
+            'Branch' => fn (Supplier $supplier): mixed => $this->relatedAttribute($supplier, 'branch', 'name'),
+            'Category' => fn (Supplier $supplier): mixed => $this->relatedAttribute($supplier, 'category', 'name'),
+            'Status' => fn (Supplier $supplier): mixed => ucfirst($supplier->status),
+            'Created At' => fn (Supplier $supplier): mixed => $this->formatIso8601($supplier->created_at),
         ];
     }
 }

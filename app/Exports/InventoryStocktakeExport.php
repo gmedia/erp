@@ -62,14 +62,14 @@ class InventoryStocktakeExport implements FromQuery, WithHeadings, WithMapping, 
     protected function columns(): array
     {
         return [
-            'ID' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->id,
-            'Stocktake Number' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->stocktake_number,
-            'Warehouse' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->warehouse?->name,
-            'Stocktake Date' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->stocktake_date?->toDateString(),
-            'Status' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->status,
-            'Product Category' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->productCategory?->name,
-            'Completed At' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->completed_at?->toIso8601String(),
-            'Created At' => static fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->created_at?->toIso8601String(),
+            'ID' => fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->id,
+            'Stocktake Number' => fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->stocktake_number,
+            'Warehouse' => fn (InventoryStocktake $inventoryStocktake): mixed => $this->relatedAttribute($inventoryStocktake, 'warehouse', 'name'),
+            'Stocktake Date' => fn (InventoryStocktake $inventoryStocktake): mixed => $this->formatDateValue($inventoryStocktake->stocktake_date, 'Y-m-d'),
+            'Status' => fn (InventoryStocktake $inventoryStocktake): mixed => $inventoryStocktake->status,
+            'Product Category' => fn (InventoryStocktake $inventoryStocktake): mixed => $this->relatedAttribute($inventoryStocktake, 'productCategory', 'name'),
+            'Completed At' => fn (InventoryStocktake $inventoryStocktake): mixed => $this->formatIso8601($inventoryStocktake->completed_at),
+            'Created At' => fn (InventoryStocktake $inventoryStocktake): mixed => $this->formatIso8601($inventoryStocktake->created_at),
         ];
     }
 }

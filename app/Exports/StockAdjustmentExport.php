@@ -60,14 +60,14 @@ class StockAdjustmentExport implements FromQuery, WithHeadings, WithMapping, Wit
     protected function columns(): array
     {
         return [
-            'ID' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->id,
-            'Adjustment Number' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->adjustment_number,
-            'Warehouse' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->warehouse?->name,
-            'Adjustment Date' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->adjustment_date?->toDateString(),
-            'Adjustment Type' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->adjustment_type,
-            'Status' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->status,
-            'Stocktake Number' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->inventoryStocktake?->stocktake_number,
-            'Created At' => static fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->created_at?->toIso8601String(),
+            'ID' => fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->id,
+            'Adjustment Number' => fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->adjustment_number,
+            'Warehouse' => fn (StockAdjustment $stockAdjustment): mixed => $this->relatedAttribute($stockAdjustment, 'warehouse', 'name'),
+            'Adjustment Date' => fn (StockAdjustment $stockAdjustment): mixed => $this->formatDateValue($stockAdjustment->adjustment_date, 'Y-m-d'),
+            'Adjustment Type' => fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->adjustment_type,
+            'Status' => fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->status,
+            'Stocktake Number' => fn (StockAdjustment $stockAdjustment): mixed => $this->relatedAttribute($stockAdjustment, 'inventoryStocktake', 'stocktake_number'),
+            'Created At' => fn (StockAdjustment $stockAdjustment): mixed => $this->formatIso8601($stockAdjustment->created_at),
         ];
     }
 }

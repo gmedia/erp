@@ -59,21 +59,21 @@ class PurchaseOrderExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
     protected function columns(): array
     {
         return [
-            'ID' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->id,
-            'PO Number' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->po_number,
-            'Supplier' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->supplier?->name,
-            'Warehouse' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->warehouse?->name,
-            'Order Date' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->order_date?->format('Y-m-d'),
-            'Expected Delivery Date' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->expected_delivery_date?->format('Y-m-d'),
-            'Payment Terms' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->payment_terms,
-            'Currency' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->currency,
-            'Status' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->status,
-            'Subtotal' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->subtotal,
-            'Tax Amount' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->tax_amount,
-            'Discount Amount' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->discount_amount,
-            'Grand Total' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->grand_total,
-            'Notes' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->notes,
-            'Created At' => static fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->created_at?->toIso8601String(),
+            'ID' => fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->id,
+            'PO Number' => fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->po_number,
+            'Supplier' => fn (PurchaseOrder $purchaseOrder): mixed => $this->relatedAttribute($purchaseOrder, 'supplier', 'name'),
+            'Warehouse' => fn (PurchaseOrder $purchaseOrder): mixed => $this->relatedAttribute($purchaseOrder, 'warehouse', 'name'),
+            'Order Date' => fn (PurchaseOrder $purchaseOrder): mixed => $this->formatDateValue($purchaseOrder->order_date, 'Y-m-d'),
+            'Expected Delivery Date' => fn (PurchaseOrder $purchaseOrder): mixed => $this->formatDateValue($purchaseOrder->expected_delivery_date, 'Y-m-d'),
+            'Payment Terms' => fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->payment_terms,
+            'Currency' => fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->currency,
+            'Status' => fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->status,
+            'Subtotal' => fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->subtotal,
+            'Tax Amount' => fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->tax_amount,
+            'Discount Amount' => fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->discount_amount,
+            'Grand Total' => fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->grand_total,
+            'Notes' => fn (PurchaseOrder $purchaseOrder): mixed => $purchaseOrder->notes,
+            'Created At' => fn (PurchaseOrder $purchaseOrder): mixed => $this->formatIso8601($purchaseOrder->created_at),
         ];
     }
 }

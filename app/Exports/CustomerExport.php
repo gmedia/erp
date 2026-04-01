@@ -51,16 +51,16 @@ class CustomerExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
     protected function columns(): array
     {
         return [
-            'ID' => static fn (Customer $customer): mixed => $customer->id,
-            'Name' => static fn (Customer $customer): mixed => $customer->name,
-            'Email' => static fn (Customer $customer): mixed => $customer->email,
-            'Phone' => static fn (Customer $customer): mixed => $customer->phone,
-            'Address' => static fn (Customer $customer): mixed => $customer->address,
-            'Branch' => static fn (Customer $customer): mixed => $customer->branch?->name,
-            'Category' => static fn (Customer $customer): mixed => $customer->category?->name,
-            'Status' => static fn (Customer $customer): mixed => ucfirst($customer->status),
-            'Notes' => static fn (Customer $customer): mixed => $customer->notes,
-            'Created At' => static fn (Customer $customer): mixed => $customer->created_at->format('Y-m-d H:i:s'),
+            'ID' => fn (Customer $customer): mixed => $customer->id,
+            'Name' => fn (Customer $customer): mixed => $customer->name,
+            'Email' => fn (Customer $customer): mixed => $customer->email,
+            'Phone' => fn (Customer $customer): mixed => $customer->phone,
+            'Address' => fn (Customer $customer): mixed => $customer->address,
+            'Branch' => fn (Customer $customer): mixed => $this->relatedAttribute($customer, 'branch', 'name'),
+            'Category' => fn (Customer $customer): mixed => $this->relatedAttribute($customer, 'category', 'name'),
+            'Status' => fn (Customer $customer): mixed => ucfirst($customer->status),
+            'Notes' => fn (Customer $customer): mixed => $customer->notes,
+            'Created At' => fn (Customer $customer): mixed => $this->formatDateValue($customer->created_at, 'Y-m-d H:i:s'),
         ];
     }
 }

@@ -60,14 +60,14 @@ class StockTransferExport implements FromQuery, WithHeadings, WithMapping, WithS
     protected function columns(): array
     {
         return [
-            'ID' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->id,
-            'Transfer Number' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->transfer_number,
-            'From Warehouse' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->fromWarehouse?->name,
-            'To Warehouse' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->toWarehouse?->name,
-            'Transfer Date' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->transfer_date?->toDateString(),
-            'Expected Arrival Date' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->expected_arrival_date?->toDateString(),
-            'Status' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->status,
-            'Created At' => static fn (StockTransfer $stockTransfer): mixed => $stockTransfer->created_at?->toIso8601String(),
+            'ID' => fn (StockTransfer $stockTransfer): mixed => $stockTransfer->id,
+            'Transfer Number' => fn (StockTransfer $stockTransfer): mixed => $stockTransfer->transfer_number,
+            'From Warehouse' => fn (StockTransfer $stockTransfer): mixed => $this->relatedAttribute($stockTransfer, 'fromWarehouse', 'name'),
+            'To Warehouse' => fn (StockTransfer $stockTransfer): mixed => $this->relatedAttribute($stockTransfer, 'toWarehouse', 'name'),
+            'Transfer Date' => fn (StockTransfer $stockTransfer): mixed => $this->formatDateValue($stockTransfer->transfer_date, 'Y-m-d'),
+            'Expected Arrival Date' => fn (StockTransfer $stockTransfer): mixed => $this->formatDateValue($stockTransfer->expected_arrival_date, 'Y-m-d'),
+            'Status' => fn (StockTransfer $stockTransfer): mixed => $stockTransfer->status,
+            'Created At' => fn (StockTransfer $stockTransfer): mixed => $this->formatIso8601($stockTransfer->created_at),
         ];
     }
 }

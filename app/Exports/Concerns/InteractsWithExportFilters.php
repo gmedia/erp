@@ -2,7 +2,9 @@
 
 namespace App\Exports\Concerns;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 trait InteractsWithExportFilters
@@ -140,5 +142,30 @@ trait InteractsWithExportFilters
             static fn (callable $resolver): mixed => $resolver($row),
             $columns,
         ));
+    }
+
+    protected function relatedAttribute(Model $model, string $relation, string $attribute): mixed
+    {
+        $related = $model->getRelationValue($relation);
+
+        if (! $related instanceof Model) {
+            return null;
+        }
+
+        return $related->getAttribute($attribute);
+    }
+
+    protected function formatDateValue(mixed $value, string $format): ?string
+    {
+        if (! $value instanceof DateTimeInterface) {
+            return null;
+        }
+
+        return $value->format($format);
+    }
+
+    protected function formatIso8601(mixed $value): ?string
+    {
+        return $this->formatDateValue($value, DateTimeInterface::ATOM);
     }
 }
