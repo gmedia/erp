@@ -17,7 +17,7 @@ Dokumen ini menyimpan status batch refactor berbasis Sonar agar prompt tetap sta
 | C | done | assets, products, asset-movements, asset-maintenances, asset-stocktakes | asset-family filter services, ProductFilterService, item controllers | snapshot 2026-04-01: duplicated_lines 6344, duplicated_blocks 332, duplicated_lines_density 7.2, coverage 87.0, new_duplicated_lines_density 11.8 |
 | D | next | financial-reporting | FinancialReportService + query/mapping laporan keuangan | pending |
 | E | next | account-mappings, journal-entries, goods-receipts, purchase-requests | pasangan Store*Request/Update*Request | pending |
-| F | in-progress | goods-receipts, supplier-returns, inventory-stocktakes, stock-adjustments, stock-transfers, purchase-orders, products, suppliers, customers | pasangan Index*/Export* request listing + export skeleton transaksi/master-data | snapshot 2026-04-01: duplicated_lines 6114, duplicated_blocks 317, duplicated_lines_density 6.9, coverage 0.0 (anomali pipeline), new_duplicated_lines_density 11.3; local wave master-data export dedup PASS 22 test |
+| F | in-progress | goods-receipts, supplier-returns, inventory-stocktakes, stock-adjustments, stock-transfers, purchase-orders, products, suppliers, customers, asset-maintenances | pasangan Index*/Export* request listing + export skeleton + mutation request sibling | snapshot 2026-04-01: duplicated_lines 6034, duplicated_blocks 314, duplicated_lines_density 6.8, coverage 86.9, new_duplicated_lines_density 11.3; local wave shared mutation request PASS 21 test + targeted PHPStan PASS |
 
 Catatan: wave dedup request untuk `approval-audit-trail` dan `pipeline-audit-trail` sudah ikut terdorong di commit sebelumnya, tetapi tetap dicatat terpisah karena berada di luar scope Batch C saat dieksekusi.
 
@@ -35,23 +35,23 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: pending (menunggu snapshot Sonar pasca-wave master-data export Batch F; latest pushed snapshot 2026-04-01 = 6114, turun 230 dari baseline Batch F)
-- duplicated_blocks: pending (menunggu snapshot Sonar pasca-wave master-data export Batch F; latest pushed snapshot 2026-04-01 = 317, turun 15 dari baseline Batch F)
-- duplicated_lines_density: pending (menunggu snapshot Sonar pasca-wave master-data export Batch F; latest pushed snapshot 2026-04-01 = 6.9, turun 0.3 dari baseline Batch F)
-- ncloc: pending (menunggu snapshot Sonar pasca-wave master-data export Batch F; latest pushed snapshot 2026-04-01 = 72857)
-- coverage: pending (menunggu snapshot Sonar pasca-wave master-data export Batch F; latest pushed snapshot 2026-04-01 = 0.0, anomali pipeline coverage)
+- duplicated_lines: pending (menunggu snapshot Sonar pasca-wave shared mutation request Batch F; latest pushed snapshot 2026-04-01 = 6034, turun 310 dari baseline Batch F)
+- duplicated_blocks: pending (menunggu snapshot Sonar pasca-wave shared mutation request Batch F; latest pushed snapshot 2026-04-01 = 314, turun 18 dari baseline Batch F)
+- duplicated_lines_density: pending (menunggu snapshot Sonar pasca-wave shared mutation request Batch F; latest pushed snapshot 2026-04-01 = 6.8, turun 0.4 dari baseline Batch F)
+- ncloc: pending (menunggu snapshot Sonar pasca-wave shared mutation request Batch F; latest pushed snapshot 2026-04-01 = 72852)
+- coverage: pending (menunggu snapshot Sonar pasca-wave shared mutation request Batch F; latest pushed snapshot 2026-04-01 = 86.9)
 
 ## Snapshot Analisa Sonar (2026-04-01, latest MCP)
 
 - Quality Gate: ERROR
 - Gate blocker utama: new_duplicated_lines_density = 11.3 (threshold: 3.0)
-- Catatan: snapshot pasca-push Batch F kembali membaik: duplicated_lines turun 6260 -> 6114, duplicated_blocks 324 -> 317, duplicated_lines_density 7.1 -> 6.9. Coverage/new_coverage muncul sebagai `0.0` lagi sehingga dicatat sebagai anomali pipeline; verifikasi lokal tetap dilanjutkan lewat suite test terfokus.
+- Catatan: snapshot pasca-push Batch F kembali membaik: duplicated_lines turun 6114 -> 6034, duplicated_blocks 317 -> 314, duplicated_lines_density 6.9 -> 6.8. Coverage Sonar kembali normal di 86.9 dan new coverage 87.8 setelah anomali pipeline pada snapshot sebelumnya.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
-- app/Exports/ProductExport.php <-> app/Exports/SupplierExport.php <-> app/Exports/CustomerExport.php: skeleton `query/headings/map` export master data baru saja disederhanakan lewat helper shared; menunggu snapshot Sonar pasca-push.
-- app/Http/Requests/JournalEntries/AbstractJournalEntryRequest.php masih berbagi blok validasi dengan export/request transaksi lain; kandidat backend request wave berikutnya.
-- cluster export atau request sibling lain perlu ditentukan ulang setelah snapshot terbaru tersedia agar prioritas mengikuti data Sonar aktual, bukan shortlist lama.
+- pasangan `Store*Request` / `Update*Request` yang masih memakai `FormRequest` mentah pada modul sibling lain tetap kandidat utama setelah `AssetMaintenances` dan `SupplierReturns` dipindah ke abstract mutation request shared.
+- app/Http/Requests/JournalEntries/AbstractJournalEntryRequest.php belum menunjukkan duplikasi aktif di MCP terbaru, tetapi family request mutasi backend tetap kandidat jika clone block baru muncul lagi.
+- shortlist berikutnya perlu ditarik ulang setelah analisis CI pasca-wave ini agar kandidat tetap mengikuti snapshot Sonar aktual.
 
 ## Rencana Refactor Fokus Duplikasi (Batch F)
 
@@ -67,6 +67,10 @@ Isi setelah batch selesai dan sebelum merge.
 	- Terapkan helper shared yang sama ke `ProductExport`, `SupplierExport`, dan `CustomerExport` untuk merapikan clone block query/headings/map.
 	- Pertahankan exact filters, sort field whitelist, urutan heading, dan format kolom existing per modul.
 	- Progress: trio export master-data sudah dimigrasikan; test terfokus PASS 22 test.
+4. Dedup mutation request sibling. (in-progress)
+	- Tambah abstract mutation request shared untuk modul yang masih menyimpan rules store/update secara terpisah.
+	- Gelombang saat ini mencakup `AssetMaintenances` dan `SupplierReturns`, dengan helper `withSometimes`/`itemsRules` agar perbedaan store vs update tetap eksplisit namun tidak duplikatif.
+	- Progress: `AbstractAssetMaintenanceMutationRequest` dan `AbstractSupplierReturnMutationRequest` sudah dipakai oleh pasangan store/update; verifikasi PASS 21 test dan targeted PHPStan PASS.
 
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
@@ -109,6 +113,8 @@ Isi setelah batch selesai dan sebelum merge.
 
 ## Log Perubahan
 
+- 2026-04-01: [F], post-push Sonar MCP untuk commit `169af811`: quality gate masih ERROR dengan blocker `new_duplicated_lines_density 11.3`, tetapi metrik inti membaik ke `duplicated_lines 6034`, `duplicated_blocks 314`, `duplicated_lines_density 6.8`, `ncloc 72852`, `coverage 86.9`, `new_coverage 87.8`.
+- 2026-04-01: [F], wave semi-besar terkontrol (shared mutation request dedup): tambah `AbstractAssetMaintenanceMutationRequest` dan `AbstractSupplierReturnMutationRequest`, lalu migrasi pasangan `Store*`/`Update*` request pada asset maintenances dan supplier returns ke helper shared berbasis `withSometimes` tanpa ubah contract validasi; test: `./vendor/bin/sail artisan test tests/Unit/Requests/AssetMaintenances/StoreAssetMaintenanceRequestTest.php tests/Unit/Requests/AssetMaintenances/UpdateAssetMaintenanceRequestTest.php tests/Unit/Requests/SupplierReturns/StoreSupplierReturnRequestTest.php tests/Unit/Requests/SupplierReturns/UpdateSupplierReturnRequestTest.php tests/Feature/AssetMaintenances/AssetMaintenanceControllerTest.php tests/Feature/SupplierReturns/SupplierReturnControllerTest.php tests/Feature/SupplierReturns/SupplierReturnExportTest.php` (PASS 21 test); static analysis: `./vendor/bin/sail php vendor/bin/phpstan analyse app/Http/Requests/AssetMaintenances/AbstractAssetMaintenanceMutationRequest.php app/Http/Requests/AssetMaintenances/StoreAssetMaintenanceRequest.php app/Http/Requests/AssetMaintenances/UpdateAssetMaintenanceRequest.php app/Http/Requests/SupplierReturns/AbstractSupplierReturnMutationRequest.php app/Http/Requests/SupplierReturns/StoreSupplierReturnRequest.php app/Http/Requests/SupplierReturns/UpdateSupplierReturnRequest.php tests/Unit/Requests/SupplierReturns/UpdateSupplierReturnRequestTest.php --error-format=raw` (PASS).
 - 2026-04-01: [F], post-push Sonar MCP untuk commit `2352ecb0`: quality gate masih ERROR namun membaik (`new_duplicated_lines_density 11.3`); metrik inti terbaru `duplicated_lines 6114`, `duplicated_blocks 317`, `duplicated_lines_density 6.9`, `ncloc 72857`, `coverage 0.0` dan `new_coverage 0.0` (anomali pipeline coverage).
 - 2026-04-01: [F], wave semi-besar terkontrol (master-data export skeleton dedup): migrasi `ProductExport`, `SupplierExport`, dan `CustomerExport` ke helper `applyConfiguredFilters`, `exportHeadings`, dan `mapExportRow` di concern shared agar clone block `query/headings/map` turun tanpa ubah output export; test: `./vendor/bin/sail artisan test tests/Feature/Products/ProductExportTest.php tests/Feature/Suppliers/SupplierExportTest.php tests/Feature/Customers/CustomerExportTest.php` (PASS 22 test).
 - 2026-04-01: [F], post-push Sonar MCP untuk commit `9b562255`: quality gate masih ERROR tetapi membaik (`new_duplicated_lines_density 11.6`); metrik inti terbaru `duplicated_lines 6260`, `duplicated_blocks 324`, `duplicated_lines_density 7.1`, `ncloc 72872`, `coverage 86.9`.
