@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\AssetLocations;
 
+use App\Http\Requests\Concerns\HasSometimesStringRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 abstract class AbstractAssetLocationRequest extends FormRequest
 {
+    use HasSometimesStringRules;
+
     public function authorize(): bool
     {
         return true;
@@ -19,15 +22,6 @@ abstract class AbstractAssetLocationRequest extends FormRequest
             'code' => $this->withSometimes('required|string|max:50'),
             'name' => $this->withSometimes('required|string|max:255'),
         ];
-    }
-
-    protected function withSometimes(string $rules): string
-    {
-        if (! $this->usesSometimes()) {
-            return $rules;
-        }
-
-        return 'sometimes|' . $rules;
     }
 
     abstract protected function usesSometimes(): bool;

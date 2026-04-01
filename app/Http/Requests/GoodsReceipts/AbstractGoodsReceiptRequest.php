@@ -34,14 +34,14 @@ abstract class AbstractGoodsReceiptRequest extends FormRequest
             'confirmed_at' => $this->withSometimes(['nullable', 'date']),
 
             'items' => $this->itemsRules(),
-            'items.*.purchase_order_item_id' => [$this->itemRequiredRule(), 'integer', 'exists:purchase_order_items,id'],
-            'items.*.product_id' => [$this->itemRequiredRule(), 'integer', 'exists:products,id'],
-            'items.*.unit_id' => [$this->itemRequiredRule(), 'integer', 'exists:units,id'],
-            'items.*.quantity_received' => [$this->itemRequiredRule(), 'numeric', 'gt:0'],
-            'items.*.quantity_accepted' => [$this->itemRequiredRule(), 'numeric', 'min:0'],
-            'items.*.quantity_rejected' => ['nullable', 'numeric', 'min:0'],
-            'items.*.unit_price' => [$this->itemRequiredRule(), 'numeric', 'min:0'],
-            'items.*.notes' => ['nullable', 'string'],
+            'items.*.purchase_order_item_id' => $this->requiredIntegerItemRule('exists:purchase_order_items,id'),
+            'items.*.product_id' => $this->requiredIntegerItemRule('exists:products,id'),
+            'items.*.unit_id' => $this->requiredIntegerItemRule('exists:units,id'),
+            'items.*.quantity_received' => $this->requiredNumericItemRule('gt:0'),
+            'items.*.quantity_accepted' => $this->requiredNumericItemRule('min:0'),
+            'items.*.quantity_rejected' => $this->nullableNumericItemRule('min:0'),
+            'items.*.unit_price' => $this->requiredNumericItemRule('min:0'),
+            'items.*.notes' => $this->nullableStringItemRule(),
         ];
     }
 

@@ -34,12 +34,12 @@ abstract class AbstractSupplierReturnMutationRequest extends FormRequest
             'notes' => $this->withSometimes(['nullable', 'string']),
 
             'items' => $this->itemsRules(),
-            'items.*.goods_receipt_item_id' => [$this->itemRequiredRule(), 'integer', 'exists:goods_receipt_items,id'],
-            'items.*.product_id' => [$this->itemRequiredRule(), 'integer', 'exists:products,id'],
-            'items.*.unit_id' => ['nullable', 'integer', 'exists:units,id'],
-            'items.*.quantity_returned' => [$this->itemRequiredRule(), 'numeric', 'gt:0'],
-            'items.*.unit_price' => [$this->itemRequiredRule(), 'numeric', 'min:0'],
-            'items.*.notes' => ['nullable', 'string'],
+            'items.*.goods_receipt_item_id' => $this->requiredIntegerItemRule('exists:goods_receipt_items,id'),
+            'items.*.product_id' => $this->requiredIntegerItemRule('exists:products,id'),
+            'items.*.unit_id' => $this->nullableIntegerItemRule('exists:units,id'),
+            'items.*.quantity_returned' => $this->requiredNumericItemRule('gt:0'),
+            'items.*.unit_price' => $this->requiredNumericItemRule('min:0'),
+            'items.*.notes' => $this->nullableStringItemRule(),
         ];
     }
 

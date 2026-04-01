@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\AssetModels;
 
+use App\Http\Requests\Concerns\HasSometimesStringRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 abstract class AbstractAssetModelRequest extends FormRequest
 {
+    use HasSometimesStringRules;
+
     public function authorize(): bool
     {
         return true;
@@ -19,15 +22,6 @@ abstract class AbstractAssetModelRequest extends FormRequest
             'model_name' => $this->withSometimes('required|string|max:255'),
             'specs' => $this->withSometimes('nullable|array'),
         ];
-    }
-
-    protected function withSometimes(string $rules): string
-    {
-        if (! $this->usesSometimes()) {
-            return $rules;
-        }
-
-        return 'sometimes|' . $rules;
     }
 
     abstract protected function usesSometimes(): bool;
