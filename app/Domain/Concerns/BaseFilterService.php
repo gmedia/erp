@@ -260,4 +260,29 @@ trait BaseFilterService
             $this->applyNumericRanges($query, $filters, $numericRanges);
         }
     }
+
+    /**
+     * Build a normalized relation sort config entry.
+     *
+     * @return array{table: string, local_column: string, foreign_column: string, order_column: string, join?: 'join'|'leftJoin'}
+     */
+    public function relationSortConfig(
+        string $table,
+        string $localColumn,
+        string $orderColumn = 'name',
+        string $join = 'join'
+    ): array {
+        $config = [
+            'table' => $table,
+            'local_column' => $localColumn,
+            'foreign_column' => $table . '.id',
+            'order_column' => $table . '.' . $orderColumn,
+        ];
+
+        if ($join !== 'join') {
+            $config['join'] = $join;
+        }
+
+        return $config;
+    }
 }

@@ -35,49 +35,23 @@ class AssetFilterService
             $sortBy,
             $sortDirection,
             $allowedSorts,
-            [
-                'category' => [
-                    'table' => 'asset_categories',
-                    'local_column' => 'assets.asset_category_id',
-                    'foreign_column' => 'asset_categories.id',
-                    'order_column' => 'asset_categories.name',
-                ],
-                'branch' => [
-                    'table' => 'branches',
-                    'local_column' => 'assets.branch_id',
-                    'foreign_column' => 'branches.id',
-                    'order_column' => 'branches.name',
-                ],
-                'location' => [
-                    'table' => 'asset_locations',
-                    'local_column' => 'assets.asset_location_id',
-                    'foreign_column' => 'asset_locations.id',
-                    'order_column' => 'asset_locations.name',
-                    'join' => 'leftJoin',
-                ],
-                'department' => [
-                    'table' => 'departments',
-                    'local_column' => 'assets.department_id',
-                    'foreign_column' => 'departments.id',
-                    'order_column' => 'departments.name',
-                    'join' => 'leftJoin',
-                ],
-                'employee' => [
-                    'table' => 'employees',
-                    'local_column' => 'assets.employee_id',
-                    'foreign_column' => 'employees.id',
-                    'order_column' => 'employees.name',
-                    'join' => 'leftJoin',
-                ],
-                'supplier' => [
-                    'table' => 'suppliers',
-                    'local_column' => 'assets.supplier_id',
-                    'foreign_column' => 'suppliers.id',
-                    'order_column' => 'suppliers.name',
-                    'join' => 'leftJoin',
-                ],
-            ],
+            $this->assetRelationSortMap(),
             'assets'
         );
+    }
+
+    /**
+     * @return array<string, array{table: string, local_column: string, foreign_column: string, order_column: string, join?: 'join'|'leftJoin'}>
+     */
+    protected function assetRelationSortMap(): array
+    {
+        return [
+            'category' => $this->relationSortConfig('asset_categories', 'assets.asset_category_id'),
+            'branch' => $this->relationSortConfig('branches', 'assets.branch_id'),
+            'location' => $this->relationSortConfig('asset_locations', 'assets.asset_location_id', join: 'leftJoin'),
+            'department' => $this->relationSortConfig('departments', 'assets.department_id', join: 'leftJoin'),
+            'employee' => $this->relationSortConfig('employees', 'assets.employee_id', join: 'leftJoin'),
+            'supplier' => $this->relationSortConfig('suppliers', 'assets.supplier_id', join: 'leftJoin'),
+        ];
     }
 }

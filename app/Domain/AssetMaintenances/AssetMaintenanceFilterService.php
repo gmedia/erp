@@ -44,19 +44,8 @@ class AssetMaintenanceFilterService
             $sortDirection,
             $allowedSorts,
             [
-                'asset' => [
-                    'table' => 'assets',
-                    'local_column' => 'asset_maintenances.asset_id',
-                    'foreign_column' => 'assets.id',
-                    'order_column' => 'assets.asset_code',
-                ],
-                'supplier' => [
-                    'table' => 'suppliers',
-                    'local_column' => 'asset_maintenances.supplier_id',
-                    'foreign_column' => 'suppliers.id',
-                    'order_column' => 'suppliers.name',
-                    'join' => 'leftJoin',
-                ],
+                'asset' => $this->relationSortConfig('assets', 'asset_maintenances.asset_id', 'asset_code'),
+                'supplier' => $this->relationSortConfig('suppliers', 'asset_maintenances.supplier_id', join: 'leftJoin'),
             ],
             'asset_maintenances'
         );

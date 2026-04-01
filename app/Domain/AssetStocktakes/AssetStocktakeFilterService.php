@@ -35,18 +35,8 @@ class AssetStocktakeFilterService
             $sortDirection,
             $allowedSorts,
             [
-                'branch' => [
-                    'table' => 'branches',
-                    'local_column' => 'asset_stocktakes.branch_id',
-                    'foreign_column' => 'branches.id',
-                    'order_column' => 'branches.name',
-                ],
-                'created_by' => [
-                    'table' => 'users',
-                    'local_column' => 'asset_stocktakes.created_by',
-                    'foreign_column' => 'users.id',
-                    'order_column' => 'users.name',
-                ],
+                'branch' => $this->relationSortConfig('branches', 'asset_stocktakes.branch_id'),
+                'created_by' => $this->relationSortConfig('users', 'asset_stocktakes.created_by'),
             ],
             'asset_stocktakes'
         );

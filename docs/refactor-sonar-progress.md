@@ -17,7 +17,7 @@ Dokumen ini menyimpan status batch refactor berbasis Sonar agar prompt tetap sta
 | C | done | assets, products, asset-movements, asset-maintenances, asset-stocktakes | asset-family filter services, ProductFilterService, item controllers | snapshot 2026-04-01: duplicated_lines 6344, duplicated_blocks 332, duplicated_lines_density 7.2, coverage 87.0, new_duplicated_lines_density 11.8 |
 | D | next | financial-reporting | FinancialReportService + query/mapping laporan keuangan | pending |
 | E | next | account-mappings, journal-entries, goods-receipts, purchase-requests | pasangan Store*Request/Update*Request | pending |
-| F | in-progress | goods-receipts, supplier-returns, inventory-stocktakes, stock-adjustments, stock-transfers, purchase-orders, products, suppliers, customers, asset-maintenances, asset-categories, asset-locations, asset-models | pasangan Index*/Export* request listing + export skeleton + mutation/simple CRUD request sibling + shared request rule concerns + configured backend filter groups + provider/model relation dedup | snapshot 2026-04-01: duplicated_lines 5983, duplicated_blocks 309, duplicated_lines_density 6.7, coverage 86.9, new_duplicated_lines_density 11.1; local wave provider/model relation dedup PASS 11 test + targeted PHPStan PASS |
+| F | in-progress | goods-receipts, supplier-returns, inventory-stocktakes, stock-adjustments, stock-transfers, purchase-orders, products, suppliers, customers, asset-maintenances, asset-categories, asset-locations, asset-models | pasangan Index*/Export* request listing + export skeleton + mutation/simple CRUD request sibling + shared request rule concerns + configured backend filter groups + provider/model relation dedup + asset-family sort map helper | snapshot 2026-04-01: duplicated_lines 5960, duplicated_blocks 307, duplicated_lines_density 6.7, coverage 86.9, new_duplicated_lines_density 11.1; local wave asset-family sort map helper PASS 14 test + targeted PHPStan PASS |
 
 Catatan: wave dedup request untuk `approval-audit-trail` dan `pipeline-audit-trail` sudah ikut terdorong di commit sebelumnya, tetapi tetap dicatat terpisah karena berada di luar scope Batch C saat dieksekusi.
 
@@ -35,23 +35,23 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: pending (menunggu snapshot Sonar pasca-wave provider/model relation dedup Batch F; latest pushed snapshot 2026-04-01 = 5983, turun 361 dari baseline Batch F)
-- duplicated_blocks: pending (menunggu snapshot Sonar pasca-wave provider/model relation dedup Batch F; latest pushed snapshot 2026-04-01 = 309, turun 23 dari baseline Batch F)
-- duplicated_lines_density: pending (menunggu snapshot Sonar pasca-wave provider/model relation dedup Batch F; latest pushed snapshot 2026-04-01 = 6.7, turun 0.5 dari baseline Batch F)
-- ncloc: pending (menunggu snapshot Sonar pasca-wave provider/model relation dedup Batch F; latest pushed snapshot 2026-04-01 = 72915)
-- coverage: pending (menunggu snapshot Sonar pasca-wave provider/model relation dedup Batch F; latest pushed snapshot 2026-04-01 = 86.9)
+- duplicated_lines: pending (menunggu snapshot Sonar pasca-wave asset-family sort map helper Batch F; latest pushed snapshot 2026-04-01 = 5960, turun 384 dari baseline Batch F)
+- duplicated_blocks: pending (menunggu snapshot Sonar pasca-wave asset-family sort map helper Batch F; latest pushed snapshot 2026-04-01 = 307, turun 25 dari baseline Batch F)
+- duplicated_lines_density: pending (menunggu snapshot Sonar pasca-wave asset-family sort map helper Batch F; latest pushed snapshot 2026-04-01 = 6.7, turun 0.5 dari baseline Batch F)
+- ncloc: pending (menunggu snapshot Sonar pasca-wave asset-family sort map helper Batch F; latest pushed snapshot 2026-04-01 = 72917)
+- coverage: pending (menunggu snapshot Sonar pasca-wave asset-family sort map helper Batch F; latest pushed snapshot 2026-04-01 = 86.9)
 
 ## Snapshot Analisa Sonar (2026-04-01, latest MCP)
 
 - Quality Gate: ERROR
 - Gate blocker utama: new_duplicated_lines_density = 11.1 (threshold: 3.0)
-- Catatan: snapshot Sonar untuk commit terakhir kembali membaik: duplicated_lines turun 6034 -> 5983, duplicated_blocks turun 314 -> 309, density turun 6.8 -> 6.7, dan new coverage naik tipis ke 87.9. Karena gate new code masih jauh di atas threshold, wave berikutnya tetap perlu menyerang clone block backend/toplist aktual.
+- Catatan: snapshot Sonar untuk commit terakhir kembali membaik: duplicated_lines turun 5983 -> 5960, duplicated_blocks turun 309 -> 307, density bertahan di 6.7, dan new coverage stabil tinggi di 87.8. Karena gate new code masih jauh di atas threshold, wave berikutnya tetap perlu menyerang clone block backend/toplist aktual.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
-- MCP duplication detail terbaru kini menunjukkan sebagian wave filter-service sudah termakan Sonar; shortlist backend tersisa bergeser ke model/provider internals, terutama `Asset.php` yang masih beririsan dengan `AssetModel.php` dan `Product.php`, serta self-duplication di `AppServiceProvider.php`.
-- Wave lokal saat ini sudah mereduksi clone block `AppServiceProvider` via map-driven mail settings dan mengekstrak trait `HasAssetAndCreatorRelations` untuk `AssetMovement` dan `AssetMaintenance`, sehingga snapshot berikutnya akan menentukan apakah fokus berikutnya tetap di asset-family models.
-- Setelah snapshot CI pasca-wave ini tersedia, kandidat backend berikutnya paling masuk akal adalah konsolidasi casts/relations pada family `Asset`/`AssetModel`/`Product`, kecuali MCP terbaru menunjukkan hotspot baru yang lebih tajam.
+- MCP duplication detail terbaru menunjukkan `AppServiceProvider` sudah tidak muncul lagi sebagai clone block aktif. Hotspot backend tersisa sekarang paling jelas di `Asset.php` yang masih beririsan dengan `AssetModel.php` dan `Product.php`, plus self-duplication di `AssetFilterService`.
+- Wave lokal saat ini sudah mengekstrak helper `relationSortConfig()` di `BaseFilterService` dan memakainya pada `AssetFilterService`, `AssetMaintenanceFilterService`, dan `AssetStocktakeFilterService` untuk mereduksi konfigurasi sort relation yang berulang.
+- Setelah snapshot CI pasca-wave ini tersedia, kandidat backend berikutnya paling masuk akal tetap konsolidasi casts/relations pada family `Asset`/`AssetModel`/`Product`, kecuali MCP terbaru menunjukkan hotspot baru yang lebih tajam.
 
 ## Rencana Refactor Fokus Duplikasi (Batch F)
 
@@ -87,6 +87,10 @@ Isi setelah batch selesai dan sebelum merge.
 	- Ubah blok konfigurasi mail di `AppServiceProvider` menjadi map-driven dan ekstrak relation bersama `asset`/`createdBy` ke trait model kecil untuk sibling asset activity.
 	- Gelombang saat ini mencakup `AppServiceProvider`, `AssetMovement`, dan `AssetMaintenance`.
 	- Progress: `applyMailSettings()` + `mailSettingConfigMap()` sudah mengganti deretan `if (isset(...))` di provider, dan trait `HasAssetAndCreatorRelations` sudah dipakai oleh `AssetMovement` serta `AssetMaintenance`; verifikasi PASS 11 test, `./vendor/bin/sail bin duster fix --no-interaction ...` PASS, targeted PHPStan PASS.
+9. Dedup asset-family sort map config. (in-progress)
+	- Ekstrak helper `relationSortConfig()` di `BaseFilterService` untuk mereduksi boilerplate konfigurasi relation sorting yang masih berulang di family asset filter services.
+	- Gelombang saat ini mencakup `AssetFilterService`, `AssetMaintenanceFilterService`, dan `AssetStocktakeFilterService`.
+	- Progress: tiga service tersebut sudah memakai helper konfigurasi sort map shared; verifikasi PASS 14 test, `./vendor/bin/sail bin duster fix --no-interaction ...` PASS, dan targeted PHPStan PASS.
 
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
@@ -129,6 +133,8 @@ Isi setelah batch selesai dan sebelum merge.
 
 ## Log Perubahan
 
+- 2026-04-01: [F], post-push Sonar MCP untuk commit `63fa9de8`: quality gate tetap ERROR dengan blocker `new_duplicated_lines_density 11.1`; metrik inti terbaru `duplicated_lines 5960`, `duplicated_blocks 307`, `duplicated_lines_density 6.7`, `ncloc 72917`, `coverage 86.9`, `new_coverage 87.8`.
+- 2026-04-01: [F], wave kecil terkontrol (asset-family sort map helper): tambah `BaseFilterService::relationSortConfig()`, lalu migrasi `AssetFilterService`, `AssetMaintenanceFilterService`, dan `AssetStocktakeFilterService` ke helper konfigurasi relation sort shared untuk mereduksi clone block map sorting tanpa ubah contract query; test: `./vendor/bin/sail artisan test tests/Unit/Domain/Assets/AssetFilterServiceTest.php tests/Unit/Domain/AssetMaintenances/AssetMaintenanceFilterServiceTest.php tests/Unit/Domain/AssetStocktakes/AssetStocktakeFilterServiceTest.php` (PASS 14 test); formatter: `./vendor/bin/sail bin duster fix --no-interaction app/Domain/Concerns/BaseFilterService.php app/Domain/Assets/AssetFilterService.php app/Domain/AssetMaintenances/AssetMaintenanceFilterService.php app/Domain/AssetStocktakes/AssetStocktakeFilterService.php` (PASS); static analysis: `./vendor/bin/sail php vendor/bin/phpstan analyse app/Domain/Concerns/BaseFilterService.php app/Domain/Assets/AssetFilterService.php app/Domain/AssetMaintenances/AssetMaintenanceFilterService.php app/Domain/AssetStocktakes/AssetStocktakeFilterService.php --memory-limit=1G` (PASS). Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
 - 2026-04-01: [F], post-push Sonar MCP untuk commit `009e76e2`: quality gate tetap ERROR dengan blocker `new_duplicated_lines_density 11.1`; metrik inti terbaru `duplicated_lines 5983`, `duplicated_blocks 309`, `duplicated_lines_density 6.7`, `ncloc 72915`, `coverage 86.9`, `new_coverage 87.9`.
 - 2026-04-01: [F], wave kecil terkontrol (provider/model relation dedup): ubah `AppServiceProvider` ke konfigurasi mail map-driven melalui `applyMailSettings()` dan `mailSettingConfigMap()`, lalu tambah trait `HasAssetAndCreatorRelations` yang dipakai oleh `AssetMovement` dan `AssetMaintenance` untuk mereduksi clone block relation backend tanpa ubah contract model; test: `./vendor/bin/sail artisan test tests/Unit/Models/AssetMovementTest.php tests/Unit/Models/AssetMaintenanceTest.php` (PASS 11 test); formatter: `./vendor/bin/sail bin duster fix --no-interaction app/Models/Concerns/HasAssetAndCreatorRelations.php app/Providers/AppServiceProvider.php app/Models/AssetMovement.php app/Models/AssetMaintenance.php` (PASS); static analysis: `./vendor/bin/sail php vendor/bin/phpstan analyse app/Models/Concerns/HasAssetAndCreatorRelations.php app/Providers/AppServiceProvider.php app/Models/AssetMovement.php app/Models/AssetMaintenance.php --memory-limit=1G` (PASS). Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
 - 2026-04-01: [F], post-push Sonar MCP untuk commit `93565428`: quality gate tetap ERROR dengan blocker `new_duplicated_lines_density 11.2`; metrik inti terbaru `duplicated_lines 6034`, `duplicated_blocks 314`, `duplicated_lines_density 6.8`, `ncloc 72878`, `coverage 86.9`, `new_coverage 87.8`.
