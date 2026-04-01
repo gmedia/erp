@@ -25,44 +25,40 @@ class SupplierExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     {
         $query = Supplier::query()->with(['branch']);
 
-        $this->applySearchFilter($query, $this->filters, ['name', 'email', 'phone']);
-        $this->applyExactFilters($query, $this->filters, [
+        $this->applyConfiguredFilters($query, $this->filters, ['name', 'email', 'phone'], [
             'branch_id' => 'branch_id',
             'category_id' => 'category_id',
             'status' => 'status',
-        ]);
-        $this->applySorting($query, $this->filters, ['name', 'email', 'phone', 'branch_id', 'category_id', 'status', 'created_at']);
+        ], [], ['name', 'email', 'phone', 'branch_id', 'category_id', 'status', 'created_at']);
 
         return $query;
     }
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'Name',
-            'Email',
-            'Phone',
-            'Address',
-            'Branch',
-            'Category',
-            'Status',
-            'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($supplier): array
     {
+        return $this->mapExportRow($supplier, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $supplier->id,
-            $supplier->name,
-            $supplier->email,
-            $supplier->phone,
-            $supplier->address,
-            $supplier->branch?->name,
-            $supplier->category?->name,
-            ucfirst($supplier->status),
-            $supplier->created_at?->toIso8601String(),
+            'ID' => static fn (Supplier $supplier): mixed => $supplier->id,
+            'Name' => static fn (Supplier $supplier): mixed => $supplier->name,
+            'Email' => static fn (Supplier $supplier): mixed => $supplier->email,
+            'Phone' => static fn (Supplier $supplier): mixed => $supplier->phone,
+            'Address' => static fn (Supplier $supplier): mixed => $supplier->address,
+            'Branch' => static fn (Supplier $supplier): mixed => $supplier->branch?->name,
+            'Category' => static fn (Supplier $supplier): mixed => $supplier->category?->name,
+            'Status' => static fn (Supplier $supplier): mixed => ucfirst($supplier->status),
+            'Created At' => static fn (Supplier $supplier): mixed => $supplier->created_at?->toIso8601String(),
         ];
     }
 }

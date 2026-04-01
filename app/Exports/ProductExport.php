@@ -15,7 +15,7 @@ class ProductExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
 {
     use InteractsWithExportFilters;
 
-    protected $filters;
+    protected array $filters;
 
     public function __construct(array $filters = [])
     {
@@ -26,49 +26,44 @@ class ProductExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
     {
         $query = Product::query()->with(['category', 'unit', 'branch']);
 
-        $this->applySearchFilter($query, $this->filters, ['name', 'code', 'description']);
-        $this->applyExactFilters($query, $this->filters, [
+        $this->applyConfiguredFilters($query, $this->filters, ['name', 'code', 'description'], [
             'category_id' => 'category_id',
             'unit_id' => 'unit_id',
             'branch_id' => 'branch_id',
             'type' => 'type',
             'status' => 'status',
             'billing_model' => 'billing_model',
-        ]);
-        $this->applySorting($query, $this->filters, ['code', 'name', 'type', 'cost', 'selling_price', 'status', 'created_at']);
+        ], [], ['code', 'name', 'type', 'cost', 'selling_price', 'status', 'created_at']);
 
         return $query;
     }
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'Code',
-            'Name',
-            'Type',
-            'Category',
-            'Unit',
-            'Cost',
-            'Selling Price',
-            'Status',
-            'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($product): array
     {
+        return $this->mapExportRow($product, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $product->id,
-            $product->code,
-            $product->name,
-            $product->type,
-            $product->category?->name,
-            $product->unit?->name,
-            $product->cost,
-            $product->selling_price,
-            $product->status,
-            $product->created_at?->toIso8601String(),
+            'ID' => static fn (Product $product): mixed => $product->id,
+            'Code' => static fn (Product $product): mixed => $product->code,
+            'Name' => static fn (Product $product): mixed => $product->name,
+            'Type' => static fn (Product $product): mixed => $product->type,
+            'Category' => static fn (Product $product): mixed => $product->category?->name,
+            'Unit' => static fn (Product $product): mixed => $product->unit?->name,
+            'Cost' => static fn (Product $product): mixed => $product->cost,
+            'Selling Price' => static fn (Product $product): mixed => $product->selling_price,
+            'Status' => static fn (Product $product): mixed => $product->status,
+            'Created At' => static fn (Product $product): mixed => $product->created_at?->toIso8601String(),
         ];
     }
 }

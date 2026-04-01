@@ -15,7 +15,7 @@ class CustomerExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
 {
     use InteractsWithExportFilters;
 
-    protected $filters;
+    protected array $filters;
 
     public function __construct(array $filters = [])
     {
@@ -26,46 +26,41 @@ class CustomerExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
     {
         $query = Customer::query()->with(['branch', 'category']);
 
-        $this->applySearchFilter($query, $this->filters, ['name', 'email', 'phone']);
-        $this->applyExactFilters($query, $this->filters, [
+        $this->applyConfiguredFilters($query, $this->filters, ['name', 'email', 'phone'], [
             'branch_id' => 'branch_id',
             'category_id' => 'category_id',
             'status' => 'status',
-        ]);
-        $this->applySorting($query, $this->filters, ['name', 'email', 'phone', 'branch_id', 'category_id', 'status', 'created_at']);
+        ], [], ['name', 'email', 'phone', 'branch_id', 'category_id', 'status', 'created_at']);
 
         return $query;
     }
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'Name',
-            'Email',
-            'Phone',
-            'Address',
-            'Branch',
-            'Category',
-            'Status',
-            'Notes',
-            'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($customer): array
     {
+        return $this->mapExportRow($customer, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $customer->id,
-            $customer->name,
-            $customer->email,
-            $customer->phone,
-            $customer->address,
-            $customer->branch?->name,
-            $customer->category?->name,
-            ucfirst($customer->status),
-            $customer->notes,
-            $customer->created_at->format('Y-m-d H:i:s'),
+            'ID' => static fn (Customer $customer): mixed => $customer->id,
+            'Name' => static fn (Customer $customer): mixed => $customer->name,
+            'Email' => static fn (Customer $customer): mixed => $customer->email,
+            'Phone' => static fn (Customer $customer): mixed => $customer->phone,
+            'Address' => static fn (Customer $customer): mixed => $customer->address,
+            'Branch' => static fn (Customer $customer): mixed => $customer->branch?->name,
+            'Category' => static fn (Customer $customer): mixed => $customer->category?->name,
+            'Status' => static fn (Customer $customer): mixed => ucfirst($customer->status),
+            'Notes' => static fn (Customer $customer): mixed => $customer->notes,
+            'Created At' => static fn (Customer $customer): mixed => $customer->created_at->format('Y-m-d H:i:s'),
         ];
     }
 }
