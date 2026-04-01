@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAssetAndCreatorRelations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -61,7 +62,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AssetMovement extends Model
 {
-    use HasFactory;
+    use HasAssetAndCreatorRelations, HasFactory;
 
     protected $fillable = [
         'asset_id',
@@ -93,11 +94,6 @@ class AssetMovement extends Model
         'to_employee_id' => 'integer',
         'created_by' => 'integer',
     ];
-
-    public function asset(): BelongsTo
-    {
-        return $this->belongsTo(Asset::class);
-    }
 
     public function fromBranch(): BelongsTo
     {
@@ -137,10 +133,5 @@ class AssetMovement extends Model
     public function toEmployee(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'to_employee_id');
-    }
-
-    public function createdBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
     }
 }

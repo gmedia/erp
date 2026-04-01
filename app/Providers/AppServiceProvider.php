@@ -71,30 +71,40 @@ class AppServiceProvider extends ServiceProvider
                 // Force default mailer to smtp to ensure database settings are used
                 config(['mail.default' => 'smtp']);
 
-                if (isset($mailSettings['mail_host'])) {
-                    config(['mail.mailers.smtp.host' => $mailSettings['mail_host']]);
-                }
-                if (isset($mailSettings['mail_port'])) {
-                    config(['mail.mailers.smtp.port' => $mailSettings['mail_port']]);
-                }
-                if (isset($mailSettings['mail_username'])) {
-                    config(['mail.mailers.smtp.username' => $mailSettings['mail_username']]);
-                }
-                if (isset($mailSettings['mail_password'])) {
-                    config(['mail.mailers.smtp.password' => $mailSettings['mail_password']]);
-                }
-                if (isset($mailSettings['mail_encryption'])) {
-                    config(['mail.mailers.smtp.encryption' => $mailSettings['mail_encryption']]);
-                }
-                if (isset($mailSettings['mail_from_address'])) {
-                    config(['mail.from.address' => $mailSettings['mail_from_address']]);
-                }
-                if (isset($mailSettings['mail_from_name'])) {
-                    config(['mail.from.name' => $mailSettings['mail_from_name']]);
-                }
+                $this->applyMailSettings($mailSettings);
             }
         } catch (Throwable $e) {
             report($e);
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $mailSettings
+     */
+    protected function applyMailSettings(array $mailSettings): void
+    {
+        foreach ($this->mailSettingConfigMap() as $settingKey => $configKey) {
+            if (! isset($mailSettings[$settingKey])) {
+                continue;
+            }
+
+            config([$configKey => $mailSettings[$settingKey]]);
+        }
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function mailSettingConfigMap(): array
+    {
+        return [
+            'mail_host' => 'mail.mailers.smtp.host',
+            'mail_port' => 'mail.mailers.smtp.port',
+            'mail_username' => 'mail.mailers.smtp.username',
+            'mail_password' => 'mail.mailers.smtp.password',
+            'mail_encryption' => 'mail.mailers.smtp.encryption',
+            'mail_from_address' => 'mail.from.address',
+            'mail_from_name' => 'mail.from.name',
+        ];
     }
 }

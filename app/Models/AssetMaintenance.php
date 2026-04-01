@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAssetAndCreatorRelations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -44,7 +45,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AssetMaintenance extends Model
 {
-    use HasFactory;
+    use HasAssetAndCreatorRelations, HasFactory;
 
     protected $fillable = [
         'asset_id',
@@ -67,18 +68,8 @@ class AssetMaintenance extends Model
         'created_by' => 'integer',
     ];
 
-    public function asset(): BelongsTo
-    {
-        return $this->belongsTo(Asset::class);
-    }
-
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class);
-    }
-
-    public function createdBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
     }
 }
