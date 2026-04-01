@@ -2,21 +2,10 @@
 
 namespace App\Http\Requests\AssetCategories;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class StoreAssetCategoryRequest extends FormRequest
+class StoreAssetCategoryRequest extends AbstractAssetCategoryRequest
 {
-    public function authorize(): bool
+    protected function usesIgnoreRule(): bool
     {
-        return true;
-    }
-
-    public function rules(): array
-    {
-        return [
-            'code' => ['required', 'string', 'max:255', 'unique:asset_categories,code'],
-            'name' => ['required', 'string', 'max:255'],
-            'useful_life_months_default' => ['nullable', 'integer', 'min:0'],
-        ];
+        return false;
     }
 }

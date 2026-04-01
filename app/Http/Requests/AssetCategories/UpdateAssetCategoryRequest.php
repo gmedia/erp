@@ -2,27 +2,10 @@
 
 namespace App\Http\Requests\AssetCategories;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-
-class UpdateAssetCategoryRequest extends FormRequest
+class UpdateAssetCategoryRequest extends AbstractAssetCategoryRequest
 {
-    public function authorize(): bool
+    protected function usesIgnoreRule(): bool
     {
         return true;
-    }
-
-    public function rules(): array
-    {
-        return [
-            'code' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('asset_categories', 'code')->ignore($this->route('asset_category')),
-            ],
-            'name' => ['required', 'string', 'max:255'],
-            'useful_life_months_default' => ['nullable', 'integer', 'min:0'],
-        ];
     }
 }
