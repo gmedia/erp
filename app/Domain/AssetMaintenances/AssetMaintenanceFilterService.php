@@ -16,22 +16,24 @@ class AssetMaintenanceFilterService
 
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        $this->applyExactFilters($query, $filters, [
-            'asset_id' => 'asset_id',
-            'maintenance_type' => 'maintenance_type',
-            'status' => 'status',
-            'supplier_id' => 'supplier_id',
-            'created_by' => 'created_by',
-        ]);
-
-        $this->applyDateRanges($query, $filters, [
-            'scheduled_at' => ['from' => 'scheduled_from', 'to' => 'scheduled_to'],
-            'performed_at' => ['from' => 'performed_from', 'to' => 'performed_to'],
-        ]);
-
-        $this->applyNumericRanges($query, $filters, [
-            'cost' => ['min' => 'cost_min', 'max' => 'cost_max'],
-        ]);
+        $this->applyConfiguredFilters(
+            $query,
+            $filters,
+            [
+                'asset_id' => 'asset_id',
+                'maintenance_type' => 'maintenance_type',
+                'status' => 'status',
+                'supplier_id' => 'supplier_id',
+                'created_by' => 'created_by',
+            ],
+            [
+                'scheduled_at' => ['from' => 'scheduled_from', 'to' => 'scheduled_to'],
+                'performed_at' => ['from' => 'performed_from', 'to' => 'performed_to'],
+            ],
+            [
+                'cost' => ['min' => 'cost_min', 'max' => 'cost_max'],
+            ],
+        );
     }
 
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void

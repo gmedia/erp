@@ -229,4 +229,35 @@ trait BaseFilterService
             }
         }
     }
+
+    /**
+     * Apply grouped exact, date-range, and numeric-range filters from a single configuration payload.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<string, mixed>  $filters
+     * @param  array<string, string>  $exactFilters
+     * @param  array<string, array{from: string, to: string}>  $dateRanges
+     * @param  array<string, array{min: string, max: string}>  $numericRanges
+     */
+    public function applyConfiguredFilters(
+        Builder $query,
+        array $filters,
+        array $exactFilters = [],
+        array $dateRanges = [],
+        array $numericRanges = []
+    ): void {
+        if ($exactFilters !== []) {
+            $this->applyExactFilters($query, $filters, $exactFilters);
+        }
+
+        if ($dateRanges !== []) {
+            $this->applyDateRanges($query, $filters, $dateRanges);
+        }
+
+        if ($numericRanges !== []) {
+            $this->applyNumericRanges($query, $filters, $numericRanges);
+        }
+    }
 }

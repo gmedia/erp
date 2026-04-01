@@ -14,14 +14,17 @@ class AssetStocktakeFilterService
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        $this->applyExactFilters($query, $filters, [
-            'branch_id' => 'branch_id',
-            'status' => 'status',
-        ]);
-
-        $this->applyDateRanges($query, $filters, [
-            'planned_at' => ['from' => 'planned_at_from', 'to' => 'planned_at_to'],
-        ]);
+        $this->applyConfiguredFilters(
+            $query,
+            $filters,
+            [
+                'branch_id' => 'branch_id',
+                'status' => 'status',
+            ],
+            [
+                'planned_at' => ['from' => 'planned_at_from', 'to' => 'planned_at_to'],
+            ],
+        );
     }
 
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
