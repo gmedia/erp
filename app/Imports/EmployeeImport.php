@@ -8,7 +8,6 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -39,7 +38,7 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
             $rowNumber = $index + 2; // +1 for 0-index, +1 for heading row
 
             // 1. Validate the row data
-            $validator = Validator::make($row->toArray(), [
+            if (! $this->validateImportRow($row, $rowNumber, [
                 'employee_id' => 'required|string',
                 'name' => 'required|string|max:255',
                 'email' => 'required|email', // We check uniqueness manually for upsert/skip logic
@@ -51,10 +50,7 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 'hire_date' => 'required|date_format:Y-m-d',
                 'employment_status' => 'required|string|in:regular,intern',
                 'termination_date' => 'nullable|date_format:Y-m-d',
-            ]);
-
-            if ($validator->fails()) {
-                $this->recordValidationErrors($validator, $rowNumber);
+            ])) {
 
                 continue;
             }

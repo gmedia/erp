@@ -4,10 +4,43 @@ namespace App\Imports\Concerns;
 
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 trait InteractsWithImportRows
 {
+    /**
+     * @return array<string, mixed>
+     */
+    protected function rowToArray(mixed $row): array
+    {
+        return is_array($row) ? $row : $row->toArray();
+    }
+
+    /**
+     * @param  array<string, string|array<int, string>>  $rules
+     */
+    protected function validateImportRow(
+        mixed $row,
+        int $rowNumber,
+        array $rules,
+        bool $incrementSkippedOnFailure = false
+    ): bool {
+        $validator = Validator::make($this->rowToArray($row), $rules);
+
+        if (! $validator->fails()) {
+            return true;
+        }
+
+        $this->recordValidationErrors($validator, $rowNumber);
+
+        if ($incrementSkippedOnFailure) {
+            $this->skippedCount++;
+        }
+
+        return false;
+    }
+
     /**
      * @param  callable(): mixed  $operation
      */

@@ -7,7 +7,6 @@ use App\Models\Branch;
 use App\Models\Supplier;
 use App\Models\SupplierCategory;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -36,7 +35,7 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
             $rowNumber = $index + 2; // +1 for 0-index, +1 for heading row
 
             // 1. Validate the row data
-            $validator = Validator::make($row->toArray(), [
+            if (! $this->validateImportRow($row, $rowNumber, [
                 'name' => 'required|string|max:255',
                 'email' => 'nullable|email',
                 'phone' => 'nullable|string|max:20',
@@ -44,10 +43,7 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 'branch' => 'nullable|string',
                 'category' => 'required|string',
                 'status' => 'required|in:active,inactive',
-            ]);
-
-            if ($validator->fails()) {
-                $this->recordValidationErrors($validator, $rowNumber);
+            ])) {
 
                 continue;
             }

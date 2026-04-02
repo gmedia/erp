@@ -12,7 +12,6 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Supplier;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -51,7 +50,7 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
             $rowNumber = $index + 2; // +1 for 0-index, +1 for heading row
 
             // 1. Validate the row data
-            $validator = Validator::make($row->toArray(), [
+            if (! $this->validateImportRow($row, $rowNumber, [
                 'asset_code' => 'required|string|max:255',
                 'name' => 'required|string|max:255',
                 'asset_category' => 'nullable|string',
@@ -70,11 +69,7 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 'status' => 'required|in:draft,active,maintenance,disposed,lost',
                 'condition' => 'nullable|in:good,needs_repair,damaged',
                 'notes' => 'nullable|string',
-            ]);
-
-            if ($validator->fails()) {
-                $this->recordValidationErrors($validator, $rowNumber);
-                $this->skippedCount++;
+            ], true)) {
 
                 continue;
             }
