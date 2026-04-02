@@ -11,7 +11,6 @@ use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Supplier;
-use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
@@ -131,11 +130,19 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
             }
 
             // 3. Upsert Logic
-            try {
-                // Convert collection row to array
+            $this->performImportUpsert($rowNumber, function () use (
+                $row,
+                $categoryId,
+                $modelId,
+                $branchId,
+                $locationId,
+                $departmentId,
+                $employeeId,
+                $supplierId
+            ): void {
                 $rowData = is_array($row) ? $row : $row->toArray();
 
-                $asset = Asset::updateOrCreate(
+                Asset::updateOrCreate(
                     ['asset_code' => $rowData['asset_code']],
                     [
                         'name' => $rowData['name'],
@@ -159,16 +166,7 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                         'notes' => $rowData['notes'] ?? null,
                     ]
                 );
-
-                if ($asset->wasRecentlyCreated) {
-                    $this->importedCount++;
-                } else {
-                    $this->importedCount++;
-                }
-            } catch (Exception $e) {
-                $this->recordSystemError($rowNumber, $e);
-                $this->skippedCount++;
-            }
+            }, true);
         }
     }
 }

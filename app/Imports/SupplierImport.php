@@ -6,7 +6,6 @@ use App\Imports\Concerns\InteractsWithImportRows;
 use App\Models\Branch;
 use App\Models\Supplier;
 use App\Models\SupplierCategory;
-use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
@@ -65,16 +64,16 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
             }
 
             // 3. Upsert Logic
-            try {
-                // If email is provided, we use it for matching (since it must be unique). Else we match by name.
+            $this->performImportUpsert($rowNumber, function () use ($row, $categoryId, $branchId): void {
                 $matchAttributes = [];
+
                 if (! empty($row['email'])) {
                     $matchAttributes['email'] = $row['email'];
                 } else {
                     $matchAttributes['name'] = $row['name'];
                 }
 
-                $supplier = Supplier::updateOrCreate(
+                Supplier::updateOrCreate(
                     $matchAttributes,
                     [
                         'name' => $row['name'],
@@ -86,15 +85,7 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                         'status' => $row['status'],
                     ]
                 );
-
-                if ($supplier->wasRecentlyCreated) {
-                    $this->importedCount++;
-                } else {
-                    $this->importedCount++;
-                }
-            } catch (Exception $e) {
-                $this->recordSystemError($rowNumber, $e);
-            }
+            });
         }
     }
 }

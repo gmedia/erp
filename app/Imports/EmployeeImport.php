@@ -7,7 +7,6 @@ use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
-use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
@@ -77,9 +76,9 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
             }
 
             // 3. Upsert Logic
-            try {
-                $employee = Employee::updateOrCreate(
-                    ['email' => $row['email']], // Look up by email
+            $this->performImportUpsert($rowNumber, function () use ($row, $departmentId, $positionId, $branchId): void {
+                Employee::updateOrCreate(
+                    ['email' => $row['email']],
                     [
                         'employee_id' => $row['employee_id'],
                         'name' => $row['name'],
@@ -91,19 +90,9 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                         'hire_date' => $row['hire_date'],
                         'employment_status' => $row['employment_status'],
                         'termination_date' => $row['termination_date'] ?? null,
-                        // 'user_id' => null, // Optional: logic to create/link user
                     ]
                 );
-
-                if ($employee->wasRecentlyCreated) {
-                    $this->importedCount++;
-                } else {
-                    // It was updated
-                    $this->importedCount++;
-                }
-            } catch (Exception $e) {
-                $this->recordSystemError($rowNumber, $e);
-            }
+            });
         }
     }
 }

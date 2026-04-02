@@ -17,7 +17,7 @@ Dokumen ini menyimpan status batch refactor berbasis Sonar agar prompt tetap sta
 | C | done | assets, products, asset-movements, asset-maintenances, asset-stocktakes | asset-family filter services, ProductFilterService, item controllers | snapshot 2026-04-01: duplicated_lines 6344, duplicated_blocks 332, duplicated_lines_density 7.2, coverage 87.0, new_duplicated_lines_density 11.8 |
 | D | next | financial-reporting | FinancialReportService + query/mapping laporan keuangan | pending |
 | E | next | account-mappings, journal-entries, goods-receipts, purchase-requests | pasangan Store*Request/Update*Request | pending |
-| F | in-progress | goods-receipts, supplier-returns, inventory-stocktakes, stock-adjustments, stock-movements, stock-transfers, purchase-orders, purchase-requests, products, suppliers, customers, asset-maintenances, asset-categories, asset-locations, asset-models, imports, approval-delegations, coa-versions, fiscal-years, resources, reports, stock-monitor | pasangan Index*/Export* request listing + export skeleton + mutation/simple CRUD request sibling + shared request rule concerns + configured backend filter groups + provider/model relation dedup + asset-family sort map helper + import row concern + asset-family cast helper + approval delegation action pair query helper + simple CRUD export filter hooks + party resource helper + report request pair helper + report index action helper + inventory report index helper + stock snapshot query helper + transaction export action base + timestamp export action base | snapshot 2026-04-02: duplicated_lines 4822, duplicated_blocks 255, duplicated_lines_density 5.4, coverage 87.6, new_duplicated_lines_density 9.1; local wave inventory export action base PASS 12 test + targeted PHPStan PASS |
+| F | in-progress | goods-receipts, supplier-returns, inventory-stocktakes, stock-adjustments, stock-movements, stock-transfers, purchase-orders, purchase-requests, products, suppliers, customers, asset-maintenances, asset-categories, asset-locations, asset-models, imports, approval-delegations, coa-versions, fiscal-years, resources, reports, stock-monitor | pasangan Index*/Export* request listing + export skeleton + mutation/simple CRUD request sibling + shared request rule concerns + configured backend filter groups + provider/model relation dedup + asset-family sort map helper + import row concern + asset-family cast helper + approval delegation action pair query helper + simple CRUD export filter hooks + party resource helper + report request pair helper + report index action helper + inventory report index helper + stock snapshot query helper + transaction export action base + timestamp export action base + import upsert helper | snapshot 2026-04-02: duplicated_lines 4767, duplicated_blocks 252, duplicated_lines_density 5.4, coverage 87.7, new_duplicated_lines_density 9.0; local wave import upsert helper PASS 16 test + targeted PHPStan PASS |
 
 Catatan: wave dedup request untuk `approval-audit-trail` dan `pipeline-audit-trail` sudah ikut terdorong di commit sebelumnya, tetapi tetap dicatat terpisah karena berada di luar scope Batch C saat dieksekusi.
 
@@ -35,24 +35,24 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: pending (menunggu snapshot Sonar pasca-wave inventory export action base Batch F; latest pushed snapshot 2026-04-02 = 4822, turun 1522 dari baseline Batch F)
-- duplicated_blocks: pending (menunggu snapshot Sonar pasca-wave inventory export action base Batch F; latest pushed snapshot 2026-04-02 = 255, turun 77 dari baseline Batch F)
-- duplicated_lines_density: pending (menunggu snapshot Sonar pasca-wave inventory export action base Batch F; latest pushed snapshot 2026-04-02 = 5.4, turun 1.8 dari baseline Batch F)
-- ncloc: pending (menunggu snapshot Sonar pasca-wave inventory export action base Batch F; latest pushed snapshot 2026-04-02 = 72731)
-- coverage: pending (menunggu snapshot Sonar pasca-wave inventory export action base Batch F; latest pushed snapshot 2026-04-02 = 87.6)
+- duplicated_lines: pending (menunggu snapshot Sonar pasca-wave import upsert helper Batch F; latest pushed snapshot 2026-04-02 = 4767, turun 1577 dari baseline Batch F)
+- duplicated_blocks: pending (menunggu snapshot Sonar pasca-wave import upsert helper Batch F; latest pushed snapshot 2026-04-02 = 252, turun 80 dari baseline Batch F)
+- duplicated_lines_density: pending (menunggu snapshot Sonar pasca-wave import upsert helper Batch F; latest pushed snapshot 2026-04-02 = 5.4, turun 1.8 dari baseline Batch F)
+- ncloc: pending (menunggu snapshot Sonar pasca-wave import upsert helper Batch F; latest pushed snapshot 2026-04-02 = 72746)
+- coverage: pending (menunggu snapshot Sonar pasca-wave import upsert helper Batch F; latest pushed snapshot 2026-04-02 = 87.7)
 
 ## Snapshot Analisa Sonar (2026-04-02, latest MCP)
 
 - Quality Gate: ERROR
-- Gate blocker utama: new_duplicated_lines_density = 9.1 (threshold: 3.0)
-- Catatan: snapshot Sonar untuk commit `4143ca06` sudah selesai dianalisis dan kembali membaik: `duplicated_lines` turun `4930 -> 4822`, `duplicated_blocks` turun `259 -> 255`, dan `new_duplicated_lines_density` turun `9.3 -> 9.1`, sementara `coverage` tetap `87.6`. Karena toplist aktif masih didominasi frontend, wave backend berikutnya tetap dipilih dari clone block backend kecil yang masih terverifikasi langsung lewat duplication detail.
+- Gate blocker utama: new_duplicated_lines_density = 9.0 (threshold: 3.0)
+- Catatan: snapshot Sonar untuk commit `5d9a60c5` sudah selesai dianalisis dan kembali membaik: `duplicated_lines` turun `4822 -> 4767`, `duplicated_blocks` turun `255 -> 252`, dan `new_duplicated_lines_density` turun `9.1 -> 9.0`, sementara `coverage` naik tipis ke `87.7`. Karena toplist aktif masih didominasi frontend, wave backend berikutnya tetap dipilih dari clone block backend kecil yang masih terverifikasi langsung lewat duplication detail.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
 - Snapshot Sonar terbaru yang sudah selesai dianalisis tidak lagi saya pakai asumtif dari wave sebelumnya; shortlist aktif saat ini justru didominasi komponen frontend.
-- Detail duplication backend yang masih terkonfirmasi langsung via MCP saat ini bergeser ke cluster action export inventory bertimestamp sederhana: `ExportInventoryStocktakesAction`, `ExportStockAdjustmentsAction`, dan `ExportStockTransfersAction`.
-- Wave lokal saat ini mengekstrak base action `ConfiguredTimestampExportAction` untuk orkestrasi filter defaults, filename timestamp, penyimpanan Excel, dan response JSON, lalu memigrasikan ketiga action tersebut tanpa ubah filter key, prefix filename, atau payload response export.
-- Jika snapshot berikutnya masih menyisakan clone block backend yang bermakna, kandidat berikutnya kemungkinan bergeser ke cluster import yang masih muncul di toplist (`AssetImport` / `EmployeeImport`) atau sisa action export sederhana lain yang belum ikut bermigrasi ke base baru.
+- Detail duplication backend yang masih terkonfirmasi langsung via MCP saat ini bergeser ke cluster import backend: `AssetImport`, `EmployeeImport`, dan `SupplierImport`.
+- Wave lokal saat ini menambahkan helper `performImportUpsert()` di `InteractsWithImportRows`, lalu memigrasikan tiga import tersebut ke jalur shared untuk blok `try/updateOrCreate/importedCount/system error` tanpa ubah validasi CSV, lookup foreign key, atau payload error/import summary.
+- Jika snapshot berikutnya masih menyisakan clone block backend yang bermakna, kandidat berikutnya kemungkinan bergeser ke sisa action export sederhana lain yang belum ikut bermigrasi ke base shared atau cluster request/action backend kecil lain yang masih tampil di shortlist baru.
 
 ## Rencana Refactor Fokus Duplikasi (Batch F)
 
@@ -136,6 +136,10 @@ Isi setelah batch selesai dan sebelum merge.
 	- Ekstrak base action kecil untuk action export `.xlsx` bertimestamp yang masih mengulang pola `validated -> filter map -> filename timestamp -> Excel::store -> JSON response`.
 	- Gelombang saat ini mencakup `ExportInventoryStocktakesAction`, `ExportStockAdjustmentsAction`, dan `ExportStockTransfersAction` melalui `ConfiguredTimestampExportAction`.
 	- Progress: tiga action tersebut sudah memakai base action shared tanpa ubah filter key, prefix filename, atau payload response export; verifikasi PASS 12 test, `./vendor/bin/sail bin duster fix --no-interaction ...` PASS, dan targeted PHPStan PASS.
+21. Dedup import upsert helper. (in-progress)
+	- Ekstrak helper kecil untuk blok `try/updateOrCreate/importedCount/system error` yang masih berulang pada import backend berbasis CSV.
+	- Gelombang saat ini mencakup `AssetImport`, `EmployeeImport`, dan `SupplierImport` melalui helper `performImportUpsert()` di `InteractsWithImportRows`.
+	- Progress: tiga import tersebut sudah memakai helper shared tanpa ubah validasi CSV, lookup foreign key, atau payload hasil import; verifikasi PASS 16 test, `./vendor/bin/sail bin duster fix --no-interaction ...` PASS, dan targeted PHPStan PASS.
 
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
@@ -178,6 +182,8 @@ Isi setelah batch selesai dan sebelum merge.
 
 ## Log Perubahan
 
+- 2026-04-02: [F], post-push Sonar MCP untuk commit `5d9a60c5`: quality gate tetap ERROR dengan blocker `new_duplicated_lines_density 9.0`; metrik inti terbaru `duplicated_lines 4767`, `duplicated_blocks 252`, `duplicated_lines_density 5.4`, `ncloc 72746`, `coverage 87.7`, `new_coverage 88.8`.
+- 2026-04-02: [F], wave kecil terkontrol (import upsert helper): tambah `performImportUpsert()` di `InteractsWithImportRows`, lalu migrasi `AssetImport`, `EmployeeImport`, dan `SupplierImport` ke helper shared untuk mereduksi clone block upsert/imported count/error handling tanpa ubah payload import; test: `DB_DATABASE=testing APP_ENV=testing ./vendor/bin/sail artisan test tests/Feature/Assets/AssetImportTest.php tests/Feature/Employees/EmployeeImportTest.php tests/Feature/Suppliers/SupplierImportTest.php` (PASS 16 test); formatter: `./vendor/bin/sail bin duster fix --no-interaction app/Imports/Concerns/InteractsWithImportRows.php app/Imports/AssetImport.php app/Imports/EmployeeImport.php app/Imports/SupplierImport.php` (PASS); static analysis: `DB_DATABASE=testing APP_ENV=testing ./vendor/bin/sail php vendor/bin/phpstan analyse app/Imports/Concerns/InteractsWithImportRows.php app/Imports/AssetImport.php app/Imports/EmployeeImport.php app/Imports/SupplierImport.php --memory-limit=1G` (PASS). Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
 - 2026-04-02: [F], post-push Sonar MCP untuk commit `4143ca06`: quality gate tetap ERROR dengan blocker `new_duplicated_lines_density 9.1`; metrik inti terbaru `duplicated_lines 4822`, `duplicated_blocks 255`, `duplicated_lines_density 5.4`, `ncloc 72731`, `coverage 87.6`, `new_coverage 88.6`.
 - 2026-04-02: [F], wave kecil terkontrol (inventory export action base): tambah `ConfiguredTimestampExportAction`, lalu migrasi `ExportInventoryStocktakesAction`, `ExportStockAdjustmentsAction`, dan `ExportStockTransfersAction` ke base action shared untuk mereduksi clone block orkestrasi export `.xlsx` bertimestamp tanpa ubah filter key, filename prefix, atau payload response; test: `DB_DATABASE=testing APP_ENV=testing ./vendor/bin/sail artisan test tests/Feature/InventoryStocktakes/InventoryStocktakeExportTest.php tests/Feature/StockAdjustments/StockAdjustmentExportTest.php tests/Feature/StockTransfers/StockTransferExportTest.php` (PASS 12 test); formatter: `./vendor/bin/sail bin duster fix --no-interaction app/Actions/Concerns/ConfiguredTimestampExportAction.php app/Actions/InventoryStocktakes/ExportInventoryStocktakesAction.php app/Actions/StockAdjustments/ExportStockAdjustmentsAction.php app/Actions/StockTransfers/ExportStockTransfersAction.php tests/Feature/InventoryStocktakes/InventoryStocktakeExportTest.php tests/Feature/StockAdjustments/StockAdjustmentExportTest.php tests/Feature/StockTransfers/StockTransferExportTest.php` (PASS); static analysis: `DB_DATABASE=testing APP_ENV=testing ./vendor/bin/sail php vendor/bin/phpstan analyse app/Actions/Concerns/ConfiguredTimestampExportAction.php app/Actions/InventoryStocktakes/ExportInventoryStocktakesAction.php app/Actions/StockAdjustments/ExportStockAdjustmentsAction.php app/Actions/StockTransfers/ExportStockTransfersAction.php --memory-limit=1G` (PASS). Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
 - 2026-04-02: [F], post-push Sonar MCP untuk commit `375dbbfa`: quality gate tetap ERROR dengan blocker `new_duplicated_lines_density 9.3`; metrik inti terbaru `duplicated_lines 4930`, `duplicated_blocks 259`, `duplicated_lines_density 5.6`, `ncloc 72768`, `coverage 87.6`, `new_coverage 88.6`.

@@ -2,12 +2,29 @@
 
 namespace App\Imports\Concerns;
 
-use Exception;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Support\Collection;
+use Throwable;
 
 trait InteractsWithImportRows
 {
+    /**
+     * @param  callable(): mixed  $operation
+     */
+    protected function performImportUpsert(int $rowNumber, callable $operation, bool $incrementSkippedOnError = false): void
+    {
+        try {
+            $operation();
+            $this->importedCount++;
+        } catch (Throwable $exception) {
+            $this->recordSystemError($rowNumber, $exception);
+
+            if ($incrementSkippedOnError) {
+                $this->skippedCount++;
+            }
+        }
+    }
+
     protected function recordValidationErrors(ValidatorContract $validator, int $rowNumber): void
     {
         foreach ($validator->errors()->all() as $error) {
@@ -28,7 +45,7 @@ trait InteractsWithImportRows
         ];
     }
 
-    protected function recordSystemError(int $rowNumber, Exception $exception): void
+    protected function recordSystemError(int $rowNumber, Throwable $exception): void
     {
         $this->errors[] = [
             'row' => $rowNumber,
