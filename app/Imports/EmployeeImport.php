@@ -26,10 +26,13 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 
     public function __construct()
     {
-        // Pre-load all potential lookups to minimize queries
-        $this->departments = Department::pluck('id', 'name'); // name => id
-        $this->positions = Position::pluck('id', 'name');     // name => id
-        $this->branches = Branch::pluck('id', 'name');        // name => id
+        ['departments' => $this->departments,
+            'positions' => $this->positions,
+            'branches' => $this->branches] = $this->preloadLookupMaps([
+                'departments' => ['model' => Department::class],
+                'positions' => ['model' => Position::class],
+                'branches' => ['model' => Branch::class],
+            ]);
     }
 
     public function collection(Collection $rows)

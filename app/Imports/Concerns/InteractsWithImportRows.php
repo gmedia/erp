@@ -10,6 +10,21 @@ use Throwable;
 trait InteractsWithImportRows
 {
     /**
+     * @param  array<string, array{model: class-string, key?: string}>  $configs
+     * @return array<string, Collection>
+     */
+    protected function preloadLookupMaps(array $configs): array
+    {
+        $lookups = [];
+
+        foreach ($configs as $property => $config) {
+            $lookups[$property] = $config['model']::pluck('id', $config['key'] ?? 'name');
+        }
+
+        return $lookups;
+    }
+
+    /**
      * @param  array<int, array{lookup: Collection, source: string, entity: string, target?: string, required?: bool, incrementSkippedOnFailure?: bool}>  $configs
      * @return array<string, mixed>|null
      */

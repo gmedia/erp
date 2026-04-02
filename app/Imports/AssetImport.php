@@ -34,14 +34,21 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 
     public function __construct()
     {
-        // Pre-load all potential lookups to minimize queries
-        $this->categories = AssetCategory::pluck('id', 'name');
-        $this->models = AssetModel::pluck('id', 'model_name');
-        $this->branches = Branch::pluck('id', 'name');
-        $this->locations = AssetLocation::pluck('id', 'name');
-        $this->departments = Department::pluck('id', 'name');
-        $this->employees = Employee::pluck('id', 'name');
-        $this->suppliers = Supplier::pluck('id', 'name');
+        ['categories' => $this->categories,
+            'models' => $this->models,
+            'branches' => $this->branches,
+            'locations' => $this->locations,
+            'departments' => $this->departments,
+            'employees' => $this->employees,
+            'suppliers' => $this->suppliers] = $this->preloadLookupMaps([
+                'categories' => ['model' => AssetCategory::class],
+                'models' => ['model' => AssetModel::class, 'key' => 'model_name'],
+                'branches' => ['model' => Branch::class],
+                'locations' => ['model' => AssetLocation::class],
+                'departments' => ['model' => Department::class],
+                'employees' => ['model' => Employee::class],
+                'suppliers' => ['model' => Supplier::class],
+            ]);
     }
 
     public function collection(Collection $rows)

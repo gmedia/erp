@@ -24,9 +24,11 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 
     public function __construct()
     {
-        // Pre-load all potential lookups to minimize queries
-        $this->categories = SupplierCategory::pluck('id', 'name'); // name => id
-        $this->branches = Branch::pluck('id', 'name');             // name => id
+        ['categories' => $this->categories,
+            'branches' => $this->branches] = $this->preloadLookupMaps([
+                'categories' => ['model' => SupplierCategory::class],
+                'branches' => ['model' => Branch::class],
+            ]);
     }
 
     public function collection(Collection $rows)
