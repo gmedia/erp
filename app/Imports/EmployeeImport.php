@@ -36,9 +36,10 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
     {
         foreach ($rows as $index => $row) {
             $rowNumber = $index + 2; // +1 for 0-index, +1 for heading row
+            $rowData = $this->rowToArray($row);
 
             // 1. Validate the row data
-            if (! $this->validateImportRow($row, $rowNumber, [
+            if (! $this->validateImportRow($rowData, $rowNumber, [
                 'employee_id' => 'required|string',
                 'name' => 'required|string|max:255',
                 'email' => 'required|email', // We check uniqueness manually for upsert/skip logic
@@ -56,36 +57,31 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
             }
 
             // 2. Resolve Foreign Keys
-            $departmentId = $this->resolveLookupId($this->departments, $row['department'], $rowNumber, 'department', 'Department');
-            if ($departmentId === null) {
-                continue;
-            }
+            $resolvedLookups = $this->resolveLookupAssignments($rowData, $rowNumber, [
+                ['lookup' => $this->departments, 'source' => 'department', 'entity' => 'Department', 'target' => 'department_id'],
+                ['lookup' => $this->positions, 'source' => 'position', 'entity' => 'Position', 'target' => 'position_id'],
+                ['lookup' => $this->branches, 'source' => 'branch', 'entity' => 'Branch', 'target' => 'branch_id'],
+            ]);
 
-            $positionId = $this->resolveLookupId($this->positions, $row['position'], $rowNumber, 'position', 'Position');
-            if ($positionId === null) {
-                continue;
-            }
-
-            $branchId = $this->resolveLookupId($this->branches, $row['branch'], $rowNumber, 'branch', 'Branch');
-            if ($branchId === null) {
+            if ($resolvedLookups === null) {
                 continue;
             }
 
             // 3. Upsert Logic
-            $this->performImportUpsert($rowNumber, function () use ($row, $departmentId, $positionId, $branchId): void {
+            $this->performImportUpsert($rowNumber, function () use ($rowData, $resolvedLookups): void {
                 Employee::updateOrCreate(
-                    ['email' => $row['email']],
+                    ['email' => $rowData['email']],
                     [
-                        'employee_id' => $row['employee_id'],
-                        'name' => $row['name'],
-                        'phone' => $row['phone'],
-                        'department_id' => $departmentId,
-                        'position_id' => $positionId,
-                        'branch_id' => $branchId,
-                        'salary' => $row['salary'] ?? null,
-                        'hire_date' => $row['hire_date'],
-                        'employment_status' => $row['employment_status'],
-                        'termination_date' => $row['termination_date'] ?? null,
+                        'employee_id' => $rowData['employee_id'],
+                        'name' => $rowData['name'],
+                        'phone' => $rowData['phone'],
+                        'department_id' => $resolvedLookups['department_id'],
+                        'position_id' => $resolvedLookups['position_id'],
+                        'branch_id' => $resolvedLookups['branch_id'],
+                        'salary' => $rowData['salary'] ?? null,
+                        'hire_date' => $rowData['hire_date'],
+                        'employment_status' => $rowData['employment_status'],
+                        'termination_date' => $rowData['termination_date'] ?? null,
                     ]
                 );
             });

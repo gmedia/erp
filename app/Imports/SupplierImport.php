@@ -33,9 +33,10 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
     {
         foreach ($rows as $index => $row) {
             $rowNumber = $index + 2; // +1 for 0-index, +1 for heading row
+            $rowData = $this->rowToArray($row);
 
             // 1. Validate the row data
-            if (! $this->validateImportRow($row, $rowNumber, [
+            if (! $this->validateImportRow($rowData, $rowNumber, [
                 'name' => 'required|string|max:255',
                 'email' => 'nullable|email',
                 'phone' => 'nullable|string|max:20',
@@ -49,36 +50,35 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
             }
 
             // 2. Resolve Foreign Keys
-            $categoryId = $this->resolveLookupId($this->categories, $row['category'], $rowNumber, 'category', 'Category');
-            if ($categoryId === null) {
-                continue;
-            }
+            $resolvedLookups = $this->resolveLookupAssignments($rowData, $rowNumber, [
+                ['lookup' => $this->categories, 'source' => 'category', 'entity' => 'Category', 'target' => 'category_id'],
+                ['lookup' => $this->branches, 'source' => 'branch', 'entity' => 'Branch', 'target' => 'branch_id', 'required' => false],
+            ]);
 
-            $branchId = $this->resolveLookupId($this->branches, $row['branch'], $rowNumber, 'branch', 'Branch', false);
-            if (! empty($row['branch']) && $branchId === null) {
+            if ($resolvedLookups === null) {
                 continue;
             }
 
             // 3. Upsert Logic
-            $this->performImportUpsert($rowNumber, function () use ($row, $categoryId, $branchId): void {
+            $this->performImportUpsert($rowNumber, function () use ($rowData, $resolvedLookups): void {
                 $matchAttributes = [];
 
-                if (! empty($row['email'])) {
-                    $matchAttributes['email'] = $row['email'];
+                if (! empty($rowData['email'])) {
+                    $matchAttributes['email'] = $rowData['email'];
                 } else {
-                    $matchAttributes['name'] = $row['name'];
+                    $matchAttributes['name'] = $rowData['name'];
                 }
 
                 Supplier::updateOrCreate(
                     $matchAttributes,
                     [
-                        'name' => $row['name'],
-                        'email' => $row['email'] ?? null,
-                        'phone' => $row['phone'] ?? null,
-                        'address' => $row['address'] ?? null,
-                        'category_id' => $categoryId,
-                        'branch_id' => $branchId,
-                        'status' => $row['status'],
+                        'name' => $rowData['name'],
+                        'email' => $rowData['email'] ?? null,
+                        'phone' => $rowData['phone'] ?? null,
+                        'address' => $rowData['address'] ?? null,
+                        'category_id' => $resolvedLookups['category_id'],
+                        'branch_id' => $resolvedLookups['branch_id'],
+                        'status' => $rowData['status'],
                     ]
                 );
             });

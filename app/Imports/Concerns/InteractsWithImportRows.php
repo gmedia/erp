@@ -10,6 +10,45 @@ use Throwable;
 trait InteractsWithImportRows
 {
     /**
+     * @param  array<int, array{lookup: Collection, source: string, entity: string, target?: string, required?: bool, incrementSkippedOnFailure?: bool}>  $configs
+     * @return array<string, mixed>|null
+     */
+    protected function resolveLookupAssignments(array $rowData, int $rowNumber, array $configs): ?array
+    {
+        $resolvedValues = [];
+
+        foreach ($configs as $config) {
+            $source = $config['source'];
+            $required = $config['required'] ?? true;
+            $value = $rowData[$source] ?? null;
+            $resolvedId = $this->resolveLookupId(
+                $config['lookup'],
+                $value,
+                $rowNumber,
+                $source,
+                $config['entity'],
+                $required
+            );
+
+            $lookupFailed = $required
+                ? $resolvedId === null
+                : ! empty($value) && $resolvedId === null;
+
+            if ($lookupFailed) {
+                if ($config['incrementSkippedOnFailure'] ?? false) {
+                    $this->skippedCount++;
+                }
+
+                return null;
+            }
+
+            $resolvedValues[$config['target'] ?? $source] = $resolvedId;
+        }
+
+        return $resolvedValues;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     protected function rowToArray(mixed $row): array

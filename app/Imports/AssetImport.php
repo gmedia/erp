@@ -48,9 +48,10 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
     {
         foreach ($rows as $index => $row) {
             $rowNumber = $index + 2; // +1 for 0-index, +1 for heading row
+            $rowData = $this->rowToArray($row);
 
             // 1. Validate the row data
-            if (! $this->validateImportRow($row, $rowNumber, [
+            if (! $this->validateImportRow($rowData, $rowNumber, [
                 'asset_code' => 'required|string|max:255',
                 'name' => 'required|string|max:255',
                 'asset_category' => 'nullable|string',
@@ -75,79 +76,36 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
             }
 
             // 2. Resolve Foreign Keys
-            $categoryId = $this->resolveLookupId($this->categories, $row['asset_category'], $rowNumber, 'asset_category', 'Category', false);
-            if (! empty($row['asset_category']) && $categoryId === null) {
-                $this->skippedCount++;
+            $resolvedLookups = $this->resolveLookupAssignments($rowData, $rowNumber, [
+                ['lookup' => $this->categories, 'source' => 'asset_category', 'entity' => 'Category', 'target' => 'category_id', 'required' => false, 'incrementSkippedOnFailure' => true],
+                ['lookup' => $this->models, 'source' => 'asset_model', 'entity' => 'Model', 'target' => 'model_id', 'required' => false, 'incrementSkippedOnFailure' => true],
+                ['lookup' => $this->branches, 'source' => 'branch', 'entity' => 'Branch', 'target' => 'branch_id', 'required' => false, 'incrementSkippedOnFailure' => true],
+                ['lookup' => $this->locations, 'source' => 'location', 'entity' => 'Location', 'target' => 'location_id', 'required' => false, 'incrementSkippedOnFailure' => true],
+                ['lookup' => $this->departments, 'source' => 'department', 'entity' => 'Department', 'target' => 'department_id', 'required' => false, 'incrementSkippedOnFailure' => true],
+                ['lookup' => $this->employees, 'source' => 'employee', 'entity' => 'Employee', 'target' => 'employee_id', 'required' => false, 'incrementSkippedOnFailure' => true],
+                ['lookup' => $this->suppliers, 'source' => 'supplier', 'entity' => 'Supplier', 'target' => 'supplier_id', 'required' => false, 'incrementSkippedOnFailure' => true],
+            ]);
 
-                continue;
-            }
-
-            $modelId = $this->resolveLookupId($this->models, $row['asset_model'], $rowNumber, 'asset_model', 'Model', false);
-            if (! empty($row['asset_model']) && $modelId === null) {
-                $this->skippedCount++;
-
-                continue;
-            }
-
-            $branchId = $this->resolveLookupId($this->branches, $row['branch'], $rowNumber, 'branch', 'Branch', false);
-            if (! empty($row['branch']) && $branchId === null) {
-                $this->skippedCount++;
-
-                continue;
-            }
-
-            $locationId = $this->resolveLookupId($this->locations, $row['location'], $rowNumber, 'location', 'Location', false);
-            if (! empty($row['location']) && $locationId === null) {
-                $this->skippedCount++;
-
-                continue;
-            }
-
-            $departmentId = $this->resolveLookupId($this->departments, $row['department'], $rowNumber, 'department', 'Department', false);
-            if (! empty($row['department']) && $departmentId === null) {
-                $this->skippedCount++;
-
-                continue;
-            }
-
-            $employeeId = $this->resolveLookupId($this->employees, $row['employee'], $rowNumber, 'employee', 'Employee', false);
-            if (! empty($row['employee']) && $employeeId === null) {
-                $this->skippedCount++;
-
-                continue;
-            }
-
-            $supplierId = $this->resolveLookupId($this->suppliers, $row['supplier'], $rowNumber, 'supplier', 'Supplier', false);
-            if (! empty($row['supplier']) && $supplierId === null) {
-                $this->skippedCount++;
-
+            if ($resolvedLookups === null) {
                 continue;
             }
 
             // 3. Upsert Logic
             $this->performImportUpsert($rowNumber, function () use (
-                $row,
-                $categoryId,
-                $modelId,
-                $branchId,
-                $locationId,
-                $departmentId,
-                $employeeId,
-                $supplierId
+                $rowData,
+                $resolvedLookups
             ): void {
-                $rowData = is_array($row) ? $row : $row->toArray();
-
                 Asset::updateOrCreate(
                     ['asset_code' => $rowData['asset_code']],
                     [
                         'name' => $rowData['name'],
-                        'asset_category_id' => $categoryId,
-                        'asset_model_id' => $modelId,
-                        'branch_id' => $branchId,
-                        'asset_location_id' => $locationId,
-                        'department_id' => $departmentId,
-                        'employee_id' => $employeeId,
-                        'supplier_id' => $supplierId,
+                        'asset_category_id' => $resolvedLookups['category_id'],
+                        'asset_model_id' => $resolvedLookups['model_id'],
+                        'branch_id' => $resolvedLookups['branch_id'],
+                        'asset_location_id' => $resolvedLookups['location_id'],
+                        'department_id' => $resolvedLookups['department_id'],
+                        'employee_id' => $resolvedLookups['employee_id'],
+                        'supplier_id' => $resolvedLookups['supplier_id'],
                         'serial_number' => $rowData['serial_number'] ?? null,
                         'barcode' => $rowData['barcode'] ?? null,
                         'purchase_date' => $rowData['purchase_date'],
