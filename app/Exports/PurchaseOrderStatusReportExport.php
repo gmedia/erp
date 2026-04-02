@@ -3,33 +3,13 @@
 namespace App\Exports;
 
 use App\Actions\Reports\IndexPurchaseOrderStatusReportAction;
+use App\Exports\Concerns\AbstractReportIndexExport;
 use App\Http\Requests\Reports\IndexPurchaseOrderStatusReportRequest;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PurchaseOrderStatusReportExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class PurchaseOrderStatusReportExport extends AbstractReportIndexExport implements WithHeadings, WithMapping
 {
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-        $this->filters['export'] = true;
-    }
-
-    public function collection()
-    {
-        $action = app(IndexPurchaseOrderStatusReportAction::class);
-        $request = new IndexPurchaseOrderStatusReportRequest;
-        $request->merge($this->filters);
-
-        return $action->execute($request);
-    }
-
     public function headings(): array
     {
         return [
@@ -68,10 +48,13 @@ class PurchaseOrderStatusReportExport implements FromCollection, ShouldAutoSize,
         ];
     }
 
-    public function styles(Worksheet $sheet): array
+    protected function actionClass(): string
     {
-        return [
-            1 => ['font' => ['bold' => true]],
-        ];
+        return IndexPurchaseOrderStatusReportAction::class;
+    }
+
+    protected function requestClass(): string
+    {
+        return IndexPurchaseOrderStatusReportRequest::class;
     }
 }

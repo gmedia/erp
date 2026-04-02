@@ -3,33 +3,13 @@
 namespace App\Exports;
 
 use App\Actions\Reports\IndexStockAdjustmentReportAction;
+use App\Exports\Concerns\AbstractReportIndexExport;
 use App\Http\Requests\Reports\IndexStockAdjustmentReportRequest;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class StockAdjustmentReportExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class StockAdjustmentReportExport extends AbstractReportIndexExport implements WithHeadings, WithMapping
 {
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-        $this->filters['export'] = true;
-    }
-
-    public function collection()
-    {
-        $action = app(IndexStockAdjustmentReportAction::class);
-        $request = new IndexStockAdjustmentReportRequest;
-        $request->merge($this->filters);
-
-        return $action->execute($request);
-    }
-
     public function headings(): array
     {
         return [
@@ -60,10 +40,13 @@ class StockAdjustmentReportExport implements FromCollection, ShouldAutoSize, Wit
         ];
     }
 
-    public function styles(Worksheet $sheet): array
+    protected function actionClass(): string
     {
-        return [
-            1 => ['font' => ['bold' => true]],
-        ];
+        return IndexStockAdjustmentReportAction::class;
+    }
+
+    protected function requestClass(): string
+    {
+        return IndexStockAdjustmentReportRequest::class;
     }
 }
