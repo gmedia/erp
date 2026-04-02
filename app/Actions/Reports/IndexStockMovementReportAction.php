@@ -2,14 +2,16 @@
 
 namespace App\Actions\Reports;
 
+use App\Actions\Reports\Concerns\HandlesReportQuery;
 use App\Http\Requests\Reports\IndexStockMovementReportRequest;
 use App\Models\StockMovement;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class IndexStockMovementReportAction
 {
+    use HandlesReportQuery;
+
     public function execute(IndexStockMovementReportRequest $request): LengthAwarePaginator|Collection
     {
         $endingBalanceRaw = '(
@@ -73,66 +75,31 @@ class IndexStockMovementReportAction
                 'last_moved_at' => 'datetime',
             ]);
 
-        if ($request->filled('start_date')) {
-            $query->whereDate('sm.moved_at', '>=', $request->string('start_date')->toString());
-        }
-
-        if ($request->filled('end_date')) {
-            $query->whereDate('sm.moved_at', '<=', $request->string('end_date')->toString());
-        }
-
-        if ($request->filled('product_id')) {
-            $query->where('sm.product_id', $request->integer('product_id'));
-        }
-
-        if ($request->filled('warehouse_id')) {
-            $query->where('sm.warehouse_id', $request->integer('warehouse_id'));
-        }
-
-        if ($request->filled('branch_id')) {
-            $query->where('w.branch_id', $request->integer('branch_id'));
-        }
-
-        if ($request->filled('category_id')) {
-            $query->where('p.category_id', $request->integer('category_id'));
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->string('search')->toString();
-            $query->where(function (Builder $builder) use ($search) {
-                $builder->where('p.name', 'like', '%' . $search . '%')
-                    ->orWhere('p.code', 'like', '%' . $search . '%')
-                    ->orWhere('w.name', 'like', '%' . $search . '%')
-                    ->orWhere('w.code', 'like', '%' . $search . '%')
-                    ->orWhere('b.name', 'like', '%' . $search . '%')
-                    ->orWhere('pc.name', 'like', '%' . $search . '%');
-            });
-        }
-
-        $sortBy = $request->string('sort_by', 'last_moved_at')->toString();
-        $sortDirection = $request->string('sort_direction', 'desc')->toString();
-        if ($sortBy === 'product_category_name') {
-            $sortBy = 'category_name';
-        }
-
-        if (in_array($sortBy, [
-            'product_name',
-            'warehouse_name',
-            'branch_name',
-            'category_name',
+        $this->applyDateRangeFilter($request, $query, 'sm.moved_at');
+        $this->applyIntegerFilters($request, $query, [
+            'product_id' => 'sm.product_id',
+            'warehouse_id' => 'sm.warehouse_id',
+            'branch_id' => 'w.branch_id',
+            'category_id' => 'p.category_id',
+        ]);
+        $this->applySearchFilter($request, $query, [
+            'p.name',
+            'p.code',
+            'w.name',
+            'w.code',
+            'b.name',
+            'pc.name',
+        ]);
+        $this->applyRequestSorting(
+            $request,
+            $query,
             'last_moved_at',
-        ], true)) {
-            $query->orderBy($sortBy, $sortDirection);
-        } elseif (in_array($sortBy, ['total_in', 'total_out', 'ending_balance'], true)) {
-            $query->orderByRaw($sortBy . ' ' . $sortDirection);
-        } else {
-            $query->orderBy('last_moved_at', 'desc');
-        }
+            ['product_category_name' => 'category_name'],
+            ['product_name', 'warehouse_name', 'branch_name', 'category_name', 'last_moved_at'],
+            ['total_in', 'total_out', 'ending_balance'],
+            'last_moved_at',
+        );
 
-        if ($request->boolean('export')) {
-            return $query->get();
-        }
-
-        return $query->paginate($request->integer('per_page', 15))->withQueryString();
+        return $this->exportOrPaginate($request, $query);
     }
 }

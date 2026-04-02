@@ -23,6 +23,26 @@ trait HandlesReportQuery
         }
     }
 
+    /**
+     * @param  array<string, string>  $columns
+     */
+    protected function applyIntegerFilters(Request $request, Builder $query, array $columns): void
+    {
+        foreach ($columns as $requestKey => $column) {
+            $this->applyIntegerFilter($request, $query, $requestKey, $column);
+        }
+    }
+
+    /**
+     * @param  array<string, string>  $columns
+     */
+    protected function applyStringFilters(Request $request, Builder $query, array $columns): void
+    {
+        foreach ($columns as $requestKey => $column) {
+            $this->applyStringFilter($request, $query, $requestKey, $column);
+        }
+    }
+
     protected function applyDateRangeFilter(
         Request $request,
         Builder $query,

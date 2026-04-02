@@ -2,15 +2,17 @@
 
 namespace App\Actions\Reports;
 
+use App\Actions\Reports\Concerns\HandlesReportQuery;
 use App\Http\Requests\Reports\IndexInventoryValuationReportRequest;
 use App\Models\StockMovement;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class IndexInventoryValuationReportAction
 {
+    use HandlesReportQuery;
+
     public function execute(IndexInventoryValuationReportRequest $request): LengthAwarePaginator|Collection
     {
         $stockValueExpr = 'stock_movements.balance_after * COALESCE(stock_movements.average_cost_after, products.cost)';
@@ -46,33 +48,20 @@ class IndexInventoryValuationReportAction
                 'stock_value' => 'decimal:2',
             ]);
 
-        if ($request->filled('product_id')) {
-            $query->where('stock_movements.product_id', $request->integer('product_id'));
-        }
-
-        if ($request->filled('warehouse_id')) {
-            $query->where('stock_movements.warehouse_id', $request->integer('warehouse_id'));
-        }
-
-        if ($request->filled('branch_id')) {
-            $query->where('warehouses.branch_id', $request->integer('branch_id'));
-        }
-
-        if ($request->filled('category_id')) {
-            $query->where('products.category_id', $request->integer('category_id'));
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->string('search')->toString();
-            $query->where(function (Builder $builder) use ($search) {
-                $builder->where('products.name', 'like', '%' . $search . '%')
-                    ->orWhere('products.code', 'like', '%' . $search . '%')
-                    ->orWhere('warehouses.name', 'like', '%' . $search . '%')
-                    ->orWhere('warehouses.code', 'like', '%' . $search . '%')
-                    ->orWhere('branches.name', 'like', '%' . $search . '%')
-                    ->orWhere('product_categories.name', 'like', '%' . $search . '%');
-            });
-        }
+        $this->applyIntegerFilters($request, $query, [
+            'product_id' => 'stock_movements.product_id',
+            'warehouse_id' => 'stock_movements.warehouse_id',
+            'branch_id' => 'warehouses.branch_id',
+            'category_id' => 'products.category_id',
+        ]);
+        $this->applySearchFilter($request, $query, [
+            'products.name',
+            'products.code',
+            'warehouses.name',
+            'warehouses.code',
+            'branches.name',
+            'product_categories.name',
+        ]);
 
         $sortBy = $request->string('sort_by', 'stock_value')->toString();
         $sortDirection = $request->string('sort_direction', 'desc')->toString();
@@ -95,10 +84,6 @@ class IndexInventoryValuationReportAction
             $query->orderBy('stock_movements.' . $sortBy, $sortDirection);
         }
 
-        if ($request->boolean('export')) {
-            return $query->get();
-        }
-
-        return $query->paginate($request->integer('per_page', 15))->withQueryString();
+        return $this->exportOrPaginate($request, $query);
     }
 }

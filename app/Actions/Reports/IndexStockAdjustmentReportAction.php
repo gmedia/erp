@@ -2,14 +2,16 @@
 
 namespace App\Actions\Reports;
 
+use App\Actions\Reports\Concerns\HandlesReportQuery;
 use App\Http\Requests\Reports\IndexStockAdjustmentReportRequest;
 use App\Models\StockAdjustmentItem;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class IndexStockAdjustmentReportAction
 {
+    use HandlesReportQuery;
+
     public function execute(IndexStockAdjustmentReportRequest $request): LengthAwarePaginator|Collection
     {
         $query = StockAdjustmentItem::query()
@@ -47,63 +49,33 @@ class IndexStockAdjustmentReportAction
                 'total_adjustment_value' => 'decimal:2',
             ]);
 
-        if ($request->filled('warehouse_id')) {
-            $query->where('sa.warehouse_id', $request->integer('warehouse_id'));
-        }
-
-        if ($request->filled('branch_id')) {
-            $query->where('w.branch_id', $request->integer('branch_id'));
-        }
-
-        if ($request->filled('adjustment_type')) {
-            $query->where('sa.adjustment_type', $request->string('adjustment_type')->toString());
-        }
-
-        if ($request->filled('status')) {
-            $query->where('sa.status', $request->string('status')->toString());
-        }
-
-        if ($request->filled('start_date')) {
-            $query->whereDate('sa.adjustment_date', '>=', $request->string('start_date')->toString());
-        }
-
-        if ($request->filled('end_date')) {
-            $query->whereDate('sa.adjustment_date', '<=', $request->string('end_date')->toString());
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->string('search')->toString();
-            $query->where(function (Builder $builder) use ($search) {
-                $builder->where('sa.adjustment_number', 'like', '%' . $search . '%')
-                    ->orWhere('w.name', 'like', '%' . $search . '%')
-                    ->orWhere('w.code', 'like', '%' . $search . '%')
-                    ->orWhere('b.name', 'like', '%' . $search . '%')
-                    ->orWhere('sa.adjustment_type', 'like', '%' . $search . '%')
-                    ->orWhere('sa.status', 'like', '%' . $search . '%');
-            });
-        }
-
-        $sortBy = $request->string('sort_by', 'adjustment_date')->toString();
-        $sortDirection = $request->string('sort_direction', 'desc')->toString();
-
-        if (in_array($sortBy, [
+        $this->applyIntegerFilters($request, $query, [
+            'warehouse_id' => 'sa.warehouse_id',
+            'branch_id' => 'w.branch_id',
+        ]);
+        $this->applyStringFilters($request, $query, [
+            'adjustment_type' => 'sa.adjustment_type',
+            'status' => 'sa.status',
+        ]);
+        $this->applyDateRangeFilter($request, $query, 'sa.adjustment_date');
+        $this->applySearchFilter($request, $query, [
+            'sa.adjustment_number',
+            'w.name',
+            'w.code',
+            'b.name',
+            'sa.adjustment_type',
+            'sa.status',
+        ]);
+        $this->applyRequestSorting(
+            $request,
+            $query,
             'adjustment_date',
-            'adjustment_type',
-            'status',
-            'warehouse_name',
-            'branch_name',
-        ], true)) {
-            $query->orderBy($sortBy, $sortDirection);
-        } elseif (in_array($sortBy, ['total_quantity_adjusted', 'total_adjustment_value', 'adjustment_count'], true)) {
-            $query->orderByRaw($sortBy . ' ' . $sortDirection);
-        } else {
-            $query->orderBy('adjustment_date', 'desc');
-        }
+            [],
+            ['adjustment_date', 'adjustment_type', 'status', 'warehouse_name', 'branch_name'],
+            ['total_quantity_adjusted', 'total_adjustment_value', 'adjustment_count'],
+            'adjustment_date',
+        );
 
-        if ($request->boolean('export')) {
-            return $query->get();
-        }
-
-        return $query->paginate($request->integer('per_page', 15))->withQueryString();
+        return $this->exportOrPaginate($request, $query);
     }
 }
