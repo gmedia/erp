@@ -53,12 +53,9 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 
     public function collection(Collection $rows)
     {
-        foreach ($rows as $index => $row) {
-            $rowNumber = $index + 2; // +1 for 0-index, +1 for heading row
-            $rowData = $this->rowToArray($row);
-
-            // 1. Validate the row data
-            if (! $this->validateImportRow($rowData, $rowNumber, [
+        $this->processImportCollection(
+            $rows,
+            [
                 'asset_code' => 'required|string|max:255',
                 'name' => 'required|string|max:255',
                 'asset_category' => 'nullable|string',
@@ -77,13 +74,8 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 'status' => 'required|in:draft,active,maintenance,disposed,lost',
                 'condition' => 'nullable|in:good,needs_repair,damaged',
                 'notes' => 'nullable|string',
-            ], true)) {
-
-                continue;
-            }
-
-            // 2. Resolve Foreign Keys
-            $resolvedLookups = $this->resolveLookupAssignments($rowData, $rowNumber, [
+            ],
+            [
                 ['lookup' => $this->categories, 'source' => 'asset_category', 'entity' => 'Category', 'target' => 'category_id', 'required' => false, 'incrementSkippedOnFailure' => true],
                 ['lookup' => $this->models, 'source' => 'asset_model', 'entity' => 'Model', 'target' => 'model_id', 'required' => false, 'incrementSkippedOnFailure' => true],
                 ['lookup' => $this->branches, 'source' => 'branch', 'entity' => 'Branch', 'target' => 'branch_id', 'required' => false, 'incrementSkippedOnFailure' => true],
@@ -91,17 +83,8 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 ['lookup' => $this->departments, 'source' => 'department', 'entity' => 'Department', 'target' => 'department_id', 'required' => false, 'incrementSkippedOnFailure' => true],
                 ['lookup' => $this->employees, 'source' => 'employee', 'entity' => 'Employee', 'target' => 'employee_id', 'required' => false, 'incrementSkippedOnFailure' => true],
                 ['lookup' => $this->suppliers, 'source' => 'supplier', 'entity' => 'Supplier', 'target' => 'supplier_id', 'required' => false, 'incrementSkippedOnFailure' => true],
-            ]);
-
-            if ($resolvedLookups === null) {
-                continue;
-            }
-
-            // 3. Upsert Logic
-            $this->performImportUpsert($rowNumber, function () use (
-                $rowData,
-                $resolvedLookups
-            ): void {
+            ],
+            function (array $rowData, array $resolvedLookups): void {
                 Asset::updateOrCreate(
                     ['asset_code' => $rowData['asset_code']],
                     [
@@ -126,7 +109,9 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                         'notes' => $rowData['notes'] ?? null,
                     ]
                 );
-            }, true);
-        }
+            },
+            true,
+            true
+        );
     }
 }

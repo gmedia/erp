@@ -33,12 +33,9 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 
     public function collection(Collection $rows)
     {
-        foreach ($rows as $index => $row) {
-            $rowNumber = $index + 2; // +1 for 0-index, +1 for heading row
-            $rowData = $this->rowToArray($row);
-
-            // 1. Validate the row data
-            if (! $this->validateImportRow($rowData, $rowNumber, [
+        $this->processImportCollection(
+            $rows,
+            [
                 'name' => 'required|string|max:255',
                 'email' => 'nullable|email',
                 'phone' => 'nullable|string|max:20',
@@ -46,23 +43,12 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 'branch' => 'nullable|string',
                 'category' => 'required|string',
                 'status' => 'required|in:active,inactive',
-            ])) {
-
-                continue;
-            }
-
-            // 2. Resolve Foreign Keys
-            $resolvedLookups = $this->resolveLookupAssignments($rowData, $rowNumber, [
+            ],
+            [
                 ['lookup' => $this->categories, 'source' => 'category', 'entity' => 'Category', 'target' => 'category_id'],
                 ['lookup' => $this->branches, 'source' => 'branch', 'entity' => 'Branch', 'target' => 'branch_id', 'required' => false],
-            ]);
-
-            if ($resolvedLookups === null) {
-                continue;
-            }
-
-            // 3. Upsert Logic
-            $this->performImportUpsert($rowNumber, function () use ($rowData, $resolvedLookups): void {
+            ],
+            function (array $rowData, array $resolvedLookups): void {
                 $matchAttributes = [];
 
                 if (! empty($rowData['email'])) {
@@ -83,7 +69,7 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                         'status' => $rowData['status'],
                     ]
                 );
-            });
-        }
+            }
+        );
     }
 }

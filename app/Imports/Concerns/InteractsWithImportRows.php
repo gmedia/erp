@@ -73,6 +73,42 @@ trait InteractsWithImportRows
 
     /**
      * @param  array<string, string|array<int, string>>  $rules
+     * @param  array<int, array{lookup: Collection, source: string, entity: string, target?: string, required?: bool, incrementSkippedOnFailure?: bool}>  $lookupConfigs
+     * @param  callable(array<string, mixed>, array<string, mixed>): void  $operation
+     */
+    protected function processImportCollection(
+        Collection $rows,
+        array $rules,
+        array $lookupConfigs,
+        callable $operation,
+        bool $incrementSkippedOnValidation = false,
+        bool $incrementSkippedOnError = false
+    ): void {
+        foreach ($rows as $index => $row) {
+            $rowNumber = $index + 2;
+            $rowData = $this->rowToArray($row);
+
+            if (! $this->validateImportRow($rowData, $rowNumber, $rules, $incrementSkippedOnValidation)) {
+                continue;
+            }
+
+            $resolvedLookups = $this->resolveLookupAssignments($rowData, $rowNumber, $lookupConfigs);
+            if ($resolvedLookups === null) {
+                continue;
+            }
+
+            $this->performImportUpsert(
+                $rowNumber,
+                function () use ($operation, $rowData, $resolvedLookups): void {
+                    $operation($rowData, $resolvedLookups);
+                },
+                $incrementSkippedOnError
+            );
+        }
+    }
+
+    /**
+     * @param  array<string, string|array<int, string>>  $rules
      */
     protected function validateImportRow(
         mixed $row,

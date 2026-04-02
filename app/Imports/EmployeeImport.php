@@ -37,12 +37,9 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 
     public function collection(Collection $rows)
     {
-        foreach ($rows as $index => $row) {
-            $rowNumber = $index + 2; // +1 for 0-index, +1 for heading row
-            $rowData = $this->rowToArray($row);
-
-            // 1. Validate the row data
-            if (! $this->validateImportRow($rowData, $rowNumber, [
+        $this->processImportCollection(
+            $rows,
+            [
                 'employee_id' => 'required|string',
                 'name' => 'required|string|max:255',
                 'email' => 'required|email', // We check uniqueness manually for upsert/skip logic
@@ -54,24 +51,13 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 'hire_date' => 'required|date_format:Y-m-d',
                 'employment_status' => 'required|string|in:regular,intern',
                 'termination_date' => 'nullable|date_format:Y-m-d',
-            ])) {
-
-                continue;
-            }
-
-            // 2. Resolve Foreign Keys
-            $resolvedLookups = $this->resolveLookupAssignments($rowData, $rowNumber, [
+            ],
+            [
                 ['lookup' => $this->departments, 'source' => 'department', 'entity' => 'Department', 'target' => 'department_id'],
                 ['lookup' => $this->positions, 'source' => 'position', 'entity' => 'Position', 'target' => 'position_id'],
                 ['lookup' => $this->branches, 'source' => 'branch', 'entity' => 'Branch', 'target' => 'branch_id'],
-            ]);
-
-            if ($resolvedLookups === null) {
-                continue;
-            }
-
-            // 3. Upsert Logic
-            $this->performImportUpsert($rowNumber, function () use ($rowData, $resolvedLookups): void {
+            ],
+            function (array $rowData, array $resolvedLookups): void {
                 Employee::updateOrCreate(
                     ['email' => $rowData['email']],
                     [
@@ -87,7 +73,7 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                         'termination_date' => $rowData['termination_date'] ?? null,
                     ]
                 );
-            });
-        }
+            }
+        );
     }
 }
