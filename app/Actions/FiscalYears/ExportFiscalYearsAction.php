@@ -7,52 +7,13 @@ use App\Exports\FiscalYearExport;
 use App\Models\FiscalYear;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Action to export fiscal years to Excel based on filters.
  */
 class ExportFiscalYearsAction extends SimpleCrudExportAction
 {
-    public function execute(FormRequest $request): JsonResponse
-    {
-        $validated = $request->validated();
-
-        $modelClass = $this->getModelClass();
-        $query = $modelClass::query();
-
-        if ($request->filled('search')) {
-            $this->applySearch($query, $validated['search'], $this->getSearchFields());
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $validated['status']);
-        }
-
-        $this->applySorting(
-            $query,
-            $validated['sort_by'] ?? 'created_at',
-            $validated['sort_direction'] ?? 'desc',
-            $this->getSortableFields()
-        );
-
-        // Generate filename with timestamp
-        $filename = $this->getFilenamePrefix() . '_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-        $filePath = 'exports/' . $filename;
-
-        // Generate the Excel file
-        $export = $this->getExportInstance([], $query);
-        Excel::store($export, $filePath, 'public');
-
-        return response()->json([
-            'url' => Storage::disk('public')->url($filePath),
-            'filename' => $filename,
-        ]);
-    }
-
     protected function getModelClass(): string
     {
         return FiscalYear::class;
@@ -66,6 +27,11 @@ class ExportFiscalYearsAction extends SimpleCrudExportAction
     protected function getFilenamePrefix(): string
     {
         return 'fiscal_years';
+    }
+
+    protected function applyAdditionalFilters(Builder $query, array $validated, FormRequest $request): void
+    {
+        $this->applyFilledEqualsFilters($query, $validated, $request, ['status']);
     }
 
     protected function getSortableFields(): array

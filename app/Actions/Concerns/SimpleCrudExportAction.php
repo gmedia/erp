@@ -27,12 +27,13 @@ abstract class SimpleCrudExportAction
     {
         $validated = $request->validated();
 
-        $modelClass = $this->getModelClass();
-        $query = $modelClass::query();
+        $query = $this->createQuery();
 
         if ($request->filled('search')) {
             $this->applySearch($query, $validated['search'], $this->getSearchFields());
         }
+
+        $this->applyAdditionalFilters($query, $validated, $request);
 
         $this->applySorting(
             $query,
@@ -58,6 +59,13 @@ abstract class SimpleCrudExportAction
             'url' => $url,
             'filename' => $filename,
         ]);
+    }
+
+    protected function createQuery(): Builder
+    {
+        $modelClass = $this->getModelClass();
+
+        return $modelClass::query();
     }
 
     /**
@@ -90,6 +98,14 @@ abstract class SimpleCrudExportAction
     }
 
     /**
+     * @param  array<string, mixed>  $validated
+     */
+    protected function applyAdditionalFilters(Builder $query, array $validated, FormRequest $request): void
+    {
+        $this->applyFilledEqualsFilters($query, $validated, $request, []);
+    }
+
+    /**
      * Get the sortable fields for this entity.
      *
      * @return array<int, string>
@@ -97,5 +113,20 @@ abstract class SimpleCrudExportAction
     protected function getSortableFields(): array
     {
         return ['id', 'name', 'created_at', 'updated_at'];
+    }
+
+    /**
+     * @param  array<string, mixed>  $validated
+     * @param  array<int|string, string>  $filters
+     */
+    protected function applyFilledEqualsFilters(Builder $query, array $validated, FormRequest $request, array $filters): void
+    {
+        foreach ($filters as $field => $column) {
+            $requestField = is_int($field) ? $column : $field;
+
+            if ($request->filled($requestField)) {
+                $query->where($column, $validated[$requestField]);
+            }
+        }
     }
 }
