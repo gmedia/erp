@@ -2,42 +2,23 @@
 
 namespace App\Actions\ApprovalDelegations;
 
+use App\Actions\ApprovalDelegations\Concerns\InteractsWithApprovalDelegationQuery;
 use App\Domain\ApprovalDelegations\ApprovalDelegationFilterService;
-use App\Models\ApprovalDelegation;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexApprovalDelegationsAction
 {
+    use InteractsWithApprovalDelegationQuery;
+
     public function __construct(
         private readonly ApprovalDelegationFilterService $filterService
     ) {}
 
     public function execute(array $filters): LengthAwarePaginator
     {
-        $query = ApprovalDelegation::query()
-            ->with(['delegator:id,name', 'delegate:id,name']);
-
-        // Base search across relationships and text fields
-        if (! empty($filters['search'])) {
-            $this->filterService->applySearch(
-                $query,
-                $filters['search'],
-                ['reason'],
-                [
-                    'delegator' => ['name'],
-                    'delegate' => ['name'],
-                ]
-            );
-        }
-
-        // Apply advanced filters (date_range, is_active, delegator, delegate)
-        $this->filterService->applyAdvancedFilters($query, $filters);
-
-        // Apply sorting
-        $this->filterService->applySorting(
-            $query,
-            $filters['sort_by'] ?? 'created_at',
-            $filters['sort_direction'] ?? 'desc',
+        $query = $this->buildFilteredQuery(
+            $this->filterService,
+            $filters,
             [
                 'id',
                 'delegator_user_id',
