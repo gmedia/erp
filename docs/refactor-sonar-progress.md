@@ -17,7 +17,7 @@ Dokumen ini menyimpan status batch refactor berbasis Sonar agar prompt tetap sta
 | C | done | assets, products, asset-movements, asset-maintenances, asset-stocktakes | asset-family filter services, ProductFilterService, item controllers | snapshot 2026-04-01: duplicated_lines 6344, duplicated_blocks 332, duplicated_lines_density 7.2, coverage 87.0, new_duplicated_lines_density 11.8 |
 | D | next | financial-reporting | FinancialReportService + query/mapping laporan keuangan | pending |
 | E | next | account-mappings, journal-entries, goods-receipts, purchase-requests | pasangan Store*Request/Update*Request | pending |
-| F | in-progress | goods-receipts, supplier-returns, inventory-stocktakes, stock-adjustments, stock-transfers, purchase-orders, products, suppliers, customers, asset-maintenances, asset-categories, asset-locations, asset-models, imports, approval-delegations, coa-versions, fiscal-years | pasangan Index*/Export* request listing + export skeleton + mutation/simple CRUD request sibling + shared request rule concerns + configured backend filter groups + provider/model relation dedup + asset-family sort map helper + import row concern + asset-family cast helper + approval delegation action pair query helper + simple CRUD export filter hooks | snapshot 2026-04-02: duplicated_lines 5659, duplicated_blocks 297, duplicated_lines_density 6.4, coverage 87.2, new_duplicated_lines_density 10.8; local wave simple CRUD export hooks PASS 10 test + targeted PHPStan PASS |
+| F | in-progress | goods-receipts, supplier-returns, inventory-stocktakes, stock-adjustments, stock-transfers, purchase-orders, products, suppliers, customers, asset-maintenances, asset-categories, asset-locations, asset-models, imports, approval-delegations, coa-versions, fiscal-years, resources | pasangan Index*/Export* request listing + export skeleton + mutation/simple CRUD request sibling + shared request rule concerns + configured backend filter groups + provider/model relation dedup + asset-family sort map helper + import row concern + asset-family cast helper + approval delegation action pair query helper + simple CRUD export filter hooks + party resource helper | snapshot 2026-04-02: duplicated_lines 5601, duplicated_blocks 295, duplicated_lines_density 6.3, coverage 87.3, new_duplicated_lines_density 10.8; local wave party resource helper PASS 2 test + targeted PHPStan PASS |
 
 Catatan: wave dedup request untuk `approval-audit-trail` dan `pipeline-audit-trail` sudah ikut terdorong di commit sebelumnya, tetapi tetap dicatat terpisah karena berada di luar scope Batch C saat dieksekusi.
 
@@ -35,23 +35,23 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: pending (menunggu snapshot Sonar pasca-wave simple CRUD export hooks Batch F; latest pushed snapshot 2026-04-02 = 5659, turun 685 dari baseline Batch F)
-- duplicated_blocks: pending (menunggu snapshot Sonar pasca-wave simple CRUD export hooks Batch F; latest pushed snapshot 2026-04-02 = 297, turun 35 dari baseline Batch F)
-- duplicated_lines_density: pending (menunggu snapshot Sonar pasca-wave simple CRUD export hooks Batch F; latest pushed snapshot 2026-04-02 = 6.4, turun 0.8 dari baseline Batch F)
-- ncloc: pending (menunggu snapshot Sonar pasca-wave simple CRUD export hooks Batch F; latest pushed snapshot 2026-04-02 = 72886)
-- coverage: pending (menunggu snapshot Sonar pasca-wave simple CRUD export hooks Batch F; latest pushed snapshot 2026-04-02 = 87.2)
+- duplicated_lines: pending (menunggu snapshot Sonar pasca-wave party resource helper Batch F; latest pushed snapshot 2026-04-02 = 5601, turun 743 dari baseline Batch F)
+- duplicated_blocks: pending (menunggu snapshot Sonar pasca-wave party resource helper Batch F; latest pushed snapshot 2026-04-02 = 295, turun 37 dari baseline Batch F)
+- duplicated_lines_density: pending (menunggu snapshot Sonar pasca-wave party resource helper Batch F; latest pushed snapshot 2026-04-02 = 6.3, turun 0.9 dari baseline Batch F)
+- ncloc: pending (menunggu snapshot Sonar pasca-wave party resource helper Batch F; latest pushed snapshot 2026-04-02 = 72858)
+- coverage: pending (menunggu snapshot Sonar pasca-wave party resource helper Batch F; latest pushed snapshot 2026-04-02 = 87.3)
 
 ## Snapshot Analisa Sonar (2026-04-02, latest MCP)
 
 - Quality Gate: ERROR
 - Gate blocker utama: new_duplicated_lines_density = 10.8 (threshold: 3.0)
-- Catatan: snapshot Sonar untuk commit terakhir kembali membaik: duplicated_lines turun 5730 -> 5659, duplicated_blocks turun 299 -> 297, density turun 6.5 -> 6.4, sementara coverage turun tipis 87.3 -> 87.2 dan new coverage bertahan aman di 87.8. Karena gate new code masih jauh di atas threshold, wave berikutnya tetap perlu menyerang clone block backend/toplist aktual.
+- Catatan: snapshot Sonar untuk commit terakhir kembali membaik: duplicated_lines turun 5659 -> 5601, duplicated_blocks turun 297 -> 295, density turun 6.4 -> 6.3, dan coverage naik tipis 87.2 -> 87.3 sementara new coverage naik ke 87.9. Karena gate new code masih jauh di atas threshold, wave berikutnya tetap perlu menyerang clone block backend/toplist aktual.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
-- MCP duplication detail terbaru masih menempatkan pasangan export action kecil sebagai hotspot backend aktif, termasuk `ExportCoaVersionsAction` dan `ExportFiscalYearsAction`, sementara shortlist backend lain mulai mengerucut ke resource pasangan seperti `CustomerResource` / `SupplierResource`.
-- Wave lokal saat ini sudah mengekstrak hook query/filter reusable di `SimpleCrudExportAction` dan memigrasikan `ExportCoaVersionsAction` serta `ExportFiscalYearsAction` ke jalur shared tanpa ubah payload export.
-- Jika snapshot berikutnya masih menyisakan clone block backend yang bermakna, kandidat berikutnya paling masuk akal bergeser ke pasangan resource atau sibling export action kecil lain yang masih muncul di shortlist.
+- MCP duplication detail terbaru menempatkan pasangan resource `CustomerResource` / `SupplierResource` sebagai clone block backend kecil yang bersih untuk diturunkan, sementara beberapa export action sibling lain masih tersisa di shortlist.
+- Wave lokal saat ini sudah mengekstrak helper `BuildsPartyResourceData` dan memigrasikan `CustomerResource` serta `SupplierResource` ke jalur shared tanpa ubah shape payload JSON.
+- Jika snapshot berikutnya masih menyisakan clone block backend yang bermakna, kandidat berikutnya paling masuk akal bergeser ke sibling export action kecil lain atau pasangan request report yang masih muncul di shortlist.
 
 ## Rencana Refactor Fokus Duplikasi (Batch F)
 
@@ -107,6 +107,10 @@ Isi setelah batch selesai dan sebelum merge.
 	- Ekstrak hook kecil di base export action untuk custom query dan filled equality filters agar sibling export action tidak menyalin ulang seluruh flow export sederhana.
 	- Gelombang saat ini mencakup `SimpleCrudExportAction`, `ExportCoaVersionsAction`, dan `ExportFiscalYearsAction`.
 	- Progress: sibling export action tersebut sudah memakai `createQuery()`, `applyAdditionalFilters()`, dan `applyFilledEqualsFilters()` shared tanpa ubah payload response export; verifikasi PASS 10 test, `./vendor/bin/sail bin duster fix --no-interaction ...` PASS, dan targeted PHPStan PASS.
+14. Dedup party resource payloads. (in-progress)
+	- Ekstrak helper kecil untuk resource master-data yang berbagi payload kontak, branch, category, status, dan timestamp.
+	- Gelombang saat ini mencakup `CustomerResource` dan `SupplierResource` melalui helper `BuildsPartyResourceData`.
+	- Progress: dua resource tersebut sudah memakai helper shared tanpa ubah shape JSON; verifikasi PASS 2 test, `./vendor/bin/sail bin duster fix --no-interaction ...` PASS, dan targeted PHPStan PASS.
 
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
@@ -149,6 +153,8 @@ Isi setelah batch selesai dan sebelum merge.
 
 ## Log Perubahan
 
+- 2026-04-02: [F], post-push Sonar MCP untuk commit `68e5e567`: quality gate tetap ERROR dengan blocker `new_duplicated_lines_density 10.8`; metrik inti terbaru `duplicated_lines 5601`, `duplicated_blocks 295`, `duplicated_lines_density 6.3`, `ncloc 72858`, `coverage 87.3`, `new_coverage 87.9`.
+- 2026-04-02: [F], wave kecil terkontrol (party resource helper): tambah helper `BuildsPartyResourceData`, lalu migrasi `CustomerResource` dan `SupplierResource` ke helper shared untuk payload kontak/branch/category/status/timestamp tanpa ubah shape JSON; test: `DB_DATABASE=testing APP_ENV=testing ./vendor/bin/sail artisan test tests/Unit/Resources/Customers/CustomerResourceTest.php tests/Unit/Resources/Suppliers/SupplierResourceTest.php` (PASS 2 test); formatter: `./vendor/bin/sail bin duster fix --no-interaction app/Http/Resources/Concerns/BuildsPartyResourceData.php app/Http/Resources/Customers/CustomerResource.php app/Http/Resources/Suppliers/SupplierResource.php` (PASS); static analysis: `./vendor/bin/sail php vendor/bin/phpstan analyse app/Http/Resources/Concerns/BuildsPartyResourceData.php app/Http/Resources/Customers/CustomerResource.php app/Http/Resources/Suppliers/SupplierResource.php --memory-limit=1G` (PASS). Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
 - 2026-04-02: [F], post-push Sonar MCP untuk commit `b2dddd64`: quality gate tetap ERROR dengan blocker `new_duplicated_lines_density 10.8`; metrik inti terbaru `duplicated_lines 5659`, `duplicated_blocks 297`, `duplicated_lines_density 6.4`, `ncloc 72886`, `coverage 87.2`, `new_coverage 87.8`.
 - 2026-04-02: [F], wave kecil terkontrol (simple CRUD export filter hooks): tambah hook `createQuery()`, `applyAdditionalFilters()`, dan `applyFilledEqualsFilters()` di `SimpleCrudExportAction`, lalu migrasi `ExportCoaVersionsAction` dan `ExportFiscalYearsAction` ke jalur shared untuk mereduksi clone block export sederhana tanpa ubah payload response export; test: `DB_DATABASE=testing APP_ENV=testing ./vendor/bin/sail artisan test tests/Unit/Actions/CoaVersions/ExportCoaVersionsActionTest.php tests/Feature/CoaVersions/CoaVersionExportTest.php tests/Unit/Actions/FiscalYears/ExportFiscalYearsActionTest.php tests/Feature/FiscalYears/FiscalYearExportTest.php` (PASS 10 test); formatter: `./vendor/bin/sail bin duster fix --no-interaction app/Actions/Concerns/SimpleCrudExportAction.php app/Actions/CoaVersions/ExportCoaVersionsAction.php app/Actions/FiscalYears/ExportFiscalYearsAction.php` (PASS); static analysis: `./vendor/bin/sail php vendor/bin/phpstan analyse app/Actions/Concerns/SimpleCrudExportAction.php app/Actions/CoaVersions/ExportCoaVersionsAction.php app/Actions/FiscalYears/ExportFiscalYearsAction.php --memory-limit=1G` (PASS). Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
 - 2026-04-02: [F], post-push Sonar MCP untuk commit `87396380`: quality gate tetap ERROR dengan blocker `new_duplicated_lines_density 10.9`; metrik inti terbaru `duplicated_lines 5730`, `duplicated_blocks 299`, `duplicated_lines_density 6.5`, `ncloc 72880`, `coverage 87.3`, `new_coverage 87.8`.

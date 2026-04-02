@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Customers;
 
+use App\Http\Resources\Concerns\BuildsPartyResourceData;
 use App\Models\Customer;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -13,6 +14,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class CustomerResource extends JsonResource
 {
+    use BuildsPartyResourceData;
+
     /**
      * Transform the resource into an array.
      *
@@ -21,24 +24,6 @@ class CustomerResource extends JsonResource
      */
     public function toArray($request): array
     {
-        return [
-            'id' => $this->resource->id,
-            'name' => $this->resource->name,
-            'email' => $this->resource->email,
-            'phone' => $this->resource->phone,
-            'address' => $this->resource->address,
-            'branch' => [
-                'id' => $this->resource->branch_id,
-                'name' => $this->resource->branch?->name,
-            ],
-            'category' => [
-                'id' => $this->resource->category_id,
-                'name' => $this->resource->category?->name,
-            ],
-            'status' => $this->resource->status,
-            'notes' => $this->resource->notes,
-            'created_at' => $this->resource->created_at?->toIso8601String(),
-            'updated_at' => $this->resource->updated_at?->toIso8601String(),
-        ];
+        return $this->partyResourceData(includeNotes: true);
     }
 }
