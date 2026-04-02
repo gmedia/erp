@@ -2,44 +2,42 @@
 
 namespace App\Actions\PurchaseRequests;
 
+use App\Actions\Concerns\ConfiguredTransactionExportAction;
 use App\Exports\PurchaseRequestExport;
-use App\Http\Requests\PurchaseRequests\ExportPurchaseRequestRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportPurchaseRequestsAction
+class ExportPurchaseRequestsAction extends ConfiguredTransactionExportAction
 {
-    public function execute(ExportPurchaseRequestRequest $request): JsonResponse
+    /**
+     * @return array<string, mixed>
+     */
+    protected function filterDefaults(): array
     {
-        $validated = $request->validated();
-
-        $filters = [
-            'search' => $validated['search'] ?? null,
-            'branch' => $validated['branch'] ?? null,
-            'department' => $validated['department'] ?? null,
-            'requested_by' => $validated['requested_by'] ?? null,
-            'priority' => $validated['priority'] ?? null,
-            'status' => $validated['status'] ?? null,
-            'request_date_from' => $validated['request_date_from'] ?? null,
-            'request_date_to' => $validated['request_date_to'] ?? null,
-            'required_date_from' => $validated['required_date_from'] ?? null,
-            'required_date_to' => $validated['required_date_to'] ?? null,
-            'sort_by' => $validated['sort_by'] ?? 'created_at',
-            'sort_direction' => $validated['sort_direction'] ?? 'desc',
+        return [
+            'search' => null,
+            'branch' => null,
+            'department' => null,
+            'requested_by' => null,
+            'priority' => null,
+            'status' => null,
+            'request_date_from' => null,
+            'request_date_to' => null,
+            'required_date_from' => null,
+            'required_date_to' => null,
+            'sort_by' => 'created_at',
+            'sort_direction' => 'desc',
         ];
+    }
 
-        $filters = array_filter($filters, static fn ($value) => $value !== null && $value !== '');
+    protected function filenamePrefix(): string
+    {
+        return 'purchase_requests';
+    }
 
-        $filename = 'purchase_requests_export_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.xlsx';
-        $filePath = 'exports/' . $filename;
-
-        Excel::store(new PurchaseRequestExport($filters), $filePath, 'public');
-
-        return response()->json([
-            'url' => Storage::disk('public')->url($filePath),
-            'filename' => $filename,
-        ]);
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new PurchaseRequestExport($filters);
     }
 }
