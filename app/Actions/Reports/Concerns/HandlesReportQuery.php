@@ -40,6 +40,26 @@ trait HandlesReportQuery
     }
 
     /**
+     * @param  array<int, string>  $searchColumns
+     */
+    protected function applyPurchaseOrderReportFilters(
+        Request $request,
+        Builder $query,
+        string $warehouseColumn,
+        string $productColumn,
+        string $statusColumn,
+        string $dateColumn,
+        array $searchColumns
+    ): void {
+        $this->applyIntegerFilter($request, $query, 'supplier_id', 'po.supplier_id');
+        $this->applyIntegerFilter($request, $query, 'warehouse_id', $warehouseColumn);
+        $this->applyIntegerFilter($request, $query, 'product_id', $productColumn);
+        $this->applyStringFilter($request, $query, 'status', $statusColumn);
+        $this->applyDateRangeFilter($request, $query, $dateColumn);
+        $this->applySearchFilter($request, $query, $searchColumns);
+    }
+
+    /**
      * @param  array<int, string>  $columns
      */
     protected function applySearchFilter(Request $request, Builder $query, array $columns): void
@@ -90,6 +110,36 @@ trait HandlesReportQuery
         }
 
         $query->orderBy($fallbackSortBy, $fallbackSortDirection);
+    }
+
+    /**
+     * @param  array<string, string>  $aliases
+     * @param  array<int, string>  $plainSortable
+     * @param  array<int, string>  $aggregateSortable
+     */
+    protected function applyRequestSorting(
+        Request $request,
+        Builder $query,
+        string $defaultSortBy,
+        array $aliases,
+        array $plainSortable,
+        array $aggregateSortable,
+        string $fallbackSortBy,
+        string $fallbackSortDirection = 'desc'
+    ): void {
+        $sortBy = $request->string('sort_by', $defaultSortBy)->toString();
+        $sortDirection = $request->string('sort_direction', $fallbackSortDirection)->toString();
+        $sortBy = $this->normalizeSortBy($sortBy, $aliases);
+
+        $this->applySorting(
+            $query,
+            $sortBy,
+            $sortDirection,
+            $plainSortable,
+            $aggregateSortable,
+            $fallbackSortBy,
+            $fallbackSortDirection,
+        );
     }
 
     protected function exportOrPaginate(Request $request, Builder $query): LengthAwarePaginator|Collection

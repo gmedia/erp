@@ -77,12 +77,7 @@ class IndexPurchaseOrderStatusReportAction
                 'item_count' => 'integer',
             ]);
 
-        $this->applyIntegerFilter($request, $query, 'supplier_id', 'po.supplier_id');
-        $this->applyIntegerFilter($request, $query, 'warehouse_id', 'po.warehouse_id');
-        $this->applyIntegerFilter($request, $query, 'product_id', 'poi.product_id');
-        $this->applyStringFilter($request, $query, 'status', 'po.status');
-        $this->applyDateRangeFilter($request, $query, 'po.order_date');
-        $this->applySearchFilter($request, $query, [
+        $this->applyPurchaseOrderReportFilters($request, $query, 'po.warehouse_id', 'poi.product_id', 'po.status', 'po.order_date', [
             'po.po_number',
             's.name',
             'w.name',
@@ -95,19 +90,16 @@ class IndexPurchaseOrderStatusReportAction
             $query->having('status_category', '=', $request->string('status_category')->toString());
         }
 
-        $sortBy = $request->string('sort_by', 'order_date')->toString();
-        $sortDirection = $request->string('sort_direction', 'desc')->toString();
-        $sortBy = $this->normalizeSortBy($sortBy, [
-            'purchase_order_po_number' => 'po_number',
-            'purchase_order_expected_delivery_date' => 'expected_delivery_date',
-            'purchase_order_status' => 'status',
-            'purchase_order_status_category' => 'status_category',
-        ]);
-
-        $this->applySorting(
+        $this->applyRequestSorting(
+            $request,
             $query,
-            $sortBy,
-            $sortDirection,
+            'order_date',
+            [
+                'purchase_order_po_number' => 'po_number',
+                'purchase_order_expected_delivery_date' => 'expected_delivery_date',
+                'purchase_order_status' => 'status',
+                'purchase_order_status_category' => 'status_category',
+            ],
             [
                 'po_number',
                 'supplier_name',

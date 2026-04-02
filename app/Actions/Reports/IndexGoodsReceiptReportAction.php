@@ -61,12 +61,7 @@ class IndexGoodsReceiptReportAction
                 'total_receipt_value' => 'decimal:2',
             ]);
 
-        $this->applyIntegerFilter($request, $query, 'supplier_id', 'po.supplier_id');
-        $this->applyIntegerFilter($request, $query, 'warehouse_id', 'gr.warehouse_id');
-        $this->applyIntegerFilter($request, $query, 'product_id', 'gri.product_id');
-        $this->applyStringFilter($request, $query, 'status', 'gr.status');
-        $this->applyDateRangeFilter($request, $query, 'gr.receipt_date');
-        $this->applySearchFilter($request, $query, [
+        $this->applyPurchaseOrderReportFilters($request, $query, 'gr.warehouse_id', 'gri.product_id', 'gr.status', 'gr.receipt_date', [
             'gr.gr_number',
             'po.po_number',
             's.name',
@@ -76,20 +71,16 @@ class IndexGoodsReceiptReportAction
             'p.code',
         ]);
 
-        $sortBy = $request->string('sort_by', 'receipt_date')->toString();
-        $sortDirection = $request->string('sort_direction', 'desc')->toString();
-
-        $sortBy = $this->normalizeSortBy($sortBy, [
-            'goods_receipt_gr_number' => 'gr_number',
-            'goods_receipt_receipt_date' => 'receipt_date',
-            'goods_receipt_status' => 'status',
-            'purchase_order_po_number' => 'po_number',
-        ]);
-
-        $this->applySorting(
+        $this->applyRequestSorting(
+            $request,
             $query,
-            $sortBy,
-            $sortDirection,
+            'receipt_date',
+            [
+                'goods_receipt_gr_number' => 'gr_number',
+                'goods_receipt_receipt_date' => 'receipt_date',
+                'goods_receipt_status' => 'status',
+                'purchase_order_po_number' => 'po_number',
+            ],
             ['gr_number', 'receipt_date', 'status', 'po_number', 'supplier_name', 'warehouse_name'],
             [
                 'item_count',
