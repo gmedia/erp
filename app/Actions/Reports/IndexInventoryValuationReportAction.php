@@ -2,6 +2,7 @@
 
 namespace App\Actions\Reports;
 
+use App\Actions\Concerns\InteractsWithStockSnapshotQuery;
 use App\Actions\Reports\Concerns\HandlesReportQuery;
 use App\Http\Requests\Reports\IndexInventoryValuationReportRequest;
 use App\Models\StockMovement;
@@ -12,14 +13,12 @@ use Illuminate\Support\Facades\DB;
 class IndexInventoryValuationReportAction
 {
     use HandlesReportQuery;
+    use InteractsWithStockSnapshotQuery;
 
     public function execute(IndexInventoryValuationReportRequest $request): LengthAwarePaginator|Collection
     {
-        $stockValueExpr = 'stock_movements.balance_after * COALESCE(stock_movements.average_cost_after, products.cost)';
-
-        $latestMovements = StockMovement::query()
-            ->selectRaw('MAX(id) as id')
-            ->groupBy('product_id', 'warehouse_id');
+        $stockValueExpr = $this->stockSnapshotValueExpression();
+        $latestMovements = $this->latestStockMovementIdsQuery();
 
         $query = StockMovement::query()
             ->whereIn('stock_movements.id', $latestMovements)
@@ -48,41 +47,8 @@ class IndexInventoryValuationReportAction
                 'stock_value' => 'decimal:2',
             ]);
 
-        $this->applyIntegerFilters($request, $query, [
-            'product_id' => 'stock_movements.product_id',
-            'warehouse_id' => 'stock_movements.warehouse_id',
-            'branch_id' => 'warehouses.branch_id',
-            'category_id' => 'products.category_id',
-        ]);
-        $this->applySearchFilter($request, $query, [
-            'products.name',
-            'products.code',
-            'warehouses.name',
-            'warehouses.code',
-            'branches.name',
-            'product_categories.name',
-        ]);
-
-        $sortBy = $request->string('sort_by', 'stock_value')->toString();
-        $sortDirection = $request->string('sort_direction', 'desc')->toString();
-
-        if ($sortBy === 'product_name') {
-            $query->orderBy('products.name', $sortDirection);
-        } elseif ($sortBy === 'warehouse_name') {
-            $query->orderBy('warehouses.name', $sortDirection);
-        } elseif ($sortBy === 'branch_name') {
-            $query->orderBy('branches.name', $sortDirection);
-        } elseif ($sortBy === 'category_name') {
-            $query->orderBy('product_categories.name', $sortDirection);
-        } elseif ($sortBy === 'stock_value') {
-            $query->orderByRaw($stockValueExpr . ' ' . $sortDirection);
-        } elseif ($sortBy === 'quantity_on_hand') {
-            $query->orderBy('stock_movements.balance_after', $sortDirection);
-        } elseif ($sortBy === 'average_cost') {
-            $query->orderByRaw('COALESCE(stock_movements.average_cost_after, products.cost) ' . $sortDirection);
-        } else {
-            $query->orderBy('stock_movements.' . $sortBy, $sortDirection);
-        }
+        $this->applyStockSnapshotFilters($request, $query);
+        $this->applyStockSnapshotSorting($request, $query, $stockValueExpr, 'stock_value');
 
         return $this->exportOrPaginate($request, $query);
     }
