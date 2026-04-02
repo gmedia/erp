@@ -3,10 +3,35 @@
 use App\Exports\StockTransferExport;
 use App\Models\StockTransfer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\Sanctum;
+use Maatwebsite\Excel\Facades\Excel;
+
+use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class)->group('stock-transfers');
 
 describe('StockTransferExport', function () {
+    test('it exports stock transfers and returns file url', function () {
+        Excel::fake();
+        Storage::fake('public');
+        StockTransfer::factory()->create();
+
+        $user = createTestUserWithPermissions(['stock_transfer']);
+        Sanctum::actingAs($user, ['*']);
+
+        $response = postJson('/api/stock-transfers/export', [
+            'status' => 'draft',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonStructure(['url', 'filename']);
+
+        $filename = $response->json('filename');
+        expect($filename)->toContain('stock_transfers_export_');
+        Excel::assertStored('exports/' . $filename, 'public');
+    });
+
     test('query applies search filter', function () {
         StockTransfer::factory()->create(['transfer_number' => 'ST-UNIQUE-001', 'status' => 'draft']);
         StockTransfer::factory()->create(['transfer_number' => 'ST-OTHER-001', 'status' => 'draft']);

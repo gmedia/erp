@@ -3,10 +3,35 @@
 use App\Exports\StockAdjustmentExport;
 use App\Models\StockAdjustment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\Sanctum;
+use Maatwebsite\Excel\Facades\Excel;
+
+use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class)->group('stock-adjustments');
 
 describe('StockAdjustmentExport', function () {
+    test('it exports stock adjustments and returns file url', function () {
+        Excel::fake();
+        Storage::fake('public');
+        StockAdjustment::factory()->create();
+
+        $user = createTestUserWithPermissions(['stock_adjustment']);
+        Sanctum::actingAs($user, ['*']);
+
+        $response = postJson('/api/stock-adjustments/export', [
+            'status' => 'draft',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonStructure(['url', 'filename']);
+
+        $filename = $response->json('filename');
+        expect($filename)->toContain('stock_adjustments_export_');
+        Excel::assertStored('exports/' . $filename, 'public');
+    });
+
     test('query applies search filter', function () {
         StockAdjustment::factory()->create(['adjustment_number' => 'SA-UNIQUE-001', 'status' => 'draft']);
         StockAdjustment::factory()->create(['adjustment_number' => 'SA-OTHER-001', 'status' => 'draft']);
