@@ -2,23 +2,19 @@
 
 namespace App\Http\Requests\AssetLocations;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseListingRequest;
 
-class ExportAssetLocationRequest extends FormRequest
+class ExportAssetLocationRequest extends BaseListingRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
-        return [
-            'search' => ['nullable', 'string'],
-            'branch_id' => ['nullable', 'exists:branches,id'],
-            'parent_id' => ['nullable', 'exists:asset_locations,id'],
-            'sort_by' => ['nullable', 'string', 'in:code,name,branch,parent,created_at,updated_at'],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
-        ];
+        return array_merge(
+            $this->searchRules(),
+            [
+                'branch_id' => ['nullable', 'exists:branches,id'],
+                'parent_id' => ['nullable', 'exists:asset_locations,id'],
+            ],
+            $this->listingSortRules('code,name,branch,parent,created_at,updated_at'),
+        );
     }
 }

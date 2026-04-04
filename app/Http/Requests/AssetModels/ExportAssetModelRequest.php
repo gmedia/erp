@@ -2,26 +2,18 @@
 
 namespace App\Http\Requests\AssetModels;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseListingRequest;
 
-class ExportAssetModelRequest extends FormRequest
+class ExportAssetModelRequest extends BaseListingRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
-        return [
-            'search' => ['nullable', 'string'],
-            'asset_category_id' => ['nullable', 'exists:asset_categories,id'],
-            'sort_by' => [
-                'nullable',
-                'string',
-                'in:id,model_name,manufacturer,category,asset_category_id,created_at,updated_at',
+        return array_merge(
+            $this->searchRules(),
+            [
+                'asset_category_id' => ['nullable', 'exists:asset_categories,id'],
             ],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
-        ];
+            $this->listingSortRules('id,model_name,manufacturer,category,asset_category_id,created_at,updated_at'),
+        );
     }
 }
