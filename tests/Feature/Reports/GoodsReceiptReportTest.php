@@ -195,3 +195,23 @@ test('it can export goods receipt report', function () {
     Excel::assertStored('exports/' . $filename, 'public');
     Carbon::setTestNow();
 });
+
+test('it can export goods receipt report as csv', function () {
+    Carbon::setTestNow(Carbon::parse('2026-03-04 10:00:00'));
+    Excel::fake();
+    Storage::fake('public');
+
+    Sanctum::actingAs($this->user, ['*']);
+    $response = postJson('/api/reports/goods-receipt/export', [
+        'format' => 'csv',
+    ])
+        ->assertOk()
+        ->assertJsonStructure(['url', 'filename']);
+
+    $filename = $response->json('filename');
+    expect($filename)->toStartWith('goods_receipt_report_2026-03-04_10-00-00_');
+    expect($filename)->toEndWith('.csv');
+
+    Excel::assertStored('exports/' . $filename, 'public');
+    Carbon::setTestNow();
+});

@@ -2,29 +2,23 @@
 
 namespace App\Actions\Reports;
 
+use App\Actions\Reports\Concerns\ConfiguredReportExportAction;
 use App\Exports\BookValueDepreciationExport;
-use App\Http\Requests\Reports\ExportBookValueDepreciationRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportBookValueDepreciationReportAction
+class ExportBookValueDepreciationReportAction extends ConfiguredReportExportAction
 {
-    public function execute(ExportBookValueDepreciationRequest $request): JsonResponse
+    protected function filenamePrefix(): string
     {
-        $filters = array_filter($request->validated());
+        return 'book_value_depreciation_report';
+    }
 
-        $filename = 'book_value_depreciation_report_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.xlsx';
-        $filePath = 'exports/' . $filename;
+    protected function supportsCsvExport(): bool
+    {
+        return false;
+    }
 
-        Excel::store(new BookValueDepreciationExport($filters), $filePath, 'public');
-
-        $url = Storage::disk('public')->url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+    protected function makeExport(array $filters): object
+    {
+        return new BookValueDepreciationExport($filters);
     }
 }
