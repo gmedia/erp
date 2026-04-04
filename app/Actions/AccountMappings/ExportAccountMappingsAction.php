@@ -2,9 +2,9 @@
 
 namespace App\Actions\AccountMappings;
 
+use App\Actions\AccountMappings\Concerns\BuildsAccountMappingQuery;
 use App\Domain\AccountMappings\AccountMappingFilterService;
 use App\Exports\AccountMappingExport;
-use App\Models\AccountMapping;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -12,6 +12,8 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ExportAccountMappingsAction
 {
+    use BuildsAccountMappingQuery;
+
     public function __construct(
         private AccountMappingFilterService $filterService
     ) {}
@@ -20,25 +22,17 @@ class ExportAccountMappingsAction
     {
         $validated = $request->validated();
 
-        $query = AccountMapping::query()->with([
-            'sourceAccount.coaVersion',
-            'targetAccount.coaVersion',
-        ]);
-
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, (string) $validated['search']);
-        }
-
-        $this->filterService->applyAdvancedFilters($query, [
-            'type' => $validated['type'] ?? null,
-            'source_coa_version_id' => $validated['source_coa_version_id'] ?? null,
-            'target_coa_version_id' => $validated['target_coa_version_id'] ?? null,
-        ]);
-
-        $sortBy = $validated['sort_by'] ?? 'created_at';
-        $sortDirection = $validated['sort_direction'] ?? 'desc';
-
-        $this->filterService->applySorting($query, $sortBy, $sortDirection);
+        $query = $this->buildAccountMappingQuery(
+            $this->filterService,
+            [
+                'type' => $validated['type'] ?? null,
+                'source_coa_version_id' => $validated['source_coa_version_id'] ?? null,
+                'target_coa_version_id' => $validated['target_coa_version_id'] ?? null,
+            ],
+            $request->filled('search') ? (string) ($validated['search'] ?? '') : null,
+            (string) ($validated['sort_by'] ?? 'created_at'),
+            (string) ($validated['sort_direction'] ?? 'desc'),
+        );
 
         $filename = 'account_mappings_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
         $filePath = 'exports/' . $filename;
