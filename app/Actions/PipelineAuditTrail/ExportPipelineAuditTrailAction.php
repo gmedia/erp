@@ -2,34 +2,30 @@
 
 namespace App\Actions\PipelineAuditTrail;
 
+use App\Actions\Concerns\ConfiguredFormattedExportAction;
 use App\Exports\PipelineAuditTrailExport;
-use App\Http\Requests\PipelineAuditTrail\ExportPipelineAuditTrailRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Maatwebsite\Excel\Excel as ExcelExcel;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportPipelineAuditTrailAction
+class ExportPipelineAuditTrailAction extends ConfiguredFormattedExportAction
 {
-    public function execute(ExportPipelineAuditTrailRequest $request): JsonResponse
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    protected function buildFilters(array $validated): array
     {
-        $filters = array_filter($request->validated());
+        return array_filter($validated);
+    }
 
-        $format = $request->get('format', 'xlsx');
-        $extension = $format === 'csv' ? 'csv' : 'xlsx';
-        $writerType = $format === 'csv' ? ExcelExcel::CSV : ExcelExcel::XLSX;
+    protected function filenamePrefix(): string
+    {
+        return 'pipeline_audit_trail';
+    }
 
-        $filename = 'pipeline_audit_trail_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.' . $extension;
-        $filePath = 'exports/' . $filename;
-
-        Excel::store(new PipelineAuditTrailExport($filters), $filePath, 'public', $writerType);
-
-        $url = Storage::disk('public')->url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new PipelineAuditTrailExport($filters);
     }
 }

@@ -2,34 +2,30 @@
 
 namespace App\Actions\StockMovements;
 
+use App\Actions\Concerns\ConfiguredFormattedExportAction;
 use App\Exports\StockMovementsExport;
-use App\Http\Requests\StockMovements\ExportStockMovementRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Maatwebsite\Excel\Excel as ExcelExcel;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportStockMovementsAction
+class ExportStockMovementsAction extends ConfiguredFormattedExportAction
 {
-    public function execute(ExportStockMovementRequest $request): JsonResponse
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    protected function buildFilters(array $validated): array
     {
-        $filters = array_filter($request->validated(), static fn ($v) => $v !== null && $v !== '');
+        return array_filter($validated, static fn (mixed $value): bool => $value !== null && $value !== '');
+    }
 
-        $format = $request->get('format', 'xlsx');
-        $extension = $format === 'csv' ? 'csv' : 'xlsx';
-        $writerType = $format === 'csv' ? ExcelExcel::CSV : ExcelExcel::XLSX;
+    protected function filenamePrefix(): string
+    {
+        return 'stock_movements';
+    }
 
-        $filename = 'stock_movements_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.' . $extension;
-        $filePath = 'exports/' . $filename;
-
-        Excel::store(new StockMovementsExport($filters), $filePath, 'public', $writerType);
-
-        $url = Storage::disk('public')->url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new StockMovementsExport($filters);
     }
 }

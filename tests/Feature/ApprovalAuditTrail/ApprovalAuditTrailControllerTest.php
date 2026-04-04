@@ -5,9 +5,11 @@ use App\Models\ApprovalRequest;
 use App\Models\Asset;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
+use Maatwebsite\Excel\Facades\Excel;
 
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -119,5 +121,25 @@ describe('export', function () {
         // Check file exists in storage
         $filename = $response->json('filename');
         Storage::disk('public')->assertExists('exports/' . $filename);
+    });
+
+    it('can export csv when requested', function () {
+        Carbon::setTestNow('2026-04-04 10:15:00');
+        Excel::fake();
+        Storage::fake('public');
+
+        Sanctum::actingAs($this->user, ['*']);
+
+        $response = postJson('/api/approval-audit-trail/export', ['format' => 'csv'])
+            ->assertOk()
+            ->assertJsonStructure(['url', 'filename']);
+
+        $filename = $response->json('filename');
+
+        expect($filename)->toStartWith('approval_audit_trail_2026-04-04_10-15-00_');
+        expect($filename)->toEndWith('.csv');
+
+        Excel::assertStored('exports/' . $filename, 'public');
+        Carbon::setTestNow();
     });
 });

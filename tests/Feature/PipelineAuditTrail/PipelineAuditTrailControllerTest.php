@@ -166,3 +166,21 @@ test('it can export the audit trail data to excel', function () {
     Excel::assertStored('exports/' . $filename, 'public');
     Carbon::setTestNow();
 });
+
+test('it can export the audit trail data to csv', function () {
+    Carbon::setTestNow(Carbon::parse('2026-02-01 10:00:00'));
+    Excel::fake();
+    Storage::fake('public');
+
+    Sanctum::actingAs($this->user, ['*']);
+    $response = $this->postJson('/api/pipeline-audit-trail/export', ['format' => 'csv'])
+        ->assertOk()
+        ->assertJsonStructure(['url', 'filename']);
+
+    $filename = $response->json('filename');
+    expect($filename)->toStartWith('pipeline_audit_trail_2026-02-01_10-00-00_');
+    expect($filename)->toEndWith('.csv');
+
+    Excel::assertStored('exports/' . $filename, 'public');
+    Carbon::setTestNow();
+});
