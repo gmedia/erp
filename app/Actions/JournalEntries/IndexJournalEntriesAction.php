@@ -2,6 +2,7 @@
 
 namespace App\Actions\JournalEntries;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\JournalEntries\JournalEntryFilterService;
 use App\Http\Requests\JournalEntries\IndexJournalEntryRequest;
 use App\Models\JournalEntry;
@@ -9,38 +10,38 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexJournalEntriesAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private JournalEntryFilterService $filterService
     ) {}
 
     public function execute(IndexJournalEntryRequest $request): LengthAwarePaginator
     {
-        $perPage = $request->get('per_page', 15);
-        $page = $request->get('page', 1);
+        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 
         $query = JournalEntry::query()
             ->with(['lines.account', 'fiscalYear', 'createdBy', 'postedBy'])
             ->withSum('lines as total_debit', 'debit');
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), [
-                'entry_number', 'description', 'reference',
-            ]);
-        }
-
-        $this->filterService->applyAdvancedFilters($query, [
-            'start_date' => $request->get('start_date'),
-            'end_date' => $request->get('end_date'),
-            'status' => $request->get('status'),
+        $this->applyRequestSearch($request, $query, $this->filterService, [
+            'entry_number',
+            'description',
+            'reference',
         ]);
-
-        $this->filterService->applySorting(
+        $this->applyRequestFilters($request, $query, $this->filterService, [
+            'start_date',
+            'end_date',
+            'status',
+        ]);
+        $this->applyIndexSorting(
+            $request,
             $query,
-            $request->get('sort_by', 'entry_date'),
-            $request->get('sort_direction', 'desc'),
-            ['entry_date', 'entry_number', 'description', 'reference', 'total_debit', 'status', 'created_at']
+            $this->filterService,
+            'entry_date',
+            ['entry_date', 'entry_number', 'description', 'reference', 'total_debit', 'status', 'created_at'],
         );
 
-        return $query->paginate($perPage, ['*'], 'page', $page);
+        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }
