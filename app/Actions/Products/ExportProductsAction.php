@@ -2,19 +2,17 @@
 
 namespace App\Actions\Products;
 
+use App\Actions\Concerns\ConfiguredTimestampExportAction;
 use App\Exports\ProductExport;
-use App\Http\Requests\Products\ExportProductRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportProductsAction
+class ExportProductsAction extends ConfiguredTimestampExportAction
 {
-    public function execute(ExportProductRequest $request): JsonResponse
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    protected function buildFilters(array $validated): array
     {
-        $validated = $request->validated();
-
-        // Map keys (request uses 'category', not 'category_id' for simplicity in filters)
         $filters = [
             'search' => $validated['search'] ?? null,
             'category_id' => $validated['category_id'] ?? null,
@@ -27,18 +25,27 @@ class ExportProductsAction
             'sort_direction' => $validated['sort_direction'] ?? 'desc',
         ];
 
-        $filters = array_filter($filters, fn ($value) => $value !== null);
+        return array_filter($filters, static fn (mixed $value): bool => $value !== null);
+    }
 
-        $filename = 'products_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-        $filePath = 'exports/' . $filename;
+    /**
+     * @return array<string, mixed>
+     */
+    protected function filterDefaults(): array
+    {
+        return [];
+    }
 
-        Excel::store(new ProductExport($filters), $filePath, 'public');
+    protected function filenamePrefix(): string
+    {
+        return 'products';
+    }
 
-        $url = Storage::disk('public')->url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new ProductExport($filters);
     }
 }

@@ -2,29 +2,34 @@
 
 namespace App\Actions\Accounts;
 
+use App\Actions\Concerns\ConfiguredTimestampExportAction;
 use App\Exports\AccountExport;
-use App\Http\Requests\Accounts\ExportAccountRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportAccountsAction
+class ExportAccountsAction extends ConfiguredTimestampExportAction
 {
-    public function execute(ExportAccountRequest $request): JsonResponse
+    /**
+     * @return array<string, mixed>
+     */
+    protected function filterDefaults(): array
     {
-        $filters = $request->validated();
+        return [
+            'coa_version_id' => null,
+            'search' => null,
+            'type' => null,
+            'is_active' => null,
+        ];
+    }
 
-        $filename = 'accounts_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-        $filePath = 'exports/' . $filename;
+    protected function filenamePrefix(): string
+    {
+        return 'accounts';
+    }
 
-        $export = new AccountExport($filters);
-        Excel::store($export, $filePath, 'public');
-
-        $url = Storage::disk('public')->url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new AccountExport($filters);
     }
 }

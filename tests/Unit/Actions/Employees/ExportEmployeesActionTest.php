@@ -4,12 +4,14 @@ use App\Actions\Employees\ExportEmployeesAction;
 use App\Http\Requests\Employees\ExportEmployeeRequest;
 use App\Models\Employee;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class)->group('employees');
 
 test('execute exports employees and returns file info', function () {
+    Carbon::setTestNow('2026-04-04 11:00:00');
     Storage::fake('public');
     Excel::shouldReceive('store')->once();
 
@@ -27,8 +29,9 @@ test('execute exports employees and returns file info', function () {
 
     $data = $result->getData(true);
     expect($data)->toHaveKeys(['url', 'filename'])
-        ->and($data['filename'])->toContain('employees_export_')
-        ->and($data['filename'])->toContain('.xlsx');
+        ->and($data['filename'])->toBe('employees_export_2026-04-04_11-00-00.xlsx');
+
+    Carbon::setTestNow();
 });
 
 test('execute exports with search filter', function () {
