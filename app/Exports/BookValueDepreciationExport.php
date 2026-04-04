@@ -3,35 +3,14 @@
 namespace App\Exports;
 
 use App\Actions\Reports\IndexBookValueDepreciationReportAction;
+use App\Exports\Concerns\AbstractActionCollectionExport;
 use App\Http\Requests\Reports\IndexBookValueDepreciationRequest;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class BookValueDepreciationExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class BookValueDepreciationExport extends AbstractActionCollectionExport implements WithHeadings, WithMapping
 {
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-    }
-
-    public function collection()
-    {
-        // Re-use logic from Index action to generate exactly what is shown on screen
-        $action = app(IndexBookValueDepreciationReportAction::class);
-
-        // Build a fake request from the filters
-        $request = new IndexBookValueDepreciationRequest;
-        $request->merge($this->filters);
-
-        return collect($action->execute($request)->items());
-    }
-
     public function headings(): array
     {
         return [
@@ -67,10 +46,18 @@ class BookValueDepreciationExport implements FromCollection, ShouldAutoSize, Wit
         ];
     }
 
-    public function styles(Worksheet $sheet)
+    protected function actionClass(): string
     {
-        return [
-            1 => ['font' => ['bold' => true]],
-        ];
+        return IndexBookValueDepreciationReportAction::class;
+    }
+
+    protected function requestClass(): string
+    {
+        return IndexBookValueDepreciationRequest::class;
+    }
+
+    protected function transformActionResult(mixed $result): Collection
+    {
+        return collect($result->items());
     }
 }

@@ -3,34 +3,14 @@
 namespace App\Exports;
 
 use App\Actions\StockMonitor\IndexStockMonitorAction;
+use App\Exports\Concerns\AbstractActionCollectionExport;
 use App\Http\Requests\StockMonitor\IndexStockMonitorRequest;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class StockMonitorExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class StockMonitorExport extends AbstractActionCollectionExport implements WithHeadings, WithMapping
 {
-    public function __construct(private readonly array $filters = [])
-    {
-        // No-op constructor; filters are stored via promoted property.
-    }
-
-    public function collection()
-    {
-        $action = app(IndexStockMonitorAction::class);
-        $request = new IndexStockMonitorRequest;
-        $request->merge(array_merge($this->filters, [
-            'per_page' => 100000,
-        ]));
-
-        $result = $action->execute($request);
-
-        return $result['stocks']->getCollection();
-    }
-
     public function headings(): array
     {
         return [
@@ -63,10 +43,29 @@ class StockMonitorExport implements FromCollection, ShouldAutoSize, WithHeadings
         ];
     }
 
-    public function styles(Worksheet $sheet): array
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return array<string, mixed>
+     */
+    protected function prepareFilters(array $filters): array
     {
-        return [
-            1 => ['font' => ['bold' => true]],
-        ];
+        return array_merge($filters, [
+            'per_page' => 100000,
+        ]);
+    }
+
+    protected function actionClass(): string
+    {
+        return IndexStockMonitorAction::class;
+    }
+
+    protected function requestClass(): string
+    {
+        return IndexStockMonitorRequest::class;
+    }
+
+    protected function transformActionResult(mixed $result): Collection
+    {
+        return $result['stocks']->getCollection();
     }
 }

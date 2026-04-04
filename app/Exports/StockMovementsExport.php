@@ -3,34 +3,13 @@
 namespace App\Exports;
 
 use App\Actions\StockMovements\IndexStockMovementsAction;
+use App\Exports\Concerns\AbstractActionCollectionExport;
 use App\Http\Requests\StockMovements\IndexStockMovementRequest;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class StockMovementsExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class StockMovementsExport extends AbstractActionCollectionExport implements WithHeadings, WithMapping
 {
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-        $this->filters['export'] = true;
-    }
-
-    public function collection()
-    {
-        $action = app(IndexStockMovementsAction::class);
-
-        $request = new IndexStockMovementRequest;
-        $request->merge($this->filters);
-
-        return $action->execute($request);
-    }
-
     public function headings(): array
     {
         return [
@@ -73,10 +52,24 @@ class StockMovementsExport implements FromCollection, ShouldAutoSize, WithHeadin
         ];
     }
 
-    public function styles(Worksheet $sheet)
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return array<string, mixed>
+     */
+    protected function prepareFilters(array $filters): array
     {
-        return [
-            1 => ['font' => ['bold' => true]],
-        ];
+        $filters['export'] = true;
+
+        return $filters;
+    }
+
+    protected function actionClass(): string
+    {
+        return IndexStockMovementsAction::class;
+    }
+
+    protected function requestClass(): string
+    {
+        return IndexStockMovementRequest::class;
     }
 }

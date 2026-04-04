@@ -3,33 +3,13 @@
 namespace App\Exports;
 
 use App\Actions\Reports\IndexInventoryStocktakeVarianceReportAction;
+use App\Exports\Concerns\AbstractActionCollectionExport;
 use App\Http\Requests\Reports\IndexInventoryStocktakeVarianceReportRequest;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class InventoryStocktakeVarianceExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class InventoryStocktakeVarianceExport extends AbstractActionCollectionExport implements WithHeadings, WithMapping
 {
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-        $this->filters['export'] = true;
-    }
-
-    public function collection()
-    {
-        $action = app(IndexInventoryStocktakeVarianceReportAction::class);
-        $request = new IndexInventoryStocktakeVarianceReportRequest;
-        $request->merge($this->filters);
-
-        return $action->execute($request);
-    }
-
     public function headings(): array
     {
         return [
@@ -68,10 +48,24 @@ class InventoryStocktakeVarianceExport implements FromCollection, ShouldAutoSize
         ];
     }
 
-    public function styles(Worksheet $sheet): array
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return array<string, mixed>
+     */
+    protected function prepareFilters(array $filters): array
     {
-        return [
-            1 => ['font' => ['bold' => true]],
-        ];
+        $filters['export'] = true;
+
+        return $filters;
+    }
+
+    protected function actionClass(): string
+    {
+        return IndexInventoryStocktakeVarianceReportAction::class;
+    }
+
+    protected function requestClass(): string
+    {
+        return IndexInventoryStocktakeVarianceReportRequest::class;
     }
 }
