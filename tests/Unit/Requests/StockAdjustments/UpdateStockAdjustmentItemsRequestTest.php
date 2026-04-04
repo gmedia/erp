@@ -19,4 +19,8 @@ test('rules contains items rules', function () {
         'items.*.unit_id',
         'items.*.quantity_adjusted',
     ]);
+
+    expect($rules['items'])->toContain('required', 'array', 'min:1')
+        ->and($rules['items.*.product_id'])->toContain('required', 'exists:products,id')
+        ->and($rules['items.*.unit_id'])->toContain('required', 'exists:units,id');
 });
