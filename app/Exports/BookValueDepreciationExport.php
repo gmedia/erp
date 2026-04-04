@@ -5,6 +5,7 @@ namespace App\Exports;
 use App\Actions\Reports\IndexBookValueDepreciationReportAction;
 use App\Exports\Concerns\AbstractActionCollectionExport;
 use App\Http\Requests\Reports\IndexBookValueDepreciationRequest;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -56,8 +57,23 @@ class BookValueDepreciationExport extends AbstractActionCollectionExport impleme
         return IndexBookValueDepreciationRequest::class;
     }
 
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return array<string, mixed>
+     */
+    protected function prepareFilters(array $filters): array
+    {
+        $filters['export'] = true;
+
+        return $filters;
+    }
+
     protected function transformActionResult(mixed $result): Collection
     {
-        return collect($result->items());
+        if ($result instanceof LengthAwarePaginator) {
+            return collect($result->items());
+        }
+
+        return parent::transformActionResult($result);
     }
 }

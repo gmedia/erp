@@ -9,6 +9,21 @@ use Illuminate\Http\Request;
 
 trait HandlesReportQuery
 {
+    protected function applyAssetRelationIntegerFilter(
+        Request $request,
+        Builder $query,
+        string $requestKey,
+        string $column,
+    ): void {
+        if (! $request->filled($requestKey)) {
+            return;
+        }
+
+        $query->whereHas('asset', function (Builder $assetQuery) use ($request, $column, $requestKey) {
+            $assetQuery->where($column, $request->integer($requestKey));
+        });
+    }
+
     protected function applyIntegerFilter(Request $request, Builder $query, string $requestKey, string $column): void
     {
         if ($request->filled($requestKey)) {
@@ -169,5 +184,53 @@ trait HandlesReportQuery
         }
 
         return $query->paginate($request->integer('per_page', 15))->withQueryString();
+    }
+
+    protected function applyMaintenanceCostReportFilters(Request $request, Builder $query): void
+    {
+        $this->applyDateRangeFilter($request, $query, 'performed_at');
+
+        if ($request->filled('search')) {
+            $search = $request->string('search')->toString();
+
+            $query->where(function (Builder $builder) use ($search) {
+                $builder->whereHas('asset', function (Builder $assetQuery) use ($search) {
+                    $assetQuery->where('asset_code', 'like', '%' . $search . '%')
+                        ->orWhere('name', 'like', '%' . $search . '%');
+                })->orWhere('notes', 'like', '%' . $search . '%');
+            });
+        }
+
+        $this->applyAssetRelationIntegerFilter($request, $query, 'asset_category_id', 'asset_category_id');
+        $this->applyAssetRelationIntegerFilter($request, $query, 'branch_id', 'branch_id');
+        $this->applyIntegerFilter($request, $query, 'supplier_id', 'supplier_id');
+        $this->applyStringFilters($request, $query, [
+            'maintenance_type' => 'maintenance_type',
+            'status' => 'status',
+        ]);
+    }
+
+    protected function applyMaintenanceCostReportSorting(Request $request, Builder $query): void
+    {
+        $sortBy = $request->string('sort_by', 'performed_at')->toString();
+        $sortDirection = $request->string('sort_direction', 'desc')->toString();
+
+        if (in_array($sortBy, ['asset_code', 'asset_name'], true)) {
+            $query->join('assets', 'asset_maintenances.asset_id', '=', 'assets.id')
+                ->orderBy($sortBy === 'asset_name' ? 'assets.name' : 'assets.asset_code', $sortDirection)
+                ->select('asset_maintenances.*');
+
+            return;
+        }
+
+        if ($sortBy === 'supplier_name') {
+            $query->leftJoin('suppliers', 'asset_maintenances.supplier_id', '=', 'suppliers.id')
+                ->orderBy('suppliers.name', $sortDirection)
+                ->select('asset_maintenances.*');
+
+            return;
+        }
+
+        $query->orderBy('asset_maintenances.' . $sortBy, $sortDirection);
     }
 }
