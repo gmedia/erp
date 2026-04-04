@@ -35,7 +35,7 @@ abstract class ConfiguredTimestampExportAction
             $filters[$key] = $validated[$key] ?? $default;
         }
 
-        return array_filter($filters);
+        return array_filter($filters, static fn (mixed $value): bool => $value !== null && $value !== '');
     }
 
     /**

@@ -2,40 +2,35 @@
 
 namespace App\Actions\Pipelines;
 
+use App\Actions\Concerns\ConfiguredTimestampExportAction;
 use App\Exports\PipelineExport;
-use App\Http\Requests\Pipelines\ExportPipelineRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportPipelinesAction
+class ExportPipelinesAction extends ConfiguredTimestampExportAction
 {
-    public function execute(ExportPipelineRequest $request): JsonResponse
+    /**
+     * @return array<string, mixed>
+     */
+    protected function filterDefaults(): array
     {
-        $validated = $request->validated();
-
-        $filters = [
-            'search' => $validated['search'] ?? null,
-            'entity_type' => $validated['entity_type'] ?? null,
-            'is_active' => $validated['is_active'] ?? null,
-            'sort_by' => $validated['sort_by'] ?? 'created_at',
-            'sort_direction' => $validated['sort_direction'] ?? 'desc',
+        return [
+            'search' => null,
+            'entity_type' => null,
+            'is_active' => null,
+            'sort_by' => 'created_at',
+            'sort_direction' => 'desc',
         ];
+    }
 
-        $filters = array_filter($filters, function ($value) {
-            return $value !== null && $value !== '';
-        });
+    protected function filenamePrefix(): string
+    {
+        return 'pipelines';
+    }
 
-        $filename = 'pipelines_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-        $filePath = 'exports/' . $filename;
-
-        Excel::store(new PipelineExport($filters), $filePath, 'public');
-
-        $url = Storage::disk('public')->url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new PipelineExport($filters);
     }
 }
