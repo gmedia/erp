@@ -2,6 +2,7 @@
 
 namespace App\Actions\ApprovalAuditTrail;
 
+use App\Actions\Concerns\InteractsWithAuditTrailIndex;
 use App\Http\Requests\ApprovalAuditTrail\IndexApprovalAuditTrailRequest;
 use App\Models\ApprovalAuditLog;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class IndexApprovalAuditTrailAction
 {
+    use InteractsWithAuditTrailIndex;
+
     public function execute(
         IndexApprovalAuditTrailRequest $request
     ): LengthAwarePaginator|Collection {
@@ -19,13 +22,7 @@ class IndexApprovalAuditTrailAction
                 'request',
             ]);
 
-        if ($request->filled('start_date')) {
-            $query->whereDate('created_at', '>=', $request->start_date);
-        }
-
-        if ($request->filled('end_date')) {
-            $query->whereDate('created_at', '<=', $request->end_date);
-        }
+        $this->applyCreatedAtDateRange($request, $query);
 
         if ($request->filled('approvable_type')) {
             $query->where('approvable_type', 'like', '%' . $request->approvable_type);
@@ -48,23 +45,14 @@ class IndexApprovalAuditTrailAction
             });
         }
 
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = $request->get('sort_direction', 'desc');
+        $this->applyUserSortableOrdering(
+            $request,
+            $query,
+            'approval_audit_logs',
+            'actor_user_id',
+            'approval_audit_logs.actor_user_id',
+        );
 
-        if ($sortBy === 'actor_user_id') {
-            $query->leftJoin('users', 'approval_audit_logs.actor_user_id', '=', 'users.id')
-                ->orderBy('users.name', $sortDirection)
-                ->select('approval_audit_logs.*');
-        } else {
-            $query->orderBy('approval_audit_logs.' . $sortBy, $sortDirection);
-        }
-
-        if ($request->boolean('export')) {
-            return $query->get();
-        }
-
-        $perPage = $request->get('per_page', 15);
-
-        return $query->paginate($perPage)->withQueryString();
+        return $this->exportOrPaginate($request, $query);
     }
 }

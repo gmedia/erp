@@ -2,6 +2,7 @@
 
 namespace App\Actions\PipelineAuditTrail;
 
+use App\Actions\Concerns\InteractsWithAuditTrailIndex;
 use App\Http\Requests\PipelineAuditTrail\IndexPipelineAuditTrailRequest;
 use App\Models\PipelineStateLog;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class IndexPipelineAuditTrailAction
 {
+    use InteractsWithAuditTrailIndex;
+
     public function execute(
         IndexPipelineAuditTrailRequest $request
     ): LengthAwarePaginator|Collection {
@@ -22,13 +25,7 @@ class IndexPipelineAuditTrailAction
                 'performedBy',
             ]);
 
-        if ($request->filled('start_date')) {
-            $query->whereDate('created_at', '>=', $request->start_date);
-        }
-
-        if ($request->filled('end_date')) {
-            $query->whereDate('created_at', '<=', $request->end_date);
-        }
+        $this->applyCreatedAtDateRange($request, $query);
 
         if ($request->filled('entity_type')) {
             $query->where('entity_type', 'like', '%' . $request->entity_type);
@@ -65,23 +62,14 @@ class IndexPipelineAuditTrailAction
             });
         }
 
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = $request->get('sort_direction', 'desc');
+        $this->applyUserSortableOrdering(
+            $request,
+            $query,
+            'pipeline_state_logs',
+            'performed_by',
+            'pipeline_state_logs.performed_by',
+        );
 
-        if ($sortBy === 'performed_by') {
-            $query->leftJoin('users', 'pipeline_state_logs.performed_by', '=', 'users.id')
-                ->orderBy('users.name', $sortDirection)
-                ->select('pipeline_state_logs.*');
-        } else {
-            $query->orderBy('pipeline_state_logs.' . $sortBy, $sortDirection);
-        }
-
-        if ($request->boolean('export')) {
-            return $query->get();
-        }
-
-        $perPage = $request->get('per_page', 15);
-
-        return $query->paginate($perPage)->withQueryString();
+        return $this->exportOrPaginate($request, $query);
     }
 }
