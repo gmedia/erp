@@ -14,8 +14,44 @@ abstract class BaseListingRequest extends FormRequest
     /**
      * @return array<string, array<int, string>>
      */
-    protected function listingSortRules(string $sortBy, bool $includeStringInSortDirection = true): array
+    protected function searchRules(): array
     {
+        return [
+            'search' => ['nullable', 'string'],
+        ];
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    protected function paginationRules(): array
+    {
+        return array_merge(
+            $this->perPageRules(),
+            [
+                'page' => ['nullable', 'integer', 'min:1'],
+            ],
+        );
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    protected function perPageRules(): array
+    {
+        return [
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+        ];
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    protected function listingSortRules(
+        string $sortBy,
+        bool $includeStringInSortDirection = true,
+        string $sortDirectionField = 'sort_direction'
+    ): array {
         $sortDirectionRules = ['nullable', 'in:asc,desc'];
 
         if ($includeStringInSortDirection) {
@@ -24,7 +60,7 @@ abstract class BaseListingRequest extends FormRequest
 
         return [
             'sort_by' => ['nullable', 'string', 'in:' . $sortBy],
-            'sort_direction' => $sortDirectionRules,
+            $sortDirectionField => $sortDirectionRules,
         ];
     }
 }

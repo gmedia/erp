@@ -2,30 +2,21 @@
 
 namespace App\Http\Requests\Pipelines;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseListingRequest;
 
-class IndexPipelineRequest extends FormRequest
+class IndexPipelineRequest extends BaseListingRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
-        return [
-            'search' => ['nullable', 'string'],
-            'entity_type' => ['nullable', 'string'],
-            'is_active' => ['nullable', 'boolean'],
-            'sort_by' => [
-                'nullable',
-                'string',
-                'in:id,name,code,entity_type,version,is_active,created_at,updated_at,created_by',
+        return array_merge(
+            $this->searchRules(),
+            [
+                'entity_type' => ['nullable', 'string'],
+                'is_active' => ['nullable', 'boolean'],
             ],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
-            'page' => ['nullable', 'integer', 'min:1'],
-        ];
+            $this->listingSortRules('id,name,code,entity_type,version,is_active,created_at,updated_at,created_by'),
+            $this->paginationRules(),
+        );
     }
 
     protected function prepareForValidation(): void

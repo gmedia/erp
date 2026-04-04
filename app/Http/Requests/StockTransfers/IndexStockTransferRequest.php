@@ -2,35 +2,28 @@
 
 namespace App\Http\Requests\StockTransfers;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseListingRequest;
 
-class IndexStockTransferRequest extends FormRequest
+class IndexStockTransferRequest extends BaseListingRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
-        return [
-            'search' => ['nullable', 'string'],
-            'from_warehouse_id' => ['nullable', 'exists:warehouses,id'],
-            'to_warehouse_id' => ['nullable', 'exists:warehouses,id'],
-            'status' => ['nullable', 'string', 'in:draft,pending_approval,approved,in_transit,received,cancelled'],
-            'transfer_date_from' => ['nullable', 'date'],
-            'transfer_date_to' => ['nullable', 'date'],
-            'expected_arrival_date_from' => ['nullable', 'date'],
-            'expected_arrival_date_to' => ['nullable', 'date'],
-            'sort_by' => [
-                'nullable',
-                'string',
-                'in:id,transfer_number,from_warehouse_id,to_warehouse_id,transfer_date,' .
-                    'expected_arrival_date,status,created_at,updated_at',
+        return array_merge(
+            $this->searchRules(),
+            [
+                'from_warehouse_id' => ['nullable', 'exists:warehouses,id'],
+                'to_warehouse_id' => ['nullable', 'exists:warehouses,id'],
+                'status' => ['nullable', 'string', 'in:draft,pending_approval,approved,in_transit,received,cancelled'],
+                'transfer_date_from' => ['nullable', 'date'],
+                'transfer_date_to' => ['nullable', 'date'],
+                'expected_arrival_date_from' => ['nullable', 'date'],
+                'expected_arrival_date_to' => ['nullable', 'date'],
             ],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
-            'page' => ['nullable', 'integer', 'min:1'],
-        ];
+            $this->listingSortRules(
+                'id,transfer_number,from_warehouse_id,to_warehouse_id,transfer_date,' .
+                    'expected_arrival_date,status,created_at,updated_at'
+            ),
+            $this->paginationRules(),
+        );
     }
 }

@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Http\Requests\Accounts;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
+
+abstract class AbstractAccountRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'coa_version_id' => ['required', 'exists:coa_versions,id'],
+            'parent_id' => ['nullable', 'exists:accounts,id'],
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                $this->accountCodeUniqueRule(),
+            ],
+            'name' => ['required', 'string', 'max:255'],
+            'type' => ['required', 'in:asset,liability,equity,revenue,expense'],
+            'sub_type' => ['nullable', 'string', 'max:255'],
+            'normal_balance' => ['required', 'in:debit,credit'],
+            'level' => ['required', 'integer', 'min:1'],
+            'is_active' => ['boolean'],
+            'is_cash_flow' => ['boolean'],
+            'description' => ['nullable', 'string'],
+        ];
+    }
+
+    protected function scopedAccountCodeUniqueRule(): Unique
+    {
+        return Rule::unique('accounts')
+            ->where(fn ($query) => $query->where('coa_version_id', $this->coa_version_id));
+    }
+
+    abstract protected function accountCodeUniqueRule(): Unique;
+}

@@ -2,25 +2,12 @@
 
 namespace App\Http\Requests\Pipelines;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class StorePipelineRequest extends FormRequest
+class StorePipelineRequest extends AbstractPipelineRequest
 {
-    public function authorize(): bool
+    protected function pipelineCodeUniqueRule(): Rule|string
     {
-        return true;
-    }
-
-    public function rules(): array
-    {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:255', 'unique:pipelines,code'],
-            'entity_type' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'version' => ['nullable', 'integer', 'min:1'],
-            'is_active' => ['nullable', 'boolean'],
-            'conditions' => ['nullable', 'json'],
-        ];
+        return 'unique:pipelines,code';
     }
 }
