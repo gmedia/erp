@@ -2,30 +2,25 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-abstract class AbstractProductUnitItemsUpdateRequest extends FormRequest
+abstract class AbstractProductUnitItemsUpdateRequest extends AbstractItemsUpdateRequest
 {
-    public function authorize(): bool
+    /**
+     * @return array<int, string>
+     */
+    protected function itemsRules(): array
     {
-        return true;
-    }
-
-    public function rules(): array
-    {
-        return array_merge($this->baseItemRules(), $this->additionalItemRules());
+        return ['required', 'array', 'min:1'];
     }
 
     /**
      * @return array<string, array<int, string>>
      */
-    protected function baseItemRules(): array
+    protected function itemRules(): array
     {
-        return [
-            'items' => ['required', 'array', 'min:1'],
+        return array_merge([
             'items.*.product_id' => ['required', 'exists:products,id'],
             'items.*.unit_id' => ['required', 'exists:units,id'],
-        ];
+        ], $this->additionalItemRules());
     }
 
     /**

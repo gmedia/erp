@@ -2,19 +2,13 @@
 
 namespace App\Http\Requests\AssetStocktakes;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AbstractItemsUpdateRequest;
 
-class UpdateAssetStocktakeItemRequest extends FormRequest
+class UpdateAssetStocktakeItemRequest extends AbstractItemsUpdateRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    public function rules(): array
+    protected function itemRules(): array
     {
         return [
-            'items' => ['required', 'array'],
             'items.*.asset_id' => ['required', 'exists:assets,id'],
             'items.*.expected_branch_id' => ['required', 'exists:branches,id'],
             'items.*.expected_location_id' => ['nullable', 'exists:asset_locations,id'],
