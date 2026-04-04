@@ -2,20 +2,23 @@
 
 namespace App\Actions\AssetStocktakes;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\AssetStocktakes\AssetStocktakeVarianceQueryService;
 use App\Http\Requests\AssetStocktakes\IndexAssetStocktakeVarianceRequest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class IndexAssetStocktakeVarianceAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private readonly AssetStocktakeVarianceQueryService $queryService
     ) {}
 
-    public function execute(IndexAssetStocktakeVarianceRequest $request): LengthAwarePaginator
+    public function execute(IndexAssetStocktakeVarianceRequest $request): LengthAwarePaginator|Collection
     {
-        $perPage = $request->get('per_page', 15);
-        $page = $request->get('page', 1);
+        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
 
         $query = $this->queryService->buildBaseQuery();
         $this->queryService->applyFilters($query, [
@@ -29,6 +32,10 @@ class IndexAssetStocktakeVarianceAction
         $sortDirection = (string) $request->get('sort_direction', 'desc');
         $this->queryService->applySorting($query, $sortBy, $sortDirection);
 
-        return $query->paginate($perPage, ['*'], 'page', $page);
+        if ($request->boolean('export')) {
+            return $query->get();
+        }
+
+        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }

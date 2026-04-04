@@ -8,7 +8,10 @@ use App\Models\AssetStocktake;
 use App\Models\AssetStocktakeItem;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
+use Maatwebsite\Excel\Facades\Excel;
 
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -88,6 +91,10 @@ test('it can filter variance by stocktake and result', function () {
 });
 
 test('it can export variance to excel', function () {
+    Carbon::setTestNow('2026-04-04 15:30:45');
+    Excel::fake();
+    Storage::fake('public');
+
     $branch = Branch::factory()->create();
     $stocktake = AssetStocktake::factory()->create(['branch_id' => $branch->id]);
 
@@ -106,4 +113,11 @@ test('it can export variance to excel', function () {
             'url',
             'filename',
         ]);
+
+    $filename = $response->json('filename');
+
+    expect($filename)->toBe('asset_stocktake_variances_20260404_153045.xlsx');
+
+    Excel::assertStored('exports/' . $filename, 'public');
+    Carbon::setTestNow();
 });
