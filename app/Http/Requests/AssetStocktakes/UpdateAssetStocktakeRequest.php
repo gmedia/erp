@@ -2,32 +2,49 @@
 
 namespace App\Http\Requests\AssetStocktakes;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-
-class UpdateAssetStocktakeRequest extends FormRequest
+class UpdateAssetStocktakeRequest extends AbstractAssetStocktakeRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    public function rules(): array
+    protected function branchRules(): array
     {
         return [
             'branch_id' => ['sometimes', 'required', 'exists:branches,id'],
-            'reference' => [
-                'sometimes',
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('asset_stocktakes')->where(function ($query) {
-                    return $query->where('branch_id', $this->branch_id ?? $this->route('asset_stocktake')->branch_id);
-                })->ignore($this->route('asset_stocktake')),
-            ],
-            'planned_at' => ['sometimes', 'required', 'date'],
-            'performed_at' => ['nullable', 'date'],
-            'status' => ['sometimes', 'required', 'in:draft,in_progress,completed,cancelled'],
         ];
+    }
+
+    protected function referenceStringRules(): array
+    {
+        return [
+            'sometimes',
+            'required',
+            'string',
+            'max:255',
+        ];
+    }
+
+    protected function plannedAtRules(): array
+    {
+        return ['sometimes', 'required', 'date'];
+    }
+
+    protected function statusRules(): array
+    {
+        return ['sometimes', 'required', 'in:draft,in_progress,completed,cancelled'];
+    }
+
+    protected function additionalRules(): array
+    {
+        return [
+            'performed_at' => ['nullable', 'date'],
+        ];
+    }
+
+    protected function assetStocktakeReferenceUniqueRule(): \Illuminate\Validation\Rules\Unique
+    {
+        return parent::assetStocktakeReferenceUniqueRule()->ignore($this->route('asset_stocktake'));
+    }
+
+    protected function assetStocktakeBranchId(): mixed
+    {
+        return $this->input('branch_id') ?? $this->route('asset_stocktake')->branch_id;
     }
 }
