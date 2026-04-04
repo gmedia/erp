@@ -2,6 +2,7 @@
 
 namespace App\Actions\Suppliers;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\Suppliers\SupplierFilterService;
 use App\Http\Requests\Suppliers\IndexSupplierRequest;
 use App\Models\Supplier;
@@ -9,6 +10,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexSuppliersAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private SupplierFilterService $filterService
     ) {}
@@ -22,22 +25,16 @@ class IndexSuppliersAction
 
         $query = Supplier::query()->with(['branch', 'category']);
 
-        // Search functionality - search across name, email, phone, address
         if ($request->filled('search')) {
             $this->filterService->applySearch($query, $request->get('search'), ['name', 'email', 'phone', 'address']);
         }
 
-        // Apply advanced filters
-        $this->filterService->applyAdvancedFilters($query, [
-            'branch_id' => $request->get('branch_id'),
-            'category_id' => $request->get('category_id'),
-            'status' => $request->get('status'),
-        ]);
-
-        $this->filterService->applySorting(
+        $this->applyRequestFilters($request, $query, $this->filterService, ['branch_id', 'category_id', 'status']);
+        $this->applyIndexSorting(
+            $request,
             $query,
-            $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
+            $this->filterService,
+            'created_at',
             [
                 'id',
                 'name',
@@ -52,17 +49,6 @@ class IndexSuppliersAction
             ]
         );
 
-        return $query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    /**
-     * Get pagination parameters from request
-     */
-    private function getPaginationParams($request): array
-    {
-        return [
-            'perPage' => $request->get('per_page', 15),
-            'page' => $request->get('page', 1),
-        ];
+        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }

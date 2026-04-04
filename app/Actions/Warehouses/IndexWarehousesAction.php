@@ -2,6 +2,7 @@
 
 namespace App\Actions\Warehouses;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\Warehouses\WarehouseFilterService;
 use App\Http\Requests\Warehouses\IndexWarehouseRequest;
 use App\Models\Warehouse;
@@ -12,6 +13,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
  */
 class IndexWarehousesAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private WarehouseFilterService $filterService
     ) {}
@@ -22,16 +25,10 @@ class IndexWarehousesAction
 
         $query = Warehouse::query()->with(['branch']);
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), ['code', 'name']);
-        } else {
-            $this->filterService->applyAdvancedFilters($query, [
-                'branch_id' => $request->get('branch_id'),
-            ]);
-        }
+        $this->applySearchOrPrimaryFilters($request, $query, $this->filterService, ['code', 'name'], ['branch_id']);
 
         $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+        $sortDirection = $this->normalizeSortDirection($request->get('sort_direction', 'desc'));
 
         if ($sortBy === 'branch') {
             $query
@@ -47,14 +44,6 @@ class IndexWarehousesAction
             );
         }
 
-        return $query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    private function getPaginationParams($request): array
-    {
-        return [
-            'perPage' => $request->get('per_page', 15),
-            'page' => $request->get('page', 1),
-        ];
+        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }

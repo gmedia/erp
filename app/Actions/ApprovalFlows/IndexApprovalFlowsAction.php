@@ -2,6 +2,7 @@
 
 namespace App\Actions\ApprovalFlows;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\ApprovalFlows\ApprovalFlowFilterService;
 use App\Http\Requests\ApprovalFlows\IndexApprovalFlowRequest;
 use App\Models\ApprovalFlow;
@@ -9,6 +10,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexApprovalFlowsAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private ApprovalFlowFilterService $filterService
     ) {}
@@ -19,33 +22,16 @@ class IndexApprovalFlowsAction
 
         $query = ApprovalFlow::query()->with(['steps.user', 'steps.department', 'creator']);
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), ['name', 'code']);
-        } else {
-            $this->filterService->applyAdvancedFilters($query, [
-                'approvable_type' => $request->get('approvable_type'),
-            ]);
-        }
-
-        $this->filterService->applyAdvancedFilters($query, [
-            'is_active' => $request->get('is_active'),
-        ]);
-
-        $this->filterService->applySorting(
+        $this->applySearchOrPrimaryFilters($request, $query, $this->filterService, ['name', 'code'], ['approvable_type']);
+        $this->applyRequestFilters($request, $query, $this->filterService, ['is_active']);
+        $this->applyIndexSorting(
+            $request,
             $query,
-            $request->get('sort_by', 'created_at'),
-            strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc',
+            $this->filterService,
+            'created_at',
             ['id', 'name', 'code', 'approvable_type', 'is_active', 'created_at', 'updated_at']
         );
 
-        return $query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    private function getPaginationParams($request): array
-    {
-        return [
-            'perPage' => $request->get('per_page', 15),
-            'page' => $request->get('page', 1),
-        ];
+        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }

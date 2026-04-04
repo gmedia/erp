@@ -2,6 +2,7 @@
 
 namespace App\Actions\Pipelines;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\Pipelines\PipelineFilterService;
 use App\Http\Requests\Pipelines\IndexPipelineRequest;
 use App\Models\Pipeline;
@@ -9,6 +10,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexPipelinesAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private PipelineFilterService $filterService
     ) {}
@@ -23,13 +26,10 @@ class IndexPipelinesAction
             $this->filterService->applySearch($query, $request->get('search'), ['name', 'code', 'description']);
         }
 
-        $this->filterService->applyAdvancedFilters($query, [
-            'entity_type' => $request->get('entity_type'),
-            'is_active' => $request->get('is_active'),
-        ]);
+        $this->applyRequestFilters($request, $query, $this->filterService, ['entity_type', 'is_active']);
 
         $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+        $sortDirection = $this->normalizeSortDirection($request->get('sort_direction', 'desc'));
 
         if ($sortBy === 'created_by') {
             $query->leftJoin('users as creator', 'pipelines.created_by', '=', 'creator.id')
@@ -44,14 +44,6 @@ class IndexPipelinesAction
             );
         }
 
-        return $query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    private function getPaginationParams($request): array
-    {
-        return [
-            'perPage' => $request->get('per_page', 15),
-            'page' => $request->get('page', 1),
-        ];
+        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }
