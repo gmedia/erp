@@ -2,6 +2,7 @@
 
 namespace App\Actions\PurchaseOrders;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\PurchaseOrders\PurchaseOrderFilterService;
 use App\Http\Requests\PurchaseOrders\IndexPurchaseOrderRequest;
 use App\Models\PurchaseOrder;
@@ -9,12 +10,16 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexPurchaseOrdersAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private PurchaseOrderFilterService $filterService
     ) {}
 
     public function execute(IndexPurchaseOrderRequest $request): LengthAwarePaginator
     {
+        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
+
         $query = PurchaseOrder::query()->with([
             'supplier',
             'warehouse',
@@ -24,39 +29,27 @@ class IndexPurchaseOrdersAction
             'items.unit',
         ]);
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->string('search')->toString(), [
-                'po_number',
-                'payment_terms',
-                'notes',
-                'shipping_address',
-            ]);
-        }
-
-        $this->filterService->applyAdvancedFilters($query, [
-            'supplier_id' => $request->get('supplier_id'),
-            'warehouse_id' => $request->get('warehouse_id'),
-            'status' => $request->get('status'),
-            'currency' => $request->get('currency'),
-            'order_date_from' => $request->get('order_date_from'),
-            'order_date_to' => $request->get('order_date_to'),
-            'expected_delivery_date_from' => $request->get('expected_delivery_date_from'),
-            'expected_delivery_date_to' => $request->get('expected_delivery_date_to'),
-            'grand_total_min' => $request->get('grand_total_min'),
-            'grand_total_max' => $request->get('grand_total_max'),
+        $this->applyRequestSearch($request, $query, $this->filterService, [
+            'po_number',
+            'payment_terms',
+            'notes',
+            'shipping_address',
         ]);
 
-        $sortBy = $request->string('sort_by', 'created_at')->toString();
-        $sortDirection = strtolower($request->string('sort_direction', 'desc')->toString()) === 'asc' ? 'asc' : 'desc';
+        $this->applyRequestFilters($request, $query, $this->filterService, [
+            'supplier_id',
+            'warehouse_id',
+            'status',
+            'currency',
+            'order_date_from',
+            'order_date_to',
+            'expected_delivery_date_from',
+            'expected_delivery_date_to',
+            'grand_total_min',
+            'grand_total_max',
+        ]);
 
-        $sortMap = [
-            'supplier' => 'supplier_id',
-            'warehouse' => 'warehouse_id',
-        ];
-
-        $sortBy = $sortMap[$sortBy] ?? $sortBy;
-
-        $this->filterService->applySorting($query, $sortBy, $sortDirection, [
+        $this->applyMappedIndexSorting($request, $query, $this->filterService, 'created_at', [
             'id',
             'po_number',
             'supplier_id',
@@ -68,13 +61,11 @@ class IndexPurchaseOrdersAction
             'grand_total',
             'created_at',
             'updated_at',
+        ], [
+            'supplier' => 'supplier_id',
+            'warehouse' => 'warehouse_id',
         ]);
 
-        return $query->paginate(
-            $request->integer('per_page', 15),
-            ['*'],
-            'page',
-            $request->integer('page', 1),
-        );
+        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }

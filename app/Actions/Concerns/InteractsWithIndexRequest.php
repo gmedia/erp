@@ -2,6 +2,7 @@
 
 namespace App\Actions\Concerns;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
@@ -21,6 +22,19 @@ trait InteractsWithIndexRequest
     private function normalizeSortDirection(?string $sortDirection): string
     {
         return strtolower((string) $sortDirection) === 'asc' ? 'asc' : 'desc';
+    }
+
+    /**
+     * @param  object{applySearch: callable}  $filterService
+     * @param  array<int, string>  $searchFields
+     */
+    private function applyRequestSearch(Request $request, Builder $query, object $filterService, array $searchFields): void
+    {
+        if (! $request->filled('search')) {
+            return;
+        }
+
+        $filterService->applySearch($query, $request->string('search')->toString(), $searchFields);
     }
 
     /**
@@ -70,6 +84,34 @@ trait InteractsWithIndexRequest
             $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
             $allowedSorts,
         );
+    }
+
+    /**
+     * @param  object{applySorting: callable}  $filterService
+     * @param  array<int, string>  $allowedSorts
+     * @param  array<string, string>  $sortMap
+     */
+    private function applyMappedIndexSorting(
+        Request $request,
+        Builder $query,
+        object $filterService,
+        string $defaultSortBy,
+        array $allowedSorts,
+        array $sortMap
+    ): void {
+        $sortBy = $request->string('sort_by', $defaultSortBy)->toString();
+
+        $filterService->applySorting(
+            $query,
+            $sortMap[$sortBy] ?? $sortBy,
+            $this->normalizeSortDirection($request->string('sort_direction', 'desc')->toString()),
+            $allowedSorts,
+        );
+    }
+
+    private function paginateIndexQuery(Builder $query, int $perPage, int $page): LengthAwarePaginator
+    {
+        return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**

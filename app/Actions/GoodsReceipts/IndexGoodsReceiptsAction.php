@@ -2,6 +2,7 @@
 
 namespace App\Actions\GoodsReceipts;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\GoodsReceipts\GoodsReceiptFilterService;
 use App\Http\Requests\GoodsReceipts\IndexGoodsReceiptRequest;
 use App\Models\GoodsReceipt;
@@ -9,12 +10,16 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexGoodsReceiptsAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private GoodsReceiptFilterService $filterService
     ) {}
 
     public function execute(IndexGoodsReceiptRequest $request): LengthAwarePaginator
     {
+        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
+
         $query = GoodsReceipt::query()->with([
             'purchaseOrder.supplier',
             'warehouse',
@@ -25,34 +30,22 @@ class IndexGoodsReceiptsAction
             'items.unit',
         ]);
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->string('search')->toString(), [
-                'gr_number',
-                'supplier_delivery_note',
-                'notes',
-            ]);
-        }
-
-        $this->filterService->applyAdvancedFilters($query, [
-            'purchase_order_id' => $request->get('purchase_order_id'),
-            'warehouse_id' => $request->get('warehouse_id'),
-            'status' => $request->get('status'),
-            'received_by' => $request->get('received_by'),
-            'receipt_date_from' => $request->get('receipt_date_from'),
-            'receipt_date_to' => $request->get('receipt_date_to'),
+        $this->applyRequestSearch($request, $query, $this->filterService, [
+            'gr_number',
+            'supplier_delivery_note',
+            'notes',
         ]);
 
-        $sortBy = $request->string('sort_by', 'created_at')->toString();
-        $sortDirection = strtolower($request->string('sort_direction', 'desc')->toString()) === 'asc' ? 'asc' : 'desc';
+        $this->applyRequestFilters($request, $query, $this->filterService, [
+            'purchase_order_id',
+            'warehouse_id',
+            'status',
+            'received_by',
+            'receipt_date_from',
+            'receipt_date_to',
+        ]);
 
-        $sortMap = [
-            'purchase_order' => 'purchase_order_id',
-            'warehouse' => 'warehouse_id',
-        ];
-
-        $sortBy = $sortMap[$sortBy] ?? $sortBy;
-
-        $this->filterService->applySorting($query, $sortBy, $sortDirection, [
+        $this->applyMappedIndexSorting($request, $query, $this->filterService, 'created_at', [
             'id',
             'gr_number',
             'purchase_order_id',
@@ -62,13 +55,11 @@ class IndexGoodsReceiptsAction
             'status',
             'created_at',
             'updated_at',
+        ], [
+            'purchase_order' => 'purchase_order_id',
+            'warehouse' => 'warehouse_id',
         ]);
 
-        return $query->paginate(
-            $request->integer('per_page', 15),
-            ['*'],
-            'page',
-            $request->integer('page', 1),
-        );
+        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }

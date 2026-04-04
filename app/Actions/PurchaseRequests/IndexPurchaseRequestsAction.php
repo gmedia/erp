@@ -2,6 +2,7 @@
 
 namespace App\Actions\PurchaseRequests;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\PurchaseRequests\PurchaseRequestFilterService;
 use App\Http\Requests\PurchaseRequests\IndexPurchaseRequestRequest;
 use App\Models\PurchaseRequest;
@@ -9,12 +10,16 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexPurchaseRequestsAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private PurchaseRequestFilterService $filterService
     ) {}
 
     public function execute(IndexPurchaseRequestRequest $request): LengthAwarePaginator
     {
+        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
+
         $query = PurchaseRequest::query()->with([
             'branch',
             'department',
@@ -25,40 +30,27 @@ class IndexPurchaseRequestsAction
             'items.unit',
         ]);
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->string('search')->toString(), [
-                'pr_number',
-                'notes',
-                'rejection_reason',
-            ]);
-        }
-
-        $this->filterService->applyAdvancedFilters($query, [
-            'branch_id' => $request->get('branch_id'),
-            'department_id' => $request->get('department_id'),
-            'requested_by' => $request->get('requested_by'),
-            'priority' => $request->get('priority'),
-            'status' => $request->get('status'),
-            'request_date_from' => $request->get('request_date_from'),
-            'request_date_to' => $request->get('request_date_to'),
-            'required_date_from' => $request->get('required_date_from'),
-            'required_date_to' => $request->get('required_date_to'),
-            'estimated_amount_min' => $request->get('estimated_amount_min'),
-            'estimated_amount_max' => $request->get('estimated_amount_max'),
+        $this->applyRequestSearch($request, $query, $this->filterService, [
+            'pr_number',
+            'notes',
+            'rejection_reason',
         ]);
 
-        $sortBy = $request->string('sort_by', 'created_at')->toString();
-        $sortDirection = strtolower($request->string('sort_direction', 'desc')->toString()) === 'asc' ? 'asc' : 'desc';
+        $this->applyRequestFilters($request, $query, $this->filterService, [
+            'branch_id',
+            'department_id',
+            'requested_by',
+            'priority',
+            'status',
+            'request_date_from',
+            'request_date_to',
+            'required_date_from',
+            'required_date_to',
+            'estimated_amount_min',
+            'estimated_amount_max',
+        ]);
 
-        $sortMap = [
-            'branch' => 'branch_id',
-            'department' => 'department_id',
-            'requester' => 'requested_by',
-        ];
-
-        $sortBy = $sortMap[$sortBy] ?? $sortBy;
-
-        $this->filterService->applySorting($query, $sortBy, $sortDirection, [
+        $this->applyMappedIndexSorting($request, $query, $this->filterService, 'created_at', [
             'id',
             'pr_number',
             'branch_id',
@@ -71,13 +63,12 @@ class IndexPurchaseRequestsAction
             'estimated_amount',
             'created_at',
             'updated_at',
+        ], [
+            'branch' => 'branch_id',
+            'department' => 'department_id',
+            'requester' => 'requested_by',
         ]);
 
-        return $query->paginate(
-            $request->integer('per_page', 15),
-            ['*'],
-            'page',
-            $request->integer('page', 1),
-        );
+        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }
