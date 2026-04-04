@@ -2,29 +2,10 @@
 
 namespace App\Http\Requests\FiscalYears;
 
-use App\Http\Requests\SimpleCrudUpdateRequest;
-use App\Models\FiscalYear;
-
-class UpdateFiscalYearRequest extends SimpleCrudUpdateRequest
+class UpdateFiscalYearRequest extends AbstractFiscalYearRequest
 {
-    /**
-     * Get the validation rules that apply to the request.
-     */
-    public function rules(): array
+    protected function usesSometimes(): bool
     {
-        $fiscalYear = $this->route('fiscal_year');
-        $id = $fiscalYear instanceof FiscalYear ? $fiscalYear->id : $fiscalYear;
-
-        return [
-            'name' => ['sometimes', 'required', 'string', 'max:255', 'unique:fiscal_years,name,' . $id],
-            'start_date' => ['sometimes', 'required', 'date'],
-            'end_date' => ['sometimes', 'required', 'date', 'after:start_date'],
-            'status' => ['sometimes', 'required', 'in:open,closed,locked'],
-        ];
-    }
-
-    protected function getModelClass(): string
-    {
-        return FiscalYear::class;
+        return true;
     }
 }
