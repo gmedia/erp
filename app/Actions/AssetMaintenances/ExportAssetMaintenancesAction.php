@@ -2,26 +2,40 @@
 
 namespace App\Actions\AssetMaintenances;
 
+use App\Actions\Concerns\ConfiguredXlsxExportAction;
 use App\Exports\AssetMaintenanceExport;
-use App\Http\Requests\AssetMaintenances\ExportAssetMaintenanceRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportAssetMaintenancesAction
+class ExportAssetMaintenancesAction extends ConfiguredXlsxExportAction
 {
-    public function execute(ExportAssetMaintenanceRequest $request): JsonResponse
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    protected function buildFilters(array $validated): array
     {
-        $filters = array_filter($request->validated(), fn ($value) => $value !== null && $value !== '');
+        return array_filter($validated, static fn (mixed $value): bool => $value !== null && $value !== '');
+    }
 
-        $filename = 'asset-maintenances-export-' . now()->format('Y-m-d-H-i-s') . '.xlsx';
-        $filePath = 'exports/' . $filename;
+    protected function filenameDelimiter(): string
+    {
+        return '-';
+    }
 
-        Excel::store(new AssetMaintenanceExport($filters), $filePath, 'public');
+    protected function timestampFormat(): string
+    {
+        return 'Y-m-d-H-i-s';
+    }
 
-        return response()->json([
-            'url' => Storage::disk('public')->url($filePath),
-            'filename' => $filename,
-        ]);
+    protected function filenamePrefix(): string
+    {
+        return 'asset-maintenances';
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new AssetMaintenanceExport($filters);
     }
 }

@@ -5,6 +5,7 @@ namespace Tests\Unit\Actions\Assets;
 use App\Actions\Assets\ExportAssetsAction;
 use App\Http\Requests\Assets\ExportAssetRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -12,6 +13,7 @@ use Maatwebsite\Excel\Facades\Excel;
 uses(RefreshDatabase::class)->group('assets');
 
 test('export assets action returns json with url', function () {
+    Carbon::setTestNow('2024-01-01 08:30:00');
     Excel::fake();
     Storage::fake('public');
 
@@ -29,5 +31,6 @@ test('export assets action returns json with url', function () {
     $data = $response->getData(true);
 
     expect($response->getStatusCode())->toBe(200)
-        ->and($data)->toHaveKeys(['url', 'filename']);
+        ->and($data)->toHaveKeys(['url', 'filename'])
+        ->and($data['filename'])->toMatch('/^assets_export_2024-01-01_08-30-00_[0-9A-HJKMNP-TV-Z]{26}\.xlsx$/');
 });

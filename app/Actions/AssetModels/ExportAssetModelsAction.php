@@ -2,18 +2,17 @@
 
 namespace App\Actions\AssetModels;
 
+use App\Actions\Concerns\ConfiguredXlsxExportAction;
 use App\Exports\AssetModelExport;
-use App\Http\Requests\AssetModels\ExportAssetModelRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportAssetModelsAction
+class ExportAssetModelsAction extends ConfiguredXlsxExportAction
 {
-    public function execute(ExportAssetModelRequest $request): JsonResponse
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    protected function buildFilters(array $validated): array
     {
-        $validated = $request->validated();
-
         $filters = [
             'search' => $validated['search'] ?? null,
             'asset_category_id' => $validated['asset_category_id'] ?? null,
@@ -21,18 +20,19 @@ class ExportAssetModelsAction
             'sort_direction' => $validated['sort_direction'] ?? 'desc',
         ];
 
-        $filters = array_filter($filters);
+        return array_filter($filters);
+    }
 
-        $filename = 'asset_models_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-        $filePath = 'exports/' . $filename;
+    protected function filenamePrefix(): string
+    {
+        return 'asset_models';
+    }
 
-        Excel::store(new AssetModelExport($filters), $filePath, 'public');
-
-        $url = Storage::disk('public')->url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new AssetModelExport($filters);
     }
 }

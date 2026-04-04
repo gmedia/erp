@@ -2,28 +2,40 @@
 
 namespace App\Actions\AssetMovements;
 
+use App\Actions\Concerns\ConfiguredXlsxExportAction;
 use App\Exports\AssetMovementExport;
-use App\Http\Requests\AssetMovements\ExportAssetMovementRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportAssetMovementsAction
+class ExportAssetMovementsAction extends ConfiguredXlsxExportAction
 {
-    public function execute(ExportAssetMovementRequest $request): JsonResponse
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    protected function buildFilters(array $validated): array
     {
-        $filters = array_filter($request->validated());
+        return array_filter($validated);
+    }
 
-        $filename = 'asset-movements-export-' . now()->format('Y-m-d-H-i-s') . '.xlsx';
-        $filePath = 'exports/' . $filename;
+    protected function filenameDelimiter(): string
+    {
+        return '-';
+    }
 
-        Excel::store(new AssetMovementExport($filters), $filePath, 'public');
+    protected function timestampFormat(): string
+    {
+        return 'Y-m-d-H-i-s';
+    }
 
-        $url = Storage::disk('public')->url($filePath);
+    protected function filenamePrefix(): string
+    {
+        return 'asset-movements';
+    }
 
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new AssetMovementExport($filters);
     }
 }

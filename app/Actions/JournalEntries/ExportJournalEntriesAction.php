@@ -2,28 +2,30 @@
 
 namespace App\Actions\JournalEntries;
 
+use App\Actions\Concerns\ConfiguredXlsxExportAction;
 use App\Exports\JournalEntryExport;
-use App\Http\Requests\JournalEntries\IndexJournalEntryRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportJournalEntriesAction
+class ExportJournalEntriesAction extends ConfiguredXlsxExportAction
 {
-    public function execute(IndexJournalEntryRequest $request): JsonResponse
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    protected function buildFilters(array $validated): array
     {
-        $filters = $request->validated();
+        return $validated;
+    }
 
-        $filename = 'journal_entries_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-        $filePath = 'exports/' . $filename;
+    protected function filenamePrefix(): string
+    {
+        return 'journal_entries';
+    }
 
-        Excel::store(new JournalEntryExport($filters), $filePath, 'public');
-
-        $url = Storage::disk('public')->url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new JournalEntryExport($filters);
     }
 }

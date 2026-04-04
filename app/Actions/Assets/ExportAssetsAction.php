@@ -2,29 +2,35 @@
 
 namespace App\Actions\Assets;
 
+use App\Actions\Concerns\ConfiguredXlsxExportAction;
 use App\Exports\AssetExport;
-use App\Http\Requests\Assets\ExportAssetRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportAssetsAction
+class ExportAssetsAction extends ConfiguredXlsxExportAction
 {
-    public function execute(ExportAssetRequest $request): JsonResponse
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    protected function buildFilters(array $validated): array
     {
-        $filters = array_filter($request->validated());
+        return array_filter($validated);
+    }
 
-        $filename = 'assets_export_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.xlsx';
-        $filePath = 'exports/' . $filename;
+    protected function includeUlidInFilename(): bool
+    {
+        return true;
+    }
 
-        Excel::store(new AssetExport($filters), $filePath, 'public');
+    protected function filenamePrefix(): string
+    {
+        return 'assets';
+    }
 
-        $url = Storage::disk('public')->url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new AssetExport($filters);
     }
 }
