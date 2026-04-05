@@ -2,15 +2,10 @@
 
 namespace App\Http\Requests\StockMonitor;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AuthorizedFormRequest;
 
-abstract class AbstractStockMonitorRequest extends FormRequest
+abstract class AbstractStockMonitorRequest extends AuthorizedFormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     protected function stockMonitorRules(): array
     {
         return [

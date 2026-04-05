@@ -2,15 +2,10 @@
 
 namespace App\Http\Requests\JournalEntries;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AuthorizedFormRequest;
 
-abstract class AbstractJournalEntryRequest extends FormRequest
+abstract class AbstractJournalEntryRequest extends AuthorizedFormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
         return [
