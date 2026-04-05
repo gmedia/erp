@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Support\Str;
+use LogicException;
 
 abstract class SimpleCrudNameRequest extends AuthorizedFormRequest
 {
@@ -32,5 +33,24 @@ abstract class SimpleCrudNameRequest extends AuthorizedFormRequest
     /**
      * @return class-string<\Illuminate\Database\Eloquent\Model>
      */
-    abstract protected function getModelClass(): string;
+    protected function getModelClass(): string
+    {
+        $requestClass = static::class;
+
+        if (str_starts_with(class_basename($requestClass), 'Mockery_')) {
+            $requestClass = get_parent_class($this) ?: $requestClass;
+        }
+
+        $modelClass = 'App\\Models\\' . str_replace(
+            ['Store', 'Update', 'Request'],
+            '',
+            class_basename($requestClass),
+        );
+
+        if (! class_exists($modelClass)) {
+            throw new LogicException('Unable to infer model class for request [' . static::class . '].');
+        }
+
+        return $modelClass;
+    }
 }

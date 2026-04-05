@@ -3,7 +3,6 @@
 namespace App\Http\Requests\ProductCategories;
 
 use App\Http\Requests\SimpleCrudUpdateRequest;
-use App\Models\ProductCategory;
 
 class UpdateProductCategoryRequest extends SimpleCrudUpdateRequest
 {
@@ -12,10 +11,5 @@ class UpdateProductCategoryRequest extends SimpleCrudUpdateRequest
         return array_merge(parent::rules(), [
             'description' => ['nullable', 'string'],
         ]);
-    }
-
-    public function getModelClass(): string
-    {
-        return ProductCategory::class;
     }
 }
