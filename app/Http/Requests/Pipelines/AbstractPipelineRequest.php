@@ -2,16 +2,11 @@
 
 namespace App\Http\Requests\Pipelines;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AuthorizedFormRequest;
 use Illuminate\Validation\Rule;
 
-abstract class AbstractPipelineRequest extends FormRequest
+abstract class AbstractPipelineRequest extends AuthorizedFormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
         return [
