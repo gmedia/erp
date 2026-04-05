@@ -22,7 +22,7 @@ class UpdateApprovalFlowRequest extends AbstractApprovalFlowRequest
         return true;
     }
 
-    protected function useSometimes(): bool
+    protected function usesSometimes(): bool
     {
         return true;
     }

@@ -2,11 +2,14 @@
 
 namespace App\Http\Requests\ApprovalFlows;
 
+use App\Http\Requests\Concerns\HasSometimesStringRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 abstract class AbstractApprovalFlowRequest extends FormRequest
 {
+    use HasSometimesStringRules;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -51,14 +54,5 @@ abstract class AbstractApprovalFlowRequest extends FormRequest
 
     abstract protected function includeStepIdRule(): bool;
 
-    abstract protected function useSometimes(): bool;
-
-    private function withSometimes(string $rule): string
-    {
-        if (! $this->useSometimes()) {
-            return $rule;
-        }
-
-        return 'sometimes|' . $rule;
-    }
+    abstract protected function usesSometimes(): bool;
 }

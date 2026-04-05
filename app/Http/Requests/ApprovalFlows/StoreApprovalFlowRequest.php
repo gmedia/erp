@@ -14,7 +14,7 @@ class StoreApprovalFlowRequest extends AbstractApprovalFlowRequest
         return false;
     }
 
-    protected function useSometimes(): bool
+    protected function usesSometimes(): bool
     {
         return false;
     }

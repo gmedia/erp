@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\ApprovalDelegations;
 
+use App\Http\Requests\Concerns\HasSometimesArrayRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 abstract class AbstractApprovalDelegationRequest extends FormRequest
 {
+    use HasSometimesArrayRules;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -22,13 +25,13 @@ abstract class AbstractApprovalDelegationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'delegator_user_id' => $this->fieldRules(['required', 'exists:users,id']),
-            'delegate_user_id' => $this->fieldRules(['required', 'exists:users,id', 'different:delegator_user_id']),
-            'approvable_type' => $this->fieldRules(['nullable', 'string', 'max:255']),
-            'start_date' => $this->fieldRules(['required', 'date']),
-            'end_date' => $this->fieldRules(['required', 'date', 'after_or_equal:start_date']),
-            'reason' => $this->fieldRules(['nullable', 'string', 'max:255']),
-            'is_active' => $this->fieldRules(['boolean']),
+            'delegator_user_id' => $this->withSometimes(['required', 'exists:users,id']),
+            'delegate_user_id' => $this->withSometimes(['required', 'exists:users,id', 'different:delegator_user_id']),
+            'approvable_type' => $this->withSometimes(['nullable', 'string', 'max:255']),
+            'start_date' => $this->withSometimes(['required', 'date']),
+            'end_date' => $this->withSometimes(['required', 'date', 'after_or_equal:start_date']),
+            'reason' => $this->withSometimes(['nullable', 'string', 'max:255']),
+            'is_active' => $this->withSometimes(['boolean']),
         ];
     }
 
@@ -44,18 +47,5 @@ abstract class AbstractApprovalDelegationRequest extends FormRequest
         }
     }
 
-    abstract protected function useSometimesRules(): bool;
-
-    /**
-     * @param  array<int, string>  $rules
-     * @return array<int, string>
-     */
-    private function fieldRules(array $rules): array
-    {
-        if (! $this->useSometimesRules()) {
-            return $rules;
-        }
-
-        return ['sometimes', ...$rules];
-    }
+    abstract protected function usesSometimes(): bool;
 }

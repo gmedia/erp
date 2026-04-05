@@ -4,7 +4,7 @@ namespace App\Http\Requests\ApprovalDelegations;
 
 class StoreApprovalDelegationRequest extends AbstractApprovalDelegationRequest
 {
-    protected function useSometimesRules(): bool
+    protected function usesSometimes(): bool
     {
         return false;
     }
