@@ -2,19 +2,10 @@
 
 namespace App\Http\Requests\Accounts;
 
-use App\Http\Requests\BaseListingRequest;
-
-class ExportAccountRequest extends BaseListingRequest
+class ExportAccountRequest extends AbstractAccountListingRequest
 {
     public function rules(): array
     {
-        return array_merge(
-            $this->searchRules(),
-            [
-                'coa_version_id' => ['required', 'exists:coa_versions,id'],
-                'type' => ['nullable', 'in:asset,liability,equity,revenue,expense'],
-                'is_active' => ['nullable', 'boolean'],
-            ],
-        );
+        return $this->accountListingRules(['required', 'exists:coa_versions,id']);
     }
 }
