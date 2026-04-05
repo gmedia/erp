@@ -11,4 +11,12 @@ abstract class SimpleCrudListingRequest extends BaseListingRequest
     {
         return $this->listingSortRules('id,name,created_at,updated_at', false);
     }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    protected function simpleCrudSortRulesByFields(string $sortBy): array
+    {
+        return $this->listingSortRules($sortBy, false);
+    }
 }
