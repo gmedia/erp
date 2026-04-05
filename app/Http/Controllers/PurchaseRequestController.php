@@ -6,6 +6,7 @@ use App\Actions\PurchaseRequests\ExportPurchaseRequestsAction;
 use App\Actions\PurchaseRequests\IndexPurchaseRequestsAction;
 use App\Actions\PurchaseRequests\SyncPurchaseRequestItemsAction;
 use App\DTOs\PurchaseRequests\UpdatePurchaseRequestData;
+use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\PurchaseRequests\ExportPurchaseRequestRequest;
 use App\Http\Requests\PurchaseRequests\IndexPurchaseRequestRequest;
 use App\Http\Requests\PurchaseRequests\StorePurchaseRequestRequest;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseRequestController extends Controller
 {
+    use StoresItemsInTransaction;
+
     public function index(IndexPurchaseRequestRequest $request, IndexPurchaseRequestsAction $action): JsonResponse
     {
         $purchaseRequests = $action->execute($request);
@@ -34,22 +37,17 @@ class PurchaseRequestController extends Controller
 
         $validated['created_by'] = Auth::id();
 
-        $purchaseRequest = DB::transaction(function () use ($validated, $items, $syncItems) {
-            $purchaseRequest = PurchaseRequest::create($validated);
-
-            if (empty($purchaseRequest->pr_number)) {
-                $purchaseRequest->update([
-                    'pr_number' => 'PR-'
-                        . now()->format('Y')
-                        . '-'
-                        . str_pad((string) $purchaseRequest->id, 6, '0', STR_PAD_LEFT),
-                ]);
-            }
-
-            $syncItems->execute($purchaseRequest, $items);
-
-            return $purchaseRequest;
-        });
+        $purchaseRequest = $this->storeWithSyncedItems(
+            attributes: $validated,
+            items: $items,
+            creator: static fn (array $attributes): PurchaseRequest => PurchaseRequest::create($attributes),
+            assignDocumentNumber: function (PurchaseRequest $purchaseRequest): void {
+                $this->assignSequentialDocumentNumber($purchaseRequest, 'pr_number', 'PR');
+            },
+            syncItems: function (PurchaseRequest $purchaseRequest, array $items) use ($syncItems): void {
+                $syncItems->execute($purchaseRequest, $items);
+            },
+        );
 
         $purchaseRequest->load([
             'branch',

@@ -6,6 +6,7 @@ use App\Actions\StockTransfers\ExportStockTransfersAction;
 use App\Actions\StockTransfers\IndexStockTransfersAction;
 use App\Actions\StockTransfers\SyncStockTransferItemsAction;
 use App\DTOs\StockTransfers\UpdateStockTransferData;
+use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\StockTransfers\ExportStockTransferRequest;
 use App\Http\Requests\StockTransfers\IndexStockTransferRequest;
 use App\Http\Requests\StockTransfers\StoreStockTransferRequest;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\DB;
 
 class StockTransferController extends Controller
 {
+    use StoresItemsInTransaction;
+
     public function index(IndexStockTransferRequest $request, IndexStockTransfersAction $action): JsonResponse
     {
         $transfers = $action->execute($request);
@@ -34,22 +37,17 @@ class StockTransferController extends Controller
 
         $data['created_by'] = Auth::id();
 
-        $transfer = DB::transaction(function () use ($data, $items, $syncItems) {
-            $transfer = StockTransfer::create($data);
-
-            if (empty($transfer->transfer_number)) {
-                $transfer->update([
-                    'transfer_number' => 'ST-'
-                        . now()->format('Y')
-                        . '-'
-                        . str_pad((string) $transfer->id, 6, '0', STR_PAD_LEFT),
-                ]);
-            }
-
-            $syncItems->execute($transfer, $items);
-
-            return $transfer;
-        });
+        $transfer = $this->storeWithSyncedItems(
+            attributes: $data,
+            items: $items,
+            creator: static fn (array $attributes): StockTransfer => StockTransfer::create($attributes),
+            assignDocumentNumber: function (StockTransfer $transfer): void {
+                $this->assignSequentialDocumentNumber($transfer, 'transfer_number', 'ST');
+            },
+            syncItems: function (StockTransfer $transfer, array $items) use ($syncItems): void {
+                $syncItems->execute($transfer, $items);
+            },
+        );
 
         $transfer->load(['fromWarehouse', 'toWarehouse', 'items.product', 'items.unit']);
 

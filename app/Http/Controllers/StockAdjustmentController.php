@@ -6,6 +6,7 @@ use App\Actions\StockAdjustments\ExportStockAdjustmentsAction;
 use App\Actions\StockAdjustments\IndexStockAdjustmentsAction;
 use App\Actions\StockAdjustments\SyncStockAdjustmentItemsAction;
 use App\DTOs\StockAdjustments\UpdateStockAdjustmentData;
+use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\StockAdjustments\ExportStockAdjustmentRequest;
 use App\Http\Requests\StockAdjustments\IndexStockAdjustmentRequest;
 use App\Http\Requests\StockAdjustments\StoreStockAdjustmentRequest;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\DB;
 
 class StockAdjustmentController extends Controller
 {
+    use StoresItemsInTransaction;
+
     public function index(IndexStockAdjustmentRequest $request, IndexStockAdjustmentsAction $action): JsonResponse
     {
         $adjustments = $action->execute($request);
@@ -34,22 +37,17 @@ class StockAdjustmentController extends Controller
 
         $data['created_by'] = Auth::id();
 
-        $adjustment = DB::transaction(function () use ($data, $items, $syncItems) {
-            $adjustment = StockAdjustment::create($data);
-
-            if (empty($adjustment->adjustment_number)) {
-                $adjustment->update([
-                    'adjustment_number' => 'SA-'
-                        . now()->format('Y')
-                        . '-'
-                        . str_pad((string) $adjustment->id, 6, '0', STR_PAD_LEFT),
-                ]);
-            }
-
-            $syncItems->execute($adjustment, $items);
-
-            return $adjustment;
-        });
+        $adjustment = $this->storeWithSyncedItems(
+            attributes: $data,
+            items: $items,
+            creator: static fn (array $attributes): StockAdjustment => StockAdjustment::create($attributes),
+            assignDocumentNumber: function (StockAdjustment $adjustment): void {
+                $this->assignSequentialDocumentNumber($adjustment, 'adjustment_number', 'SA');
+            },
+            syncItems: function (StockAdjustment $adjustment, array $items) use ($syncItems): void {
+                $syncItems->execute($adjustment, $items);
+            },
+        );
 
         $adjustment->load(['warehouse', 'inventoryStocktake', 'items.product', 'items.unit']);
 

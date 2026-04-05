@@ -6,6 +6,7 @@ use App\Actions\PurchaseOrders\ExportPurchaseOrdersAction;
 use App\Actions\PurchaseOrders\IndexPurchaseOrdersAction;
 use App\Actions\PurchaseOrders\SyncPurchaseOrderItemsAction;
 use App\DTOs\PurchaseOrders\UpdatePurchaseOrderData;
+use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\PurchaseOrders\ExportPurchaseOrderRequest;
 use App\Http\Requests\PurchaseOrders\IndexPurchaseOrderRequest;
 use App\Http\Requests\PurchaseOrders\StorePurchaseOrderRequest;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderController extends Controller
 {
+    use StoresItemsInTransaction;
+
     public function index(IndexPurchaseOrderRequest $request, IndexPurchaseOrdersAction $action): JsonResponse
     {
         $purchaseOrders = $action->execute($request);
@@ -34,22 +37,17 @@ class PurchaseOrderController extends Controller
 
         $validated['created_by'] = Auth::id();
 
-        $purchaseOrder = DB::transaction(function () use ($validated, $items, $syncItems) {
-            $purchaseOrder = PurchaseOrder::create($validated);
-
-            if (empty($purchaseOrder->po_number)) {
-                $purchaseOrder->update([
-                    'po_number' => 'PO-'
-                        . now()->format('Y')
-                        . '-'
-                        . str_pad((string) $purchaseOrder->id, 6, '0', STR_PAD_LEFT),
-                ]);
-            }
-
-            $syncItems->execute($purchaseOrder, $items);
-
-            return $purchaseOrder;
-        });
+        $purchaseOrder = $this->storeWithSyncedItems(
+            attributes: $validated,
+            items: $items,
+            creator: static fn (array $attributes): PurchaseOrder => PurchaseOrder::create($attributes),
+            assignDocumentNumber: function (PurchaseOrder $purchaseOrder): void {
+                $this->assignSequentialDocumentNumber($purchaseOrder, 'po_number', 'PO');
+            },
+            syncItems: function (PurchaseOrder $purchaseOrder, array $items) use ($syncItems): void {
+                $syncItems->execute($purchaseOrder, $items);
+            },
+        );
 
         $purchaseOrder->load(['supplier', 'warehouse', 'approver', 'creator', 'items.product', 'items.unit']);
 

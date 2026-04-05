@@ -6,6 +6,7 @@ use App\Actions\InventoryStocktakes\ExportInventoryStocktakesAction;
 use App\Actions\InventoryStocktakes\IndexInventoryStocktakesAction;
 use App\Actions\InventoryStocktakes\SyncInventoryStocktakeItemsAction;
 use App\DTOs\InventoryStocktakes\UpdateInventoryStocktakeData;
+use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\InventoryStocktakes\ExportInventoryStocktakeRequest;
 use App\Http\Requests\InventoryStocktakes\IndexInventoryStocktakeRequest;
 use App\Http\Requests\InventoryStocktakes\StoreInventoryStocktakeRequest;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\DB;
 
 class InventoryStocktakeController extends Controller
 {
+    use StoresItemsInTransaction;
+
     public function index(IndexInventoryStocktakeRequest $request, IndexInventoryStocktakesAction $action): JsonResponse
     {
         $stocktakes = $action->execute($request);
@@ -36,24 +39,17 @@ class InventoryStocktakeController extends Controller
 
         $data['created_by'] = Auth::id();
 
-        $stocktake = DB::transaction(function () use ($data, $items, $syncItems) {
-            $stocktake = InventoryStocktake::create($data);
-
-            if (empty($stocktake->stocktake_number)) {
-                $stocktake->update([
-                    'stocktake_number' => 'SO-'
-                        . now()->format('Y')
-                        . '-'
-                        . str_pad((string) $stocktake->id, 6, '0', STR_PAD_LEFT),
-                ]);
-            }
-
-            if (is_array($items)) {
+        $stocktake = $this->storeWithSyncedItems(
+            attributes: $data,
+            items: $items,
+            creator: static fn (array $attributes): InventoryStocktake => InventoryStocktake::create($attributes),
+            assignDocumentNumber: function (InventoryStocktake $stocktake): void {
+                $this->assignSequentialDocumentNumber($stocktake, 'stocktake_number', 'SO');
+            },
+            syncItems: function (InventoryStocktake $stocktake, array $items) use ($syncItems): void {
                 $syncItems->execute($stocktake, $items);
-            }
-
-            return $stocktake;
-        });
+            },
+        );
 
         $stocktake->load([
             'warehouse',

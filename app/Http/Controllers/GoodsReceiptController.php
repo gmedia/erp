@@ -6,6 +6,7 @@ use App\Actions\GoodsReceipts\ExportGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\IndexGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\SyncGoodsReceiptItemsAction;
 use App\DTOs\GoodsReceipts\UpdateGoodsReceiptData;
+use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\GoodsReceipts\ExportGoodsReceiptRequest;
 use App\Http\Requests\GoodsReceipts\IndexGoodsReceiptRequest;
 use App\Http\Requests\GoodsReceipts\StoreGoodsReceiptRequest;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\DB;
 
 class GoodsReceiptController extends Controller
 {
+    use StoresItemsInTransaction;
+
     public function index(IndexGoodsReceiptRequest $request, IndexGoodsReceiptsAction $action): JsonResponse
     {
         $goodsReceipts = $action->execute($request);
@@ -39,22 +42,17 @@ class GoodsReceiptController extends Controller
             $validated['confirmed_at'] = now()->toIso8601String();
         }
 
-        $goodsReceipt = DB::transaction(function () use ($validated, $items, $syncItems) {
-            $goodsReceipt = GoodsReceipt::create($validated);
-
-            if (empty($goodsReceipt->gr_number)) {
-                $goodsReceipt->update([
-                    'gr_number' => 'GR-'
-                        . now()->format('Y')
-                        . '-'
-                        . str_pad((string) $goodsReceipt->id, 6, '0', STR_PAD_LEFT),
-                ]);
-            }
-
-            $syncItems->execute($goodsReceipt, $items);
-
-            return $goodsReceipt;
-        });
+        $goodsReceipt = $this->storeWithSyncedItems(
+            attributes: $validated,
+            items: $items,
+            creator: static fn (array $attributes): GoodsReceipt => GoodsReceipt::create($attributes),
+            assignDocumentNumber: function (GoodsReceipt $goodsReceipt): void {
+                $this->assignSequentialDocumentNumber($goodsReceipt, 'gr_number', 'GR');
+            },
+            syncItems: function (GoodsReceipt $goodsReceipt, array $items) use ($syncItems): void {
+                $syncItems->execute($goodsReceipt, $items);
+            },
+        );
 
         $goodsReceipt->load([
             'purchaseOrder.supplier',

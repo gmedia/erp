@@ -6,6 +6,7 @@ use App\Actions\SupplierReturns\ExportSupplierReturnsAction;
 use App\Actions\SupplierReturns\IndexSupplierReturnsAction;
 use App\Actions\SupplierReturns\SyncSupplierReturnItemsAction;
 use App\DTOs\SupplierReturns\UpdateSupplierReturnData;
+use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\SupplierReturns\ExportSupplierReturnRequest;
 use App\Http\Requests\SupplierReturns\IndexSupplierReturnRequest;
 use App\Http\Requests\SupplierReturns\StoreSupplierReturnRequest;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\DB;
 
 class SupplierReturnController extends Controller
 {
+    use StoresItemsInTransaction;
+
     public function index(IndexSupplierReturnRequest $request, IndexSupplierReturnsAction $action): JsonResponse
     {
         $supplierReturns = $action->execute($request);
@@ -34,22 +37,17 @@ class SupplierReturnController extends Controller
 
         $validated['created_by'] = Auth::id();
 
-        $supplierReturn = DB::transaction(function () use ($validated, $items, $syncItems) {
-            $supplierReturn = SupplierReturn::create($validated);
-
-            if (empty($supplierReturn->return_number)) {
-                $supplierReturn->update([
-                    'return_number' => 'SR-'
-                        . now()->format('Y')
-                        . '-'
-                        . str_pad((string) $supplierReturn->id, 6, '0', STR_PAD_LEFT),
-                ]);
-            }
-
-            $syncItems->execute($supplierReturn, $items);
-
-            return $supplierReturn;
-        });
+        $supplierReturn = $this->storeWithSyncedItems(
+            attributes: $validated,
+            items: $items,
+            creator: static fn (array $attributes): SupplierReturn => SupplierReturn::create($attributes),
+            assignDocumentNumber: function (SupplierReturn $supplierReturn): void {
+                $this->assignSequentialDocumentNumber($supplierReturn, 'return_number', 'SR');
+            },
+            syncItems: function (SupplierReturn $supplierReturn, array $items) use ($syncItems): void {
+                $syncItems->execute($supplierReturn, $items);
+            },
+        );
 
         $supplierReturn->load([
             'purchaseOrder',
