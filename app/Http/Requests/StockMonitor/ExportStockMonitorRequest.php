@@ -6,11 +6,6 @@ class ExportStockMonitorRequest extends AbstractStockMonitorRequest
 {
     public function rules(): array
     {
-        return array_merge(
-            $this->stockMonitorRules(),
-            [
-                'format' => ['nullable', 'string', 'in:xlsx,csv'],
-            ],
-        );
+        return $this->stockMonitorExportRules();
     }
 }
