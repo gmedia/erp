@@ -2,19 +2,14 @@
 
 namespace App\Http\Requests\Assets;
 
+use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Unique;
 
-abstract class AbstractAssetRequest extends FormRequest
+abstract class AbstractAssetRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
-
-    public function authorize(): bool
-    {
-        return true;
-    }
 
     public function rules(): array
     {
