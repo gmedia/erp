@@ -5,6 +5,12 @@ use Illuminate\Support\Facades\Validator;
 
 uses()->group('accounts');
 
+test('it authorizes account export access', function () {
+    $request = new ExportAccountRequest;
+
+    expect($request->authorize())->toBeTrue();
+});
+
 test('it validates required coa_version_id', function () {
     $request = new ExportAccountRequest;
     $validator = Validator::make([], $request->rules());

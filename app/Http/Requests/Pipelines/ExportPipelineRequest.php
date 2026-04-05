@@ -2,24 +2,20 @@
 
 namespace App\Http\Requests\Pipelines;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseListingRequest;
 
-class ExportPipelineRequest extends FormRequest
+class ExportPipelineRequest extends BaseListingRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
-        return [
-            'search' => ['nullable', 'string'],
-            'entity_type' => ['nullable', 'string'],
-            'is_active' => ['nullable', 'boolean'],
-            'sort_by' => ['nullable', 'string', 'in:id,name,code,entity_type,version,is_active,created_at,updated_at'],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
-        ];
+        return array_merge(
+            $this->searchRules(),
+            [
+                'entity_type' => ['nullable', 'string'],
+                'is_active' => ['nullable', 'boolean'],
+            ],
+            $this->listingSortRules('id,name,code,entity_type,version,is_active,created_at,updated_at'),
+        );
     }
 
     protected function prepareForValidation(): void
