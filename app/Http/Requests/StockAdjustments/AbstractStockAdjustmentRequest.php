@@ -2,17 +2,12 @@
 
 namespace App\Http\Requests\StockAdjustments;
 
+use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
-use Illuminate\Foundation\Http\FormRequest;
 
-abstract class AbstractStockAdjustmentRequest extends FormRequest
+abstract class AbstractStockAdjustmentRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
-
-    public function authorize(): bool
-    {
-        return true;
-    }
 
     public function rules(): array
     {

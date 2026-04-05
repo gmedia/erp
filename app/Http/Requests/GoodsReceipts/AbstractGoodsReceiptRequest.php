@@ -2,17 +2,12 @@
 
 namespace App\Http\Requests\GoodsReceipts;
 
+use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
-use Illuminate\Foundation\Http\FormRequest;
 
-abstract class AbstractGoodsReceiptRequest extends FormRequest
+abstract class AbstractGoodsReceiptRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
-
-    public function authorize(): bool
-    {
-        return true;
-    }
 
     public function rules(): array
     {

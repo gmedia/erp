@@ -2,15 +2,10 @@
 
 namespace App\Http\Requests\InventoryStocktakes;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AuthorizedFormRequest;
 
-abstract class AbstractInventoryStocktakeRequest extends FormRequest
+abstract class AbstractInventoryStocktakeRequest extends AuthorizedFormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     /**
      * @return array<string, array<int, string>>
      */

@@ -2,17 +2,12 @@
 
 namespace App\Http\Requests\StockTransfers;
 
+use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
-use Illuminate\Foundation\Http\FormRequest;
 
-abstract class AbstractStockTransferRequest extends FormRequest
+abstract class AbstractStockTransferRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
-
-    public function authorize(): bool
-    {
-        return true;
-    }
 
     public function rules(): array
     {

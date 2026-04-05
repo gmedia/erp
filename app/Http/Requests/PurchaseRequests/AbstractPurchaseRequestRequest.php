@@ -2,17 +2,12 @@
 
 namespace App\Http\Requests\PurchaseRequests;
 
+use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
-use Illuminate\Foundation\Http\FormRequest;
 
-abstract class AbstractPurchaseRequestRequest extends FormRequest
+abstract class AbstractPurchaseRequestRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
-
-    public function authorize(): bool
-    {
-        return true;
-    }
 
     public function rules(): array
     {
