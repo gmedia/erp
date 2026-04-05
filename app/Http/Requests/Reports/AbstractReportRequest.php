@@ -22,6 +22,25 @@ abstract class AbstractReportRequest extends AuthorizedFormRequest
         ];
     }
 
+    protected function supplierWarehouseProductRules(): array
+    {
+        return [
+            'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
+            'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
+            'product_id' => ['nullable', 'integer', 'exists:products,id'],
+        ];
+    }
+
+    protected function inventoryDimensionRules(): array
+    {
+        return [
+            'product_id' => ['nullable', 'integer', 'exists:products,id'],
+            'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
+            'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
+            'category_id' => ['nullable', 'integer', 'exists:product_categories,id'],
+        ];
+    }
+
     protected function sortByEnumRules(array $allowedSortFields): array
     {
         return [

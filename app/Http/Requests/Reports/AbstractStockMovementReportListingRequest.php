@@ -8,12 +8,7 @@ abstract class AbstractStockMovementReportListingRequest extends AbstractReportR
     {
         return array_merge(
             $this->searchRules(),
-            [
-                'product_id' => ['nullable', 'integer', 'exists:products,id'],
-                'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
-                'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
-                'category_id' => ['nullable', 'integer', 'exists:product_categories,id'],
-            ],
+            $this->inventoryDimensionRules(),
             $this->dateRangeRules(),
             $this->sortByEnumRules([
                 'product_name',

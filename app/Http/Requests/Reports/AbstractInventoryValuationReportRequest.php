@@ -8,12 +8,7 @@ abstract class AbstractInventoryValuationReportRequest extends AbstractReportReq
     {
         return array_merge(
             $this->searchRules(),
-            [
-                'product_id' => ['nullable', 'integer', 'exists:products,id'],
-                'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
-                'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
-                'category_id' => ['nullable', 'integer', 'exists:product_categories,id'],
-            ],
+            $this->inventoryDimensionRules(),
             $this->sortByEnumRules([
                 'product_name',
                 'warehouse_name',

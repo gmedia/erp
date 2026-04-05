@@ -10,10 +10,8 @@ abstract class AbstractPurchaseHistoryReportRequest extends AbstractReportReques
     {
         return array_merge(
             $this->searchRules(),
+            $this->supplierWarehouseProductRules(),
             [
-                'supplier_id' => ['nullable', 'integer', 'exists:suppliers,id'],
-                'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
-                'product_id' => ['nullable', 'integer', 'exists:products,id'],
                 'status' => [
                     'nullable',
                     'string',
