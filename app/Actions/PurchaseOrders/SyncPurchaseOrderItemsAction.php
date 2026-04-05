@@ -2,14 +2,16 @@
 
 namespace App\Actions\PurchaseOrders;
 
+use App\Actions\Concerns\RecreatesItems;
 use App\Models\PurchaseOrder;
-use Illuminate\Support\Collection;
 
 class SyncPurchaseOrderItemsAction
 {
+    use RecreatesItems;
+
     public function execute(PurchaseOrder $purchaseOrder, array $items): void
     {
-        $normalized = Collection::make($items)->map(static function (array $item): array {
+        $normalized = $this->recreateItems($purchaseOrder->items(), $items, static function (array $item): array {
             $quantity = (float) $item['quantity'];
             $unitPrice = (float) $item['unit_price'];
             $discountPercent = (float) ($item['discount_percent'] ?? 0);
@@ -30,10 +32,7 @@ class SyncPurchaseOrderItemsAction
                 'line_total' => $lineTotal,
                 'notes' => $item['notes'] ?? null,
             ];
-        })->values()->all();
-
-        $purchaseOrder->items()->delete();
-        $purchaseOrder->items()->createMany($normalized);
+        });
 
         $subtotal = collect($normalized)
             ->sum(static fn (array $row) => (float) ($row['quantity'] * $row['unit_price']));

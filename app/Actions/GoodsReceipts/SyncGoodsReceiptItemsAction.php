@@ -2,14 +2,16 @@
 
 namespace App\Actions\GoodsReceipts;
 
+use App\Actions\Concerns\RecreatesItems;
 use App\Models\GoodsReceipt;
-use Illuminate\Support\Collection;
 
 class SyncGoodsReceiptItemsAction
 {
+    use RecreatesItems;
+
     public function execute(GoodsReceipt $goodsReceipt, array $items): void
     {
-        $normalized = Collection::make($items)->map(static function (array $item): array {
+        $this->recreateItems($goodsReceipt->items(), $items, static function (array $item): array {
             $quantityReceived = (float) $item['quantity_received'];
             $quantityRejected = (float) ($item['quantity_rejected'] ?? 0);
             $quantityAccepted = array_key_exists('quantity_accepted', $item)
@@ -26,9 +28,6 @@ class SyncGoodsReceiptItemsAction
                 'unit_price' => (float) $item['unit_price'],
                 'notes' => $item['notes'] ?? null,
             ];
-        })->values()->all();
-
-        $goodsReceipt->items()->delete();
-        $goodsReceipt->items()->createMany($normalized);
+        });
     }
 }

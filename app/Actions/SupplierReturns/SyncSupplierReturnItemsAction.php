@@ -2,14 +2,16 @@
 
 namespace App\Actions\SupplierReturns;
 
+use App\Actions\Concerns\RecreatesItems;
 use App\Models\SupplierReturn;
-use Illuminate\Support\Collection;
 
 class SyncSupplierReturnItemsAction
 {
+    use RecreatesItems;
+
     public function execute(SupplierReturn $supplierReturn, array $items): void
     {
-        $normalized = Collection::make($items)->map(static function (array $item): array {
+        $this->recreateItems($supplierReturn->items(), $items, static function (array $item): array {
             return [
                 'goods_receipt_item_id' => (int) $item['goods_receipt_item_id'],
                 'product_id' => (int) $item['product_id'],
@@ -20,9 +22,6 @@ class SyncSupplierReturnItemsAction
                 'unit_price' => (float) $item['unit_price'],
                 'notes' => $item['notes'] ?? null,
             ];
-        })->values()->all();
-
-        $supplierReturn->items()->delete();
-        $supplierReturn->items()->createMany($normalized);
+        });
     }
 }
