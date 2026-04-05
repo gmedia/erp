@@ -16,7 +16,6 @@ use App\Http\Resources\SupplierReturns\SupplierReturnResource;
 use App\Models\SupplierReturn;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class SupplierReturnController extends Controller
 {
@@ -86,15 +85,15 @@ class SupplierReturnController extends Controller
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
-        $dto = UpdateSupplierReturnData::fromArray($validated);
-
-        DB::transaction(function () use ($supplierReturn, $dto, $items, $syncItems) {
-            $supplierReturn->update($dto->toArray());
-
-            if (is_array($items)) {
+        $this->updateWithSyncedItems(
+            model: $supplierReturn,
+            attributes: $validated,
+            items: $items,
+            payloadResolver: static fn (array $attributes): array => UpdateSupplierReturnData::fromArray($attributes)->toArray(),
+            syncItems: function (SupplierReturn $supplierReturn, array $items) use ($syncItems): void {
                 $syncItems->execute($supplierReturn, $items);
-            }
-        });
+            },
+        );
 
         $supplierReturn->load([
             'purchaseOrder',

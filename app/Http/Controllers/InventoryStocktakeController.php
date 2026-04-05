@@ -16,7 +16,6 @@ use App\Http\Resources\InventoryStocktakes\InventoryStocktakeResource;
 use App\Models\InventoryStocktake;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class InventoryStocktakeController extends Controller
 {
@@ -95,15 +94,15 @@ class InventoryStocktakeController extends Controller
             $validated['completed_at'] = now()->toIso8601String();
         }
 
-        $dto = UpdateInventoryStocktakeData::fromArray($validated);
-
-        DB::transaction(function () use ($inventoryStocktake, $dto, $items, $syncItems) {
-            $inventoryStocktake->update($dto->toArray());
-
-            if (is_array($items)) {
+        $this->updateWithSyncedItems(
+            model: $inventoryStocktake,
+            attributes: $validated,
+            items: $items,
+            payloadResolver: static fn (array $attributes): array => UpdateInventoryStocktakeData::fromArray($attributes)->toArray(),
+            syncItems: function (InventoryStocktake $inventoryStocktake, array $items) use ($syncItems): void {
                 $syncItems->execute($inventoryStocktake, $items);
-            }
-        });
+            },
+        );
 
         $inventoryStocktake->load(['warehouse', 'productCategory', 'items.product', 'items.unit', 'items.countedBy']);
 

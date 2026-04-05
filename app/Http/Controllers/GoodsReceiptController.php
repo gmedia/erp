@@ -16,7 +16,6 @@ use App\Http\Resources\GoodsReceipts\GoodsReceiptResource;
 use App\Models\GoodsReceipt;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class GoodsReceiptController extends Controller
 {
@@ -96,15 +95,15 @@ class GoodsReceiptController extends Controller
             $validated['confirmed_at'] = now()->toIso8601String();
         }
 
-        $dto = UpdateGoodsReceiptData::fromArray($validated);
-
-        DB::transaction(function () use ($goodsReceipt, $dto, $items, $syncItems) {
-            $goodsReceipt->update($dto->toArray());
-
-            if (is_array($items)) {
+        $this->updateWithSyncedItems(
+            model: $goodsReceipt,
+            attributes: $validated,
+            items: $items,
+            payloadResolver: static fn (array $attributes): array => UpdateGoodsReceiptData::fromArray($attributes)->toArray(),
+            syncItems: function (GoodsReceipt $goodsReceipt, array $items) use ($syncItems): void {
                 $syncItems->execute($goodsReceipt, $items);
-            }
-        });
+            },
+        );
 
         $goodsReceipt->load([
             'purchaseOrder.supplier',

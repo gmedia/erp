@@ -54,4 +54,31 @@ trait StoresItemsInTransaction
                 . str_pad((string) $model->getKey(), 6, '0', STR_PAD_LEFT),
         ]);
     }
+
+    /**
+     * @template TModel of Model
+     *
+     * @param  TModel  $model
+     * @param  array<string, mixed>  $attributes
+     * @param  array<int, array<string, mixed>>|null  $items
+     * @param  callable(array<string, mixed>): array<string, mixed>  $payloadResolver
+     * @param  callable(TModel, array<int, array<string, mixed>>): void  $syncItems
+     */
+    protected function updateWithSyncedItems(
+        Model $model,
+        array $attributes,
+        ?array $items,
+        callable $payloadResolver,
+        callable $syncItems
+    ): void {
+        $payload = $payloadResolver($attributes);
+
+        DB::transaction(function () use ($model, $payload, $items, $syncItems): void {
+            $model->update($payload);
+
+            if (is_array($items)) {
+                $syncItems($model, $items);
+            }
+        });
+    }
 }

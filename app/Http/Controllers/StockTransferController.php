@@ -16,7 +16,6 @@ use App\Http\Resources\StockTransfers\StockTransferResource;
 use App\Models\StockTransfer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class StockTransferController extends Controller
 {
@@ -82,15 +81,15 @@ class StockTransferController extends Controller
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
-        $dto = UpdateStockTransferData::fromArray($validated);
-
-        DB::transaction(function () use ($stockTransfer, $dto, $items, $syncItems) {
-            $stockTransfer->update($dto->toArray());
-
-            if (is_array($items)) {
+        $this->updateWithSyncedItems(
+            model: $stockTransfer,
+            attributes: $validated,
+            items: $items,
+            payloadResolver: static fn (array $attributes): array => UpdateStockTransferData::fromArray($attributes)->toArray(),
+            syncItems: function (StockTransfer $stockTransfer, array $items) use ($syncItems): void {
                 $syncItems->execute($stockTransfer, $items);
-            }
-        });
+            },
+        );
 
         $stockTransfer->load(['fromWarehouse', 'toWarehouse', 'items.product', 'items.unit']);
 

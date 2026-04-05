@@ -16,7 +16,6 @@ use App\Http\Resources\PurchaseRequests\PurchaseRequestResource;
 use App\Models\PurchaseRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class PurchaseRequestController extends Controller
 {
@@ -91,15 +90,15 @@ class PurchaseRequestController extends Controller
             $validated['approved_at'] = now()->toIso8601String();
         }
 
-        $dto = UpdatePurchaseRequestData::fromArray($validated);
-
-        DB::transaction(function () use ($purchaseRequest, $dto, $items, $syncItems) {
-            $purchaseRequest->update($dto->toArray());
-
-            if (is_array($items)) {
+        $this->updateWithSyncedItems(
+            model: $purchaseRequest,
+            attributes: $validated,
+            items: $items,
+            payloadResolver: static fn (array $attributes): array => UpdatePurchaseRequestData::fromArray($attributes)->toArray(),
+            syncItems: function (PurchaseRequest $purchaseRequest, array $items) use ($syncItems): void {
                 $syncItems->execute($purchaseRequest, $items);
-            }
-        });
+            },
+        );
 
         $purchaseRequest->load([
             'branch',

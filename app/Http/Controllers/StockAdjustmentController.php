@@ -16,7 +16,6 @@ use App\Http\Resources\StockAdjustments\StockAdjustmentResource;
 use App\Models\StockAdjustment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class StockAdjustmentController extends Controller
 {
@@ -85,15 +84,15 @@ class StockAdjustmentController extends Controller
             $validated['approved_at'] = now()->toIso8601String();
         }
 
-        $dto = UpdateStockAdjustmentData::fromArray($validated);
-
-        DB::transaction(function () use ($stockAdjustment, $dto, $items, $syncItems) {
-            $stockAdjustment->update($dto->toArray());
-
-            if (is_array($items)) {
+        $this->updateWithSyncedItems(
+            model: $stockAdjustment,
+            attributes: $validated,
+            items: $items,
+            payloadResolver: static fn (array $attributes): array => UpdateStockAdjustmentData::fromArray($attributes)->toArray(),
+            syncItems: function (StockAdjustment $stockAdjustment, array $items) use ($syncItems): void {
                 $syncItems->execute($stockAdjustment, $items);
-            }
-        });
+            },
+        );
 
         $stockAdjustment->load(['warehouse', 'inventoryStocktake', 'items.product', 'items.unit']);
 
