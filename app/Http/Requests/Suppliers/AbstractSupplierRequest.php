@@ -2,19 +2,11 @@
 
 namespace App\Http\Requests\Suppliers;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AuthorizedFormRequest;
 use Illuminate\Validation\Rule;
 
-abstract class AbstractSupplierRequest extends FormRequest
+abstract class AbstractSupplierRequest extends AuthorizedFormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      */

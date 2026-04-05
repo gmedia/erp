@@ -2,16 +2,11 @@
 
 namespace App\Http\Requests\AssetCategories;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AuthorizedFormRequest;
 use Illuminate\Validation\Rule;
 
-abstract class AbstractAssetCategoryRequest extends FormRequest
+abstract class AbstractAssetCategoryRequest extends AuthorizedFormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
         return [

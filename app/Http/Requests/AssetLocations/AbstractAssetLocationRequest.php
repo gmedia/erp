@@ -2,17 +2,12 @@
 
 namespace App\Http\Requests\AssetLocations;
 
+use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesStringRules;
-use Illuminate\Foundation\Http\FormRequest;
 
-abstract class AbstractAssetLocationRequest extends FormRequest
+abstract class AbstractAssetLocationRequest extends AuthorizedFormRequest
 {
     use HasSometimesStringRules;
-
-    public function authorize(): bool
-    {
-        return true;
-    }
 
     public function rules(): array
     {

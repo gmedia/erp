@@ -2,17 +2,12 @@
 
 namespace App\Http\Requests\AssetModels;
 
+use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesStringRules;
-use Illuminate\Foundation\Http\FormRequest;
 
-abstract class AbstractAssetModelRequest extends FormRequest
+abstract class AbstractAssetModelRequest extends AuthorizedFormRequest
 {
     use HasSometimesStringRules;
-
-    public function authorize(): bool
-    {
-        return true;
-    }
 
     public function rules(): array
     {
