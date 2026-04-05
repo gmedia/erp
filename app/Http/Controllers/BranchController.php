@@ -67,9 +67,7 @@ class BranchController extends Controller
      */
     public function destroy(Branch $branch): JsonResponse
     {
-        $branch->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($branch);
     }
 
     /**

@@ -67,9 +67,7 @@ class PositionController extends Controller
      */
     public function destroy(Position $position): JsonResponse
     {
-        $position->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($position);
     }
 
     /**

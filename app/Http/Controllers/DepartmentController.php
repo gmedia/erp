@@ -67,9 +67,7 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department): JsonResponse
     {
-        $department->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($department);
     }
 
     /**

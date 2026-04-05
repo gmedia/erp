@@ -45,9 +45,7 @@ class AssetCategoryController extends Controller
 
     public function destroy(AssetCategory $assetCategory): JsonResponse
     {
-        $assetCategory->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($assetCategory);
     }
 
     public function export(ExportAssetCategoryRequest $request): JsonResponse

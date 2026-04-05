@@ -67,9 +67,7 @@ class CustomerCategoryController extends Controller
      */
     public function destroy(CustomerCategory $customerCategory): JsonResponse
     {
-        $customerCategory->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($customerCategory);
     }
 
     /**

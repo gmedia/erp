@@ -67,9 +67,7 @@ class SupplierCategoryController extends Controller
      */
     public function destroy(SupplierCategory $supplierCategory): JsonResponse
     {
-        $supplierCategory->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($supplierCategory);
     }
 
     /**

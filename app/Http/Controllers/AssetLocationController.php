@@ -50,9 +50,7 @@ class AssetLocationController extends Controller
 
     public function destroy(AssetLocation $assetLocation): JsonResponse
     {
-        $assetLocation->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($assetLocation);
     }
 
     public function export(ExportAssetLocationRequest $request, ExportAssetLocationsAction $action): JsonResponse

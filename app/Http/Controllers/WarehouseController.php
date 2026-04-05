@@ -72,9 +72,7 @@ class WarehouseController extends Controller
      */
     public function destroy(Warehouse $warehouse): JsonResponse
     {
-        $warehouse->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($warehouse);
     }
 
     /**

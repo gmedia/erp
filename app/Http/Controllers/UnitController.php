@@ -67,9 +67,7 @@ class UnitController extends Controller
      */
     public function destroy(Unit $unit): JsonResponse
     {
-        $unit->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($unit);
     }
 
     /**
