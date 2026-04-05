@@ -2,19 +2,14 @@
 
 namespace App\Http\Requests\FiscalYears;
 
+use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Unique;
 
-abstract class AbstractFiscalYearRequest extends FormRequest
+abstract class AbstractFiscalYearRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
-
-    public function authorize(): bool
-    {
-        return true;
-    }
 
     public function rules(): array
     {

@@ -2,16 +2,11 @@
 
 namespace App\Http\Requests\AccountMappings;
 
+use App\Http\Requests\AuthorizedFormRequest;
 use App\Models\Account;
-use Illuminate\Foundation\Http\FormRequest;
 
-abstract class AbstractAccountMappingRequest extends FormRequest
+abstract class AbstractAccountMappingRequest extends AuthorizedFormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
         return [

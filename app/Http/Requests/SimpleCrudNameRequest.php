@@ -2,16 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 
-abstract class SimpleCrudNameRequest extends FormRequest
+abstract class SimpleCrudNameRequest extends AuthorizedFormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     protected function modelClass(): string
     {
         return $this->getModelClass();

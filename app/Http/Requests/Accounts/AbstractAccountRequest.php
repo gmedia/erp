@@ -2,17 +2,12 @@
 
 namespace App\Http\Requests\Accounts;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AuthorizedFormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Unique;
 
-abstract class AbstractAccountRequest extends FormRequest
+abstract class AbstractAccountRequest extends AuthorizedFormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
         return [
