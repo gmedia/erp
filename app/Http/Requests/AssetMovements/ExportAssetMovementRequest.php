@@ -2,29 +2,25 @@
 
 namespace App\Http\Requests\AssetMovements;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseListingRequest;
 
-class ExportAssetMovementRequest extends FormRequest
+class ExportAssetMovementRequest extends BaseListingRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
-        return [
-            'search' => ['nullable', 'string'],
-            'asset_id' => ['nullable', 'exists:assets,id'],
-            'movement_type' => ['nullable', 'string', 'in:acquired,transfer,assign,return,dispose,adjustment'],
-            'from_branch_id' => ['nullable', 'exists:branches,id'],
-            'to_branch_id' => ['nullable', 'exists:branches,id'],
-            'from_employee_id' => ['nullable', 'exists:employees,id'],
-            'to_employee_id' => ['nullable', 'exists:employees,id'],
-            'start_date' => ['nullable', 'date'],
-            'end_date' => ['nullable', 'date'],
-            'sort_by' => ['nullable', 'string', 'in:moved_at,movement_type,created_at'],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
-        ];
+        return array_merge(
+            $this->searchRules(),
+            [
+                'asset_id' => ['nullable', 'exists:assets,id'],
+                'movement_type' => ['nullable', 'string', 'in:acquired,transfer,assign,return,dispose,adjustment'],
+                'from_branch_id' => ['nullable', 'exists:branches,id'],
+                'to_branch_id' => ['nullable', 'exists:branches,id'],
+                'from_employee_id' => ['nullable', 'exists:employees,id'],
+                'to_employee_id' => ['nullable', 'exists:employees,id'],
+                'start_date' => ['nullable', 'date'],
+                'end_date' => ['nullable', 'date'],
+            ],
+            $this->listingSortRules('moved_at,movement_type,created_at'),
+        );
     }
 }

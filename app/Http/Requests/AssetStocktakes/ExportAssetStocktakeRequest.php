@@ -2,23 +2,19 @@
 
 namespace App\Http\Requests\AssetStocktakes;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseListingRequest;
 
-class ExportAssetStocktakeRequest extends FormRequest
+class ExportAssetStocktakeRequest extends BaseListingRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
-        return [
-            'search' => ['nullable', 'string'],
-            'branch' => ['nullable', 'exists:branches,id'],
-            'status' => ['nullable', 'in:draft,in_progress,completed,cancelled'],
-            'sort_by' => ['nullable', 'string', 'in:id,reference,planned_at,performed_at,status,created_at,updated_at'],
-            'sort_direction' => ['nullable', 'string', 'in:asc,desc'],
-        ];
+        return array_merge(
+            $this->searchRules(),
+            [
+                'branch' => ['nullable', 'exists:branches,id'],
+                'status' => ['nullable', 'in:draft,in_progress,completed,cancelled'],
+            ],
+            $this->listingSortRules('id,reference,planned_at,performed_at,status,created_at,updated_at'),
+        );
     }
 }
