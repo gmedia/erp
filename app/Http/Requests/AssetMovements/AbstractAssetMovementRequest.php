@@ -2,15 +2,10 @@
 
 namespace App\Http\Requests\AssetMovements;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AuthorizedFormRequest;
 
-abstract class AbstractAssetMovementRequest extends FormRequest
+abstract class AbstractAssetMovementRequest extends AuthorizedFormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     /**
      * @return array<string, array<int, string>>
      */
