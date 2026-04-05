@@ -23,19 +23,23 @@ class SupplierReturnExport implements FromQuery, ShouldAutoSize, WithHeadings, W
     {
         $query = SupplierReturn::query()->with(['purchaseOrder', 'goodsReceipt', 'supplier', 'warehouse']);
 
-        $this->applySearchFilter($query, $this->filters, ['return_number', 'notes']);
-        $this->applyExactFilters($query, $this->filters, [
-            'purchase_order' => 'purchase_order_id',
-            'goods_receipt' => 'goods_receipt_id',
-            'supplier' => 'supplier_id',
-            'warehouse' => 'warehouse_id',
-            'reason' => 'reason',
-            'status' => 'status',
-        ]);
-        $this->applyDateRangeFilters($query, $this->filters, [
-            'return_date' => ['from' => 'return_date_from', 'to' => 'return_date_to'],
-        ]);
-        $this->applySorting($query, $this->filters, ['return_number', 'return_date', 'reason', 'status', 'created_at']);
+        $this->applyConfiguredFilters(
+            $query,
+            $this->filters,
+            ['return_number', 'notes'],
+            [
+                'purchase_order' => 'purchase_order_id',
+                'goods_receipt' => 'goods_receipt_id',
+                'supplier' => 'supplier_id',
+                'warehouse' => 'warehouse_id',
+                'reason' => 'reason',
+                'status' => 'status',
+            ],
+            [
+                'return_date' => ['from' => 'return_date_from', 'to' => 'return_date_to'],
+            ],
+            ['return_number', 'return_date', 'reason', 'status', 'created_at'],
+        );
 
         return $query;
     }

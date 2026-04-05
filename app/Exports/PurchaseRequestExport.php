@@ -23,27 +23,31 @@ class PurchaseRequestExport implements FromQuery, ShouldAutoSize, WithHeadings, 
     {
         $query = PurchaseRequest::query()->with(['branch', 'department', 'requester']);
 
-        $this->applySearchFilter($query, $this->filters, ['pr_number', 'notes', 'rejection_reason']);
-        $this->applyExactFilters($query, $this->filters, [
-            'branch' => 'branch_id',
-            'department' => 'department_id',
-            'requested_by' => 'requested_by',
-            'priority' => 'priority',
-            'status' => 'status',
-        ]);
-        $this->applyDateRangeFilters($query, $this->filters, [
-            'request_date' => ['from' => 'request_date_from', 'to' => 'request_date_to'],
-            'required_date' => ['from' => 'required_date_from', 'to' => 'required_date_to'],
-        ]);
-        $this->applySorting($query, $this->filters, [
-            'pr_number',
-            'request_date',
-            'required_date',
-            'priority',
-            'status',
-            'estimated_amount',
-            'created_at',
-        ]);
+        $this->applyConfiguredFilters(
+            $query,
+            $this->filters,
+            ['pr_number', 'notes', 'rejection_reason'],
+            [
+                'branch' => 'branch_id',
+                'department' => 'department_id',
+                'requested_by' => 'requested_by',
+                'priority' => 'priority',
+                'status' => 'status',
+            ],
+            [
+                'request_date' => ['from' => 'request_date_from', 'to' => 'request_date_to'],
+                'required_date' => ['from' => 'required_date_from', 'to' => 'required_date_to'],
+            ],
+            [
+                'pr_number',
+                'request_date',
+                'required_date',
+                'priority',
+                'status',
+                'estimated_amount',
+                'created_at',
+            ],
+        );
 
         return $query;
     }

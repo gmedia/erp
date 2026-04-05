@@ -23,17 +23,21 @@ class GoodsReceiptExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
     {
         $query = GoodsReceipt::query()->with(['purchaseOrder.supplier', 'warehouse', 'receiver']);
 
-        $this->applySearchFilter($query, $this->filters, ['gr_number', 'supplier_delivery_note', 'notes']);
-        $this->applyExactFilters($query, $this->filters, [
-            'purchase_order' => 'purchase_order_id',
-            'warehouse' => 'warehouse_id',
-            'status' => 'status',
-            'received_by' => 'received_by',
-        ]);
-        $this->applyDateRangeFilters($query, $this->filters, [
-            'receipt_date' => ['from' => 'receipt_date_from', 'to' => 'receipt_date_to'],
-        ]);
-        $this->applySorting($query, $this->filters, ['gr_number', 'receipt_date', 'status', 'created_at']);
+        $this->applyConfiguredFilters(
+            $query,
+            $this->filters,
+            ['gr_number', 'supplier_delivery_note', 'notes'],
+            [
+                'purchase_order' => 'purchase_order_id',
+                'warehouse' => 'warehouse_id',
+                'status' => 'status',
+                'received_by' => 'received_by',
+            ],
+            [
+                'receipt_date' => ['from' => 'receipt_date_from', 'to' => 'receipt_date_to'],
+            ],
+            ['gr_number', 'receipt_date', 'status', 'created_at'],
+        );
 
         return $query;
     }
