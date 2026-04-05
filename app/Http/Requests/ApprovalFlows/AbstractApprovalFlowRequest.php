@@ -2,21 +2,13 @@
 
 namespace App\Http\Requests\ApprovalFlows;
 
+use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesStringRules;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-abstract class AbstractApprovalFlowRequest extends FormRequest
+abstract class AbstractApprovalFlowRequest extends AuthorizedFormRequest
 {
     use HasSometimesStringRules;
-
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
 
     public function rules(): array
     {

@@ -2,20 +2,12 @@
 
 namespace App\Http\Requests\ApprovalDelegations;
 
+use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
-use Illuminate\Foundation\Http\FormRequest;
 
-abstract class AbstractApprovalDelegationRequest extends FormRequest
+abstract class AbstractApprovalDelegationRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
-
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
 
     /**
      * Get the validation rules that apply to the request.
