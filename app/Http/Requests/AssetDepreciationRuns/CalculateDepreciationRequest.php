@@ -2,15 +2,10 @@
 
 namespace App\Http\Requests\AssetDepreciationRuns;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AuthorizedFormRequest;
 
-class CalculateDepreciationRequest extends FormRequest
+class CalculateDepreciationRequest extends AuthorizedFormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
         return [

@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Users;
 
+use App\Http\Requests\AuthorizedFormRequest;
 use App\Models\Employee;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**
@@ -11,16 +11,8 @@ use Illuminate\Validation\Rule;
  *
  * Handles conditional validation based on whether a user already exists.
  */
-class UpdateUserRequest extends FormRequest
+class UpdateUserRequest extends AuthorizedFormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *

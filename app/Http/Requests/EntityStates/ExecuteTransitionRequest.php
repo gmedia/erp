@@ -2,15 +2,10 @@
 
 namespace App\Http\Requests\EntityStates;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AuthorizedFormRequest;
 
-class ExecuteTransitionRequest extends FormRequest
+class ExecuteTransitionRequest extends AuthorizedFormRequest
 {
-    public function authorize(): bool
-    {
-        return true; // Authorization is handled in the action based on transition config
-    }
-
     public function rules(): array
     {
         return [
