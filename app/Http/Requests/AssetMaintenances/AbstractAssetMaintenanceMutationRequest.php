@@ -2,18 +2,13 @@
 
 namespace App\Http\Requests\AssetMaintenances;
 
+use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-abstract class AbstractAssetMaintenanceMutationRequest extends FormRequest
+abstract class AbstractAssetMaintenanceMutationRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
-
-    public function authorize(): bool
-    {
-        return true;
-    }
 
     public function rules(): array
     {
