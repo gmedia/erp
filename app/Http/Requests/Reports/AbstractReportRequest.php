@@ -2,16 +2,11 @@
 
 namespace App\Http\Requests\Reports;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\AuthorizedFormRequest;
 use Illuminate\Validation\Rule;
 
-abstract class AbstractReportRequest extends FormRequest
+abstract class AbstractReportRequest extends AuthorizedFormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     protected function searchRules(): array
     {
         return [
