@@ -6,7 +6,7 @@ class IndexAssetStocktakeVarianceRequest extends AbstractAssetStocktakeVarianceL
 {
     public function rules(): array
     {
-        return array_merge($this->assetStocktakeVarianceListingRules(), [
+        return $this->assetStocktakeVarianceListingRules([
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],
         ]);
