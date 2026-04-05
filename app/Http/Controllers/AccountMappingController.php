@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\AccountMappings\ExportAccountMappingsAction;
 use App\Actions\AccountMappings\IndexAccountMappingsAction;
+use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Requests\AccountMappings\ExportAccountMappingRequest;
 use App\Http\Requests\AccountMappings\IndexAccountMappingRequest;
 use App\Http\Requests\AccountMappings\StoreAccountMappingRequest;
@@ -15,6 +16,8 @@ use Illuminate\Http\JsonResponse;
 
 class AccountMappingController extends Controller
 {
+    use LoadsResourceRelations;
+
     public function index(IndexAccountMappingRequest $request, IndexAccountMappingsAction $action): JsonResponse
     {
         $items = $action->execute($request);
@@ -26,27 +29,21 @@ class AccountMappingController extends Controller
     {
         $mapping = AccountMapping::create($request->validated());
 
-        $mapping->load(['sourceAccount.coaVersion', 'targetAccount.coaVersion']);
-
-        return (new AccountMappingResource($mapping))
+        return (new AccountMappingResource($this->loadResourceRelations($mapping)))
             ->response()
             ->setStatusCode(201);
     }
 
     public function show(AccountMapping $accountMapping): JsonResponse
     {
-        $accountMapping->load(['sourceAccount.coaVersion', 'targetAccount.coaVersion']);
-
-        return (new AccountMappingResource($accountMapping))->response();
+        return (new AccountMappingResource($this->loadResourceRelations($accountMapping)))->response();
     }
 
     public function update(UpdateAccountMappingRequest $request, AccountMapping $accountMapping): JsonResponse
     {
         $accountMapping->update($request->validated());
 
-        $accountMapping->load(['sourceAccount.coaVersion', 'targetAccount.coaVersion']);
-
-        return (new AccountMappingResource($accountMapping))->response();
+        return (new AccountMappingResource($this->loadResourceRelations($accountMapping)))->response();
     }
 
     public function destroy(AccountMapping $accountMapping): JsonResponse
@@ -59,5 +56,10 @@ class AccountMappingController extends Controller
     public function export(ExportAccountMappingRequest $request, ExportAccountMappingsAction $action): JsonResponse
     {
         return $action->execute($request);
+    }
+
+    protected function resourceRelations(): array
+    {
+        return ['sourceAccount.coaVersion', 'targetAccount.coaVersion'];
     }
 }

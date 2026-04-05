@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\ApprovalDelegations\ExportApprovalDelegationsAction;
 use App\Actions\ApprovalDelegations\IndexApprovalDelegationsAction;
 use App\DTOs\ApprovalDelegations\UpdateApprovalDelegationData;
+use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Requests\ApprovalDelegations\ExportApprovalDelegationRequest;
 use App\Http\Requests\ApprovalDelegations\IndexApprovalDelegationRequest;
 use App\Http\Requests\ApprovalDelegations\StoreApprovalDelegationRequest;
@@ -16,6 +17,8 @@ use Illuminate\Http\JsonResponse;
 
 class ApprovalDelegationController extends Controller
 {
+    use LoadsResourceRelations;
+
     public function index(
         IndexApprovalDelegationRequest $request,
         IndexApprovalDelegationsAction $action,
@@ -28,19 +31,16 @@ class ApprovalDelegationController extends Controller
     public function store(StoreApprovalDelegationRequest $request): JsonResponse
     {
         $delegation = ApprovalDelegation::create($request->validated());
-        $delegation->load(['delegator:id,name', 'delegate:id,name']);
 
         return response()->json([
             'message' => 'Approval delegation created successfully',
-            'data' => new ApprovalDelegationResource($delegation),
+            'data' => new ApprovalDelegationResource($this->loadResourceRelations($delegation)),
         ], 201);
     }
 
     public function show(ApprovalDelegation $approvalDelegation): ApprovalDelegationResource
     {
-        $approvalDelegation->load(['delegator:id,name', 'delegate:id,name']);
-
-        return new ApprovalDelegationResource($approvalDelegation);
+        return new ApprovalDelegationResource($this->loadResourceRelations($approvalDelegation));
     }
 
     public function update(
@@ -50,11 +50,10 @@ class ApprovalDelegationController extends Controller
         $dto = UpdateApprovalDelegationData::fromArray($request->validated());
 
         $approvalDelegation->update($dto->toArray());
-        $approvalDelegation->load(['delegator:id,name', 'delegate:id,name']);
 
         return response()->json([
             'message' => 'Approval delegation updated successfully',
-            'data' => new ApprovalDelegationResource($approvalDelegation),
+            'data' => new ApprovalDelegationResource($this->loadResourceRelations($approvalDelegation)),
         ]);
     }
 
@@ -70,5 +69,10 @@ class ApprovalDelegationController extends Controller
         ExportApprovalDelegationsAction $action,
     ): JsonResponse {
         return $action->execute($request->validated());
+    }
+
+    protected function resourceRelations(): array
+    {
+        return ['delegator:id,name', 'delegate:id,name'];
     }
 }

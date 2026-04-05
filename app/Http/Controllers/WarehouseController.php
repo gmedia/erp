@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Warehouses\ExportWarehousesAction;
 use App\Actions\Warehouses\IndexWarehousesAction;
 use App\Domain\Warehouses\WarehouseFilterService;
+use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Requests\Warehouses\ExportWarehouseRequest;
 use App\Http\Requests\Warehouses\IndexWarehouseRequest;
 use App\Http\Requests\Warehouses\StoreWarehouseRequest;
@@ -21,6 +22,8 @@ use Illuminate\Http\JsonResponse;
  */
 class WarehouseController extends Controller
 {
+    use LoadsResourceRelations;
+
     /**
      * Display a listing of the warehouses.
      *
@@ -39,9 +42,8 @@ class WarehouseController extends Controller
     public function store(StoreWarehouseRequest $request): JsonResponse
     {
         $warehouse = Warehouse::create($request->validated());
-        $warehouse->load(['branch']);
 
-        return (new WarehouseResource($warehouse))
+        return (new WarehouseResource($this->loadResourceRelations($warehouse)))
             ->response()
             ->setStatusCode(201);
     }
@@ -51,9 +53,7 @@ class WarehouseController extends Controller
      */
     public function show(Warehouse $warehouse): JsonResponse
     {
-        $warehouse->load(['branch']);
-
-        return (new WarehouseResource($warehouse))->response();
+        return (new WarehouseResource($this->loadResourceRelations($warehouse)))->response();
     }
 
     /**
@@ -62,9 +62,8 @@ class WarehouseController extends Controller
     public function update(UpdateWarehouseRequest $request, Warehouse $warehouse): JsonResponse
     {
         $warehouse->update($request->validated());
-        $warehouse->load(['branch']);
 
-        return (new WarehouseResource($warehouse))->response();
+        return (new WarehouseResource($this->loadResourceRelations($warehouse)))->response();
     }
 
     /**
@@ -81,5 +80,10 @@ class WarehouseController extends Controller
     public function export(ExportWarehouseRequest $request, ExportWarehousesAction $action): JsonResponse
     {
         return $action->execute($request);
+    }
+
+    protected function resourceRelations(): array
+    {
+        return ['branch'];
     }
 }

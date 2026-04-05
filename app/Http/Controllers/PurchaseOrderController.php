@@ -6,6 +6,7 @@ use App\Actions\PurchaseOrders\ExportPurchaseOrdersAction;
 use App\Actions\PurchaseOrders\IndexPurchaseOrdersAction;
 use App\Actions\PurchaseOrders\SyncPurchaseOrderItemsAction;
 use App\DTOs\PurchaseOrders\UpdatePurchaseOrderData;
+use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\PurchaseOrders\ExportPurchaseOrderRequest;
 use App\Http\Requests\PurchaseOrders\IndexPurchaseOrderRequest;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 
 class PurchaseOrderController extends Controller
 {
+    use LoadsResourceRelations;
     use StoresItemsInTransaction;
 
     public function index(IndexPurchaseOrderRequest $request, IndexPurchaseOrdersAction $action): JsonResponse
@@ -48,16 +50,12 @@ class PurchaseOrderController extends Controller
             },
         );
 
-        $purchaseOrder->load(['supplier', 'warehouse', 'approver', 'creator', 'items.product', 'items.unit']);
-
-        return (new PurchaseOrderResource($purchaseOrder))->response()->setStatusCode(201);
+        return (new PurchaseOrderResource($this->loadResourceRelations($purchaseOrder)))->response()->setStatusCode(201);
     }
 
     public function show(PurchaseOrder $purchaseOrder): JsonResponse
     {
-        $purchaseOrder->load(['supplier', 'warehouse', 'approver', 'creator', 'items.product', 'items.unit']);
-
-        return (new PurchaseOrderResource($purchaseOrder))->response();
+        return (new PurchaseOrderResource($this->loadResourceRelations($purchaseOrder)))->response();
     }
 
     public function update(
@@ -84,9 +82,7 @@ class PurchaseOrderController extends Controller
             },
         );
 
-        $purchaseOrder->load(['supplier', 'warehouse', 'approver', 'creator', 'items.product', 'items.unit']);
-
-        return (new PurchaseOrderResource($purchaseOrder))->response();
+        return (new PurchaseOrderResource($this->loadResourceRelations($purchaseOrder)))->response();
     }
 
     public function destroy(PurchaseOrder $purchaseOrder): JsonResponse
@@ -99,5 +95,10 @@ class PurchaseOrderController extends Controller
     public function export(ExportPurchaseOrderRequest $request, ExportPurchaseOrdersAction $action): JsonResponse
     {
         return $action->execute($request);
+    }
+
+    protected function resourceRelations(): array
+    {
+        return ['supplier', 'warehouse', 'approver', 'creator', 'items.product', 'items.unit'];
     }
 }
