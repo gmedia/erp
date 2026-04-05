@@ -2,33 +2,13 @@
 
 namespace App\Http\Requests\Pipelines;
 
-use App\Http\Requests\BaseListingRequest;
-
-class IndexPipelineRequest extends BaseListingRequest
+class IndexPipelineRequest extends AbstractPipelineListingRequest
 {
     public function rules(): array
     {
         return array_merge(
-            $this->searchRules(),
-            [
-                'entity_type' => ['nullable', 'string'],
-                'is_active' => ['nullable', 'boolean'],
-            ],
-            $this->listingSortRules('id,name,code,entity_type,version,is_active,created_at,updated_at,created_by'),
+            $this->pipelineListingRules('id,name,code,entity_type,version,is_active,created_at,updated_at,created_by'),
             $this->paginationRules(),
         );
-    }
-
-    protected function prepareForValidation(): void
-    {
-        if ($this->has('is_active')) {
-            if ($this->is_active === '' || $this->is_active === null) {
-                $this->merge(['is_active' => null]);
-            } else {
-                $this->merge([
-                    'is_active' => filter_var($this->is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
-                ]);
-            }
-        }
     }
 }

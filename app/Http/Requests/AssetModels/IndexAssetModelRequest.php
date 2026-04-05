@@ -2,18 +2,12 @@
 
 namespace App\Http\Requests\AssetModels;
 
-use App\Http\Requests\BaseListingRequest;
-
-class IndexAssetModelRequest extends BaseListingRequest
+class IndexAssetModelRequest extends AbstractAssetModelListingRequest
 {
     public function rules(): array
     {
         return array_merge(
-            $this->searchRules(),
-            [
-                'asset_category_id' => ['nullable', 'exists:asset_categories,id'],
-            ],
-            $this->listingSortRules('id,model_name,manufacturer,category,asset_category_id,created_at,updated_at'),
+            $this->assetModelListingRules('id,model_name,manufacturer,category,asset_category_id,created_at,updated_at'),
             $this->paginationRules(),
         );
     }
