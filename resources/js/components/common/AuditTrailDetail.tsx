@@ -20,7 +20,9 @@ export function AuditTrailField({
             <p className="text-sm font-medium text-muted-foreground">{label}</p>
             <div className={valueClassName}>{value}</div>
             {helperText ? (
-                <div className="text-xs text-muted-foreground">{helperText}</div>
+                <div className="text-xs text-muted-foreground">
+                    {helperText}
+                </div>
             ) : null}
         </div>
     );
