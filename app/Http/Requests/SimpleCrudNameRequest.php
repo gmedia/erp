@@ -38,7 +38,11 @@ abstract class SimpleCrudNameRequest extends AuthorizedFormRequest
         $requestClass = static::class;
 
         if (str_starts_with(class_basename($requestClass), 'Mockery_')) {
-            $requestClass = get_parent_class($this) ?: $requestClass;
+            $parentClass = get_parent_class($requestClass);
+
+            if ($parentClass !== false) {
+                $requestClass = $parentClass;
+            }
         }
 
         $modelClass = 'App\\Models\\' . str_replace(
