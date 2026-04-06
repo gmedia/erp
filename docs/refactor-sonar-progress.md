@@ -35,17 +35,17 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: 4061 (turun 2283 dari baseline Batch F)
-- duplicated_blocks: 189 (turun 143 dari baseline Batch F)
-- duplicated_lines_density: 4.6 (turun 2.6 dari baseline Batch F)
-- ncloc: 72452 (turun 421 dari baseline Batch F)
-- coverage: 88.2 (snapshot remote terbaru sudah sehat; new_coverage 90.1)
+- duplicated_lines: 3881 (turun 2463 dari baseline Batch F)
+- duplicated_blocks: 180 (turun 152 dari baseline Batch F)
+- duplicated_lines_density: 4.4 (turun 2.8 dari baseline Batch F)
+- ncloc: 72134 (turun 739 dari baseline Batch F)
+- coverage: 0.0 (anomali snapshot remote terbaru; quality gate juga membaca `new_coverage 0.0`)
 
 ## Snapshot Analisa Sonar (2026-04-06, latest MCP)
 
 - Quality Gate: ERROR
-- Gate blocker utama: `new_duplicated_lines_density = 7.4`
-- Catatan: snapshot Sonar remote terbaru via MCP mempertahankan coverage sehat (`coverage 88.2`, `new_coverage 90.1`) dan overall duplication turun lagi ke `duplicated_lines 4061`, `duplicated_blocks 189`, `duplicated_lines_density 4.6`, dengan `ncloc 72452`. Gate tetap `ERROR` karena blocker yang tersisa tinggal density duplikasi pada new code `7.4`. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, 4 spec Playwright pada wave audit-trail, 7 spec Playwright pada wave report-column summaries, dan 11 spec Playwright pada wave report page shells.
+- Gate blocker utama: `new_duplicated_lines_density = 7.1`
+- Catatan: snapshot Sonar remote terbaru via MCP setelah commit `0936853c` kembali menunjukkan anomali pipeline coverage (`coverage 0.0`, `new_coverage 0.0`), tetapi metrik duplikasi tetap membaik ke `duplicated_lines 3881`, `duplicated_blocks 180`, `duplicated_lines_density 4.4`, dengan `ncloc 72134`. Gate tetap `ERROR` karena kombinasi anomali coverage baru dan density duplikasi pada new code `7.1`. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, 4 spec Playwright pada wave audit-trail, 7 spec Playwright pada wave report-column summaries, 11 spec Playwright pada wave report page shells, dan 13 passed + 1 skipped pada wave remaining report pages.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
@@ -350,6 +350,10 @@ Isi setelah batch selesai dan sebelum merge.
 	- Ekstrak helper frontend generic untuk shell halaman report yang masih mengulang `Helmet + AppLayout + useCrudFilters + useCrudQuery + DataTable pagination` agar wrapper page report tidak lagi menyimpan orchestration yang sama di banyak file.
 	- Gelombang saat ini mencakup `resources/js/components/common/ReportDataTablePage.tsx`, `resources/js/pages/reports/purchase-history/index.tsx`, `resources/js/pages/reports/purchase-order-status/index.tsx`, `resources/js/pages/reports/goods-receipt/index.tsx`, `resources/js/pages/reports/stock-movement/index.tsx`, `resources/js/pages/reports/inventory-valuation/index.tsx`, `resources/js/pages/reports/inventory-stocktake-variance/index.tsx`, `resources/js/pages/reports/asset-stocktake-variances/index.tsx`, dan `resources/js/pages/reports/maintenance-cost/index.tsx`.
 	- Progress: helper shared `ReportDataTablePage` kini menggantikan boilerplate page wrapper report tanpa ubah endpoint, query key, initial filters, breadcrumb, atau export endpoint; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/purchase-history-report/ tests/e2e/purchase-order-status-report/ tests/e2e/goods-receipt-report/ tests/e2e/stock-movement-report/ tests/e2e/inventory-valuation-report/ tests/e2e/inventory-stocktake-variance-report/ tests/e2e/asset-stocktake-variances/ tests/e2e/maintenance-cost-reports/` (11 passed). Snapshot Sonar pasca-wave: belum berubah setelah push `26fa29a0`; MCP masih menampilkan `duplicated_lines 4061`, `duplicated_blocks 189`, `duplicated_lines_density 4.6`, `coverage 88.2`, `ncloc 72452`, `new_coverage 90.1`, dan `new_duplicated_lines_density 7.4`.
+73. Dedup remaining report pages. (in-progress)
+	- Perluas helper frontend `ReportDataTablePage` agar bisa menangani callback `onView` dan child modal, lalu migrasikan sisa wrapper report sederhana yang masih mengulang shell `Helmet + AppLayout + useCrudFilters + useCrudQuery + DataTable`.
+	- Gelombang saat ini mencakup `resources/js/components/common/ReportDataTablePage.tsx`, `resources/js/pages/reports/stock-adjustment/index.tsx`, `resources/js/pages/reports/book-value-depreciation/index.tsx`, dan `resources/js/pages/reports/assets/register/index.tsx`.
+	- Progress: helper shared `ReportDataTablePage` kini juga mendukung `onView` dan `children`, sehingga tiga page wrapper tersebut bisa pindah ke pola shared tanpa ubah endpoint, query key, initial filters, breadcrumb, modal asset detail, atau perilaku tombol view; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/stock-adjustment-report/ tests/e2e/book-value-depreciation-reports/ tests/e2e/assets/asset.spec.ts` (13 passed, 1 skipped). Snapshot Sonar pasca-wave: sudah berubah setelah push `0936853c`; MCP menampilkan `duplicated_lines 3881`, `duplicated_blocks 180`, `duplicated_lines_density 4.4`, `coverage 0.0`, `ncloc 72134`, `new_coverage 0.0`, dan `new_duplicated_lines_density 7.1`.
 
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
