@@ -1,8 +1,10 @@
 import {
-    createAsyncSelectFilterField,
     createDateRangeFilterFields,
+    createWarehouseBranchFilterFields,
     createSelectFilterField,
     createTextFilterField,
+    stockAdjustmentStatusOptions,
+    stockAdjustmentTypeOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
@@ -13,41 +15,17 @@ export function createStockAdjustmentReportFilterFields(): FieldDescriptor[] {
             'Search',
             'Search number, warehouse, branch, type, status...',
         ),
-        createAsyncSelectFilterField(
-            'warehouse_id',
-            'Warehouse',
-            '/api/warehouses',
-            'All warehouses',
-        ),
-        createAsyncSelectFilterField(
-            'branch_id',
-            'Branch',
-            '/api/branches',
-            'All branches',
-        ),
+        ...createWarehouseBranchFilterFields(),
         createSelectFilterField(
             'adjustment_type',
             'Adjustment Type',
-            [
-                { value: 'damage', label: 'Damage' },
-                { value: 'expired', label: 'Expired' },
-                { value: 'shrinkage', label: 'Shrinkage' },
-                { value: 'correction', label: 'Correction' },
-                { value: 'stocktake_result', label: 'Stocktake Result' },
-                { value: 'initial_stock', label: 'Initial Stock' },
-                { value: 'other', label: 'Other' },
-            ],
+            stockAdjustmentTypeOptions,
             'All types',
         ),
         createSelectFilterField(
             'status',
             'Status',
-            [
-                { value: 'draft', label: 'Draft' },
-                { value: 'pending_approval', label: 'Pending Approval' },
-                { value: 'approved', label: 'Approved' },
-                { value: 'cancelled', label: 'Cancelled' },
-            ],
+            stockAdjustmentStatusOptions,
             'All statuses',
         ),
         ...createDateRangeFilterFields(),

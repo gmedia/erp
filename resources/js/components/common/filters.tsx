@@ -35,6 +35,43 @@ export const purchaseOrderStatusOptions: SelectOption[] = [
     { value: 'closed', label: 'Closed' },
 ];
 
+export const maintenanceTypeOptions: SelectOption[] = [
+    { value: 'preventive', label: 'Preventive' },
+    { value: 'corrective', label: 'Corrective' },
+    { value: 'calibration', label: 'Calibration' },
+    { value: 'other', label: 'Other' },
+];
+
+export const maintenanceStatusOptions: SelectOption[] = [
+    { value: 'scheduled', label: 'Scheduled' },
+    { value: 'in_progress', label: 'In Progress' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'cancelled', label: 'Cancelled' },
+];
+
+export const stockAdjustmentTypeOptions: SelectOption[] = [
+    { value: 'damage', label: 'Damage' },
+    { value: 'expired', label: 'Expired' },
+    { value: 'shrinkage', label: 'Shrinkage' },
+    { value: 'correction', label: 'Correction' },
+    { value: 'stocktake_result', label: 'Stocktake Result' },
+    { value: 'initial_stock', label: 'Initial Stock' },
+    { value: 'other', label: 'Other' },
+];
+
+export const stockAdjustmentStatusOptions: SelectOption[] = [
+    { value: 'draft', label: 'Draft' },
+    { value: 'pending_approval', label: 'Pending Approval' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'cancelled', label: 'Cancelled' },
+];
+
+export const assetStocktakeVarianceResultOptions: SelectOption[] = [
+    { value: 'damaged', label: 'Damaged' },
+    { value: 'missing', label: 'Missing' },
+    { value: 'moved', label: 'Moved' },
+];
+
 export type AsyncSelectFilterConfig = {
     name: string;
     label: string;
@@ -130,6 +167,62 @@ export function createAsyncSelectFilterFields(
     );
 }
 
+export function createBranchFilterField(
+    placeholder = 'All branches',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'branch_id',
+        'Branch',
+        '/api/branches',
+        placeholder,
+    );
+}
+
+export function createWarehouseFilterField(
+    placeholder = 'All warehouses',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'warehouse_id',
+        'Warehouse',
+        '/api/warehouses',
+        placeholder,
+    );
+}
+
+export function createSupplierFilterField(
+    placeholder = 'All suppliers',
+    label = 'Supplier',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'supplier_id',
+        label,
+        '/api/suppliers',
+        placeholder,
+    );
+}
+
+export function createAssetCategoryFilterField(
+    placeholder = 'Select a category',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'asset_category_id',
+        'Category',
+        '/api/asset-categories',
+        placeholder,
+    );
+}
+
+export function createAssetStocktakeFilterField(
+    placeholder = 'Select a stocktake',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'asset_stocktake_id',
+        'Stocktake',
+        '/api/asset-stocktakes',
+        placeholder,
+    );
+}
+
 export function createSupplierWarehouseProductFilterFields(): FieldDescriptor[] {
     return createAsyncSelectFilterFields([
         {
@@ -151,6 +244,20 @@ export function createSupplierWarehouseProductFilterFields(): FieldDescriptor[] 
             placeholder: 'All products',
         },
     ]);
+}
+
+export function createAssetCategoryBranchFilterFields(): FieldDescriptor[] {
+    return [
+        createAssetCategoryFilterField('Select a category'),
+        createBranchFilterField('Select a branch'),
+    ];
+}
+
+export function createWarehouseBranchFilterFields(): FieldDescriptor[] {
+    return [
+        createWarehouseFilterField('All warehouses'),
+        createBranchFilterField('All branches'),
+    ];
 }
 
 export function createProductWarehouseBranchCategoryFilterFields(): FieldDescriptor[] {

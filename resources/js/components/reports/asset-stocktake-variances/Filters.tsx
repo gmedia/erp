@@ -1,5 +1,7 @@
 import {
-    createAsyncSelectFilterField,
+    assetStocktakeVarianceResultOptions,
+    createAssetStocktakeFilterField,
+    createBranchFilterField,
     createSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
@@ -12,26 +14,12 @@ export function createVarianceFilterFields(): FieldDescriptor[] {
             'Search',
             'Search code, name, notes...',
         ),
-        createAsyncSelectFilterField(
-            'asset_stocktake_id',
-            'Stocktake',
-            '/api/asset-stocktakes',
-            'Select a stocktake',
-        ),
-        createAsyncSelectFilterField(
-            'branch_id',
-            'Branch',
-            '/api/branches',
-            'Select a branch',
-        ),
+        createAssetStocktakeFilterField('Select a stocktake'),
+        createBranchFilterField('Select a branch'),
         createSelectFilterField(
             'result',
             'Result',
-            [
-                { value: 'damaged', label: 'Damaged' },
-                { value: 'missing', label: 'Missing' },
-                { value: 'moved', label: 'Moved' },
-            ],
+            assetStocktakeVarianceResultOptions,
             'Select result',
         ),
     ];

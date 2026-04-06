@@ -1,8 +1,11 @@
 import {
-    createAsyncSelectFilterField,
+    createAssetCategoryBranchFilterFields,
     createDateRangeFilterFields,
+    createSupplierFilterField,
     createSelectFilterField,
     createTextFilterField,
+    maintenanceStatusOptions,
+    maintenanceTypeOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
@@ -13,44 +16,18 @@ export function createMaintenanceCostReportFilterFields(): FieldDescriptor[] {
             'Search',
             'Search code, name, notes...',
         ),
-        createAsyncSelectFilterField(
-            'asset_category_id',
-            'Category',
-            '/api/asset-categories',
-            'Select a category',
-        ),
-        createAsyncSelectFilterField(
-            'branch_id',
-            'Branch',
-            '/api/branches',
-            'Select a branch',
-        ),
-        createAsyncSelectFilterField(
-            'supplier_id',
-            'Vendor',
-            '/api/suppliers',
-            'Select a vendor',
-        ),
+        ...createAssetCategoryBranchFilterFields(),
+        createSupplierFilterField('Select a vendor', 'Vendor'),
         createSelectFilterField(
             'maintenance_type',
             'Type',
-            [
-                { value: 'preventive', label: 'Preventive' },
-                { value: 'corrective', label: 'Corrective' },
-                { value: 'calibration', label: 'Calibration' },
-                { value: 'other', label: 'Other' },
-            ],
+            maintenanceTypeOptions,
             'Select type',
         ),
         createSelectFilterField(
             'status',
             'Status',
-            [
-                { value: 'scheduled', label: 'Scheduled' },
-                { value: 'in_progress', label: 'In Progress' },
-                { value: 'completed', label: 'Completed' },
-                { value: 'cancelled', label: 'Cancelled' },
-            ],
+            maintenanceStatusOptions,
             'Select status',
         ),
         ...createDateRangeFilterFields(),
