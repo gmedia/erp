@@ -35,17 +35,17 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: 4552 (turun 1792 dari baseline Batch F)
-- duplicated_blocks: 245 (turun 87 dari baseline Batch F)
-- duplicated_lines_density: 5.1 (turun 2.1 dari baseline Batch F)
-- ncloc: 72546 (turun 327 dari baseline Batch F)
+- duplicated_lines: 4453 (turun 1891 dari baseline Batch F)
+- duplicated_blocks: 225 (turun 107 dari baseline Batch F)
+- duplicated_lines_density: 5.0 (turun 2.2 dari baseline Batch F)
+- ncloc: 72471 (turun 402 dari baseline Batch F)
 - coverage: 0.0 (snapshot remote terbaru kembali anomali; coverage sehat terakhir sebelumnya 88.1)
 
 ## Snapshot Analisa Sonar (2026-04-06, latest MCP)
 
 - Quality Gate: ERROR
 - Gate blocker utama: `new_coverage = 0.0` dan `new_duplicated_lines_density = 7.1`
-- Catatan: snapshot Sonar remote terbaru via MCP setelah push `1eac71f1` masih menunjukkan anomali coverage `0.0` dan belum merefleksikan dampak wave frontend report filters secara terpisah; measures tetap `duplicated_lines 4552`, `duplicated_blocks 245`, `duplicated_lines_density 5.1`, `ncloc 72546`, dan gate `ERROR`. Untuk wave ini, verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright report terfokus.
+- Catatan: snapshot Sonar remote terbaru via MCP sekarang sudah bergerak ke `duplicated_lines 4453`, `duplicated_blocks 225`, `duplicated_lines_density 5.0`, dan `ncloc 72471`, tetapi sesudah push `76246932` nilainya masih sama sehingga wave frontend report filters kedua belum terpisah diindeks oleh snapshot baru; gate tetap `ERROR` karena coverage anomali `0.0` dan `new_duplicated_lines_density 7.1`. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama dan 10 spec Playwright pada wave kedua.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
@@ -334,6 +334,10 @@ Isi setelah batch selesai dan sebelum merge.
 	- Ekstrak helper listing kecil untuk pasangan `Index/Export` fiscal years, sambil mempertahankan whitelist sort index yang lebih luas dibanding export default simple CRUD.
 	- Gelombang saat ini mencakup `IndexFiscalYearRequest`, `ExportFiscalYearRequest`, dan abstract baru `AbstractFiscalYearListingRequest`.
 	- Progress: pasangan request fiscal year tersebut sekarang berbagi helper listing yang sama tanpa ubah filter `status`, whitelist `sort_by` khusus index (`start_date/end_date/status`), whitelist sort export default simple CRUD, atau pagination index; verifikasi PASS 17 test, `./vendor/bin/sail artisan test tests/Unit/Requests/FiscalYears/IndexFiscalYearRequestTest.php tests/Unit/Requests/FiscalYears/ExportFiscalYearRequestTest.php tests/Feature/FiscalYears/FiscalYearControllerTest.php tests/Feature/FiscalYears/FiscalYearExportTest.php` PASS dan `./vendor/bin/sail bin duster fix app/Http/Requests/FiscalYears/AbstractFiscalYearListingRequest.php app/Http/Requests/FiscalYears/IndexFiscalYearRequest.php app/Http/Requests/FiscalYears/ExportFiscalYearRequest.php` PASS. Snapshot Sonar pasca-wave: belum di-refresh.
+69. Dedup asset-side report filter field groups. (in-progress)
+	- Ekstrak helper async-select kecil dan option arrays untuk report filters yang masih mengulang pasangan `asset_category + branch`, `warehouse + branch`, serta daftar opsi status/tipe/result lokal pada report aset dan stok, sambil mempertahankan nama field, placeholder, dan urutan filter.
+	- Gelombang saat ini mencakup `resources/js/components/common/filters.tsx`, `resources/js/components/reports/maintenance-cost/Filters.tsx`, `resources/js/components/reports/stock-adjustment/Filters.tsx`, `resources/js/components/reports/book-value-depreciation/Filters.tsx`, dan `resources/js/components/reports/asset-stocktake-variances/Filters.tsx`.
+	- Progress: helper shared `createAssetCategoryBranchFilterFields()`, `createWarehouseBranchFilterFields()`, `createBranchFilterField()`, `createSupplierFilterField()`, `createAssetCategoryFilterField()`, `createAssetStocktakeFilterField()`, serta konstanta `maintenanceTypeOptions`, `maintenanceStatusOptions`, `stockAdjustmentTypeOptions`, `stockAdjustmentStatusOptions`, dan `assetStocktakeVarianceResultOptions` kini menggantikan blok async-select dan daftar opsi yang berulang tanpa ubah contract query string atau UI filter; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/maintenance-cost-reports/ tests/e2e/stock-adjustment-report/ tests/e2e/book-value-depreciation-reports/ tests/e2e/asset-stocktake-variances/` (10 passed). Snapshot Sonar pasca-wave: belum berubah setelah push rebased `76246932` di atas `a08b045e`; MCP masih menampilkan `duplicated_lines 4453`, `duplicated_blocks 225`, `duplicated_lines_density 5.0`, `coverage 0.0`, `ncloc 72471`, dan `new_duplicated_lines_density 7.1`.
 
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
