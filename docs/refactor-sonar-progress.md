@@ -35,17 +35,17 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: 4453 (turun 1891 dari baseline Batch F)
-- duplicated_blocks: 225 (turun 107 dari baseline Batch F)
-- duplicated_lines_density: 5.0 (turun 2.2 dari baseline Batch F)
-- ncloc: 72471 (turun 402 dari baseline Batch F)
+- duplicated_lines: 4356 (turun 1988 dari baseline Batch F)
+- duplicated_blocks: 208 (turun 124 dari baseline Batch F)
+- duplicated_lines_density: 4.9 (turun 2.3 dari baseline Batch F)
+- ncloc: 72498 (turun 375 dari baseline Batch F)
 - coverage: 0.0 (snapshot remote terbaru kembali anomali; coverage sehat terakhir sebelumnya 88.1)
 
 ## Snapshot Analisa Sonar (2026-04-06, latest MCP)
 
 - Quality Gate: ERROR
-- Gate blocker utama: `new_coverage = 0.0` dan `new_duplicated_lines_density = 7.1`
-- Catatan: snapshot Sonar remote terbaru via MCP sekarang sudah bergerak ke `duplicated_lines 4453`, `duplicated_blocks 225`, `duplicated_lines_density 5.0`, dan `ncloc 72471`, tetapi sesudah push `76246932` nilainya masih sama sehingga wave frontend report filters kedua belum terpisah diindeks oleh snapshot baru; gate tetap `ERROR` karena coverage anomali `0.0` dan `new_duplicated_lines_density 7.1`. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama dan 10 spec Playwright pada wave kedua.
+- Gate blocker utama: `new_coverage = 0.0` dan `new_duplicated_lines_density = 8.0`
+- Catatan: snapshot Sonar remote terbaru via MCP sesudah push `77574e26` menunjukkan overall duplication terus turun ke `duplicated_lines 4356`, `duplicated_blocks 208`, `duplicated_lines_density 4.9`, dan `ncloc 72498`, tetapi gate tetap `ERROR` karena coverage anomali `0.0` dan density duplikasi pada new code naik ke `8.0`. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, dan 4 spec Playwright pada wave audit-trail.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
@@ -338,6 +338,10 @@ Isi setelah batch selesai dan sebelum merge.
 	- Ekstrak helper async-select kecil dan option arrays untuk report filters yang masih mengulang pasangan `asset_category + branch`, `warehouse + branch`, serta daftar opsi status/tipe/result lokal pada report aset dan stok, sambil mempertahankan nama field, placeholder, dan urutan filter.
 	- Gelombang saat ini mencakup `resources/js/components/common/filters.tsx`, `resources/js/components/reports/maintenance-cost/Filters.tsx`, `resources/js/components/reports/stock-adjustment/Filters.tsx`, `resources/js/components/reports/book-value-depreciation/Filters.tsx`, dan `resources/js/components/reports/asset-stocktake-variances/Filters.tsx`.
 	- Progress: helper shared `createAssetCategoryBranchFilterFields()`, `createWarehouseBranchFilterFields()`, `createBranchFilterField()`, `createSupplierFilterField()`, `createAssetCategoryFilterField()`, `createAssetStocktakeFilterField()`, serta konstanta `maintenanceTypeOptions`, `maintenanceStatusOptions`, `stockAdjustmentTypeOptions`, `stockAdjustmentStatusOptions`, dan `assetStocktakeVarianceResultOptions` kini menggantikan blok async-select dan daftar opsi yang berulang tanpa ubah contract query string atau UI filter; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/maintenance-cost-reports/ tests/e2e/stock-adjustment-report/ tests/e2e/book-value-depreciation-reports/ tests/e2e/asset-stocktake-variances/` (10 passed). Snapshot Sonar pasca-wave: belum berubah setelah push rebased `76246932` di atas `a08b045e`; MCP masih menampilkan `duplicated_lines 4453`, `duplicated_blocks 225`, `duplicated_lines_density 5.0`, `coverage 0.0`, `ncloc 72471`, dan `new_duplicated_lines_density 7.1`.
+70. Dedup audit-trail frontend helpers. (in-progress)
+	- Ekstrak helper kecil untuk field detail modal, metadata snapshot, async user filter, dan date-range filter agar pasangan komponen audit trail tidak lagi menyalin blok UI yang sama.
+	- Gelombang saat ini mencakup `resources/js/components/common/AuditTrailDetail.tsx`, `resources/js/components/common/filters.tsx`, `resources/js/components/approval-audit-trail/DetailModal.tsx`, `resources/js/components/approval-audit-trail/Filters.tsx`, `resources/js/components/pipeline-audit-trail/DetailModal.tsx`, dan `resources/js/components/pipeline-audit-trail/Filters.tsx`.
+	- Progress: helper shared `AuditTrailField`, `AuditTrailMetadataSnapshot`, dan `createUserFilterField()` kini menggantikan blok labeled field, metadata JSON, user select, dan date-range filter yang berulang tanpa ubah judul modal, placeholder filter, atau selector E2E; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/approval-audit-trail/ tests/e2e/pipeline-audit-trail/` (4 passed). Snapshot Sonar pasca-wave: sudah berubah setelah push rebased `77574e26` di atas `946ae28d`; MCP menampilkan `duplicated_lines 4356`, `duplicated_blocks 208`, `duplicated_lines_density 4.9`, `coverage 0.0`, `ncloc 72498`, dan `new_duplicated_lines_density 8.0`.
 
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
