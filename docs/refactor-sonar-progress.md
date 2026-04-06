@@ -35,17 +35,17 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: 3552 (turun 2792 dari baseline Batch F)
-- duplicated_blocks: 169 (turun 163 dari baseline Batch F)
-- duplicated_lines_density: 4.0 (turun 3.2 dari baseline Batch F)
-- ncloc: 71733 (turun 1140 dari baseline Batch F)
+- duplicated_lines: 3425 (turun 2919 dari baseline Batch F)
+- duplicated_blocks: 164 (turun 168 dari baseline Batch F)
+- duplicated_lines_density: 3.9 (turun 3.3 dari baseline Batch F)
+- ncloc: 71728 (turun 1145 dari baseline Batch F)
 - coverage: 0.0 (anomali snapshot remote terbaru; quality gate juga membaca `new_coverage 0.0`)
 
 ## Snapshot Analisa Sonar (2026-04-06, latest MCP)
 
 - Quality Gate: ERROR
-- Gate blocker utama: `new_duplicated_lines_density = 6.8`
-- Catatan: snapshot Sonar remote terbaru via MCP setelah commit `8c8b79c4` masih menunjukkan anomali pipeline coverage (`coverage 0.0`, `new_coverage 0.0`), tetapi metrik duplikasi overall kembali turun ke `duplicated_lines 3552`, `duplicated_blocks 169`, `duplicated_lines_density 4.0`, dan `ncloc 71733`; blocker new-code ikut membaik tipis ke `6.8`. Karena remote `main` terus bergerak selama batch aktif, wave ini tetap saya catat sebagai snapshot terbaru, bukan diasumsikan murni delta dari helper lokal saja. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, 4 spec Playwright pada wave audit-trail filters/detail, 7 spec Playwright pada wave report-column summaries, 11 spec Playwright pada wave report page shells, 13 passed + 1 skipped pada wave remaining report pages, 6 passed pada wave financial report shells, 6 passed pada wave manual financial tables, 4 passed pada wave audit trail pages, 2 passed pada wave inventory table pages, dan 30 passed + 2 skipped pada wave asset filter helpers.
+- Gate blocker utama: `new_duplicated_lines_density = 6.5`
+- Catatan: snapshot Sonar remote terbaru via MCP setelah commit `501413b2` masih menunjukkan anomali pipeline coverage (`coverage 0.0`, `new_coverage 0.0`), tetapi metrik duplikasi overall kembali turun ke `duplicated_lines 3425`, `duplicated_blocks 164`, `duplicated_lines_density 3.9`, dan `ncloc 71728`; blocker new-code ikut membaik lagi ke `6.5`. Karena remote `main` terus bergerak selama batch aktif, wave ini tetap saya catat sebagai snapshot terbaru, bukan diasumsikan murni delta dari helper lokal saja. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, 4 spec Playwright pada wave audit-trail filters/detail, 7 spec Playwright pada wave report-column summaries, 11 spec Playwright pada wave report page shells, 13 passed + 1 skipped pada wave remaining report pages, 6 passed pada wave financial report shells, 6 passed pada wave manual financial tables, 4 passed pada wave audit trail pages, 2 passed pada wave inventory table pages, 30 passed + 2 skipped pada wave asset filter helpers, dan 27 passed pada wave shared list filter helpers.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
@@ -374,6 +374,10 @@ Isi setelah batch selesai dan sebelum merge.
 	- Ekstrak helper frontend kecil untuk family filter aset yang masih mengulang opsi status/kondisi aset, pasangan filter maintenance `type/status`, pasangan async select `asset/supplier`, dan numeric cost range, sambil mempertahankan nama field, placeholder, urutan filter, dan perilaku query string di tiap modul.
 	- Gelombang saat ini mencakup `resources/js/components/common/filters.tsx`, `resources/js/components/assets/AssetFilters.tsx`, `resources/js/components/asset-maintenances/AssetMaintenanceFilters.tsx`, `resources/js/components/reports/maintenance-cost/Filters.tsx`, dan `resources/js/components/asset-models/AssetModelFilters.tsx`.
 	- Progress: helper shared `createAssetFilterField()`, `createAssetSupplierFilterFields()`, `createMaintenanceTypeStatusFilterFields()`, `createAssetStatusConditionFilterFields()`, `createCostRangeFilterFields()`, serta konstanta `assetStatusOptions` dan `assetConditionOptions` kini menggantikan blok descriptor filter dan option array yang berulang tanpa ubah selector, placeholder, route, atau kontrak filter per halaman; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/assets/asset.spec.ts tests/e2e/asset-maintenances/asset-maintenance.spec.ts tests/e2e/asset-reports/asset-register.spec.ts tests/e2e/maintenance-cost-reports/index.spec.ts tests/e2e/asset-models/asset-model.spec.ts` (30 passed, 2 skipped). Snapshot Sonar pasca-wave: sudah berubah setelah push `8c8b79c4`; MCP menampilkan `duplicated_lines 3552`, `duplicated_blocks 169`, `duplicated_lines_density 4.0`, `coverage 0.0`, `ncloc 71733`, `new_coverage 0.0`, dan `new_duplicated_lines_density 6.8`.
+79. Dedup shared list filter helpers. (in-progress)
+	- Ekstrak helper frontend kecil untuk family filter list customer, supplier, dan employee yang masih mengulang descriptor `branch/category/status`, pasangan org filter `department/position/branch`, serta option array status sederhana, sambil mempertahankan nama field, placeholder, urutan filter, dan perilaku query string tiap modul.
+	- Gelombang saat ini mencakup `resources/js/components/common/filters.tsx`, `resources/js/components/customers/CustomerFilters.tsx`, `resources/js/components/suppliers/SupplierFilters.tsx`, dan `resources/js/components/employees/EmployeeFilters.tsx`.
+	- Progress: helper shared `createCustomerFilterSelectFields()`, `createSupplierFilterSelectFields()`, `createEmployeeOrganizationFilterFields()`, `createEmploymentStatusFilterField()`, `createCustomerCategoryFilterField()`, `createSupplierCategoryFilterField()`, `createDepartmentFilterField()`, `createPositionFilterField()`, serta konstanta `activeInactiveStatusOptions` dan `employmentStatusOptions` kini menggantikan blok async-select dan option array yang berulang tanpa ubah selector, placeholder, route, atau kontrak filter per halaman; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/customers/customer.spec.ts tests/e2e/suppliers/supplier.spec.ts tests/e2e/employees/employee.spec.ts` (27 passed). Snapshot Sonar pasca-wave: sudah berubah setelah push `501413b2`; MCP menampilkan `duplicated_lines 3425`, `duplicated_blocks 164`, `duplicated_lines_density 3.9`, `coverage 0.0`, `ncloc 71728`, `new_coverage 0.0`, dan `new_duplicated_lines_density 6.5`.
 
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
