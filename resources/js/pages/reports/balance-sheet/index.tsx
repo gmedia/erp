@@ -1,7 +1,12 @@
 import {
     FinancialReportSection,
+    type FinancialReportFiscalYear,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
+import {
+    FinancialReportPageShell,
+    useComparisonReportSearchParams,
+} from '@/components/reports/financial/FinancialReportPageShell';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -11,32 +16,14 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { cn, formatCurrency } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
-import { useSearchParams } from 'react-router-dom';
-
-interface FiscalYear {
-    id: number;
-    name: string;
-    start_date: string;
-    end_date: string;
-    status: string;
-}
 
 interface BalanceSheetResponse {
-    fiscalYears: FiscalYear[];
+    fiscalYears: FinancialReportFiscalYear[];
     selectedYearId: number;
     comparisonYearId?: number;
     report: {
@@ -61,9 +48,8 @@ interface BalanceSheetResponse {
 }
 
 export default function BalanceSheet() {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const urlYearId = searchParams.get('fiscal_year_id');
-    const urlComparisonId = searchParams.get('comparison_year_id');
+    const { urlYearId, urlComparisonId, handleYearChange, handleComparisonChange } =
+        useComparisonReportSearchParams();
 
     const { data, isLoading, error } = useQuery<BalanceSheetResponse>({
         queryKey: ['balance-sheet', urlYearId, urlComparisonId],
@@ -96,21 +82,6 @@ export default function BalanceSheet() {
         ? fiscalYears.find((fy) => fy.id === comparisonYearId)
         : undefined;
 
-    const handleYearChange = (value: string) => {
-        const params: Record<string, string> = { fiscal_year_id: value };
-        if (comparisonYearId)
-            params.comparison_year_id = String(comparisonYearId);
-        setSearchParams(params);
-    };
-
-    const handleComparisonChange = (value: string) => {
-        const params: Record<string, string> = {
-            fiscal_year_id: String(selectedYearId),
-        };
-        if (value !== 'none') params.comparison_year_id = value;
-        setSearchParams(params);
-    };
-
     // Calculate generic check
     const totalAssets = report.totals?.assets || 0;
     const totalLiabilitiesAndEquity =
@@ -118,139 +89,45 @@ export default function BalanceSheet() {
     const isBalanced = Math.abs(totalAssets - totalLiabilitiesAndEquity) < 1;
     const difference = Math.abs(totalAssets - totalLiabilitiesAndEquity);
 
-    if (isLoading) {
-        return (
-            <AppLayout
-                breadcrumbs={[
-                    { title: 'Reports', href: '#' },
-                    { title: 'Balance Sheet', href: '/reports/balance-sheet' },
-                ]}
-            >
-                <Helmet>
-                    <title>Balance Sheet</title>
-                </Helmet>
-                <div className="flex h-full items-center justify-center p-4">
-                    Loading report...
-                </div>
-            </AppLayout>
-        );
-    }
-
-    if (error) {
-        return (
-            <AppLayout
-                breadcrumbs={[
-                    { title: 'Reports', href: '#' },
-                    { title: 'Balance Sheet', href: '/reports/balance-sheet' },
-                ]}
-            >
-                <Helmet>
-                    <title>Balance Sheet</title>
-                </Helmet>
-                <div className="flex h-full items-center justify-center p-4 text-destructive">
-                    Error loading report.
-                </div>
-            </AppLayout>
-        );
-    }
-
     return (
-        <AppLayout
-            breadcrumbs={[
-                { title: 'Reports', href: '#' },
-                { title: 'Balance Sheet', href: '/reports/balance-sheet' },
-            ]}
-        >
-            <Helmet>
-                <title>Balance Sheet</title>
-            </Helmet>
-
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-bold tracking-tight">
-                            Balance Sheet
-                        </h1>
-                        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                            {selectedFiscalYear && (
-                                <span>
-                                    {selectedFiscalYear.name} •{' '}
-                                    {selectedFiscalYear.status}
-                                </span>
-                            )}
-                            <Badge variant="outline">
-                                {selectedComparisonFiscalYear
-                                    ? `Compare: ${selectedComparisonFiscalYear.name}`
-                                    : 'Compare: None'}
-                            </Badge>
-                            <Badge
-                                variant={
-                                    isBalanced ? 'secondary' : 'destructive'
-                                }
-                                className={cn(
-                                    isBalanced &&
-                                        'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
-                                )}
-                            >
-                                {isBalanced
-                                    ? 'Balanced'
-                                    : `Unbalanced • ${formatCurrency(difference)}`}
-                            </Badge>
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-                        <div className="w-full sm:w-[220px]">
-                            <Select
-                                value={String(selectedYearId)}
-                                onValueChange={handleYearChange}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Fiscal Year" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {fiscalYears.map((fy) => (
-                                        <SelectItem
-                                            key={fy.id}
-                                            value={String(fy.id)}
-                                        >
-                                            {fy.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="w-full sm:w-[220px]">
-                            <Select
-                                value={
-                                    comparisonYearId
-                                        ? String(comparisonYearId)
-                                        : 'none'
-                                }
-                                onValueChange={handleComparisonChange}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Compare With..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="none">None</SelectItem>
-                                    {fiscalYears
-                                        .filter(
-                                            (fy) => fy.id !== selectedYearId,
-                                        )
-                                        .map((fy) => (
-                                            <SelectItem
-                                                key={fy.id}
-                                                value={String(fy.id)}
-                                            >
-                                                {fy.name}
-                                            </SelectItem>
-                                        ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
+        <FinancialReportPageShell
+            title="Balance Sheet"
+            path="/reports/balance-sheet"
+            fiscalYears={fiscalYears}
+            selectedYearId={selectedYearId}
+            comparisonYearId={comparisonYearId}
+            onYearChange={handleYearChange}
+            onComparisonChange={(value) =>
+                handleComparisonChange(value, selectedYearId)
+            }
+            isLoading={isLoading}
+            hasError={!!error}
+            headerMeta={
+                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                    {selectedFiscalYear && (
+                        <span>
+                            {selectedFiscalYear.name} • {selectedFiscalYear.status}
+                        </span>
+                    )}
+                    <Badge variant="outline">
+                        {selectedComparisonFiscalYear
+                            ? `Compare: ${selectedComparisonFiscalYear.name}`
+                            : 'Compare: None'}
+                    </Badge>
+                    <Badge
+                        variant={isBalanced ? 'secondary' : 'destructive'}
+                        className={cn(
+                            isBalanced &&
+                                'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+                        )}
+                    >
+                        {isBalanced
+                            ? 'Balanced'
+                            : `Unbalanced • ${formatCurrency(difference)}`}
+                    </Badge>
                 </div>
-
+            }
+        >
                 <div className="grid gap-6">
                     <FinancialReportSection
                         title="Assets"
@@ -367,7 +244,6 @@ export default function BalanceSheet() {
                         </CardContent>
                     </Card>
                 </div>
-            </div>
-        </AppLayout>
+        </FinancialReportPageShell>
     );
 }

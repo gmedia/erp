@@ -1,31 +1,18 @@
 import {
     FinancialReportSection,
+    type FinancialReportFiscalYear,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
-import { Badge } from '@/components/ui/badge';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import AppLayout from '@/layouts/app-layout';
+    FinancialReportPageShell,
+    useComparisonReportSearchParams,
+} from '@/components/reports/financial/FinancialReportPageShell';
+import { Badge } from '@/components/ui/badge';
 import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
-import { Helmet } from 'react-helmet-async';
-import { useSearchParams } from 'react-router-dom';
-
-interface FiscalYear {
-    id: number;
-    name: string;
-    start_date: string;
-    end_date: string;
-    status: string;
-}
 
 interface ComparativeReportResponse {
-    fiscalYears: FiscalYear[];
+    fiscalYears: FinancialReportFiscalYear[];
     selectedYearId: number;
     comparisonYearId?: number;
     report: {
@@ -60,9 +47,8 @@ interface ComparativeReportResponse {
 }
 
 export default function ComparativeReport() {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const urlYearId = searchParams.get('fiscal_year_id');
-    const urlComparisonId = searchParams.get('comparison_year_id');
+    const { urlYearId, urlComparisonId, handleYearChange, handleComparisonChange } =
+        useComparisonReportSearchParams();
 
     const { data, isLoading, error } = useQuery<ComparativeReportResponse>({
         queryKey: ['comparative-report', urlYearId, urlComparisonId],
@@ -103,148 +89,34 @@ export default function ComparativeReport() {
         ? fiscalYears.find((fy) => fy.id === comparisonYearId)
         : undefined;
 
-    const handleYearChange = (value: string) => {
-        const params: Record<string, string> = { fiscal_year_id: value };
-        if (comparisonYearId)
-            params.comparison_year_id = String(comparisonYearId);
-        setSearchParams(params);
-    };
-
-    const handleComparisonChange = (value: string) => {
-        const params: Record<string, string> = {
-            fiscal_year_id: String(selectedYearId),
-        };
-        if (value !== 'none') params.comparison_year_id = value;
-        setSearchParams(params);
-    };
-
-    if (isLoading) {
-        return (
-            <AppLayout
-                breadcrumbs={[
-                    { title: 'Reports', href: '#' },
-                    {
-                        title: 'Comparative Report',
-                        href: '/reports/comparative',
-                    },
-                ]}
-            >
-                <Helmet>
-                    <title>Comparative Report</title>
-                </Helmet>
-                <div className="flex h-full items-center justify-center p-4">
-                    Loading report...
-                </div>
-            </AppLayout>
-        );
-    }
-
-    if (error) {
-        return (
-            <AppLayout
-                breadcrumbs={[
-                    { title: 'Reports', href: '#' },
-                    {
-                        title: 'Comparative Report',
-                        href: '/reports/comparative',
-                    },
-                ]}
-            >
-                <Helmet>
-                    <title>Comparative Report</title>
-                </Helmet>
-                <div className="flex h-full items-center justify-center p-4 text-destructive">
-                    Error loading report.
-                </div>
-            </AppLayout>
-        );
-    }
-
     return (
-        <AppLayout
-            breadcrumbs={[
-                { title: 'Reports', href: '#' },
-                { title: 'Comparative Report', href: '/reports/comparative' },
-            ]}
-        >
-            <Helmet>
-                <title>Comparative Report</title>
-            </Helmet>
-
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-bold tracking-tight">
-                            Comparative Report
-                        </h1>
-                        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                            {selectedFiscalYear && (
-                                <span>
-                                    {selectedFiscalYear.name} •{' '}
-                                    {selectedFiscalYear.status}
-                                </span>
-                            )}
-                            <Badge variant="outline">
-                                {selectedComparisonFiscalYear
-                                    ? `Compare: ${selectedComparisonFiscalYear.name}`
-                                    : 'Compare: None'}
-                            </Badge>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-                        <div className="w-full sm:w-[220px]">
-                            <Select
-                                value={String(selectedYearId)}
-                                onValueChange={handleYearChange}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Fiscal Year" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {fiscalYears.map((fy) => (
-                                        <SelectItem
-                                            key={fy.id}
-                                            value={String(fy.id)}
-                                        >
-                                            {fy.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="w-full sm:w-[220px]">
-                            <Select
-                                value={
-                                    comparisonYearId
-                                        ? String(comparisonYearId)
-                                        : 'none'
-                                }
-                                onValueChange={handleComparisonChange}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Compare With..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="none">None</SelectItem>
-                                    {fiscalYears
-                                        .filter(
-                                            (fy) => fy.id !== selectedYearId,
-                                        )
-                                        .map((fy) => (
-                                            <SelectItem
-                                                key={fy.id}
-                                                value={String(fy.id)}
-                                            >
-                                                {fy.name}
-                                            </SelectItem>
-                                        ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
+        <FinancialReportPageShell
+            title="Comparative Report"
+            path="/reports/comparative"
+            fiscalYears={fiscalYears}
+            selectedYearId={selectedYearId}
+            comparisonYearId={comparisonYearId}
+            onYearChange={handleYearChange}
+            onComparisonChange={(value) =>
+                handleComparisonChange(value, selectedYearId)
+            }
+            isLoading={isLoading}
+            hasError={!!error}
+            headerMeta={
+                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                    {selectedFiscalYear && (
+                        <span>
+                            {selectedFiscalYear.name} • {selectedFiscalYear.status}
+                        </span>
+                    )}
+                    <Badge variant="outline">
+                        {selectedComparisonFiscalYear
+                            ? `Compare: ${selectedComparisonFiscalYear.name}`
+                            : 'Compare: None'}
+                    </Badge>
                 </div>
-
+            }
+        >
                 <div className="grid gap-6">
                     <FinancialReportSection
                         title="Assets"
@@ -302,7 +174,6 @@ export default function ComparativeReport() {
                         showComparison={!!comparisonYearId}
                     />
                 </div>
-            </div>
-        </AppLayout>
+        </FinancialReportPageShell>
     );
 }
