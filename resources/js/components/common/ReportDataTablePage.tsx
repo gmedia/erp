@@ -7,6 +7,7 @@ import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import AppLayout from '@/layouts/app-layout';
 import type { ColumnDef } from '@tanstack/react-table';
+import type { ReactNode } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 type BreadcrumbItem = {
@@ -27,6 +28,8 @@ type ReportDataTablePageProps<
     queryKey: string[];
     entityName: string;
     exportEndpoint: string;
+    onView?: (item: TData) => void;
+    children?: ReactNode;
 };
 
 export function ReportDataTablePage<
@@ -42,6 +45,8 @@ export function ReportDataTablePage<
     queryKey,
     entityName,
     exportEndpoint,
+    onView,
+    children,
 }: Readonly<ReportDataTablePageProps<TData, TFilters>>) {
     const {
         filters,
@@ -93,9 +98,11 @@ export function ReportDataTablePage<
                             filterFields={filterFields}
                             exportEndpoint={exportEndpoint}
                             entityName={entityName}
+                            onView={onView}
                         />
                     </div>
                 </div>
+                {children}
             </AppLayout>
         </>
     );

@@ -3,44 +3,11 @@
 import { assetColumns } from '@/components/assets/AssetColumns';
 import { createAssetFilterFields } from '@/components/assets/AssetFilters';
 import { AssetViewModal } from '@/components/assets/AssetViewModal';
-import { DataTable } from '@/components/common/DataTableCore';
-import { useCrudFilters } from '@/hooks/useCrudFilters';
-import { useCrudQuery } from '@/hooks/useCrudQuery';
-import AppLayout from '@/layouts/app-layout';
+import { ReportDataTablePage } from '@/components/common/ReportDataTablePage';
 import { Asset } from '@/types/asset';
 import { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 
 export default function AssetRegisterReport() {
-    // Generate filters
-    const filterFields = createAssetFilterFields();
-
-    const {
-        filters,
-        pagination,
-        handleFilterChange,
-        handleSearchChange,
-        handlePageChange,
-        handlePageSizeChange,
-        resetFilters,
-    } = useCrudFilters({
-        initialFilters: {
-            search: '',
-            asset_category_id: '',
-            branch_id: '',
-            status: '',
-            condition: '',
-        },
-    });
-
-    const { data, isLoading, meta } = useCrudQuery<Asset>({
-        endpoint: '/api/assets', // Reusing the main assets endpoint, or we can use reports/assets/register if we return json
-        queryKey: ['assets-report'],
-        entityName: 'Asset Report',
-        pagination,
-        filters,
-    });
-
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [viewItem, setViewItem] = useState<Asset | null>(null);
 
@@ -54,59 +21,35 @@ export default function AssetRegisterReport() {
     const reportColumns = assetColumns.filter((col) => col.id !== 'select');
 
     return (
-        <>
-            <Helmet>
-                <title>Asset Register Report</title>
-            </Helmet>
-            <AppLayout
-                breadcrumbs={[
-                    { title: 'Reports', href: '#' },
-                    {
-                        title: 'Asset Register',
-                        href: '/reports/assets/register',
-                    },
-                ]}
-            >
-                <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                    <div className="rounded-lg bg-white">
-                        <DataTable
-                            columns={reportColumns}
-                            data={data}
-                            pagination={{
-                                page: meta.current_page,
-                                per_page: meta.per_page,
-                                total: meta.total,
-                                last_page: meta.last_page,
-                                from: meta.from ?? 0,
-                                to: meta.to ?? 0,
-                            }}
-                            onPageChange={handlePageChange}
-                            onPageSizeChange={(per_page) =>
-                                handlePageSizeChange(per_page)
-                            }
-                            onSearchChange={handleSearchChange}
-                            isLoading={isLoading}
-                            filterValue={filters.search}
-                            filters={filters}
-                            onFilterChange={handleFilterChange}
-                            onResetFilters={resetFilters}
-                            filterFields={filterFields}
-                            exportEndpoint="/reports/assets/register/export"
-                            entityName="Asset"
-                            onView={handleView}
-                        />
-                    </div>
-                </div>
-
-                <AssetViewModal
-                    open={isViewModalOpen}
-                    onClose={() => {
-                        setIsViewModalOpen(false);
-                        setViewItem(null);
-                    }}
-                    item={viewItem}
-                />
-            </AppLayout>
-        </>
+        <ReportDataTablePage<Asset>
+            title="Asset Register Report"
+            breadcrumbs={[
+                { title: 'Reports', href: '#' },
+                { title: 'Asset Register', href: '/reports/assets/register' },
+            ]}
+            columns={reportColumns}
+            filterFields={createAssetFilterFields()}
+            initialFilters={{
+                search: '',
+                asset_category_id: '',
+                branch_id: '',
+                status: '',
+                condition: '',
+            }}
+            endpoint="/api/assets"
+            queryKey={['assets-report']}
+            entityName="Asset"
+            exportEndpoint="/reports/assets/register/export"
+            onView={handleView}
+        >
+            <AssetViewModal
+                open={isViewModalOpen}
+                onClose={() => {
+                    setIsViewModalOpen(false);
+                    setViewItem(null);
+                }}
+                item={viewItem}
+            />
+        </ReportDataTablePage>
     );
 }
