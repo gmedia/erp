@@ -13,7 +13,10 @@ export default function PurchaseHistoryReportPage() {
             title="Purchase History Report"
             breadcrumbs={[
                 { title: 'Reports', href: '#' },
-                { title: 'Purchase History', href: '/reports/purchase-history' },
+                {
+                    title: 'Purchase History',
+                    href: '/reports/purchase-history',
+                },
             ]}
             columns={purchaseHistoryReportColumns}
             filterFields={createPurchaseHistoryReportFilterFields()}

@@ -13,7 +13,10 @@ export default function MaintenanceCostReport() {
             title="Maintenance Cost Report"
             breadcrumbs={[
                 { title: 'Reports', href: '#' },
-                { title: 'Maintenance Cost', href: '/reports/maintenance-cost' },
+                {
+                    title: 'Maintenance Cost',
+                    href: '/reports/maintenance-cost',
+                },
             ]}
             columns={maintenanceCostColumns}
             filterFields={createMaintenanceCostReportFilterFields()}
