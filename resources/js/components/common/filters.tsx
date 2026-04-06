@@ -226,7 +226,12 @@ export function createSupplierFilterField(
 export function createAssetFilterField(
     placeholder = 'Select an asset',
 ): FieldDescriptor {
-    return createAsyncSelectFilterField('asset_id', 'Asset', '/api/assets', placeholder);
+    return createAsyncSelectFilterField(
+        'asset_id',
+        'Asset',
+        '/api/assets',
+        placeholder,
+    );
 }
 
 export function createAssetCategoryFilterField(
@@ -412,12 +417,16 @@ export function createCostRangeFilterFields(
         {
             name: 'cost_min',
             label: 'Min Cost',
-            component: <Input type="number" min={0} placeholder={minPlaceholder} />,
+            component: (
+                <Input type="number" min={0} placeholder={minPlaceholder} />
+            ),
         },
         {
             name: 'cost_max',
             label: 'Max Cost',
-            component: <Input type="number" min={0} placeholder={maxPlaceholder} />,
+            component: (
+                <Input type="number" min={0} placeholder={maxPlaceholder} />
+            ),
         },
     ];
 }
