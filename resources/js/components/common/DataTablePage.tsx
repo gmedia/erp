@@ -41,10 +41,7 @@ type DataTablePageProps<TData, TFilters extends Record<string, unknown>> = {
     children?: ReactNode;
 };
 
-export function DataTablePage<
-    TData,
-    TFilters extends Record<string, unknown>,
->({
+export function DataTablePage<TData, TFilters extends Record<string, unknown>>({
     title,
     breadcrumbs,
     columns,
