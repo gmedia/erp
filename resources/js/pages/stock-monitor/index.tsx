@@ -1,6 +1,6 @@
 'use client';
 
-import { DataTable } from '@/components/common/DataTableCore';
+import { DataTablePage } from '@/components/common/DataTablePage';
 import {
     createStockMonitorColumns,
     type StockMonitorItem,
@@ -8,11 +8,9 @@ import {
 import { createStockMonitorFilterFields } from '@/components/stock-monitor/Filters';
 import { StockMonitorSummaryCards } from '@/components/stock-monitor/SummaryCards';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
-import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 
 type SelectOption = {
     value: string;
@@ -149,47 +147,28 @@ export default function StockMonitorPage() {
     };
 
     return (
-        <>
-            <Helmet>
-                <title>Stock Monitor</title>
-            </Helmet>
-            <AppLayout
-                breadcrumbs={[
-                    { title: 'Inventory', href: '#' },
-                    { title: 'Stock Monitor', href: '/stock-monitor' },
-                ]}
-            >
-                <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                    <StockMonitorSummaryCards summary={response?.summary} />
-                    <div className="rounded-lg bg-white">
-                        <DataTable
-                            columns={columns}
-                            data={data}
-                            pagination={{
-                                page: meta.current_page,
-                                per_page: meta.per_page,
-                                total: meta.total,
-                                last_page: meta.last_page,
-                                from: meta.from ?? 0,
-                                to: meta.to ?? 0,
-                            }}
-                            onPageChange={handlePageChange}
-                            onPageSizeChange={(perPage) =>
-                                handlePageSizeChange(perPage)
-                            }
-                            onSearchChange={handleSearchChange}
-                            isLoading={isLoading}
-                            filterValue={String(filters.search ?? '')}
-                            filters={filters as Record<string, string>}
-                            onFilterChange={handleFilterChange}
-                            onResetFilters={resetFilters}
-                            filterFields={filterFields}
-                            exportEndpoint="/api/stock-monitor/export"
-                            entityName="Stock Monitor"
-                        />
-                    </div>
-                </div>
-            </AppLayout>
-        </>
+        <DataTablePage<StockMonitorItem, Record<string, string>>
+            title="Stock Monitor"
+            breadcrumbs={[
+                { title: 'Inventory', href: '#' },
+                { title: 'Stock Monitor', href: '/stock-monitor' },
+            ]}
+            columns={columns}
+            data={data}
+            meta={meta}
+            isLoading={isLoading}
+            filterValue={String(filters.search ?? '')}
+            filters={filters as Record<string, string>}
+            filterFields={filterFields}
+            exportEndpoint="/api/stock-monitor/export"
+            entityName="Stock Monitor"
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            onSearchChange={handleSearchChange}
+            onFilterChange={handleFilterChange}
+            onResetFilters={resetFilters}
+        >
+            <StockMonitorSummaryCards summary={response?.summary} />
+        </DataTablePage>
     );
 }

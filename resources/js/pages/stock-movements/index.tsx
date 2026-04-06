@@ -1,6 +1,6 @@
 'use client';
 
-import { DataTable } from '@/components/common/DataTableCore';
+import { DataTablePage } from '@/components/common/DataTablePage';
 import {
     createStockMovementsColumns,
     type StockMovementItem,
@@ -8,8 +8,6 @@ import {
 import { createStockMovementsFilterFields } from '@/components/stock-movements/Filters';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
-import AppLayout from '@/layouts/app-layout';
-import { Helmet } from 'react-helmet-async';
 
 export default function StockMovementsPage() {
     const columns = createStockMovementsColumns();
@@ -43,46 +41,26 @@ export default function StockMovementsPage() {
     });
 
     return (
-        <>
-            <Helmet>
-                <title>Stock Movements</title>
-            </Helmet>
-            <AppLayout
-                breadcrumbs={[
-                    { title: 'Inventory', href: '#' },
-                    { title: 'Stock Movements', href: '/stock-movements' },
-                ]}
-            >
-                <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                    <div className="rounded-lg bg-white">
-                        <DataTable
-                            columns={columns}
-                            data={data}
-                            pagination={{
-                                page: meta.current_page,
-                                per_page: meta.per_page,
-                                total: meta.total,
-                                last_page: meta.last_page,
-                                from: meta.from ?? 0,
-                                to: meta.to ?? 0,
-                            }}
-                            onPageChange={handlePageChange}
-                            onPageSizeChange={(perPage) =>
-                                handlePageSizeChange(perPage)
-                            }
-                            onSearchChange={handleSearchChange}
-                            isLoading={isLoading}
-                            filterValue={String(filters.search ?? '')}
-                            filters={filters as Record<string, string>}
-                            onFilterChange={handleFilterChange}
-                            onResetFilters={resetFilters}
-                            filterFields={filterFields}
-                            exportEndpoint="/api/stock-movements/export"
-                            entityName="Stock Movement"
-                        />
-                    </div>
-                </div>
-            </AppLayout>
-        </>
+        <DataTablePage<StockMovementItem, Record<string, string>>
+            title="Stock Movements"
+            breadcrumbs={[
+                { title: 'Inventory', href: '#' },
+                { title: 'Stock Movements', href: '/stock-movements' },
+            ]}
+            columns={columns}
+            data={data}
+            meta={meta}
+            isLoading={isLoading}
+            filterValue={String(filters.search ?? '')}
+            filters={filters as Record<string, string>}
+            filterFields={filterFields}
+            exportEndpoint="/api/stock-movements/export"
+            entityName="Stock Movement"
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            onSearchChange={handleSearchChange}
+            onFilterChange={handleFilterChange}
+            onResetFilters={resetFilters}
+        />
     );
 }
