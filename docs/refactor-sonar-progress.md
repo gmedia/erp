@@ -35,17 +35,17 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: 4231 (turun 2113 dari baseline Batch F)
-- duplicated_blocks: 203 (turun 129 dari baseline Batch F)
-- duplicated_lines_density: 4.8 (turun 2.4 dari baseline Batch F)
-- ncloc: 72441 (turun 432 dari baseline Batch F)
+- duplicated_lines: 4061 (turun 2283 dari baseline Batch F)
+- duplicated_blocks: 189 (turun 143 dari baseline Batch F)
+- duplicated_lines_density: 4.6 (turun 2.6 dari baseline Batch F)
+- ncloc: 72452 (turun 421 dari baseline Batch F)
 - coverage: 88.2 (snapshot remote terbaru sudah sehat; new_coverage 90.1)
 
 ## Snapshot Analisa Sonar (2026-04-06, latest MCP)
 
 - Quality Gate: ERROR
-- Gate blocker utama: `new_duplicated_lines_density = 7.8`
-- Catatan: snapshot Sonar remote terbaru via MCP kini sudah kembali sehat pada coverage (`coverage 88.2`, `new_coverage 90.1`) dan overall duplication turun ke `duplicated_lines 4231`, `duplicated_blocks 203`, `duplicated_lines_density 4.8`, dengan `ncloc 72441`. Gate tetap `ERROR` karena blocker yang tersisa tinggal density duplikasi pada new code `7.8`. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, 4 spec Playwright pada wave audit-trail, dan 7 spec Playwright pada wave report-column summaries.
+- Gate blocker utama: `new_duplicated_lines_density = 7.4`
+- Catatan: snapshot Sonar remote terbaru via MCP mempertahankan coverage sehat (`coverage 88.2`, `new_coverage 90.1`) dan overall duplication turun lagi ke `duplicated_lines 4061`, `duplicated_blocks 189`, `duplicated_lines_density 4.6`, dengan `ncloc 72452`. Gate tetap `ERROR` karena blocker yang tersisa tinggal density duplikasi pada new code `7.4`. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, 4 spec Playwright pada wave audit-trail, 7 spec Playwright pada wave report-column summaries, dan 11 spec Playwright pada wave report page shells.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
@@ -346,6 +346,10 @@ Isi setelah batch selesai dan sebelum merge.
 	- Ekstrak helper frontend tipis untuk summary cell `primary + secondary`, summary warehouse `name + code/branch`, text fallback, dan status badge agar report/listing columns yang masih mengulang blok JSX serupa tidak lagi menyimpan renderer yang sama di banyak file.
 	- Gelombang saat ini mencakup `resources/js/components/common/ReportColumns.tsx`, `resources/js/components/reports/goods-receipt/Columns.tsx`, `resources/js/components/reports/purchase-history/Columns.tsx`, `resources/js/components/reports/purchase-order-status/Columns.tsx`, `resources/js/components/reports/stock-movement/Columns.tsx`, `resources/js/components/reports/inventory-valuation/Columns.tsx`, `resources/js/components/stock-monitor/Columns.tsx`, dan `resources/js/components/stock-movements/Columns.tsx`.
 	- Progress: helper shared `SummaryCell`, `WarehouseSummaryCell`, `TextCell`, `StatusBadgeCell`, `formatReportLabel()`, dan `formatWarehouseCodeLabel()` kini menggantikan blok summary/badge yang berulang tanpa ubah header, sorting key, atau isi cell; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/purchase-history-report/ tests/e2e/purchase-order-status-report/ tests/e2e/goods-receipt-report/ tests/e2e/stock-movement-report/ tests/e2e/inventory-valuation-report/ tests/e2e/stock-monitor/ tests/e2e/stock-movements/` (7 passed). Snapshot Sonar pasca-wave: belum berubah setelah push `1b43ae1a`; MCP masih menampilkan `duplicated_lines 4231`, `duplicated_blocks 203`, `duplicated_lines_density 4.8`, `coverage 88.2`, `ncloc 72441`, `new_coverage 90.1`, dan `new_duplicated_lines_density 7.8`.
+72. Dedup report page shells. (in-progress)
+	- Ekstrak helper frontend generic untuk shell halaman report yang masih mengulang `Helmet + AppLayout + useCrudFilters + useCrudQuery + DataTable pagination` agar wrapper page report tidak lagi menyimpan orchestration yang sama di banyak file.
+	- Gelombang saat ini mencakup `resources/js/components/common/ReportDataTablePage.tsx`, `resources/js/pages/reports/purchase-history/index.tsx`, `resources/js/pages/reports/purchase-order-status/index.tsx`, `resources/js/pages/reports/goods-receipt/index.tsx`, `resources/js/pages/reports/stock-movement/index.tsx`, `resources/js/pages/reports/inventory-valuation/index.tsx`, `resources/js/pages/reports/inventory-stocktake-variance/index.tsx`, `resources/js/pages/reports/asset-stocktake-variances/index.tsx`, dan `resources/js/pages/reports/maintenance-cost/index.tsx`.
+	- Progress: helper shared `ReportDataTablePage` kini menggantikan boilerplate page wrapper report tanpa ubah endpoint, query key, initial filters, breadcrumb, atau export endpoint; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/purchase-history-report/ tests/e2e/purchase-order-status-report/ tests/e2e/goods-receipt-report/ tests/e2e/stock-movement-report/ tests/e2e/inventory-valuation-report/ tests/e2e/inventory-stocktake-variance-report/ tests/e2e/asset-stocktake-variances/ tests/e2e/maintenance-cost-reports/` (11 passed). Snapshot Sonar pasca-wave: belum berubah setelah push `26fa29a0`; MCP masih menampilkan `duplicated_lines 4061`, `duplicated_blocks 189`, `duplicated_lines_density 4.6`, `coverage 88.2`, `ncloc 72452`, `new_coverage 90.1`, dan `new_duplicated_lines_density 7.4`.
 
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
