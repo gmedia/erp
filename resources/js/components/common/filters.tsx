@@ -63,6 +63,16 @@ export const assetConditionOptions: SelectOption[] = [
     { value: 'damaged', label: 'Damaged' },
 ];
 
+export const activeInactiveStatusOptions: SelectOption[] = [
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' },
+];
+
+export const employmentStatusOptions: SelectOption[] = [
+    { value: 'regular', label: 'Regular' },
+    { value: 'intern', label: 'Intern' },
+];
+
 export const stockAdjustmentTypeOptions: SelectOption[] = [
     { value: 'damage', label: 'Damage' },
     { value: 'expired', label: 'Expired' },
@@ -211,6 +221,28 @@ export function createWarehouseFilterField(
     );
 }
 
+export function createDepartmentFilterField(
+    placeholder = 'Select a department',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'department_id',
+        'Department',
+        '/api/departments',
+        placeholder,
+    );
+}
+
+export function createPositionFilterField(
+    placeholder = 'Select a position',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'position_id',
+        'Position',
+        '/api/positions',
+        placeholder,
+    );
+}
+
 export function createSupplierFilterField(
     placeholder = 'All suppliers',
     label = 'Supplier',
@@ -256,6 +288,28 @@ export function createAssetStocktakeFilterField(
     );
 }
 
+export function createCustomerCategoryFilterField(
+    placeholder = 'Select Category',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'category_id',
+        'Category',
+        '/api/customer-categories',
+        placeholder,
+    );
+}
+
+export function createSupplierCategoryFilterField(
+    placeholder = 'Select Category',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'category_id',
+        'Category',
+        '/api/supplier-categories',
+        placeholder,
+    );
+}
+
 export function createSupplierWarehouseProductFilterFields(): FieldDescriptor[] {
     return createAsyncSelectFilterFields([
         {
@@ -284,6 +338,51 @@ export function createAssetCategoryBranchFilterFields(): FieldDescriptor[] {
         createAssetCategoryFilterField('Select a category'),
         createBranchFilterField('Select a branch'),
     ];
+}
+
+export function createEmployeeOrganizationFilterFields(): FieldDescriptor[] {
+    return [
+        createDepartmentFilterField(),
+        createPositionFilterField(),
+        createBranchFilterField('Select a branch'),
+    ];
+}
+
+export function createCustomerFilterSelectFields(): FieldDescriptor[] {
+    return [
+        createBranchFilterField('Select a branch'),
+        createCustomerCategoryFilterField(),
+        createSelectFilterField(
+            'status',
+            'Status',
+            activeInactiveStatusOptions,
+            'All statuses',
+        ),
+    ];
+}
+
+export function createSupplierFilterSelectFields(): FieldDescriptor[] {
+    return [
+        createBranchFilterField('Select a branch'),
+        createSupplierCategoryFilterField(),
+        createSelectFilterField(
+            'status',
+            'Status',
+            activeInactiveStatusOptions,
+            'Select Status',
+        ),
+    ];
+}
+
+export function createEmploymentStatusFilterField(
+    placeholder = 'Select status',
+): FieldDescriptor {
+    return createSelectFilterField(
+        'employment_status',
+        'Status',
+        employmentStatusOptions,
+        placeholder,
+    );
 }
 
 export function createAssetSupplierFilterFields(
