@@ -13,7 +13,10 @@ export default function StockAdjustmentReportPage() {
             title="Stock Adjustment Report"
             breadcrumbs={[
                 { title: 'Reports', href: '#' },
-                { title: 'Stock Adjustment', href: '/reports/stock-adjustment' },
+                {
+                    title: 'Stock Adjustment',
+                    href: '/reports/stock-adjustment',
+                },
             ]}
             columns={stockAdjustmentReportColumns}
             filterFields={createStockAdjustmentReportFilterFields()}
