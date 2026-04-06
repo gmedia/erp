@@ -16,10 +16,7 @@ type BreadcrumbItem = {
     href: string;
 };
 
-type AuditTrailPageProps<
-    TItem,
-    TFilters extends FilterState = FilterState,
-> = {
+type AuditTrailPageProps<TItem, TFilters extends FilterState = FilterState> = {
     title: string;
     breadcrumbs: BreadcrumbItem[];
     filterFields: FieldDescriptor[];
@@ -28,7 +25,9 @@ type AuditTrailPageProps<
     queryKey: string[];
     entityName: string;
     exportEndpoint: string;
-    buildColumns: (options: { onViewDetail: (item: TItem) => void }) => ColumnDef<TItem>[];
+    buildColumns: (options: {
+        onViewDetail: (item: TItem) => void;
+    }) => ColumnDef<TItem>[];
     renderDetailModal: (options: {
         item: TItem | null;
         open: boolean;
