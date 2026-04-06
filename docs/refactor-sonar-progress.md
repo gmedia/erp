@@ -38,14 +38,14 @@ Isi setelah batch selesai dan sebelum merge.
 - duplicated_lines: 4552 (turun 1792 dari baseline Batch F)
 - duplicated_blocks: 245 (turun 87 dari baseline Batch F)
 - duplicated_lines_density: 5.1 (turun 2.1 dari baseline Batch F)
-- ncloc: 72524 (turun 349 dari baseline Batch F)
+- ncloc: 72546 (turun 327 dari baseline Batch F)
 - coverage: 0.0 (snapshot remote terbaru kembali anomali; coverage sehat terakhir sebelumnya 88.1)
 
-## Snapshot Analisa Sonar (2026-04-05, latest MCP)
+## Snapshot Analisa Sonar (2026-04-06, latest MCP)
 
 - Quality Gate: ERROR
-- Gate blocker utama: `new_coverage = 0.0` dan `new_duplicated_lines_density = 7.2`
-- Catatan: snapshot Sonar remote terbaru via MCP setelah wave `controller resource relation helper` tetap menunjukkan anomali coverage `0.0`, sementara `duplicated_lines 4552`, `duplicated_blocks 245`, `duplicated_lines_density 5.1`, dan `ncloc 72524` tetap stabil. Gate saat ini lagi-lagi belum bisa dipakai untuk menilai regression backend kecil karena coverage pipeline fluktuatif; local wave fiscal year listing request helper PASS 17 test, local wave coa version listing request helper PASS 26 test, dan local wave controller resource relation helper PASS 29 test.
+- Gate blocker utama: `new_coverage = 0.0` dan `new_duplicated_lines_density = 7.1`
+- Catatan: snapshot Sonar remote terbaru via MCP setelah push `1eac71f1` masih menunjukkan anomali coverage `0.0` dan belum merefleksikan dampak wave frontend report filters secara terpisah; measures tetap `duplicated_lines 4552`, `duplicated_blocks 245`, `duplicated_lines_density 5.1`, `ncloc 72546`, dan gate `ERROR`. Untuk wave ini, verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright report terfokus.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
@@ -318,6 +318,10 @@ Isi setelah batch selesai dan sebelum merge.
 	- Tangani outlier listing request `accounts` dengan abstract kecil yang hanya mengangkat filter bersama, sambil mempertahankan `coa_version_id` tetap `nullable` di index, `required` di export, dan nama field sort legacy `sort_order` hanya di index.
 	- Gelombang saat ini mencakup `IndexAccountRequest`, `ExportAccountRequest`, dan abstract baru `AbstractAccountListingRequest`.
 	- Progress: pasangan request account tersebut sekarang berbagi helper listing yang sama tanpa ubah filter `search`, `type`, `is_active`, perbedaan kontrak `coa_version_id`, field `sort_order`, atau `per_page`; verifikasi PASS 16 test, `./vendor/bin/sail artisan test tests/Unit/Requests/Accounts/IndexAccountRequestTest.php tests/Unit/Requests/Accounts/ExportAccountRequestTest.php tests/Feature/Accounts/AccountControllerTest.php tests/Feature/Accounts/AccountExportTest.php` PASS dan `./vendor/bin/sail bin duster fix app/Http/Requests/Accounts/AbstractAccountListingRequest.php app/Http/Requests/Accounts/IndexAccountRequest.php app/Http/Requests/Accounts/ExportAccountRequest.php` PASS. Snapshot Sonar pasca-wave: belum di-refresh.
+66. Dedup report filter field groups. (in-progress)
+	- Ekstrak helper field-group frontend untuk report filters yang masih mengulang trio `supplier/warehouse/product` dan kuartet `product/warehouse/branch/category`, sambil mempertahankan nama field, placeholder, dan urutan filter masing-masing report.
+	- Gelombang saat ini mencakup `resources/js/components/common/filters.tsx`, `resources/js/components/reports/purchase-history/Filters.tsx`, `resources/js/components/reports/purchase-order-status/Filters.tsx`, `resources/js/components/reports/goods-receipt/Filters.tsx`, `resources/js/components/reports/stock-movement/Filters.tsx`, `resources/js/components/reports/inventory-valuation/Filters.tsx`, dan `resources/js/components/reports/inventory-stocktake-variance/Filters.tsx`.
+	- Progress: helper shared `createSupplierWarehouseProductFilterFields()`, `createProductWarehouseBranchCategoryFilterFields()`, dan konstanta `purchaseOrderStatusOptions` kini menggantikan blok async-select serta opsi status yang berulang tanpa ubah contract query string atau UI filter; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/purchase-history-report/ tests/e2e/purchase-order-status-report/ tests/e2e/goods-receipt-report/ tests/e2e/stock-movement-report/ tests/e2e/inventory-valuation-report/ tests/e2e/inventory-stocktake-variance-report/` (6 passed). Snapshot Sonar pasca-wave: belum berubah setelah push `1eac71f1`; MCP masih menampilkan `duplicated_lines 4552`, `duplicated_blocks 245`, `duplicated_lines_density 5.1`, `coverage 0.0`, `ncloc 72546`, dan `new_duplicated_lines_density 7.1`.
 66. Dedup simple crud model inference helper. (in-progress)
 	- Pindahkan boilerplate `getModelClass()` dari family simple CRUD mutation ke default inference di base request, sambil menjaga modul yang masih butuh override eksplisit tetap bisa override sendiri.
 	- Gelombang saat ini mencakup `SimpleCrudNameRequest` serta pasangan store/update untuk `Branches`, `CustomerCategories`, `Departments`, `Positions`, `ProductCategories`, `SupplierCategories`, `Units`, dan `Warehouses`.
