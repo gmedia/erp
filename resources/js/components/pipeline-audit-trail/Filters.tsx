@@ -1,7 +1,8 @@
-import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     createAsyncSelectFilterField,
+    createDateRangeFilterFields,
     createTextFilterField,
+    createUserFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
@@ -24,21 +25,7 @@ export function createPipelineAuditTrailFilterFields(): FieldDescriptor[] {
             '/api/pipelines',
             'Select a pipeline',
         ),
-        createAsyncSelectFilterField(
-            'performed_by',
-            'Performed By',
-            '/api/users', // Assuming there's a user endpoint, or we can use employees
-            'Select a user',
-        ),
-        {
-            name: 'start_date',
-            label: 'Start Date',
-            component: <FilterDatePicker placeholder="Start Date" />,
-        },
-        {
-            name: 'end_date',
-            label: 'End Date',
-            component: <FilterDatePicker placeholder="End Date" />,
-        },
+        createUserFilterField('performed_by', 'Performed By'),
+        ...createDateRangeFilterFields(),
     ];
 }

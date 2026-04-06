@@ -159,6 +159,14 @@ export function createAsyncSelectFilterField(
     };
 }
 
+export function createUserFilterField(
+    name: string,
+    label: string,
+    placeholder = 'Select a user',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(name, label, '/api/users', placeholder);
+}
+
 export function createAsyncSelectFilterFields(
     configs: AsyncSelectFilterConfig[],
 ): FieldDescriptor[] {

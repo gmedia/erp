@@ -1,3 +1,7 @@
+import {
+    AuditTrailField,
+    AuditTrailMetadataSnapshot,
+} from '@/components/common/AuditTrailDetail';
 import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
@@ -83,82 +87,37 @@ export function DetailModal({
 
                         {/* Basic Info */}
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Document Type
-                                </p>
-                                <p className="text-sm font-medium">
-                                    {item.approvable_type_short}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                    {item.approvable_type}
-                                </p>
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Document ID
-                                </p>
-                                <p className="text-sm font-medium">
-                                    {item.approvable_id}
-                                </p>
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Actor
-                                </p>
-                                <p className="text-sm font-medium">
-                                    {item.actor_user_name}
-                                </p>
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Date & Time
-                                </p>
-                                <p className="text-sm font-medium">
-                                    {formatDateTimeByRegionalSettings(
-                                        item.created_at,
-                                    )}
-                                </p>
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    IP Address
-                                </p>
-                                <p className="text-sm font-medium">
-                                    {item.ip_address || '-'}
-                                </p>
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    User Agent
-                                </p>
-                                <p
-                                    className="truncate text-sm font-medium"
-                                    title={item.user_agent || ''}
-                                >
-                                    {item.user_agent || '-'}
-                                </p>
-                            </div>
+                            <AuditTrailField
+                                label="Document Type"
+                                value={item.approvable_type_short}
+                                helperText={item.approvable_type}
+                            />
+                            <AuditTrailField
+                                label="Document ID"
+                                value={item.approvable_id}
+                            />
+                            <AuditTrailField
+                                label="Actor"
+                                value={item.actor_user_name}
+                            />
+                            <AuditTrailField
+                                label="Date & Time"
+                                value={formatDateTimeByRegionalSettings(
+                                    item.created_at,
+                                )}
+                            />
+                            <AuditTrailField
+                                label="IP Address"
+                                value={item.ip_address || '-'}
+                            />
+                            <AuditTrailField
+                                label="User Agent"
+                                value={item.user_agent || '-'}
+                                valueClassName="truncate text-sm font-medium"
+                            />
                         </div>
 
-                        {/* Metadata JSON */}
-                        {item.metadata &&
-                            Object.keys(item.metadata).length > 0 && (
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium text-muted-foreground">
-                                        Metadata Snapshot
-                                    </p>
-                                    <pre className="overflow-x-auto rounded-lg bg-muted p-4 text-xs">
-                                        <code>
-                                            {JSON.stringify(
-                                                item.metadata,
-                                                null,
-                                                2,
-                                            )}
-                                        </code>
-                                    </pre>
-                                </div>
-                            )}
+                        <AuditTrailMetadataSnapshot metadata={item.metadata} />
                     </div>
                 </ScrollArea>
             </DialogContent>

@@ -1,3 +1,7 @@
+import {
+    AuditTrailField,
+    AuditTrailMetadataSnapshot,
+} from '@/components/common/AuditTrailDetail';
 import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
@@ -108,100 +112,50 @@ export function DetailModal({
 
                         {/* Basic Info */}
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Entity Type
-                                </p>
-                                <p className="text-sm font-medium">
-                                    {item.entity_type_short}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                    {item.entity_type}
-                                </p>
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Entity ID
-                                </p>
-                                <p className="text-sm font-medium">
-                                    {item.entity_id}
-                                </p>
-                            </div>
+                            <AuditTrailField
+                                label="Entity Type"
+                                value={item.entity_type_short}
+                                helperText={item.entity_type}
+                            />
+                            <AuditTrailField
+                                label="Entity ID"
+                                value={item.entity_id}
+                            />
                             {item.pipeline_name && (
-                                <div className="col-span-2 space-y-1">
-                                    <p className="text-sm font-medium text-muted-foreground">
-                                        Pipeline
-                                    </p>
-                                    <p className="text-sm font-medium">
-                                        {item.pipeline_name}
-                                    </p>
-                                </div>
+                                <AuditTrailField
+                                    className="col-span-2 space-y-1"
+                                    label="Pipeline"
+                                    value={item.pipeline_name}
+                                />
                             )}
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Performed By
-                                </p>
-                                <p className="text-sm font-medium">
-                                    {item.performed_by_name}
-                                </p>
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Date & Time
-                                </p>
-                                <p className="text-sm font-medium">
-                                    {formatDateTimeByRegionalSettings(
-                                        item.created_at,
-                                    )}
-                                </p>
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    IP Address
-                                </p>
-                                <p className="text-sm font-medium">
-                                    {item.ip_address || '-'}
-                                </p>
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    User Agent
-                                </p>
-                                <p
-                                    className="truncate text-sm font-medium"
-                                    title={item.user_agent || ''}
-                                >
-                                    {item.user_agent || '-'}
-                                </p>
-                            </div>
-                            <div className="col-span-2 space-y-1">
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Comment
-                                </p>
-                                <p className="text-sm font-medium whitespace-pre-wrap">
-                                    {item.comment || '-'}
-                                </p>
-                            </div>
+                            <AuditTrailField
+                                label="Performed By"
+                                value={item.performed_by_name}
+                            />
+                            <AuditTrailField
+                                label="Date & Time"
+                                value={formatDateTimeByRegionalSettings(
+                                    item.created_at,
+                                )}
+                            />
+                            <AuditTrailField
+                                label="IP Address"
+                                value={item.ip_address || '-'}
+                            />
+                            <AuditTrailField
+                                label="User Agent"
+                                value={item.user_agent || '-'}
+                                valueClassName="truncate text-sm font-medium"
+                            />
+                            <AuditTrailField
+                                className="col-span-2 space-y-1"
+                                label="Comment"
+                                value={item.comment || '-'}
+                                valueClassName="text-sm font-medium whitespace-pre-wrap"
+                            />
                         </div>
 
-                        {/* Metadata JSON */}
-                        {item.metadata &&
-                            Object.keys(item.metadata).length > 0 && (
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium text-muted-foreground">
-                                        Metadata Snapshot
-                                    </p>
-                                    <pre className="overflow-x-auto rounded-lg bg-muted p-4 text-xs">
-                                        <code>
-                                            {JSON.stringify(
-                                                item.metadata,
-                                                null,
-                                                2,
-                                            )}
-                                        </code>
-                                    </pre>
-                                </div>
-                            )}
+                        <AuditTrailMetadataSnapshot metadata={item.metadata} />
                     </div>
                 </ScrollArea>
             </DialogContent>

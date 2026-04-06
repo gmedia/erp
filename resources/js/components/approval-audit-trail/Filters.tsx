@@ -1,8 +1,8 @@
-import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
-    createAsyncSelectFilterField,
+    createDateRangeFilterFields,
     createSelectFilterField,
     createTextFilterField,
+    createUserFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
@@ -35,21 +35,7 @@ export function createApprovalAuditTrailFilterFields(): FieldDescriptor[] {
             ],
             'Select Event',
         ),
-        createAsyncSelectFilterField(
-            'actor_user_id',
-            'Actor',
-            '/api/users', // Assumes a generic user search endpoint
-            'Select a user',
-        ),
-        {
-            name: 'start_date',
-            label: 'Start Date',
-            component: <FilterDatePicker placeholder="Start Date" />,
-        },
-        {
-            name: 'end_date',
-            label: 'End Date',
-            component: <FilterDatePicker placeholder="End Date" />,
-        },
+        createUserFilterField('actor_user_id', 'Actor'),
+        ...createDateRangeFilterFields(),
     ];
 }
