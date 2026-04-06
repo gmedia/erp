@@ -1,8 +1,8 @@
 import {
     createAssetCategoryBranchFilterFields,
     createDateRangeFilterFields,
-    createSupplierFilterField,
     createSelectFilterField,
+    createSupplierFilterField,
     createTextFilterField,
     maintenanceStatusOptions,
     maintenanceTypeOptions,

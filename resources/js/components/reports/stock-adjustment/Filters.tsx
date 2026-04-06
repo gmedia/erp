@@ -1,8 +1,8 @@
 import {
     createDateRangeFilterFields,
-    createWarehouseBranchFilterFields,
     createSelectFilterField,
     createTextFilterField,
+    createWarehouseBranchFilterFields,
     stockAdjustmentStatusOptions,
     stockAdjustmentTypeOptions,
     type FieldDescriptor,
