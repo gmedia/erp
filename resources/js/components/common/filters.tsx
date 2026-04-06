@@ -73,6 +73,27 @@ export const employmentStatusOptions: SelectOption[] = [
     { value: 'intern', label: 'Intern' },
 ];
 
+export const productTypeOptions: SelectOption[] = [
+    { value: 'raw_material', label: 'Raw Material' },
+    { value: 'work_in_progress', label: 'WIP' },
+    { value: 'finished_good', label: 'Finished Good' },
+    { value: 'purchased_good', label: 'Purchased Good' },
+    { value: 'service', label: 'Service' },
+];
+
+export const productStatusOptions: SelectOption[] = [
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' },
+    { value: 'discontinued', label: 'Discontinued' },
+];
+
+export const inventoryStocktakeStatusOptions: SelectOption[] = [
+    { value: 'draft', label: 'Draft' },
+    { value: 'in_progress', label: 'In Progress' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'cancelled', label: 'Cancelled' },
+];
+
 export const stockAdjustmentTypeOptions: SelectOption[] = [
     { value: 'damage', label: 'Damage' },
     { value: 'expired', label: 'Expired' },
@@ -221,6 +242,12 @@ export function createWarehouseFilterField(
     );
 }
 
+export function createUnitFilterField(
+    placeholder = 'Select unit',
+): FieldDescriptor {
+    return createAsyncSelectFilterField('unit_id', 'Unit', '/api/units', placeholder);
+}
+
 export function createDepartmentFilterField(
     placeholder = 'Select a department',
 ): FieldDescriptor {
@@ -310,6 +337,19 @@ export function createSupplierCategoryFilterField(
     );
 }
 
+export function createProductCategoryFilterField(
+    name = 'category_id',
+    label = 'Category',
+    placeholder = 'Select category',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        name,
+        label,
+        '/api/product-categories',
+        placeholder,
+    );
+}
+
 export function createSupplierWarehouseProductFilterFields(): FieldDescriptor[] {
     return createAsyncSelectFilterFields([
         {
@@ -383,6 +423,43 @@ export function createEmploymentStatusFilterField(
         employmentStatusOptions,
         placeholder,
     );
+}
+
+export function createProductCatalogAsyncFilterFields(): FieldDescriptor[] {
+    return [
+        createProductCategoryFilterField(),
+        createUnitFilterField(),
+        createBranchFilterField('Select branch'),
+    ];
+}
+
+export function createProductTypeStatusFilterFields(): FieldDescriptor[] {
+    return [
+        createSelectFilterField('type', 'Type', productTypeOptions, 'Select type'),
+        createSelectFilterField(
+            'status',
+            'Status',
+            productStatusOptions,
+            'Select status',
+        ),
+    ];
+}
+
+export function createInventoryStocktakeFilterSelectFields(): FieldDescriptor[] {
+    return [
+        createWarehouseFilterField('Select warehouse'),
+        createProductCategoryFilterField(
+            'product_category_id',
+            'Product Category',
+            'Select category',
+        ),
+        createSelectFilterField(
+            'status',
+            'Status',
+            inventoryStocktakeStatusOptions,
+            'Select status',
+        ),
+    ];
 }
 
 export function createAssetSupplierFilterFields(
