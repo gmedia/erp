@@ -24,6 +24,17 @@ export type SelectOption = {
     label: string;
 };
 
+export const purchaseOrderStatusOptions: SelectOption[] = [
+    { value: 'draft', label: 'Draft' },
+    { value: 'pending_approval', label: 'Pending Approval' },
+    { value: 'confirmed', label: 'Confirmed' },
+    { value: 'rejected', label: 'Rejected' },
+    { value: 'partially_received', label: 'Partially Received' },
+    { value: 'fully_received', label: 'Fully Received' },
+    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'closed', label: 'Closed' },
+];
+
 export type AsyncSelectFilterConfig = {
     name: string;
     label: string;
@@ -117,6 +128,58 @@ export function createAsyncSelectFilterFields(
     return configs.map(({ name, label, url, placeholder }) =>
         createAsyncSelectFilterField(name, label, url, placeholder),
     );
+}
+
+export function createSupplierWarehouseProductFilterFields(): FieldDescriptor[] {
+    return createAsyncSelectFilterFields([
+        {
+            name: 'supplier_id',
+            label: 'Supplier',
+            url: '/api/suppliers',
+            placeholder: 'All suppliers',
+        },
+        {
+            name: 'warehouse_id',
+            label: 'Warehouse',
+            url: '/api/warehouses',
+            placeholder: 'All warehouses',
+        },
+        {
+            name: 'product_id',
+            label: 'Product',
+            url: '/api/products',
+            placeholder: 'All products',
+        },
+    ]);
+}
+
+export function createProductWarehouseBranchCategoryFilterFields(): FieldDescriptor[] {
+    return createAsyncSelectFilterFields([
+        {
+            name: 'product_id',
+            label: 'Product',
+            url: '/api/products',
+            placeholder: 'All products',
+        },
+        {
+            name: 'warehouse_id',
+            label: 'Warehouse',
+            url: '/api/warehouses',
+            placeholder: 'All warehouses',
+        },
+        {
+            name: 'branch_id',
+            label: 'Branch',
+            url: '/api/branches',
+            placeholder: 'All branches',
+        },
+        {
+            name: 'category_id',
+            label: 'Category',
+            url: '/api/product-categories',
+            placeholder: 'All categories',
+        },
+    ]);
 }
 
 export function createSelectFilterFields(

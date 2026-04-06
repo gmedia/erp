@@ -1,6 +1,7 @@
 import {
     createAsyncSelectFilterField,
     createDateRangeFilterFields,
+    createProductWarehouseBranchCategoryFilterFields,
     createSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
@@ -19,30 +20,7 @@ export function createInventoryStocktakeVarianceFilterFields(): FieldDescriptor[
             '/api/inventory-stocktakes',
             'All stocktakes',
         ),
-        createAsyncSelectFilterField(
-            'product_id',
-            'Product',
-            '/api/products',
-            'All products',
-        ),
-        createAsyncSelectFilterField(
-            'warehouse_id',
-            'Warehouse',
-            '/api/warehouses',
-            'All warehouses',
-        ),
-        createAsyncSelectFilterField(
-            'branch_id',
-            'Branch',
-            '/api/branches',
-            'All branches',
-        ),
-        createAsyncSelectFilterField(
-            'category_id',
-            'Category',
-            '/api/product-categories',
-            'All categories',
-        ),
+        ...createProductWarehouseBranchCategoryFilterFields(),
         createSelectFilterField(
             'result',
             'Result',

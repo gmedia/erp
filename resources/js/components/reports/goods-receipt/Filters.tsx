@@ -1,6 +1,6 @@
 import {
-    createAsyncSelectFilterField,
     createDateRangeFilterFields,
+    createSupplierWarehouseProductFilterFields,
     createSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
@@ -13,24 +13,7 @@ export function createGoodsReceiptReportFilterFields(): FieldDescriptor[] {
             'Search',
             'Search GR number, PO number, supplier, warehouse, or product...',
         ),
-        createAsyncSelectFilterField(
-            'supplier_id',
-            'Supplier',
-            '/api/suppliers',
-            'All suppliers',
-        ),
-        createAsyncSelectFilterField(
-            'warehouse_id',
-            'Warehouse',
-            '/api/warehouses',
-            'All warehouses',
-        ),
-        createAsyncSelectFilterField(
-            'product_id',
-            'Product',
-            '/api/products',
-            'All products',
-        ),
+        ...createSupplierWarehouseProductFilterFields(),
         createSelectFilterField(
             'status',
             'Status',

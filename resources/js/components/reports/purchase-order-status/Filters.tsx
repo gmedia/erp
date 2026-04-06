@@ -1,6 +1,7 @@
 import {
-    createAsyncSelectFilterField,
     createDateRangeFilterFields,
+    createSupplierWarehouseProductFilterFields,
+    purchaseOrderStatusOptions,
     createSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
@@ -13,24 +14,7 @@ export function createPurchaseOrderStatusReportFilterFields(): FieldDescriptor[]
             'Search',
             'Search PO number, supplier, warehouse, or product...',
         ),
-        createAsyncSelectFilterField(
-            'supplier_id',
-            'Supplier',
-            '/api/suppliers',
-            'All suppliers',
-        ),
-        createAsyncSelectFilterField(
-            'warehouse_id',
-            'Warehouse',
-            '/api/warehouses',
-            'All warehouses',
-        ),
-        createAsyncSelectFilterField(
-            'product_id',
-            'Product',
-            '/api/products',
-            'All products',
-        ),
+        ...createSupplierWarehouseProductFilterFields(),
         createSelectFilterField(
             'status_category',
             'Status Category',
@@ -44,16 +28,7 @@ export function createPurchaseOrderStatusReportFilterFields(): FieldDescriptor[]
         createSelectFilterField(
             'status',
             'PO Status',
-            [
-                { value: 'draft', label: 'Draft' },
-                { value: 'pending_approval', label: 'Pending Approval' },
-                { value: 'confirmed', label: 'Confirmed' },
-                { value: 'rejected', label: 'Rejected' },
-                { value: 'partially_received', label: 'Partially Received' },
-                { value: 'fully_received', label: 'Fully Received' },
-                { value: 'cancelled', label: 'Cancelled' },
-                { value: 'closed', label: 'Closed' },
-            ],
+            purchaseOrderStatusOptions,
             'All statuses',
         ),
         ...createDateRangeFilterFields(),
