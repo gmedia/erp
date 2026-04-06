@@ -1,6 +1,11 @@
 'use client';
 
 import {
+    SummaryCell,
+    TextCell,
+    WarehouseSummaryCell,
+} from '@/components/common/ReportColumns';
+import {
     createCurrencyColumn,
     createNumberColumn,
     createSortingHeader,
@@ -38,43 +43,27 @@ export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [
         id: 'product_name',
         header: 'Product',
         cell: ({ row }) => (
-            <div className="space-y-0.5">
-                <div className="font-medium">
-                    {row.original.product?.name ?? '-'}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                    {row.original.product?.code ?? '-'}
-                </div>
-            </div>
+            <SummaryCell
+                primary={row.original.product?.name}
+                secondary={row.original.product?.code}
+            />
         ),
     },
     {
         id: 'category_name',
         header: 'Category',
-        cell: ({ row }) => (
-            <div>{row.original.product?.category?.name ?? '-'}</div>
-        ),
+        cell: ({ row }) => <TextCell value={row.original.product?.category?.name} />,
     },
     {
         id: 'unit_name',
         header: 'Unit',
-        cell: ({ row }) => <div>{row.original.product?.unit?.name ?? '-'}</div>,
+        cell: ({ row }) => <TextCell value={row.original.product?.unit?.name} />,
     },
     {
         id: 'warehouse_name',
         header: 'Warehouse',
         cell: ({ row }) => (
-            <div className="space-y-0.5">
-                <div className="font-medium">
-                    {row.original.warehouse?.name ?? '-'}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                    {(row.original.warehouse?.code ?? '-') +
-                        (row.original.warehouse?.branch?.name
-                            ? ` • ${row.original.warehouse.branch.name}`
-                            : '')}
-                </div>
-            </div>
+            <WarehouseSummaryCell warehouse={row.original.warehouse} />
         ),
     },
     createNumberColumn<InventoryValuationItem>({
@@ -104,6 +93,6 @@ export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [
     {
         accessorKey: 'moved_at',
         ...createSortingHeader('Last Movement'),
-        cell: ({ row }) => <div>{formatDate(row.original.moved_at)}</div>,
+        cell: ({ row }) => <TextCell value={formatDate(row.original.moved_at)} />,
     },
 ];

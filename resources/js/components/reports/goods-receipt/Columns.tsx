@@ -1,6 +1,11 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
+import {
+    StatusBadgeCell,
+    SummaryCell,
+    TextCell,
+    WarehouseSummaryCell,
+} from '@/components/common/ReportColumns';
 import {
     createCurrencyColumn,
     createNumberColumn,
@@ -40,59 +45,41 @@ function formatDate(value: string | null | undefined): string {
     return formatDateByRegionalSettings(value);
 }
 
-function formatLabel(value: string | null | undefined): string {
-    if (!value) return '-';
-    return value.replaceAll('_', ' ');
-}
-
 export const goodsReceiptReportColumns: ColumnDef<GoodsReceiptReportItem>[] = [
     {
         accessorKey: 'goods_receipt.gr_number',
         ...createSortingHeader('GR Number'),
         cell: ({ row }) => (
-            <div className="space-y-0.5">
-                <div className="font-medium">
-                    {row.original.goods_receipt?.gr_number ?? '-'}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                    {formatDate(row.original.goods_receipt?.receipt_date)}
-                </div>
-            </div>
+            <SummaryCell
+                primary={row.original.goods_receipt?.gr_number}
+                secondary={formatDate(row.original.goods_receipt?.receipt_date)}
+            />
         ),
     },
     {
         accessorKey: 'purchase_order.po_number',
         ...createSortingHeader('PO Number'),
         cell: ({ row }) => (
-            <div>{row.original.purchase_order?.po_number ?? '-'}</div>
+            <TextCell value={row.original.purchase_order?.po_number} />
         ),
     },
     {
         accessorKey: 'supplier.name',
         ...createSortingHeader('Supplier'),
-        cell: ({ row }) => <div>{row.original.supplier?.name ?? '-'}</div>,
+        cell: ({ row }) => <TextCell value={row.original.supplier?.name} />,
     },
     {
         accessorKey: 'warehouse.name',
         ...createSortingHeader('Warehouse'),
         cell: ({ row }) => (
-            <div className="space-y-0.5">
-                <div className="font-medium">
-                    {row.original.warehouse?.name ?? '-'}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                    {row.original.warehouse?.code ?? '-'}
-                </div>
-            </div>
+            <WarehouseSummaryCell warehouse={row.original.warehouse} />
         ),
     },
     {
         accessorKey: 'goods_receipt.status',
         ...createSortingHeader('Status'),
         cell: ({ row }) => (
-            <Badge variant="outline" className="capitalize">
-                {formatLabel(row.original.goods_receipt?.status)}
-            </Badge>
+            <StatusBadgeCell value={row.original.goods_receipt?.status} />
         ),
     },
     createNumberColumn<GoodsReceiptReportItem>({

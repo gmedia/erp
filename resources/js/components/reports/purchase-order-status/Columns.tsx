@@ -1,6 +1,12 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
+import {
+    StatusBadgeCell,
+    SummaryCell,
+    TextCell,
+    WarehouseSummaryCell,
+    formatReportLabel,
+} from '@/components/common/ReportColumns';
 import {
     createCurrencyColumn,
     createNumberColumn,
@@ -39,53 +45,35 @@ function formatDate(value: string | null | undefined): string {
     return formatDateByRegionalSettings(value);
 }
 
-function formatLabel(value: string | null | undefined): string {
-    if (!value) return '-';
-    return value.replaceAll('_', ' ');
-}
-
 export const purchaseOrderStatusReportColumns: ColumnDef<PurchaseOrderStatusReportItem>[] =
     [
         {
             accessorKey: 'purchase_order.po_number',
             ...createSortingHeader('PO Number'),
             cell: ({ row }) => (
-                <div className="space-y-0.5">
-                    <div className="font-medium">
-                        {row.original.purchase_order?.po_number ?? '-'}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                        {formatDate(row.original.purchase_order?.order_date)}
-                    </div>
-                </div>
+                <SummaryCell
+                    primary={row.original.purchase_order?.po_number}
+                    secondary={formatDate(row.original.purchase_order?.order_date)}
+                />
             ),
         },
         {
             accessorKey: 'supplier.name',
             ...createSortingHeader('Supplier'),
-            cell: ({ row }) => <div>{row.original.supplier?.name ?? '-'}</div>,
+            cell: ({ row }) => <TextCell value={row.original.supplier?.name} />,
         },
         {
             accessorKey: 'warehouse.name',
             ...createSortingHeader('Warehouse'),
             cell: ({ row }) => (
-                <div className="space-y-0.5">
-                    <div className="font-medium">
-                        {row.original.warehouse?.name ?? '-'}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                        {row.original.warehouse?.code ?? '-'}
-                    </div>
-                </div>
+                <WarehouseSummaryCell warehouse={row.original.warehouse} />
             ),
         },
         {
             accessorKey: 'purchase_order.status',
             ...createSortingHeader('Status'),
             cell: ({ row }) => (
-                <Badge variant="outline" className="capitalize">
-                    {formatLabel(row.original.purchase_order?.status)}
-                </Badge>
+                <StatusBadgeCell value={row.original.purchase_order?.status} />
             ),
         },
         {
@@ -95,9 +83,7 @@ export const purchaseOrderStatusReportColumns: ColumnDef<PurchaseOrderStatusRepo
                 const value = row.original.purchase_order?.status_category;
                 const variant = value === 'closed' ? 'default' : 'outline';
                 return (
-                    <Badge variant={variant} className="capitalize">
-                        {formatLabel(value)}
-                    </Badge>
+                    <StatusBadgeCell value={value} variant={variant} />
                 );
             },
         },
@@ -137,11 +123,11 @@ export const purchaseOrderStatusReportColumns: ColumnDef<PurchaseOrderStatusRepo
             accessorKey: 'purchase_order.expected_delivery_date',
             ...createSortingHeader('Expected Delivery'),
             cell: ({ row }) => (
-                <div>
-                    {formatDate(
+                <TextCell
+                    value={formatDate(
                         row.original.purchase_order?.expected_delivery_date,
                     )}
-                </div>
+                />
             ),
         },
     ];

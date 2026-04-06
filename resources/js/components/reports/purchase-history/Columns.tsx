@@ -1,6 +1,11 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
+import {
+    StatusBadgeCell,
+    SummaryCell,
+    TextCell,
+    WarehouseSummaryCell,
+} from '@/components/common/ReportColumns';
 import {
     createCurrencyColumn,
     createNumberColumn,
@@ -44,67 +49,45 @@ function formatDate(value: string | null | undefined): string {
     return formatDateByRegionalSettings(value);
 }
 
-function formatLabel(value: string | null | undefined): string {
-    if (!value) return '-';
-    return value.replaceAll('_', ' ');
-}
-
 export const purchaseHistoryReportColumns: ColumnDef<PurchaseHistoryReportItem>[] =
     [
         {
             accessorKey: 'purchase_order.po_number',
             ...createSortingHeader('PO Number'),
             cell: ({ row }) => (
-                <div className="space-y-0.5">
-                    <div className="font-medium">
-                        {row.original.purchase_order?.po_number ?? '-'}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                        {formatDate(row.original.purchase_order?.order_date)}
-                    </div>
-                </div>
+                <SummaryCell
+                    primary={row.original.purchase_order?.po_number}
+                    secondary={formatDate(row.original.purchase_order?.order_date)}
+                />
             ),
         },
         {
             accessorKey: 'supplier.name',
             ...createSortingHeader('Supplier'),
-            cell: ({ row }) => <div>{row.original.supplier?.name ?? '-'}</div>,
+            cell: ({ row }) => <TextCell value={row.original.supplier?.name} />,
         },
         {
             accessorKey: 'product.name',
             ...createSortingHeader('Product'),
             cell: ({ row }) => (
-                <div className="space-y-0.5">
-                    <div className="font-medium">
-                        {row.original.product?.name ?? '-'}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                        {row.original.product?.code ?? '-'}
-                    </div>
-                </div>
+                <SummaryCell
+                    primary={row.original.product?.name}
+                    secondary={row.original.product?.code}
+                />
             ),
         },
         {
             accessorKey: 'warehouse.name',
             ...createSortingHeader('Warehouse'),
             cell: ({ row }) => (
-                <div className="space-y-0.5">
-                    <div className="font-medium">
-                        {row.original.warehouse?.name ?? '-'}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                        {row.original.warehouse?.code ?? '-'}
-                    </div>
-                </div>
+                <WarehouseSummaryCell warehouse={row.original.warehouse} />
             ),
         },
         {
             accessorKey: 'purchase_order.status',
             ...createSortingHeader('Status'),
             cell: ({ row }) => (
-                <Badge variant="outline" className="capitalize">
-                    {formatLabel(row.original.purchase_order?.status)}
-                </Badge>
+                <StatusBadgeCell value={row.original.purchase_order?.status} />
             ),
         },
         createNumberColumn<PurchaseHistoryReportItem>({
@@ -135,7 +118,7 @@ export const purchaseHistoryReportColumns: ColumnDef<PurchaseHistoryReportItem>[
             accessorKey: 'goods_receipt.last_receipt_date',
             ...createSortingHeader('Last Receipt'),
             cell: ({ row }) => (
-                <div>{formatDate(row.original.last_receipt_date)}</div>
+                <TextCell value={formatDate(row.original.last_receipt_date)} />
             ),
         },
         createCurrencyColumn<PurchaseHistoryReportItem>({
@@ -150,11 +133,11 @@ export const purchaseHistoryReportColumns: ColumnDef<PurchaseHistoryReportItem>[
             accessorKey: 'purchase_order.expected_delivery_date',
             ...createSortingHeader('Expected Delivery'),
             cell: ({ row }) => (
-                <div>
-                    {formatDate(
+                <TextCell
+                    value={formatDate(
                         row.original.purchase_order?.expected_delivery_date,
                     )}
-                </div>
+                />
             ),
         },
     ];

@@ -1,5 +1,10 @@
 'use client';
 
+import {
+    SummaryCell,
+    TextCell,
+    WarehouseSummaryCell,
+} from '@/components/common/ReportColumns';
 import { createNumberColumn, createSortingHeader } from '@/utils/columns';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -64,38 +69,24 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
             accessorFn: (row) => row.moved_at,
             ...createSortingHeader('Moved At'),
             cell: ({ row }) => (
-                <div>{formatDateTime(row.original.moved_at)}</div>
+                <TextCell value={formatDateTime(row.original.moved_at)} />
             ),
         },
         {
             id: 'product_name',
             header: 'Product',
             cell: ({ row }) => (
-                <div className="space-y-0.5">
-                    <div className="font-medium">
-                        {row.original.product?.name ?? '-'}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                        {row.original.product?.code ?? '-'}
-                    </div>
-                </div>
+                <SummaryCell
+                    primary={row.original.product?.name}
+                    secondary={row.original.product?.code}
+                />
             ),
         },
         {
             id: 'warehouse_name',
             header: 'Warehouse',
             cell: ({ row }) => (
-                <div className="space-y-0.5">
-                    <div className="font-medium">
-                        {row.original.warehouse?.name ?? '-'}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                        {(row.original.warehouse?.code ?? '-') +
-                            (row.original.warehouse?.branch?.name
-                                ? ` • ${row.original.warehouse.branch.name}`
-                                : '')}
-                    </div>
-                </div>
+                <WarehouseSummaryCell warehouse={row.original.warehouse} />
             ),
         },
         {
@@ -156,9 +147,7 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
         {
             id: 'created_by',
             header: 'Created By',
-            cell: ({ row }) => (
-                <div>{row.original.created_by?.name ?? '-'}</div>
-            ),
+            cell: ({ row }) => <TextCell value={row.original.created_by?.name} />,
         },
     ];
 }
