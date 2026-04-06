@@ -245,7 +245,12 @@ export function createWarehouseFilterField(
 export function createUnitFilterField(
     placeholder = 'Select unit',
 ): FieldDescriptor {
-    return createAsyncSelectFilterField('unit_id', 'Unit', '/api/units', placeholder);
+    return createAsyncSelectFilterField(
+        'unit_id',
+        'Unit',
+        '/api/units',
+        placeholder,
+    );
 }
 
 export function createDepartmentFilterField(
@@ -435,7 +440,12 @@ export function createProductCatalogAsyncFilterFields(): FieldDescriptor[] {
 
 export function createProductTypeStatusFilterFields(): FieldDescriptor[] {
     return [
-        createSelectFilterField('type', 'Type', productTypeOptions, 'Select type'),
+        createSelectFilterField(
+            'type',
+            'Type',
+            productTypeOptions,
+            'Select type',
+        ),
         createSelectFilterField(
             'status',
             'Status',
