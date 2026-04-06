@@ -1,7 +1,7 @@
 import {
     createDateRangeFilterFields,
-    createSupplierWarehouseProductFilterFields,
     createSelectFilterField,
+    createSupplierWarehouseProductFilterFields,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
