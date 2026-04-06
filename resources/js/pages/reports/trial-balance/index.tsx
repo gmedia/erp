@@ -1,3 +1,4 @@
+import type { FinancialReportFiscalYear } from '@/components/reports/financial/FinancialReportPageShell';
 import {
     FinancialTableCard,
     SingleYearFinancialReportPageShell,
@@ -8,7 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import axios from '@/lib/axios';
 import { cn, formatCurrency } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
-import type { FinancialReportFiscalYear } from '@/components/reports/financial/FinancialReportPageShell';
 
 interface AccountItem extends FinancialTableRow {
     id: number;
@@ -76,7 +76,8 @@ export default function TrialBalance() {
                 <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                     {selectedFiscalYear && (
                         <span>
-                            {selectedFiscalYear.name} • {selectedFiscalYear.status}
+                            {selectedFiscalYear.name} •{' '}
+                            {selectedFiscalYear.status}
                         </span>
                     )}
                     {report.length > 0 && (

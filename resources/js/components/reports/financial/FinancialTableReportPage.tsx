@@ -138,7 +138,8 @@ export function SingleYearFinancialReportPageShell({
                                             key={fiscalYear.id}
                                             value={String(fiscalYear.id)}
                                         >
-                                            {fiscalYear.name} ({fiscalYear.status})
+                                            {fiscalYear.name} (
+                                            {fiscalYear.status})
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -183,7 +184,9 @@ export function FinancialTableCard<TItem extends FinancialTableRow>({
                         <Table className="min-w-[760px]">
                             <TableHeader className="sticky top-0 z-10 bg-background">
                                 <TableRow>
-                                    <TableHead className="w-[120px]">Code</TableHead>
+                                    <TableHead className="w-[120px]">
+                                        Code
+                                    </TableHead>
                                     <TableHead>Account Name</TableHead>
                                     <TableHead className="hidden w-[120px] md:table-cell">
                                         Type
@@ -210,7 +213,9 @@ export function FinancialTableCard<TItem extends FinancialTableRow>({
                                     </TableRow>
                                 ) : (
                                     items.map((item) => {
-                                        const hasChildren = parentIds.has(item.id);
+                                        const hasChildren = parentIds.has(
+                                            item.id,
+                                        );
 
                                         return (
                                             <TableRow
@@ -238,7 +243,8 @@ export function FinancialTableCard<TItem extends FinancialTableRow>({
                                                     {item.type}
                                                 </TableCell>
                                                 {amountColumns.map((column) => {
-                                                    const value = column.value(item);
+                                                    const value =
+                                                        column.value(item);
 
                                                     return (
                                                         <TableCell
@@ -247,7 +253,9 @@ export function FinancialTableCard<TItem extends FinancialTableRow>({
                                                         >
                                                             {value === 0
                                                                 ? '-'
-                                                                : formatCurrency(value)}
+                                                                : formatCurrency(
+                                                                      value,
+                                                                  )}
                                                         </TableCell>
                                                     );
                                                 })}

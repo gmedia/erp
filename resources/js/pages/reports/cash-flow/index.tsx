@@ -1,3 +1,4 @@
+import type { FinancialReportFiscalYear } from '@/components/reports/financial/FinancialReportPageShell';
 import {
     FinancialTableCard,
     SingleYearFinancialReportPageShell,
@@ -6,7 +7,6 @@ import {
 } from '@/components/reports/financial/FinancialTableReportPage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
-import type { FinancialReportFiscalYear } from '@/components/reports/financial/FinancialReportPageShell';
 
 import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
