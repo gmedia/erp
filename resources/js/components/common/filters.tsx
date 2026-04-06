@@ -49,6 +49,20 @@ export const maintenanceStatusOptions: SelectOption[] = [
     { value: 'cancelled', label: 'Cancelled' },
 ];
 
+export const assetStatusOptions: SelectOption[] = [
+    { value: 'draft', label: 'Draft' },
+    { value: 'active', label: 'Active' },
+    { value: 'maintenance', label: 'Maintenance' },
+    { value: 'disposed', label: 'Disposed' },
+    { value: 'lost', label: 'Lost' },
+];
+
+export const assetConditionOptions: SelectOption[] = [
+    { value: 'good', label: 'Good' },
+    { value: 'needs_repair', label: 'Needs Repair' },
+    { value: 'damaged', label: 'Damaged' },
+];
+
 export const stockAdjustmentTypeOptions: SelectOption[] = [
     { value: 'damage', label: 'Damage' },
     { value: 'expired', label: 'Expired' },
@@ -209,6 +223,12 @@ export function createSupplierFilterField(
     );
 }
 
+export function createAssetFilterField(
+    placeholder = 'Select an asset',
+): FieldDescriptor {
+    return createAsyncSelectFilterField('asset_id', 'Asset', '/api/assets', placeholder);
+}
+
 export function createAssetCategoryFilterField(
     placeholder = 'Select a category',
 ): FieldDescriptor {
@@ -258,6 +278,56 @@ export function createAssetCategoryBranchFilterFields(): FieldDescriptor[] {
     return [
         createAssetCategoryFilterField('Select a category'),
         createBranchFilterField('Select a branch'),
+    ];
+}
+
+export function createAssetSupplierFilterFields(
+    assetPlaceholder = 'Select an asset',
+    supplierPlaceholder = 'Select a supplier',
+): FieldDescriptor[] {
+    return [
+        createAssetFilterField(assetPlaceholder),
+        createSupplierFilterField(supplierPlaceholder),
+    ];
+}
+
+export function createMaintenanceTypeStatusFilterFields(
+    typePlaceholder = 'Select type',
+    statusPlaceholder = 'Select status',
+): FieldDescriptor[] {
+    return [
+        createSelectFilterField(
+            'maintenance_type',
+            'Type',
+            maintenanceTypeOptions,
+            typePlaceholder,
+        ),
+        createSelectFilterField(
+            'status',
+            'Status',
+            maintenanceStatusOptions,
+            statusPlaceholder,
+        ),
+    ];
+}
+
+export function createAssetStatusConditionFilterFields(
+    statusPlaceholder = 'Select a status',
+    conditionPlaceholder = 'Select a condition',
+): FieldDescriptor[] {
+    return [
+        createSelectFilterField(
+            'status',
+            'Status',
+            assetStatusOptions,
+            statusPlaceholder,
+        ),
+        createSelectFilterField(
+            'condition',
+            'Condition',
+            assetConditionOptions,
+            conditionPlaceholder,
+        ),
     ];
 }
 
@@ -330,6 +400,24 @@ export function createDateRangeFilterFields(
             name: 'end_date',
             label: 'End Date',
             component: <FilterDatePicker placeholder={endPlaceholder} />,
+        },
+    ];
+}
+
+export function createCostRangeFilterFields(
+    minPlaceholder = '0',
+    maxPlaceholder = '0',
+): FieldDescriptor[] {
+    return [
+        {
+            name: 'cost_min',
+            label: 'Min Cost',
+            component: <Input type="number" min={0} placeholder={minPlaceholder} />,
+        },
+        {
+            name: 'cost_max',
+            label: 'Max Cost',
+            component: <Input type="number" min={0} placeholder={maxPlaceholder} />,
         },
     ];
 }

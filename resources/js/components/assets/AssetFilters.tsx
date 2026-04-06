@@ -2,7 +2,7 @@
 
 import {
     createAsyncSelectFilterFields,
-    createSelectFilterFields,
+    createAssetStatusConditionFilterFields,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
@@ -48,29 +48,6 @@ export function createAssetFilterFields(): FieldDescriptor[] {
                 placeholder: 'Select a branch',
             },
         ]),
-        ...createSelectFilterFields([
-            {
-                name: 'status',
-                label: 'Status',
-                options: [
-                    { value: 'draft', label: 'Draft' },
-                    { value: 'active', label: 'Active' },
-                    { value: 'maintenance', label: 'Maintenance' },
-                    { value: 'disposed', label: 'Disposed' },
-                    { value: 'lost', label: 'Lost' },
-                ],
-                placeholder: 'Select a status',
-            },
-            {
-                name: 'condition',
-                label: 'Condition',
-                options: [
-                    { value: 'good', label: 'Good' },
-                    { value: 'needs_repair', label: 'Needs Repair' },
-                    { value: 'damaged', label: 'Damaged' },
-                ],
-                placeholder: 'Select a condition',
-            },
-        ]),
+        ...createAssetStatusConditionFilterFields(),
     ];
 }
