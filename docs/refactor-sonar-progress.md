@@ -35,17 +35,17 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: 3841 (turun 2503 dari baseline Batch F)
-- duplicated_blocks: 176 (turun 156 dari baseline Batch F)
-- duplicated_lines_density: 4.4 (turun 2.8 dari baseline Batch F)
-- ncloc: 71990 (turun 883 dari baseline Batch F)
+- duplicated_lines: 3642 (turun 2702 dari baseline Batch F)
+- duplicated_blocks: 173 (turun 159 dari baseline Batch F)
+- duplicated_lines_density: 4.1 (turun 3.1 dari baseline Batch F)
+- ncloc: 71790 (turun 1083 dari baseline Batch F)
 - coverage: 0.0 (anomali snapshot remote terbaru; quality gate juga membaca `new_coverage 0.0`)
 
 ## Snapshot Analisa Sonar (2026-04-06, latest MCP)
 
 - Quality Gate: ERROR
-- Gate blocker utama: `new_duplicated_lines_density = 7.1`
-- Catatan: snapshot Sonar remote terbaru via MCP setelah commit `f8d8e21f` masih menunjukkan anomali pipeline coverage (`coverage 0.0`, `new_coverage 0.0`), tetapi metrik duplikasi kembali membaik ke `duplicated_lines 3841`, `duplicated_blocks 176`, `duplicated_lines_density 4.4`, dengan `ncloc 71990`. Gate tetap `ERROR` karena kombinasi anomali coverage baru dan density duplikasi pada new code `7.1`. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, 4 spec Playwright pada wave audit-trail, 7 spec Playwright pada wave report-column summaries, 11 spec Playwright pada wave report page shells, 13 passed + 1 skipped pada wave remaining report pages, dan 6 passed pada wave financial report shells.
+- Gate blocker utama: `new_duplicated_lines_density = 6.9`
+- Catatan: snapshot Sonar remote terbaru via MCP setelah commit `02249476` masih menunjukkan anomali pipeline coverage (`coverage 0.0`, `new_coverage 0.0`), tetapi metrik duplikasi kembali membaik ke `duplicated_lines 3642`, `duplicated_blocks 173`, `duplicated_lines_density 4.1`, dengan `ncloc 71790`. Gate tetap `ERROR` karena kombinasi anomali coverage baru dan density duplikasi pada new code `6.9`. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, 4 spec Playwright pada wave audit-trail, 7 spec Playwright pada wave report-column summaries, 11 spec Playwright pada wave report page shells, 13 passed + 1 skipped pada wave remaining report pages, 6 passed pada wave financial report shells, dan 6 passed pada wave manual financial tables.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
@@ -358,6 +358,10 @@ Isi setelah batch selesai dan sebelum merge.
 	- Ekstrak helper frontend untuk tiga halaman laporan keuangan komparatif yang masih mengulang shell `AppLayout + Helmet + fiscal-year selector + comparison-year selector + loading/error state + heading meta`, lalu migrasikan page finansial yang memakai `FinancialReportSection` ke helper itu.
 	- Gelombang saat ini mencakup `resources/js/components/reports/financial/FinancialReportPageShell.tsx`, `resources/js/pages/reports/balance-sheet/index.tsx`, `resources/js/pages/reports/income-statement/index.tsx`, dan `resources/js/pages/reports/comparative/index.tsx`.
 	- Progress: helper shared `FinancialReportPageShell` dan `useComparisonReportSearchParams()` kini menggantikan boilerplate page shell finansial tanpa ubah route, query param `fiscal_year_id/comparison_year_id`, heading, badge meta, atau isi section report; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/reports/financial-reports.spec.ts` (6 passed). Snapshot Sonar pasca-wave: sudah berubah setelah push `f8d8e21f`; MCP menampilkan `duplicated_lines 3841`, `duplicated_blocks 176`, `duplicated_lines_density 4.4`, `coverage 0.0`, `ncloc 71990`, `new_coverage 0.0`, dan `new_duplicated_lines_density 7.1`.
+75. Dedup manual financial tables. (in-progress)
+	- Ekstrak helper frontend untuk pasangan laporan keuangan single-year yang masih mengulang shell `AppLayout + Helmet + fiscal-year selector + loading/error state` dan tabel hierarkis manual `Code/Account Name/Type + amount columns`, lalu migrasikan dua page tabel finansial yang tersisa ke helper itu.
+	- Gelombang saat ini mencakup `resources/js/components/reports/financial/FinancialTableReportPage.tsx`, `resources/js/pages/reports/trial-balance/index.tsx`, dan `resources/js/pages/reports/cash-flow/index.tsx`.
+	- Progress: helper shared `SingleYearFinancialReportPageShell`, `FinancialTableCard`, dan `useSingleYearReportSearchParams()` kini menggantikan boilerplate shell serta tabel hierarkis tanpa ubah route, query param `fiscal_year_id`, heading, card title, kolom tabel, summary cash flow, atau alert imbalance trial balance; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/reports/financial-reports.spec.ts` (6 passed). Snapshot Sonar pasca-wave: sudah berubah setelah push `02249476`; MCP menampilkan `duplicated_lines 3642`, `duplicated_blocks 173`, `duplicated_lines_density 4.1`, `coverage 0.0`, `ncloc 71790`, `new_coverage 0.0`, dan `new_duplicated_lines_density 6.9`.
 
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
