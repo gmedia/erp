@@ -1,38 +1,17 @@
+import {
+    FinancialTableCard,
+    SingleYearFinancialReportPageShell,
+    useSingleYearReportSearchParams,
+    type FinancialTableRow,
+} from '@/components/reports/financial/FinancialTableReportPage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/lib/utils';
-import { Helmet } from 'react-helmet-async';
+import type { FinancialReportFiscalYear } from '@/components/reports/financial/FinancialReportPageShell';
 
 import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router-dom';
 
-interface FiscalYear {
-    id: number;
-    name: string;
-    start_date: string;
-    end_date: string;
-    status: string;
-}
-
-interface CashFlowItem {
+interface CashFlowItem extends FinancialTableRow {
     id: number;
     code: string;
     name: string;
@@ -45,14 +24,13 @@ interface CashFlowItem {
 }
 
 interface CashFlowResponse {
-    fiscalYears: FiscalYear[];
+    fiscalYears: FinancialReportFiscalYear[];
     selectedYearId: number;
     report: CashFlowItem[];
 }
 
 export default function CashFlow() {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const urlYearId = searchParams.get('fiscal_year_id');
+    const { urlYearId, handleYearChange } = useSingleYearReportSearchParams();
 
     const { data, isLoading, error } = useQuery<CashFlowResponse>({
         queryKey: ['cash-flow', urlYearId],
@@ -85,98 +63,24 @@ export default function CashFlow() {
     const selectedFiscalYear = fiscalYears.find(
         (fy) => fy.id === selectedYearId,
     );
-    const parentIds = new Set(
-        report
-            .map((item) => item.parent_id)
-            .filter((id): id is number => id != null),
-    );
-
-    const handleYearChange = (value: string) => {
-        setSearchParams({ fiscal_year_id: value });
-    };
-
-    if (isLoading) {
-        return (
-            <AppLayout
-                breadcrumbs={[
-                    { title: 'Reports', href: '#' },
-                    { title: 'Cash Flow', href: '/reports/cash-flow' },
-                ]}
-            >
-                <Helmet>
-                    <title>Cash Flow</title>
-                </Helmet>
-                <div className="flex h-full items-center justify-center p-4">
-                    Loading report...
-                </div>
-            </AppLayout>
-        );
-    }
-
-    if (error) {
-        return (
-            <AppLayout
-                breadcrumbs={[
-                    { title: 'Reports', href: '#' },
-                    { title: 'Cash Flow', href: '/reports/cash-flow' },
-                ]}
-            >
-                <Helmet>
-                    <title>Cash Flow</title>
-                </Helmet>
-                <div className="flex h-full items-center justify-center p-4 text-destructive">
-                    Error loading report.
-                </div>
-            </AppLayout>
-        );
-    }
 
     return (
-        <AppLayout
-            breadcrumbs={[
-                { title: 'Reports', href: '#' },
-                { title: 'Cash Flow', href: '/reports/cash-flow' },
-            ]}
-        >
-            <Helmet>
-                <title>Cash Flow</title>
-            </Helmet>
-
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-bold tracking-tight">
-                            Cash Flow
-                        </h1>
-                        {selectedFiscalYear && (
-                            <div className="text-sm text-muted-foreground">
-                                {selectedFiscalYear.name} •{' '}
-                                {selectedFiscalYear.status}
-                            </div>
-                        )}
+        <SingleYearFinancialReportPageShell
+            title="Cash Flow"
+            path="/reports/cash-flow"
+            fiscalYears={fiscalYears}
+            selectedYearId={selectedYearId}
+            onYearChange={handleYearChange}
+            isLoading={isLoading}
+            hasError={!!error}
+            headerMeta={
+                selectedFiscalYear ? (
+                    <div className="text-sm text-muted-foreground">
+                        {selectedFiscalYear.name} • {selectedFiscalYear.status}
                     </div>
-                    <div className="w-full sm:w-[240px]">
-                        <Select
-                            value={String(selectedYearId)}
-                            onValueChange={handleYearChange}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select Fiscal Year" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {fiscalYears.map((fy) => (
-                                    <SelectItem
-                                        key={fy.id}
-                                        value={String(fy.id)}
-                                    >
-                                        {fy.name} ({fy.status})
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-
+                ) : undefined
+            }
+            preContent={
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <Card>
                         <CardHeader>
@@ -203,121 +107,26 @@ export default function CashFlow() {
                         </CardContent>
                     </Card>
                 </div>
-
-                <Card className="flex-1">
-                    <CardHeader>
-                        <CardTitle>Cash Flow Report</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="overflow-hidden rounded-md border">
-                            <ScrollArea className="max-h-[calc(100vh-22rem)]">
-                                <Table className="min-w-[760px]">
-                                    <TableHeader className="sticky top-0 z-10 bg-background">
-                                        <TableRow>
-                                            <TableHead className="w-[120px]">
-                                                Code
-                                            </TableHead>
-                                            <TableHead>Account Name</TableHead>
-                                            <TableHead className="hidden w-[120px] md:table-cell">
-                                                Type
-                                            </TableHead>
-                                            <TableHead className="text-right tabular-nums">
-                                                Inflow
-                                            </TableHead>
-                                            <TableHead className="text-right tabular-nums">
-                                                Outflow
-                                            </TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {report.length === 0 ? (
-                                            <TableRow>
-                                                <TableCell
-                                                    colSpan={5}
-                                                    className="h-24 text-center text-muted-foreground"
-                                                >
-                                                    No data available for the
-                                                    selected fiscal year.
-                                                </TableCell>
-                                            </TableRow>
-                                        ) : (
-                                            report.map((item) => {
-                                                const hasChildren =
-                                                    parentIds.has(item.id);
-                                                return (
-                                                    <TableRow
-                                                        key={item.id}
-                                                        className={
-                                                            hasChildren
-                                                                ? 'bg-muted/20 font-medium'
-                                                                : 'odd:bg-muted/10'
-                                                        }
-                                                    >
-                                                        <TableCell className="font-mono text-xs text-muted-foreground">
-                                                            {item.code}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div
-                                                                className="truncate"
-                                                                style={{
-                                                                    paddingLeft: `${Math.max(0, item.level - 1) * 1.25}rem`,
-                                                                }}
-                                                            >
-                                                                {item.name}
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="hidden text-muted-foreground capitalize md:table-cell">
-                                                            {item.type}
-                                                        </TableCell>
-                                                        <TableCell className="text-right tabular-nums">
-                                                            {item.inflow === 0
-                                                                ? '-'
-                                                                : formatCurrency(
-                                                                      item.inflow,
-                                                                  )}
-                                                        </TableCell>
-                                                        <TableCell className="text-right tabular-nums">
-                                                            {item.outflow === 0
-                                                                ? '-'
-                                                                : formatCurrency(
-                                                                      item.outflow,
-                                                                  )}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                );
-                                            })
-                                        )}
-                                    </TableBody>
-                                    {report.length > 0 && (
-                                        <TableFooter>
-                                            <TableRow>
-                                                <TableCell
-                                                    colSpan={2}
-                                                    className="text-right font-semibold"
-                                                >
-                                                    Total
-                                                </TableCell>
-                                                <TableCell className="hidden md:table-cell" />
-                                                <TableCell className="text-right font-semibold tabular-nums">
-                                                    {formatCurrency(
-                                                        totalInflow,
-                                                    )}
-                                                </TableCell>
-                                                <TableCell className="text-right font-semibold tabular-nums">
-                                                    {formatCurrency(
-                                                        totalOutflow,
-                                                    )}
-                                                </TableCell>
-                                            </TableRow>
-                                        </TableFooter>
-                                    )}
-                                </Table>
-                                <ScrollBar orientation="horizontal" />
-                            </ScrollArea>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-        </AppLayout>
+            }
+        >
+            <FinancialTableCard
+                title="Cash Flow Report"
+                items={report}
+                amountColumns={[
+                    {
+                        header: 'Inflow',
+                        total: totalInflow,
+                        value: (item) => item.inflow,
+                    },
+                    {
+                        header: 'Outflow',
+                        total: totalOutflow,
+                        value: (item) => item.outflow,
+                    },
+                ]}
+                emptyMessage="No data available for the selected fiscal year."
+                scrollAreaClassName="max-h-[calc(100vh-22rem)]"
+            />
+        </SingleYearFinancialReportPageShell>
     );
 }
