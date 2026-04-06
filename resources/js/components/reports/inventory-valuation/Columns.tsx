@@ -52,12 +52,16 @@ export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [
     {
         id: 'category_name',
         header: 'Category',
-        cell: ({ row }) => <TextCell value={row.original.product?.category?.name} />,
+        cell: ({ row }) => (
+            <TextCell value={row.original.product?.category?.name} />
+        ),
     },
     {
         id: 'unit_name',
         header: 'Unit',
-        cell: ({ row }) => <TextCell value={row.original.product?.unit?.name} />,
+        cell: ({ row }) => (
+            <TextCell value={row.original.product?.unit?.name} />
+        ),
     },
     {
         id: 'warehouse_name',
@@ -93,6 +97,8 @@ export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [
     {
         accessorKey: 'moved_at',
         ...createSortingHeader('Last Movement'),
-        cell: ({ row }) => <TextCell value={formatDate(row.original.moved_at)} />,
+        cell: ({ row }) => (
+            <TextCell value={formatDate(row.original.moved_at)} />
+        ),
     },
 ];

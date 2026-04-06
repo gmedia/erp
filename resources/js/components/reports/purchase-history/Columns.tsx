@@ -57,7 +57,9 @@ export const purchaseHistoryReportColumns: ColumnDef<PurchaseHistoryReportItem>[
             cell: ({ row }) => (
                 <SummaryCell
                     primary={row.original.purchase_order?.po_number}
-                    secondary={formatDate(row.original.purchase_order?.order_date)}
+                    secondary={formatDate(
+                        row.original.purchase_order?.order_date,
+                    )}
                 />
             ),
         },

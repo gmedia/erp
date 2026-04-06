@@ -147,7 +147,9 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
         {
             id: 'created_by',
             header: 'Created By',
-            cell: ({ row }) => <TextCell value={row.original.created_by?.name} />,
+            cell: ({ row }) => (
+                <TextCell value={row.original.created_by?.name} />
+            ),
         },
     ];
 }

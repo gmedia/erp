@@ -5,7 +5,6 @@ import {
     SummaryCell,
     TextCell,
     WarehouseSummaryCell,
-    formatReportLabel,
 } from '@/components/common/ReportColumns';
 import {
     createCurrencyColumn,
@@ -53,7 +52,9 @@ export const purchaseOrderStatusReportColumns: ColumnDef<PurchaseOrderStatusRepo
             cell: ({ row }) => (
                 <SummaryCell
                     primary={row.original.purchase_order?.po_number}
-                    secondary={formatDate(row.original.purchase_order?.order_date)}
+                    secondary={formatDate(
+                        row.original.purchase_order?.order_date,
+                    )}
                 />
             ),
         },
@@ -82,9 +83,7 @@ export const purchaseOrderStatusReportColumns: ColumnDef<PurchaseOrderStatusRepo
             cell: ({ row }) => {
                 const value = row.original.purchase_order?.status_category;
                 const variant = value === 'closed' ? 'default' : 'outline';
-                return (
-                    <StatusBadgeCell value={value} variant={variant} />
-                );
+                return <StatusBadgeCell value={value} variant={variant} />;
             },
         },
         createNumberColumn<PurchaseOrderStatusReportItem>({

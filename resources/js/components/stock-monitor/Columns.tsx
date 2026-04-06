@@ -48,7 +48,9 @@ export function createStockMonitorColumns(): ColumnDef<StockMonitorItem>[] {
         {
             id: 'category_name',
             header: 'Category',
-            cell: ({ row }) => <TextCell value={row.original.product?.category?.name} />,
+            cell: ({ row }) => (
+                <TextCell value={row.original.product?.category?.name} />
+            ),
         },
         {
             id: 'warehouse_name',
@@ -78,7 +80,9 @@ export function createStockMonitorColumns(): ColumnDef<StockMonitorItem>[] {
         {
             accessorKey: 'moved_at',
             ...createSortingHeader('Last Movement'),
-            cell: ({ row }) => <TextCell value={formatDate(row.original.moved_at)} />,
+            cell: ({ row }) => (
+                <TextCell value={formatDate(row.original.moved_at)} />
+            ),
         },
     ];
 }

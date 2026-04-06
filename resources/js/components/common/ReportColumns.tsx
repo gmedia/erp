@@ -5,11 +5,14 @@ import type { ComponentProps, ReactNode } from 'react';
 
 type DisplayValue = ReactNode | null | undefined;
 
-type WarehouseSummary = {
-    name: string | null;
-    code?: string | null;
-    branch?: { name: string | null } | null;
-} | null | undefined;
+type WarehouseSummary =
+    | {
+          name: string | null;
+          code?: string | null;
+          branch?: { name: string | null } | null;
+      }
+    | null
+    | undefined;
 
 function resolveDisplayValue(value: DisplayValue): ReactNode {
     if (value === null || value === undefined || value === '') {
