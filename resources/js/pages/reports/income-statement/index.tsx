@@ -1,13 +1,13 @@
 import {
+    FinancialReportPageShell,
+    useComparisonReportSearchParams,
+} from '@/components/reports/financial/FinancialReportPageShell';
+import {
     FinancialReportSection,
     getChangeTextClass,
     type FinancialReportFiscalYear,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
-import {
-    FinancialReportPageShell,
-    useComparisonReportSearchParams,
-} from '@/components/reports/financial/FinancialReportPageShell';
 import { Badge } from '@/components/ui/badge';
 import {
     Card,
@@ -46,8 +46,12 @@ interface IncomeStatementResponse {
 }
 
 export default function IncomeStatement() {
-    const { urlYearId, urlComparisonId, handleYearChange, handleComparisonChange } =
-        useComparisonReportSearchParams();
+    const {
+        urlYearId,
+        urlComparisonId,
+        handleYearChange,
+        handleComparisonChange,
+    } = useComparisonReportSearchParams();
 
     const { data, isLoading, error } = useQuery<IncomeStatementResponse>({
         queryKey: ['income-statement', urlYearId, urlComparisonId],
@@ -104,7 +108,8 @@ export default function IncomeStatement() {
                 <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                     {selectedFiscalYear && (
                         <span>
-                            {selectedFiscalYear.name} • {selectedFiscalYear.status}
+                            {selectedFiscalYear.name} •{' '}
+                            {selectedFiscalYear.status}
                         </span>
                     )}
                     <Badge variant="outline">
@@ -124,137 +129,126 @@ export default function IncomeStatement() {
                 </div>
             }
         >
-                <div className="grid gap-6">
-                    <FinancialReportSection
-                        title="Revenue"
-                        nodes={report.revenues || []}
-                        total={report.totals?.revenue || 0}
-                        comparisonTotal={report.totals?.comparison_revenue}
-                        change={report.totals?.change_revenue}
-                        changePercentage={
-                            report.totals?.change_percentage_revenue
-                        }
-                        showComparison={!!comparisonYearId}
-                    />
+            <div className="grid gap-6">
+                <FinancialReportSection
+                    title="Revenue"
+                    nodes={report.revenues || []}
+                    total={report.totals?.revenue || 0}
+                    comparisonTotal={report.totals?.comparison_revenue}
+                    change={report.totals?.change_revenue}
+                    changePercentage={report.totals?.change_percentage_revenue}
+                    showComparison={!!comparisonYearId}
+                />
 
-                    <FinancialReportSection
-                        title="Expense"
-                        nodes={report.expenses || []}
-                        total={report.totals?.expense || 0}
-                        comparisonTotal={report.totals?.comparison_expense}
-                        change={report.totals?.change_expense}
-                        changePercentage={
-                            report.totals?.change_percentage_expense
-                        }
-                        showComparison={!!comparisonYearId}
-                    />
+                <FinancialReportSection
+                    title="Expense"
+                    nodes={report.expenses || []}
+                    total={report.totals?.expense || 0}
+                    comparisonTotal={report.totals?.comparison_expense}
+                    change={report.totals?.change_expense}
+                    changePercentage={report.totals?.change_percentage_expense}
+                    showComparison={!!comparisonYearId}
+                />
 
-                    <Card
-                        className={cn(
-                            'overflow-hidden border-t-4',
-                            isProfit
-                                ? 'border-emerald-500'
-                                : 'border-destructive',
-                        )}
-                    >
-                        <CardHeader className="bg-muted/15">
-                            <div className="flex items-start justify-between gap-3">
-                                <div className="space-y-1">
-                                    <CardTitle className="text-base">
-                                        Summary
-                                    </CardTitle>
-                                    <CardDescription className="text-xs">
-                                        Net Income = Total Revenue - Total
-                                        Expense.
-                                    </CardDescription>
-                                </div>
-                                <Badge
-                                    variant={
-                                        isProfit ? 'secondary' : 'destructive'
-                                    }
+                <Card
+                    className={cn(
+                        'overflow-hidden border-t-4',
+                        isProfit ? 'border-emerald-500' : 'border-destructive',
+                    )}
+                >
+                    <CardHeader className="bg-muted/15">
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="space-y-1">
+                                <CardTitle className="text-base">
+                                    Summary
+                                </CardTitle>
+                                <CardDescription className="text-xs">
+                                    Net Income = Total Revenue - Total Expense.
+                                </CardDescription>
+                            </div>
+                            <Badge
+                                variant={isProfit ? 'secondary' : 'destructive'}
+                                className={cn(
+                                    isProfit &&
+                                        'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+                                )}
+                            >
+                                {isProfit ? 'Profit' : 'Loss'}
+                            </Badge>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="grid gap-4">
+                        <div className="grid gap-3 rounded-lg border bg-background p-4">
+                            <div className="flex items-center justify-between gap-4">
+                                <span className="text-sm text-muted-foreground">
+                                    Total Revenue
+                                </span>
+                                <span className="text-sm font-semibold tabular-nums">
+                                    {formatCurrency(totalRevenue)}
+                                </span>
+                            </div>
+                            <Separator />
+                            <div className="flex items-center justify-between gap-4">
+                                <span className="text-sm text-muted-foreground">
+                                    Total Expense
+                                </span>
+                                <span className="text-sm font-semibold tabular-nums">
+                                    {formatCurrency(totalExpense)}
+                                </span>
+                            </div>
+                            <Separator />
+                            <div className="flex items-center justify-between gap-4">
+                                <span className="text-sm text-muted-foreground">
+                                    Net Income
+                                </span>
+                                <span
                                     className={cn(
-                                        isProfit &&
-                                            'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+                                        'text-sm font-semibold tabular-nums',
+                                        isProfit
+                                            ? 'text-emerald-700 dark:text-emerald-300'
+                                            : 'text-destructive',
                                     )}
                                 >
-                                    {isProfit ? 'Profit' : 'Loss'}
-                                </Badge>
+                                    {formatCurrency(netIncome)}
+                                </span>
                             </div>
-                        </CardHeader>
-                        <CardContent className="grid gap-4">
-                            <div className="grid gap-3 rounded-lg border bg-background p-4">
-                                <div className="flex items-center justify-between gap-4">
-                                    <span className="text-sm text-muted-foreground">
-                                        Total Revenue
-                                    </span>
-                                    <span className="text-sm font-semibold tabular-nums">
-                                        {formatCurrency(totalRevenue)}
-                                    </span>
-                                </div>
-                                <Separator />
-                                <div className="flex items-center justify-between gap-4">
-                                    <span className="text-sm text-muted-foreground">
-                                        Total Expense
-                                    </span>
-                                    <span className="text-sm font-semibold tabular-nums">
-                                        {formatCurrency(totalExpense)}
-                                    </span>
-                                </div>
-                                <Separator />
-                                <div className="flex items-center justify-between gap-4">
-                                    <span className="text-sm text-muted-foreground">
-                                        Net Income
-                                    </span>
-                                    <span
-                                        className={cn(
-                                            'text-sm font-semibold tabular-nums',
-                                            isProfit
-                                                ? 'text-emerald-700 dark:text-emerald-300'
-                                                : 'text-destructive',
-                                        )}
-                                    >
-                                        {formatCurrency(netIncome)}
-                                    </span>
-                                </div>
-                                {!!comparisonYearId && (
-                                    <>
-                                        <Separator />
-                                        <div className="flex items-center justify-between gap-4">
-                                            <span className="text-sm text-muted-foreground">
-                                                Net Income (Comparison)
-                                            </span>
-                                            <span className="text-sm font-semibold text-muted-foreground tabular-nums">
-                                                {formatCurrency(
-                                                    netIncomeComparison,
-                                                )}
-                                            </span>
-                                        </div>
-                                        <Separator />
-                                        <div className="flex items-center justify-between gap-4">
-                                            <span className="text-sm text-muted-foreground">
-                                                Net Income Change
-                                            </span>
-                                            <span
-                                                className={cn(
-                                                    'text-sm font-semibold tabular-nums',
-                                                    getChangeTextClass(
-                                                        netIncomeChange,
-                                                    ),
-                                                )}
-                                            >
-                                                {formatCurrency(
+                            {!!comparisonYearId && (
+                                <>
+                                    <Separator />
+                                    <div className="flex items-center justify-between gap-4">
+                                        <span className="text-sm text-muted-foreground">
+                                            Net Income (Comparison)
+                                        </span>
+                                        <span className="text-sm font-semibold text-muted-foreground tabular-nums">
+                                            {formatCurrency(
+                                                netIncomeComparison,
+                                            )}
+                                        </span>
+                                    </div>
+                                    <Separator />
+                                    <div className="flex items-center justify-between gap-4">
+                                        <span className="text-sm text-muted-foreground">
+                                            Net Income Change
+                                        </span>
+                                        <span
+                                            className={cn(
+                                                'text-sm font-semibold tabular-nums',
+                                                getChangeTextClass(
                                                     netIncomeChange,
-                                                )}{' '}
-                                                ({netIncomeChangePct.toFixed(1)}
-                                                %)
-                                            </span>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
+                                                ),
+                                            )}
+                                        >
+                                            {formatCurrency(netIncomeChange)} (
+                                            {netIncomeChangePct.toFixed(1)}
+                                            %)
+                                        </span>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </FinancialReportPageShell>
     );
 }

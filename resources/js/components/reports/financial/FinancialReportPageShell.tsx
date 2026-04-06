@@ -149,7 +149,9 @@ export function FinancialReportPageShell({
                                         <SelectValue placeholder="Compare With..." />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="none">None</SelectItem>
+                                        <SelectItem value="none">
+                                            None
+                                        </SelectItem>
                                         {fiscalYears
                                             .filter(
                                                 (fiscalYear) =>

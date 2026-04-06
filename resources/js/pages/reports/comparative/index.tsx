@@ -1,12 +1,12 @@
 import {
+    FinancialReportPageShell,
+    useComparisonReportSearchParams,
+} from '@/components/reports/financial/FinancialReportPageShell';
+import {
     FinancialReportSection,
     type FinancialReportFiscalYear,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
-import {
-    FinancialReportPageShell,
-    useComparisonReportSearchParams,
-} from '@/components/reports/financial/FinancialReportPageShell';
 import { Badge } from '@/components/ui/badge';
 import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
@@ -47,8 +47,12 @@ interface ComparativeReportResponse {
 }
 
 export default function ComparativeReport() {
-    const { urlYearId, urlComparisonId, handleYearChange, handleComparisonChange } =
-        useComparisonReportSearchParams();
+    const {
+        urlYearId,
+        urlComparisonId,
+        handleYearChange,
+        handleComparisonChange,
+    } = useComparisonReportSearchParams();
 
     const { data, isLoading, error } = useQuery<ComparativeReportResponse>({
         queryKey: ['comparative-report', urlYearId, urlComparisonId],
@@ -106,7 +110,8 @@ export default function ComparativeReport() {
                 <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                     {selectedFiscalYear && (
                         <span>
-                            {selectedFiscalYear.name} • {selectedFiscalYear.status}
+                            {selectedFiscalYear.name} •{' '}
+                            {selectedFiscalYear.status}
                         </span>
                     )}
                     <Badge variant="outline">
@@ -117,63 +122,55 @@ export default function ComparativeReport() {
                 </div>
             }
         >
-                <div className="grid gap-6">
-                    <FinancialReportSection
-                        title="Assets"
-                        nodes={report.assets || []}
-                        total={report.totals?.assets || 0}
-                        comparisonTotal={report.totals?.comparison_assets}
-                        change={report.totals?.change_assets}
-                        changePercentage={
-                            report.totals?.change_percentage_assets
-                        }
-                        showComparison={!!comparisonYearId}
-                    />
-                    <FinancialReportSection
-                        title="Liabilities"
-                        nodes={report.liabilities || []}
-                        total={report.totals?.liabilities || 0}
-                        comparisonTotal={report.totals?.comparison_liabilities}
-                        change={report.totals?.change_liabilities}
-                        changePercentage={
-                            report.totals?.change_percentage_liabilities
-                        }
-                        showComparison={!!comparisonYearId}
-                    />
-                    <FinancialReportSection
-                        title="Equity"
-                        nodes={report.equity || []}
-                        total={report.totals?.equity || 0}
-                        comparisonTotal={report.totals?.comparison_equity}
-                        change={report.totals?.change_equity}
-                        changePercentage={
-                            report.totals?.change_percentage_equity
-                        }
-                        showComparison={!!comparisonYearId}
-                    />
-                    <FinancialReportSection
-                        title="Revenue"
-                        nodes={report.revenues || []}
-                        total={report.totals?.revenues || 0}
-                        comparisonTotal={report.totals?.comparison_revenues}
-                        change={report.totals?.change_revenues}
-                        changePercentage={
-                            report.totals?.change_percentage_revenues
-                        }
-                        showComparison={!!comparisonYearId}
-                    />
-                    <FinancialReportSection
-                        title="Expense"
-                        nodes={report.expenses || []}
-                        total={report.totals?.expenses || 0}
-                        comparisonTotal={report.totals?.comparison_expenses}
-                        change={report.totals?.change_expenses}
-                        changePercentage={
-                            report.totals?.change_percentage_expenses
-                        }
-                        showComparison={!!comparisonYearId}
-                    />
-                </div>
+            <div className="grid gap-6">
+                <FinancialReportSection
+                    title="Assets"
+                    nodes={report.assets || []}
+                    total={report.totals?.assets || 0}
+                    comparisonTotal={report.totals?.comparison_assets}
+                    change={report.totals?.change_assets}
+                    changePercentage={report.totals?.change_percentage_assets}
+                    showComparison={!!comparisonYearId}
+                />
+                <FinancialReportSection
+                    title="Liabilities"
+                    nodes={report.liabilities || []}
+                    total={report.totals?.liabilities || 0}
+                    comparisonTotal={report.totals?.comparison_liabilities}
+                    change={report.totals?.change_liabilities}
+                    changePercentage={
+                        report.totals?.change_percentage_liabilities
+                    }
+                    showComparison={!!comparisonYearId}
+                />
+                <FinancialReportSection
+                    title="Equity"
+                    nodes={report.equity || []}
+                    total={report.totals?.equity || 0}
+                    comparisonTotal={report.totals?.comparison_equity}
+                    change={report.totals?.change_equity}
+                    changePercentage={report.totals?.change_percentage_equity}
+                    showComparison={!!comparisonYearId}
+                />
+                <FinancialReportSection
+                    title="Revenue"
+                    nodes={report.revenues || []}
+                    total={report.totals?.revenues || 0}
+                    comparisonTotal={report.totals?.comparison_revenues}
+                    change={report.totals?.change_revenues}
+                    changePercentage={report.totals?.change_percentage_revenues}
+                    showComparison={!!comparisonYearId}
+                />
+                <FinancialReportSection
+                    title="Expense"
+                    nodes={report.expenses || []}
+                    total={report.totals?.expenses || 0}
+                    comparisonTotal={report.totals?.comparison_expenses}
+                    change={report.totals?.change_expenses}
+                    changePercentage={report.totals?.change_percentage_expenses}
+                    showComparison={!!comparisonYearId}
+                />
+            </div>
         </FinancialReportPageShell>
     );
 }
