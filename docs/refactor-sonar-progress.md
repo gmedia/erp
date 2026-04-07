@@ -35,17 +35,17 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: 3353 (turun 2991 dari baseline Batch F)
-- duplicated_blocks: 160 (turun 172 dari baseline Batch F)
-- duplicated_lines_density: 3.8 (turun 3.4 dari baseline Batch F)
-- ncloc: 71825 (turun 1048 dari baseline Batch F)
-- coverage: 0.0 (anomali snapshot remote terbaru; quality gate juga membaca `new_coverage 0.0`)
+- duplicated_lines: 3224 (turun 3120 dari baseline Batch F)
+- duplicated_blocks: 145 (turun 187 dari baseline Batch F)
+- duplicated_lines_density: 3.7 (turun 3.5 dari baseline Batch F)
+- ncloc: 71830 (turun 1043 dari baseline Batch F)
+- coverage: 88.2 (naik 1.2 dari baseline Batch F)
 
 ## Snapshot Analisa Sonar (2026-04-06, latest MCP)
 
 - Quality Gate: ERROR
-- Gate blocker utama: `new_coverage = 0.0` dan `new_duplicated_lines_density = 6.4`
-- Catatan: snapshot Sonar remote terbaru via MCP setelah commit `da3735c7` menunjukkan anomali pipeline coverage kembali (`coverage 0.0`, `new_coverage 0.0`), sementara blocker duplikasi new-code turun tipis ke `6.4`. Metrik duplikasi overall saat ini berada di `duplicated_lines 3353`, `duplicated_blocks 160`, `duplicated_lines_density 3.8`, dengan `ncloc 71825`. Karena remote `main` terus bergerak selama batch aktif, angka ini saya catat sebagai snapshot terbaru lintas wave, bukan diasumsikan murni delta dari helper purchasing filters saja. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, 4 spec Playwright pada wave audit-trail filters/detail, 7 spec Playwright pada wave report-column summaries, 11 spec Playwright pada wave report page shells, 13 passed + 1 skipped pada wave remaining report pages, 6 passed pada wave financial report shells, 6 passed pada wave manual financial tables, 4 passed pada wave audit trail pages, 2 passed pada wave inventory table pages, 30 passed + 2 skipped pada wave asset filter helpers, 27 passed pada wave shared list filter helpers, 18 passed pada wave catalog filter helpers, 42 passed pada wave transaction filter helpers, dan 25 passed pada wave purchasing filter helpers.
+- Gate blocker utama: `new_duplicated_lines_density = 6.1`
+- Catatan: snapshot Sonar remote terbaru via MCP setelah commit `3f31c236` sudah kembali menunjukkan coverage sehat (`coverage 88.2`, `new_coverage 90.1`), sementara blocker duplikasi new-code turun lagi ke `6.1`. Metrik duplikasi overall saat ini berada di `duplicated_lines 3224`, `duplicated_blocks 145`, `duplicated_lines_density 3.7`, dengan `ncloc 71830`. Karena remote `main` terus bergerak selama batch aktif, angka ini saya catat sebagai snapshot terbaru lintas wave, bukan diasumsikan murni delta dari helper purchasing report filters saja. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, 4 spec Playwright pada wave audit-trail filters/detail, 7 spec Playwright pada wave report-column summaries, 11 spec Playwright pada wave report page shells, 13 passed + 1 skipped pada wave remaining report pages, 6 passed pada wave financial report shells, 6 passed pada wave manual financial tables, 4 passed pada wave audit trail pages, 2 passed pada wave inventory table pages, 30 passed + 2 skipped pada wave asset filter helpers, 27 passed pada wave shared list filter helpers, 18 passed pada wave catalog filter helpers, 42 passed pada wave transaction filter helpers, 25 passed pada wave purchasing filter helpers, dan 3 passed pada wave purchasing report filters.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
@@ -390,6 +390,10 @@ Isi setelah batch selesai dan sebelum merge.
 	- Ekstrak helper frontend kecil untuk family filter purchasing dan stock movement yang masih mengulang pasangan async-select `supplier/warehouse`, konteks purchase request `branch/department/requester`, pasangan async-select `product/warehouse`, option array `currency`, `purchase request priority/status`, `movement type`, serta pasangan date field sederhana, sambil mempertahankan nama field, placeholder, urutan filter, dan perilaku query string per modul.
 	- Gelombang saat ini mencakup `resources/js/components/common/filters.tsx`, `resources/js/components/purchase-orders/PurchaseOrderFilters.tsx`, `resources/js/components/purchase-requests/PurchaseRequestFilters.tsx`, dan `resources/js/components/stock-movements/Filters.tsx`.
 	- Progress: helper shared `createSupplierWarehouseFilterFields()`, `createPurchaseRequestContextFilterFields()`, `createProductFilterField()`, dan `createProductWarehouseFilterFields()`, serta konstanta `currencyOptions`, `purchaseRequestPriorityOptions`, `purchaseRequestStatusOptions`, dan `stockMovementTypeOptions` kini menggantikan blok descriptor filter, option array, dan date field yang berulang tanpa ubah selector, placeholder, route, atau kontrak filter per halaman; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/purchase-orders/ tests/e2e/purchase-requests/ tests/e2e/stock-movements/` (25 passed). Snapshot Sonar pasca-wave: sudah dibaca setelah push `da3735c7`; MCP menampilkan `duplicated_lines 3353`, `duplicated_blocks 160`, `duplicated_lines_density 3.8`, `coverage 0.0`, `ncloc 71825`, `new_coverage 0.0`, dan `new_duplicated_lines_density 6.4`.
+83. Dedup purchasing report filter helpers. (in-progress)
+	- Ekstrak helper frontend kecil untuk family report purchasing yang masih mengulang scope filter `supplier/warehouse/product + date range`, select status goods receipt, select status purchase order, dan select `status_category`, sambil mempertahankan nama field, placeholder, urutan filter, dan perilaku query string per modul.
+	- Gelombang saat ini mencakup `resources/js/components/common/filters.tsx`, `resources/js/components/reports/goods-receipt/Filters.tsx`, `resources/js/components/reports/purchase-history/Filters.tsx`, dan `resources/js/components/reports/purchase-order-status/Filters.tsx`.
+	- Progress: helper shared `createPurchasingReportScopeFilterFields()`, `createGoodsReceiptStatusFilterField()`, `createPurchaseOrderStatusFilterField()`, dan `createPurchaseOrderStatusCategoryFilterField()`, serta konstanta `purchaseOrderStatusCategoryOptions` kini menggantikan blok filter scope dan option array yang berulang tanpa ubah selector, placeholder, route, atau kontrak filter per halaman; verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/goods-receipt-report/ tests/e2e/purchase-history-report/ tests/e2e/purchase-order-status-report/` (3 passed). Snapshot Sonar pasca-wave: snapshot MCP terbaru setelah push `ae9e1a6b` belum bergerak lagi dari analisis remote yang tersedia, sehingga sementara saya catat angka terbaru yang sudah terlihat di remote: `duplicated_lines 3224`, `duplicated_blocks 145`, `duplicated_lines_density 3.7`, `coverage 88.2`, `ncloc 71830`, `new_coverage 90.1`, dan `new_duplicated_lines_density 6.1`.
 
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
