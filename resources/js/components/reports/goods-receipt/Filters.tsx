@@ -1,7 +1,6 @@
 import {
-    createDateRangeFilterFields,
-    createSelectFilterField,
-    createSupplierWarehouseProductFilterFields,
+    createGoodsReceiptStatusFilterField,
+    createPurchasingReportScopeFilterFields,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
@@ -13,17 +12,7 @@ export function createGoodsReceiptReportFilterFields(): FieldDescriptor[] {
             'Search',
             'Search GR number, PO number, supplier, warehouse, or product...',
         ),
-        ...createSupplierWarehouseProductFilterFields(),
-        createSelectFilterField(
-            'status',
-            'Status',
-            [
-                { value: 'draft', label: 'Draft' },
-                { value: 'confirmed', label: 'Confirmed' },
-                { value: 'cancelled', label: 'Cancelled' },
-            ],
-            'All statuses',
-        ),
-        ...createDateRangeFilterFields(),
+        ...createPurchasingReportScopeFilterFields(),
+        createGoodsReceiptStatusFilterField(),
     ];
 }

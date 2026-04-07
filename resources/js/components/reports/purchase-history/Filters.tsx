@@ -1,9 +1,7 @@
 import {
-    createDateRangeFilterFields,
-    createSelectFilterField,
-    createSupplierWarehouseProductFilterFields,
+    createPurchaseOrderStatusFilterField,
+    createPurchasingReportScopeFilterFields,
     createTextFilterField,
-    purchaseOrderStatusOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
@@ -14,13 +12,7 @@ export function createPurchaseHistoryReportFilterFields(): FieldDescriptor[] {
             'Search',
             'Search PO number, supplier, warehouse, or product...',
         ),
-        ...createSupplierWarehouseProductFilterFields(),
-        createSelectFilterField(
-            'status',
-            'PO Status',
-            purchaseOrderStatusOptions,
-            'All statuses',
-        ),
-        ...createDateRangeFilterFields(),
+        ...createPurchasingReportScopeFilterFields(),
+        createPurchaseOrderStatusFilterField(),
     ];
 }

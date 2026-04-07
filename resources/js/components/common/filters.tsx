@@ -58,6 +58,12 @@ export const purchaseRequestStatusOptions: SelectOption[] = [
     { value: 'cancelled', label: 'Cancelled' },
 ];
 
+export const purchaseOrderStatusCategoryOptions: SelectOption[] = [
+    { value: 'outstanding', label: 'Outstanding' },
+    { value: 'partially_received', label: 'Partially Received' },
+    { value: 'closed', label: 'Closed' },
+];
+
 export const maintenanceTypeOptions: SelectOption[] = [
     { value: 'preventive', label: 'Preventive' },
     { value: 'corrective', label: 'Corrective' },
@@ -489,6 +495,48 @@ export function createSupplierWarehouseProductFilterFields(): FieldDescriptor[] 
             placeholder: 'All products',
         },
     ]);
+}
+
+export function createPurchasingReportScopeFilterFields(): FieldDescriptor[] {
+    return [
+        ...createSupplierWarehouseProductFilterFields(),
+        ...createDateRangeFilterFields(),
+    ];
+}
+
+export function createGoodsReceiptStatusFilterField(
+    placeholder = 'All statuses',
+): FieldDescriptor {
+    return createSelectFilterField(
+        'status',
+        'Status',
+        draftConfirmedCancelledStatusOptions,
+        placeholder,
+    );
+}
+
+export function createPurchaseOrderStatusFilterField(
+    name = 'status',
+    label = 'PO Status',
+    placeholder = 'All statuses',
+): FieldDescriptor {
+    return createSelectFilterField(
+        name,
+        label,
+        purchaseOrderStatusOptions,
+        placeholder,
+    );
+}
+
+export function createPurchaseOrderStatusCategoryFilterField(
+    placeholder = 'All categories',
+): FieldDescriptor {
+    return createSelectFilterField(
+        'status_category',
+        'Status Category',
+        purchaseOrderStatusCategoryOptions,
+        placeholder,
+    );
 }
 
 export function createSupplierWarehouseFilterFields(
