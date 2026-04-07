@@ -1,11 +1,11 @@
 'use client';
 
 import {
-    SummaryCell,
-    TextCell,
-    WarehouseSummaryCell,
+    createReportSummaryColumn,
+    createReportTextColumn,
+    createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
-import { createNumberColumn, createSortingHeader } from '@/utils/columns';
+import { createNumberColumn } from '@/utils/columns';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -35,30 +35,22 @@ function formatDate(value: string | null | undefined): string {
 
 export function createStockMonitorColumns(): ColumnDef<StockMonitorItem>[] {
     return [
-        {
+        createReportSummaryColumn<StockMonitorItem>({
             id: 'product_name',
             header: 'Product',
-            cell: ({ row }) => (
-                <SummaryCell
-                    primary={row.original.product?.name}
-                    secondary={row.original.product?.code}
-                />
-            ),
-        },
-        {
+            getPrimary: (item) => item.product?.name,
+            getSecondary: (item) => item.product?.code,
+        }),
+        createReportTextColumn<StockMonitorItem>({
             id: 'category_name',
             header: 'Category',
-            cell: ({ row }) => (
-                <TextCell value={row.original.product?.category?.name} />
-            ),
-        },
-        {
+            getValue: (item) => item.product?.category?.name,
+        }),
+        createReportWarehouseColumn<StockMonitorItem>({
             id: 'warehouse_name',
             header: 'Warehouse',
-            cell: ({ row }) => (
-                <WarehouseSummaryCell warehouse={row.original.warehouse} />
-            ),
-        },
+            getWarehouse: (item) => item.warehouse,
+        }),
         createNumberColumn<StockMonitorItem>({
             accessorKey: 'quantity_on_hand',
             label: 'Qty On Hand',
@@ -77,12 +69,11 @@ export function createStockMonitorColumns(): ColumnDef<StockMonitorItem>[] {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         }),
-        {
+        createReportTextColumn<StockMonitorItem>({
             accessorKey: 'moved_at',
-            ...createSortingHeader('Last Movement'),
-            cell: ({ row }) => (
-                <TextCell value={formatDate(row.original.moved_at)} />
-            ),
-        },
+            header: 'Last Movement',
+            getValue: (item) => formatDate(item.moved_at),
+            sortable: true,
+        }),
     ];
 }

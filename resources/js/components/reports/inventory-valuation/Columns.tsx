@@ -1,14 +1,13 @@
 'use client';
 
 import {
-    SummaryCell,
-    TextCell,
-    WarehouseSummaryCell,
+    createReportSummaryColumn,
+    createReportTextColumn,
+    createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
 import {
     createCurrencyColumn,
     createNumberColumn,
-    createSortingHeader,
 } from '@/utils/columns';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -39,37 +38,27 @@ function formatDate(value: string | null | undefined): string {
 }
 
 export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [
-    {
+    createReportSummaryColumn<InventoryValuationItem>({
         id: 'product_name',
         header: 'Product',
-        cell: ({ row }) => (
-            <SummaryCell
-                primary={row.original.product?.name}
-                secondary={row.original.product?.code}
-            />
-        ),
-    },
-    {
+        getPrimary: (item) => item.product?.name,
+        getSecondary: (item) => item.product?.code,
+    }),
+    createReportTextColumn<InventoryValuationItem>({
         id: 'category_name',
         header: 'Category',
-        cell: ({ row }) => (
-            <TextCell value={row.original.product?.category?.name} />
-        ),
-    },
-    {
+        getValue: (item) => item.product?.category?.name,
+    }),
+    createReportTextColumn<InventoryValuationItem>({
         id: 'unit_name',
         header: 'Unit',
-        cell: ({ row }) => (
-            <TextCell value={row.original.product?.unit?.name} />
-        ),
-    },
-    {
+        getValue: (item) => item.product?.unit?.name,
+    }),
+    createReportWarehouseColumn<InventoryValuationItem>({
         id: 'warehouse_name',
         header: 'Warehouse',
-        cell: ({ row }) => (
-            <WarehouseSummaryCell warehouse={row.original.warehouse} />
-        ),
-    },
+        getWarehouse: (item) => item.warehouse,
+    }),
     createNumberColumn<InventoryValuationItem>({
         accessorKey: 'quantity_on_hand',
         label: 'Qty On Hand',
@@ -94,11 +83,10 @@ export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [
         maximumFractionDigits: 2,
         className: 'text-right',
     }),
-    {
+    createReportTextColumn<InventoryValuationItem>({
         accessorKey: 'moved_at',
-        ...createSortingHeader('Last Movement'),
-        cell: ({ row }) => (
-            <TextCell value={formatDate(row.original.moved_at)} />
-        ),
-    },
+        header: 'Last Movement',
+        getValue: (item) => formatDate(item.moved_at),
+        sortable: true,
+    }),
 ];

@@ -1,15 +1,14 @@
 'use client';
 
 import {
-    StatusBadgeCell,
-    SummaryCell,
-    TextCell,
-    WarehouseSummaryCell,
+    createReportStatusBadgeColumn,
+    createReportSummaryColumn,
+    createReportTextColumn,
+    createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
 import {
     createCurrencyColumn,
     createNumberColumn,
-    createSortingHeader,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -51,47 +50,37 @@ function formatDate(value: string | null | undefined): string {
 
 export const purchaseHistoryReportColumns: ColumnDef<PurchaseHistoryReportItem>[] =
     [
-        {
+        createReportSummaryColumn<PurchaseHistoryReportItem>({
             accessorKey: 'purchase_order.po_number',
-            ...createSortingHeader('PO Number'),
-            cell: ({ row }) => (
-                <SummaryCell
-                    primary={row.original.purchase_order?.po_number}
-                    secondary={formatDate(
-                        row.original.purchase_order?.order_date,
-                    )}
-                />
-            ),
-        },
-        {
+            header: 'PO Number',
+            getPrimary: (item) => item.purchase_order?.po_number,
+            getSecondary: (item) => formatDate(item.purchase_order?.order_date),
+            sortable: true,
+        }),
+        createReportTextColumn<PurchaseHistoryReportItem>({
             accessorKey: 'supplier.name',
-            ...createSortingHeader('Supplier'),
-            cell: ({ row }) => <TextCell value={row.original.supplier?.name} />,
-        },
-        {
+            header: 'Supplier',
+            getValue: (item) => item.supplier?.name,
+            sortable: true,
+        }),
+        createReportSummaryColumn<PurchaseHistoryReportItem>({
             accessorKey: 'product.name',
-            ...createSortingHeader('Product'),
-            cell: ({ row }) => (
-                <SummaryCell
-                    primary={row.original.product?.name}
-                    secondary={row.original.product?.code}
-                />
-            ),
-        },
-        {
+            header: 'Product',
+            getPrimary: (item) => item.product?.name,
+            getSecondary: (item) => item.product?.code,
+            sortable: true,
+        }),
+        createReportWarehouseColumn<PurchaseHistoryReportItem>({
             accessorKey: 'warehouse.name',
-            ...createSortingHeader('Warehouse'),
-            cell: ({ row }) => (
-                <WarehouseSummaryCell warehouse={row.original.warehouse} />
-            ),
-        },
-        {
+            header: 'Warehouse',
+            getWarehouse: (item) => item.warehouse,
+            sortable: true,
+        }),
+        createReportStatusBadgeColumn<PurchaseHistoryReportItem>({
             accessorKey: 'purchase_order.status',
-            ...createSortingHeader('Status'),
-            cell: ({ row }) => (
-                <StatusBadgeCell value={row.original.purchase_order?.status} />
-            ),
-        },
+            header: 'Status',
+            getValue: (item) => item.purchase_order?.status,
+        }),
         createNumberColumn<PurchaseHistoryReportItem>({
             accessorKey: 'ordered_quantity',
             label: 'Ordered Qty',
@@ -116,13 +105,12 @@ export const purchaseHistoryReportColumns: ColumnDef<PurchaseHistoryReportItem>[
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
         }),
-        {
+        createReportTextColumn<PurchaseHistoryReportItem>({
             accessorKey: 'goods_receipt.last_receipt_date',
-            ...createSortingHeader('Last Receipt'),
-            cell: ({ row }) => (
-                <TextCell value={formatDate(row.original.last_receipt_date)} />
-            ),
-        },
+            header: 'Last Receipt',
+            getValue: (item) => formatDate(item.last_receipt_date),
+            sortable: true,
+        }),
         createCurrencyColumn<PurchaseHistoryReportItem>({
             accessorKey: 'total_purchase_value',
             label: 'Total Value',
@@ -131,15 +119,11 @@ export const purchaseHistoryReportColumns: ColumnDef<PurchaseHistoryReportItem>[
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         }),
-        {
+        createReportTextColumn<PurchaseHistoryReportItem>({
             accessorKey: 'purchase_order.expected_delivery_date',
-            ...createSortingHeader('Expected Delivery'),
-            cell: ({ row }) => (
-                <TextCell
-                    value={formatDate(
-                        row.original.purchase_order?.expected_delivery_date,
-                    )}
-                />
-            ),
-        },
+            header: 'Expected Delivery',
+            getValue: (item) =>
+                formatDate(item.purchase_order?.expected_delivery_date),
+            sortable: true,
+        }),
     ];
