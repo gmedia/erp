@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { createSortingHeader } from '@/utils/columns';
-import type { ColumnDef } from '@tanstack/react-table';
+import type { CellContext, ColumnDef } from '@tanstack/react-table';
 import type { ComponentProps, ReactNode } from 'react';
 
 type DisplayValue = ReactNode | null | undefined;
@@ -131,74 +131,102 @@ export function StatusBadgeCell({
 export function createReportSummaryColumn<TData>(
     options: SummaryColumnOptions<TData>,
 ): ColumnDef<TData> {
-    const column: ColumnDef<TData> = {
-        ...(options.id ? { id: options.id } : {}),
-        ...(options.accessorKey ? { accessorKey: options.accessorKey } : {}),
-        header: options.header,
-        cell: ({ row }) => (
-            <SummaryCell
-                primary={options.getPrimary(row.original)}
-                secondary={options.getSecondary(row.original)}
-            />
-        ),
-    };
+    const cell = ({ row }: CellContext<TData, unknown>) => (
+        <SummaryCell
+            primary={options.getPrimary(row.original)}
+            secondary={options.getSecondary(row.original)}
+        />
+    );
 
-    if (!options.sortable) {
-        return column;
+    if (options.sortable && options.accessorKey) {
+        return {
+            accessorKey: options.accessorKey,
+            cell,
+            ...createSortingHeader(options.header),
+        };
+    }
+
+    if (options.accessorKey) {
+        return {
+            accessorKey: options.accessorKey,
+            enableSorting: false,
+            header: options.header,
+            cell,
+        };
     }
 
     return {
-        ...column,
-        ...createSortingHeader(options.header),
+        id: options.id ?? options.header.toLowerCase().replaceAll(/\s+/g, '_'),
+        enableSorting: false,
+        header: options.header,
+        cell,
     };
 }
 
 export function createReportTextColumn<TData>(
     options: TextColumnOptions<TData>,
 ): ColumnDef<TData> {
-    const column: ColumnDef<TData> = {
-        ...(options.id ? { id: options.id } : {}),
-        ...(options.accessorKey ? { accessorKey: options.accessorKey } : {}),
-        header: options.header,
-        cell: ({ row }) => (
-            <TextCell
-                value={options.getValue(row.original)}
-                className={options.className}
-            />
-        ),
-    };
+    const cell = ({ row }: CellContext<TData, unknown>) => (
+        <TextCell
+            value={options.getValue(row.original)}
+            className={options.className}
+        />
+    );
 
-    if (!options.sortable) {
-        return column;
+    if (options.sortable && options.accessorKey) {
+        return {
+            accessorKey: options.accessorKey,
+            cell,
+            ...createSortingHeader(options.header),
+        };
+    }
+
+    if (options.accessorKey) {
+        return {
+            accessorKey: options.accessorKey,
+            enableSorting: false,
+            header: options.header,
+            cell,
+        };
     }
 
     return {
-        ...column,
-        ...createSortingHeader(options.header),
+        id: options.id ?? options.header.toLowerCase().replaceAll(/\s+/g, '_'),
+        enableSorting: false,
+        header: options.header,
+        cell,
     };
 }
 
 export function createReportWarehouseColumn<TData>(
     options: WarehouseColumnOptions<TData>,
 ): ColumnDef<TData> {
-    const column: ColumnDef<TData> = {
-        ...(options.id ? { id: options.id } : {}),
-        ...(options.accessorKey ? { accessorKey: options.accessorKey } : {}),
-        header: options.header,
-        cell: ({ row }) => (
-            <WarehouseSummaryCell
-                warehouse={options.getWarehouse(row.original)}
-            />
-        ),
-    };
+    const cell = ({ row }: CellContext<TData, unknown>) => (
+        <WarehouseSummaryCell warehouse={options.getWarehouse(row.original)} />
+    );
 
-    if (!options.sortable) {
-        return column;
+    if (options.sortable && options.accessorKey) {
+        return {
+            accessorKey: options.accessorKey,
+            cell,
+            ...createSortingHeader(options.header),
+        };
+    }
+
+    if (options.accessorKey) {
+        return {
+            accessorKey: options.accessorKey,
+            enableSorting: false,
+            header: options.header,
+            cell,
+        };
     }
 
     return {
-        ...column,
-        ...createSortingHeader(options.header),
+        id: options.id ?? options.header.toLowerCase().replaceAll(/\s+/g, '_'),
+        enableSorting: false,
+        header: options.header,
+        cell,
     };
 }
 
@@ -208,7 +236,7 @@ export function createReportStatusBadgeColumn<TData>(
     return {
         accessorKey: options.accessorKey,
         ...createSortingHeader(options.header),
-        cell: ({ row }) => (
+        cell: ({ row }: CellContext<TData, unknown>) => (
             <StatusBadgeCell
                 value={options.getValue(row.original)}
                 variant={options.getVariant?.(row.original)}
