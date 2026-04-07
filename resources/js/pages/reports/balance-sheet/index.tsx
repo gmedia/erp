@@ -55,13 +55,9 @@ export default function BalanceSheet() {
         handleComparisonChange,
     } = useComparisonReportSearchParams();
 
-    const { data, isLoading, error } =
-        useComparisonFinancialReportQuery<BalanceSheetResponse['report']>(
-            'balance-sheet',
-            'balance-sheet',
-            urlYearId,
-            urlComparisonId,
-        );
+    const { data, isLoading, error } = useComparisonFinancialReportQuery<
+        BalanceSheetResponse['report']
+    >('balance-sheet', 'balance-sheet', urlYearId, urlComparisonId);
 
     const fiscalYears = data?.fiscalYears || [];
     const selectedYearId = data?.selectedYearId || 0;

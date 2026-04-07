@@ -31,12 +31,9 @@ interface CashFlowResponse {
 export default function CashFlow() {
     const { urlYearId, handleYearChange } = useSingleYearReportSearchParams();
 
-    const { data, isLoading, error } =
-        useSingleYearFinancialReportQuery<CashFlowResponse['report']>(
-            'cash-flow',
-            'cash-flow',
-            urlYearId,
-        );
+    const { data, isLoading, error } = useSingleYearFinancialReportQuery<
+        CashFlowResponse['report']
+    >('cash-flow', 'cash-flow', urlYearId);
 
     const fiscalYears = Array.isArray(data?.fiscalYears)
         ? data.fiscalYears

@@ -54,13 +54,9 @@ export default function ComparativeReport() {
         handleComparisonChange,
     } = useComparisonReportSearchParams();
 
-    const { data, isLoading, error } =
-        useComparisonFinancialReportQuery<ComparativeReportResponse['report']>(
-            'comparative-report',
-            'comparative',
-            urlYearId,
-            urlComparisonId,
-        );
+    const { data, isLoading, error } = useComparisonFinancialReportQuery<
+        ComparativeReportResponse['report']
+    >('comparative-report', 'comparative', urlYearId, urlComparisonId);
 
     const fiscalYears = data?.fiscalYears || [];
     const selectedYearId = data?.selectedYearId || 0;

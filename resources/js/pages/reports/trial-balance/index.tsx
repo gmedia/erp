@@ -31,12 +31,9 @@ interface TrialBalanceResponse {
 export default function TrialBalance() {
     const { urlYearId, handleYearChange } = useSingleYearReportSearchParams();
 
-    const { data, isLoading, error } =
-        useSingleYearFinancialReportQuery<TrialBalanceResponse['report']>(
-            'trial-balance',
-            'trial-balance',
-            urlYearId,
-        );
+    const { data, isLoading, error } = useSingleYearFinancialReportQuery<
+        TrialBalanceResponse['report']
+    >('trial-balance', 'trial-balance', urlYearId);
 
     const fiscalYears = Array.isArray(data?.fiscalYears)
         ? data.fiscalYears

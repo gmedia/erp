@@ -5,9 +5,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
-import AppLayout from '@/layouts/app-layout';
 import type { ReactNode } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';

@@ -53,13 +53,9 @@ export default function IncomeStatement() {
         handleComparisonChange,
     } = useComparisonReportSearchParams();
 
-    const { data, isLoading, error } =
-        useComparisonFinancialReportQuery<IncomeStatementResponse['report']>(
-            'income-statement',
-            'income-statement',
-            urlYearId,
-            urlComparisonId,
-        );
+    const { data, isLoading, error } = useComparisonFinancialReportQuery<
+        IncomeStatementResponse['report']
+    >('income-statement', 'income-statement', urlYearId, urlComparisonId);
 
     const fiscalYears = data?.fiscalYears || [];
     const selectedYearId = data?.selectedYearId || 0;
