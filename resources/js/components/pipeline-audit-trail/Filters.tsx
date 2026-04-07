@@ -1,6 +1,6 @@
 import {
-    createAsyncSelectFilterField,
     createDateRangeFilterFields,
+    createPipelineFilterField,
     createTextFilterField,
     createUserFilterField,
     type FieldDescriptor,
@@ -19,12 +19,7 @@ export function createPipelineAuditTrailFilterFields(): FieldDescriptor[] {
             'Entity Type',
             'e.g. Asset, Employee',
         ),
-        createAsyncSelectFilterField(
-            'pipeline_id',
-            'Pipeline',
-            '/api/pipelines',
-            'Select a pipeline',
-        ),
+        createPipelineFilterField(),
         createUserFilterField('performed_by', 'Performed By'),
         ...createDateRangeFilterFields(),
     ];

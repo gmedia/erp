@@ -39,8 +39,9 @@ export function ApprovalDelegationFilters() {
 
 import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
-    createAsyncSelectFilterField,
-    createSelectFilterField,
+    createApprovalDelegationUserFilterFields,
+    createBinaryStatusFilterField,
+    createDateFilterFields,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
@@ -48,36 +49,25 @@ import {
 export function createApprovalDelegationFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField('search', 'Search', 'Search reason...'),
-        createAsyncSelectFilterField(
-            'delegator_user_id',
-            'Delegator',
-            '/api/users',
-            'Select delegator',
-        ),
-        createAsyncSelectFilterField(
-            'delegate_user_id',
-            'Delegate',
-            '/api/users',
-            'Select delegate',
-        ),
-        createSelectFilterField(
+        ...createApprovalDelegationUserFilterFields(),
+        createBinaryStatusFilterField(
             'is_active',
             'Status',
-            [
-                { value: 'true', label: 'Active' },
-                { value: 'false', label: 'Inactive' },
-            ],
+            'true',
+            'false',
             'Select status',
         ),
-        {
-            name: 'start_date_from',
-            label: 'Start Date From',
-            component: <FilterDatePicker placeholder="Start Date From" />,
-        },
-        {
-            name: 'start_date_to',
-            label: 'Start Date To',
-            component: <FilterDatePicker placeholder="Start Date To" />,
-        },
+        ...createDateFilterFields([
+            {
+                name: 'start_date_from',
+                label: 'Start Date From',
+                placeholder: 'Start Date From',
+            },
+            {
+                name: 'start_date_to',
+                label: 'Start Date To',
+                placeholder: 'Start Date To',
+            },
+        ]),
     ];
 }

@@ -82,6 +82,19 @@ export const journalEntryStatusOptions: SelectOption[] = [
     { value: 'void', label: 'Void' },
 ];
 
+export const approvalAuditEventOptions: SelectOption[] = [
+    { value: 'submitted', label: 'Submitted' },
+    { value: 'step_approved', label: 'Step Approved' },
+    { value: 'step_rejected', label: 'Step Rejected' },
+    { value: 'step_skipped', label: 'Step Skipped' },
+    { value: 'auto_approved', label: 'Auto Approved' },
+    { value: 'escalated', label: 'Escalated' },
+    { value: 'delegated', label: 'Delegated' },
+    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'resubmitted', label: 'Resubmitted' },
+    { value: 'completed', label: 'Completed' },
+];
+
 export const maintenanceTypeOptions: SelectOption[] = [
     { value: 'preventive', label: 'Preventive' },
     { value: 'corrective', label: 'Corrective' },
@@ -613,6 +626,43 @@ export function createJournalEntryStatusFilterField(
         journalEntryStatusOptions,
         placeholder,
     );
+}
+
+export function createApprovalAuditEventFilterField(
+    placeholder = 'Select Event',
+): FieldDescriptor {
+    return createSelectFilterField(
+        'event',
+        'Event',
+        approvalAuditEventOptions,
+        placeholder,
+    );
+}
+
+export function createPipelineFilterField(
+    placeholder = 'Select a pipeline',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'pipeline_id',
+        'Pipeline',
+        '/api/pipelines',
+        placeholder,
+    );
+}
+
+export function createApprovalDelegationUserFilterFields(): FieldDescriptor[] {
+    return [
+        createUserFilterField(
+            'delegator_user_id',
+            'Delegator',
+            'Select delegator',
+        ),
+        createUserFilterField(
+            'delegate_user_id',
+            'Delegate',
+            'Select delegate',
+        ),
+    ];
 }
 
 export function createSupplierWarehouseFilterFields(
