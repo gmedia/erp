@@ -1,4 +1,5 @@
 import {
+    createBinaryStatusFilterField,
     createSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
@@ -18,13 +19,11 @@ export function createPipelineFilterFields(): FieldDescriptor[] {
             [...APPROVABLE_TYPE_OPTIONS],
             'All Entities',
         ),
-        createSelectFilterField(
+        createBinaryStatusFilterField(
             'is_active',
             'Status',
-            [
-                { value: 'true', label: 'Active' },
-                { value: 'false', label: 'Inactive' },
-            ],
+            'true',
+            'false',
             'All Statuses',
         ),
     ];

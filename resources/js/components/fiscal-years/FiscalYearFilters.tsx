@@ -1,7 +1,7 @@
 'use client';
 
 import {
-    createSelectFilterField,
+    createFiscalYearStatusFilterField,
     createTextFilterField,
     FieldDescriptor,
 } from '@/components/common/filters';
@@ -9,15 +9,6 @@ import {
 export function createFiscalYearFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField('search', 'Search', 'Search fiscal years...'),
-        createSelectFilterField(
-            'status',
-            'Status',
-            [
-                { label: 'Open', value: 'open' },
-                { label: 'Closed', value: 'closed' },
-                { label: 'Locked', value: 'locked' },
-            ],
-            'All Statuses',
-        ),
+        createFiscalYearStatusFilterField(),
     ];
 }

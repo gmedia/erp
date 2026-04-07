@@ -1,16 +1,12 @@
 'use client';
 
 import {
+    createBinaryStatusFilterField,
     createSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
 import { APPROVABLE_TYPE_OPTIONS } from '@/constants/model-options';
-
-const statusOptions = [
-    { label: 'Active', value: '1' },
-    { label: 'Inactive', value: '0' },
-];
 
 export function createApprovalFlowFilterFields(): FieldDescriptor[] {
     return [
@@ -21,10 +17,11 @@ export function createApprovalFlowFilterFields(): FieldDescriptor[] {
             [...APPROVABLE_TYPE_OPTIONS],
             'All Types',
         ),
-        createSelectFilterField(
+        createBinaryStatusFilterField(
             'is_active',
             'Status',
-            statusOptions,
+            '1',
+            '0',
             'All Statuses',
         ),
     ];

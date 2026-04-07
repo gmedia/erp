@@ -64,6 +64,24 @@ export const purchaseOrderStatusCategoryOptions: SelectOption[] = [
     { value: 'closed', label: 'Closed' },
 ];
 
+export const fiscalYearStatusOptions: SelectOption[] = [
+    { label: 'Open', value: 'open' },
+    { label: 'Closed', value: 'closed' },
+    { label: 'Locked', value: 'locked' },
+];
+
+export const coaVersionStatusOptions: SelectOption[] = [
+    { label: 'Draft', value: 'draft' },
+    { label: 'Active', value: 'active' },
+    { label: 'Archived', value: 'archived' },
+];
+
+export const journalEntryStatusOptions: SelectOption[] = [
+    { value: 'draft', label: 'Draft' },
+    { value: 'posted', label: 'Posted' },
+    { value: 'void', label: 'Void' },
+];
+
 export const maintenanceTypeOptions: SelectOption[] = [
     { value: 'preventive', label: 'Preventive' },
     { value: 'corrective', label: 'Corrective' },
@@ -540,6 +558,59 @@ export function createPurchaseOrderStatusCategoryFilterField(
         'status_category',
         'Status Category',
         purchaseOrderStatusCategoryOptions,
+        placeholder,
+    );
+}
+
+export function createBinaryStatusFilterField(
+    name = 'status',
+    label = 'Status',
+    activeValue = 'active',
+    inactiveValue = 'inactive',
+    placeholder = 'All Statuses',
+    activeLabel = 'Active',
+    inactiveLabel = 'Inactive',
+): FieldDescriptor {
+    return createSelectFilterField(
+        name,
+        label,
+        [
+            { label: activeLabel, value: activeValue },
+            { label: inactiveLabel, value: inactiveValue },
+        ],
+        placeholder,
+    );
+}
+
+export function createFiscalYearStatusFilterField(
+    placeholder = 'All Statuses',
+): FieldDescriptor {
+    return createSelectFilterField(
+        'status',
+        'Status',
+        fiscalYearStatusOptions,
+        placeholder,
+    );
+}
+
+export function createCoaVersionStatusFilterField(
+    placeholder = 'All Statuses',
+): FieldDescriptor {
+    return createSelectFilterField(
+        'status',
+        'Status',
+        coaVersionStatusOptions,
+        placeholder,
+    );
+}
+
+export function createJournalEntryStatusFilterField(
+    placeholder = 'Select status',
+): FieldDescriptor {
+    return createSelectFilterField(
+        'status',
+        'Status',
+        journalEntryStatusOptions,
         placeholder,
     );
 }
