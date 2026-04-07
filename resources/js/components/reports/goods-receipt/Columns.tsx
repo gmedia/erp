@@ -1,15 +1,14 @@
 'use client';
 
 import {
-    StatusBadgeCell,
-    SummaryCell,
-    TextCell,
-    WarehouseSummaryCell,
+    createReportStatusBadgeColumn,
+    createReportSummaryColumn,
+    createReportTextColumn,
+    createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
 import {
     createCurrencyColumn,
     createNumberColumn,
-    createSortingHeader,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -46,42 +45,36 @@ function formatDate(value: string | null | undefined): string {
 }
 
 export const goodsReceiptReportColumns: ColumnDef<GoodsReceiptReportItem>[] = [
-    {
+    createReportSummaryColumn<GoodsReceiptReportItem>({
         accessorKey: 'goods_receipt.gr_number',
-        ...createSortingHeader('GR Number'),
-        cell: ({ row }) => (
-            <SummaryCell
-                primary={row.original.goods_receipt?.gr_number}
-                secondary={formatDate(row.original.goods_receipt?.receipt_date)}
-            />
-        ),
-    },
-    {
+        header: 'GR Number',
+        getPrimary: (item) => item.goods_receipt?.gr_number,
+        getSecondary: (item) => formatDate(item.goods_receipt?.receipt_date),
+        sortable: true,
+    }),
+    createReportTextColumn<GoodsReceiptReportItem>({
         accessorKey: 'purchase_order.po_number',
-        ...createSortingHeader('PO Number'),
-        cell: ({ row }) => (
-            <TextCell value={row.original.purchase_order?.po_number} />
-        ),
-    },
-    {
+        header: 'PO Number',
+        getValue: (item) => item.purchase_order?.po_number,
+        sortable: true,
+    }),
+    createReportTextColumn<GoodsReceiptReportItem>({
         accessorKey: 'supplier.name',
-        ...createSortingHeader('Supplier'),
-        cell: ({ row }) => <TextCell value={row.original.supplier?.name} />,
-    },
-    {
+        header: 'Supplier',
+        getValue: (item) => item.supplier?.name,
+        sortable: true,
+    }),
+    createReportWarehouseColumn<GoodsReceiptReportItem>({
         accessorKey: 'warehouse.name',
-        ...createSortingHeader('Warehouse'),
-        cell: ({ row }) => (
-            <WarehouseSummaryCell warehouse={row.original.warehouse} />
-        ),
-    },
-    {
+        header: 'Warehouse',
+        getWarehouse: (item) => item.warehouse,
+        sortable: true,
+    }),
+    createReportStatusBadgeColumn<GoodsReceiptReportItem>({
         accessorKey: 'goods_receipt.status',
-        ...createSortingHeader('Status'),
-        cell: ({ row }) => (
-            <StatusBadgeCell value={row.original.goods_receipt?.status} />
-        ),
-    },
+        header: 'Status',
+        getValue: (item) => item.goods_receipt?.status,
+    }),
     createNumberColumn<GoodsReceiptReportItem>({
         accessorKey: 'item_count',
         label: 'Item Count',

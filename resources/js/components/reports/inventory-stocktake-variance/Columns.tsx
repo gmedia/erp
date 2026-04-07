@@ -1,6 +1,10 @@
 'use client';
 
-import { createNumberColumn, createSortingHeader } from '@/utils/columns';
+import {
+    createReportSummaryColumn,
+    createReportTextColumn,
+} from '@/components/common/ReportColumns';
+import { createNumberColumn } from '@/utils/columns';
 import {
     formatDateByRegionalSettings,
     formatDateTimeByRegionalSettings,
@@ -40,64 +44,44 @@ function formatDate(value: string | null | undefined): string {
 
 export const inventoryStocktakeVarianceColumns: ColumnDef<InventoryStocktakeVarianceReportItem>[] =
     [
-        {
+        createReportTextColumn<InventoryStocktakeVarianceReportItem>({
             id: 'stocktake_number',
             accessorKey: 'stocktake.stocktake_number',
-            ...createSortingHeader('Stocktake No.'),
-            cell: ({ row }) => (
-                <div>{row.original.stocktake?.stocktake_number ?? '-'}</div>
-            ),
-        },
-        {
+            header: 'Stocktake No.',
+            getValue: (item) => item.stocktake?.stocktake_number,
+            sortable: true,
+        }),
+        createReportTextColumn<InventoryStocktakeVarianceReportItem>({
             id: 'stocktake_date',
             accessorKey: 'stocktake.stocktake_date',
-            ...createSortingHeader('Stocktake Date'),
-            cell: ({ row }) => (
-                <div>
-                    {formatDateByRegionalSettings(
-                        row.original.stocktake?.stocktake_date,
-                    )}
-                </div>
-            ),
-        },
-        {
+            header: 'Stocktake Date',
+            getValue: (item) =>
+                formatDateByRegionalSettings(item.stocktake?.stocktake_date),
+            sortable: true,
+        }),
+        createReportSummaryColumn<InventoryStocktakeVarianceReportItem>({
             id: 'product_name',
             accessorKey: 'product.name',
-            ...createSortingHeader('Product'),
-            cell: ({ row }) => (
-                <div className="space-y-0.5">
-                    <div className="font-medium">
-                        {row.original.product?.name ?? '-'}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                        {row.original.product?.code ?? '-'}
-                    </div>
-                </div>
-            ),
-        },
-        {
+            header: 'Product',
+            getPrimary: (item) => item.product?.name,
+            getSecondary: (item) => item.product?.code,
+            sortable: true,
+        }),
+        createReportTextColumn<InventoryStocktakeVarianceReportItem>({
             id: 'category_name',
             accessorKey: 'product.category.name',
-            ...createSortingHeader('Category'),
-            cell: ({ row }) => (
-                <div>{row.original.product?.category?.name ?? '-'}</div>
-            ),
-        },
-        {
+            header: 'Category',
+            getValue: (item) => item.product?.category?.name,
+            sortable: true,
+        }),
+        createReportSummaryColumn<InventoryStocktakeVarianceReportItem>({
             id: 'warehouse_name',
             accessorKey: 'warehouse.name',
-            ...createSortingHeader('Warehouse'),
-            cell: ({ row }) => (
-                <div className="space-y-0.5">
-                    <div className="font-medium">
-                        {row.original.warehouse?.name ?? '-'}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                        {row.original.warehouse?.branch?.name ?? '-'}
-                    </div>
-                </div>
-            ),
-        },
+            header: 'Warehouse',
+            getPrimary: (item) => item.warehouse?.name,
+            getSecondary: (item) => item.warehouse?.branch?.name,
+            sortable: true,
+        }),
         createNumberColumn<InventoryStocktakeVarianceReportItem>({
             accessorKey: 'system_quantity',
             label: 'System Qty',
@@ -116,18 +100,19 @@ export const inventoryStocktakeVarianceColumns: ColumnDef<InventoryStocktakeVari
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         }),
-        {
+        createReportTextColumn<InventoryStocktakeVarianceReportItem>({
             id: 'result',
             accessorKey: 'result',
-            ...createSortingHeader('Result'),
-            cell: ({ row }) => (
-                <div className="capitalize">{row.original.result ?? '-'}</div>
-            ),
-        },
-        {
+            header: 'Result',
+            getValue: (item) => item.result,
+            className: 'capitalize',
+            sortable: true,
+        }),
+        createReportTextColumn<InventoryStocktakeVarianceReportItem>({
             id: 'counted_at',
             accessorKey: 'counted_at',
-            ...createSortingHeader('Counted At'),
-            cell: ({ row }) => <div>{formatDate(row.original.counted_at)}</div>,
-        },
+            header: 'Counted At',
+            getValue: (item) => formatDate(item.counted_at),
+            sortable: true,
+        }),
     ];

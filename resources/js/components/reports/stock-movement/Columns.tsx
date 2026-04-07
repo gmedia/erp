@@ -1,11 +1,11 @@
 'use client';
 
 import {
-    SummaryCell,
-    TextCell,
-    WarehouseSummaryCell,
+    createReportSummaryColumn,
+    createReportTextColumn,
+    createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
-import { createNumberColumn, createSortingHeader } from '@/utils/columns';
+import { createNumberColumn } from '@/utils/columns';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -34,30 +34,25 @@ function formatDate(value: string | null | undefined): string {
 
 export const stockMovementReportColumns: ColumnDef<StockMovementReportItem>[] =
     [
-        {
+        createReportSummaryColumn<StockMovementReportItem>({
             accessorKey: 'product.name',
-            ...createSortingHeader('Product'),
-            cell: ({ row }) => (
-                <SummaryCell
-                    primary={row.original.product?.name}
-                    secondary={row.original.product?.code}
-                />
-            ),
-        },
-        {
+            header: 'Product',
+            getPrimary: (item) => item.product?.name,
+            getSecondary: (item) => item.product?.code,
+            sortable: true,
+        }),
+        createReportTextColumn<StockMovementReportItem>({
             accessorKey: 'product.category.name',
-            ...createSortingHeader('Category'),
-            cell: ({ row }) => (
-                <TextCell value={row.original.product?.category?.name} />
-            ),
-        },
-        {
+            header: 'Category',
+            getValue: (item) => item.product?.category?.name,
+            sortable: true,
+        }),
+        createReportWarehouseColumn<StockMovementReportItem>({
             accessorKey: 'warehouse.name',
-            ...createSortingHeader('Warehouse'),
-            cell: ({ row }) => (
-                <WarehouseSummaryCell warehouse={row.original.warehouse} />
-            ),
-        },
+            header: 'Warehouse',
+            getWarehouse: (item) => item.warehouse,
+            sortable: true,
+        }),
         createNumberColumn<StockMovementReportItem>({
             accessorKey: 'total_in',
             label: 'Total In',
@@ -76,11 +71,10 @@ export const stockMovementReportColumns: ColumnDef<StockMovementReportItem>[] =
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         }),
-        {
+        createReportTextColumn<StockMovementReportItem>({
             accessorKey: 'last_moved_at',
-            ...createSortingHeader('Last Movement'),
-            cell: ({ row }) => (
-                <TextCell value={formatDate(row.original.last_moved_at)} />
-            ),
-        },
+            header: 'Last Movement',
+            getValue: (item) => formatDate(item.last_moved_at),
+            sortable: true,
+        }),
     ];

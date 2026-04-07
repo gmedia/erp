@@ -1,5 +1,9 @@
 'use client';
 
+import {
+    createReportTextColumn,
+    createReportWarehouseColumn,
+} from '@/components/common/ReportColumns';
 import { createNumberColumn, createSortingHeader } from '@/utils/columns';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -20,46 +24,33 @@ export type StockAdjustmentReportItem = {
 
 export const stockAdjustmentReportColumns: ColumnDef<StockAdjustmentReportItem>[] =
     [
-        {
+        createReportTextColumn<StockAdjustmentReportItem>({
             accessorKey: 'adjustment_date',
-            ...createSortingHeader('Adjustment Date'),
-            cell: ({ row }) => <div>{row.original.adjustment_date ?? '-'}</div>,
-        },
-        {
+            header: 'Adjustment Date',
+            getValue: (item) => item.adjustment_date,
+            sortable: true,
+        }),
+        createReportTextColumn<StockAdjustmentReportItem>({
             accessorKey: 'adjustment_type',
-            ...createSortingHeader('Adjustment Type'),
-            cell: ({ row }) => (
-                <div className="capitalize">
-                    {(row.original.adjustment_type ?? '-').replaceAll('_', ' ')}
-                </div>
-            ),
-        },
-        {
+            header: 'Adjustment Type',
+            getValue: (item) =>
+                (item.adjustment_type ?? '-').replaceAll('_', ' '),
+            className: 'capitalize',
+            sortable: true,
+        }),
+        createReportTextColumn<StockAdjustmentReportItem>({
             accessorKey: 'status',
-            ...createSortingHeader('Status'),
-            cell: ({ row }) => (
-                <div className="capitalize">
-                    {(row.original.status ?? '-').replaceAll('_', ' ')}
-                </div>
-            ),
-        },
-        {
+            header: 'Status',
+            getValue: (item) => (item.status ?? '-').replaceAll('_', ' '),
+            className: 'capitalize',
+            sortable: true,
+        }),
+        createReportWarehouseColumn<StockAdjustmentReportItem>({
             accessorKey: 'warehouse.name',
-            ...createSortingHeader('Warehouse'),
-            cell: ({ row }) => (
-                <div className="space-y-0.5">
-                    <div className="font-medium">
-                        {row.original.warehouse?.name ?? '-'}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                        {(row.original.warehouse?.code ?? '-') +
-                            (row.original.warehouse?.branch?.name
-                                ? ` • ${row.original.warehouse.branch.name}`
-                                : '')}
-                    </div>
-                </div>
-            ),
-        },
+            header: 'Warehouse',
+            getWarehouse: (item) => item.warehouse,
+            sortable: true,
+        }),
         createNumberColumn<StockAdjustmentReportItem>({
             accessorKey: 'adjustment_count',
             label: 'Adjustment Count',
