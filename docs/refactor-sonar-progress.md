@@ -35,17 +35,17 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: 3203 (turun 3141 dari baseline Batch F)
-- duplicated_blocks: 143 (turun 189 dari baseline Batch F)
-- duplicated_lines_density: 3.6 (turun 3.6 dari baseline Batch F)
-- ncloc: 71896 (turun 977 dari baseline Batch F)
-- coverage: 88.2
+- duplicated_lines: 3117 (turun 3227 dari baseline Batch F)
+- duplicated_blocks: 139 (turun 193 dari baseline Batch F)
+- duplicated_lines_density: 3.5 (turun 3.7 dari baseline Batch F)
+- ncloc: 71959 (turun 914 dari baseline Batch F)
+- coverage: 0.0 (anomali snapshot remote terbaru; quality gate juga membaca `new_coverage 0.0`)
 
 ## Snapshot Analisa Sonar (2026-04-07, latest MCP)
 
 - Quality Gate: ERROR
-- Gate blocker utama: `new_duplicated_lines_density = 6.0`
-- Catatan: snapshot Sonar remote terbaru via MCP setelah commit `4f5ee9a2` masih menunjukkan blocker duplikasi new-code `6.0`, tetapi coverage remote sudah kembali sehat di `coverage 88.2` dan `new_coverage 90.1`. Metrik duplikasi overall saat ini berada di `duplicated_lines 3203`, `duplicated_blocks 143`, `duplicated_lines_density 3.6`, dengan `ncloc 71896`. Karena remote `main` terus bergerak selama batch aktif dan analisis pasca-push wave terbaru belum tentu langsung bergeser, angka ini saya catat sebagai snapshot terbaru lintas wave, bukan diasumsikan murni delta dari satu wave helper saja. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, 4 spec Playwright pada wave audit-trail filters/detail, 7 spec Playwright pada wave report-column summaries, 11 spec Playwright pada wave report page shells, 13 passed + 1 skipped pada wave remaining report pages, 6 passed pada wave financial report shells, 6 passed pada wave manual financial tables, 4 passed pada wave audit trail pages, 2 passed pada wave inventory table pages, 30 passed + 2 skipped pada wave asset filter helpers, 27 passed pada wave shared list filter helpers, 18 passed pada wave catalog filter helpers, 42 passed pada wave transaction filter helpers, 25 passed pada wave purchasing filter helpers, 3 passed pada wave purchasing report filters, 3 passed pada wave inventory report filters, 47 passed pada wave simple status filters, 13 passed pada wave approval-related filters, 9 passed pada wave asset report filters, dan 4 passed pada wave report column definitions.
+- Gate blocker utama: `new_coverage = 0.0` dan `new_duplicated_lines_density = 5.8`
+- Catatan: snapshot Sonar remote terbaru via MCP setelah commit `7e6a50d6` menunjukkan duplikasi overall kembali membaik ke `duplicated_lines 3117`, `duplicated_blocks 139`, `duplicated_lines_density 3.5`, dengan `ncloc 71959`, dan blocker duplikasi new-code turun ke `5.8`. Namun anomali pipeline coverage muncul lagi di remote (`coverage 0.0`, `new_coverage 0.0`). Karena remote `main` terus bergerak selama batch aktif dan ada commit luar yang ikut masuk saat rebase, angka ini saya catat sebagai snapshot terbaru lintas wave, bukan diasumsikan murni delta dari satu wave helper saja. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, 4 spec Playwright pada wave audit-trail filters/detail, 7 spec Playwright pada wave report-column summaries, 11 spec Playwright pada wave report page shells, 13 passed + 1 skipped pada wave remaining report pages, 6 passed pada wave financial report shells, 6 passed pada wave manual financial tables, 4 passed pada wave audit trail pages, 2 passed pada wave inventory table pages, 30 passed + 2 skipped pada wave asset filter helpers, 27 passed pada wave shared list filter helpers, 18 passed pada wave catalog filter helpers, 42 passed pada wave transaction filter helpers, 25 passed pada wave purchasing filter helpers, 3 passed pada wave purchasing report filters, 3 passed pada wave inventory report filters, 47 passed pada wave simple status filters, 13 passed pada wave approval-related filters, 9 passed pada wave asset report filters, 4 passed pada wave report column definitions, dan 4 passed pada wave stock report column definitions.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
@@ -414,6 +414,10 @@ Isi setelah batch selesai dan sebelum merge.
 	- Ekstrak helper frontend kecil untuk family kolom report yang masih mengulang cell `summary`, `text`, `warehouse`, dan `status badge`, sambil mempertahankan label header, accessor sort, urutan kolom, dan tampilan sel per modul.
 	- Gelombang saat ini mencakup `resources/js/components/common/ReportColumns.tsx`, `resources/js/components/reports/inventory-valuation/Columns.tsx`, `resources/js/components/reports/purchase-history/Columns.tsx`, `resources/js/components/reports/purchase-order-status/Columns.tsx`, dan `resources/js/components/stock-monitor/Columns.tsx`.
 	- Progress: helper shared `createReportSummaryColumn()`, `createReportTextColumn()`, `createReportWarehouseColumn()`, dan `createReportStatusBadgeColumn()` kini menggantikan definisi cell inline yang berulang tanpa ubah label sort button, accessor key, atau kontrak render per halaman. Verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/inventory-valuation-report/ tests/e2e/purchase-history-report/ tests/e2e/purchase-order-status-report/ tests/e2e/stock-monitor/` (4 passed). Snapshot Sonar pasca-wave: snapshot MCP terbaru setelah push `4f5ee9a2` yang tersedia saat ini menunjukkan `duplicated_lines 3203`, `duplicated_blocks 143`, `duplicated_lines_density 3.6`, `coverage 88.2`, `ncloc 71896`, `new_coverage 90.1`, dan `new_duplicated_lines_density 6.0`.
+89. Dedup stock report column definitions. (in-progress)
+	- Ekstrak reuse helper frontend yang sama untuk family kolom report stok yang masih mengulang cell `summary`, `text`, `warehouse`, dan `status-like text`, sambil mempertahankan label header, accessor sort, urutan kolom, dan tampilan sel per modul.
+	- Gelombang saat ini mencakup `resources/js/components/reports/goods-receipt/Columns.tsx`, `resources/js/components/reports/stock-movement/Columns.tsx`, `resources/js/components/reports/stock-adjustment/Columns.tsx`, dan `resources/js/components/reports/inventory-stocktake-variance/Columns.tsx`.
+	- Progress: helper shared `createReportSummaryColumn()`, `createReportTextColumn()`, `createReportWarehouseColumn()`, dan `createReportStatusBadgeColumn()` kini juga menggantikan definisi cell inline yang berulang pada report stok tanpa ubah label sort button, accessor key, atau kontrak render per halaman. Verifikasi PASS `./vendor/bin/sail npx playwright test tests/e2e/goods-receipt-report/ tests/e2e/stock-movement-report/ tests/e2e/stock-adjustment-report/ tests/e2e/inventory-stocktake-variance-report/` (4 passed). Snapshot Sonar pasca-wave: snapshot MCP terbaru setelah push `7e6a50d6` yang tersedia saat ini menunjukkan `duplicated_lines 3117`, `duplicated_blocks 139`, `duplicated_lines_density 3.5`, `coverage 0.0`, `ncloc 71959`, `new_coverage 0.0`, dan `new_duplicated_lines_density 5.8`.
 
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
