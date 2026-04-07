@@ -94,6 +94,36 @@ export const inventoryStocktakeStatusOptions: SelectOption[] = [
     { value: 'cancelled', label: 'Cancelled' },
 ];
 
+export const draftConfirmedCancelledStatusOptions: SelectOption[] = [
+    { value: 'draft', label: 'Draft' },
+    { value: 'confirmed', label: 'Confirmed' },
+    { value: 'cancelled', label: 'Cancelled' },
+];
+
+export const approvalWorkflowStatusOptions: SelectOption[] = [
+    { value: 'draft', label: 'Draft' },
+    { value: 'pending_approval', label: 'Pending Approval' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'cancelled', label: 'Cancelled' },
+];
+
+export const stockTransferStatusOptions: SelectOption[] = [
+    { value: 'draft', label: 'Draft' },
+    { value: 'pending_approval', label: 'Pending Approval' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'in_transit', label: 'In Transit' },
+    { value: 'received', label: 'Received' },
+    { value: 'cancelled', label: 'Cancelled' },
+];
+
+export const supplierReturnReasonOptions: SelectOption[] = [
+    { value: 'defective', label: 'Defective' },
+    { value: 'wrong_item', label: 'Wrong Item' },
+    { value: 'excess_quantity', label: 'Excess Quantity' },
+    { value: 'damaged', label: 'Damaged' },
+    { value: 'other', label: 'Other' },
+];
+
 export const stockAdjustmentTypeOptions: SelectOption[] = [
     { value: 'damage', label: 'Damage' },
     { value: 'expired', label: 'Expired' },
@@ -287,6 +317,36 @@ export function createSupplierFilterField(
     );
 }
 
+export function createEmployeeLookupFilterField(
+    name = 'employee_id',
+    label = 'Employee',
+    placeholder = 'Select employee',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(name, label, '/api/employees', placeholder);
+}
+
+export function createPurchaseOrderFilterField(
+    placeholder = 'Select purchase order',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'purchase_order_id',
+        'Purchase Order',
+        '/api/purchase-orders',
+        placeholder,
+    );
+}
+
+export function createGoodsReceiptFilterField(
+    placeholder = 'Select goods receipt',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'goods_receipt_id',
+        'Goods Receipt',
+        '/api/goods-receipts',
+        placeholder,
+    );
+}
+
 export function createAssetFilterField(
     placeholder = 'Select an asset',
 ): FieldDescriptor {
@@ -376,6 +436,22 @@ export function createSupplierWarehouseProductFilterFields(): FieldDescriptor[] 
             placeholder: 'All products',
         },
     ]);
+}
+
+export function createWarehouseStatusFilterFields(
+    statusOptions: SelectOption[],
+    warehousePlaceholder = 'Select warehouse',
+    statusPlaceholder = 'Select status',
+): FieldDescriptor[] {
+    return [
+        createWarehouseFilterField(warehousePlaceholder),
+        createSelectFilterField(
+            'status',
+            'Status',
+            statusOptions,
+            statusPlaceholder,
+        ),
+    ];
 }
 
 export function createAssetCategoryBranchFilterFields(): FieldDescriptor[] {
