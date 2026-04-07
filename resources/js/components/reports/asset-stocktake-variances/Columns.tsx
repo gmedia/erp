@@ -1,3 +1,4 @@
+import { createReportTextColumn } from '@/components/common/ReportColumns';
 import { Badge } from '@/components/ui/badge';
 import { createSortingHeader } from '@/utils/columns';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
@@ -26,51 +27,53 @@ export interface AssetStocktakeVarianceItem {
 }
 
 export const varianceColumns: ColumnDef<AssetStocktakeVarianceItem>[] = [
-    {
+    createReportTextColumn<AssetStocktakeVarianceItem>({
         accessorKey: 'stocktake_reference',
-        ...createSortingHeader('Stocktake Ref'),
-        cell: ({ row }) => (
-            <div className="font-medium">
-                {row.getValue('stocktake_reference') || '-'}
-            </div>
-        ),
-    },
-    {
+        header: 'Stocktake Ref',
+        getValue: (item) => item.stocktake_reference,
+        className: 'font-medium',
+        sortable: true,
+    }),
+    createReportTextColumn<AssetStocktakeVarianceItem>({
         accessorKey: 'asset_code',
-        ...createSortingHeader('Asset Code'),
-        cell: ({ row }) => <div>{row.getValue('asset_code') || '-'}</div>,
-    },
-    {
+        header: 'Asset Code',
+        getValue: (item) => item.asset_code,
+        sortable: true,
+    }),
+    createReportTextColumn<AssetStocktakeVarianceItem>({
         accessorKey: 'asset_name',
-        ...createSortingHeader('Asset Name'),
-        cell: ({ row }) => <div>{row.getValue('asset_name') || '-'}</div>,
-    },
-    {
-        accessorKey: 'expected_branch_name',
+        header: 'Asset Name',
+        getValue: (item) => item.asset_name,
+        sortable: true,
+    }),
+    createReportTextColumn<AssetStocktakeVarianceItem>({
         id: 'expected_branch',
-        ...createSortingHeader('Expected Branch'),
-        cell: ({ row }) => <div>{row.getValue('expected_branch') || '-'}</div>,
-    },
-    {
-        accessorKey: 'expected_location_name',
+        accessorKey: 'expected_branch_name',
+        header: 'Expected Branch',
+        getValue: (item) => item.expected_branch_name,
+        sortable: true,
+    }),
+    createReportTextColumn<AssetStocktakeVarianceItem>({
         id: 'expected_location',
-        ...createSortingHeader('Expected Location'),
-        cell: ({ row }) => (
-            <div>{row.getValue('expected_location') || '-'}</div>
-        ),
-    },
-    {
-        accessorKey: 'found_branch_name',
+        accessorKey: 'expected_location_name',
+        header: 'Expected Location',
+        getValue: (item) => item.expected_location_name,
+        sortable: true,
+    }),
+    createReportTextColumn<AssetStocktakeVarianceItem>({
         id: 'found_branch',
-        ...createSortingHeader('Found Branch'),
-        cell: ({ row }) => <div>{row.getValue('found_branch') || '-'}</div>,
-    },
-    {
-        accessorKey: 'found_location_name',
+        accessorKey: 'found_branch_name',
+        header: 'Found Branch',
+        getValue: (item) => item.found_branch_name,
+        sortable: true,
+    }),
+    createReportTextColumn<AssetStocktakeVarianceItem>({
         id: 'found_location',
-        ...createSortingHeader('Found Location'),
-        cell: ({ row }) => <div>{row.getValue('found_location') || '-'}</div>,
-    },
+        accessorKey: 'found_location_name',
+        header: 'Found Location',
+        getValue: (item) => item.found_location_name,
+        sortable: true,
+    }),
     {
         accessorKey: 'result',
         ...createSortingHeader('Result'),
@@ -85,24 +88,20 @@ export const varianceColumns: ColumnDef<AssetStocktakeVarianceItem>[] = [
             return <Badge variant={variant}>{val?.toUpperCase() || '-'}</Badge>;
         },
     },
-    {
+    createReportTextColumn<AssetStocktakeVarianceItem>({
         accessorKey: 'notes',
         header: 'Notes',
-        cell: ({ row }) => <div>{row.getValue('notes') || '-'}</div>,
-        enableSorting: false,
-    },
-    {
+        getValue: (item) => item.notes,
+    }),
+    createReportTextColumn<AssetStocktakeVarianceItem>({
         accessorKey: 'checked_at',
-        ...createSortingHeader('Checked At'),
-        cell: ({ row }) => {
-            const date = row.getValue('checked_at') as string;
-            return <div>{formatDateTimeByRegionalSettings(date)}</div>;
-        },
-    },
-    {
+        header: 'Checked At',
+        getValue: (item) => formatDateTimeByRegionalSettings(item.checked_at),
+        sortable: true,
+    }),
+    createReportTextColumn<AssetStocktakeVarianceItem>({
         accessorKey: 'checked_by_name',
         header: 'Checked By',
-        cell: ({ row }) => <div>{row.getValue('checked_by_name') || '-'}</div>,
-        enableSorting: false,
-    },
+        getValue: (item) => item.checked_by_name,
+    }),
 ];

@@ -1,3 +1,4 @@
+import { createReportTextColumn } from '@/components/common/ReportColumns';
 import { formatCurrency } from '@/lib/utils';
 import { createSortingHeader } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
@@ -19,43 +20,35 @@ export interface BookValueDepreciationReportItem {
 }
 export const bookValueDepreciationColumns: ColumnDef<BookValueDepreciationReportItem>[] =
     [
-        {
+        createReportTextColumn<BookValueDepreciationReportItem>({
             accessorKey: 'asset_code',
-            ...createSortingHeader('Asset Code'),
-            cell: ({ row }) => (
-                <div className="font-medium">{row.getValue('asset_code')}</div>
-            ),
-        },
-        {
+            header: 'Asset Code',
+            getValue: (item) => item.asset_code,
+            className: 'font-medium',
+            sortable: true,
+        }),
+        createReportTextColumn<BookValueDepreciationReportItem>({
             accessorKey: 'name',
-            ...createSortingHeader('Asset Name'),
-            cell: ({ row }) => <div>{row.getValue('name')}</div>,
-        },
-        {
+            header: 'Asset Name',
+            getValue: (item) => item.name,
+            sortable: true,
+        }),
+        createReportTextColumn<BookValueDepreciationReportItem>({
             accessorKey: 'category_name',
             header: 'Category',
-            cell: ({ row }) => (
-                <div>{row.getValue('category_name') || '-'}</div>
-            ),
-            enableSorting: false,
-        },
-        {
+            getValue: (item) => item.category_name,
+        }),
+        createReportTextColumn<BookValueDepreciationReportItem>({
             accessorKey: 'branch_name',
             header: 'Branch',
-            cell: ({ row }) => <div>{row.getValue('branch_name') || '-'}</div>,
-            enableSorting: false,
-        },
-        {
+            getValue: (item) => item.branch_name,
+        }),
+        createReportTextColumn<BookValueDepreciationReportItem>({
             accessorKey: 'purchase_date',
-            ...createSortingHeader('Purchase Date'),
-            cell: ({ row }) => (
-                <div>
-                    {formatDateByRegionalSettings(
-                        row.getValue('purchase_date') as string,
-                    )}
-                </div>
-            ),
-        },
+            header: 'Purchase Date',
+            getValue: (item) => formatDateByRegionalSettings(item.purchase_date),
+            sortable: true,
+        }),
         {
             accessorKey: 'purchase_cost',
             ...createSortingHeader('Purchase Cost'),

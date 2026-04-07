@@ -1,3 +1,7 @@
+import {
+    createReportStatusBadgeColumn,
+    createReportTextColumn,
+} from '@/components/common/ReportColumns';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
 import { createSortingHeader } from '@/utils/columns';
@@ -20,70 +24,59 @@ export interface MaintenanceCostReportItem {
 }
 
 export const maintenanceCostColumns: ColumnDef<MaintenanceCostReportItem>[] = [
-    {
+    createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'asset_code',
-        ...createSortingHeader('Asset Code'),
-        cell: ({ row }) => (
-            <div className="font-medium">
-                {row.getValue('asset_code') || '-'}
-            </div>
-        ),
-    },
-    {
+        header: 'Asset Code',
+        getValue: (item) => item.asset_code,
+        className: 'font-medium',
+        sortable: true,
+    }),
+    createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'asset_name',
-        ...createSortingHeader('Asset Name'),
-        cell: ({ row }) => <div>{row.getValue('asset_name') || '-'}</div>,
-    },
-    {
+        header: 'Asset Name',
+        getValue: (item) => item.asset_name,
+        sortable: true,
+    }),
+    createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'category_name',
         header: 'Category',
-        cell: ({ row }) => <div>{row.getValue('category_name') || '-'}</div>,
-        enableSorting: false,
-    },
-    {
+        getValue: (item) => item.category_name,
+    }),
+    createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'branch_name',
         header: 'Branch',
-        cell: ({ row }) => <div>{row.getValue('branch_name') || '-'}</div>,
-        enableSorting: false,
-    },
-    {
+        getValue: (item) => item.branch_name,
+    }),
+    createReportStatusBadgeColumn<MaintenanceCostReportItem>({
         accessorKey: 'maintenance_type',
-        ...createSortingHeader('Type'),
-        cell: ({ row }) => (
-            <Badge variant="outline" className="capitalize">
-                {(row.getValue('maintenance_type') as string).replace('_', ' ')}
-            </Badge>
-        ),
-    },
-    {
+        header: 'Type',
+        getValue: (item) => item.maintenance_type,
+    }),
+    createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
-        cell: ({ row }) => {
-            const status = row.getValue('status') as string;
-            return <div className="capitalize">{status.replace('_', ' ')}</div>;
-        },
-    },
-    {
+        header: 'Status',
+        getValue: (item) => item.status?.replace('_', ' '),
+        className: 'capitalize',
+        sortable: true,
+    }),
+    createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'scheduled_at',
-        ...createSortingHeader('Scheduled At'),
-        cell: ({ row }) => {
-            const date = row.getValue('scheduled_at') as string;
-            return <div>{formatDateByRegionalSettings(date)}</div>;
-        },
-    },
-    {
+        header: 'Scheduled At',
+        getValue: (item) => formatDateByRegionalSettings(item.scheduled_at),
+        sortable: true,
+    }),
+    createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'performed_at',
-        ...createSortingHeader('Performed At'),
-        cell: ({ row }) => {
-            const date = row.getValue('performed_at') as string;
-            return <div>{formatDateByRegionalSettings(date)}</div>;
-        },
-    },
-    {
+        header: 'Performed At',
+        getValue: (item) => formatDateByRegionalSettings(item.performed_at),
+        sortable: true,
+    }),
+    createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'supplier_name',
-        ...createSortingHeader('Vendor'),
-        cell: ({ row }) => <div>{row.getValue('supplier_name') || '-'}</div>,
-    },
+        header: 'Vendor',
+        getValue: (item) => item.supplier_name,
+        sortable: true,
+    }),
     {
         accessorKey: 'cost',
         ...createSortingHeader('Cost'),
