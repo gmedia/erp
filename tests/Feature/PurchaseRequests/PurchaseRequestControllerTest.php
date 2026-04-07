@@ -55,7 +55,10 @@ test('index supports search and filters', function () {
         'priority' => 'high',
         'status' => 'draft',
     ]);
-    PurchaseRequest::factory()->create();
+    PurchaseRequest::factory()->create([
+        'priority' => 'low',
+        'status' => 'approved',
+    ]);
 
     getJson('/api/purchase-requests?search=PR-SEARCH-001')
         ->assertOk()
