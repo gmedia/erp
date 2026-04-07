@@ -2,8 +2,8 @@
 
 import {
     createAsyncSelectFilterFields,
-    createTextFilterField,
     createSelectFilterField,
+    createTextFilterField,
     stockTransferStatusOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';

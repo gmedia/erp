@@ -1,10 +1,10 @@
 'use client';
 
 import {
+    approvalWorkflowStatusOptions,
     createSelectFilterField,
     createTextFilterField,
     createWarehouseStatusFilterFields,
-    approvalWorkflowStatusOptions,
     stockAdjustmentTypeOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';

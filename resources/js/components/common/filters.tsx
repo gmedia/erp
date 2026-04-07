@@ -322,7 +322,12 @@ export function createEmployeeLookupFilterField(
     label = 'Employee',
     placeholder = 'Select employee',
 ): FieldDescriptor {
-    return createAsyncSelectFilterField(name, label, '/api/employees', placeholder);
+    return createAsyncSelectFilterField(
+        name,
+        label,
+        '/api/employees',
+        placeholder,
+    );
 }
 
 export function createPurchaseOrderFilterField(
