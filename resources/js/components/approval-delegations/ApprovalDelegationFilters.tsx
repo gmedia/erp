@@ -37,7 +37,6 @@ export function ApprovalDelegationFilters() {
     );
 }
 
-import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     createApprovalDelegationUserFilterFields,
     createBinaryStatusFilterField,
