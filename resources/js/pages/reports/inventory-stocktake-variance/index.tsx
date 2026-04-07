@@ -1,6 +1,9 @@
 'use client';
 
-import { ReportDataTablePage } from '@/components/common/ReportDataTablePage';
+import {
+    createEmptyReportFilters,
+    ReportDataTablePage,
+} from '@/components/common/ReportDataTablePage';
 import {
     inventoryStocktakeVarianceColumns,
     type InventoryStocktakeVarianceReportItem,
@@ -20,17 +23,16 @@ export default function InventoryStocktakeVarianceReportPage() {
             ]}
             columns={inventoryStocktakeVarianceColumns}
             filterFields={createInventoryStocktakeVarianceFilterFields()}
-            initialFilters={{
-                search: '',
-                inventory_stocktake_id: '',
-                product_id: '',
-                warehouse_id: '',
-                branch_id: '',
-                category_id: '',
-                result: '',
-                start_date: '',
-                end_date: '',
-            }}
+            initialFilters={createEmptyReportFilters([
+                'inventory_stocktake_id',
+                'product_id',
+                'warehouse_id',
+                'branch_id',
+                'category_id',
+                'result',
+                'start_date',
+                'end_date',
+            ])}
             endpoint="/api/reports/inventory-stocktake-variance"
             queryKey={['inventory-stocktake-variance-report']}
             entityName="Inventory Stocktake Variance"

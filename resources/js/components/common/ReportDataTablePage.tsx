@@ -25,6 +25,14 @@ export function createReportBreadcrumbs(
     ];
 }
 
+export function createEmptyReportFilters<const TKeys extends readonly string[]>(
+    fields: TKeys,
+): Record<TKeys[number] | 'search', string> {
+    return Object.fromEntries(
+        ['search', ...fields].map((field) => [field, '']),
+    ) as Record<TKeys[number] | 'search', string>;
+}
+
 type ReportDataTablePageProps<
     TData,
     TFilters extends FilterState = FilterState,

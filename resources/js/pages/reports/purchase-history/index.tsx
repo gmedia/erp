@@ -1,6 +1,7 @@
 'use client';
 
 import {
+    createEmptyReportFilters,
     createReportBreadcrumbs,
     ReportDataTablePage,
 } from '@/components/common/ReportDataTablePage';
@@ -20,15 +21,14 @@ export default function PurchaseHistoryReportPage() {
             )}
             columns={purchaseHistoryReportColumns}
             filterFields={createPurchaseHistoryReportFilterFields()}
-            initialFilters={{
-                search: '',
-                supplier_id: '',
-                warehouse_id: '',
-                product_id: '',
-                status: '',
-                start_date: '',
-                end_date: '',
-            }}
+            initialFilters={createEmptyReportFilters([
+                'supplier_id',
+                'warehouse_id',
+                'product_id',
+                'status',
+                'start_date',
+                'end_date',
+            ])}
             endpoint="/api/reports/purchase-history"
             queryKey={['purchase-history-report']}
             entityName="Purchase History Report"

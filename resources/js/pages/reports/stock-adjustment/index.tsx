@@ -1,6 +1,9 @@
 'use client';
 
-import { ReportDataTablePage } from '@/components/common/ReportDataTablePage';
+import {
+    createEmptyReportFilters,
+    ReportDataTablePage,
+} from '@/components/common/ReportDataTablePage';
 import {
     stockAdjustmentReportColumns,
     type StockAdjustmentReportItem,
@@ -20,15 +23,14 @@ export default function StockAdjustmentReportPage() {
             ]}
             columns={stockAdjustmentReportColumns}
             filterFields={createStockAdjustmentReportFilterFields()}
-            initialFilters={{
-                search: '',
-                warehouse_id: '',
-                branch_id: '',
-                adjustment_type: '',
-                status: '',
-                start_date: '',
-                end_date: '',
-            }}
+            initialFilters={createEmptyReportFilters([
+                'warehouse_id',
+                'branch_id',
+                'adjustment_type',
+                'status',
+                'start_date',
+                'end_date',
+            ])}
             endpoint="/api/reports/stock-adjustment"
             queryKey={['stock-adjustment-report']}
             entityName="Stock Adjustment Report"

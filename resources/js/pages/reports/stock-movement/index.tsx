@@ -1,6 +1,9 @@
 'use client';
 
-import { ReportDataTablePage } from '@/components/common/ReportDataTablePage';
+import {
+    createEmptyReportFilters,
+    ReportDataTablePage,
+} from '@/components/common/ReportDataTablePage';
 import {
     stockMovementReportColumns,
     type StockMovementReportItem,
@@ -17,15 +20,14 @@ export default function StockMovementReportPage() {
             ]}
             columns={stockMovementReportColumns}
             filterFields={createStockMovementReportFilterFields()}
-            initialFilters={{
-                search: '',
-                product_id: '',
-                warehouse_id: '',
-                branch_id: '',
-                category_id: '',
-                start_date: '',
-                end_date: '',
-            }}
+            initialFilters={createEmptyReportFilters([
+                'product_id',
+                'warehouse_id',
+                'branch_id',
+                'category_id',
+                'start_date',
+                'end_date',
+            ])}
             endpoint="/api/reports/stock-movement"
             queryKey={['stock-movement-report']}
             entityName="Stock Movement Report"

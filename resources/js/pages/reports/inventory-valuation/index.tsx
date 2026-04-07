@@ -1,6 +1,7 @@
 'use client';
 
 import {
+    createEmptyReportFilters,
     createReportBreadcrumbs,
     ReportDataTablePage,
 } from '@/components/common/ReportDataTablePage';
@@ -20,13 +21,12 @@ export default function InventoryValuationReportPage() {
             )}
             columns={inventoryValuationColumns}
             filterFields={createInventoryValuationFilterFields()}
-            initialFilters={{
-                search: '',
-                product_id: '',
-                warehouse_id: '',
-                branch_id: '',
-                category_id: '',
-            }}
+            initialFilters={createEmptyReportFilters([
+                'product_id',
+                'warehouse_id',
+                'branch_id',
+                'category_id',
+            ])}
             endpoint="/api/reports/inventory-valuation"
             queryKey={['inventory-valuation-report']}
             entityName="Inventory Valuation"

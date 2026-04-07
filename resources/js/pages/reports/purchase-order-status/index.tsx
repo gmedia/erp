@@ -1,6 +1,9 @@
 'use client';
 
-import { ReportDataTablePage } from '@/components/common/ReportDataTablePage';
+import {
+    createEmptyReportFilters,
+    ReportDataTablePage,
+} from '@/components/common/ReportDataTablePage';
 import {
     purchaseOrderStatusReportColumns,
     type PurchaseOrderStatusReportItem,
@@ -20,16 +23,15 @@ export default function PurchaseOrderStatusReportPage() {
             ]}
             columns={purchaseOrderStatusReportColumns}
             filterFields={createPurchaseOrderStatusReportFilterFields()}
-            initialFilters={{
-                search: '',
-                supplier_id: '',
-                warehouse_id: '',
-                product_id: '',
-                status: '',
-                status_category: '',
-                start_date: '',
-                end_date: '',
-            }}
+            initialFilters={createEmptyReportFilters([
+                'supplier_id',
+                'warehouse_id',
+                'product_id',
+                'status',
+                'status_category',
+                'start_date',
+                'end_date',
+            ])}
             endpoint="/api/reports/purchase-order-status"
             queryKey={['purchase-order-status-report']}
             entityName="Purchase Order Status Report"
