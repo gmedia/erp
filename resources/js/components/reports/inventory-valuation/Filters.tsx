@@ -1,5 +1,5 @@
 import {
-    createProductWarehouseBranchCategoryFilterFields,
+    createInventoryReportScopeFilterFields,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
@@ -11,6 +11,6 @@ export function createInventoryValuationFilterFields(): FieldDescriptor[] {
             'Search',
             'Search product, category, warehouse, branch...',
         ),
-        ...createProductWarehouseBranchCategoryFilterFields(),
+        ...createInventoryReportScopeFilterFields(),
     ];
 }

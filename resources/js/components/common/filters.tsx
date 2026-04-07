@@ -123,6 +123,11 @@ export const inventoryStocktakeStatusOptions: SelectOption[] = [
     { value: 'cancelled', label: 'Cancelled' },
 ];
 
+export const inventoryStocktakeVarianceResultOptions: SelectOption[] = [
+    { value: 'surplus', label: 'Surplus' },
+    { value: 'deficit', label: 'Deficit' },
+];
+
 export const draftConfirmedCancelledStatusOptions: SelectOption[] = [
     { value: 'draft', label: 'Draft' },
     { value: 'confirmed', label: 'Confirmed' },
@@ -767,6 +772,40 @@ export function createProductWarehouseBranchCategoryFilterFields(): FieldDescrip
             placeholder: 'All categories',
         },
     ]);
+}
+
+export function createInventoryReportScopeFilterFields(
+    includeDateRange = false,
+): FieldDescriptor[] {
+    const fields = [...createProductWarehouseBranchCategoryFilterFields()];
+
+    if (includeDateRange) {
+        fields.push(...createDateRangeFilterFields());
+    }
+
+    return fields;
+}
+
+export function createInventoryStocktakeReportFilterField(
+    placeholder = 'All stocktakes',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'inventory_stocktake_id',
+        'Stocktake',
+        '/api/inventory-stocktakes',
+        placeholder,
+    );
+}
+
+export function createInventoryStocktakeVarianceResultFilterField(
+    placeholder = 'All results',
+): FieldDescriptor {
+    return createSelectFilterField(
+        'result',
+        'Result',
+        inventoryStocktakeVarianceResultOptions,
+        placeholder,
+    );
 }
 
 export function createSelectFilterFields(
