@@ -85,8 +85,10 @@ export interface DataTableProps<T> {
     onSearchChange: (search: string) => void;
     isLoading?: boolean;
     filterValue?: string;
-    filters?: Record<string, string | undefined>;
-    onFilterChange: (filters: Record<string, string | undefined>) => void;
+    filters?: Record<string, string | number | undefined>;
+    onFilterChange: (
+        filters: Record<string, string | number | undefined>,
+    ) => void;
     onResetFilters: () => void;
     /** Optional endpoint for export requests */
     exportEndpoint?: string;
@@ -148,13 +150,11 @@ export function DataTable<T>({
     const { exporting, exportData } = useExport({ endpoint: exportEndpoint });
 
     // Temporary filter state for the modal
-    const [tempFilters, setTempFilters] = React.useState<
-        Record<string, string>
-    >(
+    const [tempFilters, setTempFilters] = React.useState<Record<string, string>>(
         Object.fromEntries(
             Object.entries(filters).filter(
                 ([, v]) => v !== undefined && v !== '',
-            ),
+            ).map(([key, value]) => [key, String(value)]),
         ) as Record<string, string>,
     );
 
@@ -180,7 +180,14 @@ export function DataTable<T>({
 
     // Memoize export handler
     const handleExport = React.useCallback(() => {
-        exportData(filters);
+        exportData(
+            Object.fromEntries(
+                Object.entries(filters).map(([key, value]) => [
+                    key,
+                    value === undefined ? undefined : String(value),
+                ]),
+            ),
+        );
     }, [exportData, filters]);
 
     // Sync temporary filters with external filters when they change or when the modal opens
@@ -190,7 +197,7 @@ export function DataTable<T>({
                 Object.fromEntries(
                     Object.entries(filters).filter(
                         ([, v]) => v !== undefined && v !== '',
-                    ),
+                    ).map(([key, value]) => [key, String(value)]),
                 ) as Record<string, string>,
             );
         }
@@ -271,7 +278,7 @@ export function DataTable<T>({
     };
 
     const handleApplyFilters = () => {
-        onFilterChange(tempFilters as Record<string, string | undefined>);
+        onFilterChange(tempFilters);
         setIsFilterModalOpen(false);
     };
 
@@ -358,7 +365,7 @@ export function DataTable<T>({
                     const cleaned = Object.fromEntries(
                         Object.entries(filters).filter(
                             ([, v]) => v !== undefined && v !== '',
-                        ),
+                        ).map(([key, value]) => [key, String(value)]),
                     ) as Record<string, string>;
                     setTempFilters(cleaned);
                 }}

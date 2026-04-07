@@ -2,6 +2,7 @@
 
 import { DataTable } from '@/components/common/DataTableCore';
 import type { FieldDescriptor } from '@/components/common/filters';
+import type { FilterState } from '@/hooks/useCrudFilters';
 import AppLayout from '@/layouts/app-layout';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
@@ -21,7 +22,7 @@ type PaginationMeta = {
     to?: number;
 };
 
-type DataTablePageProps<TData, TFilters extends Record<string, unknown>> = {
+type DataTablePageProps<TData, TFilters extends FilterState = FilterState> = {
     title: string;
     breadcrumbs: BreadcrumbItem[];
     columns: ColumnDef<TData>[];
@@ -36,12 +37,12 @@ type DataTablePageProps<TData, TFilters extends Record<string, unknown>> = {
     onPageChange: (page: number) => void;
     onPageSizeChange: (perPage: number) => void;
     onSearchChange: (value: string) => void;
-    onFilterChange: (name: string, value: unknown) => void;
+    onFilterChange: (filters: Partial<TFilters>) => void;
     onResetFilters: () => void;
     children?: ReactNode;
 };
 
-export function DataTablePage<TData, TFilters extends Record<string, unknown>>({
+export function DataTablePage<TData, TFilters extends FilterState = FilterState>({
     title,
     breadcrumbs,
     columns,
@@ -60,6 +61,9 @@ export function DataTablePage<TData, TFilters extends Record<string, unknown>>({
     onResetFilters,
     children,
 }: Readonly<DataTablePageProps<TData, TFilters>>) {
+    const tableFilters =
+        filters as Record<string, string | number | undefined>;
+
     return (
         <>
             <Helmet>
@@ -85,8 +89,10 @@ export function DataTablePage<TData, TFilters extends Record<string, unknown>>({
                             onSearchChange={onSearchChange}
                             isLoading={isLoading}
                             filterValue={filterValue}
-                            filters={filters}
-                            onFilterChange={onFilterChange}
+                            filters={tableFilters}
+                            onFilterChange={(newFilters) =>
+                                onFilterChange(newFilters as Partial<TFilters>)
+                            }
                             onResetFilters={onResetFilters}
                             filterFields={filterFields}
                             exportEndpoint={exportEndpoint}

@@ -1,10 +1,10 @@
 import {
     FinancialReportPageShell,
+    type FinancialReportFiscalYear,
     useComparisonReportSearchParams,
 } from '@/components/reports/financial/FinancialReportPageShell';
 import {
     FinancialReportSection,
-    type FinancialReportFiscalYear,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
 import { Badge } from '@/components/ui/badge';

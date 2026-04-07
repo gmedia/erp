@@ -1,11 +1,11 @@
 import {
     FinancialReportPageShell,
+    type FinancialReportFiscalYear,
     useComparisonReportSearchParams,
 } from '@/components/reports/financial/FinancialReportPageShell';
 import {
     FinancialReportSection,
     getChangeTextClass,
-    type FinancialReportFiscalYear,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
 import { Badge } from '@/components/ui/badge';

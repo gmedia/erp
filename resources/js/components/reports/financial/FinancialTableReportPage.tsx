@@ -213,9 +213,9 @@ export function FinancialTableCard<TItem extends FinancialTableRow>({
                                     </TableRow>
                                 ) : (
                                     items.map((item) => {
-                                        const hasChildren = parentIds.has(
-                                            item.id,
-                                        );
+                                        const hasChildren =
+                                            typeof item.id === 'number' &&
+                                            parentIds.has(item.id);
 
                                         return (
                                             <TableRow

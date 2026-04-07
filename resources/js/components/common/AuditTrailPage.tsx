@@ -103,9 +103,11 @@ export function AuditTrailPage<
                             onPageSizeChange={handlePageSizeChange}
                             onSearchChange={handleSearchChange}
                             isLoading={isLoading}
-                            filterValue={filters.search}
+                            filterValue={String(filters.search ?? '')}
                             filters={filters}
-                            onFilterChange={handleFilterChange}
+                            onFilterChange={(newFilters) =>
+                                handleFilterChange(newFilters as Partial<TFilters>)
+                            }
                             onResetFilters={resetFilters}
                             filterFields={filterFields}
                             exportEndpoint={exportEndpoint}
