@@ -5,6 +5,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import axios from '@/lib/axios';
+import { useQuery } from '@tanstack/react-query';
 import AppLayout from '@/layouts/app-layout';
 import type { ReactNode } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -21,6 +23,13 @@ export type FinancialReportFiscalYear = {
     start_date: string;
     end_date: string;
     status: string;
+};
+
+type ComparisonReportResponse<TReport> = {
+    fiscalYears: FinancialReportFiscalYear[];
+    selectedYearId: number;
+    comparisonYearId?: number;
+    report: TReport;
 };
 
 type FinancialReportPageShellProps = {
@@ -74,6 +83,47 @@ export function useComparisonReportSearchParams() {
         urlComparisonId,
         handleYearChange,
         handleComparisonChange,
+    };
+}
+
+export function useComparisonFinancialReportQuery<TReport>(
+    queryKey: string,
+    endpoint: string,
+    urlYearId: string | null,
+    urlComparisonId: string | null,
+) {
+    return useQuery<ComparisonReportResponse<TReport>>({
+        queryKey: [queryKey, urlYearId, urlComparisonId],
+        queryFn: async () => {
+            const params = new URLSearchParams();
+
+            if (urlYearId) {
+                params.append('fiscal_year_id', urlYearId);
+            }
+
+            if (urlComparisonId) {
+                params.append('comparison_year_id', urlComparisonId);
+            }
+
+            const response = await axios.get(
+                `/api/reports/${endpoint}?${params.toString()}`,
+            );
+
+            return response.data;
+        },
+    });
+}
+
+export function resolveComparisonFiscalYears(
+    fiscalYears: FinancialReportFiscalYear[],
+    selectedYearId: number,
+    comparisonYearId?: number,
+) {
+    return {
+        selectedFiscalYear: fiscalYears.find((fy) => fy.id === selectedYearId),
+        selectedComparisonFiscalYear: comparisonYearId
+            ? fiscalYears.find((fy) => fy.id === comparisonYearId)
+            : undefined,
     };
 }
 

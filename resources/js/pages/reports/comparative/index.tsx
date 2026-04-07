@@ -1,5 +1,7 @@
 import {
     FinancialReportPageShell,
+    resolveComparisonFiscalYears,
+    useComparisonFinancialReportQuery,
     useComparisonReportSearchParams,
     type FinancialReportFiscalYear,
 } from '@/components/reports/financial/FinancialReportPageShell';
@@ -8,8 +10,6 @@ import {
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
 import { Badge } from '@/components/ui/badge';
-import axios from '@/lib/axios';
-import { useQuery } from '@tanstack/react-query';
 
 interface ComparativeReportResponse {
     fiscalYears: FinancialReportFiscalYear[];
@@ -54,19 +54,13 @@ export default function ComparativeReport() {
         handleComparisonChange,
     } = useComparisonReportSearchParams();
 
-    const { data, isLoading, error } = useQuery<ComparativeReportResponse>({
-        queryKey: ['comparative-report', urlYearId, urlComparisonId],
-        queryFn: async () => {
-            const params = new URLSearchParams();
-            if (urlYearId) params.append('fiscal_year_id', urlYearId);
-            if (urlComparisonId)
-                params.append('comparison_year_id', urlComparisonId);
-            const response = await axios.get(
-                `/api/reports/comparative?${params.toString()}`,
-            );
-            return response.data;
-        },
-    });
+    const { data, isLoading, error } =
+        useComparisonFinancialReportQuery<ComparativeReportResponse['report']>(
+            'comparative-report',
+            'comparative',
+            urlYearId,
+            urlComparisonId,
+        );
 
     const fiscalYears = data?.fiscalYears || [];
     const selectedYearId = data?.selectedYearId || 0;
@@ -86,12 +80,12 @@ export default function ComparativeReport() {
         },
     };
 
-    const selectedFiscalYear = fiscalYears.find(
-        (fy) => fy.id === selectedYearId,
-    );
-    const selectedComparisonFiscalYear = comparisonYearId
-        ? fiscalYears.find((fy) => fy.id === comparisonYearId)
-        : undefined;
+    const { selectedFiscalYear, selectedComparisonFiscalYear } =
+        resolveComparisonFiscalYears(
+            fiscalYears,
+            selectedYearId,
+            comparisonYearId,
+        );
 
     return (
         <FinancialReportPageShell

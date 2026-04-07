@@ -1,5 +1,7 @@
 import {
     FinancialReportPageShell,
+    resolveComparisonFiscalYears,
+    useComparisonFinancialReportQuery,
     useComparisonReportSearchParams,
     type FinancialReportFiscalYear,
 } from '@/components/reports/financial/FinancialReportPageShell';
@@ -17,9 +19,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import axios from '@/lib/axios';
 import { cn, formatCurrency } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
 
 interface IncomeStatementResponse {
     fiscalYears: FinancialReportFiscalYear[];
@@ -53,19 +53,13 @@ export default function IncomeStatement() {
         handleComparisonChange,
     } = useComparisonReportSearchParams();
 
-    const { data, isLoading, error } = useQuery<IncomeStatementResponse>({
-        queryKey: ['income-statement', urlYearId, urlComparisonId],
-        queryFn: async () => {
-            const params = new URLSearchParams();
-            if (urlYearId) params.append('fiscal_year_id', urlYearId);
-            if (urlComparisonId)
-                params.append('comparison_year_id', urlComparisonId);
-            const response = await axios.get(
-                `/api/reports/income-statement?${params.toString()}`,
-            );
-            return response.data;
-        },
-    });
+    const { data, isLoading, error } =
+        useComparisonFinancialReportQuery<IncomeStatementResponse['report']>(
+            'income-statement',
+            'income-statement',
+            urlYearId,
+            urlComparisonId,
+        );
 
     const fiscalYears = data?.fiscalYears || [];
     const selectedYearId = data?.selectedYearId || 0;
@@ -76,12 +70,12 @@ export default function IncomeStatement() {
         totals: { revenue: 0, expense: 0, net_income: 0 },
     };
 
-    const selectedFiscalYear = fiscalYears.find(
-        (fy) => fy.id === selectedYearId,
-    );
-    const selectedComparisonFiscalYear = comparisonYearId
-        ? fiscalYears.find((fy) => fy.id === comparisonYearId)
-        : undefined;
+    const { selectedFiscalYear, selectedComparisonFiscalYear } =
+        resolveComparisonFiscalYears(
+            fiscalYears,
+            selectedYearId,
+            comparisonYearId,
+        );
 
     const totalRevenue = report.totals?.revenue || 0;
     const totalExpense = report.totals?.expense || 0;

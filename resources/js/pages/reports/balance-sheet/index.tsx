@@ -1,5 +1,7 @@
 import {
     FinancialReportPageShell,
+    resolveComparisonFiscalYears,
+    useComparisonFinancialReportQuery,
     useComparisonReportSearchParams,
     type FinancialReportFiscalYear,
 } from '@/components/reports/financial/FinancialReportPageShell';
@@ -17,9 +19,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import axios from '@/lib/axios';
 import { cn, formatCurrency } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
 
 interface BalanceSheetResponse {
@@ -55,19 +55,13 @@ export default function BalanceSheet() {
         handleComparisonChange,
     } = useComparisonReportSearchParams();
 
-    const { data, isLoading, error } = useQuery<BalanceSheetResponse>({
-        queryKey: ['balance-sheet', urlYearId, urlComparisonId],
-        queryFn: async () => {
-            const params = new URLSearchParams();
-            if (urlYearId) params.append('fiscal_year_id', urlYearId);
-            if (urlComparisonId)
-                params.append('comparison_year_id', urlComparisonId);
-            const response = await axios.get(
-                `/api/reports/balance-sheet?${params.toString()}`,
-            );
-            return response.data;
-        },
-    });
+    const { data, isLoading, error } =
+        useComparisonFinancialReportQuery<BalanceSheetResponse['report']>(
+            'balance-sheet',
+            'balance-sheet',
+            urlYearId,
+            urlComparisonId,
+        );
 
     const fiscalYears = data?.fiscalYears || [];
     const selectedYearId = data?.selectedYearId || 0;
@@ -79,12 +73,12 @@ export default function BalanceSheet() {
         totals: { assets: 0, liabilities: 0, equity: 0 },
     };
 
-    const selectedFiscalYear = fiscalYears.find(
-        (fy) => fy.id === selectedYearId,
-    );
-    const selectedComparisonFiscalYear = comparisonYearId
-        ? fiscalYears.find((fy) => fy.id === comparisonYearId)
-        : undefined;
+    const { selectedFiscalYear, selectedComparisonFiscalYear } =
+        resolveComparisonFiscalYears(
+            fiscalYears,
+            selectedYearId,
+            comparisonYearId,
+        );
 
     // Calculate generic check
     const totalAssets = report.totals?.assets || 0;
