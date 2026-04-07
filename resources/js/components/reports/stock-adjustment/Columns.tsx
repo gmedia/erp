@@ -4,7 +4,7 @@ import {
     createReportTextColumn,
     createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
-import { createNumberColumn, createSortingHeader } from '@/utils/columns';
+import { createNumberColumn } from '@/utils/columns';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type StockAdjustmentReportItem = {
