@@ -16,8 +16,10 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import axios from '@/lib/axios';
 import AppLayout from '@/layouts/app-layout';
 import { cn, formatCurrency } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
@@ -37,6 +39,12 @@ export interface FinancialTableRow {
     level: number;
     parent_id: number | null;
 }
+
+type SingleYearFinancialReportResponse<TReport> = {
+    fiscalYears: FinancialReportFiscalYear[];
+    selectedYearId: number;
+    report: TReport;
+};
 
 type FinancialAmountColumn<TItem extends FinancialTableRow> = {
     header: string;
@@ -87,6 +95,36 @@ export function useSingleYearReportSearchParams() {
         urlYearId,
         handleYearChange,
     };
+}
+
+export function useSingleYearFinancialReportQuery<TReport>(
+    queryKey: string,
+    endpoint: string,
+    urlYearId: string | null,
+) {
+    return useQuery<SingleYearFinancialReportResponse<TReport>>({
+        queryKey: [queryKey, urlYearId],
+        queryFn: async () => {
+            const params = new URLSearchParams();
+
+            if (urlYearId) {
+                params.append('fiscal_year_id', urlYearId);
+            }
+
+            const response = await axios.get(
+                `/api/reports/${endpoint}?${params.toString()}`,
+            );
+
+            return response.data;
+        },
+    });
+}
+
+export function resolveSelectedFiscalYear(
+    fiscalYears: FinancialReportFiscalYear[],
+    selectedYearId: number,
+) {
+    return fiscalYears.find((fy) => fy.id === selectedYearId);
 }
 
 export function SingleYearFinancialReportPageShell({

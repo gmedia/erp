@@ -1,14 +1,14 @@
 import type { FinancialReportFiscalYear } from '@/components/reports/financial/FinancialReportPageShell';
 import {
     FinancialTableCard,
+    resolveSelectedFiscalYear,
     SingleYearFinancialReportPageShell,
+    useSingleYearFinancialReportQuery,
     useSingleYearReportSearchParams,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
 import { Badge } from '@/components/ui/badge';
-import axios from '@/lib/axios';
 import { cn, formatCurrency } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
 
 interface AccountItem extends FinancialTableRow {
     id: number;
@@ -31,19 +31,12 @@ interface TrialBalanceResponse {
 export default function TrialBalance() {
     const { urlYearId, handleYearChange } = useSingleYearReportSearchParams();
 
-    const { data, isLoading, error } = useQuery<TrialBalanceResponse>({
-        queryKey: ['trial-balance', urlYearId],
-        queryFn: async () => {
-            const params = new URLSearchParams();
-            if (urlYearId) {
-                params.append('fiscal_year_id', urlYearId);
-            }
-            const response = await axios.get(
-                `/api/reports/trial-balance?${params.toString()}`,
-            );
-            return response.data;
-        },
-    });
+    const { data, isLoading, error } =
+        useSingleYearFinancialReportQuery<TrialBalanceResponse['report']>(
+            'trial-balance',
+            'trial-balance',
+            urlYearId,
+        );
 
     const fiscalYears = Array.isArray(data?.fiscalYears)
         ? data.fiscalYears
@@ -59,8 +52,9 @@ export default function TrialBalance() {
     const difference = Math.abs(totalDebit - totalCredit);
     const isBalanced = Math.abs(totalDebit - totalCredit) < 0.01;
 
-    const selectedFiscalYear = fiscalYears.find(
-        (fy) => fy.id === selectedYearId,
+    const selectedFiscalYear = resolveSelectedFiscalYear(
+        fiscalYears,
+        selectedYearId,
     );
 
     return (

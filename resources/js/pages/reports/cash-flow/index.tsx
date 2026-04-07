@@ -1,15 +1,14 @@
 import type { FinancialReportFiscalYear } from '@/components/reports/financial/FinancialReportPageShell';
 import {
     FinancialTableCard,
+    resolveSelectedFiscalYear,
     SingleYearFinancialReportPageShell,
+    useSingleYearFinancialReportQuery,
     useSingleYearReportSearchParams,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
-
-import axios from '@/lib/axios';
-import { useQuery } from '@tanstack/react-query';
 
 interface CashFlowItem extends FinancialTableRow {
     id: number;
@@ -32,17 +31,12 @@ interface CashFlowResponse {
 export default function CashFlow() {
     const { urlYearId, handleYearChange } = useSingleYearReportSearchParams();
 
-    const { data, isLoading, error } = useQuery<CashFlowResponse>({
-        queryKey: ['cash-flow', urlYearId],
-        queryFn: async () => {
-            const params = new URLSearchParams();
-            if (urlYearId) params.append('fiscal_year_id', urlYearId);
-            const response = await axios.get(
-                `/api/reports/cash-flow?${params.toString()}`,
-            );
-            return response.data;
-        },
-    });
+    const { data, isLoading, error } =
+        useSingleYearFinancialReportQuery<CashFlowResponse['report']>(
+            'cash-flow',
+            'cash-flow',
+            urlYearId,
+        );
 
     const fiscalYears = Array.isArray(data?.fiscalYears)
         ? data.fiscalYears
@@ -60,8 +54,9 @@ export default function CashFlow() {
     );
     const netCashFlow = totalInflow - totalOutflow;
 
-    const selectedFiscalYear = fiscalYears.find(
-        (fy) => fy.id === selectedYearId,
+    const selectedFiscalYear = resolveSelectedFiscalYear(
+        fiscalYears,
+        selectedYearId,
     );
 
     return (
