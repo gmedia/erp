@@ -1,4 +1,7 @@
-import type { FinancialReportFiscalYear } from '@/components/reports/financial/FinancialReportPageShell';
+import {
+    FinancialReportHeaderMeta,
+    type FinancialReportFiscalYear,
+} from '@/components/reports/financial/FinancialReportPageShell';
 import {
     FinancialTableCard,
     resolveSelectedFiscalYear,
@@ -65,13 +68,7 @@ export default function CashFlow() {
             onYearChange={handleYearChange}
             isLoading={isLoading}
             hasError={!!error}
-            headerMeta={
-                selectedFiscalYear ? (
-                    <div className="text-sm text-muted-foreground">
-                        {selectedFiscalYear.name} • {selectedFiscalYear.status}
-                    </div>
-                ) : undefined
-            }
+            headerMeta={<FinancialReportHeaderMeta fiscalYear={selectedFiscalYear} />}
             preContent={
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <Card>

@@ -6,6 +6,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { Badge } from '@/components/ui/badge';
 import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
@@ -125,6 +126,42 @@ export function resolveComparisonFiscalYears(
             ? fiscalYears.find((fy) => fy.id === comparisonYearId)
             : undefined,
     };
+}
+
+type FinancialReportHeaderMetaProps = {
+    fiscalYear?: FinancialReportFiscalYear;
+    comparisonFiscalYear?: FinancialReportFiscalYear;
+    showComparisonBadge?: boolean;
+    children?: ReactNode;
+};
+
+export function FinancialReportHeaderMeta({
+    fiscalYear,
+    comparisonFiscalYear,
+    showComparisonBadge = false,
+    children,
+}: Readonly<FinancialReportHeaderMetaProps>) {
+    if (!fiscalYear && !showComparisonBadge && !children) {
+        return null;
+    }
+
+    return (
+        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+            {fiscalYear && (
+                <span>
+                    {fiscalYear.name} • {fiscalYear.status}
+                </span>
+            )}
+            {showComparisonBadge && (
+                <Badge variant="outline">
+                    {comparisonFiscalYear
+                        ? `Compare: ${comparisonFiscalYear.name}`
+                        : 'Compare: None'}
+                </Badge>
+            )}
+            {children}
+        </div>
+    );
 }
 
 export function FinancialReportPageShell({

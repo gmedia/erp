@@ -1,4 +1,7 @@
-import type { FinancialReportFiscalYear } from '@/components/reports/financial/FinancialReportPageShell';
+import {
+    FinancialReportHeaderMeta,
+    type FinancialReportFiscalYear,
+} from '@/components/reports/financial/FinancialReportPageShell';
 import {
     FinancialTableCard,
     resolveSelectedFiscalYear,
@@ -64,13 +67,7 @@ export default function TrialBalance() {
             isLoading={isLoading}
             hasError={!!error}
             headerMeta={
-                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                    {selectedFiscalYear && (
-                        <span>
-                            {selectedFiscalYear.name} •{' '}
-                            {selectedFiscalYear.status}
-                        </span>
-                    )}
+                <FinancialReportHeaderMeta fiscalYear={selectedFiscalYear}>
                     {report.length > 0 && (
                         <Badge
                             variant={isBalanced ? 'secondary' : 'destructive'}
@@ -84,7 +81,7 @@ export default function TrialBalance() {
                                 : `Unbalanced • ${formatCurrency(difference)}`}
                         </Badge>
                     )}
-                </div>
+                </FinancialReportHeaderMeta>
             }
         >
             <FinancialTableCard

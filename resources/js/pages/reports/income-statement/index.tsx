@@ -1,4 +1,5 @@
 import {
+    FinancialReportHeaderMeta,
     FinancialReportPageShell,
     resolveComparisonFiscalYears,
     useComparisonFinancialReportQuery,
@@ -95,18 +96,11 @@ export default function IncomeStatement() {
             isLoading={isLoading}
             hasError={!!error}
             headerMeta={
-                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                    {selectedFiscalYear && (
-                        <span>
-                            {selectedFiscalYear.name} •{' '}
-                            {selectedFiscalYear.status}
-                        </span>
-                    )}
-                    <Badge variant="outline">
-                        {selectedComparisonFiscalYear
-                            ? `Compare: ${selectedComparisonFiscalYear.name}`
-                            : 'Compare: None'}
-                    </Badge>
+                <FinancialReportHeaderMeta
+                    fiscalYear={selectedFiscalYear}
+                    comparisonFiscalYear={selectedComparisonFiscalYear}
+                    showComparisonBadge
+                >
                     <Badge
                         variant={isProfit ? 'secondary' : 'destructive'}
                         className={cn(
@@ -116,7 +110,7 @@ export default function IncomeStatement() {
                     >
                         {isProfit ? 'Profit' : 'Loss'}
                     </Badge>
-                </div>
+                </FinancialReportHeaderMeta>
             }
         >
             <div className="grid gap-6">

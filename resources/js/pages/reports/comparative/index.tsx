@@ -1,4 +1,5 @@
 import {
+    FinancialReportHeaderMeta,
     FinancialReportPageShell,
     resolveComparisonFiscalYears,
     useComparisonFinancialReportQuery,
@@ -9,8 +10,6 @@ import {
     FinancialReportSection,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
-import { Badge } from '@/components/ui/badge';
-
 interface ComparativeReportResponse {
     fiscalYears: FinancialReportFiscalYear[];
     selectedYearId: number;
@@ -97,19 +96,11 @@ export default function ComparativeReport() {
             isLoading={isLoading}
             hasError={!!error}
             headerMeta={
-                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                    {selectedFiscalYear && (
-                        <span>
-                            {selectedFiscalYear.name} •{' '}
-                            {selectedFiscalYear.status}
-                        </span>
-                    )}
-                    <Badge variant="outline">
-                        {selectedComparisonFiscalYear
-                            ? `Compare: ${selectedComparisonFiscalYear.name}`
-                            : 'Compare: None'}
-                    </Badge>
-                </div>
+                <FinancialReportHeaderMeta
+                    fiscalYear={selectedFiscalYear}
+                    comparisonFiscalYear={selectedComparisonFiscalYear}
+                    showComparisonBadge
+                />
             }
         >
             <div className="grid gap-6">

@@ -1,4 +1,5 @@
 import {
+    FinancialReportHeaderMeta,
     FinancialReportPageShell,
     resolveComparisonFiscalYears,
     useComparisonFinancialReportQuery,
@@ -97,18 +98,11 @@ export default function BalanceSheet() {
             isLoading={isLoading}
             hasError={!!error}
             headerMeta={
-                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                    {selectedFiscalYear && (
-                        <span>
-                            {selectedFiscalYear.name} •{' '}
-                            {selectedFiscalYear.status}
-                        </span>
-                    )}
-                    <Badge variant="outline">
-                        {selectedComparisonFiscalYear
-                            ? `Compare: ${selectedComparisonFiscalYear.name}`
-                            : 'Compare: None'}
-                    </Badge>
+                <FinancialReportHeaderMeta
+                    fiscalYear={selectedFiscalYear}
+                    comparisonFiscalYear={selectedComparisonFiscalYear}
+                    showComparisonBadge
+                >
                     <Badge
                         variant={isBalanced ? 'secondary' : 'destructive'}
                         className={cn(
@@ -120,7 +114,7 @@ export default function BalanceSheet() {
                             ? 'Balanced'
                             : `Unbalanced • ${formatCurrency(difference)}`}
                     </Badge>
-                </div>
+                </FinancialReportHeaderMeta>
             }
         >
             <div className="grid gap-6">
