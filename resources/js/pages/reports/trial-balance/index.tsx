@@ -10,7 +10,7 @@ import {
     useSingleYearReportSearchParams,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
-import { Badge } from '@/components/ui/badge';
+import { FinancialStatusBadge } from '@/components/reports/financial/FinancialSummaryCard';
 import { cn, formatCurrency } from '@/lib/utils';
 
 interface AccountItem extends FinancialTableRow {
@@ -69,17 +69,11 @@ export default function TrialBalance() {
             headerMeta={
                 <FinancialReportHeaderMeta fiscalYear={selectedFiscalYear}>
                     {report.length > 0 && (
-                        <Badge
-                            variant={isBalanced ? 'secondary' : 'destructive'}
-                            className={cn(
-                                isBalanced &&
-                                    'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
-                            )}
-                        >
-                            {isBalanced
-                                ? 'Balanced'
-                                : `Unbalanced • ${formatCurrency(difference)}`}
-                        </Badge>
+                        <FinancialStatusBadge
+                            isPositive={isBalanced}
+                            positiveLabel="Balanced"
+                            negativeLabel={`Unbalanced • ${formatCurrency(difference)}`}
+                        />
                     )}
                 </FinancialReportHeaderMeta>
             }

@@ -11,14 +11,10 @@ import {
     getChangeTextClass,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
-import { Badge } from '@/components/ui/badge';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+    FinancialStatusBadge,
+    FinancialSummaryCard,
+} from '@/components/reports/financial/FinancialSummaryCard';
 import { Separator } from '@/components/ui/separator';
 import { cn, formatCurrency } from '@/lib/utils';
 
@@ -101,15 +97,11 @@ export default function IncomeStatement() {
                     comparisonFiscalYear={selectedComparisonFiscalYear}
                     showComparisonBadge
                 >
-                    <Badge
-                        variant={isProfit ? 'secondary' : 'destructive'}
-                        className={cn(
-                            isProfit &&
-                                'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
-                        )}
-                    >
-                        {isProfit ? 'Profit' : 'Loss'}
-                    </Badge>
+                    <FinancialStatusBadge
+                        isPositive={isProfit}
+                        positiveLabel="Profit"
+                        negativeLabel="Loss"
+                    />
                 </FinancialReportHeaderMeta>
             }
         >
@@ -134,104 +126,83 @@ export default function IncomeStatement() {
                     showComparison={!!comparisonYearId}
                 />
 
-                <Card
-                    className={cn(
-                        'overflow-hidden border-t-4',
-                        isProfit ? 'border-emerald-500' : 'border-destructive',
-                    )}
+                <FinancialSummaryCard
+                    description="Net Income = Total Revenue - Total Expense."
+                    isPositive={isProfit}
+                    status={
+                        <FinancialStatusBadge
+                            isPositive={isProfit}
+                            positiveLabel="Profit"
+                            negativeLabel="Loss"
+                        />
+                    }
                 >
-                    <CardHeader className="bg-muted/15">
-                        <div className="flex items-start justify-between gap-3">
-                            <div className="space-y-1">
-                                <CardTitle className="text-base">
-                                    Summary
-                                </CardTitle>
-                                <CardDescription className="text-xs">
-                                    Net Income = Total Revenue - Total Expense.
-                                </CardDescription>
-                            </div>
-                            <Badge
-                                variant={isProfit ? 'secondary' : 'destructive'}
+                    <div className="grid gap-3 rounded-lg border bg-background p-4">
+                        <div className="flex items-center justify-between gap-4">
+                            <span className="text-sm text-muted-foreground">
+                                Total Revenue
+                            </span>
+                            <span className="text-sm font-semibold tabular-nums">
+                                {formatCurrency(totalRevenue)}
+                            </span>
+                        </div>
+                        <Separator />
+                        <div className="flex items-center justify-between gap-4">
+                            <span className="text-sm text-muted-foreground">
+                                Total Expense
+                            </span>
+                            <span className="text-sm font-semibold tabular-nums">
+                                {formatCurrency(totalExpense)}
+                            </span>
+                        </div>
+                        <Separator />
+                        <div className="flex items-center justify-between gap-4">
+                            <span className="text-sm text-muted-foreground">
+                                Net Income
+                            </span>
+                            <span
                                 className={cn(
-                                    isProfit &&
-                                        'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+                                    'text-sm font-semibold tabular-nums',
+                                    isProfit
+                                        ? 'text-emerald-700 dark:text-emerald-300'
+                                        : 'text-destructive',
                                 )}
                             >
-                                {isProfit ? 'Profit' : 'Loss'}
-                            </Badge>
+                                {formatCurrency(netIncome)}
+                            </span>
                         </div>
-                    </CardHeader>
-                    <CardContent className="grid gap-4">
-                        <div className="grid gap-3 rounded-lg border bg-background p-4">
-                            <div className="flex items-center justify-between gap-4">
-                                <span className="text-sm text-muted-foreground">
-                                    Total Revenue
-                                </span>
-                                <span className="text-sm font-semibold tabular-nums">
-                                    {formatCurrency(totalRevenue)}
-                                </span>
-                            </div>
-                            <Separator />
-                            <div className="flex items-center justify-between gap-4">
-                                <span className="text-sm text-muted-foreground">
-                                    Total Expense
-                                </span>
-                                <span className="text-sm font-semibold tabular-nums">
-                                    {formatCurrency(totalExpense)}
-                                </span>
-                            </div>
-                            <Separator />
-                            <div className="flex items-center justify-between gap-4">
-                                <span className="text-sm text-muted-foreground">
-                                    Net Income
-                                </span>
-                                <span
-                                    className={cn(
-                                        'text-sm font-semibold tabular-nums',
-                                        isProfit
-                                            ? 'text-emerald-700 dark:text-emerald-300'
-                                            : 'text-destructive',
-                                    )}
-                                >
-                                    {formatCurrency(netIncome)}
-                                </span>
-                            </div>
-                            {!!comparisonYearId && (
-                                <>
-                                    <Separator />
-                                    <div className="flex items-center justify-between gap-4">
-                                        <span className="text-sm text-muted-foreground">
-                                            Net Income (Comparison)
-                                        </span>
-                                        <span className="text-sm font-semibold text-muted-foreground tabular-nums">
-                                            {formatCurrency(
-                                                netIncomeComparison,
-                                            )}
-                                        </span>
-                                    </div>
-                                    <Separator />
-                                    <div className="flex items-center justify-between gap-4">
-                                        <span className="text-sm text-muted-foreground">
-                                            Net Income Change
-                                        </span>
-                                        <span
-                                            className={cn(
-                                                'text-sm font-semibold tabular-nums',
-                                                getChangeTextClass(
-                                                    netIncomeChange,
-                                                ),
-                                            )}
-                                        >
-                                            {formatCurrency(netIncomeChange)} (
-                                            {netIncomeChangePct.toFixed(1)}
-                                            %)
-                                        </span>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
+                        {!!comparisonYearId && (
+                            <>
+                                <Separator />
+                                <div className="flex items-center justify-between gap-4">
+                                    <span className="text-sm text-muted-foreground">
+                                        Net Income (Comparison)
+                                    </span>
+                                    <span className="text-sm font-semibold text-muted-foreground tabular-nums">
+                                        {formatCurrency(netIncomeComparison)}
+                                    </span>
+                                </div>
+                                <Separator />
+                                <div className="flex items-center justify-between gap-4">
+                                    <span className="text-sm text-muted-foreground">
+                                        Net Income Change
+                                    </span>
+                                    <span
+                                        className={cn(
+                                            'text-sm font-semibold tabular-nums',
+                                            getChangeTextClass(
+                                                netIncomeChange,
+                                            ),
+                                        )}
+                                    >
+                                        {formatCurrency(netIncomeChange)} (
+                                        {netIncomeChangePct.toFixed(1)}%)
+                                    </span>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </FinancialSummaryCard>
             </div>
         </FinancialReportPageShell>
     );
