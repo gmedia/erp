@@ -2,6 +2,7 @@ import {
     FinancialReportHeaderMeta,
     type FinancialReportFiscalYear,
 } from '@/components/reports/financial/FinancialReportPageShell';
+import { FinancialStatusBadge } from '@/components/reports/financial/FinancialSummaryCard';
 import {
     FinancialTableCard,
     resolveSelectedFiscalYear,
@@ -10,8 +11,7 @@ import {
     useSingleYearReportSearchParams,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
-import { FinancialStatusBadge } from '@/components/reports/financial/FinancialSummaryCard';
-import { cn, formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 
 interface AccountItem extends FinancialTableRow {
     id: number;

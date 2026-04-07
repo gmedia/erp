@@ -190,9 +190,7 @@ export default function IncomeStatement() {
                                     <span
                                         className={cn(
                                             'text-sm font-semibold tabular-nums',
-                                            getChangeTextClass(
-                                                netIncomeChange,
-                                            ),
+                                            getChangeTextClass(netIncomeChange),
                                         )}
                                     >
                                         {formatCurrency(netIncomeChange)} (
