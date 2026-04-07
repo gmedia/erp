@@ -722,6 +722,31 @@ export function createAssetCategoryBranchFilterFields(): FieldDescriptor[] {
     ];
 }
 
+export function createAssetReportScopeFilterFields(
+    searchPlaceholder = 'Search code, name...',
+): FieldDescriptor[] {
+    return [
+        createTextFilterField('search', 'Search', searchPlaceholder),
+        ...createAssetCategoryBranchFilterFields(),
+    ];
+}
+
+export function createAssetStocktakeVarianceScopeFilterFields(
+    stocktakePlaceholder = 'Select a stocktake',
+    resultPlaceholder = 'Select result',
+): FieldDescriptor[] {
+    return [
+        createAssetStocktakeFilterField(stocktakePlaceholder),
+        createBranchFilterField('Select a branch'),
+        createSelectFilterField(
+            'result',
+            'Result',
+            assetStocktakeVarianceResultOptions,
+            resultPlaceholder,
+        ),
+    ];
+}
+
 export function createEmployeeOrganizationFilterFields(): FieldDescriptor[] {
     return [
         createDepartmentFilterField(),

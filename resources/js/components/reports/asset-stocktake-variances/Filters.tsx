@@ -1,8 +1,5 @@
 import {
-    assetStocktakeVarianceResultOptions,
-    createAssetStocktakeFilterField,
-    createBranchFilterField,
-    createSelectFilterField,
+    createAssetStocktakeVarianceScopeFilterFields,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
@@ -14,13 +11,6 @@ export function createVarianceFilterFields(): FieldDescriptor[] {
             'Search',
             'Search code, name, notes...',
         ),
-        createAssetStocktakeFilterField('Select a stocktake'),
-        createBranchFilterField('Select a branch'),
-        createSelectFilterField(
-            'result',
-            'Result',
-            assetStocktakeVarianceResultOptions,
-            'Select result',
-        ),
+        ...createAssetStocktakeVarianceScopeFilterFields(),
     ];
 }

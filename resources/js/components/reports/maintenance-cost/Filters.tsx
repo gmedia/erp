@@ -1,20 +1,14 @@
 import {
-    createAssetCategoryBranchFilterFields,
+    createAssetReportScopeFilterFields,
     createDateRangeFilterFields,
     createMaintenanceTypeStatusFilterFields,
     createSupplierFilterField,
-    createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
 export function createMaintenanceCostReportFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search code, name, notes...',
-        ),
-        ...createAssetCategoryBranchFilterFields(),
+        ...createAssetReportScopeFilterFields('Search code, name, notes...'),
         createSupplierFilterField('Select a vendor', 'Vendor'),
         ...createMaintenanceTypeStatusFilterFields(),
         ...createDateRangeFilterFields(),
