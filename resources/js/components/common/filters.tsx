@@ -35,6 +35,29 @@ export const purchaseOrderStatusOptions: SelectOption[] = [
     { value: 'closed', label: 'Closed' },
 ];
 
+export const currencyOptions: SelectOption[] = [
+    { value: 'IDR', label: 'IDR' },
+    { value: 'USD', label: 'USD' },
+    { value: 'EUR', label: 'EUR' },
+];
+
+export const purchaseRequestPriorityOptions: SelectOption[] = [
+    { value: 'low', label: 'Low' },
+    { value: 'normal', label: 'Normal' },
+    { value: 'high', label: 'High' },
+    { value: 'urgent', label: 'Urgent' },
+];
+
+export const purchaseRequestStatusOptions: SelectOption[] = [
+    { value: 'draft', label: 'Draft' },
+    { value: 'pending_approval', label: 'Pending Approval' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'rejected', label: 'Rejected' },
+    { value: 'partially_ordered', label: 'Partially Ordered' },
+    { value: 'fully_ordered', label: 'Fully Ordered' },
+    { value: 'cancelled', label: 'Cancelled' },
+];
+
 export const maintenanceTypeOptions: SelectOption[] = [
     { value: 'preventive', label: 'Preventive' },
     { value: 'corrective', label: 'Corrective' },
@@ -139,6 +162,19 @@ export const stockAdjustmentStatusOptions: SelectOption[] = [
     { value: 'pending_approval', label: 'Pending Approval' },
     { value: 'approved', label: 'Approved' },
     { value: 'cancelled', label: 'Cancelled' },
+];
+
+export const stockMovementTypeOptions: SelectOption[] = [
+    { value: 'goods_receipt', label: 'Goods Receipt' },
+    { value: 'supplier_return', label: 'Supplier Return' },
+    { value: 'transfer_out', label: 'Transfer Out' },
+    { value: 'transfer_in', label: 'Transfer In' },
+    { value: 'adjustment_in', label: 'Adjustment In' },
+    { value: 'adjustment_out', label: 'Adjustment Out' },
+    { value: 'production_consume', label: 'Production Consume' },
+    { value: 'production_output', label: 'Production Output' },
+    { value: 'sales', label: 'Sales' },
+    { value: 'sales_return', label: 'Sales Return' },
 ];
 
 export const assetStocktakeVarianceResultOptions: SelectOption[] = [
@@ -317,6 +353,18 @@ export function createSupplierFilterField(
     );
 }
 
+export function createProductFilterField(
+    placeholder = 'Select a product',
+    label = 'Product',
+): FieldDescriptor {
+    return createAsyncSelectFilterField(
+        'product_id',
+        label,
+        '/api/products',
+        placeholder,
+    );
+}
+
 export function createEmployeeLookupFilterField(
     name = 'employee_id',
     label = 'Employee',
@@ -441,6 +489,40 @@ export function createSupplierWarehouseProductFilterFields(): FieldDescriptor[] 
             placeholder: 'All products',
         },
     ]);
+}
+
+export function createSupplierWarehouseFilterFields(
+    supplierPlaceholder = 'Select a supplier',
+    warehousePlaceholder = 'Select a warehouse',
+): FieldDescriptor[] {
+    return [
+        createSupplierFilterField(supplierPlaceholder),
+        createWarehouseFilterField(warehousePlaceholder),
+    ];
+}
+
+export function createPurchaseRequestContextFilterFields(
+    requesterPlaceholder = 'Select requester',
+): FieldDescriptor[] {
+    return [
+        createBranchFilterField('Select a branch'),
+        createDepartmentFilterField('Select a department'),
+        createEmployeeLookupFilterField(
+            'requested_by',
+            'Requester',
+            requesterPlaceholder,
+        ),
+    ];
+}
+
+export function createProductWarehouseFilterFields(
+    productPlaceholder = 'Select a product',
+    warehousePlaceholder = 'Select a warehouse',
+): FieldDescriptor[] {
+    return [
+        createProductFilterField(productPlaceholder),
+        createWarehouseFilterField(warehousePlaceholder),
+    ];
 }
 
 export function createWarehouseStatusFilterFields(

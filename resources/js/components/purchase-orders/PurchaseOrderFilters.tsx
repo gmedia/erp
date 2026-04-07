@@ -1,10 +1,12 @@
 'use client';
 
-import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
-    createAsyncSelectFilterField,
-    createSelectFilterField,
+    createDateFilterFields,
+    createSelectFilterFields,
+    createSupplierWarehouseFilterFields,
     createTextFilterField,
+    currencyOptions,
+    purchaseOrderStatusOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
@@ -15,52 +17,32 @@ export function createPurchaseOrderFilterFields(): FieldDescriptor[] {
             'Search',
             'Search PO number, payment terms, notes, or shipping address...',
         ),
-        createAsyncSelectFilterField(
-            'supplier_id',
-            'Supplier',
-            '/api/suppliers',
-            'Select a supplier',
-        ),
-        createAsyncSelectFilterField(
-            'warehouse_id',
-            'Warehouse',
-            '/api/warehouses',
-            'Select a warehouse',
-        ),
-        createSelectFilterField(
-            'status',
-            'Status',
-            [
-                { value: 'draft', label: 'Draft' },
-                { value: 'pending_approval', label: 'Pending Approval' },
-                { value: 'confirmed', label: 'Confirmed' },
-                { value: 'rejected', label: 'Rejected' },
-                { value: 'partially_received', label: 'Partially Received' },
-                { value: 'fully_received', label: 'Fully Received' },
-                { value: 'cancelled', label: 'Cancelled' },
-                { value: 'closed', label: 'Closed' },
-            ],
-            'Select Status',
-        ),
-        createSelectFilterField(
-            'currency',
-            'Currency',
-            [
-                { value: 'IDR', label: 'IDR' },
-                { value: 'USD', label: 'USD' },
-                { value: 'EUR', label: 'EUR' },
-            ],
-            'Select Currency',
-        ),
-        {
-            name: 'order_date_from',
-            label: 'Order Date From',
-            component: <FilterDatePicker placeholder="Order Date From" />,
-        },
-        {
-            name: 'order_date_to',
-            label: 'Order Date To',
-            component: <FilterDatePicker placeholder="Order Date To" />,
-        },
+        ...createSupplierWarehouseFilterFields(),
+        ...createSelectFilterFields([
+            {
+                name: 'status',
+                label: 'Status',
+                options: purchaseOrderStatusOptions,
+                placeholder: 'Select Status',
+            },
+            {
+                name: 'currency',
+                label: 'Currency',
+                options: currencyOptions,
+                placeholder: 'Select Currency',
+            },
+        ]),
+        ...createDateFilterFields([
+            {
+                name: 'order_date_from',
+                label: 'Order Date From',
+                placeholder: 'Order Date From',
+            },
+            {
+                name: 'order_date_to',
+                label: 'Order Date To',
+                placeholder: 'Order Date To',
+            },
+        ]),
     ];
 }
