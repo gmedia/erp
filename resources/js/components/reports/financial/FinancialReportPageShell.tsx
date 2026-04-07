@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import {
     Select,
     SelectContent,
@@ -6,7 +7,6 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import { Badge } from '@/components/ui/badge';
 import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
