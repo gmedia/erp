@@ -150,11 +150,13 @@ export function DataTable<T>({
     const { exporting, exportData } = useExport({ endpoint: exportEndpoint });
 
     // Temporary filter state for the modal
-    const [tempFilters, setTempFilters] = React.useState<Record<string, string>>(
+    const [tempFilters, setTempFilters] = React.useState<
+        Record<string, string>
+    >(
         Object.fromEntries(
-            Object.entries(filters).filter(
-                ([, v]) => v !== undefined && v !== '',
-            ).map(([key, value]) => [key, String(value)]),
+            Object.entries(filters)
+                .filter(([, v]) => v !== undefined && v !== '')
+                .map(([key, value]) => [key, String(value)]),
         ) as Record<string, string>,
     );
 
@@ -195,9 +197,9 @@ export function DataTable<T>({
         if (isFilterModalOpen) {
             setTempFilters(
                 Object.fromEntries(
-                    Object.entries(filters).filter(
-                        ([, v]) => v !== undefined && v !== '',
-                    ).map(([key, value]) => [key, String(value)]),
+                    Object.entries(filters)
+                        .filter(([, v]) => v !== undefined && v !== '')
+                        .map(([key, value]) => [key, String(value)]),
                 ) as Record<string, string>,
             );
         }
@@ -363,9 +365,9 @@ export function DataTable<T>({
                 onApplyFilters={handleApplyFilters}
                 onResetFilters={() => {
                     const cleaned = Object.fromEntries(
-                        Object.entries(filters).filter(
-                            ([, v]) => v !== undefined && v !== '',
-                        ).map(([key, value]) => [key, String(value)]),
+                        Object.entries(filters)
+                            .filter(([, v]) => v !== undefined && v !== '')
+                            .map(([key, value]) => [key, String(value)]),
                     ) as Record<string, string>;
                     setTempFilters(cleaned);
                 }}

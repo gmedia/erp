@@ -42,7 +42,10 @@ type DataTablePageProps<TData, TFilters extends FilterState = FilterState> = {
     children?: ReactNode;
 };
 
-export function DataTablePage<TData, TFilters extends FilterState = FilterState>({
+export function DataTablePage<
+    TData,
+    TFilters extends FilterState = FilterState,
+>({
     title,
     breadcrumbs,
     columns,
@@ -61,8 +64,7 @@ export function DataTablePage<TData, TFilters extends FilterState = FilterState>
     onResetFilters,
     children,
 }: Readonly<DataTablePageProps<TData, TFilters>>) {
-    const tableFilters =
-        filters as Record<string, string | number | undefined>;
+    const tableFilters = filters as Record<string, string | number | undefined>;
 
     return (
         <>

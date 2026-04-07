@@ -106,7 +106,9 @@ export function AuditTrailPage<
                             filterValue={String(filters.search ?? '')}
                             filters={filters}
                             onFilterChange={(newFilters) =>
-                                handleFilterChange(newFilters as Partial<TFilters>)
+                                handleFilterChange(
+                                    newFilters as Partial<TFilters>,
+                                )
                             }
                             onResetFilters={resetFilters}
                             filterFields={filterFields}

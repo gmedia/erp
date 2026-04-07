@@ -1,7 +1,7 @@
 import {
     FinancialReportPageShell,
-    type FinancialReportFiscalYear,
     useComparisonReportSearchParams,
+    type FinancialReportFiscalYear,
 } from '@/components/reports/financial/FinancialReportPageShell';
 import {
     FinancialReportSection,
