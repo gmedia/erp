@@ -46,7 +46,8 @@ export const bookValueDepreciationColumns: ColumnDef<BookValueDepreciationReport
         createReportTextColumn<BookValueDepreciationReportItem>({
             accessorKey: 'purchase_date',
             header: 'Purchase Date',
-            getValue: (item) => formatDateByRegionalSettings(item.purchase_date),
+            getValue: (item) =>
+                formatDateByRegionalSettings(item.purchase_date),
             sortable: true,
         }),
         {

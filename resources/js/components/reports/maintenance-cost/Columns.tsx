@@ -2,7 +2,6 @@ import {
     createReportStatusBadgeColumn,
     createReportTextColumn,
 } from '@/components/common/ReportColumns';
-import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
 import { createSortingHeader } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
