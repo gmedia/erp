@@ -6,10 +6,7 @@ import {
     createReportTextColumn,
     createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
-import {
-    createCurrencyColumn,
-    createNumberColumn,
-} from '@/utils/columns';
+import { createCurrencyColumn, createNumberColumn } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
