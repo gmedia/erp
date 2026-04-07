@@ -1,6 +1,9 @@
 'use client';
 
-import { ReportDataTablePage } from '@/components/common/ReportDataTablePage';
+import {
+    createReportBreadcrumbs,
+    ReportDataTablePage,
+} from '@/components/common/ReportDataTablePage';
 import {
     bookValueDepreciationColumns,
     BookValueDepreciationReportItem,
@@ -11,13 +14,10 @@ export default function BookValueDepreciationReport() {
     return (
         <ReportDataTablePage<BookValueDepreciationReportItem>
             title="Book Value & Depreciation Report"
-            breadcrumbs={[
-                { title: 'Reports', href: '#' },
-                {
-                    title: 'Book Value & Depreciation',
-                    href: '/reports/book-value-depreciation',
-                },
-            ]}
+            breadcrumbs={createReportBreadcrumbs(
+                'Book Value & Depreciation',
+                '/reports/book-value-depreciation',
+            )}
             columns={bookValueDepreciationColumns}
             filterFields={createBookValueReportFilterFields()}
             initialFilters={{

@@ -1,6 +1,9 @@
 'use client';
 
-import { ReportDataTablePage } from '@/components/common/ReportDataTablePage';
+import {
+    createReportBreadcrumbs,
+    ReportDataTablePage,
+} from '@/components/common/ReportDataTablePage';
 import {
     AssetStocktakeVarianceItem,
     varianceColumns,
@@ -11,13 +14,10 @@ export default function StocktakeVarianceReport() {
     return (
         <ReportDataTablePage<AssetStocktakeVarianceItem>
             title="Stocktake Variance Report"
-            breadcrumbs={[
-                { title: 'Reports', href: '#' },
-                {
-                    title: 'Stocktake Variance',
-                    href: '/asset-stocktake-variances',
-                },
-            ]}
+            breadcrumbs={createReportBreadcrumbs(
+                'Stocktake Variance',
+                '/asset-stocktake-variances',
+            )}
             columns={varianceColumns}
             filterFields={createVarianceFilterFields()}
             initialFilters={{

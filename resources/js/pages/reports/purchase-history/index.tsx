@@ -1,6 +1,9 @@
 'use client';
 
-import { ReportDataTablePage } from '@/components/common/ReportDataTablePage';
+import {
+    createReportBreadcrumbs,
+    ReportDataTablePage,
+} from '@/components/common/ReportDataTablePage';
 import {
     purchaseHistoryReportColumns,
     type PurchaseHistoryReportItem,
@@ -11,13 +14,10 @@ export default function PurchaseHistoryReportPage() {
     return (
         <ReportDataTablePage<PurchaseHistoryReportItem>
             title="Purchase History Report"
-            breadcrumbs={[
-                { title: 'Reports', href: '#' },
-                {
-                    title: 'Purchase History',
-                    href: '/reports/purchase-history',
-                },
-            ]}
+            breadcrumbs={createReportBreadcrumbs(
+                'Purchase History',
+                '/reports/purchase-history',
+            )}
             columns={purchaseHistoryReportColumns}
             filterFields={createPurchaseHistoryReportFilterFields()}
             initialFilters={{

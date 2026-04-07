@@ -1,6 +1,9 @@
 'use client';
 
-import { ReportDataTablePage } from '@/components/common/ReportDataTablePage';
+import {
+    createReportBreadcrumbs,
+    ReportDataTablePage,
+} from '@/components/common/ReportDataTablePage';
 import {
     inventoryValuationColumns,
     type InventoryValuationItem,
@@ -11,13 +14,10 @@ export default function InventoryValuationReportPage() {
     return (
         <ReportDataTablePage<InventoryValuationItem>
             title="Inventory Valuation Report"
-            breadcrumbs={[
-                { title: 'Reports', href: '#' },
-                {
-                    title: 'Inventory Valuation',
-                    href: '/reports/inventory-valuation',
-                },
-            ]}
+            breadcrumbs={createReportBreadcrumbs(
+                'Inventory Valuation',
+                '/reports/inventory-valuation',
+            )}
             columns={inventoryValuationColumns}
             filterFields={createInventoryValuationFilterFields()}
             initialFilters={{

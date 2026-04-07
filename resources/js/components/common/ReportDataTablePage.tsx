@@ -15,6 +15,16 @@ type BreadcrumbItem = {
     href: string;
 };
 
+export function createReportBreadcrumbs(
+    title: string,
+    href: string,
+): BreadcrumbItem[] {
+    return [
+        { title: 'Reports', href: '#' },
+        { title, href },
+    ];
+}
+
 type ReportDataTablePageProps<
     TData,
     TFilters extends FilterState = FilterState,

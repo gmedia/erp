@@ -1,6 +1,9 @@
 'use client';
 
-import { ReportDataTablePage } from '@/components/common/ReportDataTablePage';
+import {
+    createReportBreadcrumbs,
+    ReportDataTablePage,
+} from '@/components/common/ReportDataTablePage';
 import {
     maintenanceCostColumns,
     MaintenanceCostReportItem,
@@ -11,13 +14,10 @@ export default function MaintenanceCostReport() {
     return (
         <ReportDataTablePage<MaintenanceCostReportItem>
             title="Maintenance Cost Report"
-            breadcrumbs={[
-                { title: 'Reports', href: '#' },
-                {
-                    title: 'Maintenance Cost',
-                    href: '/reports/maintenance-cost',
-                },
-            ]}
+            breadcrumbs={createReportBreadcrumbs(
+                'Maintenance Cost',
+                '/reports/maintenance-cost',
+            )}
             columns={maintenanceCostColumns}
             filterFields={createMaintenanceCostReportFilterFields()}
             initialFilters={{

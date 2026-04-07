@@ -1,6 +1,9 @@
 'use client';
 
-import { ReportDataTablePage } from '@/components/common/ReportDataTablePage';
+import {
+    createReportBreadcrumbs,
+    ReportDataTablePage,
+} from '@/components/common/ReportDataTablePage';
 import {
     goodsReceiptReportColumns,
     type GoodsReceiptReportItem,
@@ -11,10 +14,10 @@ export default function GoodsReceiptReportPage() {
     return (
         <ReportDataTablePage<GoodsReceiptReportItem>
             title="Goods Receipt Report"
-            breadcrumbs={[
-                { title: 'Reports', href: '#' },
-                { title: 'Goods Receipt', href: '/reports/goods-receipt' },
-            ]}
+            breadcrumbs={createReportBreadcrumbs(
+                'Goods Receipt',
+                '/reports/goods-receipt',
+            )}
             columns={goodsReceiptReportColumns}
             filterFields={createGoodsReceiptReportFilterFields()}
             initialFilters={{
