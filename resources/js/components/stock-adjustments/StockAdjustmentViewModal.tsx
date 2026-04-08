@@ -1,14 +1,6 @@
 import { ViewField } from '@/components/common/ViewField';
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import {
     Table,
     TableBody,
@@ -62,17 +54,15 @@ export const StockAdjustmentViewModal = React.memo(
         const current = detail || item;
 
         return (
-            <Dialog open={open} onOpenChange={onClose}>
-                <DialogContent className="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden sm:max-w-7xl">
-                    <DialogHeader>
-                        <DialogTitle>Stock Adjustment Details</DialogTitle>
-                        <DialogDescription>
-                            {t('common.view_details')}
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
-                        <div className="space-y-6 py-4">
+            <ViewModalShell
+                open={open}
+                onClose={onClose}
+                title="Stock Adjustment Details"
+                description={t('common.view_details')}
+                contentClassName="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden sm:max-w-7xl"
+            >
+                <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
+                    <div className="space-y-6 py-4">
                             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                 <ViewField
                                     label="Adjustment Number"
@@ -203,16 +193,9 @@ export const StockAdjustmentViewModal = React.memo(
                                     </Table>
                                 </div>
                             </div>
-                        </div>
                     </div>
-
-                    <DialogFooter>
-                        <Button type="button" onClick={onClose}>
-                            Close
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                </div>
+            </ViewModalShell>
         );
     },
 );

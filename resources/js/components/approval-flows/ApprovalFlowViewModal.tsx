@@ -1,14 +1,6 @@
 import { ViewField } from '@/components/common/ViewField';
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { useTranslation } from '@/contexts/i18n-context';
 import { type ApprovalFlow } from '@/types/entity';
 import { memo } from 'react';
@@ -25,17 +17,15 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
         if (!item) return null;
 
         return (
-            <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-                <DialogContent className="flex max-h-[90vh] max-w-3xl flex-col overflow-hidden">
-                    <DialogHeader>
-                        <DialogTitle>View Approval Flow</DialogTitle>
-                        <DialogDescription>
-                            {t('common.view_details')}
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
-                        <div className="space-y-6 py-4">
+            <ViewModalShell
+                open={open}
+                onClose={onClose}
+                title="View Approval Flow"
+                description={t('common.view_details')}
+                contentClassName="flex max-h-[90vh] max-w-3xl flex-col overflow-hidden"
+            >
+                <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
+                    <div className="space-y-6 py-4">
                             {/* Basic Info Section */}
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <ViewField label="Code" value={item.code} />
@@ -198,16 +188,9 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
                                     )}
                                 </div>
                             </div>
-                        </div>
                     </div>
-
-                    <DialogFooter>
-                        <Button type="button" onClick={onClose}>
-                            Close
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                </div>
+            </ViewModalShell>
         );
     },
 );
