@@ -3,15 +3,14 @@
 import { CalculateFormModal } from '@/components/asset-depreciation-runs/CalculateFormModal';
 import { RunLinesModal } from '@/components/asset-depreciation-runs/RunLinesModal';
 import { DataTablePagination } from '@/components/common/DataTablePagination';
+import {
+    buildStandalonePaginationView,
+    StandaloneTablePage,
+    TableEmptyStateRow,
+    TableLoadingRow,
+} from '@/components/common/StandaloneTablePage';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import {
     Table,
     TableBody,
@@ -21,14 +20,12 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { useAssetDepreciationRuns } from '@/hooks/useAssetDepreciationRuns';
-import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { type AssetDepreciationCalculationFormData } from '@/utils/schemas';
 import { Calculator, CheckCircle2, Eye, Loader2, Plus } from 'lucide-react';
 import { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -65,56 +62,34 @@ export default function Index() {
     const [isCalcOpen, setIsCalcOpen] = useState(false);
     const [viewRunId, setViewRunId] = useState<number | null>(null);
 
-    const from =
-        meta.from ??
-        (meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1);
-    const to =
-        meta.to ??
-        (meta.total === 0
-            ? 0
-            : (meta.current_page - 1) * meta.per_page + data.length);
-
-    const paginationView = {
-        page: meta.current_page,
-        per_page: meta.per_page,
-        total: meta.total,
-        last_page: meta.last_page,
-        from,
-        to,
-    };
+    const paginationView = buildStandalonePaginationView(meta, data.length);
 
     let tableBodyContent: React.ReactNode;
     if (isLoading) {
         tableBodyContent = (
-            <TableRow>
-                <TableCell colSpan={7} className="h-56 text-center">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="text-muted-foreground">Loading runs...</p>
-                    </div>
-                </TableCell>
-            </TableRow>
+            <TableLoadingRow
+                colSpan={7}
+                icon={<Loader2 className="h-8 w-8 animate-spin text-primary" />}
+                message="Loading runs..."
+            />
         );
     } else if (data.length === 0) {
         tableBodyContent = (
-            <TableRow>
-                <TableCell colSpan={7} className="h-56 text-center">
-                    <div className="flex flex-col items-center justify-center gap-2 opacity-70">
-                        <Calculator className="h-10 w-10 text-muted-foreground" />
-                        <p className="text-lg font-medium">No runs found</p>
-                        <p className="text-sm text-muted-foreground">
-                            Start by running a new calculation.
-                        </p>
-                        <Button
-                            variant="outline"
-                            className="mt-4"
-                            onClick={() => setIsCalcOpen(true)}
-                        >
-                            <Plus className="mr-2 h-4 w-4" /> Calculate Now
-                        </Button>
-                    </div>
-                </TableCell>
-            </TableRow>
+            <TableEmptyStateRow
+                colSpan={7}
+                icon={<Calculator className="h-10 w-10 text-muted-foreground" />}
+                title="No runs found"
+                description="Start by running a new calculation."
+                action={
+                    <Button
+                        variant="outline"
+                        className="mt-4"
+                        onClick={() => setIsCalcOpen(true)}
+                    >
+                        <Plus className="mr-2 h-4 w-4" /> Calculate Now
+                    </Button>
+                }
+            />
         );
     } else {
         tableBodyContent = data.map((item) => (
@@ -213,61 +188,48 @@ export default function Index() {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet>
-                <title>Asset Depreciation Runs</title>
-            </Helmet>
+        <StandaloneTablePage
+            title="Asset Depreciation Runs"
+            heading="Depreciation Runs"
+            breadcrumbs={breadcrumbs}
+            description={
+                <>
+                    Calculate and review asset depreciation. Once verified,
+                    post the calculated amounts to the general ledger.
+                </>
+            }
+            actions={
+                <Button onClick={() => setIsCalcOpen(true)}>
+                    <Calculator className="mr-2 h-4 w-4" />
+                    Run Calculation
+                </Button>
+            }
+        >
+            <div className="overflow-hidden rounded-md border">
+                <Table>
+                    <TableHeader className="bg-muted">
+                        <TableRow>
+                            <TableHead>Fiscal Year</TableHead>
+                            <TableHead>Period</TableHead>
+                            <TableHead>Lines</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Journal</TableHead>
+                            <TableHead>Created By</TableHead>
+                            <TableHead className="text-right">
+                                Actions
+                            </TableHead>
+                        </TableRow>
+                    </TableHeader>
 
-            <div className="flex flex-col gap-6 p-6">
-                <Card>
-                    <CardHeader className="gap-4 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
-                        <div>
-                            <CardTitle className="text-2xl font-semibold tracking-tight">
-                                Depreciation Runs
-                            </CardTitle>
-                            <CardDescription className="mt-1">
-                                Calculate and review asset depreciation. Once
-                                verified, post the calculated amounts to the
-                                general ledger.
-                            </CardDescription>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Button onClick={() => setIsCalcOpen(true)}>
-                                <Calculator className="mr-2 h-4 w-4" />
-                                Run Calculation
-                            </Button>
-                        </div>
-                    </CardHeader>
-
-                    <CardContent className="flex flex-col gap-4">
-                        <div className="overflow-hidden rounded-md border">
-                            <Table>
-                                <TableHeader className="bg-muted">
-                                    <TableRow>
-                                        <TableHead>Fiscal Year</TableHead>
-                                        <TableHead>Period</TableHead>
-                                        <TableHead>Lines</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Journal</TableHead>
-                                        <TableHead>Created By</TableHead>
-                                        <TableHead className="text-right">
-                                            Actions
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-
-                                <TableBody>{tableBodyContent}</TableBody>
-                            </Table>
-                        </div>
-
-                        <DataTablePagination
-                            pagination={paginationView}
-                            onPageChange={setPage}
-                            onPageSizeChange={setPerPage}
-                        />
-                    </CardContent>
-                </Card>
+                    <TableBody>{tableBodyContent}</TableBody>
+                </Table>
             </div>
+
+            <DataTablePagination
+                pagination={paginationView}
+                onPageChange={setPage}
+                onPageSizeChange={setPerPage}
+            />
 
             <CalculateFormModal
                 open={isCalcOpen}
@@ -281,6 +243,6 @@ export default function Index() {
                 open={viewRunId !== null}
                 onClose={() => setViewRunId(null)}
             />
-        </AppLayout>
+        </StandaloneTablePage>
     );
 }

@@ -1,17 +1,16 @@
 'use client';
 
 import { DataTablePagination } from '@/components/common/DataTablePagination';
+import {
+    buildStandalonePaginationView,
+    StandaloneTablePage,
+    TableEmptyStateRow,
+    TableLoadingRow,
+} from '@/components/common/StandaloneTablePage';
 import { JournalEntryViewModal } from '@/components/journal-entries/JournalEntryViewModal';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import {
@@ -40,7 +39,6 @@ import {
     X,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -105,53 +103,26 @@ export default function Index() {
         return { totals, selectedTotals };
     }, [data, selectedIds]);
 
-    const from =
-        meta.from ??
-        (meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1);
-    const to =
-        meta.to ??
-        (meta.total === 0
-            ? 0
-            : (meta.current_page - 1) * meta.per_page + data.length);
-
-    const paginationView = {
-        page: meta.current_page,
-        per_page: meta.per_page,
-        total: meta.total,
-        last_page: meta.last_page,
-        from,
-        to,
-    };
+    const paginationView = buildStandalonePaginationView(meta, data.length);
+    const { from, to } = paginationView;
 
     let tableBodyContent: React.ReactNode;
     if (isLoading) {
         tableBodyContent = (
-            <TableRow>
-                <TableCell colSpan={7} className="h-56 text-center">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="text-muted-foreground">
-                            Loading journals...
-                        </p>
-                    </div>
-                </TableCell>
-            </TableRow>
+            <TableLoadingRow
+                colSpan={7}
+                icon={<Loader2 className="h-8 w-8 animate-spin text-primary" />}
+                message="Loading journals..."
+            />
         );
     } else if (data.length === 0) {
         tableBodyContent = (
-            <TableRow>
-                <TableCell colSpan={7} className="h-56 text-center">
-                    <div className="flex flex-col items-center justify-center gap-2 opacity-70">
-                        <AlertCircle className="h-10 w-10 text-muted-foreground" />
-                        <p className="text-lg font-medium">
-                            No draft journals found
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                            All journal entries are already posted or voided.
-                        </p>
-                    </div>
-                </TableCell>
-            </TableRow>
+            <TableEmptyStateRow
+                colSpan={7}
+                icon={<AlertCircle className="h-10 w-10 text-muted-foreground" />}
+                title="No draft journals found"
+                description="All journal entries are already posted or voided."
+            />
         );
     } else {
         tableBodyContent = data.map((item) => {
@@ -246,69 +217,54 @@ export default function Index() {
     }
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet>
-                <title>Posting Journals</title>
-            </Helmet>
+        <StandaloneTablePage
+            title="Posting Journals"
+            breadcrumbs={breadcrumbs}
+            description={
+                <>
+                    Review draft journal entries and post them to the general
+                    ledger.
+                </>
+            }
+            actions={
+                <>
+                    <div className="relative sm:w-80">
+                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                            value={searchQuery}
+                            placeholder="Search journals..."
+                            className="pl-9"
+                            onChange={(e) => handleSearch(e.target.value)}
+                        />
+                    </div>
 
-            <div className="flex flex-col gap-6 p-6">
-                <Card>
-                    <CardHeader className="gap-4 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
-                        <div>
-                            <CardTitle className="text-2xl font-semibold tracking-tight">
-                                Posting Journals
-                            </CardTitle>
-                            <CardDescription className="mt-1">
-                                Review draft journal entries and post them to
-                                the general ledger.
-                            </CardDescription>
-                        </div>
-
-                        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-                            <div className="relative sm:w-80">
-                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                                <Input
-                                    value={searchQuery}
-                                    placeholder="Search journals..."
-                                    className="pl-9"
-                                    onChange={(e) =>
-                                        handleSearch(e.target.value)
-                                    }
-                                />
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    onClick={clearSelection}
-                                    disabled={
-                                        selectedIds.length === 0 || isPosting
-                                    }
-                                >
-                                    <X className="mr-2 h-4 w-4" />
-                                    Clear
-                                </Button>
-                                <Button
-                                    onClick={postSelected}
-                                    disabled={
-                                        selectedIds.length === 0 || isPosting
-                                    }
-                                >
-                                    {isPosting ? (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <CheckCircle2 className="mr-2 h-4 w-4" />
-                                    )}
-                                    {isPosting
-                                        ? 'Posting...'
-                                        : `Post Selected (${selectedIds.length})`}
-                                </Button>
-                            </div>
-                        </div>
-                    </CardHeader>
-
-                    <CardContent className="flex flex-col gap-4">
-                        <div className="flex flex-col gap-3 rounded-md border bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={clearSelection}
+                            disabled={selectedIds.length === 0 || isPosting}
+                        >
+                            <X className="mr-2 h-4 w-4" />
+                            Clear
+                        </Button>
+                        <Button
+                            onClick={postSelected}
+                            disabled={selectedIds.length === 0 || isPosting}
+                        >
+                            {isPosting ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                                <CheckCircle2 className="mr-2 h-4 w-4" />
+                            )}
+                            {isPosting
+                                ? 'Posting...'
+                                : `Post Selected (${selectedIds.length})`}
+                        </Button>
+                    </div>
+                </>
+            }
+        >
+            <div className="flex flex-col gap-3 rounded-md border bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
                                 <div>
                                     <span className="text-muted-foreground">
@@ -387,65 +343,52 @@ export default function Index() {
                                     </span>
                                 </div>
                             </div>
-                        </div>
-
-                        {selectedIds.length > 0 && (
-                            <Alert>
-                                <AlertTitle>Selection active</AlertTitle>
-                                <AlertDescription>
-                                    {formatNumberByRegionalSettings(
-                                        selectedIds.length,
-                                    )}{' '}
-                                    draft journal(s) selected in this page.
-                                </AlertDescription>
-                            </Alert>
-                        )}
-
-                        <div className="overflow-hidden rounded-md border">
-                            <Table>
-                                <TableHeader className="bg-muted">
-                                    <TableRow>
-                                        <TableHead className="w-[52px]">
-                                            <Checkbox
-                                                checked={allSelected}
-                                                onCheckedChange={selectAll}
-                                                aria-label="Select all"
-                                            />
-                                        </TableHead>
-                                        <TableHead>Journal</TableHead>
-                                        <TableHead className="w-[220px]">
-                                            Lines
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Debit
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Credit
-                                        </TableHead>
-                                        <TableHead className="text-center">
-                                            Status
-                                        </TableHead>
-                                        <TableHead className="w-[60px]"></TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>{tableBodyContent}</TableBody>
-                            </Table>
-                        </div>
-
-                        <DataTablePagination
-                            pagination={paginationView}
-                            onPageChange={setPage}
-                            onPageSizeChange={setPerPage}
-                        />
-                    </CardContent>
-                </Card>
             </div>
+
+            {selectedIds.length > 0 && (
+                <Alert>
+                    <AlertTitle>Selection active</AlertTitle>
+                    <AlertDescription>
+                        {formatNumberByRegionalSettings(selectedIds.length)}{' '}
+                        draft journal(s) selected in this page.
+                    </AlertDescription>
+                </Alert>
+            )}
+
+            <div className="overflow-hidden rounded-md border">
+                <Table>
+                    <TableHeader className="bg-muted">
+                        <TableRow>
+                            <TableHead className="w-[52px]">
+                                <Checkbox
+                                    checked={allSelected}
+                                    onCheckedChange={selectAll}
+                                    aria-label="Select all"
+                                />
+                            </TableHead>
+                            <TableHead>Journal</TableHead>
+                            <TableHead className="w-[220px]">Lines</TableHead>
+                            <TableHead className="text-right">Debit</TableHead>
+                            <TableHead className="text-right">Credit</TableHead>
+                            <TableHead className="text-center">Status</TableHead>
+                            <TableHead className="w-[60px]"></TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>{tableBodyContent}</TableBody>
+                </Table>
+            </div>
+
+            <DataTablePagination
+                pagination={paginationView}
+                onPageChange={setPage}
+                onPageSizeChange={setPerPage}
+            />
 
             <JournalEntryViewModal
                 item={viewItem}
                 open={viewOpen}
                 onClose={() => setViewOpen(false)}
             />
-        </AppLayout>
+        </StandaloneTablePage>
     );
 }

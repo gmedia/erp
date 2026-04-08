@@ -1,5 +1,7 @@
 import { expect, Page } from '@playwright/test';
 
+import { reloadAndWaitForApi, searchAndWaitForApi } from '../helpers';
+
 export async function createSupplierReturn(page: Page): Promise<string> {
     const createResult = await page.evaluate(async () => {
         const apiToken = localStorage.getItem('api_token') || '';
@@ -122,27 +124,18 @@ export async function createSupplierReturn(page: Page): Promise<string> {
     expect(createResult.ok).toBeTruthy();
     expect(createResult.returnNumber).not.toBe('');
 
-    const responsePromise = page.waitForResponse(
-        (r) => r.url().includes('/api/supplier-returns') && r.status() < 400,
-        { timeout: 10000 }
-    ).catch(() => null);
-    
-    await page.reload();
-    await responsePromise;
+    await reloadAndWaitForApi(page, '/api/supplier-returns');
 
     return String(createResult.returnNumber);
 }
 
 export async function searchSupplierReturn(page: Page, identifier: string): Promise<void> {
-    await page.getByPlaceholder(/search/i).fill(identifier);
-    
-    const responsePromise = page.waitForResponse(
-        (r) => r.url().includes('/api/supplier-returns') && r.status() < 400,
-        { timeout: 10000 }
-    ).catch(() => null);
-    
-    await page.keyboard.press('Enter');
-    await responsePromise;
+    await searchAndWaitForApi(
+        page,
+        page.getByPlaceholder(/search/i),
+        identifier,
+        '/api/supplier-returns',
+    );
 }
 
 export async function editSupplierReturn(
@@ -249,11 +242,5 @@ export async function editSupplierReturn(
 
     expect(updateResult, JSON.stringify(updateResult)).toMatchObject({ ok: true });
 
-    const editPromise = page.waitForResponse(
-        (r) => r.url().includes('/api/supplier-returns') && r.status() < 400,
-        { timeout: 10000 }
-    ).catch(() => null);
-    
-    await page.reload();
-    await editPromise;
+    await reloadAndWaitForApi(page, '/api/supplier-returns');
 }

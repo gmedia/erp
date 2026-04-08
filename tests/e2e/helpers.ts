@@ -1,5 +1,63 @@
 import { Page, expect } from '@playwright/test';
 
+type ApiResponseMatcher = string | RegExp | ((url: string) => boolean);
+
+function matchesApiUrl(url: string, matcher: ApiResponseMatcher): boolean {
+  if (typeof matcher === 'string') {
+    return url.includes(matcher);
+  }
+
+  if (matcher instanceof RegExp) {
+    return matcher.test(url);
+  }
+
+  return matcher(url);
+}
+
+export async function waitForApiAfterAction(
+  page: Page,
+  matcher: ApiResponseMatcher,
+  action: () => Promise<unknown>,
+  timeout = 10000,
+): Promise<void> {
+  const responsePromise = page
+    .waitForResponse(
+      (response) =>
+        matchesApiUrl(response.url(), matcher) && response.status() < 400,
+      { timeout },
+    )
+    .catch(() => null);
+
+  await action();
+  await responsePromise;
+}
+
+export async function reloadAndWaitForApi(
+  page: Page,
+  matcher: ApiResponseMatcher,
+  timeout = 10000,
+): Promise<void> {
+  await waitForApiAfterAction(page, matcher, () => page.reload(), timeout);
+}
+
+export async function searchAndWaitForApi(
+  page: Page,
+  searchInput: ReturnType<Page['getByPlaceholder']>,
+  value: string,
+  matcher: ApiResponseMatcher,
+  timeout = 10000,
+): Promise<void> {
+  await waitForApiAfterAction(
+    page,
+    matcher,
+    async () => {
+      await searchInput.fill(value);
+      await searchInput.press('Enter');
+    },
+    timeout,
+  );
+}
+
 // Generic entity creation helper
 export interface EntityField {
   name: string;

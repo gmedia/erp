@@ -1,5 +1,7 @@
 import { expect, Page } from '@playwright/test';
 
+import { reloadAndWaitForApi, searchAndWaitForApi } from '../helpers';
+
 export async function createGoodsReceipt(page: Page): Promise<string> {
     const createResult = await page.evaluate(async () => {
         const apiToken = localStorage.getItem('api_token') || '';
@@ -91,22 +93,18 @@ export async function createGoodsReceipt(page: Page): Promise<string> {
     expect(createResult.ok).toBeTruthy();
     expect(createResult.grNumber).not.toBe('');
 
-    await page.reload();
-    await page
-        .waitForResponse((r) => r.url().includes('/api/goods-receipts') && r.status() < 400)
-        .catch(() => null);
+    await reloadAndWaitForApi(page, '/api/goods-receipts');
 
     return String(createResult.grNumber);
 }
 
 export async function searchGoodsReceipt(page: Page, identifier: string): Promise<void> {
-    await page.getByPlaceholder(/search/i).fill(identifier);
-    await page.keyboard.press('Enter');
-    await page
-        .waitForResponse(
-            (r) => r.url().includes('/api/goods-receipts') && r.status() < 400,
-        )
-        .catch(() => null);
+    await searchAndWaitForApi(
+        page,
+        page.getByPlaceholder(/search/i),
+        identifier,
+        '/api/goods-receipts',
+    );
 }
 
 export async function editGoodsReceipt(
@@ -213,10 +211,5 @@ export async function editGoodsReceipt(
 
     expect(updateResult, JSON.stringify(updateResult)).toMatchObject({ ok: true });
 
-    await page.reload();
-    await page
-        .waitForResponse(
-            (r) => r.url().includes('/api/goods-receipts') && r.status() < 400,
-        )
-        .catch(() => null);
+    await reloadAndWaitForApi(page, '/api/goods-receipts');
 }

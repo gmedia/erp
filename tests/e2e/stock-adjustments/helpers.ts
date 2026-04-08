@@ -1,5 +1,7 @@
 import { Page, expect } from '@playwright/test';
 
+import { searchAndWaitForApi } from '../helpers';
+
 async function selectAsyncOption(
     page: Page,
     trigger: ReturnType<Page['getByRole']>,
@@ -124,14 +126,12 @@ export async function searchStockAdjustment(
     page: Page,
     identifier: string,
 ): Promise<void> {
-    const searchInput = page.getByPlaceholder('Search stock adjustments...');
-    await searchInput.fill(identifier);
-    await searchInput.press('Enter');
-    await page
-        .waitForResponse(
-            (r) => r.url().includes('/api/stock-adjustments') && r.status() < 400,
-        )
-        .catch(() => null);
+    await searchAndWaitForApi(
+        page,
+        page.getByPlaceholder('Search stock adjustments...'),
+        identifier,
+        '/api/stock-adjustments',
+    );
 }
 
 export async function editStockAdjustment(

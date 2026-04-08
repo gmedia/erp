@@ -1,5 +1,7 @@
 import { Page, expect } from '@playwright/test';
 
+import { searchAndWaitForApi } from '../helpers';
+
 async function selectAsyncOption(
     page: Page,
     trigger: ReturnType<Page['getByRole']>,
@@ -114,12 +116,12 @@ export async function createInventoryStocktake(page: Page): Promise<string> {
 }
 
 export async function searchInventoryStocktake(page: Page, identifier: string): Promise<void> {
-    const searchInput = page.getByPlaceholder('Search inventory stocktakes...');
-    await searchInput.fill(identifier);
-    await searchInput.press('Enter');
-    await page.waitForResponse(
-        (r) => r.url().includes('/api/inventory-stocktakes') && r.status() < 400,
-    ).catch(() => null);
+    await searchAndWaitForApi(
+        page,
+        page.getByPlaceholder('Search inventory stocktakes...'),
+        identifier,
+        '/api/inventory-stocktakes',
+    );
 }
 
 export async function editInventoryStocktake(
