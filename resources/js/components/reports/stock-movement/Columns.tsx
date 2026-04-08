@@ -35,6 +35,7 @@ function formatDate(value: string | null | undefined): string {
 export const stockMovementReportColumns: ColumnDef<StockMovementReportItem>[] =
     [
         createReportSummaryColumn<StockMovementReportItem>({
+            id: 'product_name',
             accessorKey: 'product.name',
             header: 'Product',
             getPrimary: (item) => item.product?.name,
@@ -42,12 +43,14 @@ export const stockMovementReportColumns: ColumnDef<StockMovementReportItem>[] =
             sortable: true,
         }),
         createReportTextColumn<StockMovementReportItem>({
+            id: 'product_category_name',
             accessorKey: 'product.category.name',
             header: 'Category',
             getValue: (item) => item.product?.category?.name,
             sortable: true,
         }),
         createReportWarehouseColumn<StockMovementReportItem>({
+            id: 'warehouse_name',
             accessorKey: 'warehouse.name',
             header: 'Warehouse',
             getWarehouse: (item) => item.warehouse,

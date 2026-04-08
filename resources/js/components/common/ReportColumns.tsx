@@ -137,9 +137,12 @@ export function createReportSummaryColumn<TData>(
             secondary={options.getSecondary(row.original)}
         />
     );
+    const columnId =
+        options.id ?? options.header.toLowerCase().replaceAll(/\s+/g, '_');
 
     if (options.sortable && options.accessorKey) {
         return {
+            id: columnId,
             accessorKey: options.accessorKey,
             cell,
             ...createSortingHeader(options.header),
@@ -148,6 +151,7 @@ export function createReportSummaryColumn<TData>(
 
     if (options.accessorKey) {
         return {
+            id: columnId,
             accessorKey: options.accessorKey,
             enableSorting: false,
             header: options.header,
@@ -156,7 +160,7 @@ export function createReportSummaryColumn<TData>(
     }
 
     return {
-        id: options.id ?? options.header.toLowerCase().replaceAll(/\s+/g, '_'),
+        id: columnId,
         enableSorting: false,
         header: options.header,
         cell,
@@ -172,9 +176,12 @@ export function createReportTextColumn<TData>(
             className={options.className}
         />
     );
+    const columnId =
+        options.id ?? options.header.toLowerCase().replaceAll(/\s+/g, '_');
 
     if (options.sortable && options.accessorKey) {
         return {
+            id: columnId,
             accessorKey: options.accessorKey,
             cell,
             ...createSortingHeader(options.header),
@@ -183,6 +190,7 @@ export function createReportTextColumn<TData>(
 
     if (options.accessorKey) {
         return {
+            id: columnId,
             accessorKey: options.accessorKey,
             enableSorting: false,
             header: options.header,
@@ -191,7 +199,7 @@ export function createReportTextColumn<TData>(
     }
 
     return {
-        id: options.id ?? options.header.toLowerCase().replaceAll(/\s+/g, '_'),
+        id: columnId,
         enableSorting: false,
         header: options.header,
         cell,
@@ -204,9 +212,12 @@ export function createReportWarehouseColumn<TData>(
     const cell = ({ row }: CellContext<TData, unknown>) => (
         <WarehouseSummaryCell warehouse={options.getWarehouse(row.original)} />
     );
+    const columnId =
+        options.id ?? options.header.toLowerCase().replaceAll(/\s+/g, '_');
 
     if (options.sortable && options.accessorKey) {
         return {
+            id: columnId,
             accessorKey: options.accessorKey,
             cell,
             ...createSortingHeader(options.header),
@@ -215,6 +226,7 @@ export function createReportWarehouseColumn<TData>(
 
     if (options.accessorKey) {
         return {
+            id: columnId,
             accessorKey: options.accessorKey,
             enableSorting: false,
             header: options.header,
@@ -223,7 +235,7 @@ export function createReportWarehouseColumn<TData>(
     }
 
     return {
-        id: options.id ?? options.header.toLowerCase().replaceAll(/\s+/g, '_'),
+        id: columnId,
         enableSorting: false,
         header: options.header,
         cell,

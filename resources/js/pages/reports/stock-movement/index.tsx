@@ -1,6 +1,7 @@
 'use client';
 
 import {
+    createReportBreadcrumbs,
     createEmptyReportFilters,
     ReportDataTablePage,
 } from '@/components/common/ReportDataTablePage';
@@ -14,10 +15,10 @@ export default function StockMovementReportPage() {
     return (
         <ReportDataTablePage<StockMovementReportItem>
             title="Stock Movement Report"
-            breadcrumbs={[
-                { title: 'Reports', href: '#' },
-                { title: 'Stock Movement', href: '/reports/stock-movement' },
-            ]}
+            breadcrumbs={createReportBreadcrumbs(
+                'Stock Movement',
+                '/reports/stock-movement',
+            )}
             columns={stockMovementReportColumns}
             filterFields={createStockMovementReportFilterFields()}
             initialFilters={createEmptyReportFilters([

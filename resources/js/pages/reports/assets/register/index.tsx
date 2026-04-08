@@ -3,7 +3,10 @@
 import { assetColumns } from '@/components/assets/AssetColumns';
 import { createAssetFilterFields } from '@/components/assets/AssetFilters';
 import { AssetViewModal } from '@/components/assets/AssetViewModal';
-import { ReportDataTablePage } from '@/components/common/ReportDataTablePage';
+import {
+    createReportBreadcrumbs,
+    ReportDataTablePage,
+} from '@/components/common/ReportDataTablePage';
 import { Asset } from '@/types/asset';
 import { useState } from 'react';
 
@@ -23,10 +26,10 @@ export default function AssetRegisterReport() {
     return (
         <ReportDataTablePage<Asset>
             title="Asset Register Report"
-            breadcrumbs={[
-                { title: 'Reports', href: '#' },
-                { title: 'Asset Register', href: '/reports/assets/register' },
-            ]}
+            breadcrumbs={createReportBreadcrumbs(
+                'Asset Register',
+                '/reports/assets/register',
+            )}
             columns={reportColumns}
             filterFields={createAssetFilterFields()}
             initialFilters={{

@@ -1,6 +1,7 @@
 'use client';
 
 import {
+    createReportBreadcrumbs,
     createEmptyReportFilters,
     ReportDataTablePage,
 } from '@/components/common/ReportDataTablePage';
@@ -14,13 +15,10 @@ export default function PurchaseOrderStatusReportPage() {
     return (
         <ReportDataTablePage<PurchaseOrderStatusReportItem>
             title="Purchase Order Status Report"
-            breadcrumbs={[
-                { title: 'Reports', href: '#' },
-                {
-                    title: 'Purchase Order Status',
-                    href: '/reports/purchase-order-status',
-                },
-            ]}
+            breadcrumbs={createReportBreadcrumbs(
+                'Purchase Order Status',
+                '/reports/purchase-order-status',
+            )}
             columns={purchaseOrderStatusReportColumns}
             filterFields={createPurchaseOrderStatusReportFilterFields()}
             initialFilters={createEmptyReportFilters([

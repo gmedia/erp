@@ -1,6 +1,7 @@
 'use client';
 
 import {
+    createReportBreadcrumbs,
     createEmptyReportFilters,
     ReportDataTablePage,
 } from '@/components/common/ReportDataTablePage';
@@ -14,13 +15,10 @@ export default function InventoryStocktakeVarianceReportPage() {
     return (
         <ReportDataTablePage<InventoryStocktakeVarianceReportItem>
             title="Inventory Stocktake Variance Report"
-            breadcrumbs={[
-                { title: 'Reports', href: '#' },
-                {
-                    title: 'Inventory Stocktake Variance',
-                    href: '/reports/inventory-stocktake-variance',
-                },
-            ]}
+            breadcrumbs={createReportBreadcrumbs(
+                'Inventory Stocktake Variance',
+                '/reports/inventory-stocktake-variance',
+            )}
             columns={inventoryStocktakeVarianceColumns}
             filterFields={createInventoryStocktakeVarianceFilterFields()}
             initialFilters={createEmptyReportFilters([
