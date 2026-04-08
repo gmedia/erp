@@ -46,6 +46,12 @@ type SingleYearFinancialReportResponse<TReport> = {
     report: TReport;
 };
 
+type SingleYearFinancialReportPageOptions<TReport> = {
+    queryKey: string;
+    endpoint: string;
+    emptyReport: TReport;
+};
+
 type FinancialAmountColumn<TItem extends FinancialTableRow> = {
     header: string;
     total: number;
@@ -125,6 +131,37 @@ export function resolveSelectedFiscalYear(
     selectedYearId: number,
 ) {
     return fiscalYears.find((fy) => fy.id === selectedYearId);
+}
+
+export function useSingleYearFinancialReportPage<TReport>({
+    queryKey,
+    endpoint,
+    emptyReport,
+}: SingleYearFinancialReportPageOptions<TReport>) {
+    const { urlYearId, handleYearChange } = useSingleYearReportSearchParams();
+    const { data, isLoading, error } = useSingleYearFinancialReportQuery<TReport>(
+        queryKey,
+        endpoint,
+        urlYearId,
+    );
+
+    const fiscalYears = Array.isArray(data?.fiscalYears) ? data.fiscalYears : [];
+    const selectedYearId = data?.selectedYearId || 0;
+    const report = data?.report || emptyReport;
+    const selectedFiscalYear = resolveSelectedFiscalYear(
+        fiscalYears,
+        selectedYearId,
+    );
+
+    return {
+        fiscalYears,
+        selectedYearId,
+        report,
+        selectedFiscalYear,
+        handleYearChange,
+        isLoading,
+        error,
+    };
 }
 
 export function SingleYearFinancialReportPageShell({

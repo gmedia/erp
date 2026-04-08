@@ -33,6 +33,12 @@ type ComparisonReportResponse<TReport> = {
     report: TReport;
 };
 
+type ComparisonFinancialReportPageOptions<TReport> = {
+    queryKey: string;
+    endpoint: string;
+    emptyReport: TReport;
+};
+
 type FinancialReportPageShellProps = {
     title: string;
     path: string;
@@ -125,6 +131,50 @@ export function resolveComparisonFiscalYears(
         selectedComparisonFiscalYear: comparisonYearId
             ? fiscalYears.find((fy) => fy.id === comparisonYearId)
             : undefined,
+    };
+}
+
+export function useComparisonFinancialReportPage<TReport>({
+    queryKey,
+    endpoint,
+    emptyReport,
+}: ComparisonFinancialReportPageOptions<TReport>) {
+    const {
+        urlYearId,
+        urlComparisonId,
+        handleYearChange,
+        handleComparisonChange,
+    } = useComparisonReportSearchParams();
+
+    const { data, isLoading, error } = useComparisonFinancialReportQuery<TReport>(
+        queryKey,
+        endpoint,
+        urlYearId,
+        urlComparisonId,
+    );
+
+    const fiscalYears = data?.fiscalYears || [];
+    const selectedYearId = data?.selectedYearId || 0;
+    const comparisonYearId = data?.comparisonYearId;
+    const report = data?.report || emptyReport;
+    const { selectedFiscalYear, selectedComparisonFiscalYear } =
+        resolveComparisonFiscalYears(
+            fiscalYears,
+            selectedYearId,
+            comparisonYearId,
+        );
+
+    return {
+        fiscalYears,
+        selectedYearId,
+        comparisonYearId,
+        report,
+        selectedFiscalYear,
+        selectedComparisonFiscalYear,
+        handleYearChange,
+        handleComparisonChange,
+        isLoading,
+        error,
     };
 }
 

@@ -5,10 +5,8 @@ import {
 import { FinancialStatusBadge } from '@/components/reports/financial/FinancialSummaryCard';
 import {
     FinancialTableCard,
-    resolveSelectedFiscalYear,
     SingleYearFinancialReportPageShell,
-    useSingleYearFinancialReportQuery,
-    useSingleYearReportSearchParams,
+    useSingleYearFinancialReportPage,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
 import { formatCurrency } from '@/lib/utils';
@@ -31,18 +29,22 @@ interface TrialBalanceResponse {
     report: AccountItem[];
 }
 
+const emptyTrialBalanceReport: TrialBalanceResponse['report'] = [];
+
 export default function TrialBalance() {
-    const { urlYearId, handleYearChange } = useSingleYearReportSearchParams();
-
-    const { data, isLoading, error } = useSingleYearFinancialReportQuery<
-        TrialBalanceResponse['report']
-    >('trial-balance', 'trial-balance', urlYearId);
-
-    const fiscalYears = Array.isArray(data?.fiscalYears)
-        ? data.fiscalYears
-        : [];
-    const selectedYearId = data?.selectedYearId || 0;
-    const report = Array.isArray(data?.report) ? data.report : [];
+    const {
+        fiscalYears,
+        selectedYearId,
+        report,
+        selectedFiscalYear,
+        handleYearChange,
+        isLoading,
+        error,
+    } = useSingleYearFinancialReportPage<TrialBalanceResponse['report']>({
+        queryKey: 'trial-balance',
+        endpoint: 'trial-balance',
+        emptyReport: emptyTrialBalanceReport,
+    });
 
     const totalDebit = report.reduce((sum, item) => sum + (item.debit || 0), 0);
     const totalCredit = report.reduce(
@@ -51,11 +53,6 @@ export default function TrialBalance() {
     );
     const difference = Math.abs(totalDebit - totalCredit);
     const isBalanced = Math.abs(totalDebit - totalCredit) < 0.01;
-
-    const selectedFiscalYear = resolveSelectedFiscalYear(
-        fiscalYears,
-        selectedYearId,
-    );
 
     return (
         <SingleYearFinancialReportPageShell

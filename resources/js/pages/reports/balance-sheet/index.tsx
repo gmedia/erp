@@ -1,9 +1,7 @@
 import {
     FinancialReportHeaderMeta,
     FinancialReportPageShell,
-    resolveComparisonFiscalYears,
-    useComparisonFinancialReportQuery,
-    useComparisonReportSearchParams,
+    useComparisonFinancialReportPage,
     type FinancialReportFiscalYear,
 } from '@/components/reports/financial/FinancialReportPageShell';
 import {
@@ -44,36 +42,31 @@ interface BalanceSheetResponse {
     };
 }
 
+const emptyBalanceSheetReport: BalanceSheetResponse['report'] = {
+    assets: [],
+    liabilities: [],
+    equity: [],
+    totals: { assets: 0, liabilities: 0, equity: 0 },
+};
+
 export default function BalanceSheet() {
     const {
-        urlYearId,
-        urlComparisonId,
+        fiscalYears,
+        selectedYearId,
+        comparisonYearId,
+        report,
+        selectedFiscalYear,
+        selectedComparisonFiscalYear,
         handleYearChange,
         handleComparisonChange,
-    } = useComparisonReportSearchParams();
+        isLoading,
+        error,
+    } = useComparisonFinancialReportPage<BalanceSheetResponse['report']>({
+        queryKey: 'balance-sheet',
+        endpoint: 'balance-sheet',
+        emptyReport: emptyBalanceSheetReport,
+    });
 
-    const { data, isLoading, error } = useComparisonFinancialReportQuery<
-        BalanceSheetResponse['report']
-    >('balance-sheet', 'balance-sheet', urlYearId, urlComparisonId);
-
-    const fiscalYears = data?.fiscalYears || [];
-    const selectedYearId = data?.selectedYearId || 0;
-    const comparisonYearId = data?.comparisonYearId;
-    const report = data?.report || {
-        assets: [],
-        liabilities: [],
-        equity: [],
-        totals: { assets: 0, liabilities: 0, equity: 0 },
-    };
-
-    const { selectedFiscalYear, selectedComparisonFiscalYear } =
-        resolveComparisonFiscalYears(
-            fiscalYears,
-            selectedYearId,
-            comparisonYearId,
-        );
-
-    // Calculate generic check
     const totalAssets = report.totals?.assets || 0;
     const totalLiabilitiesAndEquity =
         (report.totals?.liabilities || 0) + (report.totals?.equity || 0);

@@ -1,9 +1,7 @@
 import {
     FinancialReportHeaderMeta,
     FinancialReportPageShell,
-    resolveComparisonFiscalYears,
-    useComparisonFinancialReportQuery,
-    useComparisonReportSearchParams,
+    useComparisonFinancialReportPage,
     type FinancialReportFiscalYear,
 } from '@/components/reports/financial/FinancialReportPageShell';
 import {
@@ -42,33 +40,29 @@ interface IncomeStatementResponse {
     };
 }
 
+const emptyIncomeStatementReport: IncomeStatementResponse['report'] = {
+    revenues: [],
+    expenses: [],
+    totals: { revenue: 0, expense: 0, net_income: 0 },
+};
+
 export default function IncomeStatement() {
     const {
-        urlYearId,
-        urlComparisonId,
+        fiscalYears,
+        selectedYearId,
+        comparisonYearId,
+        report,
+        selectedFiscalYear,
+        selectedComparisonFiscalYear,
         handleYearChange,
         handleComparisonChange,
-    } = useComparisonReportSearchParams();
-
-    const { data, isLoading, error } = useComparisonFinancialReportQuery<
-        IncomeStatementResponse['report']
-    >('income-statement', 'income-statement', urlYearId, urlComparisonId);
-
-    const fiscalYears = data?.fiscalYears || [];
-    const selectedYearId = data?.selectedYearId || 0;
-    const comparisonYearId = data?.comparisonYearId;
-    const report = data?.report || {
-        revenues: [],
-        expenses: [],
-        totals: { revenue: 0, expense: 0, net_income: 0 },
-    };
-
-    const { selectedFiscalYear, selectedComparisonFiscalYear } =
-        resolveComparisonFiscalYears(
-            fiscalYears,
-            selectedYearId,
-            comparisonYearId,
-        );
+        isLoading,
+        error,
+    } = useComparisonFinancialReportPage<IncomeStatementResponse['report']>({
+        queryKey: 'income-statement',
+        endpoint: 'income-statement',
+        emptyReport: emptyIncomeStatementReport,
+    });
 
     const totalRevenue = report.totals?.revenue || 0;
     const totalExpense = report.totals?.expense || 0;

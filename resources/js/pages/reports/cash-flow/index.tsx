@@ -4,10 +4,8 @@ import {
 } from '@/components/reports/financial/FinancialReportPageShell';
 import {
     FinancialTableCard,
-    resolveSelectedFiscalYear,
     SingleYearFinancialReportPageShell,
-    useSingleYearFinancialReportQuery,
-    useSingleYearReportSearchParams,
+    useSingleYearFinancialReportPage,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,18 +29,22 @@ interface CashFlowResponse {
     report: CashFlowItem[];
 }
 
+const emptyCashFlowReport: CashFlowResponse['report'] = [];
+
 export default function CashFlow() {
-    const { urlYearId, handleYearChange } = useSingleYearReportSearchParams();
-
-    const { data, isLoading, error } = useSingleYearFinancialReportQuery<
-        CashFlowResponse['report']
-    >('cash-flow', 'cash-flow', urlYearId);
-
-    const fiscalYears = Array.isArray(data?.fiscalYears)
-        ? data.fiscalYears
-        : [];
-    const selectedYearId = data?.selectedYearId || 0;
-    const report = Array.isArray(data?.report) ? data.report : [];
+    const {
+        fiscalYears,
+        selectedYearId,
+        report,
+        selectedFiscalYear,
+        handleYearChange,
+        isLoading,
+        error,
+    } = useSingleYearFinancialReportPage<CashFlowResponse['report']>({
+        queryKey: 'cash-flow',
+        endpoint: 'cash-flow',
+        emptyReport: emptyCashFlowReport,
+    });
 
     const totalInflow = report.reduce(
         (sum, item) => sum + (item.inflow || 0),
@@ -53,11 +55,6 @@ export default function CashFlow() {
         0,
     );
     const netCashFlow = totalInflow - totalOutflow;
-
-    const selectedFiscalYear = resolveSelectedFiscalYear(
-        fiscalYears,
-        selectedYearId,
-    );
 
     return (
         <SingleYearFinancialReportPageShell

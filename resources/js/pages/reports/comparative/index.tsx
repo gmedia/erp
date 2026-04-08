@@ -1,9 +1,7 @@
 import {
     FinancialReportHeaderMeta,
     FinancialReportPageShell,
-    resolveComparisonFiscalYears,
-    useComparisonFinancialReportQuery,
-    useComparisonReportSearchParams,
+    useComparisonFinancialReportPage,
     type FinancialReportFiscalYear,
 } from '@/components/reports/financial/FinancialReportPageShell';
 import {
@@ -45,42 +43,38 @@ interface ComparativeReportResponse {
     };
 }
 
+const emptyComparativeReport: ComparativeReportResponse['report'] = {
+    assets: [],
+    liabilities: [],
+    equity: [],
+    revenues: [],
+    expenses: [],
+    totals: {
+        assets: 0,
+        liabilities: 0,
+        equity: 0,
+        revenues: 0,
+        expenses: 0,
+    },
+};
+
 export default function ComparativeReport() {
     const {
-        urlYearId,
-        urlComparisonId,
+        fiscalYears,
+        selectedYearId,
+        comparisonYearId,
+        report,
+        selectedFiscalYear,
+        selectedComparisonFiscalYear,
         handleYearChange,
         handleComparisonChange,
-    } = useComparisonReportSearchParams();
-
-    const { data, isLoading, error } = useComparisonFinancialReportQuery<
-        ComparativeReportResponse['report']
-    >('comparative-report', 'comparative', urlYearId, urlComparisonId);
-
-    const fiscalYears = data?.fiscalYears || [];
-    const selectedYearId = data?.selectedYearId || 0;
-    const comparisonYearId = data?.comparisonYearId;
-    const report = data?.report || {
-        assets: [],
-        liabilities: [],
-        equity: [],
-        revenues: [],
-        expenses: [],
-        totals: {
-            assets: 0,
-            liabilities: 0,
-            equity: 0,
-            revenues: 0,
-            expenses: 0,
-        },
-    };
-
-    const { selectedFiscalYear, selectedComparisonFiscalYear } =
-        resolveComparisonFiscalYears(
-            fiscalYears,
-            selectedYearId,
-            comparisonYearId,
-        );
+        isLoading,
+        error,
+    } = useComparisonFinancialReportPage<ComparativeReportResponse['report']>({
+        queryKey: 'comparative-report',
+        endpoint: 'comparative',
+        emptyReport: emptyComparativeReport,
+    });
 
     return (
         <FinancialReportPageShell
