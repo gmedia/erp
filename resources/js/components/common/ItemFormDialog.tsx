@@ -122,7 +122,10 @@ export function ItemProductSelectField<TFormValues extends FieldValues>({
             onItemSelect={(item) => {
                 form.setValue(
                     labelName,
-                    (item?.name || '') as PathValue<TFormValues, typeof labelName>,
+                    (item?.name || '') as PathValue<
+                        TFormValues,
+                        typeof labelName
+                    >,
                     {
                         shouldDirty: true,
                     },
