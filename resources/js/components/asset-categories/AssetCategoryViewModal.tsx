@@ -1,12 +1,6 @@
 'use client';
 
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { formatDate } from '@/lib/utils';
 import { AssetCategory } from '@/types/asset-category';
 
@@ -24,14 +18,13 @@ export function AssetCategoryViewModal({
     if (!item) return null;
 
     return (
-        <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-            <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                    <DialogTitle>Asset Category Details</DialogTitle>
-                    <DialogDescription>
-                        View complete details for the selected asset category.
-                    </DialogDescription>
-                </DialogHeader>
+        <ViewModalShell
+            open={open}
+            onClose={onClose}
+            title="Asset Category Details"
+            description="View complete details for the selected asset category."
+            contentClassName="sm:max-w-[500px]"
+        >
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-1 gap-1 sm:grid-cols-4 sm:items-center sm:gap-4">
                         <span className="font-bold">Code:</span>
@@ -60,7 +53,6 @@ export function AssetCategoryViewModal({
                         </span>
                     </div>
                 </div>
-            </DialogContent>
-        </Dialog>
+        </ViewModalShell>
     );
 }

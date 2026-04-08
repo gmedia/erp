@@ -1,13 +1,7 @@
 'use client';
 
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { type Warehouse } from '@/types/entity';
 
 interface WarehouseViewModalProps {
@@ -24,14 +18,13 @@ export function WarehouseViewModal({
     if (!item) return null;
 
     return (
-        <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-md">
-                <DialogHeader>
-                    <DialogTitle>{item.name}</DialogTitle>
-                    <DialogDescription>
-                        View warehouse details
-                    </DialogDescription>
-                </DialogHeader>
+        <ViewModalShell
+            open={open}
+            onClose={onClose}
+            title={item.name}
+            description="View warehouse details"
+            contentClassName="max-w-md"
+        >
                 <div className="space-y-4 py-2">
                     <div className="space-y-1">
                         <span className="text-sm font-medium text-muted-foreground">
@@ -52,7 +45,6 @@ export function WarehouseViewModal({
                         </div>
                     </div>
                 </div>
-            </DialogContent>
-        </Dialog>
+        </ViewModalShell>
     );
 }

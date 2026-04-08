@@ -1,10 +1,4 @@
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { type Pipeline } from '@/types/entity';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 
@@ -22,15 +16,13 @@ export function PipelineViewModal({
     if (!item) return null;
 
     return (
-        <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle>{item.name}</DialogTitle>
-                    <DialogDescription>
-                        View complete pipeline information for the selected
-                        item.
-                    </DialogDescription>
-                </DialogHeader>
+        <ViewModalShell
+            open={open}
+            onClose={onClose}
+            title={item.name}
+            description="View complete pipeline information for the selected item."
+            contentClassName="max-w-2xl"
+        >
                 <div className="space-y-4">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
@@ -101,7 +93,6 @@ export function PipelineViewModal({
                         </div>
                     )}
                 </div>
-            </DialogContent>
-        </Dialog>
+        </ViewModalShell>
     );
 }

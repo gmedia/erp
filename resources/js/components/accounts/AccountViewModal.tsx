@@ -1,13 +1,7 @@
 'use client';
 
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { type Account } from '@/types/account';
 
 interface AccountViewModalProps {
@@ -24,16 +18,17 @@ export function AccountViewModal({
     if (!account) return null;
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                    <DialogTitle>
-                        {account.code} - {account.name}
-                    </DialogTitle>
-                    <DialogDescription>
-                        Account details for {account.code}
-                    </DialogDescription>
-                </DialogHeader>
+        <ViewModalShell
+            open={open}
+            onClose={() => onOpenChange(false)}
+            title={
+                <>
+                    {account.code} - {account.name}
+                </>
+            }
+            description={`Account details for ${account.code}`}
+            contentClassName="sm:max-w-[500px]"
+        >
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-1 gap-1 sm:grid-cols-4 sm:items-center sm:gap-4">
                         <span className="text-sm font-semibold">Type:</span>
@@ -80,7 +75,6 @@ export function AccountViewModal({
                         </div>
                     )}
                 </div>
-            </DialogContent>
-        </Dialog>
+        </ViewModalShell>
     );
 }

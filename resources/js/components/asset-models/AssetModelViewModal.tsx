@@ -1,13 +1,7 @@
 'use client';
 
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { type AssetModel } from '@/types/entity';
 
 interface AssetModelViewModalProps {
@@ -24,14 +18,13 @@ export function AssetModelViewModal({
     if (!item) return null;
 
     return (
-        <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-md">
-                <DialogHeader>
-                    <DialogTitle>{item.model_name}</DialogTitle>
-                    <DialogDescription>
-                        View asset model details
-                    </DialogDescription>
-                </DialogHeader>
+        <ViewModalShell
+            open={open}
+            onClose={onClose}
+            title={item.model_name}
+            description="View asset model details"
+            contentClassName="max-w-md"
+        >
                 <div className="space-y-4 py-2">
                     <div className="space-y-1">
                         <span className="text-sm font-medium text-muted-foreground">
@@ -62,7 +55,6 @@ export function AssetModelViewModal({
                         </div>
                     )}
                 </div>
-            </DialogContent>
-        </Dialog>
+        </ViewModalShell>
     );
 }

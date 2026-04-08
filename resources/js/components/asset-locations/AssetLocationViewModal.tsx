@@ -1,13 +1,7 @@
 'use client';
 
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { type AssetLocation } from '@/types/entity';
 
 interface AssetLocationViewModalProps {
@@ -24,14 +18,13 @@ export function AssetLocationViewModal({
     if (!item) return null;
 
     return (
-        <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="max-w-md">
-                <DialogHeader>
-                    <DialogTitle>{item.name}</DialogTitle>
-                    <DialogDescription>
-                        View asset location details
-                    </DialogDescription>
-                </DialogHeader>
+        <ViewModalShell
+            open={open}
+            onClose={onClose}
+            title={item.name}
+            description="View asset location details"
+            contentClassName="max-w-md"
+        >
                 <div className="space-y-4 py-2">
                     <div className="space-y-1">
                         <span className="text-sm font-medium text-muted-foreground">
@@ -60,7 +53,6 @@ export function AssetLocationViewModal({
                         </div>
                     </div>
                 </div>
-            </DialogContent>
-        </Dialog>
+        </ViewModalShell>
     );
 }
