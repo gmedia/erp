@@ -37,8 +37,14 @@ export const ProductCategoryViewModal = memo<ProductCategoryViewModalProps>(
                         value={item.description || '-'}
                         className="whitespace-pre-wrap"
                     />
-                    <ViewField label="Created At" value={formatDate(item.created_at)} />
-                    <ViewField label="Updated At" value={formatDate(item.updated_at)} />
+                    <ViewField
+                        label="Created At"
+                        value={formatDate(item.created_at)}
+                    />
+                    <ViewField
+                        label="Updated At"
+                        value={formatDate(item.updated_at)}
+                    />
                 </div>
             </ViewModalShell>
         );

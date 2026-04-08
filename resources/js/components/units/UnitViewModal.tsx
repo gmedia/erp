@@ -36,8 +36,14 @@ export const UnitViewModal = memo<UnitViewModalProps>(function UnitViewModal({
             <div className="space-y-4 py-4">
                 <ViewField label="Name" value={item.name} />
                 <ViewField label="Symbol" value={item.symbol || '-'} />
-                <ViewField label="Created At" value={formatDate(item.created_at)} />
-                <ViewField label="Updated At" value={formatDate(item.updated_at)} />
+                <ViewField
+                    label="Created At"
+                    value={formatDate(item.created_at)}
+                />
+                <ViewField
+                    label="Updated At"
+                    value={formatDate(item.updated_at)}
+                />
             </div>
         </ViewModalShell>
     );

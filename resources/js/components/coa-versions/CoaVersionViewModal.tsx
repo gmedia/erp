@@ -27,10 +27,22 @@ export const CoaVersionViewModal = memo<CoaVersionViewModalProps>(
             >
                 <div className="space-y-4 py-4">
                     <ViewField label="Name" value={item.name} />
-                    <ViewField label="Fiscal Year" value={item.fiscal_year?.name || '-'} />
-                    <ViewField label="Status" value={item.status.toUpperCase()} />
-                    <ViewField label="Created At" value={formatDate(item.created_at)} />
-                    <ViewField label="Updated At" value={formatDate(item.updated_at)} />
+                    <ViewField
+                        label="Fiscal Year"
+                        value={item.fiscal_year?.name || '-'}
+                    />
+                    <ViewField
+                        label="Status"
+                        value={item.status.toUpperCase()}
+                    />
+                    <ViewField
+                        label="Created At"
+                        value={formatDate(item.created_at)}
+                    />
+                    <ViewField
+                        label="Updated At"
+                        value={formatDate(item.updated_at)}
+                    />
                 </div>
             </ViewModalShell>
         );

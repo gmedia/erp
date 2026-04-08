@@ -27,11 +27,26 @@ export const FiscalYearViewModal = memo<FiscalYearViewModalProps>(
             >
                 <div className="space-y-4 py-4">
                     <ViewField label="Name" value={item.name} />
-                    <ViewField label="Start Date" value={formatDate(item.start_date)} />
-                    <ViewField label="End Date" value={formatDate(item.end_date)} />
-                    <ViewField label="Status" value={item.status.toUpperCase()} />
-                    <ViewField label="Created At" value={formatDate(item.created_at)} />
-                    <ViewField label="Updated At" value={formatDate(item.updated_at)} />
+                    <ViewField
+                        label="Start Date"
+                        value={formatDate(item.start_date)}
+                    />
+                    <ViewField
+                        label="End Date"
+                        value={formatDate(item.end_date)}
+                    />
+                    <ViewField
+                        label="Status"
+                        value={item.status.toUpperCase()}
+                    />
+                    <ViewField
+                        label="Created At"
+                        value={formatDate(item.created_at)}
+                    />
+                    <ViewField
+                        label="Updated At"
+                        value={formatDate(item.updated_at)}
+                    />
                 </div>
             </ViewModalShell>
         );
