@@ -3,16 +3,8 @@
 import { memo } from 'react';
 
 import { ViewField } from '@/components/common/ViewField';
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { useTranslation } from '@/contexts/i18n-context';
 
 import { Customer } from '@/types/entity';
@@ -36,62 +28,43 @@ export const CustomerViewModal = memo<CustomerViewModalProps>(
             typeof item.branch === 'object' ? item.branch.name : item.branch;
 
         return (
-            <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>View Customer</DialogTitle>
-                        <DialogDescription>
-                            {t('common.view_details')}
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="space-y-4 py-4">
-                        {/* Basic Info Section */}
-                        <ViewField label="Name" value={item.name} />
-                        <ViewField label="Email" value={item.email} />
-                        <ViewField label="Phone" value={item.phone} />
-                        <ViewField label="Address" value={item.address} />
-
-                        {/* Details Section */}
-                        <ViewField label="Branch" value={branchName} />
-                        <ViewField
-                            label="Category"
-                            value={
-                                typeof item.category === 'object'
-                                    ? item.category.name
-                                    : item.category
+            <ViewModalShell
+                open={open}
+                onClose={onClose}
+                title="View Customer"
+                description={t('common.view_details')}
+            >
+                <div className="space-y-4 py-4">
+                    <ViewField label="Name" value={item.name} />
+                    <ViewField label="Email" value={item.email} />
+                    <ViewField label="Phone" value={item.phone} />
+                    <ViewField label="Address" value={item.address} />
+                    <ViewField label="Branch" value={branchName} />
+                    <ViewField
+                        label="Category"
+                        value={
+                            typeof item.category === 'object'
+                                ? item.category.name
+                                : item.category
+                        }
+                    />
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <span className="text-sm font-medium text-muted-foreground">
+                            Status
+                        </span>
+                        <Badge
+                            variant={
+                                item.status === 'active'
+                                    ? 'default'
+                                    : 'destructive'
                             }
-                        />
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                            <span className="text-sm font-medium text-muted-foreground">
-                                Status
-                            </span>
-                            <Badge
-                                variant={
-                                    item.status === 'active'
-                                        ? 'default'
-                                        : 'destructive'
-                                }
-                            >
-                                {item.status === 'active'
-                                    ? 'Active'
-                                    : 'Inactive'}
-                            </Badge>
-                        </div>
-
-                        {/* Notes Section */}
-                        {item.notes && (
-                            <ViewField label="Notes" value={item.notes} />
-                        )}
+                        >
+                            {item.status === 'active' ? 'Active' : 'Inactive'}
+                        </Badge>
                     </div>
-
-                    <DialogFooter>
-                        <Button type="button" onClick={onClose}>
-                            Close
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                    {item.notes && <ViewField label="Notes" value={item.notes} />}
+                </div>
+            </ViewModalShell>
         );
     },
 );

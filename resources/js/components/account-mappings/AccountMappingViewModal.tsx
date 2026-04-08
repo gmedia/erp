@@ -1,15 +1,7 @@
 'use client';
 
 import { ViewField } from '@/components/common/ViewField';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { useTranslation } from '@/contexts/i18n-context';
 import { formatDate } from '@/lib/utils';
 import { type AccountMapping } from '@/types/account-mapping';
@@ -40,46 +32,28 @@ export const AccountMappingViewModal = memo<AccountMappingViewModalProps>(
         if (!item) return null;
 
         return (
-            <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-                <DialogContent className="sm:max-w-[520px]">
-                    <DialogHeader>
-                        <DialogTitle>View Account Mapping</DialogTitle>
-                        <DialogDescription>
-                            {t('common.view_details')}
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="space-y-4 py-4">
-                        <ViewField
-                            label="Source Account"
-                            value={formatAccount(item.source_account)}
-                        />
-                        <ViewField
-                            label="Target Account"
-                            value={formatAccount(item.target_account)}
-                        />
-                        <ViewField
-                            label="Type"
-                            value={item.type.toUpperCase()}
-                        />
-                        <ViewField label="Notes" value={item.notes || '-'} />
-                        <ViewField
-                            label="Created At"
-                            value={formatDate(item.created_at)}
-                        />
-                        <ViewField
-                            label="Updated At"
-                            value={formatDate(item.updated_at)}
-                        />
-                    </div>
-
-                    <DialogFooter>
-                        <Button type="button" onClick={onClose}>
-                            Close
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <ViewModalShell
+                open={open}
+                onClose={onClose}
+                title="View Account Mapping"
+                description={t('common.view_details')}
+                contentClassName="sm:max-w-[520px]"
+            >
+                <div className="space-y-4 py-4">
+                    <ViewField
+                        label="Source Account"
+                        value={formatAccount(item.source_account)}
+                    />
+                    <ViewField
+                        label="Target Account"
+                        value={formatAccount(item.target_account)}
+                    />
+                    <ViewField label="Type" value={item.type.toUpperCase()} />
+                    <ViewField label="Notes" value={item.notes || '-'} />
+                    <ViewField label="Created At" value={formatDate(item.created_at)} />
+                    <ViewField label="Updated At" value={formatDate(item.updated_at)} />
+                </div>
+            </ViewModalShell>
         );
     },
 );

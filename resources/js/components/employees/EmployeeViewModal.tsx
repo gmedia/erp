@@ -3,15 +3,7 @@
 import { memo } from 'react';
 
 import { ViewField } from '@/components/common/ViewField';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { formatDate } from '@/lib/utils';
 import { formatRupiah } from '@/utils/formatters';
 
@@ -47,59 +39,41 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
             typeof item.branch === 'object' ? item.branch.name : item.branch;
 
         return (
-            <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>View Employee</DialogTitle>
-                        <DialogDescription>
-                            {t('common.view_details')}
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="space-y-4 py-4">
-                        {/* Basic Info Section */}
-                        <ViewField label="NIK" value={item.employee_id} />
-                        <ViewField label="Name" value={item.name} />
-                        <ViewField label="Email" value={item.email} />
-                        <ViewField label="Phone" value={item.phone} />
-
-                        {/* Work Info Section */}
+            <ViewModalShell
+                open={open}
+                onClose={onClose}
+                title="View Employee"
+                description={t('common.view_details')}
+            >
+                <div className="space-y-4 py-4">
+                    <ViewField label="NIK" value={item.employee_id} />
+                    <ViewField label="Name" value={item.name} />
+                    <ViewField label="Email" value={item.email} />
+                    <ViewField label="Phone" value={item.phone} />
+                    <ViewField
+                        label="Status"
+                        value={
+                            item.employment_status === 'intern'
+                                ? 'Intern'
+                                : 'Regular'
+                        }
+                    />
+                    <ViewField label="Department" value={departmentName} />
+                    <ViewField label="Position" value={positionName} />
+                    <ViewField label="Branch" value={branchName} />
+                    <ViewField
+                        label="Salary"
+                        value={formatRupiah(item.salary || 0)}
+                    />
+                    <ViewField label="Hire Date" value={formatDate(item.hire_date)} />
+                    {item.termination_date && (
                         <ViewField
-                            label="Status"
-                            value={
-                                item.employment_status === 'intern'
-                                    ? 'Intern'
-                                    : 'Regular'
-                            }
+                            label="Termination Date"
+                            value={formatDate(item.termination_date)}
                         />
-                        <ViewField label="Department" value={departmentName} />
-                        <ViewField label="Position" value={positionName} />
-                        <ViewField label="Branch" value={branchName} />
-                        <ViewField
-                            label="Salary"
-                            value={formatRupiah(item.salary || 0)}
-                        />
-
-                        {/* Date Section */}
-                        <ViewField
-                            label="Hire Date"
-                            value={formatDate(item.hire_date)}
-                        />
-                        {item.termination_date && (
-                            <ViewField
-                                label="Termination Date"
-                                value={formatDate(item.termination_date)}
-                            />
-                        )}
-                    </div>
-
-                    <DialogFooter>
-                        <Button type="button" onClick={onClose}>
-                            Close
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                    )}
+                </div>
+            </ViewModalShell>
         );
     },
 );

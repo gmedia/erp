@@ -1,14 +1,6 @@
 import { ViewField } from '@/components/common/ViewField';
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { ApprovalDelegation } from '@/types/approval-delegation';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { memo } from 'react';
@@ -35,69 +27,53 @@ export const ApprovalDelegationViewModal =
             };
 
             return (
-                <Dialog
+                <ViewModalShell
                     open={open}
-                    onOpenChange={(isOpen) => !isOpen && onClose()}
+                    onClose={onClose}
+                    title="View Approval Delegation"
+                    description="Approval Delegation Details"
+                    contentClassName="sm:max-w-[500px]"
                 >
-                    <DialogContent className="sm:max-w-[500px]">
-                        <DialogHeader>
-                            <DialogTitle>View Approval Delegation</DialogTitle>
-                            <DialogDescription>
-                                Approval Delegation Details
-                            </DialogDescription>
-                        </DialogHeader>
-
-                        <div className="space-y-4 py-4">
-                            <ViewField
-                                label="Delegator"
-                                value={item.delegator?.name || '-'}
-                            />
-                            <ViewField
-                                label="Delegate"
-                                value={item.delegate?.name || '-'}
-                            />
-                            <ViewField
-                                label="Start Date"
-                                value={formatDate(item.start_date)}
-                            />
-                            <ViewField
-                                label="End Date"
-                                value={formatDate(item.end_date)}
-                            />
-                            <ViewField
-                                label="Approvable Type"
-                                value={formatApprovableType(
-                                    item.approvable_type,
-                                )}
-                            />
-                            <div className="space-y-1">
-                                <span className="text-sm font-medium text-muted-foreground">
-                                    Status
-                                </span>
-                                <div>
-                                    <Badge
-                                        variant={
-                                            item.is_active
-                                                ? 'default'
-                                                : 'secondary'
-                                        }
-                                    >
-                                        {item.is_active ? 'Active' : 'Inactive'}
-                                    </Badge>
-                                </div>
+                    <div className="space-y-4 py-4">
+                        <ViewField
+                            label="Delegator"
+                            value={item.delegator?.name || '-'}
+                        />
+                        <ViewField
+                            label="Delegate"
+                            value={item.delegate?.name || '-'}
+                        />
+                        <ViewField
+                            label="Start Date"
+                            value={formatDate(item.start_date)}
+                        />
+                        <ViewField
+                            label="End Date"
+                            value={formatDate(item.end_date)}
+                        />
+                        <ViewField
+                            label="Approvable Type"
+                            value={formatApprovableType(item.approvable_type)}
+                        />
+                        <div className="space-y-1">
+                            <span className="text-sm font-medium text-muted-foreground">
+                                Status
+                            </span>
+                            <div>
+                                <Badge
+                                    variant={
+                                        item.is_active ? 'default' : 'secondary'
+                                    }
+                                >
+                                    {item.is_active ? 'Active' : 'Inactive'}
+                                </Badge>
                             </div>
-                            {item.reason && (
-                                <ViewField label="Reason" value={item.reason} />
-                            )}
                         </div>
-
-                        <DialogFooter>
-                            <Button type="button" onClick={onClose}>
-                                Close
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                        {item.reason && (
+                            <ViewField label="Reason" value={item.reason} />
+                        )}
+                    </div>
+                </ViewModalShell>
             );
         },
     );
