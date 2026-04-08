@@ -77,7 +77,9 @@ export default function Index() {
         tableBodyContent = (
             <TableEmptyStateRow
                 colSpan={7}
-                icon={<Calculator className="h-10 w-10 text-muted-foreground" />}
+                icon={
+                    <Calculator className="h-10 w-10 text-muted-foreground" />
+                }
                 title="No runs found"
                 description="Start by running a new calculation."
                 action={
@@ -194,8 +196,8 @@ export default function Index() {
             breadcrumbs={breadcrumbs}
             description={
                 <>
-                    Calculate and review asset depreciation. Once verified,
-                    post the calculated amounts to the general ledger.
+                    Calculate and review asset depreciation. Once verified, post
+                    the calculated amounts to the general ledger.
                 </>
             }
             actions={

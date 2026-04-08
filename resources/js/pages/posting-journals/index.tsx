@@ -22,7 +22,6 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { usePostingJournal } from '@/hooks/usePostingJournal';
-import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { JournalEntry } from '@/types/journal-entry';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
@@ -119,7 +118,9 @@ export default function Index() {
         tableBodyContent = (
             <TableEmptyStateRow
                 colSpan={7}
-                icon={<AlertCircle className="h-10 w-10 text-muted-foreground" />}
+                icon={
+                    <AlertCircle className="h-10 w-10 text-muted-foreground" />
+                }
                 title="No draft journals found"
                 description="All journal entries are already posted or voided."
             />
@@ -265,84 +266,76 @@ export default function Index() {
             }
         >
             <div className="flex flex-col gap-3 rounded-md border bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
-                                <div>
-                                    <span className="text-muted-foreground">
-                                        Draft journals
-                                    </span>{' '}
-                                    <span className="font-medium text-foreground">
-                                        {formatNumberByRegionalSettings(
-                                            meta.total,
-                                        )}
-                                    </span>
-                                </div>
-                                <div>
-                                    <span className="text-muted-foreground">
-                                        Showing
-                                    </span>{' '}
-                                    <span className="font-medium text-foreground">
-                                        {formatNumberByRegionalSettings(from)}–
-                                        {formatNumberByRegionalSettings(to)}
-                                    </span>
-                                </div>
-                                <div>
-                                    <span className="text-muted-foreground">
-                                        Page totals
-                                    </span>{' '}
-                                    <span className="font-medium text-foreground">
-                                        {formatCurrencyByRegionalSettings(
-                                            pageTotals.totals.debit,
-                                            {
-                                                locale: 'id-ID',
-                                                currency: 'IDR',
-                                            },
-                                        )}{' '}
-                                        /{' '}
-                                        {formatCurrencyByRegionalSettings(
-                                            pageTotals.totals.credit,
-                                            {
-                                                locale: 'id-ID',
-                                                currency: 'IDR',
-                                            },
-                                        )}
-                                    </span>
-                                </div>
-                            </div>
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
+                    <div>
+                        <span className="text-muted-foreground">
+                            Draft journals
+                        </span>{' '}
+                        <span className="font-medium text-foreground">
+                            {formatNumberByRegionalSettings(meta.total)}
+                        </span>
+                    </div>
+                    <div>
+                        <span className="text-muted-foreground">Showing</span>{' '}
+                        <span className="font-medium text-foreground">
+                            {formatNumberByRegionalSettings(from)}–
+                            {formatNumberByRegionalSettings(to)}
+                        </span>
+                    </div>
+                    <div>
+                        <span className="text-muted-foreground">
+                            Page totals
+                        </span>{' '}
+                        <span className="font-medium text-foreground">
+                            {formatCurrencyByRegionalSettings(
+                                pageTotals.totals.debit,
+                                {
+                                    locale: 'id-ID',
+                                    currency: 'IDR',
+                                },
+                            )}{' '}
+                            /{' '}
+                            {formatCurrencyByRegionalSettings(
+                                pageTotals.totals.credit,
+                                {
+                                    locale: 'id-ID',
+                                    currency: 'IDR',
+                                },
+                            )}
+                        </span>
+                    </div>
+                </div>
 
-                            <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
-                                <div>
-                                    <span className="text-muted-foreground">
-                                        Selected
-                                    </span>{' '}
-                                    <span className="font-medium text-foreground">
-                                        {formatNumberByRegionalSettings(
-                                            selectedIds.length,
-                                        )}
-                                    </span>
-                                </div>
-                                <div>
-                                    <span className="text-muted-foreground">
-                                        Selected totals
-                                    </span>{' '}
-                                    <span className="font-medium text-foreground">
-                                        {formatCurrencyByRegionalSettings(
-                                            pageTotals.selectedTotals.debit,
-                                            {
-                                                locale: 'id-ID',
-                                                currency: 'IDR',
-                                            },
-                                        )}{' '}
-                                        /{' '}
-                                        {formatCurrencyByRegionalSettings(
-                                            pageTotals.selectedTotals.credit,
-                                            {
-                                                locale: 'id-ID',
-                                                currency: 'IDR',
-                                            },
-                                        )}
-                                    </span>
-                                </div>
-                            </div>
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
+                    <div>
+                        <span className="text-muted-foreground">Selected</span>{' '}
+                        <span className="font-medium text-foreground">
+                            {formatNumberByRegionalSettings(selectedIds.length)}
+                        </span>
+                    </div>
+                    <div>
+                        <span className="text-muted-foreground">
+                            Selected totals
+                        </span>{' '}
+                        <span className="font-medium text-foreground">
+                            {formatCurrencyByRegionalSettings(
+                                pageTotals.selectedTotals.debit,
+                                {
+                                    locale: 'id-ID',
+                                    currency: 'IDR',
+                                },
+                            )}{' '}
+                            /{' '}
+                            {formatCurrencyByRegionalSettings(
+                                pageTotals.selectedTotals.credit,
+                                {
+                                    locale: 'id-ID',
+                                    currency: 'IDR',
+                                },
+                            )}
+                        </span>
+                    </div>
+                </div>
             </div>
 
             {selectedIds.length > 0 && (
@@ -370,7 +363,9 @@ export default function Index() {
                             <TableHead className="w-[220px]">Lines</TableHead>
                             <TableHead className="text-right">Debit</TableHead>
                             <TableHead className="text-right">Credit</TableHead>
-                            <TableHead className="text-center">Status</TableHead>
+                            <TableHead className="text-center">
+                                Status
+                            </TableHead>
                             <TableHead className="w-[60px]"></TableHead>
                         </TableRow>
                     </TableHeader>
