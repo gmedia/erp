@@ -139,13 +139,16 @@ export function useSingleYearFinancialReportPage<TReport>({
     emptyReport,
 }: SingleYearFinancialReportPageOptions<TReport>) {
     const { urlYearId, handleYearChange } = useSingleYearReportSearchParams();
-    const { data, isLoading, error } = useSingleYearFinancialReportQuery<TReport>(
-        queryKey,
-        endpoint,
-        urlYearId,
-    );
+    const { data, isLoading, error } =
+        useSingleYearFinancialReportQuery<TReport>(
+            queryKey,
+            endpoint,
+            urlYearId,
+        );
 
-    const fiscalYears = Array.isArray(data?.fiscalYears) ? data.fiscalYears : [];
+    const fiscalYears = Array.isArray(data?.fiscalYears)
+        ? data.fiscalYears
+        : [];
     const selectedYearId = data?.selectedYearId || 0;
     const report = data?.report || emptyReport;
     const selectedFiscalYear = resolveSelectedFiscalYear(

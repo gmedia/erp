@@ -146,12 +146,13 @@ export function useComparisonFinancialReportPage<TReport>({
         handleComparisonChange,
     } = useComparisonReportSearchParams();
 
-    const { data, isLoading, error } = useComparisonFinancialReportQuery<TReport>(
-        queryKey,
-        endpoint,
-        urlYearId,
-        urlComparisonId,
-    );
+    const { data, isLoading, error } =
+        useComparisonFinancialReportQuery<TReport>(
+            queryKey,
+            endpoint,
+            urlYearId,
+            urlComparisonId,
+        );
 
     const fiscalYears = data?.fiscalYears || [];
     const selectedYearId = data?.selectedYearId || 0;
