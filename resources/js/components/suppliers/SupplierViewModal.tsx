@@ -58,7 +58,9 @@ export const SupplierViewModal = React.memo(
                     />
                     <ViewField
                         label="Created At"
-                        value={formatDateTimeByRegionalSettings(item.created_at)}
+                        value={formatDateTimeByRegionalSettings(
+                            item.created_at,
+                        )}
                     />
                 </div>
             </ViewModalShell>

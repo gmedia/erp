@@ -65,7 +65,10 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
                         label="Salary"
                         value={formatRupiah(item.salary || 0)}
                     />
-                    <ViewField label="Hire Date" value={formatDate(item.hire_date)} />
+                    <ViewField
+                        label="Hire Date"
+                        value={formatDate(item.hire_date)}
+                    />
                     {item.termination_date && (
                         <ViewField
                             label="Termination Date"

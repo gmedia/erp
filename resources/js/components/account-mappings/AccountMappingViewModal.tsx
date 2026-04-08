@@ -50,8 +50,14 @@ export const AccountMappingViewModal = memo<AccountMappingViewModalProps>(
                     />
                     <ViewField label="Type" value={item.type.toUpperCase()} />
                     <ViewField label="Notes" value={item.notes || '-'} />
-                    <ViewField label="Created At" value={formatDate(item.created_at)} />
-                    <ViewField label="Updated At" value={formatDate(item.updated_at)} />
+                    <ViewField
+                        label="Created At"
+                        value={formatDate(item.created_at)}
+                    />
+                    <ViewField
+                        label="Updated At"
+                        value={formatDate(item.updated_at)}
+                    />
                 </div>
             </ViewModalShell>
         );

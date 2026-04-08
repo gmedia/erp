@@ -62,7 +62,9 @@ export const CustomerViewModal = memo<CustomerViewModalProps>(
                             {item.status === 'active' ? 'Active' : 'Inactive'}
                         </Badge>
                     </div>
-                    {item.notes && <ViewField label="Notes" value={item.notes} />}
+                    {item.notes && (
+                        <ViewField label="Notes" value={item.notes} />
+                    )}
                 </div>
             </ViewModalShell>
         );
