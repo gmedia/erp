@@ -30,7 +30,8 @@ export function AssetMovementViewModal({
                             Asset
                         </span>
                         <span className="font-medium">
-                            {item.asset?.name || '-'} ({item.asset?.asset_code || '-'})
+                            {item.asset?.name || '-'} (
+                            {item.asset?.asset_code || '-'})
                         </span>
                     </div>
                     <div>

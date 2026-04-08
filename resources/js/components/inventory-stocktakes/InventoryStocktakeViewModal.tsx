@@ -131,7 +131,8 @@ export const InventoryStocktakeViewModal = React.memo(
                                             (current.items || []).map((it) => (
                                                 <TableRow key={it.id}>
                                                     <TableCell>
-                                                        {it.product?.name || '-'}
+                                                        {it.product?.name ||
+                                                            '-'}
                                                     </TableCell>
                                                     <TableCell>
                                                         {it.unit?.name || '-'}
@@ -140,7 +141,8 @@ export const InventoryStocktakeViewModal = React.memo(
                                                         {it.system_quantity}
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                        {it.counted_quantity ?? '-'}
+                                                        {it.counted_quantity ??
+                                                            '-'}
                                                     </TableCell>
                                                     <TableCell className="text-right">
                                                         {it.variance ?? '-'}

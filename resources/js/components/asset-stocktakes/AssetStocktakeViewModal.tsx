@@ -50,7 +50,9 @@ export function AssetStocktakeViewModal({
                             Performed Date
                         </span>
                         <span>
-                            {item.performed_at ? formatDate(item.performed_at) : '-'}
+                            {item.performed_at
+                                ? formatDate(item.performed_at)
+                                : '-'}
                         </span>
                     </div>
                     <div>

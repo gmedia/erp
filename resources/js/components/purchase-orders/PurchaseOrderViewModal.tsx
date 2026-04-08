@@ -55,7 +55,10 @@ export const PurchaseOrderViewModal = React.memo(
                 <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
                     <div className="space-y-6 py-2">
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                            <ViewField label="PO Number" value={item.po_number} />
+                            <ViewField
+                                label="PO Number"
+                                value={item.po_number}
+                            />
                             <ViewField
                                 label="Supplier"
                                 value={item.supplier?.name}
@@ -83,7 +86,11 @@ export const PurchaseOrderViewModal = React.memo(
                             <ViewField label="Currency" value={item.currency} />
                             <ViewField
                                 label="Status"
-                                value={<Badge variant="outline">{item.status}</Badge>}
+                                value={
+                                    <Badge variant="outline">
+                                        {item.status}
+                                    </Badge>
+                                }
                             />
                             <ViewField
                                 label="Subtotal"
@@ -105,7 +112,10 @@ export const PurchaseOrderViewModal = React.memo(
                                 label="Shipping Address"
                                 value={item.shipping_address || '-'}
                             />
-                            <ViewField label="Notes" value={item.notes || '-'} />
+                            <ViewField
+                                label="Notes"
+                                value={item.notes || '-'}
+                            />
                         </div>
 
                         <div className="space-y-2">
@@ -120,7 +130,9 @@ export const PurchaseOrderViewModal = React.memo(
                                             <th className="p-2 text-left">
                                                 Unit
                                             </th>
-                                            <th className="p-2 text-right">Qty</th>
+                                            <th className="p-2 text-right">
+                                                Qty
+                                            </th>
                                             <th className="p-2 text-right">
                                                 Unit Price
                                             </th>
@@ -148,10 +160,14 @@ export const PurchaseOrderViewModal = React.memo(
                                                     {it.unit?.name || '-'}
                                                 </td>
                                                 <td className="p-2 text-right">
-                                                    {formatQuantity(it.quantity)}
+                                                    {formatQuantity(
+                                                        it.quantity,
+                                                    )}
                                                 </td>
                                                 <td className="p-2 text-right">
-                                                    {formatAmount(it.unit_price)}
+                                                    {formatAmount(
+                                                        it.unit_price,
+                                                    )}
                                                 </td>
                                                 <td className="p-2 text-right">
                                                     {formatPercent(
@@ -159,10 +175,14 @@ export const PurchaseOrderViewModal = React.memo(
                                                     )}
                                                 </td>
                                                 <td className="p-2 text-right">
-                                                    {formatPercent(it.tax_percent)}
+                                                    {formatPercent(
+                                                        it.tax_percent,
+                                                    )}
                                                 </td>
                                                 <td className="p-2 text-right">
-                                                    {formatAmount(it.line_total)}
+                                                    {formatAmount(
+                                                        it.line_total,
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}
