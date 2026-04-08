@@ -5,19 +5,13 @@ import { useMemo } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { InputField } from '@/components/common/InputField';
-import { TextareaField } from '@/components/common/TextareaField';
-import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import { Form } from '@/components/ui/form';
+    ItemFormDialogShell,
+    ItemProductSelectField,
+    ItemUnitSelectField,
+} from '@/components/common/ItemFormDialog';
+import { TextareaField } from '@/components/common/TextareaField';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type SupplierReturnFormData } from '@/types/supplier-return';
 
@@ -95,108 +89,69 @@ export function SupplierReturnItemFormDialog({
     useResetFormOnDefaultValues(form, defaultValues, { enabled: open });
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle>{item ? 'Edit Item' : 'Add Item'}</DialogTitle>
-                    <DialogDescription className="sr-only">
-                        {item
-                            ? 'Edit supplier return item.'
-                            : 'Add supplier return item.'}
-                    </DialogDescription>
-                </DialogHeader>
+        <ItemFormDialogShell
+            open={open}
+            onOpenChange={onOpenChange}
+            item={item}
+            form={form}
+            onSave={onSave}
+            itemDescription="supplier return item"
+        >
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <InputField
+                    name="goods_receipt_item_id"
+                    label="GR Item ID"
+                    type="number"
+                    min={1}
+                    step="1"
+                    placeholder="1"
+                />
+                <ItemProductSelectField
+                    form={form}
+                    open={open}
+                    name="product_id"
+                    labelName="product_label"
+                    label="Product"
+                    url="/api/products"
+                    placeholder="Select product"
+                    initialId={defaultValues.product_id}
+                    initialLabel={defaultValues.product_label}
+                />
+                <ItemUnitSelectField
+                    form={form}
+                    open={open}
+                    name="unit_id"
+                    labelName="unit_label"
+                    label="Unit"
+                    url="/api/units"
+                    placeholder="Select unit"
+                    initialId={defaultValues.unit_id}
+                    initialLabel={defaultValues.unit_label}
+                />
+                <InputField
+                    name="quantity_returned"
+                    label="Quantity Returned"
+                    type="number"
+                    min={0}
+                    step="any"
+                    placeholder="1"
+                />
+                <InputField
+                    name="unit_price"
+                    label="Unit Price"
+                    type="number"
+                    min={0}
+                    step="any"
+                    placeholder="0"
+                />
+            </div>
 
-                <Form {...form}>
-                    <form
-                        onSubmit={(event) => {
-                            event.stopPropagation();
-                            form.handleSubmit(onSave)(event);
-                        }}
-                        className="space-y-4"
-                    >
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <InputField
-                                name="goods_receipt_item_id"
-                                label="GR Item ID"
-                                type="number"
-                                min={1}
-                                step="1"
-                                placeholder="1"
-                            />
-                            <AsyncSelectField<{ name?: string }>
-                                key={`product-${defaultValues.product_id || 'new'}-${open ? 'open' : 'closed'}`}
-                                name="product_id"
-                                label="Product"
-                                url="/api/products"
-                                placeholder="Select product"
-                                initialLabel={defaultValues.product_label}
-                                onItemSelect={(product) => {
-                                    form.setValue(
-                                        'product_label',
-                                        product?.name || '',
-                                        {
-                                            shouldDirty: true,
-                                        },
-                                    );
-                                }}
-                            />
-                            <AsyncSelectField<{ name?: string }>
-                                key={`unit-${defaultValues.unit_id || 'new'}-${open ? 'open' : 'closed'}`}
-                                name="unit_id"
-                                label="Unit"
-                                url="/api/units"
-                                placeholder="Select unit"
-                                initialLabel={defaultValues.unit_label}
-                                onItemSelect={(unit) => {
-                                    form.setValue(
-                                        'unit_label',
-                                        unit?.name || '',
-                                        {
-                                            shouldDirty: true,
-                                        },
-                                    );
-                                }}
-                            />
-                            <InputField
-                                name="quantity_returned"
-                                label="Quantity Returned"
-                                type="number"
-                                min={0}
-                                step="any"
-                                placeholder="1"
-                            />
-                            <InputField
-                                name="unit_price"
-                                label="Unit Price"
-                                type="number"
-                                min={0}
-                                step="any"
-                                placeholder="0"
-                            />
-                        </div>
-
-                        <TextareaField
-                            name="notes"
-                            label="Notes"
-                            placeholder="Item notes"
-                            rows={3}
-                        />
-
-                        <DialogFooter>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => onOpenChange(false)}
-                            >
-                                Cancel
-                            </Button>
-                            <Button type="submit">
-                                {item ? 'Update Item' : 'Save Item'}
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
-            </DialogContent>
-        </Dialog>
+            <TextareaField
+                name="notes"
+                label="Notes"
+                placeholder="Item notes"
+                rows={3}
+            />
+        </ItemFormDialogShell>
     );
 }
