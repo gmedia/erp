@@ -61,119 +61,108 @@ export const StockTransferViewModal = React.memo(
             >
                 <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
                     <div className="space-y-6 py-4">
-                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                <ViewField
-                                    label="Transfer Number"
-                                    value={current.transfer_number}
-                                />
-                                <ViewField
-                                    label="Status"
-                                    value={
-                                        <Badge variant="outline">
-                                            {current.status}
-                                        </Badge>
-                                    }
-                                />
-                                <ViewField
-                                    label="From Warehouse"
-                                    value={current.from_warehouse?.name}
-                                />
-                                <ViewField
-                                    label="To Warehouse"
-                                    value={current.to_warehouse?.name}
-                                />
-                                <ViewField
-                                    label="Transfer Date"
-                                    value={formatDateByRegionalSettings(
-                                        current.transfer_date,
-                                    )}
-                                />
-                                <ViewField
-                                    label="Expected Arrival"
-                                    value={formatDateByRegionalSettings(
-                                        current.expected_arrival_date,
-                                    )}
-                                />
-                                <ViewField
-                                    label="Requested By"
-                                    value={current.requested_by?.name || '-'}
-                                />
-                                <ViewField
-                                    label="Notes"
-                                    value={current.notes || '-'}
-                                />
-                            </div>
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <ViewField
+                                label="Transfer Number"
+                                value={current.transfer_number}
+                            />
+                            <ViewField
+                                label="Status"
+                                value={
+                                    <Badge variant="outline">
+                                        {current.status}
+                                    </Badge>
+                                }
+                            />
+                            <ViewField
+                                label="From Warehouse"
+                                value={current.from_warehouse?.name}
+                            />
+                            <ViewField
+                                label="To Warehouse"
+                                value={current.to_warehouse?.name}
+                            />
+                            <ViewField
+                                label="Transfer Date"
+                                value={formatDateByRegionalSettings(
+                                    current.transfer_date,
+                                )}
+                            />
+                            <ViewField
+                                label="Expected Arrival"
+                                value={formatDateByRegionalSettings(
+                                    current.expected_arrival_date,
+                                )}
+                            />
+                            <ViewField
+                                label="Requested By"
+                                value={current.requested_by?.name || '-'}
+                            />
+                            <ViewField
+                                label="Notes"
+                                value={current.notes || '-'}
+                            />
+                        </div>
 
-                            <div className="space-y-2">
-                                <div className="text-sm font-semibold">
-                                    Items
-                                </div>
-                                <div className="min-w-0 rounded-md border">
-                                    <Table className="min-w-[760px]">
-                                        <TableHeader>
+                        <div className="space-y-2">
+                            <div className="text-sm font-semibold">Items</div>
+                            <div className="min-w-0 rounded-md border">
+                                <Table className="min-w-[760px]">
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Product</TableHead>
+                                            <TableHead>Unit</TableHead>
+                                            <TableHead className="text-right">
+                                                Qty
+                                            </TableHead>
+                                            <TableHead className="text-right">
+                                                Qty Received
+                                            </TableHead>
+                                            <TableHead className="text-right">
+                                                Unit Cost
+                                            </TableHead>
+                                            <TableHead>Notes</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {(current.items || []).length === 0 ? (
                                             <TableRow>
-                                                <TableHead>Product</TableHead>
-                                                <TableHead>Unit</TableHead>
-                                                <TableHead className="text-right">
-                                                    Qty
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Qty Received
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Unit Cost
-                                                </TableHead>
-                                                <TableHead>Notes</TableHead>
+                                                <TableCell
+                                                    colSpan={6}
+                                                    className="py-8 text-center text-muted-foreground"
+                                                >
+                                                    No items.
+                                                </TableCell>
                                             </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {(current.items || []).length ===
-                                            0 ? (
-                                                <TableRow>
-                                                    <TableCell
-                                                        colSpan={6}
-                                                        className="py-8 text-center text-muted-foreground"
-                                                    >
-                                                        No items.
+                                        ) : (
+                                            (current.items || []).map((it) => (
+                                                <TableRow key={it.id}>
+                                                    <TableCell>
+                                                        {it.product?.name ||
+                                                            '-'}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {it.unit?.name || '-'}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {it.quantity}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {it.quantity_received}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {it.unit_cost}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {it.notes || '-'}
                                                     </TableCell>
                                                 </TableRow>
-                                            ) : (
-                                                (current.items || []).map(
-                                                    (it) => (
-                                                        <TableRow key={it.id}>
-                                                            <TableCell>
-                                                                {it.product
-                                                                    ?.name ||
-                                                                    '-'}
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {it.unit
-                                                                    ?.name ||
-                                                                    '-'}
-                                                            </TableCell>
-                                                            <TableCell className="text-right">
-                                                                {it.quantity}
-                                                            </TableCell>
-                                                            <TableCell className="text-right">
-                                                                {
-                                                                    it.quantity_received
-                                                                }
-                                                            </TableCell>
-                                                            <TableCell className="text-right">
-                                                                {it.unit_cost}
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {it.notes ||
-                                                                    '-'}
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ),
-                                                )
-                                            )}
-                                        </TableBody>
-                                    </Table>
-                                </div>
+                                            ))
+                                        )}
+                                    </TableBody>
+                                </Table>
                             </div>
+                        </div>
                     </div>
                 </div>
             </ViewModalShell>

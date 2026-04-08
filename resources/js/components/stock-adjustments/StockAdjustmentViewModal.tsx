@@ -63,136 +63,121 @@ export const StockAdjustmentViewModal = React.memo(
             >
                 <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
                     <div className="space-y-6 py-4">
-                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                <ViewField
-                                    label="Adjustment Number"
-                                    value={current.adjustment_number}
-                                />
-                                <ViewField
-                                    label="Status"
-                                    value={
-                                        <Badge variant="outline">
-                                            {current.status}
-                                        </Badge>
-                                    }
-                                />
-                                <ViewField
-                                    label="Adjustment Type"
-                                    value={
-                                        <Badge variant="outline">
-                                            {current.adjustment_type}
-                                        </Badge>
-                                    }
-                                />
-                                <ViewField
-                                    label="Warehouse"
-                                    value={current.warehouse?.name}
-                                />
-                                <ViewField
-                                    label="Adjustment Date"
-                                    value={formatDateByRegionalSettings(
-                                        current.adjustment_date,
-                                    )}
-                                />
-                                <ViewField
-                                    label="Stocktake"
-                                    value={
-                                        current.inventory_stocktake
-                                            ?.stocktake_number || '-'
-                                    }
-                                />
-                                <ViewField
-                                    label="Notes"
-                                    value={current.notes || '-'}
-                                />
-                            </div>
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <ViewField
+                                label="Adjustment Number"
+                                value={current.adjustment_number}
+                            />
+                            <ViewField
+                                label="Status"
+                                value={
+                                    <Badge variant="outline">
+                                        {current.status}
+                                    </Badge>
+                                }
+                            />
+                            <ViewField
+                                label="Adjustment Type"
+                                value={
+                                    <Badge variant="outline">
+                                        {current.adjustment_type}
+                                    </Badge>
+                                }
+                            />
+                            <ViewField
+                                label="Warehouse"
+                                value={current.warehouse?.name}
+                            />
+                            <ViewField
+                                label="Adjustment Date"
+                                value={formatDateByRegionalSettings(
+                                    current.adjustment_date,
+                                )}
+                            />
+                            <ViewField
+                                label="Stocktake"
+                                value={
+                                    current.inventory_stocktake
+                                        ?.stocktake_number || '-'
+                                }
+                            />
+                            <ViewField
+                                label="Notes"
+                                value={current.notes || '-'}
+                            />
+                        </div>
 
-                            <div className="space-y-2">
-                                <div className="text-sm font-semibold">
-                                    Items
-                                </div>
-                                <div className="min-w-0 rounded-md border">
-                                    <Table className="min-w-[920px]">
-                                        <TableHeader>
+                        <div className="space-y-2">
+                            <div className="text-sm font-semibold">Items</div>
+                            <div className="min-w-0 rounded-md border">
+                                <Table className="min-w-[920px]">
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Product</TableHead>
+                                            <TableHead>Unit</TableHead>
+                                            <TableHead className="text-right">
+                                                Qty Before
+                                            </TableHead>
+                                            <TableHead className="text-right">
+                                                Qty Adjusted
+                                            </TableHead>
+                                            <TableHead className="text-right">
+                                                Qty After
+                                            </TableHead>
+                                            <TableHead className="text-right">
+                                                Unit Cost
+                                            </TableHead>
+                                            <TableHead className="text-right">
+                                                Total Cost
+                                            </TableHead>
+                                            <TableHead>Reason</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {(current.items || []).length === 0 ? (
                                             <TableRow>
-                                                <TableHead>Product</TableHead>
-                                                <TableHead>Unit</TableHead>
-                                                <TableHead className="text-right">
-                                                    Qty Before
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Qty Adjusted
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Qty After
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Unit Cost
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Total Cost
-                                                </TableHead>
-                                                <TableHead>Reason</TableHead>
+                                                <TableCell
+                                                    colSpan={8}
+                                                    className="py-8 text-center text-muted-foreground"
+                                                >
+                                                    No items.
+                                                </TableCell>
                                             </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {(current.items || []).length ===
-                                            0 ? (
-                                                <TableRow>
-                                                    <TableCell
-                                                        colSpan={8}
-                                                        className="py-8 text-center text-muted-foreground"
-                                                    >
-                                                        No items.
+                                        ) : (
+                                            (current.items || []).map((it) => (
+                                                <TableRow key={it.id}>
+                                                    <TableCell>
+                                                        {it.product?.name ||
+                                                            '-'}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {it.unit?.name || '-'}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {it.quantity_before}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {it.quantity_adjusted}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {it.quantity_after}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {it.unit_cost}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {it.total_cost}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {it.reason || '-'}
                                                     </TableCell>
                                                 </TableRow>
-                                            ) : (
-                                                (current.items || []).map(
-                                                    (it) => (
-                                                        <TableRow key={it.id}>
-                                                            <TableCell>
-                                                                {it.product
-                                                                    ?.name ||
-                                                                    '-'}
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {it.unit
-                                                                    ?.name ||
-                                                                    '-'}
-                                                            </TableCell>
-                                                            <TableCell className="text-right">
-                                                                {
-                                                                    it.quantity_before
-                                                                }
-                                                            </TableCell>
-                                                            <TableCell className="text-right">
-                                                                {
-                                                                    it.quantity_adjusted
-                                                                }
-                                                            </TableCell>
-                                                            <TableCell className="text-right">
-                                                                {
-                                                                    it.quantity_after
-                                                                }
-                                                            </TableCell>
-                                                            <TableCell className="text-right">
-                                                                {it.unit_cost}
-                                                            </TableCell>
-                                                            <TableCell className="text-right">
-                                                                {it.total_cost}
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {it.reason ||
-                                                                    '-'}
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ),
-                                                )
-                                            )}
-                                        </TableBody>
-                                    </Table>
-                                </div>
+                                            ))
+                                        )}
+                                    </TableBody>
+                                </Table>
                             </div>
+                        </div>
                     </div>
                 </div>
             </ViewModalShell>
