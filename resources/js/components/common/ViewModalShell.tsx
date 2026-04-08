@@ -19,6 +19,10 @@ interface ViewModalShellProps {
     description: ReactNode;
     children: ReactNode;
     contentClassName?: string;
+    headerClassName?: string;
+    footerClassName?: string;
+    footer?: ReactNode;
+    hideFooter?: boolean;
 }
 
 export function ViewModalShell({
@@ -28,22 +32,30 @@ export function ViewModalShell({
     description,
     children,
     contentClassName = 'sm:max-w-[425px]',
+    headerClassName,
+    footerClassName,
+    footer,
+    hideFooter = false,
 }: Readonly<ViewModalShellProps>) {
     return (
         <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
             <DialogContent className={contentClassName}>
-                <DialogHeader>
+                <DialogHeader className={headerClassName}>
                     <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>{description}</DialogDescription>
                 </DialogHeader>
 
                 {children}
 
-                <DialogFooter>
-                    <Button type="button" onClick={onClose}>
-                        Close
-                    </Button>
-                </DialogFooter>
+                {!hideFooter && (
+                    <DialogFooter className={footerClassName}>
+                        {footer ?? (
+                            <Button type="button" onClick={onClose}>
+                                Close
+                            </Button>
+                        )}
+                    </DialogFooter>
+                )}
             </DialogContent>
         </Dialog>
     );

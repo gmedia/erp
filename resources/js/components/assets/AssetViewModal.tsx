@@ -1,13 +1,7 @@
 'use client';
 
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { type Asset } from '@/types/asset';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
@@ -67,22 +61,23 @@ export function AssetViewModal({
     };
 
     return (
-        <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col overflow-hidden">
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <span>{item.name}</span>
-                        <Badge variant="outline" className="ml-2">
-                            {item.asset_code}
-                        </Badge>
-                    </DialogTitle>
-                    <DialogDescription>
-                        Detailed information about this asset.
-                    </DialogDescription>
-                </DialogHeader>
-
-                <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
-                    <div className="py-4">
+        <ViewModalShell
+            open={open}
+            onClose={onClose}
+            title={
+                <span className="flex items-center gap-2">
+                    <span>{item.name}</span>
+                    <Badge variant="outline" className="ml-2">
+                        {item.asset_code}
+                    </Badge>
+                </span>
+            }
+            description="Detailed information about this asset."
+            contentClassName="flex max-h-[90vh] max-w-2xl flex-col overflow-hidden"
+            hideFooter
+        >
+            <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
+                <div className="py-4">
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             {/* General Information */}
                             <div className="space-y-4">
@@ -305,9 +300,8 @@ export function AssetViewModal({
                                 </p>
                             </div>
                         )}
-                    </div>
                 </div>
-            </DialogContent>
-        </Dialog>
+            </div>
+        </ViewModalShell>
     );
 }

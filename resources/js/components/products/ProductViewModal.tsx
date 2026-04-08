@@ -1,16 +1,8 @@
 'use client';
 
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { ViewField } from '@/components/common/ViewField';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { useTranslation } from '@/contexts/i18n-context';
 import { Product } from '@/types/entity';
 import { formatRupiah } from '@/utils/formatters';
@@ -34,19 +26,17 @@ export const ProductViewModal = memo<ProductViewModalProps>(
         if (!item) return null;
 
         return (
-            <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-                <DialogContent className="flex max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-[600px]">
-                    <div className="shrink-0 p-6 pb-2">
-                        <DialogHeader>
-                            <DialogTitle>View Product/Service</DialogTitle>
-                            <DialogDescription>
-                                {t('common.view_details')}
-                            </DialogDescription>
-                        </DialogHeader>
-                    </div>
-
-                    <div className="min-h-0 flex-1 overflow-y-auto px-6">
-                        <div className="grid grid-cols-1 gap-x-6 gap-y-4 py-4 md:grid-cols-2">
+            <ViewModalShell
+                open={open}
+                onClose={onClose}
+                title="View Product/Service"
+                description={t('common.view_details')}
+                contentClassName="flex max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-[600px]"
+                headerClassName="shrink-0 p-6 pb-2"
+                footerClassName="shrink-0 p-6 pt-2"
+            >
+                <div className="min-h-0 flex-1 overflow-y-auto px-6">
+                    <div className="grid grid-cols-1 gap-x-6 gap-y-4 py-4 md:grid-cols-2">
                             {/* General Info */}
                             <div className="space-y-4 border-b pb-4 md:col-span-2">
                                 <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
@@ -200,16 +190,8 @@ export const ProductViewModal = memo<ProductViewModalProps>(
                                 <ViewField label="Notes" value={item.notes} />
                             </div>
                         </div>
-                    </div>
-                    <div className="shrink-0 p-6 pt-2">
-                        <DialogFooter>
-                            <Button type="button" onClick={onClose}>
-                                Close
-                            </Button>
-                        </DialogFooter>
-                    </div>
-                </DialogContent>
-            </Dialog>
+                </div>
+            </ViewModalShell>
         );
     },
 );
