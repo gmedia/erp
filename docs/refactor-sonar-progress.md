@@ -532,6 +532,11 @@ Isi setelah batch selesai dan sebelum merge.
 	- Gelombang saat ini mencakup `app/Actions/Concerns/ConfiguredPartyExportAction.php`, `app/Actions/Customers/ExportCustomersAction.php`, dan `app/Actions/Suppliers/ExportSuppliersAction.php`.
 	- Progress: pasangan action export tersebut sekarang berbagi base kecil untuk default filter party tanpa ubah prefix filename, payload response export, atau export object yang dipakai. Verifikasi PASS `./vendor/bin/sail pest tests/Unit/Actions/Customers/ExportCustomersActionTest.php tests/Unit/Actions/Suppliers/ExportSuppliersActionTest.php` (3 passed) dan PASS `./vendor/bin/sail bin duster fix --no-interaction app/Actions/Concerns/ConfiguredPartyExportAction.php app/Actions/Customers/ExportCustomersAction.php app/Actions/Suppliers/ExportSuppliersAction.php`. Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
 
+116. Dedup stock movement index filters. (in-progress)
+	- Pindahkan search, advanced filter, dan relation sorting `stock-movements` ke filter service tipis agar action index tidak lagi menyimpan blok query inline yang sudah mengikuti pola modul stok lain.
+	- Gelombang saat ini mencakup `app/Domain/StockMovements/StockMovementFilterService.php` dan `app/Actions/StockMovements/IndexStockMovementsAction.php`.
+	- Progress: `IndexStockMovementsAction` sekarang mengandalkan `InteractsWithIndexRequest` plus filter service khusus untuk search relasi `product/warehouse/createdBy`, exact/date filters, dan sorting alias `product_name/warehouse_name/created_by`, sambil mempertahankan eager load, payload pagination, dan flow export collection. Verifikasi PASS `./vendor/bin/sail pest tests/Feature/StockMovements/StockMovementControllerTest.php tests/Feature/StockMovements/StockMovementExportTest.php` (6 passed) dan PASS `./vendor/bin/sail bin duster fix --no-interaction app/Domain/StockMovements/StockMovementFilterService.php app/Actions/StockMovements/IndexStockMovementsAction.php`. Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
+
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
 1. Ekstraksi query builder bersama untuk variances asset stocktake. (done)
