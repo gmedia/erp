@@ -28,14 +28,6 @@ class ExportProductsAction extends ConfiguredTimestampExportAction
         return array_filter($filters, static fn (mixed $value): bool => $value !== null);
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    protected function filterDefaults(): array
-    {
-        return [];
-    }
-
     protected function filenamePrefix(): string
     {
         return 'products';

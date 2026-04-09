@@ -42,7 +42,10 @@ abstract class ConfiguredTransactionExportAction
     /**
      * @return array<string, mixed>
      */
-    abstract protected function filterDefaults(): array;
+    protected function filterDefaults(): array
+    {
+        return [];
+    }
 
     abstract protected function filenamePrefix(): string;
 

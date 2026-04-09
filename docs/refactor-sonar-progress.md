@@ -522,6 +522,11 @@ Isi setelah batch selesai dan sebelum merge.
 	- Gelombang saat ini mencakup `app/Actions/Concerns/ConfiguredXlsxExportAction.php` dan `app/Actions/AssetMaintenances/ExportAssetMaintenancesAction.php`.
 	- Progress: `ConfiguredXlsxExportAction` kini menyediakan default filter null/kosong yang sama seperti backbone export lain, sehingga `ExportAssetMaintenancesAction` tidak lagi perlu mendefinisikan `buildFilters()` lokal. Perilaku filename `asset-maintenances-export-YYYY-mm-dd-HH-ii-ss.xlsx` tetap sama karena override delimiter dan timestamp format tidak disentuh. Verifikasi PASS `./vendor/bin/sail pest tests/Unit/Actions/AssetMaintenances/ExportAssetMaintenancesActionTest.php` (1 passed) dan PASS `./vendor/bin/sail bin duster fix --no-interaction app/Actions/Concerns/ConfiguredXlsxExportAction.php app/Actions/AssetMaintenances/ExportAssetMaintenancesAction.php`. Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
 
+114. Dedup empty export filter defaults. (in-progress)
+	- Beri default `filterDefaults()` kosong di base action export timestamp/transaksi agar subclass yang tidak butuh default map tidak tetap menyimpan override `return []` yang redundant.
+	- Gelombang saat ini mencakup `app/Actions/Concerns/ConfiguredTimestampExportAction.php`, `app/Actions/Concerns/ConfiguredTransactionExportAction.php`, dan `app/Actions/Products/ExportProductsAction.php`.
+	- Progress: kedua base action sekarang menyediakan default kosong bawaan, sehingga `ExportProductsAction` bisa menghapus override `filterDefaults()` tanpa ubah perilaku filter custom `buildFilters()` atau payload response export. Verifikasi PASS `./vendor/bin/sail pest tests/Unit/Actions/Products/ExportProductsActionTest.php` (1 passed) dan PASS `./vendor/bin/sail bin duster fix --no-interaction app/Actions/Concerns/ConfiguredTimestampExportAction.php app/Actions/Concerns/ConfiguredTransactionExportAction.php app/Actions/Products/ExportProductsAction.php`. Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
+
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
 1. Ekstraksi query builder bersama untuk variances asset stocktake. (done)
