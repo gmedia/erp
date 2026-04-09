@@ -527,6 +527,11 @@ Isi setelah batch selesai dan sebelum merge.
 	- Gelombang saat ini mencakup `app/Actions/Concerns/ConfiguredTimestampExportAction.php`, `app/Actions/Concerns/ConfiguredTransactionExportAction.php`, dan `app/Actions/Products/ExportProductsAction.php`.
 	- Progress: kedua base action sekarang menyediakan default kosong bawaan, sehingga `ExportProductsAction` bisa menghapus override `filterDefaults()` tanpa ubah perilaku filter custom `buildFilters()` atau payload response export. Verifikasi PASS `./vendor/bin/sail pest tests/Unit/Actions/Products/ExportProductsActionTest.php` (1 passed) dan PASS `./vendor/bin/sail bin duster fix --no-interaction app/Actions/Concerns/ConfiguredTimestampExportAction.php app/Actions/Concerns/ConfiguredTransactionExportAction.php app/Actions/Products/ExportProductsAction.php`. Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
 
+115. Dedup party export filter defaults. (in-progress)
+	- Ekstrak default filter export master-data party yang identik agar action `customers` dan `suppliers` tidak terus menyimpan map `search/branch/category/status/sort` yang sama persis.
+	- Gelombang saat ini mencakup `app/Actions/Concerns/ConfiguredPartyExportAction.php`, `app/Actions/Customers/ExportCustomersAction.php`, dan `app/Actions/Suppliers/ExportSuppliersAction.php`.
+	- Progress: pasangan action export tersebut sekarang berbagi base kecil untuk default filter party tanpa ubah prefix filename, payload response export, atau export object yang dipakai. Verifikasi PASS `./vendor/bin/sail pest tests/Unit/Actions/Customers/ExportCustomersActionTest.php tests/Unit/Actions/Suppliers/ExportSuppliersActionTest.php` (3 passed) dan PASS `./vendor/bin/sail bin duster fix --no-interaction app/Actions/Concerns/ConfiguredPartyExportAction.php app/Actions/Customers/ExportCustomersAction.php app/Actions/Suppliers/ExportSuppliersAction.php`. Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
+
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
 1. Ekstraksi query builder bersama untuk variances asset stocktake. (done)

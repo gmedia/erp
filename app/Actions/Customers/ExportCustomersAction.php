@@ -2,26 +2,11 @@
 
 namespace App\Actions\Customers;
 
-use App\Actions\Concerns\ConfiguredTimestampExportAction;
+use App\Actions\Concerns\ConfiguredPartyExportAction;
 use App\Exports\CustomerExport;
 
-class ExportCustomersAction extends ConfiguredTimestampExportAction
+class ExportCustomersAction extends ConfiguredPartyExportAction
 {
-    /**
-     * @return array<string, mixed>
-     */
-    protected function filterDefaults(): array
-    {
-        return [
-            'search' => null,
-            'branch_id' => null,
-            'category_id' => null,
-            'status' => null,
-            'sort_by' => 'created_at',
-            'sort_direction' => 'desc',
-        ];
-    }
-
     protected function filenamePrefix(): string
     {
         return 'customers';
