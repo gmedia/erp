@@ -20,12 +20,9 @@ class CoaVersionFilterService
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-
-        if (! empty($filters['fiscal_year_id'])) {
-            $query->where('fiscal_year_id', $filters['fiscal_year_id']);
-        }
+        $this->applyExactFilters($query, $filters, [
+            'status' => 'status',
+            'fiscal_year_id' => 'fiscal_year_id',
+        ]);
     }
 }
