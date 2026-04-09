@@ -52,7 +52,10 @@ export function DetailModal({
                             <p className="text-sm font-medium text-muted-foreground">
                                 Event
                             </p>
-                            <Badge variant={variant} className="px-3 py-1 text-sm">
+                            <Badge
+                                variant={variant}
+                                className="px-3 py-1 text-sm"
+                            >
                                 {eventFormatted}
                             </Badge>
                         </div>
