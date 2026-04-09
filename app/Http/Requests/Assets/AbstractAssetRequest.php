@@ -41,14 +41,11 @@ abstract class AbstractAssetRequest extends AuthorizedFormRequest
         ];
     }
 
-    protected function usesSometimes(): bool
-    {
-        return $this->isUpdateRequest();
-    }
+    abstract protected function usesSometimes(): bool;
 
     private function assetCodeUniqueRule(): string|Unique
     {
-        if (! $this->isUpdateRequest()) {
+        if (! $this->usesSometimes()) {
             return 'unique:assets,asset_code';
         }
 
@@ -57,15 +54,10 @@ abstract class AbstractAssetRequest extends AuthorizedFormRequest
 
     private function barcodeUniqueRule(): string|Unique
     {
-        if (! $this->isUpdateRequest()) {
+        if (! $this->usesSometimes()) {
             return 'unique:assets,barcode';
         }
 
         return Rule::unique('assets')->ignore($this->route('asset'));
-    }
-
-    private function isUpdateRequest(): bool
-    {
-        return $this instanceof UpdateAssetRequest;
     }
 }
