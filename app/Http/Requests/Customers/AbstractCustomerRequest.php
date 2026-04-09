@@ -3,10 +3,13 @@
 namespace App\Http\Requests\Customers;
 
 use App\Http\Requests\AuthorizedFormRequest;
+use App\Http\Requests\Concerns\HasSometimesStringRules;
 use Illuminate\Validation\Rule;
 
 abstract class AbstractCustomerRequest extends AuthorizedFormRequest
 {
+    use HasSometimesStringRules;
+
     /**
      * Get the validation rules that apply to the request.
      */
@@ -24,12 +27,14 @@ abstract class AbstractCustomerRequest extends AuthorizedFormRequest
         ];
     }
 
+    abstract protected function usesSometimes(): bool;
+
     /**
      * @return array<int, string|Rule>|string
      */
     private function emailRules(): array|string
     {
-        if (! $this->isUpdateRequest()) {
+        if (! $this->usesSometimes()) {
             return 'required|email|unique:customers,email';
         }
 
@@ -39,19 +44,5 @@ abstract class AbstractCustomerRequest extends AuthorizedFormRequest
             'email',
             Rule::unique('customers', 'email')->ignore($this->route('customer')),
         ];
-    }
-
-    private function withSometimes(string $rules): string
-    {
-        if (! $this->isUpdateRequest()) {
-            return $rules;
-        }
-
-        return 'sometimes|' . $rules;
-    }
-
-    private function isUpdateRequest(): bool
-    {
-        return $this instanceof UpdateCustomerRequest;
     }
 }

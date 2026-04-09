@@ -3,10 +3,13 @@
 namespace App\Http\Requests\Suppliers;
 
 use App\Http\Requests\AuthorizedFormRequest;
+use App\Http\Requests\Concerns\HasSometimesStringRules;
 use Illuminate\Validation\Rule;
 
 abstract class AbstractSupplierRequest extends AuthorizedFormRequest
 {
+    use HasSometimesStringRules;
+
     /**
      * Get the validation rules that apply to the request.
      */
@@ -23,12 +26,14 @@ abstract class AbstractSupplierRequest extends AuthorizedFormRequest
         ];
     }
 
+    abstract protected function usesSometimes(): bool;
+
     /**
      * @return array<int, string|Rule>|string
      */
     private function emailRules(): array|string
     {
-        if (! $this->isUpdateRequest()) {
+        if (! $this->usesSometimes()) {
             return 'nullable|email|unique:suppliers,email';
         }
 
@@ -37,19 +42,5 @@ abstract class AbstractSupplierRequest extends AuthorizedFormRequest
             'email',
             Rule::unique('suppliers', 'email')->ignore($this->route('supplier')->id),
         ];
-    }
-
-    private function withSometimes(string $rules): string
-    {
-        if (! $this->isUpdateRequest()) {
-            return $rules;
-        }
-
-        return 'sometimes|' . $rules;
-    }
-
-    private function isUpdateRequest(): bool
-    {
-        return $this instanceof UpdateSupplierRequest;
     }
 }

@@ -35,17 +35,17 @@ Isi saat mulai batch baru.
 
 Isi setelah batch selesai dan sebelum merge.
 
-- duplicated_lines: 2992 (turun 3352 dari baseline Batch F)
-- duplicated_blocks: 129 (turun 203 dari baseline Batch F)
-- duplicated_lines_density: 3.4 (turun 3.8 dari baseline Batch F)
-- ncloc: 71951 (turun 922 dari baseline Batch F)
-- coverage: 0.0 (anomali snapshot remote terbaru; quality gate juga membaca `new_coverage 0.0`)
+- duplicated_lines: 2399 (turun 3945 dari baseline Batch F)
+- duplicated_blocks: 101 (turun 231 dari baseline Batch F)
+- duplicated_lines_density: 2.7 (turun 4.5 dari baseline Batch F)
+- ncloc: 71341 (turun 1532 dari baseline Batch F)
+- coverage: 88.2
 
-## Snapshot Analisa Sonar (2026-04-07, latest MCP)
+## Snapshot Analisa Sonar (2026-04-09, latest MCP)
 
-- Quality Gate: ERROR
-- Gate blocker utama: `new_coverage = 0.0` dan `new_duplicated_lines_density = 5.6`
-- Catatan: snapshot Sonar remote terbaru via MCP saat dicek setelah push commit `b7bc2ab5` masih belum mengubah angka duplikasi dari wave sebelumnya, sehingga nilai terbaru yang tersedia tetap `duplicated_lines 2992`, `duplicated_blocks 129`, `duplicated_lines_density 3.4`, dengan `new_duplicated_lines_density 5.6`; yang bergeser hanya `ncloc` ke `71951`. Anomali pipeline coverage tetap muncul di remote (`coverage 0.0`, `new_coverage 0.0`), jadi quality gate masih `ERROR`. Karena remote `main` terus bergerak selama batch aktif, angka ini tetap saya catat sebagai snapshot terbaru lintas wave, bukan diasumsikan murni delta dari satu commit saja. Verifikasi lokal yang relevan lulus penuh melalui 6 spec Playwright pada wave pertama report filters, 10 spec Playwright pada wave kedua report filters, 4 spec Playwright pada wave audit-trail filters/detail, 7 spec Playwright pada wave report-column summaries, 11 spec Playwright pada wave report page shells, 13 passed + 1 skipped pada wave remaining report pages, 6 passed pada wave financial report shells, 6 passed pada wave manual financial tables, 4 passed pada wave audit trail pages, 2 passed pada wave inventory table pages, 30 passed + 2 skipped pada wave asset filter helpers, 27 passed pada wave shared list filter helpers, 18 passed pada wave catalog filter helpers, 42 passed pada wave transaction filter helpers, 25 passed pada wave purchasing filter helpers, 3 passed pada wave purchasing report filters, 3 passed pada wave inventory report filters, 47 passed pada wave simple status filters, 13 passed pada wave approval-related filters, 9 passed pada wave asset report filters, 4 passed pada wave report column definitions, 4 passed pada wave stock report column definitions, 9 passed pada wave asset report column definitions, 6 passed pada wave financial report query helper, 6 passed pada wave single-year financial report helper, 6 passed pada wave financial report header meta helper, 6 passed pada wave financial summary helper, 12 passed pada wave report breadcrumb helper, 7 passed pada wave report initial-filter helper, 6 passed pada wave financial report page data helper, 75 passed pada wave item dialog shell helper, 5 passed pada wave standalone table page helper, 36 passed pada wave view modal shell helper, 45 passed pada wave view modal shell helper extension, 63 passed pada wave transaction view modal shell helper, 46 passed + 3 skipped pada wave asset and purchase view modal shell helper, 70 passed pada wave simple master view modal shell helper, dan 38 passed + 1 skipped pada wave outlier view modal shell helper.
+- Quality Gate: OK
+- Metrik new code sehat: `new_coverage = 96.9`, `new_duplicated_lines_density = 2.5`, dan `new_security_hotspots_reviewed = 100.0`
+- Catatan: snapshot Sonar remote terbaru via MCP setelah CI untuk rangkaian wave frontend modal menunjukkan baseline sudah stabil dan hijau. Measures proyek saat dicek kini berada di `duplicated_lines 2399`, `duplicated_blocks 101`, `duplicated_lines_density 2.7`, `coverage 88.2`, dan `ncloc 71341`. Dengan family `ViewModalShell` dan pasangan audit trail detail modal sudah ikut masuk, quick win frontend yang paling murah praktis sudah banyak terkuras; kandidat lanjutan yang lebih layak kemungkinan bergeser kembali ke cluster backend request/helper yang masih tersisa, kecuali ada shortlist frontend baru dari duplication detail Sonar berikutnya. Verifikasi lokal yang relevan sampai wave terbaru mencakup seluruh rangkaian PASS sebelumnya, ditambah 4 passed pada wave audit trail detail modal shell helper.
 
 ### Prioritas Duplikasi Backend (Batch F)
 
@@ -491,6 +491,11 @@ Isi setelah batch selesai dan sebelum merge.
 	- Perluas helper frontend `ViewModalShell` ke pasangan modal detail audit trail yang masih mengulang `DialogHeader` dan shell scroll-body tanpa footer aksi, sambil mempertahankan isi field, badge, metadata snapshot, title, deskripsi, dan ukuran dialog per modul.
 	- Gelombang saat ini mencakup `resources/js/components/approval-audit-trail/DetailModal.tsx` dan `resources/js/components/pipeline-audit-trail/DetailModal.tsx`.
 	- Progress: kedua modal audit trail tersebut kini memakai `ViewModalShell` dengan `hideFooter` tanpa ubah susunan field, badge state/event, `ScrollArea`, metadata snapshot, atau kontrak `onOpenChange`; validasi awal sempat gagal karena environment lokal mengarah ke `public/hot` sehingga asset Vite belum tersedia, lalu diverifikasi ulang setelah Vite dev server aktif di `localhost:5178` dan Playwright diarahkan ke app Sail `localhost:85`. Verifikasi PASS `./vendor/bin/sail npm run types` dan PASS `PLAYWRIGHT_BASE_URL=http://localhost:85 ./vendor/bin/sail npx playwright test tests/e2e/approval-audit-trail/approval-audit-trail.spec.ts tests/e2e/pipeline-audit-trail/pipeline-audit-trail.spec.ts` (4 passed). Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
+
+108. Dedup customer and supplier request concern helper. (in-progress)
+	- Migrasikan pasangan abstract mutation request `Customers` dan `Suppliers` ke concern shared `HasSometimesStringRules` agar helper `withSometimes(string)` dan branching store/update tidak lagi diduplikasi lokal, sambil mempertahankan kontrak rules, unique email behavior, dan perbedaan `nullable` versus `required` per modul.
+	- Gelombang saat ini mencakup `app/Http/Requests/Customers/AbstractCustomerRequest.php`, `app/Http/Requests/Customers/StoreCustomerRequest.php`, `app/Http/Requests/Customers/UpdateCustomerRequest.php`, `app/Http/Requests/Suppliers/AbstractSupplierRequest.php`, `app/Http/Requests/Suppliers/StoreSupplierRequest.php`, dan `app/Http/Requests/Suppliers/UpdateSupplierRequest.php`.
+	- Progress: kedua abstract request kini memakai concern shared dan turunan store/update hanya mengoverride `usesSometimes()` secara eksplisit, sehingga `instanceof` helper lokal bisa dihapus tanpa ubah shape `rules()` maupun ignore rule update. Verifikasi PASS `./vendor/bin/sail pest tests/Unit/Requests/Customers/StoreCustomerRequestTest.php tests/Unit/Requests/Customers/UpdateCustomerRequestTest.php tests/Unit/Requests/Suppliers/StoreSupplierRequestTest.php tests/Unit/Requests/Suppliers/UpdateSupplierRequestTest.php` (8 passed) dan PASS `./vendor/bin/sail bin duster fix --no-interaction app/Http/Requests/Customers/AbstractCustomerRequest.php app/Http/Requests/Customers/StoreCustomerRequest.php app/Http/Requests/Customers/UpdateCustomerRequest.php app/Http/Requests/Suppliers/AbstractSupplierRequest.php app/Http/Requests/Suppliers/StoreSupplierRequest.php app/Http/Requests/Suppliers/UpdateSupplierRequest.php`. Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
 
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 

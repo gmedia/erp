@@ -2,4 +2,10 @@
 
 namespace App\Http\Requests\Suppliers;
 
-class StoreSupplierRequest extends AbstractSupplierRequest {}
+class StoreSupplierRequest extends AbstractSupplierRequest
+{
+    protected function usesSometimes(): bool
+    {
+        return false;
+    }
+}
