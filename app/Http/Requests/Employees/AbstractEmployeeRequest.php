@@ -31,14 +31,11 @@ abstract class AbstractEmployeeRequest extends AuthorizedFormRequest
         ];
     }
 
-    protected function usesSometimes(): bool
-    {
-        return $this->isUpdateRequest();
-    }
+    abstract protected function usesSometimes(): bool;
 
     private function employeeIdUniqueRule(): string|Unique
     {
-        if (! $this->isUpdateRequest()) {
+        if (! $this->usesSometimes()) {
             return 'unique:employees,employee_id';
         }
 
@@ -47,15 +44,10 @@ abstract class AbstractEmployeeRequest extends AuthorizedFormRequest
 
     private function emailUniqueRule(): string|Unique
     {
-        if (! $this->isUpdateRequest()) {
+        if (! $this->usesSometimes()) {
             return 'unique:employees,email';
         }
 
         return Rule::unique('employees', 'email')->ignore($this->route('employee')->id);
-    }
-
-    private function isUpdateRequest(): bool
-    {
-        return $this instanceof UpdateEmployeeRequest;
     }
 }

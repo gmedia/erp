@@ -7,4 +7,10 @@ namespace App\Http\Requests\Employees;
  *
  * @method \Illuminate\Routing\Route route($param = null)
  */
-class UpdateEmployeeRequest extends AbstractEmployeeRequest {}
+class UpdateEmployeeRequest extends AbstractEmployeeRequest
+{
+    protected function usesSometimes(): bool
+    {
+        return true;
+    }
+}

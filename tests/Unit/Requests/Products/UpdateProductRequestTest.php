@@ -3,7 +3,6 @@
 use App\Http\Requests\Products\UpdateProductRequest;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Route;
 
 uses(RefreshDatabase::class)->group('products');
 
@@ -20,7 +19,7 @@ describe('UpdateProductRequest', function () {
         ];
 
         $validator = validator($data, (new UpdateProductRequest)->rules());
-        expect($validator->passes())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 
     test('rules validation fails with invalid status', function () {
@@ -53,14 +52,30 @@ describe('UpdateProductRequest', function () {
         expect($validator->fails())->toBeTrue();
 
         // Now simulate the request with the product to be ignored
-        $request = Mockery::mock(UpdateProductRequest::class)->makePartial();
-        $request->shouldReceive('route')->with('product')->andReturn($product1);
+        $request = new UpdateProductRequest;
+        $request->setRouteResolver(function () use ($product1) {
+            return new class($product1)
+            {
+                public function __construct(public $product)
+                {
+                    // No-op constructor for promoted property in anonymous route model stub.
+                }
+
+                public function parameter($key, $default = null)
+                {
+                    return match ($key) {
+                        'product' => $this->product,
+                        default => $default,
+                    };
+                }
+            };
+        });
 
         $data = [
             'code' => 'P-001', // its own code
         ];
 
         $validator = validator($data, $request->rules());
-        expect($validator->passes())->toBeTrue();
+        expect(! $validator->fails())->toBeTrue();
     });
 });

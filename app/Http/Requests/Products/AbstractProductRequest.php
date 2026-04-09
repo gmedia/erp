@@ -37,22 +37,14 @@ abstract class AbstractProductRequest extends AuthorizedFormRequest
         ];
     }
 
-    protected function usesSometimes(): bool
-    {
-        return $this->isUpdateRequest();
-    }
+    abstract protected function usesSometimes(): bool;
 
     private function codeUniqueRule(): string|Unique
     {
-        if (! $this->isUpdateRequest()) {
+        if (! $this->usesSometimes()) {
             return 'unique:products,code';
         }
 
         return Rule::unique('products', 'code')->ignore($this->route('product'));
-    }
-
-    private function isUpdateRequest(): bool
-    {
-        return $this instanceof UpdateProductRequest;
     }
 }
