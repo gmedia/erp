@@ -22,35 +22,27 @@ class IndexInventoryStocktakesAction
 
         $query = InventoryStocktake::query()->with(['warehouse', 'productCategory']);
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), ['stocktake_number', 'notes']);
-        }
-
+        $this->applyRequestSearch($request, $query, $this->filterService, ['stocktake_number', 'notes']);
         $this->excludeStatusWhenFilterMissing($request, $query, 'cancelled');
 
-        $this->filterService->applyAdvancedFilters($query, [
-            'warehouse_id' => $request->get('warehouse_id'),
-            'product_category_id' => $request->get('product_category_id'),
-            'status' => $request->get('status'),
-            'stocktake_date_from' => $request->get('stocktake_date_from'),
-            'stocktake_date_to' => $request->get('stocktake_date_to'),
+        $this->applyRequestFilters($request, $query, $this->filterService, [
+            'warehouse_id',
+            'product_category_id',
+            'status',
+            'stocktake_date_from',
+            'stocktake_date_to',
         ]);
 
-        $this->filterService->applySorting(
-            $query,
-            $request->get('sort_by', 'created_at'),
-            $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
-            [
-                'id',
-                'stocktake_number',
-                'warehouse_id',
-                'stocktake_date',
-                'status',
-                'product_category_id',
-                'created_at',
-                'updated_at',
-            ],
-        );
+        $this->applyIndexSorting($request, $query, $this->filterService, 'created_at', [
+            'id',
+            'stocktake_number',
+            'warehouse_id',
+            'stocktake_date',
+            'status',
+            'product_category_id',
+            'created_at',
+            'updated_at',
+        ]);
 
         return $query->paginate($perPage, ['*'], 'page', $page);
     }

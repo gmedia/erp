@@ -22,38 +22,30 @@ class IndexStockTransfersAction
 
         $query = StockTransfer::query()->with(['fromWarehouse', 'toWarehouse']);
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), ['transfer_number', 'notes']);
-        }
-
+        $this->applyRequestSearch($request, $query, $this->filterService, ['transfer_number', 'notes']);
         $this->excludeStatusWhenFilterMissing($request, $query, 'cancelled');
 
-        $this->filterService->applyAdvancedFilters($query, [
-            'from_warehouse_id' => $request->get('from_warehouse_id'),
-            'to_warehouse_id' => $request->get('to_warehouse_id'),
-            'status' => $request->get('status'),
-            'transfer_date_from' => $request->get('transfer_date_from'),
-            'transfer_date_to' => $request->get('transfer_date_to'),
-            'expected_arrival_date_from' => $request->get('expected_arrival_date_from'),
-            'expected_arrival_date_to' => $request->get('expected_arrival_date_to'),
+        $this->applyRequestFilters($request, $query, $this->filterService, [
+            'from_warehouse_id',
+            'to_warehouse_id',
+            'status',
+            'transfer_date_from',
+            'transfer_date_to',
+            'expected_arrival_date_from',
+            'expected_arrival_date_to',
         ]);
 
-        $this->filterService->applySorting(
-            $query,
-            $request->get('sort_by', 'created_at'),
-            $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
-            [
-                'id',
-                'transfer_number',
-                'from_warehouse_id',
-                'to_warehouse_id',
-                'transfer_date',
-                'expected_arrival_date',
-                'status',
-                'created_at',
-                'updated_at',
-            ],
-        );
+        $this->applyIndexSorting($request, $query, $this->filterService, 'created_at', [
+            'id',
+            'transfer_number',
+            'from_warehouse_id',
+            'to_warehouse_id',
+            'transfer_date',
+            'expected_arrival_date',
+            'status',
+            'created_at',
+            'updated_at',
+        ]);
 
         return $query->paginate($perPage, ['*'], 'page', $page);
     }
