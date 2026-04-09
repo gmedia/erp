@@ -26,9 +26,7 @@ class IndexInventoryStocktakesAction
             $this->filterService->applySearch($query, $request->get('search'), ['stocktake_number', 'notes']);
         }
 
-        if (! $request->filled('status')) {
-            $query->where('status', '!=', 'cancelled');
-        }
+        $this->excludeStatusWhenFilterMissing($request, $query, 'cancelled');
 
         $this->filterService->applyAdvancedFilters($query, [
             'warehouse_id' => $request->get('warehouse_id'),

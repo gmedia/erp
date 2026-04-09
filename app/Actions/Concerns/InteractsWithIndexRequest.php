@@ -67,6 +67,19 @@ trait InteractsWithIndexRequest
         $filterService->applyAdvancedFilters($query, $this->extractRequestFilters($request, $filterKeys));
     }
 
+    private function excludeStatusWhenFilterMissing(
+        Request $request,
+        Builder $query,
+        string $excludedStatus,
+        string $statusField = 'status'
+    ): void {
+        if ($request->filled($statusField)) {
+            return;
+        }
+
+        $query->where($statusField, '!=', $excludedStatus);
+    }
+
     /**
      * @param  object{applySorting: callable}  $filterService
      * @param  array<int, string>  $allowedSorts

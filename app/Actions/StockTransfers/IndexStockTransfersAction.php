@@ -26,9 +26,7 @@ class IndexStockTransfersAction
             $this->filterService->applySearch($query, $request->get('search'), ['transfer_number', 'notes']);
         }
 
-        if (! $request->filled('status')) {
-            $query->where('status', '!=', 'cancelled');
-        }
+        $this->excludeStatusWhenFilterMissing($request, $query, 'cancelled');
 
         $this->filterService->applyAdvancedFilters($query, [
             'from_warehouse_id' => $request->get('from_warehouse_id'),
