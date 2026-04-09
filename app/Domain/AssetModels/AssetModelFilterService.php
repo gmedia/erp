@@ -15,8 +15,8 @@ class AssetModelFilterService
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['asset_category_id'])) {
-            $query->where('asset_category_id', $filters['asset_category_id']);
-        }
+        $this->applyExactFilters($query, $filters, [
+            'asset_category_id' => 'asset_category_id',
+        ]);
     }
 }

@@ -552,6 +552,11 @@ Isi setelah batch selesai dan sebelum merge.
 	- Gelombang saat ini mencakup `app/Domain/CoaVersions/CoaVersionFilterService.php` dan `app/Domain/FiscalYears/FiscalYearFilterService.php`.
 	- Progress: dua filter service tersebut sekarang memakai `applyExactFilters()` shared, sekaligus menghapus helper status lokal yang tidak lagi dipakai pada fiscal years, tanpa ubah field filter ataupun perilaku sorting/search existing. Verifikasi PASS `./vendor/bin/sail pest tests/Unit/Domain/CoaVersions/CoaVersionFilterServiceTest.php tests/Unit/Domain/FiscalYears/FiscalYearFilterServiceTest.php` (6 passed) dan PASS `./vendor/bin/sail bin duster fix --no-interaction app/Domain/CoaVersions/CoaVersionFilterService.php app/Domain/FiscalYears/FiscalYearFilterService.php`. Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
 
+120. Dedup asset exact filter services. (in-progress)
+	- Reuse exact-filter helper pada filter service asset sederhana yang masih menyimpan `where` tunggal/manual, sambil mempertahankan cabang lokal khusus yang memang tidak bisa dipindah apa adanya.
+	- Gelombang saat ini mencakup `app/Domain/AssetModels/AssetModelFilterService.php` dan `app/Domain/AssetLocations/AssetLocationFilterService.php`.
+	- Progress: `AssetModelFilterService` kini sepenuhnya memakai `applyExactFilters()`, sedangkan `AssetLocationFilterService` memindahkan filter `branch_id` ke helper shared tetapi tetap mempertahankan logika khusus `parent_id` untuk root location. Verifikasi PASS `./vendor/bin/sail pest tests/Unit/Domain/AssetModels/AssetModelFilterServiceTest.php tests/Unit/Domain/AssetLocations/AssetLocationFilterServiceTest.php` (6 passed) dan PASS `./vendor/bin/sail bin duster fix --no-interaction app/Domain/AssetModels/AssetModelFilterService.php app/Domain/AssetLocations/AssetLocationFilterService.php`. Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
+
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
 1. Ekstraksi query builder bersama untuk variances asset stocktake. (done)

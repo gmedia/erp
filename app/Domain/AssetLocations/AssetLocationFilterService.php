@@ -15,9 +15,9 @@ class AssetLocationFilterService
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['branch_id'])) {
-            $query->where('branch_id', $filters['branch_id']);
-        }
+        $this->applyExactFilters($query, $filters, [
+            'branch_id' => 'branch_id',
+        ]);
 
         if (array_key_exists('parent_id', $filters)) {
             if ($filters['parent_id'] === null || $filters['parent_id'] === '') {
