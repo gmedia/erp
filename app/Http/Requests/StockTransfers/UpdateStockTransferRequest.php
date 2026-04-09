@@ -18,4 +18,9 @@ class UpdateStockTransferRequest extends AbstractStockTransferRequest
             'received_at' => ['sometimes', 'nullable', 'date'],
         ];
     }
+
+    protected function usesSometimes(): bool
+    {
+        return true;
+    }
 }

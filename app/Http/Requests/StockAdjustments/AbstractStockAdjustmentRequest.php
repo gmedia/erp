@@ -16,7 +16,7 @@ abstract class AbstractStockAdjustmentRequest extends AuthorizedFormRequest
                 'nullable',
                 'string',
                 'max:255',
-                $this->buildAdjustmentNumberUniqueRule(),
+                $this->adjustmentNumberUniqueRule(),
             ]),
             'warehouse_id' => $this->withSometimes(['required', 'exists:warehouses,id']),
             'adjustment_date' => $this->withSometimes(['required', 'date']),
@@ -42,24 +42,16 @@ abstract class AbstractStockAdjustmentRequest extends AuthorizedFormRequest
         ];
     }
 
-    protected function usesSometimes(): bool
-    {
-        return $this->isUpdateRequest();
-    }
+    abstract protected function usesSometimes(): bool;
 
-    private function buildAdjustmentNumberUniqueRule(): string
+    private function adjustmentNumberUniqueRule(): string
     {
-        if (! $this->isUpdateRequest()) {
+        if (! $this->usesSometimes()) {
             return 'unique:stock_adjustments,adjustment_number';
         }
 
         $adjustmentId = $this->route('stockAdjustment')->id ?? $this->route('id');
 
         return 'unique:stock_adjustments,adjustment_number,' . $adjustmentId;
-    }
-
-    private function isUpdateRequest(): bool
-    {
-        return $this instanceof UpdateStockAdjustmentRequest;
     }
 }

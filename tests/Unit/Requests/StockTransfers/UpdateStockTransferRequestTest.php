@@ -14,9 +14,25 @@ test('authorize returns true', function () {
 test('rules builds unique rule with current model id', function () {
     $transfer = StockTransfer::factory()->create();
 
-    $request = Mockery::mock(UpdateStockTransferRequest::class)->makePartial();
-    $request->shouldReceive('route')->with('stockTransfer')->andReturn($transfer);
-    $request->shouldReceive('route')->with('id')->andReturn(null);
+    $request = new UpdateStockTransferRequest;
+    $request->setRouteResolver(function () use ($transfer) {
+        return new class($transfer)
+        {
+            public function __construct(public $stockTransfer)
+            {
+                // No-op constructor for promoted property in anonymous route model stub.
+            }
+
+            public function parameter($key, $default = null)
+            {
+                return match ($key) {
+                    'stockTransfer' => $this->stockTransfer,
+                    'id' => null,
+                    default => $default,
+                };
+            }
+        };
+    });
 
     $rules = $request->rules();
 

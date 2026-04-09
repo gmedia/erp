@@ -16,7 +16,7 @@ abstract class AbstractStockTransferRequest extends AuthorizedFormRequest
                 'nullable',
                 'string',
                 'max:255',
-                $this->buildTransferNumberUniqueRule(),
+                $this->transferNumberUniqueRule(),
             ]),
             'from_warehouse_id' => $this->withSometimes(['required', 'exists:warehouses,id', 'different:to_warehouse_id']),
             'to_warehouse_id' => $this->withSometimes(['required', 'exists:warehouses,id']),
@@ -41,6 +41,8 @@ abstract class AbstractStockTransferRequest extends AuthorizedFormRequest
         ];
     }
 
+    abstract protected function usesSometimes(): bool;
+
     /**
      * @return array<string, array<int, string>>
      */
@@ -49,24 +51,14 @@ abstract class AbstractStockTransferRequest extends AuthorizedFormRequest
         return [];
     }
 
-    protected function usesSometimes(): bool
+    private function transferNumberUniqueRule(): string
     {
-        return $this->isUpdateRequest();
-    }
-
-    private function buildTransferNumberUniqueRule(): string
-    {
-        if (! $this->isUpdateRequest()) {
+        if (! $this->usesSometimes()) {
             return 'unique:stock_transfers,transfer_number';
         }
 
         $transferId = $this->route('stockTransfer')->id ?? $this->route('id');
 
         return 'unique:stock_transfers,transfer_number,' . $transferId;
-    }
-
-    private function isUpdateRequest(): bool
-    {
-        return $this instanceof UpdateStockTransferRequest;
     }
 }
