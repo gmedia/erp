@@ -47,122 +47,118 @@ export function JournalEntryViewModal({
         >
             <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
                 <div className="space-y-6 py-2">
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div className="min-w-0">
-                                <p className="text-sm font-medium text-gray-500">
-                                    Entry Number
-                                </p>
-                                <p>{item.entry_number}</p>
-                            </div>
-                            <div className="min-w-0">
-                                <p className="text-sm font-medium text-gray-500">
-                                    Date
-                                </p>
-                                <p>
-                                    {formatDateByRegionalSettings(
-                                        item.entry_date,
-                                    )}
-                                </p>
-                            </div>
-                            <div className="min-w-0">
-                                <p className="text-sm font-medium text-gray-500">
-                                    Reference
-                                </p>
-                                <p>{item.reference || '-'}</p>
-                            </div>
-                            <div className="min-w-0">
-                                <p className="text-sm font-medium text-gray-500">
-                                    Status
-                                </p>
-                                <Badge
-                                    variant={getJournalStatusVariant(
-                                        item.status,
-                                    )}
-                                >
-                                    {item.status.toUpperCase()}
-                                </Badge>
-                            </div>
-                            <div className="min-w-0 sm:col-span-2">
-                                <p className="text-sm font-medium text-gray-500">
-                                    Description
-                                </p>
-                                <p>{item.description}</p>
-                            </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-500">
+                                Entry Number
+                            </p>
+                            <p>{item.entry_number}</p>
                         </div>
+                        <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-500">
+                                Date
+                            </p>
+                            <p>
+                                {formatDateByRegionalSettings(item.entry_date)}
+                            </p>
+                        </div>
+                        <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-500">
+                                Reference
+                            </p>
+                            <p>{item.reference || '-'}</p>
+                        </div>
+                        <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-500">
+                                Status
+                            </p>
+                            <Badge
+                                variant={getJournalStatusVariant(item.status)}
+                            >
+                                {item.status.toUpperCase()}
+                            </Badge>
+                        </div>
+                        <div className="min-w-0 sm:col-span-2">
+                            <p className="text-sm font-medium text-gray-500">
+                                Description
+                            </p>
+                            <p>{item.description}</p>
+                        </div>
+                    </div>
 
-                        <div className="min-w-0 rounded-md border">
-                            <Table className="min-w-[600px]">
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Account</TableHead>
-                                        <TableHead className="text-right">
-                                            Debit
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Credit
-                                        </TableHead>
-                                        <TableHead>Memo</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {item.lines.map((line) => (
-                                        <TableRow key={line.id}>
-                                            <TableCell>
-                                                <div>{line.account_code}</div>
-                                                <div className="text-sm text-gray-500">
-                                                    {line.account_name}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                {formatCurrencyByRegionalSettings(
-                                                    line.debit,
-                                                    {
-                                                        locale: 'id-ID',
-                                                        currency: 'IDR',
-                                                    },
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                {formatCurrencyByRegionalSettings(
-                                                    line.credit,
-                                                    {
-                                                        locale: 'id-ID',
-                                                        currency: 'IDR',
-                                                    },
-                                                )}
-                                            </TableCell>
-                                            <TableCell>{line.memo}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                                <TableFooter>
-                                    <TableRow>
-                                        <TableCell className="font-bold">
-                                            Total
+                    <div className="min-w-0 rounded-md border">
+                        <Table className="min-w-[600px]">
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Account</TableHead>
+                                    <TableHead className="text-right">
+                                        Debit
+                                    </TableHead>
+                                    <TableHead className="text-right">
+                                        Credit
+                                    </TableHead>
+                                    <TableHead>Memo</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {item.lines.map((line) => (
+                                    <TableRow key={line.id}>
+                                        <TableCell>
+                                            <div>{line.account_code}</div>
+                                            <div className="text-sm text-gray-500">
+                                                {line.account_name}
+                                            </div>
                                         </TableCell>
-                                        <TableCell className="text-right font-bold">
+                                        <TableCell className="text-right">
                                             {formatCurrencyByRegionalSettings(
-                                                item.total_debit,
+                                                line.debit,
                                                 {
                                                     locale: 'id-ID',
                                                     currency: 'IDR',
                                                 },
                                             )}
                                         </TableCell>
-                                        <TableCell className="text-right font-bold">
+                                        <TableCell className="text-right">
                                             {formatCurrencyByRegionalSettings(
-                                                item.total_credit,
+                                                line.credit,
                                                 {
                                                     locale: 'id-ID',
                                                     currency: 'IDR',
                                                 },
                                             )}
                                         </TableCell>
-                                        <TableCell></TableCell>
+                                        <TableCell>{line.memo}</TableCell>
                                     </TableRow>
-                                </TableFooter>
-                            </Table>
-                        </div>
+                                ))}
+                            </TableBody>
+                            <TableFooter>
+                                <TableRow>
+                                    <TableCell className="font-bold">
+                                        Total
+                                    </TableCell>
+                                    <TableCell className="text-right font-bold">
+                                        {formatCurrencyByRegionalSettings(
+                                            item.total_debit,
+                                            {
+                                                locale: 'id-ID',
+                                                currency: 'IDR',
+                                            },
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="text-right font-bold">
+                                        {formatCurrencyByRegionalSettings(
+                                            item.total_credit,
+                                            {
+                                                locale: 'id-ID',
+                                                currency: 'IDR',
+                                            },
+                                        )}
+                                    </TableCell>
+                                    <TableCell></TableCell>
+                                </TableRow>
+                            </TableFooter>
+                        </Table>
+                    </div>
                 </div>
             </div>
         </ViewModalShell>

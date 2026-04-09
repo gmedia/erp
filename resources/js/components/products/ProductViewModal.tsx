@@ -1,7 +1,7 @@
 'use client';
 
-import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { ViewField } from '@/components/common/ViewField';
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from '@/contexts/i18n-context';
 import { Product } from '@/types/entity';
@@ -37,159 +37,159 @@ export const ProductViewModal = memo<ProductViewModalProps>(
             >
                 <div className="min-h-0 flex-1 overflow-y-auto px-6">
                     <div className="grid grid-cols-1 gap-x-6 gap-y-4 py-4 md:grid-cols-2">
-                            {/* General Info */}
-                            <div className="space-y-4 border-b pb-4 md:col-span-2">
-                                <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
-                                    General Information
-                                </h3>
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                    <ViewField label="Code" value={item.code} />
-                                    <ViewField label="Name" value={item.name} />
-                                    <div className="col-span-2">
-                                        <ViewField
-                                            label="Description"
-                                            value={item.description}
-                                        />
-                                    </div>
+                        {/* General Info */}
+                        <div className="space-y-4 border-b pb-4 md:col-span-2">
+                            <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
+                                General Information
+                            </h3>
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <ViewField label="Code" value={item.code} />
+                                <ViewField label="Name" value={item.name} />
+                                <div className="col-span-2">
                                     <ViewField
-                                        label="Category"
-                                        value={item.category.name}
-                                    />
-                                    <ViewField
-                                        label="Unit"
-                                        value={`${item.unit.name} (${item.unit.symbol || '-'})`}
-                                    />
-                                    <ViewField
-                                        label="Branch"
-                                        value={item.branch?.name || '-'}
-                                    />
-                                    <ViewField
-                                        label="Type"
-                                        value={
-                                            <Badge variant="outline">
-                                                {item.type}
-                                            </Badge>
-                                        }
+                                        label="Description"
+                                        value={item.description}
                                     />
                                 </div>
-                            </div>
-
-                            {/* Pricing */}
-                            <div className="space-y-4 border-b pb-4 md:col-span-2">
-                                <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
-                                    Pricing
-                                </h3>
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                    <ViewField
-                                        label="Cost"
-                                        value={formatRupiah(item.cost)}
-                                    />
-                                    <ViewField
-                                        label="Selling Price"
-                                        value={formatRupiah(item.selling_price)}
-                                    />
-                                    <ViewField
-                                        label="Markup"
-                                        value={`${item.markup_percentage || '0'}%`}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Configuration */}
-                            <div className="space-y-4 border-b pb-4 md:col-span-2">
-                                <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
-                                    Configuration
-                                </h3>
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                    <ViewField
-                                        label="Billing Model"
-                                        value={
-                                            <Badge variant="secondary">
-                                                {item.billing_model}
-                                            </Badge>
-                                        }
-                                    />
-                                    <ViewField
-                                        label="Trial Period"
-                                        value={`${item.trial_period_days || 0} Days`}
-                                    />
-                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:col-span-2 md:grid-cols-3">
-                                        <ViewField
-                                            label="Recurring"
-                                            value={
-                                                <BooleanBadge
-                                                    value={item.is_recurring}
-                                                />
-                                            }
-                                        />
-                                        <ViewField
-                                            label="One-Time Purchase"
-                                            value={
-                                                <BooleanBadge
-                                                    value={
-                                                        item.allow_one_time_purchase
-                                                    }
-                                                />
-                                            }
-                                        />
-                                        <ViewField
-                                            label="Manufactured"
-                                            value={
-                                                <BooleanBadge
-                                                    value={item.is_manufactured}
-                                                />
-                                            }
-                                        />
-                                        <ViewField
-                                            label="Purchasable"
-                                            value={
-                                                <BooleanBadge
-                                                    value={item.is_purchasable}
-                                                />
-                                            }
-                                        />
-                                        <ViewField
-                                            label="Sellable"
-                                            value={
-                                                <BooleanBadge
-                                                    value={item.is_sellable}
-                                                />
-                                            }
-                                        />
-                                        <ViewField
-                                            label="Taxable"
-                                            value={
-                                                <BooleanBadge
-                                                    value={item.is_taxable}
-                                                />
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Metadata */}
-                            <div className="space-y-4 md:col-span-2">
-                                <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
-                                    Status & Notes
-                                </h3>
                                 <ViewField
-                                    label="Status"
+                                    label="Category"
+                                    value={item.category.name}
+                                />
+                                <ViewField
+                                    label="Unit"
+                                    value={`${item.unit.name} (${item.unit.symbol || '-'})`}
+                                />
+                                <ViewField
+                                    label="Branch"
+                                    value={item.branch?.name || '-'}
+                                />
+                                <ViewField
+                                    label="Type"
                                     value={
-                                        <Badge
-                                            variant={
-                                                item.status === 'active'
-                                                    ? 'default'
-                                                    : 'secondary'
-                                            }
-                                        >
-                                            {item.status}
+                                        <Badge variant="outline">
+                                            {item.type}
                                         </Badge>
                                     }
                                 />
-                                <ViewField label="Notes" value={item.notes} />
                             </div>
                         </div>
+
+                        {/* Pricing */}
+                        <div className="space-y-4 border-b pb-4 md:col-span-2">
+                            <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
+                                Pricing
+                            </h3>
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                <ViewField
+                                    label="Cost"
+                                    value={formatRupiah(item.cost)}
+                                />
+                                <ViewField
+                                    label="Selling Price"
+                                    value={formatRupiah(item.selling_price)}
+                                />
+                                <ViewField
+                                    label="Markup"
+                                    value={`${item.markup_percentage || '0'}%`}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Configuration */}
+                        <div className="space-y-4 border-b pb-4 md:col-span-2">
+                            <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
+                                Configuration
+                            </h3>
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <ViewField
+                                    label="Billing Model"
+                                    value={
+                                        <Badge variant="secondary">
+                                            {item.billing_model}
+                                        </Badge>
+                                    }
+                                />
+                                <ViewField
+                                    label="Trial Period"
+                                    value={`${item.trial_period_days || 0} Days`}
+                                />
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:col-span-2 md:grid-cols-3">
+                                    <ViewField
+                                        label="Recurring"
+                                        value={
+                                            <BooleanBadge
+                                                value={item.is_recurring}
+                                            />
+                                        }
+                                    />
+                                    <ViewField
+                                        label="One-Time Purchase"
+                                        value={
+                                            <BooleanBadge
+                                                value={
+                                                    item.allow_one_time_purchase
+                                                }
+                                            />
+                                        }
+                                    />
+                                    <ViewField
+                                        label="Manufactured"
+                                        value={
+                                            <BooleanBadge
+                                                value={item.is_manufactured}
+                                            />
+                                        }
+                                    />
+                                    <ViewField
+                                        label="Purchasable"
+                                        value={
+                                            <BooleanBadge
+                                                value={item.is_purchasable}
+                                            />
+                                        }
+                                    />
+                                    <ViewField
+                                        label="Sellable"
+                                        value={
+                                            <BooleanBadge
+                                                value={item.is_sellable}
+                                            />
+                                        }
+                                    />
+                                    <ViewField
+                                        label="Taxable"
+                                        value={
+                                            <BooleanBadge
+                                                value={item.is_taxable}
+                                            />
+                                        }
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Metadata */}
+                        <div className="space-y-4 md:col-span-2">
+                            <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
+                                Status & Notes
+                            </h3>
+                            <ViewField
+                                label="Status"
+                                value={
+                                    <Badge
+                                        variant={
+                                            item.status === 'active'
+                                                ? 'default'
+                                                : 'secondary'
+                                        }
+                                    >
+                                        {item.status}
+                                    </Badge>
+                                }
+                            />
+                            <ViewField label="Notes" value={item.notes} />
+                        </div>
+                    </div>
                 </div>
             </ViewModalShell>
         );
