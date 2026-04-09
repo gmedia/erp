@@ -7,15 +7,6 @@ use App\Exports\AssetMaintenanceExport;
 
 class ExportAssetMaintenancesAction extends ConfiguredXlsxExportAction
 {
-    /**
-     * @param  array<string, mixed>  $validated
-     * @return array<string, mixed>
-     */
-    protected function buildFilters(array $validated): array
-    {
-        return array_filter($validated, static fn (mixed $value): bool => $value !== null && $value !== '');
-    }
-
     protected function filenameDelimiter(): string
     {
         return '-';

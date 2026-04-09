@@ -28,7 +28,10 @@ abstract class ConfiguredXlsxExportAction
      * @param  array<string, mixed>  $validated
      * @return array<string, mixed>
      */
-    abstract protected function buildFilters(array $validated): array;
+    protected function buildFilters(array $validated): array
+    {
+        return array_filter($validated, static fn (mixed $value): bool => $value !== null && $value !== '');
+    }
 
     protected function buildFilename(): string
     {

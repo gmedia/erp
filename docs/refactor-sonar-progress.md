@@ -517,6 +517,11 @@ Isi setelah batch selesai dan sebelum merge.
 	- Gelombang saat ini mencakup `app/Actions/StockMonitor/ExportStockMonitorAction.php` dan `app/Actions/StockMovements/ExportStockMovementsAction.php`.
 	- Progress: kedua action export tersebut sekarang sepenuhnya mengandalkan default `buildFilters()` dari base shared, sehingga boilerplate `array_filter($validated, ...)` lokal hilang tanpa ubah path export, nama file, format writer, atau response JSON. Verifikasi PASS `./vendor/bin/sail pest tests/Feature/StockMonitor/StockMonitorExportTest.php tests/Feature/StockMovements/StockMovementExportTest.php` (4 passed) dan PASS `./vendor/bin/sail bin duster fix --no-interaction app/Actions/StockMonitor/ExportStockMonitorAction.php app/Actions/StockMovements/ExportStockMovementsAction.php`. Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
 
+113. Dedup xlsx export action filter override. (in-progress)
+	- Tambah default `buildFilters()` di `ConfiguredXlsxExportAction` lalu hapus override lokal yang redundant pada action export `.xlsx` yang hanya meneruskan `array_filter($validated, ...)`, sambil mempertahankan filename prefix, delimiter, timestamp format, dan payload response export.
+	- Gelombang saat ini mencakup `app/Actions/Concerns/ConfiguredXlsxExportAction.php` dan `app/Actions/AssetMaintenances/ExportAssetMaintenancesAction.php`.
+	- Progress: `ConfiguredXlsxExportAction` kini menyediakan default filter null/kosong yang sama seperti backbone export lain, sehingga `ExportAssetMaintenancesAction` tidak lagi perlu mendefinisikan `buildFilters()` lokal. Perilaku filename `asset-maintenances-export-YYYY-mm-dd-HH-ii-ss.xlsx` tetap sama karena override delimiter dan timestamp format tidak disentuh. Verifikasi PASS `./vendor/bin/sail pest tests/Unit/Actions/AssetMaintenances/ExportAssetMaintenancesActionTest.php` (1 passed) dan PASS `./vendor/bin/sail bin duster fix --no-interaction app/Actions/Concerns/ConfiguredXlsxExportAction.php app/Actions/AssetMaintenances/ExportAssetMaintenancesAction.php`. Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
+
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
 1. Ekstraksi query builder bersama untuk variances asset stocktake. (done)
