@@ -7,15 +7,6 @@ use App\Exports\StockMovementsExport;
 
 class ExportStockMovementsAction extends ConfiguredFormattedExportAction
 {
-    /**
-     * @param  array<string, mixed>  $validated
-     * @return array<string, mixed>
-     */
-    protected function buildFilters(array $validated): array
-    {
-        return array_filter($validated, static fn (mixed $value): bool => $value !== null && $value !== '');
-    }
-
     protected function filenamePrefix(): string
     {
         return 'stock_movements';
