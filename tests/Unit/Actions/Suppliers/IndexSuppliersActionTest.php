@@ -5,6 +5,7 @@ use App\Domain\Suppliers\SupplierFilterService;
 use App\Http\Requests\Suppliers\IndexSupplierRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Stringable;
 
 uses(RefreshDatabase::class)->group('suppliers');
 
@@ -16,7 +17,7 @@ test('execute calls filter service with correct parameters', function () {
     $request->shouldReceive('get')->with('per_page', 15)->andReturn(15);
     $request->shouldReceive('get')->with('page', 1)->andReturn(1);
     $request->shouldReceive('filled')->with('search')->andReturn(true);
-    $request->shouldReceive('get')->with('search')->andReturn('test');
+    $request->shouldReceive('string')->with('search')->andReturn(new Stringable('test'));
 
     // Advanced filters
     $request->shouldReceive('get')->with('branch_id')->andReturn(null);

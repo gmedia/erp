@@ -18,35 +18,17 @@ class IndexAssetModelsAction
 
     public function execute(IndexAssetModelRequest $request): LengthAwarePaginator
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
         $query = AssetModel::query()->with(['category']);
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), ['model_name', 'manufacturer']);
-        } else {
-            $this->filterService->applyAdvancedFilters($query, [
-                'asset_category_id' => $request->get('asset_category_id'),
-            ]);
-        }
-
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = $this->normalizeSortDirection($request->get('sort_direction', 'desc'));
-
-        if ($sortBy === 'category') {
-            $query
-                ->leftJoin('asset_categories', 'asset_models.asset_category_id', '=', 'asset_categories.id')
-                ->select('asset_models.*')
-                ->orderBy('asset_categories.name', $sortDirection);
-        } else {
-            $this->filterService->applySorting(
-                $query,
-                $sortBy,
-                $sortDirection,
-                ['id', 'model_name', 'manufacturer', 'asset_category_id', 'created_at', 'updated_at']
-            );
-        }
-
-        return $query->paginate($perPage, ['*'], 'page', $page);
+        return $this->handleSearchOrPrimaryIndexRequest(
+            $request,
+            $query,
+            $this->filterService,
+            ['model_name', 'manufacturer'],
+            ['asset_category_id'],
+            [],
+            'created_at',
+            ['id', 'model_name', 'manufacturer', 'asset_category_id', 'category', 'created_at', 'updated_at'],
+        );
     }
 }

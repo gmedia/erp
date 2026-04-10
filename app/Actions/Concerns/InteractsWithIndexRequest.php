@@ -4,10 +4,13 @@ namespace App\Actions\Concerns;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 trait InteractsWithIndexRequest
 {
+    use InteractsWithExportableQuery;
+
     /**
      * @return array{perPage: int, page: int}
      */
@@ -178,6 +181,30 @@ trait InteractsWithIndexRequest
         $this->applyIndexSorting($request, $query, $filterService, $defaultSortBy, $allowedSorts);
 
         return $this->paginateIndexQuery($query, $perPage, $page);
+    }
+
+    /**
+     * @param  object{applySearch: callable, applyAdvancedFilters: callable, applySorting: callable}  $filterService
+     * @param  array<int, string>  $searchFields
+     * @param  array<int, string>  $filterKeys
+     * @param  array<int, string>  $allowedSorts
+     */
+    private function handleIndexRequestWithOptionalExport(
+        Request $request,
+        Builder $query,
+        object $filterService,
+        array $searchFields,
+        array $filterKeys,
+        string $defaultSortBy,
+        array $allowedSorts
+    ): LengthAwarePaginator|Collection {
+        ['page' => $page] = $this->getPaginationParams($request);
+
+        $this->applyRequestSearch($request, $query, $filterService, $searchFields);
+        $this->applyRequestFilters($request, $query, $filterService, $filterKeys);
+        $this->applyIndexSorting($request, $query, $filterService, $defaultSortBy, $allowedSorts);
+
+        return $this->exportOrPaginate($request, $query, $page);
     }
 
     /**

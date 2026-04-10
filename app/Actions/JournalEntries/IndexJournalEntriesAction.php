@@ -18,30 +18,18 @@ class IndexJournalEntriesAction
 
     public function execute(IndexJournalEntryRequest $request): LengthAwarePaginator
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
         $query = JournalEntry::query()
             ->with(['lines.account', 'fiscalYear', 'createdBy', 'postedBy'])
             ->withSum('lines as total_debit', 'debit');
 
-        $this->applyRequestSearch($request, $query, $this->filterService, [
-            'entry_number',
-            'description',
-            'reference',
-        ]);
-        $this->applyRequestFilters($request, $query, $this->filterService, [
-            'start_date',
-            'end_date',
-            'status',
-        ]);
-        $this->applyIndexSorting(
+        return $this->handleIndexRequest(
             $request,
             $query,
             $this->filterService,
+            ['entry_number', 'description', 'reference'],
+            ['start_date', 'end_date', 'status'],
             'entry_date',
             ['entry_date', 'entry_number', 'description', 'reference', 'total_debit', 'status', 'created_at'],
         );
-
-        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }

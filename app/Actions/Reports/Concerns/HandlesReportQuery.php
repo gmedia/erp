@@ -2,13 +2,14 @@
 
 namespace App\Actions\Reports\Concerns;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Actions\Concerns\InteractsWithExportableQuery;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 trait HandlesReportQuery
 {
+    use InteractsWithExportableQuery;
+
     protected function applyAssetRelationIntegerFilter(
         Request $request,
         Builder $query,
@@ -175,15 +176,6 @@ trait HandlesReportQuery
             $fallbackSortBy,
             $fallbackSortDirection,
         );
-    }
-
-    protected function exportOrPaginate(Request $request, Builder $query): LengthAwarePaginator|Collection
-    {
-        if ($request->boolean('export')) {
-            return $query->get();
-        }
-
-        return $query->paginate($request->integer('per_page', 15))->withQueryString();
     }
 
     protected function applyMaintenanceCostReportFilters(Request $request, Builder $query): void

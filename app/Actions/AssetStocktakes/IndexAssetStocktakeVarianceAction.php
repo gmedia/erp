@@ -18,7 +18,7 @@ class IndexAssetStocktakeVarianceAction
 
     public function execute(IndexAssetStocktakeVarianceRequest $request): LengthAwarePaginator|Collection
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
+        ['page' => $page] = $this->getPaginationParams($request);
 
         $query = $this->queryService->buildBaseQuery();
         $this->queryService->applyFilters($query, [
@@ -32,10 +32,6 @@ class IndexAssetStocktakeVarianceAction
         $sortDirection = (string) $request->get('sort_direction', 'desc');
         $this->queryService->applySorting($query, $sortBy, $sortDirection);
 
-        if ($request->boolean('export')) {
-            return $query->get();
-        }
-
-        return $this->paginateIndexQuery($query, $perPage, $page);
+        return $this->exportOrPaginate($request, $query, $page, false);
     }
 }

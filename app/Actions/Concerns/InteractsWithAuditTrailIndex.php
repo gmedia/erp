@@ -2,13 +2,13 @@
 
 namespace App\Actions\Concerns;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 trait InteractsWithAuditTrailIndex
 {
+    use InteractsWithExportableQuery;
+
     private function applyCreatedAtDateRange(Request $request, Builder $query): void
     {
         if ($request->filled('start_date')) {
@@ -39,14 +39,5 @@ trait InteractsWithAuditTrailIndex
         }
 
         $query->orderBy($table . '.' . $sortBy, $sortDirection);
-    }
-
-    private function exportOrPaginate(Request $request, Builder $query): LengthAwarePaginator|Collection
-    {
-        if ($request->boolean('export')) {
-            return $query->get();
-        }
-
-        return $query->paginate($request->get('per_page', 15))->withQueryString();
     }
 }

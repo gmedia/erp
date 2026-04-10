@@ -21,19 +21,14 @@ class IndexSuppliersAction
      */
     public function execute(IndexSupplierRequest $request): LengthAwarePaginator
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
         $query = Supplier::query()->with(['branch', 'category']);
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), ['name', 'email', 'phone', 'address']);
-        }
-
-        $this->applyRequestFilters($request, $query, $this->filterService, ['branch_id', 'category_id', 'status']);
-        $this->applyIndexSorting(
+        return $this->handleIndexRequest(
             $request,
             $query,
             $this->filterService,
+            ['name', 'email', 'phone', 'address'],
+            ['branch_id', 'category_id', 'status'],
             'created_at',
             [
                 'id',
@@ -46,9 +41,7 @@ class IndexSuppliersAction
                 'status',
                 'created_at',
                 'updated_at',
-            ]
+            ],
         );
-
-        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }

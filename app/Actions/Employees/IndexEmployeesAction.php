@@ -21,39 +21,21 @@ class IndexEmployeesAction
      */
     public function execute(IndexEmployeeRequest $request): LengthAwarePaginator
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
         $query = Employee::query()->with(['department', 'position', 'branch']);
 
-        // Search functionality - search across name, email, phone, and employee_id
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), [
+        return $this->handleSearchOrPrimaryIndexRequest(
+            $request,
+            $query,
+            $this->filterService,
+            [
                 'name',
                 'email',
                 'phone',
                 'employee_id',
-            ]);
-        } else {
-            $this->filterService->applyAdvancedFilters($query, [
-                'department_id' => $request->get('department_id'),
-                'position_id' => $request->get('position_id'),
-                'branch_id' => $request->get('branch_id'),
-                'employment_status' => $request->get('employment_status'),
-            ]);
-        }
-
-        // Apply salary and hire date filters (always applied)
-        $this->filterService->applyAdvancedFilters($query, [
-            'salary_min' => $request->get('salary_min'),
-            'salary_max' => $request->get('salary_max'),
-            'hire_date_from' => $request->get('hire_date_from'),
-            'hire_date_to' => $request->get('hire_date_to'),
-        ]);
-
-        $this->filterService->applySorting(
-            $query,
-            $request->get('sort_by', 'created_at'),
-            $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
+            ],
+            ['department_id', 'position_id', 'branch_id', 'employment_status'],
+            ['salary_min', 'salary_max', 'hire_date_from', 'hire_date_to'],
+            'created_at',
             [
                 'id',
                 'employee_id',
@@ -68,9 +50,7 @@ class IndexEmployeesAction
                 'hire_date',
                 'created_at',
                 'updated_at',
-            ]
+            ],
         );
-
-        return $query->paginate($perPage, ['*'], 'page', $page);
     }
 }
