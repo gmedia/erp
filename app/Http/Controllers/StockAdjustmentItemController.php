@@ -14,23 +14,7 @@ class StockAdjustmentItemController extends Controller
 
     public function getItems(StockAdjustment $stockAdjustment): JsonResponse
     {
-        return $this->nestedItemsResponse($stockAdjustment, ['items.product', 'items.unit'], fn ($item) => [
-            'id' => $item->id,
-            'product' => [
-                'id' => $item->product_id,
-                'name' => $item->product->name,
-            ],
-            'unit' => [
-                'id' => $item->unit_id,
-                'name' => $item->unit->name,
-            ],
-            'quantity_before' => (string) $item->quantity_before,
-            'quantity_adjusted' => (string) $item->quantity_adjusted,
-            'quantity_after' => (string) $item->quantity_after,
-            'unit_cost' => (string) $item->unit_cost,
-            'total_cost' => (string) $item->total_cost,
-            'reason' => $item->reason,
-        ]);
+        return $this->nestedItemsResponse($stockAdjustment, ['items.product', 'items.unit'], $this->mapAdjustmentItem(...));
     }
 
     public function syncItems(
@@ -40,7 +24,12 @@ class StockAdjustmentItemController extends Controller
     ): JsonResponse {
         $action->execute($stockAdjustment, $request->validated()['items']);
 
-        return $this->nestedItemsResponse($stockAdjustment, ['items.product', 'items.unit'], fn ($item) => [
+        return $this->nestedItemsResponse($stockAdjustment, ['items.product', 'items.unit'], $this->mapAdjustmentItem(...));
+    }
+
+    private function mapAdjustmentItem(mixed $item): array
+    {
+        return [
             'id' => $item->id,
             'product' => [
                 'id' => $item->product_id,
@@ -56,6 +45,6 @@ class StockAdjustmentItemController extends Controller
             'unit_cost' => (string) $item->unit_cost,
             'total_cost' => (string) $item->total_cost,
             'reason' => $item->reason,
-        ]);
+        ];
     }
 }
