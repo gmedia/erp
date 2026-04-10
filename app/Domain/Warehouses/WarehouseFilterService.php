@@ -20,8 +20,8 @@ class WarehouseFilterService
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['branch_id'])) {
-            $query->where('branch_id', $filters['branch_id']);
-        }
+        $this->applyExactFilters($query, $filters, [
+            'branch_id' => 'branch_id',
+        ]);
     }
 }
