@@ -147,3 +147,71 @@ test('AccountMappingFilterService can search notes and account fields', function
 
     expect($query->count())->toBe(1);
 });
+
+test('AccountMappingFilterService sorts by source account code', function () {
+    $service = new AccountMappingFilterService;
+
+    /** @var Account $sourceA */
+    $sourceA = Account::factory()->create(['code' => '11100']);
+    /** @var Account $sourceB */
+    $sourceB = Account::factory()->create(['code' => '22200']);
+    /** @var Account $target */
+    $target = Account::factory()->create(['code' => '99900']);
+
+    AccountMapping::create([
+        'source_account_id' => $sourceB->id,
+        'target_account_id' => $target->id,
+        'type' => 'rename',
+        'notes' => 'second',
+    ]);
+
+    AccountMapping::create([
+        'source_account_id' => $sourceA->id,
+        'target_account_id' => $target->id,
+        'type' => 'rename',
+        'notes' => 'first',
+    ]);
+
+    $query = AccountMapping::query();
+    $service->applySorting($query, 'source', 'asc');
+
+    $results = $query->get();
+
+    expect($results)->toHaveCount(2)
+        ->and($results[0]->notes)->toBe('first')
+        ->and($results[1]->notes)->toBe('second');
+});
+
+test('AccountMappingFilterService sorts by target account code', function () {
+    $service = new AccountMappingFilterService;
+
+    /** @var Account $source */
+    $source = Account::factory()->create(['code' => '11100']);
+    /** @var Account $targetA */
+    $targetA = Account::factory()->create(['code' => '22200']);
+    /** @var Account $targetB */
+    $targetB = Account::factory()->create(['code' => '33300']);
+
+    AccountMapping::create([
+        'source_account_id' => $source->id,
+        'target_account_id' => $targetB->id,
+        'type' => 'rename',
+        'notes' => 'second',
+    ]);
+
+    AccountMapping::create([
+        'source_account_id' => $source->id,
+        'target_account_id' => $targetA->id,
+        'type' => 'rename',
+        'notes' => 'first',
+    ]);
+
+    $query = AccountMapping::query();
+    $service->applySorting($query, 'target', 'asc');
+
+    $results = $query->get();
+
+    expect($results)->toHaveCount(2)
+        ->and($results[0]->notes)->toBe('first')
+        ->and($results[1]->notes)->toBe('second');
+});

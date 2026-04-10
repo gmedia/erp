@@ -351,13 +351,17 @@ trait BaseFilterService
         string $table,
         string $localColumn,
         string $orderColumn = 'name',
-        string $join = 'join'
+        string $join = 'join',
+        ?string $tableAlias = null
     ): array {
+        $joinTable = $tableAlias === null ? $table : $table . ' as ' . $tableAlias;
+        $qualifiedTable = $tableAlias ?? $table;
+
         $config = [
-            'table' => $table,
+            'table' => $joinTable,
             'local_column' => $localColumn,
-            'foreign_column' => $table . '.id',
-            'order_column' => $table . '.' . $orderColumn,
+            'foreign_column' => $qualifiedTable . '.id',
+            'order_column' => $qualifiedTable . '.' . $orderColumn,
         ];
 
         if ($join !== 'join') {
