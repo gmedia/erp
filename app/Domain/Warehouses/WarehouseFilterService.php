@@ -12,7 +12,18 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class WarehouseFilterService
 {
-    use BaseFilterService;
+    use BaseFilterService {
+        applySearch as private applyBaseSearch;
+    }
+
+    /**
+     * @param  Builder<\App\Models\Warehouse>  $query
+     * @param  array<int, string>  $searchFields
+     */
+    public function applySearch(Builder $query, string $search, array $searchFields): void
+    {
+        $this->applyBaseSearch($query, $search, $this->qualifySearchFields('warehouses', $searchFields));
+    }
 
     /**
      * @param  Builder<\App\Models\Warehouse>  $query
@@ -23,5 +34,23 @@ class WarehouseFilterService
         $this->applyExactFilters($query, $filters, [
             'branch_id' => 'branch_id',
         ]);
+    }
+
+    /**
+     * @param  Builder<\App\Models\Warehouse>  $query
+     * @param  array<int, string>  $allowedSorts
+     */
+    public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
+    {
+        $this->applySortingWithRelationFallback(
+            $query,
+            $sortBy,
+            $sortDirection,
+            $allowedSorts,
+            [
+                'branch' => $this->relationSortConfig('branches', 'warehouses.branch_id', join: 'leftJoin'),
+            ],
+            'warehouses',
+        );
     }
 }

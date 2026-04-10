@@ -18,32 +18,16 @@ class IndexPipelinesAction
 
     public function execute(IndexPipelineRequest $request): LengthAwarePaginator
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
         $query = Pipeline::query()->with(['creator']);
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), ['name', 'code', 'description']);
-        }
-
-        $this->applyRequestFilters($request, $query, $this->filterService, ['entity_type', 'is_active']);
-
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = $this->normalizeSortDirection($request->get('sort_direction', 'desc'));
-
-        if ($sortBy === 'created_by') {
-            $query->leftJoin('users as creator', 'pipelines.created_by', '=', 'creator.id')
-                ->orderBy('creator.name', $sortDirection)
-                ->select('pipelines.*');
-        } else {
-            $this->filterService->applySorting(
-                $query,
-                $sortBy,
-                $sortDirection,
-                ['id', 'name', 'code', 'entity_type', 'version', 'is_active', 'created_at', 'updated_at']
-            );
-        }
-
-        return $this->paginateIndexQuery($query, $perPage, $page);
+        return $this->handleIndexRequest(
+            $request,
+            $query,
+            $this->filterService,
+            ['name', 'code', 'description'],
+            ['entity_type', 'is_active'],
+            'created_at',
+            ['id', 'name', 'code', 'entity_type', 'version', 'is_active', 'created_by', 'created_at', 'updated_at'],
+        );
     }
 }

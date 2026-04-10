@@ -7,7 +7,18 @@ use Illuminate\Database\Eloquent\Builder;
 
 class AssetLocationFilterService
 {
-    use BaseFilterService;
+    use BaseFilterService {
+        applySearch as private applyBaseSearch;
+    }
+
+    /**
+     * @param  Builder<\App\Models\AssetLocation>  $query
+     * @param  array<int, string>  $searchFields
+     */
+    public function applySearch(Builder $query, string $search, array $searchFields): void
+    {
+        $this->applyBaseSearch($query, $search, $this->qualifySearchFields('asset_locations', $searchFields));
+    }
 
     /**
      * @param  Builder<\App\Models\AssetLocation>  $query
@@ -26,5 +37,24 @@ class AssetLocationFilterService
                 $query->where('parent_id', $filters['parent_id']);
             }
         }
+    }
+
+    /**
+     * @param  Builder<\App\Models\AssetLocation>  $query
+     * @param  array<int, string>  $allowedSorts
+     */
+    public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
+    {
+        $this->applySortingWithRelationFallback(
+            $query,
+            $sortBy,
+            $sortDirection,
+            $allowedSorts,
+            [
+                'branch' => $this->relationSortConfig('branches', 'asset_locations.branch_id', join: 'leftJoin'),
+                'parent' => $this->relationSortConfig('asset_locations', 'asset_locations.parent_id', join: 'leftJoin', tableAlias: 'parents'),
+            ],
+            'asset_locations',
+        );
     }
 }

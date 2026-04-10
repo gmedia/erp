@@ -97,6 +97,20 @@ trait BaseFilterService
     }
 
     /**
+     * Qualify unqualified search fields against a base table to avoid ambiguous columns after joins.
+     *
+     * @param  array<int, string>  $searchFields
+     * @return array<int, string>
+     */
+    public function qualifySearchFields(string $table, array $searchFields): array
+    {
+        return array_map(
+            static fn (string $field): string => str_contains($field, '.') ? $field : $table . '.' . $field,
+            $searchFields,
+        );
+    }
+
+    /**
      * Apply mapped relation sorting using join metadata.
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model

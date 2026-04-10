@@ -7,7 +7,18 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ProductFilterService
 {
-    use BaseFilterService;
+    use BaseFilterService {
+        applySearch as private applyBaseSearch;
+    }
+
+    /**
+     * @param  Builder<\App\Models\Product>  $query
+     * @param  array<int, string>  $searchFields
+     */
+    public function applySearch(Builder $query, string $search, array $searchFields): void
+    {
+        $this->applyBaseSearch($query, $search, $this->qualifySearchFields('products', $searchFields));
+    }
 
     /**
      * @param  Builder<\App\Models\Product>  $query
@@ -29,5 +40,23 @@ class ProductFilterService
                 $query->where($flag, $filters[$flag]);
             }
         }
+    }
+
+    /**
+     * @param  Builder<\App\Models\Product>  $query
+     * @param  array<int, string>  $allowedSorts
+     */
+    public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
+    {
+        $this->applySortingWithRelationFallback(
+            $query,
+            $sortBy,
+            $sortDirection,
+            $allowedSorts,
+            [
+                'category' => $this->relationSortConfig('product_categories', 'products.category_id', join: 'leftJoin'),
+            ],
+            'products',
+        );
     }
 }

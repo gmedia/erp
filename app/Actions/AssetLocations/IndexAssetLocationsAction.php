@@ -18,34 +18,17 @@ class IndexAssetLocationsAction
 
     public function execute(IndexAssetLocationRequest $request): LengthAwarePaginator
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
         $query = AssetLocation::query()->with(['branch', 'parent']);
 
-        $this->applySearchOrPrimaryFilters($request, $query, $this->filterService, ['code', 'name'], ['branch_id', 'parent_id']);
-
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = $this->normalizeSortDirection($request->get('sort_direction', 'desc'));
-
-        if ($sortBy === 'branch') {
-            $query
-                ->leftJoin('branches', 'asset_locations.branch_id', '=', 'branches.id')
-                ->select('asset_locations.*')
-                ->orderBy('branches.name', $sortDirection);
-        } elseif ($sortBy === 'parent') {
-            $query
-                ->leftJoin('asset_locations as parents', 'asset_locations.parent_id', '=', 'parents.id')
-                ->select('asset_locations.*')
-                ->orderBy('parents.name', $sortDirection);
-        } else {
-            $this->filterService->applySorting(
-                $query,
-                $sortBy,
-                $sortDirection,
-                ['id', 'code', 'name', 'branch_id', 'parent_id', 'created_at', 'updated_at']
-            );
-        }
-
-        return $this->paginateIndexQuery($query, $perPage, $page);
+        return $this->handleSearchOrPrimaryIndexRequest(
+            $request,
+            $query,
+            $this->filterService,
+            ['code', 'name'],
+            ['branch_id', 'parent_id'],
+            [],
+            'created_at',
+            ['id', 'code', 'name', 'branch_id', 'parent_id', 'branch', 'parent', 'created_at', 'updated_at'],
+        );
     }
 }
