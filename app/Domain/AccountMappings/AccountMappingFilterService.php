@@ -7,40 +7,28 @@ use Illuminate\Database\Eloquent\Builder;
 
 class AccountMappingFilterService
 {
-    use BaseFilterService;
+    use BaseFilterService {
+        applySearch as protected applyBaseSearch;
+    }
 
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['type'])) {
-            $query->where('type', $filters['type']);
-        }
+        $this->applyExactFilters($query, $filters, [
+            'type' => 'type',
+        ]);
 
-        if (! empty($filters['source_coa_version_id'])) {
-            $query->whereHas('sourceAccount', function ($q) use ($filters) {
-                $q->where('coa_version_id', $filters['source_coa_version_id']);
-            });
-        }
-
-        if (! empty($filters['target_coa_version_id'])) {
-            $query->whereHas('targetAccount', function ($q) use ($filters) {
-                $q->where('coa_version_id', $filters['target_coa_version_id']);
-            });
-        }
+        $this->applyRelatedExactFilters($query, $filters, [
+            'source_coa_version_id' => ['relation' => 'sourceAccount', 'column' => 'coa_version_id'],
+            'target_coa_version_id' => ['relation' => 'targetAccount', 'column' => 'coa_version_id'],
+        ]);
     }
 
     public function applySearch(Builder $query, string $search): void
     {
-        $query->where(function ($q) use ($search) {
-            $q->where('notes', 'like', "%{$search}%")
-                ->orWhereHas('sourceAccount', function ($sq) use ($search) {
-                    $sq->where('code', 'like', "%{$search}%")
-                        ->orWhere('name', 'like', "%{$search}%");
-                })
-                ->orWhereHas('targetAccount', function ($tq) use ($search) {
-                    $tq->where('code', 'like', "%{$search}%")
-                        ->orWhere('name', 'like', "%{$search}%");
-                });
-        });
+        $this->applyBaseSearch($query, $search, ['notes'], [
+            'sourceAccount' => ['code', 'name'],
+            'targetAccount' => ['code', 'name'],
+        ]);
     }
 
     public function applySorting(Builder $query, string $sortBy, string $sortDirection): void

@@ -2,6 +2,7 @@
 
 namespace App\Domain\AssetStocktakes;
 
+use App\Domain\Concerns\BaseFilterService;
 use App\Models\Asset;
 use App\Models\AssetLocation;
 use App\Models\AssetStocktake;
@@ -11,6 +12,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class AssetStocktakeVarianceQueryService
 {
+    use BaseFilterService;
+
     /**
      * @return Builder<AssetStocktakeItem>
      */
@@ -35,19 +38,14 @@ class AssetStocktakeVarianceQueryService
      */
     public function applyFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['asset_stocktake_id'])) {
-            $query->where('asset_stocktake_id', $filters['asset_stocktake_id']);
-        }
+        $this->applyExactFilters($query, $filters, [
+            'asset_stocktake_id' => 'asset_stocktake_id',
+            'result' => 'result',
+        ]);
 
-        if (! empty($filters['branch_id'])) {
-            $query->whereHas('stocktake', function (Builder $branchQuery) use ($filters): void {
-                $branchQuery->where('branch_id', $filters['branch_id']);
-            });
-        }
-
-        if (! empty($filters['result'])) {
-            $query->where('result', $filters['result']);
-        }
+        $this->applyRelatedExactFilters($query, $filters, [
+            'branch_id' => ['relation' => 'stocktake', 'column' => 'branch_id'],
+        ]);
 
         if (! empty($filters['search'])) {
             $search = (string) $filters['search'];

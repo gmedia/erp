@@ -187,6 +187,26 @@ trait BaseFilterService
     }
 
     /**
+     * Apply exact-match filters against related model columns via whereHas.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<string, mixed>  $filters
+     * @param  array<string, array{relation: string, column: string}>  $relationFieldMap  Request key => relation config
+     */
+    public function applyRelatedExactFilters(Builder $query, array $filters, array $relationFieldMap): void
+    {
+        foreach ($relationFieldMap as $filterKey => $config) {
+            if (! empty($filters[$filterKey])) {
+                $query->whereHas($config['relation'], function (Builder $relationQuery) use ($config, $filters, $filterKey): void {
+                    $relationQuery->where($config['column'], $filters[$filterKey]);
+                });
+            }
+        }
+    }
+
+    /**
      * Apply date range filters with optional from/to keys.
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
