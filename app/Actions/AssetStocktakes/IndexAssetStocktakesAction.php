@@ -18,29 +18,15 @@ class IndexAssetStocktakesAction
 
     public function execute(IndexAssetStocktakeRequest $request): LengthAwarePaginator
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
         $query = AssetStocktake::query()->with(['branch', 'createdBy']);
 
-        $this->applySearchOrPrimaryFilters(
+        return $this->handleSearchOrPrimaryIndexRequest(
             $request,
             $query,
             $this->filterService,
             ['reference'],
             ['branch_id', 'status'],
-        );
-
-        $this->applyRequestFilters(
-            $request,
-            $query,
-            $this->filterService,
             ['planned_at_from', 'planned_at_to'],
-        );
-
-        $this->applyIndexSorting(
-            $request,
-            $query,
-            $this->filterService,
             'created_at',
             [
                 'id',
@@ -55,7 +41,5 @@ class IndexAssetStocktakesAction
                 'updated_at',
             ],
         );
-
-        return $query->paginate($perPage, ['*'], 'page', $page);
     }
 }

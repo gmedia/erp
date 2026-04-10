@@ -18,20 +18,17 @@ class IndexApprovalFlowsAction
 
     public function execute(IndexApprovalFlowRequest $request): LengthAwarePaginator
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
         $query = ApprovalFlow::query()->with(['steps.user', 'steps.department', 'creator']);
 
-        $this->applySearchOrPrimaryFilters($request, $query, $this->filterService, ['name', 'code'], ['approvable_type']);
-        $this->applyRequestFilters($request, $query, $this->filterService, ['is_active']);
-        $this->applyIndexSorting(
+        return $this->handleSearchOrPrimaryIndexRequest(
             $request,
             $query,
             $this->filterService,
+            ['name', 'code'],
+            ['approvable_type'],
+            ['is_active'],
             'created_at',
-            ['id', 'name', 'code', 'approvable_type', 'is_active', 'created_at', 'updated_at']
+            ['id', 'name', 'code', 'approvable_type', 'is_active', 'created_at', 'updated_at'],
         );
-
-        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }

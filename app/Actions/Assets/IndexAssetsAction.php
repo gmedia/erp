@@ -18,8 +18,6 @@ class IndexAssetsAction
 
     public function execute(IndexAssetRequest $request): LengthAwarePaginator
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
         $query = Asset::query()->with([
             'category',
             'model',
@@ -30,18 +28,13 @@ class IndexAssetsAction
             'supplier',
         ]);
 
-        $this->applySearchOrPrimaryFilters(
+        return $this->handleSearchOrPrimaryIndexRequest(
             $request,
             $query,
             $this->filterService,
             ['name', 'asset_code', 'serial_number', 'barcode'],
             ['asset_category_id', 'asset_model_id', 'branch_id', 'asset_location_id', 'department_id', 'employee_id', 'supplier_id', 'status', 'condition'],
-        );
-
-        $this->applyIndexSorting(
-            $request,
-            $query,
-            $this->filterService,
+            [],
             'created_at',
             [
                 'id',
@@ -59,7 +52,5 @@ class IndexAssetsAction
                 'supplier',
             ],
         );
-
-        return $query->paginate($perPage, ['*'], 'page', $page);
     }
 }
