@@ -207,6 +207,33 @@ trait BaseFilterService
     }
 
     /**
+     * Apply a boolean filter when the request key is present.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<string, mixed>  $filters
+     */
+    public function applyBooleanFilter(
+        Builder $query,
+        array $filters,
+        string $filterKey,
+        ?string $column = null,
+        bool $coerceValue = false,
+        bool $skipEmptyString = true
+    ): void {
+        if (! isset($filters[$filterKey])) {
+            return;
+        }
+
+        if ($skipEmptyString && $filters[$filterKey] === '') {
+            return;
+        }
+
+        $query->where($column ?? $filterKey, $coerceValue ? (bool) $filters[$filterKey] : $filters[$filterKey]);
+    }
+
+    /**
      * Apply date range filters with optional from/to keys.
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model

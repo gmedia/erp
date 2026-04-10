@@ -21,8 +21,6 @@ class ApprovalFlowFilterService
             ]);
         }
 
-        if (isset($filters['is_active']) && $filters['is_active'] !== '') {
-            $query->where('is_active', $filters['is_active']);
-        }
+        $this->applyBooleanFilter($query, $filters, 'is_active');
     }
 }

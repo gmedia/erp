@@ -25,8 +25,6 @@ class AccountFilterService
             'coa_version_id' => 'coa_version_id',
         ]);
 
-        if (isset($filters['is_active'])) {
-            $query->where('is_active', (bool) $filters['is_active']);
-        }
+        $this->applyBooleanFilter($query, $filters, 'is_active', coerceValue: true, skipEmptyString: false);
     }
 }
