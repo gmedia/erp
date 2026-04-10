@@ -21,8 +21,11 @@ class PipelineFilterService
             ]);
         }
 
-        if (isset($filters['is_active']) && $filters['is_active'] !== '') {
-            $query->where('is_active', filter_var($filters['is_active'], FILTER_VALIDATE_BOOLEAN));
-        }
+        $this->applyResolvedBooleanFilter(
+            $query,
+            $filters,
+            'is_active',
+            static fn (mixed $value): bool => filter_var($value, FILTER_VALIDATE_BOOLEAN),
+        );
     }
 }

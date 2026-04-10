@@ -29,10 +29,23 @@ class ApprovalDelegationFilterService
             ],
         );
 
-        if (in_array(strtolower((string) ($filters['is_active'] ?? '')), ['true', '1'], true)) {
-            $query->where('is_active', true);
-        } elseif (in_array(strtolower((string) ($filters['is_active'] ?? '')), ['false', '0'], true)) {
-            $query->where('is_active', false);
-        }
+        $this->applyResolvedBooleanFilter(
+            $query,
+            $filters,
+            'is_active',
+            static function (mixed $value): ?bool {
+                $normalizedValue = strtolower((string) $value);
+
+                if (in_array($normalizedValue, ['true', '1'], true)) {
+                    return true;
+                }
+
+                if (in_array($normalizedValue, ['false', '0'], true)) {
+                    return false;
+                }
+
+                return null;
+            },
+        );
     }
 }

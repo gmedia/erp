@@ -234,6 +234,40 @@ trait BaseFilterService
     }
 
     /**
+     * Apply a boolean filter using a resolver for module-specific parsing.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  array<string, mixed>  $filters
+     * @param  callable(mixed): ?bool  $resolver
+     */
+    public function applyResolvedBooleanFilter(
+        Builder $query,
+        array $filters,
+        string $filterKey,
+        callable $resolver,
+        ?string $column = null,
+        bool $skipEmptyString = true
+    ): void {
+        if (! isset($filters[$filterKey])) {
+            return;
+        }
+
+        if ($skipEmptyString && $filters[$filterKey] === '') {
+            return;
+        }
+
+        $resolvedValue = $resolver($filters[$filterKey]);
+
+        if ($resolvedValue === null) {
+            return;
+        }
+
+        $query->where($column ?? $filterKey, $resolvedValue);
+    }
+
+    /**
      * Apply date range filters with optional from/to keys.
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
