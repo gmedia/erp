@@ -18,8 +18,6 @@ class IndexSupplierReturnsAction
 
     public function execute(IndexSupplierReturnRequest $request): LengthAwarePaginator
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
         $query = SupplierReturn::query()->with([
             'purchaseOrder',
             'goodsReceipt',
@@ -30,12 +28,10 @@ class IndexSupplierReturnsAction
             'items.unit',
         ]);
 
-        $this->applyRequestSearch($request, $query, $this->filterService, [
+        return $this->handleMappedIndexRequest($request, $query, $this->filterService, [
             'return_number',
             'notes',
-        ]);
-
-        $this->applyRequestFilters($request, $query, $this->filterService, [
+        ], [
             'purchase_order_id',
             'goods_receipt_id',
             'supplier_id',
@@ -44,9 +40,7 @@ class IndexSupplierReturnsAction
             'status',
             'return_date_from',
             'return_date_to',
-        ]);
-
-        $this->applyMappedIndexSorting($request, $query, $this->filterService, 'created_at', [
+        ], 'created_at', [
             'id',
             'return_number',
             'purchase_order_id',
@@ -64,7 +58,5 @@ class IndexSupplierReturnsAction
             'supplier' => 'supplier_id',
             'warehouse' => 'warehouse_id',
         ]);
-
-        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }

@@ -18,8 +18,6 @@ class IndexPurchaseOrdersAction
 
     public function execute(IndexPurchaseOrderRequest $request): LengthAwarePaginator
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
         $query = PurchaseOrder::query()->with([
             'supplier',
             'warehouse',
@@ -29,14 +27,12 @@ class IndexPurchaseOrdersAction
             'items.unit',
         ]);
 
-        $this->applyRequestSearch($request, $query, $this->filterService, [
+        return $this->handleMappedIndexRequest($request, $query, $this->filterService, [
             'po_number',
             'payment_terms',
             'notes',
             'shipping_address',
-        ]);
-
-        $this->applyRequestFilters($request, $query, $this->filterService, [
+        ], [
             'supplier_id',
             'warehouse_id',
             'status',
@@ -47,9 +43,7 @@ class IndexPurchaseOrdersAction
             'expected_delivery_date_to',
             'grand_total_min',
             'grand_total_max',
-        ]);
-
-        $this->applyMappedIndexSorting($request, $query, $this->filterService, 'created_at', [
+        ], 'created_at', [
             'id',
             'po_number',
             'supplier_id',
@@ -65,7 +59,5 @@ class IndexPurchaseOrdersAction
             'supplier' => 'supplier_id',
             'warehouse' => 'warehouse_id',
         ]);
-
-        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 }

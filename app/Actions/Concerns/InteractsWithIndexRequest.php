@@ -122,6 +122,32 @@ trait InteractsWithIndexRequest
         );
     }
 
+    /**
+     * @param  object{applySearch: callable, applyAdvancedFilters: callable, applySorting: callable}  $filterService
+     * @param  array<int, string>  $searchFields
+     * @param  array<int, string>  $filterKeys
+     * @param  array<int, string>  $allowedSorts
+     * @param  array<string, string>  $sortMap
+     */
+    private function handleMappedIndexRequest(
+        Request $request,
+        Builder $query,
+        object $filterService,
+        array $searchFields,
+        array $filterKeys,
+        string $defaultSortBy,
+        array $allowedSorts,
+        array $sortMap
+    ): LengthAwarePaginator {
+        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
+
+        $this->applyRequestSearch($request, $query, $filterService, $searchFields);
+        $this->applyRequestFilters($request, $query, $filterService, $filterKeys);
+        $this->applyMappedIndexSorting($request, $query, $filterService, $defaultSortBy, $allowedSorts, $sortMap);
+
+        return $this->paginateIndexQuery($query, $perPage, $page);
+    }
+
     private function paginateIndexQuery(Builder $query, int $perPage, int $page): LengthAwarePaginator
     {
         return $query->paginate($perPage, ['*'], 'page', $page);
