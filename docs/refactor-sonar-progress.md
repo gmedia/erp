@@ -557,6 +557,11 @@ Isi setelah batch selesai dan sebelum merge.
 	- Gelombang saat ini mencakup `app/Domain/AssetModels/AssetModelFilterService.php` dan `app/Domain/AssetLocations/AssetLocationFilterService.php`.
 	- Progress: `AssetModelFilterService` kini sepenuhnya memakai `applyExactFilters()`, sedangkan `AssetLocationFilterService` memindahkan filter `branch_id` ke helper shared tetapi tetap mempertahankan logika khusus `parent_id` untuk root location. Verifikasi PASS `./vendor/bin/sail pest tests/Unit/Domain/AssetModels/AssetModelFilterServiceTest.php tests/Unit/Domain/AssetLocations/AssetLocationFilterServiceTest.php` (6 passed) dan PASS `./vendor/bin/sail bin duster fix --no-interaction app/Domain/AssetModels/AssetModelFilterService.php app/Domain/AssetLocations/AssetLocationFilterService.php`. Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
 
+121. Dedup party exact filter services. (in-progress)
+	- Ekstrak exact filter `branch/category/status` yang identik pada filter service party agar `customers` dan `suppliers` tidak lagi menyimpan trio `where(...)` yang sama.
+	- Gelombang saat ini mencakup `app/Domain/Concerns/AppliesPartyExactFilters.php`, `app/Domain/Customers/CustomerFilterService.php`, dan `app/Domain/Suppliers/SupplierFilterService.php`.
+	- Progress: kedua service party kini berbagi concern kecil untuk exact filter `branch_id`, `category_id`, dan `status` tanpa ubah perilaku search, sorting, maupun API filter existing. Verifikasi PASS `./vendor/bin/sail pest tests/Unit/Domain/Customers/CustomerFilterServiceTest.php tests/Unit/Domain/Suppliers/SupplierFilterServiceTest.php` (11 passed) dan PASS `./vendor/bin/sail bin duster fix --no-interaction app/Domain/Concerns/AppliesPartyExactFilters.php app/Domain/Customers/CustomerFilterService.php app/Domain/Suppliers/SupplierFilterService.php`. Snapshot Sonar pasca-wave: menunggu analisis CI berikutnya.
+
 ## Rencana Refactor Fokus Duplikasi (Batch C, arsip)
 
 1. Ekstraksi query builder bersama untuk variances asset stocktake. (done)

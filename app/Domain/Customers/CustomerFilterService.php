@@ -2,6 +2,7 @@
 
 namespace App\Domain\Customers;
 
+use App\Domain\Concerns\AppliesPartyExactFilters;
 use App\Domain\Concerns\BaseFilterService;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class CustomerFilterService
 {
+    use AppliesPartyExactFilters;
     use BaseFilterService;
 
     /**
@@ -22,19 +24,6 @@ class CustomerFilterService
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        // Branch filter (by foreign key)
-        if (! empty($filters['branch_id'])) {
-            $query->where('branch_id', $filters['branch_id']);
-        }
-
-        // Filter by category
-        if (! empty($filters['category_id'])) {
-            $query->where('category_id', $filters['category_id']);
-        }
-
-        // Status filter
-        if (! empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
+        $this->applyPartyExactFilters($query, $filters);
     }
 }
