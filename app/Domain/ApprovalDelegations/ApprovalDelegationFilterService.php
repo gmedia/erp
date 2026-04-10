@@ -17,26 +17,22 @@ class ApprovalDelegationFilterService
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['delegator_user_id'])) {
-            $query->where('delegator_user_id', $filters['delegator_user_id']);
-        }
-
-        if (! empty($filters['delegate_user_id'])) {
-            $query->where('delegate_user_id', $filters['delegate_user_id']);
-        }
+        $this->applyConfiguredFilters(
+            $query,
+            $filters,
+            [
+                'delegator_user_id' => 'delegator_user_id',
+                'delegate_user_id' => 'delegate_user_id',
+            ],
+            [
+                'start_date' => ['from' => 'start_date_from', 'to' => 'start_date_to'],
+            ],
+        );
 
         if (in_array(strtolower((string) ($filters['is_active'] ?? '')), ['true', '1'], true)) {
             $query->where('is_active', true);
         } elseif (in_array(strtolower((string) ($filters['is_active'] ?? '')), ['false', '0'], true)) {
             $query->where('is_active', false);
-        }
-
-        if (! empty($filters['start_date_from'])) {
-            $query->whereDate('start_date', '>=', $filters['start_date_from']);
-        }
-
-        if (! empty($filters['start_date_to'])) {
-            $query->whereDate('start_date', '<=', $filters['start_date_to']);
         }
     }
 }
