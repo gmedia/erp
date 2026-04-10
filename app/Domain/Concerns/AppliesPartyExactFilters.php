@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Builder;
 trait AppliesPartyExactFilters
 {
     /**
-     * @param  Builder<\App\Models\Customer|\App\Models\Supplier>  $query
+     * @template TModel of \App\Models\Customer|\App\Models\Supplier
+     *
+     * @param  Builder<TModel>  $query
      * @param  array<string, mixed>  $filters
      */
     protected function applyPartyExactFilters(Builder $query, array $filters): void
