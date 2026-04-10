@@ -16,7 +16,9 @@ class PipelineFilterService
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
         if (isset($filters['entity_type']) && $filters['entity_type'] !== '') {
-            $query->where('entity_type', $filters['entity_type']);
+            $this->applyExactFilters($query, $filters, [
+                'entity_type' => 'entity_type',
+            ]);
         }
 
         if (isset($filters['is_active']) && $filters['is_active'] !== '') {

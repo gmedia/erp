@@ -11,9 +11,10 @@ class AssetDepreciationRunFilterService
 
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['fiscal_year_id'])) {
-            $query->where('fiscal_year_id', $filters['fiscal_year_id']);
-        }
+        $this->applyExactFilters($query, $filters, [
+            'fiscal_year_id' => 'fiscal_year_id',
+            'status' => 'status',
+        ]);
 
         if (! empty($filters['start_date'])) {
             $query->whereDate('period_start', '>=', $filters['start_date']);
@@ -21,10 +22,6 @@ class AssetDepreciationRunFilterService
 
         if (! empty($filters['end_date'])) {
             $query->whereDate('period_end', '<=', $filters['end_date']);
-        }
-
-        if (! empty($filters['status'])) {
-            $query->where('status', $filters['status']);
         }
     }
 }
