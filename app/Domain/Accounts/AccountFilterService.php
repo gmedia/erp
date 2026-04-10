@@ -20,16 +20,13 @@ class AccountFilterService
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
-        if (! empty($filters['type'])) {
-            $query->where('type', $filters['type']);
-        }
+        $this->applyExactFilters($query, $filters, [
+            'type' => 'type',
+            'coa_version_id' => 'coa_version_id',
+        ]);
 
         if (isset($filters['is_active'])) {
             $query->where('is_active', (bool) $filters['is_active']);
-        }
-
-        if (! empty($filters['coa_version_id'])) {
-            $query->where('coa_version_id', $filters['coa_version_id']);
         }
     }
 }

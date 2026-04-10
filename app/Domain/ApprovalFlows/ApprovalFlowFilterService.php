@@ -16,7 +16,9 @@ class ApprovalFlowFilterService
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
         if (isset($filters['approvable_type']) && $filters['approvable_type'] !== '') {
-            $query->where('approvable_type', $filters['approvable_type']);
+            $this->applyExactFilters($query, $filters, [
+                'approvable_type' => 'approvable_type',
+            ]);
         }
 
         if (isset($filters['is_active']) && $filters['is_active'] !== '') {
