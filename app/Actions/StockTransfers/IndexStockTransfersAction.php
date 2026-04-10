@@ -18,14 +18,9 @@ class IndexStockTransfersAction
 
     public function execute(IndexStockTransferRequest $request): LengthAwarePaginator
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
         $query = StockTransfer::query()->with(['fromWarehouse', 'toWarehouse']);
 
-        $this->applyRequestSearch($request, $query, $this->filterService, ['transfer_number', 'notes']);
-        $this->excludeStatusWhenFilterMissing($request, $query, 'cancelled');
-
-        $this->applyRequestFilters($request, $query, $this->filterService, [
+        return $this->handleIndexRequestWithStatusExclusion($request, $query, $this->filterService, ['transfer_number', 'notes'], [
             'from_warehouse_id',
             'to_warehouse_id',
             'status',
@@ -33,9 +28,7 @@ class IndexStockTransfersAction
             'transfer_date_to',
             'expected_arrival_date_from',
             'expected_arrival_date_to',
-        ]);
-
-        $this->applyIndexSorting($request, $query, $this->filterService, 'created_at', [
+        ], 'created_at', [
             'id',
             'transfer_number',
             'from_warehouse_id',
@@ -45,8 +38,6 @@ class IndexStockTransfersAction
             'status',
             'created_at',
             'updated_at',
-        ]);
-
-        return $query->paginate($perPage, ['*'], 'page', $page);
+        ], 'cancelled');
     }
 }

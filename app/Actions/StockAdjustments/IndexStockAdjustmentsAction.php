@@ -18,23 +18,16 @@ class IndexStockAdjustmentsAction
 
     public function execute(IndexStockAdjustmentRequest $request): LengthAwarePaginator
     {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
         $query = StockAdjustment::query()->with(['warehouse', 'inventoryStocktake']);
 
-        $this->applyRequestSearch($request, $query, $this->filterService, ['adjustment_number', 'notes']);
-        $this->excludeStatusWhenFilterMissing($request, $query, 'cancelled');
-
-        $this->applyRequestFilters($request, $query, $this->filterService, [
+        return $this->handleIndexRequestWithStatusExclusion($request, $query, $this->filterService, ['adjustment_number', 'notes'], [
             'warehouse_id',
             'status',
             'adjustment_type',
             'inventory_stocktake_id',
             'adjustment_date_from',
             'adjustment_date_to',
-        ]);
-
-        $this->applyIndexSorting($request, $query, $this->filterService, 'created_at', [
+        ], 'created_at', [
             'id',
             'adjustment_number',
             'warehouse_id',
@@ -47,8 +40,6 @@ class IndexStockAdjustmentsAction
             'approved_at',
             'created_at',
             'updated_at',
-        ]);
-
-        return $query->paginate($perPage, ['*'], 'page', $page);
+        ], 'cancelled');
     }
 }
