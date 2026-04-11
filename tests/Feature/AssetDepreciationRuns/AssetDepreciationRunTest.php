@@ -6,8 +6,8 @@ use App\Models\AssetDepreciationLine;
 use App\Models\AssetDepreciationRun;
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -16,7 +16,7 @@ uses(RefreshDatabase::class)->group('asset-depreciation-runs');
 
 beforeEach(function () {
     $this->user = createTestUserWithPermissions(['asset_depreciation_run']);
-    actingAs($this->user);
+    Sanctum::actingAs($this->user);
 
     $this->fiscalYear = FiscalYear::factory()->create([
         'start_date' => '2024-01-01',
@@ -28,6 +28,43 @@ beforeEach(function () {
 test('user can view depreciation runs page', function () {
     $response = get('/asset-depreciation-runs');
     $response->assertStatus(200);
+});
+
+test('user can list depreciation runs with filters', function () {
+    $otherFiscalYear = FiscalYear::factory()->create([
+        'start_date' => '2025-01-01',
+        'end_date' => '2025-12-31',
+        'status' => 'open',
+    ]);
+
+    AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-02-01',
+        'period_end' => '2024-02-29',
+        'status' => 'calculated',
+    ]);
+    AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-01-01',
+        'period_end' => '2024-01-31',
+        'status' => 'draft',
+    ]);
+    AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $otherFiscalYear->id,
+        'period_start' => '2024-02-01',
+        'period_end' => '2024-02-29',
+        'status' => 'calculated',
+    ]);
+
+    $response = getJson('/api/asset-depreciation-runs?fiscal_year_id=' . $this->fiscalYear->id . '&status=calculated&start_date=2024-02-01&end_date=2024-02-29&sort_by=period_start&sort_direction=asc&per_page=10');
+
+    $response->assertStatus(200)
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.fiscal_year.id', $this->fiscalYear->id)
+        ->assertJsonPath('data.0.status', 'calculated')
+        ->assertJsonPath('data.0.period_start', '2024-02-01')
+        ->assertJsonPath('data.0.lines_count', 0)
+        ->assertJsonPath('meta.total', 1);
 });
 
 test('user can calculate depreciation', function () {

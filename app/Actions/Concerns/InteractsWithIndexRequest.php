@@ -185,6 +185,27 @@ trait InteractsWithIndexRequest
     }
 
     /**
+     * @param  object{applyAdvancedFilters: callable, applySorting: callable}  $filterService
+     * @param  array<int, string>  $filterKeys
+     * @param  array<int, string>  $allowedSorts
+     */
+    private function handleFilteredIndexRequest(
+        Request $request,
+        Builder $query,
+        object $filterService,
+        array $filterKeys,
+        string $defaultSortBy,
+        array $allowedSorts
+    ): LengthAwarePaginator {
+        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
+
+        $this->applyRequestFilters($request, $query, $filterService, $filterKeys);
+        $this->applyIndexSorting($request, $query, $filterService, $defaultSortBy, $allowedSorts);
+
+        return $this->paginateIndexQuery($query, $perPage, $page);
+    }
+
+    /**
      * @param  object{applySearch: callable, applyAdvancedFilters: callable, applySorting: callable}  $filterService
      * @param  array<int, string>  $searchFields
      * @param  array<int, string>  $filterKeys
