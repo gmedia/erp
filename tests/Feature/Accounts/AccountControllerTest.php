@@ -5,9 +5,9 @@ use App\Models\CoaVersion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\Sanctum;
 use Maatwebsite\Excel\Facades\Excel;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
@@ -25,7 +25,7 @@ describe('Account API Endpoints', function () {
             'account.edit',
             'account.delete',
         ]);
-        actingAs($user);
+        Sanctum::actingAs($user);
 
         $this->coaVersion = CoaVersion::factory()->create();
     });
@@ -73,6 +73,25 @@ describe('Account API Endpoints', function () {
         $response = getJson("/api/accounts?coa_version_id={$this->coaVersion->id}&search=12000");
         $response->assertJsonCount(1, 'data');
         expect($response->json('data.0.name'))->toBe('Bank');
+    });
+
+    test('index respects legacy sort_order parameter', function () {
+        Account::factory()->create([
+            'code' => '20000',
+            'name' => 'Zeta Payable',
+            'coa_version_id' => $this->coaVersion->id,
+        ]);
+        Account::factory()->create([
+            'code' => '10000',
+            'name' => 'Alpha Cash',
+            'coa_version_id' => $this->coaVersion->id,
+        ]);
+
+        $response = getJson("/api/accounts?coa_version_id={$this->coaVersion->id}&sort_by=name&sort_order=asc");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.0.name', 'Alpha Cash')
+            ->assertJsonPath('data.1.name', 'Zeta Payable');
     });
 
     test('store creates a new account', function () {

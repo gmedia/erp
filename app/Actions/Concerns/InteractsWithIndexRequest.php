@@ -22,7 +22,7 @@ trait InteractsWithIndexRequest
         ];
     }
 
-    private function normalizeSortDirection(?string $sortDirection): string
+    private function normalizeIndexSortDirection(?string $sortDirection): string
     {
         return strtolower((string) $sortDirection) === 'asc' ? 'asc' : 'desc';
     }
@@ -92,12 +92,13 @@ trait InteractsWithIndexRequest
         Builder $query,
         object $filterService,
         string $defaultSortBy,
-        array $allowedSorts
+        array $allowedSorts,
+        string $sortDirectionField = 'sort_direction'
     ): void {
         $filterService->applySorting(
             $query,
             $request->get('sort_by', $defaultSortBy),
-            $this->normalizeSortDirection($request->get('sort_direction', 'desc')),
+            $this->normalizeIndexSortDirection($request->get($sortDirectionField, 'desc')),
             $allowedSorts,
         );
     }
@@ -189,6 +190,40 @@ trait InteractsWithIndexRequest
      * @param  array<int, string>  $filterKeys
      * @param  array<int, string>  $allowedSorts
      */
+    private function handleIndexRequestWithOptionalPagination(
+        Request $request,
+        Builder $query,
+        object $filterService,
+        array $searchFields,
+        array $filterKeys,
+        string $defaultSortBy,
+        array $allowedSorts,
+        string $sortDirectionField = 'sort_direction'
+    ): LengthAwarePaginator|Collection {
+        $this->applyRequestSearch($request, $query, $filterService, $searchFields);
+        $this->applyRequestFilters($request, $query, $filterService, $filterKeys);
+        $this->applyIndexSorting(
+            $request,
+            $query,
+            $filterService,
+            $defaultSortBy,
+            $allowedSorts,
+            $sortDirectionField,
+        );
+
+        if (! $request->filled('per_page')) {
+            return $query->get();
+        }
+
+        return $query->paginate($request->integer('per_page'));
+    }
+
+    /**
+     * @param  object{applySearch: callable, applyAdvancedFilters: callable, applySorting: callable}  $filterService
+     * @param  array<int, string>  $searchFields
+     * @param  array<int, string>  $filterKeys
+     * @param  array<int, string>  $allowedSorts
+     */
     private function handleIndexRequestWithOptionalExport(
         Request $request,
         Builder $query,
@@ -225,7 +260,7 @@ trait InteractsWithIndexRequest
         $filterService->applySorting(
             $query,
             $sortMap[$sortBy] ?? $sortBy,
-            $this->normalizeSortDirection($request->string('sort_direction', 'desc')->toString()),
+            $this->normalizeIndexSortDirection($request->string('sort_direction', 'desc')->toString()),
             $allowedSorts,
         );
     }

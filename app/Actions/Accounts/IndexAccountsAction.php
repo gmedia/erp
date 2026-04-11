@@ -2,16 +2,20 @@
 
 namespace App\Actions\Accounts;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Actions\Concerns\SimpleCrudIndexAction;
 use App\Domain\Accounts\AccountFilterService;
 use App\Models\Account;
 use App\Models\CoaVersion;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
 
 class IndexAccountsAction extends SimpleCrudIndexAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
         private AccountFilterService $filterService
     ) {}
@@ -23,41 +27,18 @@ class IndexAccountsAction extends SimpleCrudIndexAction
     {
         $query = Account::query()->with('parent');
 
-        // Default to active COA version if not provided
-        if ($request->filled('coa_version_id')) {
-            $query->where('coa_version_id', $request->coa_version_id);
-        } else {
-            // Find active coa version
-            $activeVersion = CoaVersion::where('status', 'active')->first();
-            if ($activeVersion) {
-                $query->where('coa_version_id', $activeVersion->id);
-            }
-        }
+        $this->applyCoaVersionFilter($request, $query);
 
-        // Apply filters AND search
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), $this->getSearchFields());
-        }
-
-        $this->filterService->applyAdvancedFilters($query, [
-            'type' => $request->get('type'),
-            'is_active' => $request->get('is_active'),
-            'coa_version_id' => $request->get('coa_version_id'),
-        ]);
-
-        $this->filterService->applySorting(
+        return $this->handleIndexRequestWithOptionalPagination(
+            $request,
             $query,
-            $request->get('sort_by', $this->getDefaultSortBy()),
-            strtolower($request->get('sort_direction', $this->getDefaultSortDirection())) === 'asc' ? 'asc' : 'desc',
-            $this->getSortableFields()
+            $this->filterService,
+            $this->getSearchFields(),
+            ['type', 'is_active', 'coa_version_id'],
+            $this->getDefaultSortBy(),
+            $this->getSortableFields(),
+            'sort_order',
         );
-
-        // If per_page is provided, paginate. Otherwise return all (useful for tree)
-        if ($request->filled('per_page')) {
-            return $query->paginate($request->integer('per_page'));
-        }
-
-        return $query->get();
     }
 
     protected function getModelClass(): string
@@ -73,5 +54,22 @@ class IndexAccountsAction extends SimpleCrudIndexAction
     protected function getSortableFields(): array
     {
         return ['id', 'code', 'name', 'type', 'level', 'created_at', 'updated_at'];
+    }
+
+    private function applyCoaVersionFilter(FormRequest $request, Builder $query): void
+    {
+        if ($request->filled('coa_version_id')) {
+            $query->where('coa_version_id', $request->get('coa_version_id'));
+
+            return;
+        }
+
+        $activeVersionId = CoaVersion::query()
+            ->where('status', 'active')
+            ->value('id');
+
+        if ($activeVersionId !== null) {
+            $query->where('coa_version_id', $activeVersionId);
+        }
     }
 }
