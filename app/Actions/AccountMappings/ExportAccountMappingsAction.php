@@ -3,14 +3,11 @@
 namespace App\Actions\AccountMappings;
 
 use App\Actions\AccountMappings\Concerns\BuildsAccountMappingQuery;
+use App\Actions\Concerns\ConfiguredTimestampExportAction;
 use App\Domain\AccountMappings\AccountMappingFilterService;
 use App\Exports\AccountMappingExport;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportAccountMappingsAction
+class ExportAccountMappingsAction extends ConfiguredTimestampExportAction
 {
     use BuildsAccountMappingQuery;
 
@@ -18,30 +15,43 @@ class ExportAccountMappingsAction
         private AccountMappingFilterService $filterService
     ) {}
 
-    public function execute(FormRequest $request): JsonResponse
+    /**
+     * @return array<string, mixed>
+     */
+    protected function filterDefaults(): array
     {
-        $validated = $request->validated();
+        return [
+            'search' => null,
+            'type' => null,
+            'source_coa_version_id' => null,
+            'target_coa_version_id' => null,
+            'sort_by' => 'created_at',
+            'sort_direction' => 'desc',
+        ];
+    }
 
+    protected function filenamePrefix(): string
+    {
+        return 'account_mappings';
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
         $query = $this->buildAccountMappingQuery(
             $this->filterService,
             [
-                'type' => $validated['type'] ?? null,
-                'source_coa_version_id' => $validated['source_coa_version_id'] ?? null,
-                'target_coa_version_id' => $validated['target_coa_version_id'] ?? null,
+                'type' => $filters['type'] ?? null,
+                'source_coa_version_id' => $filters['source_coa_version_id'] ?? null,
+                'target_coa_version_id' => $filters['target_coa_version_id'] ?? null,
             ],
-            $request->filled('search') ? (string) ($validated['search'] ?? '') : null,
-            (string) ($validated['sort_by'] ?? 'created_at'),
-            (string) ($validated['sort_direction'] ?? 'desc'),
+            isset($filters['search']) ? (string) $filters['search'] : null,
+            (string) ($filters['sort_by'] ?? 'created_at'),
+            (string) ($filters['sort_direction'] ?? 'desc'),
         );
 
-        $filename = 'account_mappings_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-        $filePath = 'exports/' . $filename;
-
-        Excel::store(new AccountMappingExport($validated, $query), $filePath, 'public');
-
-        return response()->json([
-            'url' => Storage::disk('public')->url($filePath),
-            'filename' => $filename,
-        ]);
+        return new AccountMappingExport($filters, $query);
     }
 }

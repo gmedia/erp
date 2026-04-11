@@ -3,13 +3,11 @@
 namespace App\Actions\ApprovalDelegations;
 
 use App\Actions\ApprovalDelegations\Concerns\InteractsWithApprovalDelegationQuery;
+use App\Actions\Concerns\ConfiguredTimestampExportAction;
 use App\Domain\ApprovalDelegations\ApprovalDelegationFilterService;
 use App\Exports\ApprovalDelegations\ApprovalDelegationExport;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 
-class ExportApprovalDelegationsAction
+class ExportApprovalDelegationsAction extends ConfiguredTimestampExportAction
 {
     use InteractsWithApprovalDelegationQuery;
 
@@ -17,7 +15,34 @@ class ExportApprovalDelegationsAction
         private readonly ApprovalDelegationFilterService $filterService
     ) {}
 
-    public function execute(array $filters): JsonResponse
+    /**
+     * @return array<string, mixed>
+     */
+    protected function filterDefaults(): array
+    {
+        return [
+            'search' => null,
+            'id' => null,
+            'delegator_user_id' => null,
+            'delegate_user_id' => null,
+            'approvable_type' => null,
+            'start_date' => null,
+            'end_date' => null,
+            'is_active' => null,
+            'sort_by' => 'created_at',
+            'sort_direction' => 'desc',
+        ];
+    }
+
+    protected function filenamePrefix(): string
+    {
+        return 'approval_delegations';
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
     {
         $query = $this->buildFilteredQuery(
             $this->filterService,
@@ -34,22 +59,6 @@ class ExportApprovalDelegationsAction
             ],
         );
 
-        // Generate filename with timestamp
-        $filename = 'approval_delegations_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-
-        // Store the file in storage/app/public/exports/
-        $filePath = 'exports/' . $filename;
-
-        // Generate the Excel file using public disk
-        $export = new ApprovalDelegationExport($query);
-        Excel::store($export, $filePath, 'public');
-
-        // Generate the public URL for download
-        $url = Storage::disk('public')->url($filePath);
-
-        return response()->json([
-            'url' => $url,
-            'filename' => $filename,
-        ]);
+        return new ApprovalDelegationExport($query);
     }
 }

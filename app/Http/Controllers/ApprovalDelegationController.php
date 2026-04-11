@@ -68,7 +68,7 @@ class ApprovalDelegationController extends Controller
         ExportApprovalDelegationRequest $request,
         ExportApprovalDelegationsAction $action,
     ): JsonResponse {
-        return $action->execute($request->validated());
+        return $action->execute($request);
     }
 
     protected function resourceRelations(): array
