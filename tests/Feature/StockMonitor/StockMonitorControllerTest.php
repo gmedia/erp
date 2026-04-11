@@ -13,13 +13,10 @@ use function Pest\Laravel\getJson;
 
 uses(RefreshDatabase::class)->group('stock-monitor');
 
-beforeEach(function () {
-    $this->user = createTestUserWithPermissions(['stock_monitor']);
-    $this->otherUser = createTestUserWithPermissions([]);
-});
-
 test('it requires permission to access stock monitor', function () {
-    Sanctum::actingAs($this->otherUser, ['*']);
+    $otherUser = createTestUserWithPermissions([]);
+
+    Sanctum::actingAs($otherUser, ['*']);
     getJson('/api/stock-monitor')
         ->assertForbidden();
 });
@@ -54,7 +51,9 @@ test('it returns current stock snapshot per product and warehouse', function () 
         'moved_at' => now(),
     ]);
 
-    Sanctum::actingAs($this->user, ['*']);
+    $user = createTestUserWithPermissions(['stock_monitor']);
+
+    Sanctum::actingAs($user, ['*']);
     $response = getJson('/api/stock-monitor?per_page=10');
     $response->assertOk()
         ->assertJson(fn (AssertableJson $json) => $json
@@ -91,7 +90,9 @@ test('it can filter by branch, warehouse, category, product, and low stock thres
         'balance_after' => 50,
     ]);
 
-    Sanctum::actingAs($this->user, ['*']);
+    $user = createTestUserWithPermissions(['stock_monitor']);
+
+    Sanctum::actingAs($user, ['*']);
     getJson('/api/stock-monitor?branch_id=' . $branchA->id)
         ->assertOk()
         ->assertJsonCount(1, 'data')
@@ -116,4 +117,38 @@ test('it can filter by branch, warehouse, category, product, and low stock thres
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.product.id', $productA->id);
+});
+
+test('it preserves filter query string in pagination links', function () {
+    $branch = Branch::factory()->create(['name' => 'Cabang A']);
+    $warehouse = Warehouse::factory()->create(['branch_id' => $branch->id, 'name' => 'Warehouse A']);
+    $category = ProductCategory::factory()->create(['name' => 'Kategori A']);
+    $productA = Product::factory()->create(['name' => 'Produk A', 'category_id' => $category->id]);
+    $productB = Product::factory()->create(['name' => 'Produk B', 'category_id' => $category->id]);
+
+    StockMovement::factory()->create([
+        'product_id' => $productA->id,
+        'warehouse_id' => $warehouse->id,
+        'balance_after' => 5,
+    ]);
+
+    StockMovement::factory()->create([
+        'product_id' => $productB->id,
+        'warehouse_id' => $warehouse->id,
+        'balance_after' => 8,
+    ]);
+
+    $user = createTestUserWithPermissions(['stock_monitor']);
+
+    Sanctum::actingAs($user, ['*']);
+
+    $response = getJson('/api/stock-monitor?branch_id=' . $branch->id . '&per_page=1');
+
+    $response->assertOk()
+        ->assertJsonCount(1, 'data');
+
+    expect($response->json('links.next'))
+        ->toContain('branch_id=' . $branch->id)
+        ->toContain('per_page=1')
+        ->toContain('page=2');
 });

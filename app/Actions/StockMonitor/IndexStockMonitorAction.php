@@ -2,6 +2,7 @@
 
 namespace App\Actions\StockMonitor;
 
+use App\Actions\Concerns\InteractsWithExportableQuery;
 use App\Actions\Concerns\InteractsWithStockSnapshotQuery;
 use App\Http\Requests\StockMonitor\IndexStockMonitorRequest;
 use App\Models\StockMovement;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class IndexStockMonitorAction
 {
+    use InteractsWithExportableQuery;
     use InteractsWithStockSnapshotQuery;
 
     public function execute(IndexStockMonitorRequest $request): array
@@ -52,7 +54,7 @@ class IndexStockMonitorAction
         $this->applyStockSnapshotSorting($request, $query, $stockValueExpr, 'quantity_on_hand');
 
         $summaryRows = (clone $query)->get();
-        $stocks = $query->paginate($request->integer('per_page', 15))->withQueryString();
+        $stocks = $this->paginateQuery($request, $query);
 
         return [
             'stocks' => $stocks,
