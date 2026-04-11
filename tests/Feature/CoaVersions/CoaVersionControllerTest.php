@@ -3,8 +3,8 @@
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 
-use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
@@ -23,7 +23,7 @@ describe('COA Version API Endpoints', function () {
             'coa_version.delete',
             'coa_version.export',
         ]);
-        actingAs($user);
+        Sanctum::actingAs($user);
 
         $this->fiscalYear = FiscalYear::factory()->create([
             'name' => 'FY 2026',
@@ -115,6 +115,22 @@ describe('COA Version API Endpoints', function () {
         $response->assertStatus(200)
             ->assertJsonPath('data.0.fiscal_year.name', 'FY 2024')
             ->assertJsonPath('data.1.fiscal_year.name', 'FY 2025');
+    });
+
+    test('index keeps search compatible with fiscal year sorting alias', function () {
+        $fyA = FiscalYear::factory()->create(['name' => 'FY 2023', 'status' => 'open']);
+        $fyB = FiscalYear::factory()->create(['name' => 'FY 2024', 'status' => 'open']);
+
+        CoaVersion::factory()->create(['name' => 'Version FY2024', 'fiscal_year_id' => $fyB->id]);
+        CoaVersion::factory()->create(['name' => 'Version FY2023', 'fiscal_year_id' => $fyA->id]);
+        CoaVersion::factory()->create(['name' => 'Archive Legacy', 'fiscal_year_id' => $fyA->id]);
+
+        $response = getJson('/api/coa-versions?search=Version&sort_by=fiscal_year_name&sort_direction=asc&per_page=10');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.fiscal_year.name', 'FY 2023')
+            ->assertJsonPath('data.1.fiscal_year.name', 'FY 2024');
     });
 
     test('index filters by fiscal year', function () {
@@ -236,7 +252,7 @@ describe('COA Version API Endpoints', function () {
 
     test('unauthorized access is forbidden', function () {
         $user = createTestUserWithPermissions([]); // No permissions
-        actingAs($user);
+        Sanctum::actingAs($user);
 
         getJson('/api/coa-versions')->assertForbidden();
     });

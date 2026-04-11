@@ -2,7 +2,9 @@
 
 namespace App\Actions\FiscalYears;
 
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Actions\Concerns\SimpleCrudIndexAction;
+use App\Domain\FiscalYears\FiscalYearFilterService;
 use App\Models\FiscalYear;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -12,8 +14,10 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class IndexFiscalYearsAction extends SimpleCrudIndexAction
 {
+    use InteractsWithIndexRequest;
+
     public function __construct(
-        private \App\Domain\FiscalYears\FiscalYearFilterService $filterService
+        private FiscalYearFilterService $filterService
     ) {}
 
     /**
@@ -23,22 +27,16 @@ class IndexFiscalYearsAction extends SimpleCrudIndexAction
     {
         $query = FiscalYear::query();
 
-        if ($request->filled('search')) {
-            $this->filterService->applySearch($query, $request->get('search'), $this->getSearchFields());
-        } else {
-            $this->filterService->applyAdvancedFilters($query, [
-                'status' => $request->get('status'),
-            ]);
-        }
-
-        $this->filterService->applySorting(
+        return $this->handleSearchOrPrimaryIndexRequest(
+            $request,
             $query,
-            $request->get('sort_by', $this->getDefaultSortBy()),
-            strtolower($request->get('sort_direction', $this->getDefaultSortDirection())) === 'asc' ? 'asc' : 'desc',
-            $this->getSortableFields()
+            $this->filterService,
+            $this->getSearchFields(),
+            ['status'],
+            [],
+            $this->getDefaultSortBy(),
+            $this->getSortableFields(),
         );
-
-        return $query->paginate($request->get('per_page', $this->getDefaultPerPage()));
     }
 
     protected function getModelClass(): string

@@ -10,7 +10,18 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class CoaVersionFilterService
 {
-    use BaseFilterService;
+    use BaseFilterService {
+        applySearch as private applyBaseSearch;
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\CoaVersion>  $query
+     * @param  array<int, string>  $searchFields
+     */
+    public function applySearch(Builder $query, string $search, array $searchFields): void
+    {
+        $this->applyBaseSearch($query, $search, $this->qualifySearchFields('coa_versions', $searchFields));
+    }
 
     /**
      * Apply advanced filters for COA versions.
@@ -24,5 +35,24 @@ class CoaVersionFilterService
             'status' => 'status',
             'fiscal_year_id' => 'fiscal_year_id',
         ]);
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\CoaVersion>  $query
+     * @param  array<int, string>  $allowedSorts
+     */
+    public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
+    {
+        $this->applySortingWithRelationFallback(
+            $query,
+            $sortBy,
+            $sortDirection,
+            $allowedSorts,
+            [
+                'fiscal_year.name' => $this->relationSortConfig('fiscal_years', 'coa_versions.fiscal_year_id', join: 'leftJoin'),
+                'fiscal_year_name' => $this->relationSortConfig('fiscal_years', 'coa_versions.fiscal_year_id', join: 'leftJoin'),
+            ],
+            'coa_versions',
+        );
     }
 }

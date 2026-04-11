@@ -26,10 +26,30 @@ test('execute returns paginated coa versions', function () {
     $request->shouldReceive('get')->with('sort_by', 'created_at')->andReturn('created_at');
     $request->shouldReceive('get')->with('sort_direction', 'desc')->andReturn('desc');
     $request->shouldReceive('get')->with('per_page', 15)->andReturn(15);
-    $request->shouldReceive('validated')->andReturn([]);
+    $request->shouldReceive('get')->with('page', 1)->andReturn(1);
 
     $results = $action->execute($request);
 
     expect($results)->toBeInstanceOf(LengthAwarePaginator::class)
         ->and($results->total())->toBe(5);
+});
+
+test('execute applies search when search is present', function () {
+    $filterService = Mockery::mock(CoaVersionFilterService::class);
+    $filterService->shouldReceive('applySearch')
+        ->once()
+        ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), 'Alpha', ['name']);
+    $filterService->shouldReceive('applySorting')->once();
+
+    $action = new IndexCoaVersionsAction($filterService);
+
+    $request = Mockery::mock(IndexCoaVersionRequest::class);
+    $request->shouldReceive('filled')->with('search')->andReturn(true);
+    $request->shouldReceive('get')->with('search')->andReturn('Alpha');
+    $request->shouldReceive('get')->with('sort_by', 'created_at')->andReturn('created_at');
+    $request->shouldReceive('get')->with('sort_direction', 'desc')->andReturn('desc');
+    $request->shouldReceive('get')->with('per_page', 15)->andReturn(15);
+    $request->shouldReceive('get')->with('page', 1)->andReturn(1);
+
+    $action->execute($request);
 });
