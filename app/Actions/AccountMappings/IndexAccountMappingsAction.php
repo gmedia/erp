@@ -3,6 +3,7 @@
 namespace App\Actions\AccountMappings;
 
 use App\Actions\AccountMappings\Concerns\BuildsAccountMappingQuery;
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\AccountMappings\AccountMappingFilterService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -11,6 +12,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class IndexAccountMappingsAction
 {
     use BuildsAccountMappingQuery;
+    use InteractsWithIndexRequest;
 
     public function __construct(
         private AccountMappingFilterService $filterService
@@ -30,6 +32,6 @@ class IndexAccountMappingsAction
             (string) $request->get('sort_direction', 'desc'),
         );
 
-        return $query->paginate($request->integer('per_page', 15));
+        return $this->handlePreparedIndexRequest($request, $query);
     }
 }

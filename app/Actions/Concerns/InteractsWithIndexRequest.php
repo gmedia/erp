@@ -14,12 +14,22 @@ trait InteractsWithIndexRequest
     /**
      * @return array{perPage: int, page: int}
      */
-    private function getPaginationParams(Request $request): array
+    private function getPaginationParams(Request $request, int $defaultPerPage = 15): array
     {
         return [
-            'perPage' => (int) $request->get('per_page', 15),
+            'perPage' => (int) $request->get('per_page', $defaultPerPage),
             'page' => (int) $request->get('page', 1),
         ];
+    }
+
+    private function handlePreparedIndexRequest(
+        Request $request,
+        Builder $query,
+        int $defaultPerPage = 15
+    ): LengthAwarePaginator {
+        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request, $defaultPerPage);
+
+        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 
     private function normalizeIndexSortDirection(?string $sortDirection): string

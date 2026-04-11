@@ -23,7 +23,7 @@ class ApprovalDelegationController extends Controller
         IndexApprovalDelegationRequest $request,
         IndexApprovalDelegationsAction $action,
     ): ApprovalDelegationCollection {
-        $delegations = $action->execute($request->validated());
+        $delegations = $action->execute($request);
 
         return new ApprovalDelegationCollection($delegations);
     }

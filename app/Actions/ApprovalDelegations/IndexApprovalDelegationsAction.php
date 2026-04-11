@@ -3,22 +3,25 @@
 namespace App\Actions\ApprovalDelegations;
 
 use App\Actions\ApprovalDelegations\Concerns\InteractsWithApprovalDelegationQuery;
+use App\Actions\Concerns\InteractsWithIndexRequest;
 use App\Domain\ApprovalDelegations\ApprovalDelegationFilterService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Foundation\Http\FormRequest;
 
 class IndexApprovalDelegationsAction
 {
     use InteractsWithApprovalDelegationQuery;
+    use InteractsWithIndexRequest;
 
     public function __construct(
         private readonly ApprovalDelegationFilterService $filterService
     ) {}
 
-    public function execute(array $filters): LengthAwarePaginator
+    public function execute(FormRequest $request): LengthAwarePaginator
     {
         $query = $this->buildFilteredQuery(
             $this->filterService,
-            $filters,
+            $request->validated(),
             [
                 'id',
                 'delegator_user_id',
@@ -32,9 +35,6 @@ class IndexApprovalDelegationsAction
             ],
         );
 
-        $perPage = $filters['per_page'] ?? 10;
-        $page = $filters['page'] ?? 1;
-
-        return $query->paginate($perPage, ['*'], 'page', $page);
+        return $this->handlePreparedIndexRequest($request, $query, 10);
     }
 }
