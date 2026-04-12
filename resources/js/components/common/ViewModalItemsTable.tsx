@@ -58,7 +58,9 @@ export function ViewModalItemsTable<TItem>({
                                 {columns.map((column) => (
                                     <td
                                         key={column.key}
-                                        className={getCellClassName(column.align)}
+                                        className={getCellClassName(
+                                            column.align,
+                                        )}
                                     >
                                         {column.render(item)}
                                     </td>
