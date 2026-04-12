@@ -2,18 +2,21 @@
 
 import axios from '@/lib/axios';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
+import {
+    EntityFormItemActionsCell,
+    EntityFormItemEmptyRow,
+    EntityFormItemSectionHeader,
+} from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
-import { Button } from '@/components/ui/button';
 import {
     Table,
     TableBody,
@@ -22,6 +25,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { StockTransfer } from '@/types/stock-transfer';
 import {
@@ -161,19 +165,20 @@ export const StockTransferForm = memo<StockTransferFormProps>(
             control: form.control,
             name: 'items',
         });
-        const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
-        const [editingIndex, setEditingIndex] = useState<number | null>(null);
         const watchedItems = form.watch('items');
-
-        const handleCreateNewItem = () => {
-            setEditingIndex(null);
-            setIsItemDialogOpen(true);
-        };
-
-        const handleEditItem = (index: number) => {
-            setEditingIndex(index);
-            setIsItemDialogOpen(true);
-        };
+        const {
+            isItemDialogOpen,
+            item: selectedItem,
+            handleCreateNewItem,
+            handleEditItem,
+            handleItemDialogOpenChange,
+            handleSaveItem,
+        } = useEntityFormItemDialog({
+            items: watchedItems,
+            appendItem: append,
+            updateItem: update,
+            mapEditingItem: normalizeStockTransferItem,
+        });
 
         const handleSubmit = (data: StockTransferFormData) => {
             onSubmit({
@@ -334,17 +339,9 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                 </div>
 
                 <div className="mt-2 space-y-3 border-t pt-4">
-                    <div className="flex items-center justify-between">
-                        <div className="text-sm font-semibold">Items</div>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={handleCreateNewItem}
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Item
-                        </Button>
-                    </div>
+                    <EntityFormItemSectionHeader
+                        onAddItem={handleCreateNewItem}
+                    />
 
                     <div className="rounded-md border">
                         <Table>
@@ -373,14 +370,10 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                             </TableHeader>
                             <TableBody>
                                 {fields.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={7}
-                                            className="py-8 text-center text-muted-foreground"
-                                        >
-                                            No items added yet.
-                                        </TableCell>
-                                    </TableRow>
+                                    <EntityFormItemEmptyRow
+                                        colSpan={7}
+                                        className="py-8 text-center text-muted-foreground"
+                                    />
                                 ) : (
                                     fields.map((field, index) => {
                                         const stockTransferItem =
@@ -418,34 +411,11 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                                     {stockTransferItem.notes ||
                                                         '-'}
                                                 </TableCell>
-                                                <TableCell className="text-right">
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() =>
-                                                            handleEditItem(
-                                                                index,
-                                                            )
-                                                        }
-                                                        title="Edit item"
-                                                        aria-label={`Edit item ${index + 1}`}
-                                                    >
-                                                        <Pencil className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() =>
-                                                            remove(index)
-                                                        }
-                                                        title="Remove item"
-                                                        aria-label={`Remove item ${index + 1}`}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </TableCell>
+                                                <EntityFormItemActionsCell
+                                                    index={index}
+                                                    onEdit={handleEditItem}
+                                                    onRemove={remove}
+                                                />
                                             </TableRow>
                                         );
                                     })
@@ -457,30 +427,9 @@ export const StockTransferForm = memo<StockTransferFormProps>(
 
                 <StockTransferItemFormDialog
                     open={isItemDialogOpen}
-                    onOpenChange={(nextOpen) => {
-                        setIsItemDialogOpen(nextOpen);
-                        if (nextOpen) {
-                            return;
-                        }
-
-                        setEditingIndex(null);
-                    }}
-                    item={
-                        editingIndex === null
-                            ? null
-                            : normalizeStockTransferItem(
-                                  watchedItems?.[editingIndex],
-                              )
-                    }
-                    onSave={(data) => {
-                        if (editingIndex === null) {
-                            append(data);
-                        } else {
-                            update(editingIndex, data);
-                        }
-                        setIsItemDialogOpen(false);
-                        setEditingIndex(null);
-                    }}
+                    onOpenChange={handleItemDialogOpenChange}
+                    item={selectedItem}
+                    onSave={handleSaveItem}
                 />
             </EntityForm>
         );

@@ -1,8 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { memo, useMemo, useState } from 'react';
+import { memo, useMemo } from 'react';
 import {
     type Resolver,
     Controller,
@@ -13,10 +12,14 @@ import {
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
+import {
+    EntityFormItemActionsCell,
+    EntityFormItemEmptyRow,
+    EntityFormItemSectionHeader,
+} from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
-import { Button } from '@/components/ui/button';
 import {
     Table,
     TableBody,
@@ -25,6 +28,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import {
     type GoodsReceipt,
@@ -145,19 +149,19 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
             control: form.control,
             name: 'items',
         });
-        const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
-        const [editingIndex, setEditingIndex] = useState<number | null>(null);
         const watchedItems = form.watch('items');
-
-        const handleCreateNewItem = () => {
-            setEditingIndex(null);
-            setIsItemDialogOpen(true);
-        };
-
-        const handleEditItem = (index: number) => {
-            setEditingIndex(index);
-            setIsItemDialogOpen(true);
-        };
+        const {
+            isItemDialogOpen,
+            item: selectedItem,
+            handleCreateNewItem,
+            handleEditItem,
+            handleItemDialogOpenChange,
+            handleSaveItem,
+        } = useEntityFormItemDialog({
+            items: watchedItems,
+            appendItem: append,
+            updateItem: update,
+        });
 
         const handleSubmit = (data: GoodsReceiptFormData) => {
             onSubmit({
@@ -288,17 +292,9 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                 </div>
 
                 <div className="mt-2 space-y-3 border-t pt-4">
-                    <div className="flex items-center justify-between">
-                        <div className="text-sm font-semibold">Items</div>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={handleCreateNewItem}
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Item
-                        </Button>
-                    </div>
+                    <EntityFormItemSectionHeader
+                        onAddItem={handleCreateNewItem}
+                    />
 
                     <div className="rounded-md border">
                         <Table>
@@ -376,44 +372,16 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                                             <TableCell>
                                                 {goodsReceiptItem.notes || '-'}
                                             </TableCell>
-                                            <TableCell className="text-right">
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() =>
-                                                        handleEditItem(index)
-                                                    }
-                                                    title="Edit item"
-                                                    aria-label={`Edit item ${index + 1}`}
-                                                >
-                                                    <Pencil className="h-4 w-4" />
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() =>
-                                                        remove(index)
-                                                    }
-                                                    title="Remove item"
-                                                    aria-label={`Remove item ${index + 1}`}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </TableCell>
+                                            <EntityFormItemActionsCell
+                                                index={index}
+                                                onEdit={handleEditItem}
+                                                onRemove={remove}
+                                            />
                                         </TableRow>
                                     );
                                 })}
                                 {fields.length === 0 && (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={9}
-                                            className="py-6 text-center text-muted-foreground"
-                                        >
-                                            No items added yet.
-                                        </TableCell>
-                                    </TableRow>
+                                    <EntityFormItemEmptyRow colSpan={9} />
                                 )}
                             </TableBody>
                         </Table>
@@ -422,28 +390,9 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
 
                 <GoodsReceiptItemFormDialog
                     open={isItemDialogOpen}
-                    onOpenChange={(nextOpen) => {
-                        setIsItemDialogOpen(nextOpen);
-                        if (nextOpen) {
-                            return;
-                        }
-
-                        setEditingIndex(null);
-                    }}
-                    item={
-                        editingIndex === null
-                            ? null
-                            : (watchedItems?.[editingIndex] ?? null)
-                    }
-                    onSave={(data) => {
-                        if (editingIndex === null) {
-                            append(data);
-                        } else {
-                            update(editingIndex, data);
-                        }
-                        setIsItemDialogOpen(false);
-                        setEditingIndex(null);
-                    }}
+                    onOpenChange={handleItemDialogOpenChange}
+                    item={selectedItem}
+                    onSave={handleSaveItem}
                 />
             </EntityForm>
         );
