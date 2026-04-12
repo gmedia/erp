@@ -601,6 +601,38 @@ export type PipelineTransitionFormData = z.infer<
     typeof pipelineTransitionFormSchema
 >;
 
+export const approvalFlowStepSchema = z.object({
+    id: z.number().optional(),
+    name: z.string().min(1, 'Step name is required'),
+    approver_type: z.literal('user'),
+    approver_user_id: z.preprocess(
+        (val) => (val === '' || val === null ? null : Number(val)),
+        z
+            .number()
+            .nullable()
+            .refine((value) => value !== null, {
+                message: 'Approver user is required',
+            }),
+    ),
+    required_action: z.enum(['approve', 'review', 'acknowledge']),
+    auto_approve_after_hours: z.preprocess(
+        (val) => (val === '' || val === null ? null : Number(val)),
+        z.number().nullable().optional(),
+    ),
+    escalate_after_hours: z.preprocess(
+        (val) => (val === '' || val === null ? null : Number(val)),
+        z.number().nullable().optional(),
+    ),
+    escalation_user_id: z.preprocess(
+        (val) => (val === '' || val === null ? null : Number(val)),
+        z.number().nullable().optional(),
+    ),
+    can_reject: z
+        .union([z.boolean(), z.string()])
+        .default(true)
+        .transform((val) => val === true || val === 'true'),
+});
+
 export const approvalFlowFormSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     code: z.string().min(1, 'Code is required'),
@@ -611,38 +643,7 @@ export const approvalFlowFormSchema = z.object({
         .transform((val) => val === true || val === 'true'),
     conditions: z.string().nullable().optional(),
     steps: z
-        .array(
-            z.object({
-                id: z.number().optional(),
-                name: z.string().min(1, 'Step name is required'),
-                approver_type: z.literal('user'),
-                approver_user_id: z.preprocess(
-                    (val) => (val === '' || val === null ? null : Number(val)),
-                    z
-                        .number()
-                        .nullable()
-                        .refine((value) => value !== null, {
-                            message: 'Approver user is required',
-                        }),
-                ),
-                required_action: z.enum(['approve', 'review', 'acknowledge']),
-                auto_approve_after_hours: z.preprocess(
-                    (val) => (val === '' || val === null ? null : Number(val)),
-                    z.number().nullable().optional(),
-                ),
-                escalate_after_hours: z.preprocess(
-                    (val) => (val === '' || val === null ? null : Number(val)),
-                    z.number().nullable().optional(),
-                ),
-                escalation_user_id: z.preprocess(
-                    (val) => (val === '' || val === null ? null : Number(val)),
-                    z.number().nullable().optional(),
-                ),
-                can_reject: z
-                    .union([z.boolean(), z.string()])
-                    .transform((val) => val === true || val === 'true'),
-            }),
-        )
+        .array(approvalFlowStepSchema)
         .min(1, 'At least one approval step is required'),
 });
 
