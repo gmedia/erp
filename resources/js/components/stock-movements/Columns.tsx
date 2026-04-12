@@ -30,6 +30,23 @@ export type StockMovementItem = {
     created_by: { id: number; name: string; email: string } | null;
 };
 
+function createStockMovementNumberColumn(
+    accessorKey:
+        | 'quantity_in'
+        | 'quantity_out'
+        | 'balance_after'
+        | 'unit_cost'
+        | 'average_cost_after',
+    label: string,
+): ColumnDef<StockMovementItem> {
+    return createNumberColumn<StockMovementItem>({
+        accessorKey,
+        label,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+}
+
 function formatMovementType(value: string | null | undefined): string {
     if (!value) return '-';
     return value
@@ -114,36 +131,11 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
                 );
             },
         },
-        createNumberColumn<StockMovementItem>({
-            accessorKey: 'quantity_in',
-            label: 'Qty In',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }),
-        createNumberColumn<StockMovementItem>({
-            accessorKey: 'quantity_out',
-            label: 'Qty Out',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }),
-        createNumberColumn<StockMovementItem>({
-            accessorKey: 'balance_after',
-            label: 'Balance',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }),
-        createNumberColumn<StockMovementItem>({
-            accessorKey: 'unit_cost',
-            label: 'Unit Cost',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }),
-        createNumberColumn<StockMovementItem>({
-            accessorKey: 'average_cost_after',
-            label: 'Avg Cost',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }),
+        createStockMovementNumberColumn('quantity_in', 'Qty In'),
+        createStockMovementNumberColumn('quantity_out', 'Qty Out'),
+        createStockMovementNumberColumn('balance_after', 'Balance'),
+        createStockMovementNumberColumn('unit_cost', 'Unit Cost'),
+        createStockMovementNumberColumn('average_cost_after', 'Avg Cost'),
         {
             id: 'created_by',
             header: 'Created By',
