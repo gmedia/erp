@@ -2,8 +2,10 @@
 
 namespace App\Actions\Concerns;
 
+use App\Models\StockMovement;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 trait InteractsWithStockSnapshotQuery
 {
@@ -12,6 +14,40 @@ trait InteractsWithStockSnapshotQuery
         return 'stock_movements.balance_after * COALESCE(stock_movements.average_cost_after, products.cost)';
     }
 
+    /**
+     * @return Builder<StockMovement>
+     */
+    protected function buildStockSnapshotQuery(bool $includeProductUnit = false): Builder
+    {
+        $stockValueExpr = $this->stockSnapshotValueExpression();
+
+        return $this->stockMovementModelClass()::query()
+            ->whereIn('stock_movements.id', $this->latestStockMovementIdsQuery())
+            ->with($this->stockSnapshotRelations($includeProductUnit))
+            ->join('products', 'stock_movements.product_id', '=', 'products.id')
+            ->join('warehouses', 'stock_movements.warehouse_id', '=', 'warehouses.id')
+            ->leftJoin('branches', 'warehouses.branch_id', '=', 'branches.id')
+            ->leftJoin('product_categories', 'products.category_id', '=', 'product_categories.id')
+            ->select([
+                'stock_movements.*',
+                DB::raw('stock_movements.balance_after as quantity_on_hand'),
+                DB::raw('COALESCE(stock_movements.average_cost_after, products.cost) as average_cost'),
+                DB::raw('(' . $stockValueExpr . ') as stock_value'),
+                DB::raw('products.name as product_name'),
+                DB::raw('warehouses.name as warehouse_name'),
+                DB::raw('branches.name as branch_name'),
+                DB::raw('product_categories.name as category_name'),
+            ])
+            ->withCasts([
+                'quantity_on_hand' => 'decimal:2',
+                'average_cost' => 'decimal:2',
+                'stock_value' => 'decimal:2',
+            ]);
+    }
+
+    /**
+     * @return Builder<StockMovement>
+     */
     protected function latestStockMovementIdsQuery(): Builder
     {
         return $this->stockMovementModelClass()::query()
@@ -110,8 +146,28 @@ trait InteractsWithStockSnapshotQuery
         $query->orderBy('stock_movements.' . $sortBy, $sortDirection);
     }
 
+    /**
+     * @return class-string<StockMovement>
+     */
     protected function stockMovementModelClass(): string
     {
-        return \App\Models\StockMovement::class;
+        return StockMovement::class;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function stockSnapshotRelations(bool $includeProductUnit): array
+    {
+        $relations = [
+            'product.category',
+            'warehouse.branch',
+        ];
+
+        if ($includeProductUnit) {
+            $relations[] = 'product.unit';
+        }
+
+        return $relations;
     }
 }
