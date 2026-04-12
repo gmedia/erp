@@ -2,15 +2,15 @@
 
 namespace App\Actions\SupplierReturns;
 
-use App\Actions\Concerns\InteractsWithIndexRequest;
+use App\Actions\Concerns\ExecutesConfiguredMappedIndexRequest;
+use App\Actions\Concerns\TransactionMappedIndexConfigurations;
 use App\Domain\SupplierReturns\SupplierReturnFilterService;
 use App\Http\Requests\SupplierReturns\IndexSupplierReturnRequest;
-use App\Models\SupplierReturn;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IndexSupplierReturnsAction
 {
-    use InteractsWithIndexRequest;
+    use ExecutesConfiguredMappedIndexRequest;
 
     public function __construct(
         private SupplierReturnFilterService $filterService
@@ -18,45 +18,10 @@ class IndexSupplierReturnsAction
 
     public function execute(IndexSupplierReturnRequest $request): LengthAwarePaginator
     {
-        $query = SupplierReturn::query()->with([
-            'purchaseOrder',
-            'goodsReceipt',
-            'supplier',
-            'warehouse',
-            'creator',
-            'items.product',
-            'items.unit',
-        ]);
-
-        return $this->handleMappedIndexRequest($request, $query, $this->filterService, [
-            'return_number',
-            'notes',
-        ], [
-            'purchase_order_id',
-            'goods_receipt_id',
-            'supplier_id',
-            'warehouse_id',
-            'reason',
-            'status',
-            'return_date_from',
-            'return_date_to',
-        ], 'created_at', [
-            'id',
-            'return_number',
-            'purchase_order_id',
-            'goods_receipt_id',
-            'supplier_id',
-            'warehouse_id',
-            'return_date',
-            'reason',
-            'status',
-            'created_at',
-            'updated_at',
-        ], [
-            'purchase_order' => 'purchase_order_id',
-            'goods_receipt' => 'goods_receipt_id',
-            'supplier' => 'supplier_id',
-            'warehouse' => 'warehouse_id',
-        ]);
+        return $this->executeConfiguredMappedIndexRequest(
+            $request,
+            $this->filterService,
+            TransactionMappedIndexConfigurations::for('supplier_returns'),
+        );
     }
 }
