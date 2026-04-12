@@ -1,15 +1,11 @@
 'use client';
 
-import { DataTable } from '@/components/common/DataTableCore';
 import type { FieldDescriptor } from '@/components/common/filters';
+import { ReportDataTablePage } from '@/components/common/ReportDataTablePage';
 import type { FilterState } from '@/hooks/useCrudFilters';
-import { useCrudFilters } from '@/hooks/useCrudFilters';
-import { useCrudQuery } from '@/hooks/useCrudQuery';
-import AppLayout from '@/layouts/app-layout';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 
 type BreadcrumbItem = {
     title: string;
@@ -60,70 +56,23 @@ export function AuditTrailPage<
 
     const columns = buildColumns({ onViewDetail: handleViewDetail });
 
-    const {
-        filters,
-        pagination,
-        handleFilterChange,
-        handleSearchChange,
-        handlePageChange,
-        handlePageSizeChange,
-        resetFilters,
-    } = useCrudFilters<TFilters>({
-        initialFilters,
-    });
-
-    const { data, isLoading, meta } = useCrudQuery<TItem>({
-        endpoint,
-        queryKey,
-        entityName,
-        pagination,
-        filters,
-    });
-
     return (
-        <>
-            <Helmet>
-                <title>{title}</title>
-            </Helmet>
-            <AppLayout breadcrumbs={breadcrumbs}>
-                <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                    <div className="rounded-lg bg-white">
-                        <DataTable
-                            columns={columns}
-                            data={data}
-                            pagination={{
-                                page: meta.current_page,
-                                per_page: meta.per_page,
-                                total: meta.total,
-                                last_page: meta.last_page,
-                                from: meta.from ?? 0,
-                                to: meta.to ?? 0,
-                            }}
-                            onPageChange={handlePageChange}
-                            onPageSizeChange={handlePageSizeChange}
-                            onSearchChange={handleSearchChange}
-                            isLoading={isLoading}
-                            filterValue={String(filters.search ?? '')}
-                            filters={filters}
-                            onFilterChange={(newFilters) =>
-                                handleFilterChange(
-                                    newFilters as Partial<TFilters>,
-                                )
-                            }
-                            onResetFilters={resetFilters}
-                            filterFields={filterFields}
-                            exportEndpoint={exportEndpoint}
-                            entityName={entityName}
-                        />
-                    </div>
-                </div>
-
-                {renderDetailModal({
-                    item: selectedItem,
-                    open: isDetailModalOpen,
-                    onOpenChange: setIsDetailModalOpen,
-                })}
-            </AppLayout>
-        </>
+        <ReportDataTablePage<TItem, TFilters>
+            title={title}
+            breadcrumbs={breadcrumbs}
+            columns={columns}
+            filterFields={filterFields}
+            initialFilters={initialFilters}
+            endpoint={endpoint}
+            queryKey={queryKey}
+            entityName={entityName}
+            exportEndpoint={exportEndpoint}
+        >
+            {renderDetailModal({
+                item: selectedItem,
+                open: isDetailModalOpen,
+                onOpenChange: setIsDetailModalOpen,
+            })}
+        </ReportDataTablePage>
     );
 }

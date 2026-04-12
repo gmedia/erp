@@ -26,6 +26,21 @@ const renderRelationCell =
         );
     };
 
+const createAssetRelationColumn = (
+    accessorKey:
+        | 'category'
+        | 'branch'
+        | 'location'
+        | 'department'
+        | 'employee'
+        | 'supplier',
+    label: string,
+): ColumnDef<Asset> => ({
+    accessorKey,
+    ...createSortingHeader(label),
+    cell: renderRelationCell(accessorKey),
+});
+
 const renderStatusCell = ({ row }: { row: { original: Asset } }) => {
     const status = row.original.status;
     const variants: Record<
@@ -61,36 +76,12 @@ export const assetColumns: ColumnDef<Asset>[] = [
             </Link>
         ),
     },
-    {
-        accessorKey: 'category',
-        ...createSortingHeader('Category'),
-        cell: renderRelationCell('category'),
-    },
-    {
-        accessorKey: 'branch',
-        ...createSortingHeader('Branch'),
-        cell: renderRelationCell('branch'),
-    },
-    {
-        accessorKey: 'location',
-        ...createSortingHeader('Location'),
-        cell: renderRelationCell('location'),
-    },
-    {
-        accessorKey: 'department',
-        ...createSortingHeader('Department'),
-        cell: renderRelationCell('department'),
-    },
-    {
-        accessorKey: 'employee',
-        ...createSortingHeader('Employee'),
-        cell: renderRelationCell('employee'),
-    },
-    {
-        accessorKey: 'supplier',
-        ...createSortingHeader('Supplier'),
-        cell: renderRelationCell('supplier'),
-    },
+    createAssetRelationColumn('category', 'Category'),
+    createAssetRelationColumn('branch', 'Branch'),
+    createAssetRelationColumn('location', 'Location'),
+    createAssetRelationColumn('department', 'Department'),
+    createAssetRelationColumn('employee', 'Employee'),
+    createAssetRelationColumn('supplier', 'Supplier'),
     {
         accessorKey: 'status',
         ...createSortingHeader('Status'),
