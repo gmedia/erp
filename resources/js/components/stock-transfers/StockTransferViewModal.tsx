@@ -9,7 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import axios from '@/lib/axios';
+import { useViewModalDetail } from '@/hooks/useViewModalDetail';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
@@ -25,31 +25,13 @@ interface StockTransferViewModalProps {
 export const StockTransferViewModal = React.memo(
     ({ item, open, onClose }: StockTransferViewModalProps) => {
         const { t } = useTranslation();
-        const [detail, setDetail] = React.useState<StockTransfer | null>(null);
+        const current = useViewModalDetail({
+            endpoint: '/api/stock-transfers',
+            open,
+            item,
+        });
 
-        React.useEffect(() => {
-            const load = async () => {
-                if (!open || !item?.id) return;
-                if (item.items && item.items.length > 0) {
-                    setDetail(item);
-                    return;
-                }
-                try {
-                    const response = await axios.get(
-                        `/api/stock-transfers/${item.id}`,
-                    );
-                    const data = response.data?.data ?? response.data;
-                    setDetail(data);
-                } catch {
-                    setDetail(item);
-                }
-            };
-
-            load();
-        }, [open, item]);
-
-        if (!item) return null;
-        const current = detail || item;
+        if (!current) return null;
 
         return (
             <ViewModalShell

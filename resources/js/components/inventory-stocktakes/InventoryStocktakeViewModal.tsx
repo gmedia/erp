@@ -9,7 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import axios from '@/lib/axios';
+import { useViewModalDetail } from '@/hooks/useViewModalDetail';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
@@ -25,33 +25,13 @@ interface InventoryStocktakeViewModalProps {
 export const InventoryStocktakeViewModal = React.memo(
     ({ item, open, onClose }: InventoryStocktakeViewModalProps) => {
         const { t } = useTranslation();
-        const [detail, setDetail] = React.useState<InventoryStocktake | null>(
-            null,
-        );
+        const current = useViewModalDetail({
+            endpoint: '/api/inventory-stocktakes',
+            open,
+            item,
+        });
 
-        React.useEffect(() => {
-            const load = async () => {
-                if (!open || !item?.id) return;
-                if (item.items && item.items.length > 0) {
-                    setDetail(item);
-                    return;
-                }
-                try {
-                    const response = await axios.get(
-                        `/api/inventory-stocktakes/${item.id}`,
-                    );
-                    const data = response.data?.data ?? response.data;
-                    setDetail(data);
-                } catch {
-                    setDetail(item);
-                }
-            };
-
-            load();
-        }, [open, item]);
-
-        if (!item) return null;
-        const current = detail || item;
+        if (!current) return null;
 
         return (
             <ViewModalShell
