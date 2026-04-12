@@ -128,6 +128,28 @@ abstract class ConfiguredPurchaseOrderReportIndexAction
         ];
     }
 
+    protected function joinSupplierAndWarehouseTables(
+        Builder $query,
+        string $supplierIdColumn,
+        string $warehouseIdColumn,
+    ): Builder {
+        return $query
+            ->join('suppliers as s', $supplierIdColumn, '=', 's.id')
+            ->join('warehouses as w', $warehouseIdColumn, '=', 'w.id');
+    }
+
+    protected function joinProductDimensionTables(
+        Builder $query,
+        string $itemTable,
+        string $itemLeftColumn,
+        string $itemRightColumn,
+        string $productIdColumn,
+    ): Builder {
+        return $query
+            ->leftJoin($itemTable, $itemLeftColumn, '=', $itemRightColumn)
+            ->leftJoin('products as p', $productIdColumn, '=', 'p.id');
+    }
+
     /**
      * @return array<int, string>
      */
@@ -155,6 +177,31 @@ abstract class ConfiguredPurchaseOrderReportIndexAction
             'purchase_order_expected_delivery_date' => 'expected_delivery_date',
             'purchase_order_status' => 'status',
         ], $aliases);
+    }
+
+    /**
+     * @param  array<int, string>  $selectColumns
+     * @param  array<int, string>  $metricColumns
+     */
+    protected function compilePurchaseOrderSummarySelect(array $selectColumns, array $metricColumns): string
+    {
+        return $this->compileSelectColumns([
+            ...$selectColumns,
+            ...$this->purchaseOrderPartySelectColumns(),
+            ...$metricColumns,
+        ]);
+    }
+
+    /**
+     * @param  array<int, string>  $groupByColumns
+     * @return array<int, string>
+     */
+    protected function purchaseOrderGroupedColumns(array $groupByColumns): array
+    {
+        return [
+            ...$groupByColumns,
+            ...$this->purchaseOrderPartyGroupByColumns(),
+        ];
     }
 
     /**

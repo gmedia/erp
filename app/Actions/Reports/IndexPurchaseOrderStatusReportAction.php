@@ -11,36 +11,44 @@ class IndexPurchaseOrderStatusReportAction extends ConfiguredPurchaseOrderReport
 {
     protected function buildQuery(): Builder
     {
-        return PurchaseOrder::query()
-            ->from('purchase_orders as po')
-            ->join('suppliers as s', 'po.supplier_id', '=', 's.id')
-            ->join('warehouses as w', 'po.warehouse_id', '=', 'w.id')
-            ->leftJoin('purchase_order_items as poi', 'po.id', '=', 'poi.purchase_order_id')
-            ->leftJoin('products as p', 'poi.product_id', '=', 'p.id')
-            ->selectRaw($this->compileSelectColumns([
-                'po.id',
-                'po.po_number',
-                'po.order_date',
-                'po.expected_delivery_date',
-                'po.status',
-                'po.grand_total',
-                ...$this->purchaseOrderPartySelectColumns(),
-                'COUNT(DISTINCT poi.id) as item_count',
-                'COALESCE(SUM(poi.quantity), 0) as ordered_quantity',
-                'COALESCE(SUM(poi.quantity_received), 0) as received_quantity',
-                'COALESCE(SUM(poi.quantity), 0) - COALESCE(SUM(poi.quantity_received), 0) as outstanding_quantity',
-            ]))
+        $query = PurchaseOrder::query()->from('purchase_orders as po');
+
+        $query = $this->joinSupplierAndWarehouseTables($query, 'po.supplier_id', 'po.warehouse_id');
+        $query = $this->joinProductDimensionTables(
+            $query,
+            'purchase_order_items as poi',
+            'po.id',
+            'poi.purchase_order_id',
+            'poi.product_id',
+        );
+
+        return $query
+            ->selectRaw($this->compilePurchaseOrderSummarySelect(
+                [
+                    'po.id',
+                    'po.po_number',
+                    'po.order_date',
+                    'po.expected_delivery_date',
+                    'po.status',
+                    'po.grand_total',
+                ],
+                [
+                    'COUNT(DISTINCT poi.id) as item_count',
+                    'COALESCE(SUM(poi.quantity), 0) as ordered_quantity',
+                    'COALESCE(SUM(poi.quantity_received), 0) as received_quantity',
+                    'COALESCE(SUM(poi.quantity), 0) - COALESCE(SUM(poi.quantity_received), 0) as outstanding_quantity',
+                ],
+            ))
             ->selectRaw($this->statusCategorySelectSql() . ' as status_category')
             ->selectRaw($this->receiptProgressPercentSelectSql())
-            ->groupBy([
+            ->groupBy($this->purchaseOrderGroupedColumns([
                 'po.id',
                 'po.po_number',
                 'po.order_date',
                 'po.expected_delivery_date',
                 'po.status',
                 'po.grand_total',
-                ...$this->purchaseOrderPartyGroupByColumns(),
-            ])
+            ]))
             ->withCasts($this->purchaseOrderQuantityCasts([
                 'grand_total' => 'decimal:2',
                 'receipt_progress_percent' => 'decimal:2',

@@ -10,36 +10,45 @@ class IndexGoodsReceiptReportAction extends ConfiguredPurchaseOrderReportIndexAc
 {
     protected function buildQuery(): Builder
     {
-        return GoodsReceipt::query()
+        $query = GoodsReceipt::query()
             ->from('goods_receipts as gr')
-            ->join('purchase_orders as po', 'gr.purchase_order_id', '=', 'po.id')
-            ->join('suppliers as s', 'po.supplier_id', '=', 's.id')
-            ->join('warehouses as w', 'gr.warehouse_id', '=', 'w.id')
-            ->leftJoin('goods_receipt_items as gri', 'gr.id', '=', 'gri.goods_receipt_id')
-            ->leftJoin('products as p', 'gri.product_id', '=', 'p.id')
-            ->selectRaw($this->compileSelectColumns([
-                'gr.id as goods_receipt_id',
-                'gr.gr_number',
-                'gr.receipt_date',
-                'gr.status',
-                'po.id as purchase_order_id',
-                'po.po_number',
-                ...$this->purchaseOrderPartySelectColumns(),
-                'COUNT(DISTINCT gri.id) as item_count',
-                'COALESCE(SUM(gri.quantity_received), 0) as total_received_quantity',
-                'COALESCE(SUM(gri.quantity_accepted), 0) as total_accepted_quantity',
-                'COALESCE(SUM(gri.quantity_rejected), 0) as total_rejected_quantity',
-                'COALESCE(SUM(gri.quantity_received * gri.unit_price), 0) as total_receipt_value',
-            ]))
-            ->groupBy([
+            ->join('purchase_orders as po', 'gr.purchase_order_id', '=', 'po.id');
+
+        $query = $this->joinSupplierAndWarehouseTables($query, 'po.supplier_id', 'gr.warehouse_id');
+        $query = $this->joinProductDimensionTables(
+            $query,
+            'goods_receipt_items as gri',
+            'gr.id',
+            'gri.goods_receipt_id',
+            'gri.product_id',
+        );
+
+        return $query
+            ->selectRaw($this->compilePurchaseOrderSummarySelect(
+                [
+                    'gr.id as goods_receipt_id',
+                    'gr.gr_number',
+                    'gr.receipt_date',
+                    'gr.status',
+                    'po.id as purchase_order_id',
+                    'po.po_number',
+                ],
+                [
+                    'COUNT(DISTINCT gri.id) as item_count',
+                    'COALESCE(SUM(gri.quantity_received), 0) as total_received_quantity',
+                    'COALESCE(SUM(gri.quantity_accepted), 0) as total_accepted_quantity',
+                    'COALESCE(SUM(gri.quantity_rejected), 0) as total_rejected_quantity',
+                    'COALESCE(SUM(gri.quantity_received * gri.unit_price), 0) as total_receipt_value',
+                ],
+            ))
+            ->groupBy($this->purchaseOrderGroupedColumns([
                 'gr.id',
                 'gr.gr_number',
                 'gr.receipt_date',
                 'gr.status',
                 'po.id',
                 'po.po_number',
-                ...$this->purchaseOrderPartyGroupByColumns(),
-            ])
+            ]))
             ->withCasts([
                 'receipt_date' => 'date',
                 'item_count' => 'integer',
