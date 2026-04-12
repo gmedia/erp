@@ -8,10 +8,9 @@ import { z } from 'zod';
 import { InputField } from '@/components/common/InputField';
 import {
     ItemFormDialogShell,
-    ItemProductSelectField,
-    ItemUnitSelectField,
+    ItemNotesField,
+    ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
-import { TextareaField } from '@/components/common/TextareaField';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type InventoryStocktakeFormData } from '@/utils/schemas';
 
@@ -100,27 +99,13 @@ export function InventoryStocktakeItemFormDialog({
             itemDescription="inventory stocktake item"
         >
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <ItemProductSelectField
+                <ItemProductUnitFields
                     form={form}
                     open={open}
-                    name="product_id"
-                    labelName="product_label"
-                    label="Product"
-                    url="/api/products"
-                    placeholder="Select product"
-                    initialId={defaultValues.product_id}
-                    initialLabel={defaultValues.product_label}
-                />
-                <ItemUnitSelectField
-                    form={form}
-                    open={open}
-                    name="unit_id"
-                    labelName="unit_label"
-                    label="Unit"
-                    url="/api/units"
-                    placeholder="Select unit"
-                    initialId={defaultValues.unit_id}
-                    initialLabel={defaultValues.unit_label}
+                    productInitialId={defaultValues.product_id}
+                    productInitialLabel={defaultValues.product_label}
+                    unitInitialId={defaultValues.unit_id}
+                    unitInitialLabel={defaultValues.unit_label}
                 />
                 <InputField
                     name="system_quantity"
@@ -140,12 +125,7 @@ export function InventoryStocktakeItemFormDialog({
                 />
             </div>
 
-            <TextareaField
-                name="notes"
-                label="Notes"
-                placeholder="Item notes"
-                rows={3}
-            />
+            <ItemNotesField />
         </ItemFormDialogShell>
     );
 }

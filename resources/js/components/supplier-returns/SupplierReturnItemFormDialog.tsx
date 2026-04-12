@@ -8,10 +8,9 @@ import { z } from 'zod';
 import { InputField } from '@/components/common/InputField';
 import {
     ItemFormDialogShell,
-    ItemProductSelectField,
-    ItemUnitSelectField,
+    ItemNotesField,
+    ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
-import { TextareaField } from '@/components/common/TextareaField';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type SupplierReturnFormData } from '@/types/supplier-return';
 
@@ -106,27 +105,13 @@ export function SupplierReturnItemFormDialog({
                     step="1"
                     placeholder="1"
                 />
-                <ItemProductSelectField
+                <ItemProductUnitFields
                     form={form}
                     open={open}
-                    name="product_id"
-                    labelName="product_label"
-                    label="Product"
-                    url="/api/products"
-                    placeholder="Select product"
-                    initialId={defaultValues.product_id}
-                    initialLabel={defaultValues.product_label}
-                />
-                <ItemUnitSelectField
-                    form={form}
-                    open={open}
-                    name="unit_id"
-                    labelName="unit_label"
-                    label="Unit"
-                    url="/api/units"
-                    placeholder="Select unit"
-                    initialId={defaultValues.unit_id}
-                    initialLabel={defaultValues.unit_label}
+                    productInitialId={defaultValues.product_id}
+                    productInitialLabel={defaultValues.product_label}
+                    unitInitialId={defaultValues.unit_id}
+                    unitInitialLabel={defaultValues.unit_label}
                 />
                 <InputField
                     name="quantity_returned"
@@ -146,12 +131,7 @@ export function SupplierReturnItemFormDialog({
                 />
             </div>
 
-            <TextareaField
-                name="notes"
-                label="Notes"
-                placeholder="Item notes"
-                rows={3}
-            />
+            <ItemNotesField />
         </ItemFormDialogShell>
     );
 }

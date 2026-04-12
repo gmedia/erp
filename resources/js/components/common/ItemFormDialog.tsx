@@ -9,6 +9,7 @@ import {
 } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
+import { TextareaField } from '@/components/common/TextareaField';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -40,6 +41,22 @@ interface ItemEntitySelectFieldProps<TFormValues extends FieldValues> {
     readonly placeholder: string;
     readonly initialId?: string;
     readonly initialLabel?: string;
+}
+
+interface ItemProductUnitFieldsProps<TFormValues extends FieldValues> {
+    readonly form: UseFormReturn<TFormValues>;
+    readonly open: boolean;
+    readonly productInitialId?: string;
+    readonly productInitialLabel?: string;
+    readonly unitInitialId?: string;
+    readonly unitInitialLabel?: string;
+}
+
+interface ItemNotesFieldProps {
+    readonly name?: string;
+    readonly label?: string;
+    readonly placeholder?: string;
+    readonly rows?: number;
 }
 
 function buildAsyncFieldKey(
@@ -139,4 +156,56 @@ export function ItemUnitSelectField<TFormValues extends FieldValues>(
     props: Readonly<ItemEntitySelectFieldProps<TFormValues>>,
 ) {
     return <ItemProductSelectField {...props} />;
+}
+
+export function ItemProductUnitFields<TFormValues extends FieldValues>({
+    form,
+    open,
+    productInitialId,
+    productInitialLabel,
+    unitInitialId,
+    unitInitialLabel,
+}: Readonly<ItemProductUnitFieldsProps<TFormValues>>) {
+    return (
+        <>
+            <ItemProductSelectField
+                form={form}
+                open={open}
+                name={'product_id' as Path<TFormValues>}
+                labelName={'product_label' as Path<TFormValues>}
+                label="Product"
+                url="/api/products"
+                placeholder="Select product"
+                initialId={productInitialId}
+                initialLabel={productInitialLabel}
+            />
+            <ItemUnitSelectField
+                form={form}
+                open={open}
+                name={'unit_id' as Path<TFormValues>}
+                labelName={'unit_label' as Path<TFormValues>}
+                label="Unit"
+                url="/api/units"
+                placeholder="Select unit"
+                initialId={unitInitialId}
+                initialLabel={unitInitialLabel}
+            />
+        </>
+    );
+}
+
+export function ItemNotesField({
+    name = 'notes',
+    label = 'Notes',
+    placeholder = 'Item notes',
+    rows = 3,
+}: Readonly<ItemNotesFieldProps>) {
+    return (
+        <TextareaField
+            name={name}
+            label={label}
+            placeholder={placeholder}
+            rows={rows}
+        />
+    );
 }
