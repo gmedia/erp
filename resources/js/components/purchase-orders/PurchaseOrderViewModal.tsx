@@ -1,4 +1,8 @@
 import { ViewField } from '@/components/common/ViewField';
+import {
+    ViewModalItemsTable,
+    type ViewModalItemsTableColumn,
+} from '@/components/common/ViewModalItemsTable';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
@@ -8,7 +12,7 @@ import {
 } from '@/utils/number-format';
 import React from 'react';
 
-import { PurchaseOrder } from '@/types/purchase-order';
+import { PurchaseOrder, type PurchaseOrderItem } from '@/types/purchase-order';
 
 interface PurchaseOrderViewModalProps {
     open: boolean;
@@ -17,6 +21,67 @@ interface PurchaseOrderViewModalProps {
 }
 
 type FormatValueInput = string | number | null | undefined;
+
+const formatQuantity = (value: FormatValueInput) =>
+    formatNumberByRegionalSettings(value ?? 0, {
+        locale: 'id-ID',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    });
+
+const formatPercent = (value: FormatValueInput) =>
+    `${formatNumberByRegionalSettings(value ?? 0, {
+        locale: 'id-ID',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    })}%`;
+
+function createPurchaseOrderItemColumns(
+    formatAmount: (value: FormatValueInput) => string,
+): ViewModalItemsTableColumn<PurchaseOrderItem>[] {
+    return [
+        {
+            key: 'product',
+            header: 'Product',
+            render: (item) => item.product?.name || '-',
+        },
+        {
+            key: 'unit',
+            header: 'Unit',
+            render: (item) => item.unit?.name || '-',
+        },
+        {
+            key: 'quantity',
+            header: 'Qty',
+            align: 'right',
+            render: (item) => formatQuantity(item.quantity),
+        },
+        {
+            key: 'unit_price',
+            header: 'Unit Price',
+            align: 'right',
+            render: (item) => formatAmount(item.unit_price),
+        },
+        {
+            key: 'discount_percent',
+            header: 'Disc %',
+            align: 'right',
+            render: (item) => formatPercent(item.discount_percent),
+        },
+        {
+            key: 'tax_percent',
+            header: 'Tax %',
+            align: 'right',
+            render: (item) => formatPercent(item.tax_percent),
+        },
+        {
+            key: 'line_total',
+            header: 'Line Total',
+            align: 'right',
+            render: (item) => formatAmount(item.line_total),
+        },
+    ];
+}
 
 export const PurchaseOrderViewModal = React.memo(
     ({ item, open, onClose }: PurchaseOrderViewModalProps) => {
@@ -30,19 +95,7 @@ export const PurchaseOrderViewModal = React.memo(
                 maximumFractionDigits: 2,
             });
 
-        const formatQuantity = (value: FormatValueInput) =>
-            formatNumberByRegionalSettings(value ?? 0, {
-                locale: 'id-ID',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2,
-            });
-
-        const formatPercent = (value: FormatValueInput) =>
-            `${formatNumberByRegionalSettings(value ?? 0, {
-                locale: 'id-ID',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2,
-            })}%`;
+        const itemColumns = createPurchaseOrderItemColumns(formatAmount);
 
         return (
             <ViewModalShell
@@ -118,78 +171,12 @@ export const PurchaseOrderViewModal = React.memo(
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <h4 className="text-sm font-semibold">Items</h4>
-                            <div className="overflow-x-auto rounded-md border">
-                                <table className="min-w-[860px] text-sm">
-                                    <thead>
-                                        <tr className="border-b">
-                                            <th className="p-2 text-left">
-                                                Product
-                                            </th>
-                                            <th className="p-2 text-left">
-                                                Unit
-                                            </th>
-                                            <th className="p-2 text-right">
-                                                Qty
-                                            </th>
-                                            <th className="p-2 text-right">
-                                                Unit Price
-                                            </th>
-                                            <th className="p-2 text-right">
-                                                Disc %
-                                            </th>
-                                            <th className="p-2 text-right">
-                                                Tax %
-                                            </th>
-                                            <th className="p-2 text-right">
-                                                Line Total
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {(item.items || []).map((it) => (
-                                            <tr
-                                                key={it.id}
-                                                className="border-b last:border-b-0"
-                                            >
-                                                <td className="p-2">
-                                                    {it.product?.name || '-'}
-                                                </td>
-                                                <td className="p-2">
-                                                    {it.unit?.name || '-'}
-                                                </td>
-                                                <td className="p-2 text-right">
-                                                    {formatQuantity(
-                                                        it.quantity,
-                                                    )}
-                                                </td>
-                                                <td className="p-2 text-right">
-                                                    {formatAmount(
-                                                        it.unit_price,
-                                                    )}
-                                                </td>
-                                                <td className="p-2 text-right">
-                                                    {formatPercent(
-                                                        it.discount_percent,
-                                                    )}
-                                                </td>
-                                                <td className="p-2 text-right">
-                                                    {formatPercent(
-                                                        it.tax_percent,
-                                                    )}
-                                                </td>
-                                                <td className="p-2 text-right">
-                                                    {formatAmount(
-                                                        it.line_total,
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <ViewModalItemsTable
+                            items={item.items}
+                            columns={itemColumns}
+                            minWidthClassName="min-w-[860px]"
+                            getRowKey={(row) => row.id}
+                        />
                     </div>
                 </div>
             </ViewModalShell>

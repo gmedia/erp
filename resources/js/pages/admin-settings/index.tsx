@@ -156,15 +156,8 @@ function GeneralSettings({
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
         } catch (error: unknown) {
-            if (axios.isAxiosError(error) && error.response?.status === 422) {
-                const newErrors: Record<string, string> = {};
-                const serverErrors = error.response.data.errors as Record<
-                    string,
-                    string[]
-                >;
-                Object.keys(serverErrors).forEach((key) => {
-                    newErrors[key] = serverErrors[key][0];
-                });
+            const newErrors = mapValidationErrors(error);
+            if (Object.keys(newErrors).length > 0) {
                 setErrors(newErrors);
             }
         } finally {
@@ -357,15 +350,8 @@ function RegionalSettings({
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
         } catch (error: unknown) {
-            if (axios.isAxiosError(error) && error.response?.status === 422) {
-                const newErrors: Record<string, string> = {};
-                const serverErrors = error.response.data.errors as Record<
-                    string,
-                    string[]
-                >;
-                Object.keys(serverErrors).forEach((key) => {
-                    newErrors[key] = serverErrors[key][0];
-                });
+            const newErrors = mapValidationErrors(error);
+            if (Object.keys(newErrors).length > 0) {
                 setErrors(newErrors);
             }
         } finally {
@@ -573,14 +559,7 @@ function SmtpSettings({
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 422) {
-                    const newErrors: Record<string, string> = {};
-                    const serverErrors = error.response.data.errors as Record<
-                        string,
-                        string[]
-                    >;
-                    Object.keys(serverErrors).forEach((key) => {
-                        newErrors[key] = serverErrors[key][0];
-                    });
+                    const newErrors = mapValidationErrors(error);
                     setTestErrors(newErrors);
                 } else if (error.response?.data?.message) {
                     setTestErrors({ test_email: error.response.data.message });

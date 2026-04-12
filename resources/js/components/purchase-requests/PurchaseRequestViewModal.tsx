@@ -1,4 +1,8 @@
 import { ViewField } from '@/components/common/ViewField';
+import {
+    ViewModalItemsTable,
+    type ViewModalItemsTableColumn,
+} from '@/components/common/ViewModalItemsTable';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
@@ -8,7 +12,10 @@ import {
 } from '@/utils/number-format';
 import React from 'react';
 
-import { PurchaseRequest } from '@/types/purchase-request';
+import {
+    PurchaseRequest,
+    type PurchaseRequestItem,
+} from '@/types/purchase-request';
 
 interface PurchaseRequestViewModalProps {
     open: boolean;
@@ -29,6 +36,38 @@ const formatQuantity = (value: string | number | null | undefined): string =>
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     });
+
+const purchaseRequestItemColumns: ViewModalItemsTableColumn<PurchaseRequestItem>[] =
+    [
+        {
+            key: 'product',
+            header: 'Product',
+            render: (item) => item.product?.name || '-',
+        },
+        {
+            key: 'unit',
+            header: 'Unit',
+            render: (item) => item.unit?.name || '-',
+        },
+        {
+            key: 'quantity',
+            header: 'Quantity',
+            align: 'right',
+            render: (item) => formatQuantity(item.quantity),
+        },
+        {
+            key: 'estimated_unit_price',
+            header: 'Est. Unit Price',
+            align: 'right',
+            render: (item) => formatAmount(item.estimated_unit_price),
+        },
+        {
+            key: 'estimated_total',
+            header: 'Est. Total',
+            align: 'right',
+            render: (item) => formatAmount(item.estimated_total),
+        },
+    ];
 
 export const PurchaseRequestViewModal = React.memo(
     ({ item, open, onClose }: PurchaseRequestViewModalProps) => {
@@ -95,62 +134,12 @@ export const PurchaseRequestViewModal = React.memo(
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <h4 className="text-sm font-semibold">Items</h4>
-                            <div className="overflow-x-auto rounded-md border">
-                                <table className="min-w-[720px] text-sm">
-                                    <thead>
-                                        <tr className="border-b">
-                                            <th className="p-2 text-left">
-                                                Product
-                                            </th>
-                                            <th className="p-2 text-left">
-                                                Unit
-                                            </th>
-                                            <th className="p-2 text-right">
-                                                Quantity
-                                            </th>
-                                            <th className="p-2 text-right">
-                                                Est. Unit Price
-                                            </th>
-                                            <th className="p-2 text-right">
-                                                Est. Total
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {(item.items || []).map((it) => (
-                                            <tr
-                                                key={it.id}
-                                                className="border-b last:border-b-0"
-                                            >
-                                                <td className="p-2">
-                                                    {it.product?.name || '-'}
-                                                </td>
-                                                <td className="p-2">
-                                                    {it.unit?.name || '-'}
-                                                </td>
-                                                <td className="p-2 text-right">
-                                                    {formatQuantity(
-                                                        it.quantity,
-                                                    )}
-                                                </td>
-                                                <td className="p-2 text-right">
-                                                    {formatAmount(
-                                                        it.estimated_unit_price,
-                                                    )}
-                                                </td>
-                                                <td className="p-2 text-right">
-                                                    {formatAmount(
-                                                        it.estimated_total,
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <ViewModalItemsTable
+                            items={item.items}
+                            columns={purchaseRequestItemColumns}
+                            minWidthClassName="min-w-[720px]"
+                            getRowKey={(row) => row.id}
+                        />
                     </div>
                 </div>
             </ViewModalShell>
