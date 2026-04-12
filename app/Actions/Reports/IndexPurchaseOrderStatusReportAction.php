@@ -41,49 +41,11 @@ class IndexPurchaseOrderStatusReportAction extends ConfiguredPurchaseOrderReport
                 'po.grand_total',
                 ...$this->purchaseOrderPartyGroupByColumns(),
             ])
-            ->withCasts([
-                'order_date' => 'date',
-                'expected_delivery_date' => 'date',
+            ->withCasts($this->purchaseOrderQuantityCasts([
                 'grand_total' => 'decimal:2',
-                'ordered_quantity' => 'decimal:2',
-                'received_quantity' => 'decimal:2',
-                'outstanding_quantity' => 'decimal:2',
                 'receipt_progress_percent' => 'decimal:2',
                 'item_count' => 'integer',
-            ]);
-    }
-
-    protected function warehouseColumn(): string
-    {
-        return 'po.warehouse_id';
-    }
-
-    protected function productColumn(): string
-    {
-        return 'poi.product_id';
-    }
-
-    protected function statusColumn(): string
-    {
-        return 'po.status';
-    }
-
-    protected function dateColumn(): string
-    {
-        return 'po.order_date';
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    protected function searchColumns(): array
-    {
-        return $this->basePurchaseOrderReportSearchColumns();
-    }
-
-    protected function defaultSortBy(): string
-    {
-        return 'order_date';
+            ]));
     }
 
     /**
@@ -91,12 +53,9 @@ class IndexPurchaseOrderStatusReportAction extends ConfiguredPurchaseOrderReport
      */
     protected function sortAliases(): array
     {
-        return [
-            'purchase_order_po_number' => 'po_number',
-            'purchase_order_expected_delivery_date' => 'expected_delivery_date',
-            'purchase_order_status' => 'status',
+        return $this->purchaseOrderSortAliasMap([
             'purchase_order_status_category' => 'status_category',
-        ];
+        ]);
     }
 
     /**
@@ -104,15 +63,9 @@ class IndexPurchaseOrderStatusReportAction extends ConfiguredPurchaseOrderReport
      */
     protected function plainSortableColumns(): array
     {
-        return [
-            'po_number',
-            'supplier_name',
-            'warehouse_name',
-            'order_date',
-            'expected_delivery_date',
-            'status',
+        return $this->purchaseOrderPlainSortableColumns([
             'status_category',
-        ];
+        ]);
     }
 
     /**
@@ -120,13 +73,10 @@ class IndexPurchaseOrderStatusReportAction extends ConfiguredPurchaseOrderReport
      */
     protected function aggregateSortableColumns(): array
     {
-        return [
-            'ordered_quantity',
-            'received_quantity',
-            'outstanding_quantity',
+        return $this->purchaseOrderAggregateSortableColumns([
             'receipt_progress_percent',
             'grand_total',
-        ];
+        ]);
     }
 
     protected function applyAdditionalFilters(FormRequest $request, Builder $query): void

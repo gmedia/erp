@@ -53,49 +53,11 @@ class IndexPurchaseHistoryReportAction extends ConfiguredPurchaseOrderReportInde
                 'poi.quantity',
                 'poi.line_total',
             ])
-            ->withCasts([
-                'order_date' => 'date',
-                'expected_delivery_date' => 'date',
-                'ordered_quantity' => 'decimal:2',
-                'received_quantity' => 'decimal:2',
-                'outstanding_quantity' => 'decimal:2',
+            ->withCasts($this->purchaseOrderQuantityCasts([
                 'total_purchase_value' => 'decimal:2',
                 'receipt_count' => 'integer',
                 'last_receipt_date' => 'date',
-            ]);
-    }
-
-    protected function warehouseColumn(): string
-    {
-        return 'po.warehouse_id';
-    }
-
-    protected function productColumn(): string
-    {
-        return 'poi.product_id';
-    }
-
-    protected function statusColumn(): string
-    {
-        return 'po.status';
-    }
-
-    protected function dateColumn(): string
-    {
-        return 'po.order_date';
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    protected function searchColumns(): array
-    {
-        return $this->basePurchaseOrderReportSearchColumns();
-    }
-
-    protected function defaultSortBy(): string
-    {
-        return 'order_date';
+            ]));
     }
 
     /**
@@ -103,13 +65,9 @@ class IndexPurchaseHistoryReportAction extends ConfiguredPurchaseOrderReportInde
      */
     protected function sortAliases(): array
     {
-        return [
-            'purchase_order_po_number' => 'po_number',
-            'purchase_order_order_date' => 'order_date',
-            'purchase_order_expected_delivery_date' => 'expected_delivery_date',
-            'purchase_order_status' => 'status',
+        return $this->purchaseOrderSortAliasMap([
             'goods_receipt_last_receipt_date' => 'last_receipt_date',
-        ];
+        ]);
     }
 
     /**
@@ -117,17 +75,11 @@ class IndexPurchaseHistoryReportAction extends ConfiguredPurchaseOrderReportInde
      */
     protected function plainSortableColumns(): array
     {
-        return [
-            'po_number',
-            'supplier_name',
+        return $this->purchaseOrderPlainSortableColumns([
             'product_name',
             'product_code',
-            'warehouse_name',
-            'order_date',
-            'expected_delivery_date',
-            'status',
             'last_receipt_date',
-        ];
+        ]);
     }
 
     /**
@@ -135,13 +87,10 @@ class IndexPurchaseHistoryReportAction extends ConfiguredPurchaseOrderReportInde
      */
     protected function aggregateSortableColumns(): array
     {
-        return [
-            'ordered_quantity',
-            'received_quantity',
-            'outstanding_quantity',
+        return $this->purchaseOrderAggregateSortableColumns([
             'receipt_count',
             'total_purchase_value',
-        ];
+        ]);
     }
 
     private function receivedQuantitySelectSql(): string

@@ -42,20 +42,38 @@ abstract class ConfiguredPurchaseOrderReportIndexAction
 
     abstract protected function buildQuery(): Builder;
 
-    abstract protected function warehouseColumn(): string;
+    protected function warehouseColumn(): string
+    {
+        return 'po.warehouse_id';
+    }
 
-    abstract protected function productColumn(): string;
+    protected function productColumn(): string
+    {
+        return 'poi.product_id';
+    }
 
-    abstract protected function statusColumn(): string;
+    protected function statusColumn(): string
+    {
+        return 'po.status';
+    }
 
-    abstract protected function dateColumn(): string;
+    protected function dateColumn(): string
+    {
+        return 'po.order_date';
+    }
 
     /**
      * @return array<int, string>
      */
-    abstract protected function searchColumns(): array;
+    protected function searchColumns(): array
+    {
+        return $this->basePurchaseOrderReportSearchColumns();
+    }
 
-    abstract protected function defaultSortBy(): string;
+    protected function defaultSortBy(): string
+    {
+        return 'order_date';
+    }
 
     /**
      * @return array<string, string>
@@ -123,6 +141,64 @@ abstract class ConfiguredPurchaseOrderReportIndexAction
             'p.name',
             'p.code',
         ];
+    }
+
+    /**
+     * @param  array<string, string>  $aliases
+     * @return array<string, string>
+     */
+    protected function purchaseOrderSortAliasMap(array $aliases = []): array
+    {
+        return array_merge([
+            'purchase_order_po_number' => 'po_number',
+            'purchase_order_order_date' => 'order_date',
+            'purchase_order_expected_delivery_date' => 'expected_delivery_date',
+            'purchase_order_status' => 'status',
+        ], $aliases);
+    }
+
+    /**
+     * @param  array<int, string>  $extraColumns
+     * @return array<int, string>
+     */
+    protected function purchaseOrderPlainSortableColumns(array $extraColumns = []): array
+    {
+        return array_merge([
+            'po_number',
+            'supplier_name',
+            'warehouse_name',
+            'order_date',
+            'expected_delivery_date',
+            'status',
+        ], $extraColumns);
+    }
+
+    /**
+     * @param  array<int, string>  $extraColumns
+     * @return array<int, string>
+     */
+    protected function purchaseOrderAggregateSortableColumns(array $extraColumns = []): array
+    {
+        return array_merge([
+            'ordered_quantity',
+            'received_quantity',
+            'outstanding_quantity',
+        ], $extraColumns);
+    }
+
+    /**
+     * @param  array<string, string>  $extraCasts
+     * @return array<string, string>
+     */
+    protected function purchaseOrderQuantityCasts(array $extraCasts = []): array
+    {
+        return array_merge([
+            'order_date' => 'date',
+            'expected_delivery_date' => 'date',
+            'ordered_quantity' => 'decimal:2',
+            'received_quantity' => 'decimal:2',
+            'outstanding_quantity' => 'decimal:2',
+        ], $extraCasts);
     }
 
     /**
