@@ -16,18 +16,9 @@ class FinancialReportService
      */
     public function getTrialBalance(int $fiscalYearId): array
     {
-        $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
-        // Assuming there is an active COA version for this fiscal year,
-        // OR we just get all accounts that have transactions in this FY.
-        // Based on design doc, accounts are linked to coa_version,
-        // which is linked to fiscal_year via coa_versions table.
-        // However, a simpler approach for now is to find the active COA version for this fiscal year.
-
-        $coaVersion = $this->resolveCoaVersionForFiscalYear($fiscalYear);
+        $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
         if (! $coaVersion) {
-            // Fallback: try to find any version or handle error
-            // For now, let's assume one exists or return empty
             return [];
         }
 
@@ -49,8 +40,7 @@ class FinancialReportService
 
     public function getCashFlow(int $fiscalYearId): array
     {
-        $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
-        $coaVersion = $this->resolveCoaVersionForFiscalYear($fiscalYear);
+        $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
         if (! $coaVersion) {
             return [];
@@ -76,8 +66,7 @@ class FinancialReportService
      */
     public function getBalanceSheet(int $fiscalYearId, ?int $comparisonFiscalYearId = null): array
     {
-        $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
-        $coaVersion = $this->resolveCoaVersionForFiscalYear($fiscalYear);
+        $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
         if (! $coaVersion) {
             return [];
@@ -147,8 +136,7 @@ class FinancialReportService
 
     public function getIncomeStatement(int $fiscalYearId, ?int $comparisonFiscalYearId = null): array
     {
-        $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
-        $coaVersion = $this->resolveCoaVersionForFiscalYear($fiscalYear);
+        $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
         if (! $coaVersion) {
             return [];
@@ -189,8 +177,7 @@ class FinancialReportService
 
     public function getComparativeReport(int $fiscalYearId, ?int $comparisonFiscalYearId = null): array
     {
-        $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
-        $coaVersion = $this->resolveCoaVersionForFiscalYear($fiscalYear);
+        $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
         if (! $coaVersion) {
             return [
@@ -262,6 +249,13 @@ class FinancialReportService
         }
 
         return $revenue - $expense;
+    }
+
+    private function resolveRequiredCoaVersion(int $fiscalYearId): ?CoaVersion
+    {
+        $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
+
+        return $this->resolveCoaVersionForFiscalYear($fiscalYear);
     }
 
     private function resolveCoaVersionForFiscalYear(FiscalYear $fiscalYear): ?CoaVersion
