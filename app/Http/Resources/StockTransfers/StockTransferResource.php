@@ -2,7 +2,10 @@
 
 namespace App\Http\Resources\StockTransfers;
 
+use App\Http\Resources\Concerns\BuildsProductUnitItemResourceData;
 use App\Models\StockTransfer;
+use App\Models\StockTransferItem;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -13,8 +16,24 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class StockTransferResource extends JsonResource
 {
+    use BuildsProductUnitItemResourceData;
+
     public function toArray($request): array
     {
+        $items = [];
+
+        if ($this->resource->relationLoaded('items')) {
+            /** @var EloquentCollection<int, StockTransferItem> $stockTransferItems */
+            $stockTransferItems = $this->resource->items;
+
+            $items = $this->productUnitItemsResourceData($stockTransferItems, fn ($item) => [
+                'quantity' => (string) $item->quantity,
+                'quantity_received' => (string) $item->quantity_received,
+                'unit_cost' => (string) $item->unit_cost,
+                'notes' => $item->notes,
+            ]);
+        }
+
         return [
             'id' => $this->resource->id,
             'transfer_number' => $this->resource->transfer_number,
@@ -53,25 +72,7 @@ class StockTransferResource extends JsonResource
                 'id' => $this->resource->createdBy->id,
                 'name' => $this->resource->createdBy->name,
             ] : null,
-            'items' => $this->resource->relationLoaded('items')
-                ? $this->resource->items->map(fn ($item) => [
-                    'id' => $item->id,
-                    'product' => [
-                        'id' => $item->product_id,
-                        'name' => $item->product?->name,
-                    ],
-                    'unit' => [
-                        'id' => $item->unit_id,
-                        'name' => $item->unit?->name,
-                    ],
-                    'quantity' => (string) $item->quantity,
-                    'quantity_received' => (string) $item->quantity_received,
-                    'unit_cost' => (string) $item->unit_cost,
-                    'notes' => $item->notes,
-                    'created_at' => $item->created_at?->toIso8601String(),
-                    'updated_at' => $item->updated_at?->toIso8601String(),
-                ])->values()
-                : [],
+            'items' => $items,
             'created_at' => $this->resource->created_at?->toIso8601String(),
             'updated_at' => $this->resource->updated_at?->toIso8601String(),
         ];

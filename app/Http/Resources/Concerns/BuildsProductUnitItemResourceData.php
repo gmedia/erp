@@ -4,6 +4,7 @@ namespace App\Http\Resources\Concerns;
 
 use App\Models\Product;
 use App\Models\Unit;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 
 trait BuildsProductUnitItemResourceData
@@ -33,5 +34,31 @@ trait BuildsProductUnitItemResourceData
                 'name' => $unit?->name,
             ],
         ], $attributes);
+    }
+
+    /**
+     * @param  iterable<int, Model>  $items
+     * @return array<int, array<string, mixed>>
+     */
+    protected function productUnitItemsResourceData(iterable $items, callable $attributesResolver): array
+    {
+        $resourceItems = [];
+
+        foreach ($items as $item) {
+            $resourceItems[] = $this->productUnitItemResourceData($item, array_merge(
+                $attributesResolver($item),
+                [
+                    'created_at' => $this->iso8601Timestamp($item->getAttribute('created_at')),
+                    'updated_at' => $this->iso8601Timestamp($item->getAttribute('updated_at')),
+                ],
+            ));
+        }
+
+        return $resourceItems;
+    }
+
+    protected function iso8601Timestamp(mixed $value): ?string
+    {
+        return $value instanceof DateTimeInterface ? $value->format(DateTimeInterface::ATOM) : null;
     }
 }

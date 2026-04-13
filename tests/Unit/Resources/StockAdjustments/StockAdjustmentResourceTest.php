@@ -53,5 +53,10 @@ test('to array returns correct structure', function () {
 
     expect($result['adjustment_number'])->toBe('SA-TEST-0001')
         ->and($result['warehouse']['name'])->toBe('Main Warehouse')
-        ->and($result['items'])->toHaveCount(1);
+        ->and($result['items'])->toHaveCount(1)
+        ->and($result['items'][0]['product']['name'])->toBe('Test Product')
+        ->and($result['items'][0]['unit']['name'])->toBe('PCS')
+        ->and($result['items'][0]['quantity_before'])->toBe('10.00')
+        ->and($result['items'][0]['quantity_adjusted'])->toBe('-2.00')
+        ->and($result['items'][0]['unit_cost'])->toBe('100.00');
 });

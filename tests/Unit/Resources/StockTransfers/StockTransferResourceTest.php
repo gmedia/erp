@@ -29,6 +29,9 @@ test('to array returns correct structure', function () {
         'product_id' => $product->id,
         'unit_id' => $unit->id,
         'quantity' => 2,
+        'quantity_received' => 1,
+        'unit_cost' => 100,
+        'notes' => 'Move to destination warehouse',
     ]);
 
     $transfer->load(['fromWarehouse', 'toWarehouse', 'items.product', 'items.unit']);
@@ -53,5 +56,11 @@ test('to array returns correct structure', function () {
     expect($result['transfer_number'])->toBe('ST-TEST-0001')
         ->and($result['from_warehouse']['name'])->toBe('From WH')
         ->and($result['to_warehouse']['name'])->toBe('To WH')
-        ->and($result['items'])->toHaveCount(1);
+        ->and($result['items'])->toHaveCount(1)
+        ->and($result['items'][0]['product']['name'])->toBe('Test Product')
+        ->and($result['items'][0]['unit']['name'])->toBe('PCS')
+        ->and($result['items'][0]['quantity'])->toBe('2.00')
+        ->and($result['items'][0]['quantity_received'])->toBe('1.00')
+        ->and($result['items'][0]['unit_cost'])->toBe('100.00')
+        ->and($result['items'][0]['notes'])->toBe('Move to destination warehouse');
 });
