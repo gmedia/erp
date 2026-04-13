@@ -2,14 +2,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useMemo } from 'react';
-import {
-    type Resolver,
-    Controller,
-    useFieldArray,
-    useForm,
-} from 'react-hook-form';
+import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 
-import { AsyncSelect } from '@/components/common/AsyncSelect';
+import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import {
@@ -232,73 +227,25 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
                         placeholder="Select status"
                     />
 
-                    <Controller
-                        control={form.control}
+                    <AsyncSelectField
                         name="branch_id"
-                        render={({ field }) => (
-                            <div className="space-y-2">
-                                <div className="text-sm leading-none font-medium">
-                                    Branch
-                                </div>
-                                <AsyncSelect
-                                    value={
-                                        field.value
-                                            ? String(field.value)
-                                            : undefined
-                                    }
-                                    onValueChange={field.onChange}
-                                    url="/api/branches"
-                                    placeholder="Select branch"
-                                    label="Branch"
-                                />
-                            </div>
-                        )}
+                        label="Branch"
+                        url="/api/branches"
+                        placeholder="Select branch"
                     />
 
-                    <Controller
-                        control={form.control}
+                    <AsyncSelectField
                         name="department_id"
-                        render={({ field }) => (
-                            <div className="space-y-2">
-                                <div className="text-sm leading-none font-medium">
-                                    Department
-                                </div>
-                                <AsyncSelect
-                                    value={
-                                        field.value
-                                            ? String(field.value)
-                                            : undefined
-                                    }
-                                    onValueChange={field.onChange}
-                                    url="/api/departments"
-                                    placeholder="Select department"
-                                    label="Department"
-                                />
-                            </div>
-                        )}
+                        label="Department"
+                        url="/api/departments"
+                        placeholder="Select department"
                     />
 
-                    <Controller
-                        control={form.control}
+                    <AsyncSelectField
                         name="requested_by"
-                        render={({ field }) => (
-                            <div className="space-y-2">
-                                <div className="text-sm leading-none font-medium">
-                                    Requested By
-                                </div>
-                                <AsyncSelect
-                                    value={
-                                        field.value
-                                            ? String(field.value)
-                                            : undefined
-                                    }
-                                    onValueChange={field.onChange}
-                                    url="/api/employees"
-                                    placeholder="Select requester"
-                                    label="Requested By"
-                                />
-                            </div>
-                        )}
+                        label="Requested By"
+                        url="/api/employees"
+                        placeholder="Select requester"
                     />
 
                     <DatePickerField name="request_date" label="Request Date" />

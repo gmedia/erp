@@ -2,14 +2,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useMemo } from 'react';
-import {
-    type Resolver,
-    Controller,
-    useFieldArray,
-    useForm,
-} from 'react-hook-form';
+import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 
-import { AsyncSelect } from '@/components/common/AsyncSelect';
+import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import {
@@ -204,96 +199,32 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                         placeholder="Select status"
                     />
 
-                    <Controller
-                        control={form.control}
+                    <AsyncSelectField
                         name="purchase_order_id"
-                        render={({ field }) => (
-                            <div className="space-y-2">
-                                <div className="text-sm leading-none font-medium">
-                                    Purchase Order
-                                </div>
-                                <AsyncSelect
-                                    value={
-                                        field.value
-                                            ? String(field.value)
-                                            : undefined
-                                    }
-                                    onValueChange={field.onChange}
-                                    url="/api/purchase-orders"
-                                    placeholder="Select purchase order"
-                                    label="Purchase Order"
-                                />
-                            </div>
-                        )}
+                        label="Purchase Order"
+                        url="/api/purchase-orders"
+                        placeholder="Select purchase order"
                     />
 
-                    <Controller
-                        control={form.control}
+                    <AsyncSelectField
                         name="goods_receipt_id"
-                        render={({ field }) => (
-                            <div className="space-y-2">
-                                <div className="text-sm leading-none font-medium">
-                                    Goods Receipt
-                                </div>
-                                <AsyncSelect
-                                    value={
-                                        field.value
-                                            ? String(field.value)
-                                            : undefined
-                                    }
-                                    onValueChange={field.onChange}
-                                    url="/api/goods-receipts"
-                                    placeholder="Select goods receipt"
-                                    label="Goods Receipt"
-                                />
-                            </div>
-                        )}
+                        label="Goods Receipt"
+                        url="/api/goods-receipts"
+                        placeholder="Select goods receipt"
                     />
 
-                    <Controller
-                        control={form.control}
+                    <AsyncSelectField
                         name="supplier_id"
-                        render={({ field }) => (
-                            <div className="space-y-2">
-                                <div className="text-sm leading-none font-medium">
-                                    Supplier
-                                </div>
-                                <AsyncSelect
-                                    value={
-                                        field.value
-                                            ? String(field.value)
-                                            : undefined
-                                    }
-                                    onValueChange={field.onChange}
-                                    url="/api/suppliers"
-                                    placeholder="Select supplier"
-                                    label="Supplier"
-                                />
-                            </div>
-                        )}
+                        label="Supplier"
+                        url="/api/suppliers"
+                        placeholder="Select supplier"
                     />
 
-                    <Controller
-                        control={form.control}
+                    <AsyncSelectField
                         name="warehouse_id"
-                        render={({ field }) => (
-                            <div className="space-y-2">
-                                <div className="text-sm leading-none font-medium">
-                                    Warehouse
-                                </div>
-                                <AsyncSelect
-                                    value={
-                                        field.value
-                                            ? String(field.value)
-                                            : undefined
-                                    }
-                                    onValueChange={field.onChange}
-                                    url="/api/warehouses"
-                                    placeholder="Select warehouse"
-                                    label="Warehouse"
-                                />
-                            </div>
-                        )}
+                        label="Warehouse"
+                        url="/api/warehouses"
+                        placeholder="Select warehouse"
                     />
 
                     <DatePickerField name="return_date" label="Return Date" />
