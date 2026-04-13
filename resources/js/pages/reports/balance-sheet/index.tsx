@@ -5,7 +5,10 @@ import {
     type FinancialReportFiscalYear,
 } from '@/components/reports/financial/FinancialReportPageShell';
 import {
+    ComparisonFinancialReportSection,
+    ComparisonFinancialReportSectionGroup,
     FinancialReportSection,
+    financialPositionSectionConfigs,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
 import {
@@ -48,6 +51,8 @@ const emptyBalanceSheetReport: BalanceSheetResponse['report'] = {
     equity: [],
     totals: { assets: 0, liabilities: 0, equity: 0 },
 };
+
+const balanceSheetSecondarySections = financialPositionSectionConfigs.slice(1);
 
 export default function BalanceSheet() {
     const {
@@ -101,41 +106,21 @@ export default function BalanceSheet() {
             }
         >
             <div className="grid gap-6">
-                <FinancialReportSection
-                    title="Assets"
+                <ComparisonFinancialReportSection
+                    title={financialPositionSectionConfigs[0].title}
+                    metric={financialPositionSectionConfigs[0].metric}
                     nodes={report.assets || []}
-                    total={report.totals?.assets || 0}
-                    comparisonTotal={report.totals?.comparison_assets}
-                    change={report.totals?.change_assets}
-                    changePercentage={report.totals?.change_percentage_assets}
+                    totals={report.totals}
                     showComparison={!!comparisonYearId}
                 />
 
-                <div className="space-y-6">
-                    <FinancialReportSection
-                        title="Liabilities"
-                        nodes={report.liabilities || []}
-                        total={report.totals?.liabilities || 0}
-                        comparisonTotal={report.totals?.comparison_liabilities}
-                        change={report.totals?.change_liabilities}
-                        changePercentage={
-                            report.totals?.change_percentage_liabilities
-                        }
-                        showComparison={!!comparisonYearId}
-                    />
-
-                    <FinancialReportSection
-                        title="Equity"
-                        nodes={report.equity || []}
-                        total={report.totals?.equity || 0}
-                        comparisonTotal={report.totals?.comparison_equity}
-                        change={report.totals?.change_equity}
-                        changePercentage={
-                            report.totals?.change_percentage_equity
-                        }
-                        showComparison={!!comparisonYearId}
-                    />
-                </div>
+                <ComparisonFinancialReportSectionGroup
+                    className="space-y-6"
+                    sections={balanceSheetSecondarySections}
+                    report={report}
+                    totals={report.totals}
+                    showComparison={!!comparisonYearId}
+                />
 
                 <FinancialSummaryCard
                     description="Assets should equal liabilities plus equity."

@@ -17,6 +17,37 @@ export interface ReportAccountNode {
     level: number;
 }
 
+export type FinancialReportMetric =
+    | 'assets'
+    | 'liabilities'
+    | 'equity'
+    | 'revenues'
+    | 'expenses'
+    | 'revenue'
+    | 'expense';
+
+type FinancialReportTotals = Partial<
+    Record<FinancialReportMetric, number> &
+        Record<`comparison_${FinancialReportMetric}`, number> &
+        Record<`change_${FinancialReportMetric}`, number> &
+        Record<`change_percentage_${FinancialReportMetric}`, number>
+>;
+
+type FinancialReportSectionConfig = {
+    title: string;
+    metric: FinancialReportMetric;
+};
+
+type FinancialReportSectionGroupReport = Partial<
+    Record<FinancialReportMetric, ReportAccountNode[]>
+>;
+
+export const financialPositionSectionConfigs: readonly FinancialReportSectionConfig[] = [
+    { title: 'Assets', metric: 'assets' },
+    { title: 'Liabilities', metric: 'liabilities' },
+    { title: 'Equity', metric: 'equity' },
+];
+
 export const getChangeTextClass = (value: number): string => {
     if (value < 0) {
         return 'text-red-500';
@@ -220,4 +251,61 @@ export function FinancialReportSection({
             </CardContent>
         </Card>
     );
+}
+
+export function ComparisonFinancialReportSection({
+    title,
+    metric,
+    nodes,
+    totals,
+    showComparison = false,
+}: Readonly<{
+    title: string;
+    metric: FinancialReportMetric;
+    nodes: ReportAccountNode[];
+    totals: FinancialReportTotals;
+    showComparison?: boolean;
+}>) {
+    return (
+        <FinancialReportSection
+            title={title}
+            nodes={nodes}
+            total={totals[metric] || 0}
+            comparisonTotal={totals[`comparison_${metric}`]}
+            change={totals[`change_${metric}`]}
+            changePercentage={totals[`change_percentage_${metric}`]}
+            showComparison={showComparison}
+        />
+    );
+}
+
+export function ComparisonFinancialReportSectionGroup({
+    sections,
+    report,
+    totals,
+    showComparison = false,
+    className,
+}: Readonly<{
+    sections: readonly FinancialReportSectionConfig[];
+    report: FinancialReportSectionGroupReport;
+    totals: FinancialReportTotals;
+    showComparison?: boolean;
+    className?: string;
+}>) {
+    const content = sections.map(({ title, metric }) => (
+        <ComparisonFinancialReportSection
+            key={metric}
+            title={title}
+            metric={metric}
+            nodes={report[metric] || []}
+            totals={totals}
+            showComparison={showComparison}
+        />
+    ));
+
+    if (!className) {
+        return <>{content}</>;
+    }
+
+    return <div className={className}>{content}</div>;
 }
