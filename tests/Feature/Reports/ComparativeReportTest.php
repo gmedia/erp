@@ -52,6 +52,70 @@ test('can view comparative report properties via json', function () {
         ->assertJsonPath('comparisonYearId', $this->fyPrev->id);
 });
 
+test('comparative uses matching account code for comparison balance without mappings', function () {
+    $cashPrev = Account::create([
+        'coa_version_id' => $this->coaPrev->id,
+        'code' => '11110',
+        'name' => 'Cash in Bank',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'level' => 2,
+        'is_active' => true,
+        'is_cash_flow' => true,
+    ]);
+
+    $assetHeader = Account::create([
+        'coa_version_id' => $this->coaCurr->id,
+        'code' => '10000',
+        'name' => 'Assets',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'level' => 1,
+        'is_active' => true,
+        'is_cash_flow' => false,
+    ]);
+
+    Account::create([
+        'coa_version_id' => $this->coaCurr->id,
+        'code' => '11110',
+        'name' => 'Cash in Bank',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'level' => 2,
+        'parent_id' => $assetHeader->id,
+        'is_active' => true,
+        'is_cash_flow' => true,
+    ]);
+
+    $jePrev = JournalEntry::create([
+        'fiscal_year_id' => $this->fyPrev->id,
+        'entry_number' => 'JV-PREV-CODE-1',
+        'entry_date' => '2025-01-15',
+        'description' => 'Prev cash by code',
+        'status' => 'posted',
+        'created_by' => $this->user->id,
+    ]);
+
+    JournalEntryLine::create([
+        'journal_entry_id' => $jePrev->id,
+        'account_id' => $cashPrev->id,
+        'debit' => 450,
+        'credit' => 0,
+    ]);
+
+    Sanctum::actingAs($this->user, ['*']);
+    $this->getJson(
+        '/api/reports/comparative?fiscal_year_id=' .
+            $this->fyCurr->id .
+            '&comparison_year_id=' .
+            $this->fyPrev->id,
+    )
+        ->assertStatus(200)
+        ->assertJsonPath('report.totals.assets', 0)
+        ->assertJsonPath('report.totals.comparison_assets', 450)
+        ->assertJsonPath('report.totals.change_assets', -450);
+});
+
 test('comparative uses archived previous year and mapping split allocated to LCA', function () {
     $cashPrev = Account::create([
         'coa_version_id' => $this->coaPrev->id,

@@ -440,6 +440,45 @@ class FinancialReportService
         return $normalBalance === 'debit' ? ($debit - $credit) : ($credit - $debit);
     }
 
+    private function computePostedBalance(Account $account): float
+    {
+        return $this->computeAccountBalance(
+            $account->normal_balance,
+            $account->total_debit ?? 0,
+            $account->total_credit ?? 0
+        );
+    }
+
+    /**
+     * @param  Collection<int, Account>  $accounts
+     * @return array<int, float>
+     */
+    private function mapAccountBalancesById(Collection $accounts): array
+    {
+        $balanceById = [];
+
+        foreach ($accounts as $account) {
+            $balanceById[$account->id] = $this->computePostedBalance($account);
+        }
+
+        return $balanceById;
+    }
+
+    /**
+     * @param  Collection<int, Account>  $accounts
+     * @return array<string, float>
+     */
+    private function mapAccountBalancesByCode(Collection $accounts): array
+    {
+        $balanceByCode = [];
+
+        foreach ($accounts as $account) {
+            $balanceByCode[$account->code] = $this->computePostedBalance($account);
+        }
+
+        return $balanceByCode;
+    }
+
     private function buildComparisonBalanceMap(
         Collection $currentAccounts,
         int $comparisonFiscalYearId,
@@ -449,23 +488,16 @@ class FinancialReportService
         $currentIds = $currentAccounts->pluck('id')->all();
         $codes = $currentAccounts->pluck('code')->unique()->values()->all();
 
-        $comparisonByCode = $this->accountsWithPostedSums($comparisonCoaVersion->id, $comparisonFiscalYearId)
+        /** @var Collection<int, Account> $comparisonAccounts */
+        $comparisonAccounts = $this->accountsWithPostedSums($comparisonCoaVersion->id, $comparisonFiscalYearId)
             ->whereIn('code', $codes)
-            ->get()
-            ->keyBy('code');
+            ->get();
 
-        $comparisonBalanceByCurrentId = [];
+        $comparisonBalanceByCode = $this->mapAccountBalancesByCode($comparisonAccounts);
+
+        $comparisonBalanceByCurrentId = array_fill_keys($currentIds, 0);
         foreach ($currentAccounts as $account) {
-            $comparisonBalanceByCurrentId[$account->id] = 0;
-            if (isset($comparisonByCode[$account->code])) {
-                /** @var Account $compAcc */
-                $compAcc = $comparisonByCode[$account->code];
-                $comparisonBalanceByCurrentId[$account->id] = $this->computeAccountBalance(
-                    $compAcc->normal_balance,
-                    $compAcc->total_debit ?? 0,
-                    $compAcc->total_credit ?? 0
-                );
-            }
+            $comparisonBalanceByCurrentId[$account->id] = $comparisonBalanceByCode[$account->code] ?? 0;
         }
 
         $mappings = AccountMapping::query()
@@ -477,19 +509,12 @@ class FinancialReportService
         }
 
         $sourceIds = $mappings->pluck('source_account_id')->unique()->values()->all();
+        /** @var Collection<int, Account> $sourceAccounts */
         $sourceAccounts = $this->accountsWithPostedSums($comparisonCoaVersion->id, $comparisonFiscalYearId)
             ->whereIn('id', $sourceIds)
             ->get();
 
-        $sourceBalanceById = [];
-        foreach ($sourceAccounts as $sourceAccount) {
-            /** @var Account $sourceAccount */
-            $sourceBalanceById[$sourceAccount->id] = $this->computeAccountBalance(
-                $sourceAccount->normal_balance,
-                $sourceAccount->total_debit ?? 0,
-                $sourceAccount->total_credit ?? 0
-            );
-        }
+        $sourceBalanceById = $this->mapAccountBalancesById($sourceAccounts);
 
         $mappingSumByTargetId = [];
         foreach ($mappings as $mapping) {
