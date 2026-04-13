@@ -2,8 +2,12 @@
 
 namespace App\DTOs\Customers;
 
+use App\DTOs\Concerns\FiltersNullUpdateData;
+
 readonly class UpdateCustomerData
 {
+    use FiltersNullUpdateData;
+
     public function __construct(
         public ?string $name = null,
         public ?string $email = null,
@@ -49,46 +53,15 @@ readonly class UpdateCustomerData
      */
     public function toArray(): array
     {
-        // Simple filter might remove nulls we intend to set (like notes).
-        // But for update, we usually want to update only provided fields.
-        // If a field is not provided in constructor, it is null.
-
-        $data = [];
-        if ($this->name !== null) {
-            $data['name'] = $this->name;
-        }
-        if ($this->email !== null) {
-            $data['email'] = $this->email;
-        }
-        if ($this->phone !== null) {
-            $data['phone'] = $this->phone;
-        }
-        if ($this->address !== null) {
-            $data['address'] = $this->address;
-        }
-        if ($this->branch_id !== null) {
-            $data['branch_id'] = $this->branch_id;
-        }
-        if ($this->category_id !== null) {
-            $data['category_id'] = $this->category_id;
-        }
-        if ($this->status !== null) {
-            $data['status'] = $this->status;
-        }
-
-        // Notes is special because it can be nullable in DB.
-        // If it's passed as null, maybe we want to ignore it OR set it to null?
-        // In standard PATCH/PUT partial update, missing field = ignore.
-        // Present + null = set to null.
-        // However, generic DTO constructor sets default null.
-        // We'll follow the pattern that if it's set in the DTO, we use it.
-        // But since default is null, we can't distinguish "unset" vs "set to null" easily here without extra flags.
-        // For simplicity and matching Employee pattern (which just filters nulls), we'll do:
-
-        if ($this->notes !== null) {
-            $data['notes'] = $this->notes;
-        }
-
-        return $data;
+        return $this->filterNullUpdateData([
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'address' => $this->address,
+            'branch_id' => $this->branch_id,
+            'category_id' => $this->category_id,
+            'status' => $this->status,
+            'notes' => $this->notes,
+        ]);
     }
 }

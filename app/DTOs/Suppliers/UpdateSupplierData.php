@@ -2,8 +2,12 @@
 
 namespace App\DTOs\Suppliers;
 
+use App\DTOs\Concerns\FiltersNullUpdateData;
+
 readonly class UpdateSupplierData
 {
+    use FiltersNullUpdateData;
+
     public function __construct(
         public ?string $name = null,
         public ?string $email = null,
@@ -45,29 +49,14 @@ readonly class UpdateSupplierData
      */
     public function toArray(): array
     {
-        $data = [];
-        if ($this->name !== null) {
-            $data['name'] = $this->name;
-        }
-        if ($this->email !== null) {
-            $data['email'] = $this->email;
-        }
-        if ($this->phone !== null) {
-            $data['phone'] = $this->phone;
-        }
-        if ($this->address !== null) {
-            $data['address'] = $this->address;
-        }
-        if ($this->branch_id !== null) {
-            $data['branch_id'] = $this->branch_id;
-        }
-        if ($this->category !== null) {
-            $data['category'] = $this->category;
-        }
-        if ($this->status !== null) {
-            $data['status'] = $this->status;
-        }
-
-        return $data;
+        return $this->filterNullUpdateData([
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'address' => $this->address,
+            'branch_id' => $this->branch_id,
+            'category' => $this->category,
+            'status' => $this->status,
+        ]);
     }
 }
