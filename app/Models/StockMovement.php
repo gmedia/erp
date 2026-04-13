@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BuildsAttributeCasts;
+use App\Models\Concerns\HasProductRelation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -55,7 +57,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class StockMovement extends Model
 {
     /** @use HasFactory<\Database\Factories\StockMovementFactory> */
-    use HasFactory;
+    use BuildsAttributeCasts, HasFactory, HasProductRelation;
 
     /**
      * @var list<string>
@@ -77,29 +79,6 @@ class StockMovement extends Model
         'created_by',
     ];
 
-    /**
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'product_id' => 'integer',
-        'warehouse_id' => 'integer',
-        'quantity_in' => 'decimal:2',
-        'quantity_out' => 'decimal:2',
-        'balance_after' => 'decimal:2',
-        'unit_cost' => 'decimal:2',
-        'average_cost_after' => 'decimal:2',
-        'reference_id' => 'integer',
-        'moved_at' => 'datetime',
-        'created_by' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
-    public function product(): BelongsTo
-    {
-        return $this->belongsTo(Product::class);
-    }
-
     public function warehouse(): BelongsTo
     {
         return $this->belongsTo(Warehouse::class);
@@ -108,5 +87,29 @@ class StockMovement extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            ...$this->integerCasts([
+                'product_id',
+                'warehouse_id',
+                'reference_id',
+                'created_by',
+            ]),
+            ...$this->decimalCasts([
+                'quantity_in',
+                'quantity_out',
+                'balance_after',
+                'unit_cost',
+                'average_cost_after',
+            ]),
+            ...$this->datetimeCasts([
+                'moved_at',
+                'created_at',
+                'updated_at',
+            ]),
+        ];
     }
 }
