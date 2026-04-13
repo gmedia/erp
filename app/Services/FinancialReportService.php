@@ -83,38 +83,32 @@ class FinancialReportService
             return [];
         }
 
-        // 1. Calculate Net Income for Current Year
-        $netIncome = $this->calculateNetIncome($fiscalYearId, $coaVersion->id);
-
-        // 2. Calculate Net Income for Comparison Year (if exists)
-        $comparisonNetIncome = 0;
-        $comparisonCoaVersion = $this->resolveComparisonCoaVersion($comparisonFiscalYearId);
-        if ($comparisonFiscalYearId && $comparisonCoaVersion) {
-            $comparisonNetIncome = $this->calculateNetIncome($comparisonFiscalYearId, $comparisonCoaVersion->id);
-        }
-
-        // 3. Get Asset, Liability, Equity Accounts
+        // 1. Get Asset, Liability, Equity Accounts
         // We need to fetch balances for BOTH years.
         // Complex part: COA might be different.
         // For this task, we assume we display the CURRENT COA structure,
         // and map previous years data to it IF possible (via mapping or just same code).
         // Design doc says: "Sistem akan mencoba mencocokkan akun berdasarkan kolom code."
 
+        /** @var Collection<int, Account> $accounts */
         $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId)
             ->whereIn('type', ['asset', 'liability', 'equity'])
             ->orderBy('code')
             ->get();
 
-        // If comparison needed, we might need a separate query to get comparison balances
-        // because we can't easily sum relations with different filters in one go (unless we use different aliases).
-        // Let's use separate aliases if possible, OR just separate query.
-        // Eloquent `withSum` uses subqueries, so we can add more `withSum` for comparison.
+        [
+            'comparisonCoaVersion' => $comparisonCoaVersion,
+            'comparisonBalanceByCurrentAccountId' => $comparisonBalanceByCurrentAccountId,
+        ] = $this->prepareComparisonContext($accounts, $comparisonFiscalYearId);
 
-        $comparisonBalanceByCurrentAccountId = $this->resolveComparisonBalanceMap(
-            $accounts,
-            $comparisonFiscalYearId,
-            $comparisonCoaVersion
-        );
+        // 2. Calculate Net Income for Current Year
+        $netIncome = $this->calculateNetIncome($fiscalYearId, $coaVersion->id);
+
+        // 3. Calculate Net Income for Comparison Year (if exists)
+        $comparisonNetIncome = 0;
+        if ($comparisonFiscalYearId && $comparisonCoaVersion) {
+            $comparisonNetIncome = $this->calculateNetIncome($comparisonFiscalYearId, $comparisonCoaVersion->id);
+        }
 
         ['buckets' => $buckets, 'totals' => $totals] = $this->collectAccountBuckets(
             $accounts,
@@ -160,17 +154,15 @@ class FinancialReportService
             return [];
         }
 
-        $comparisonCoaVersion = $this->resolveComparisonCoaVersion($comparisonFiscalYearId);
-
+        /** @var Collection<int, Account> $accounts */
         $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId)
             ->whereIn('type', ['revenue', 'expense'])
             ->orderBy('code')
             ->get();
 
-        $comparisonBalanceByCurrentAccountId = $this->resolveComparisonBalanceMap(
+        ['comparisonBalanceByCurrentAccountId' => $comparisonBalanceByCurrentAccountId] = $this->prepareComparisonContext(
             $accounts,
             $comparisonFiscalYearId,
-            $comparisonCoaVersion
         );
 
         ['buckets' => $buckets, 'totals' => $totals] = $this->collectAccountBuckets(
@@ -211,16 +203,14 @@ class FinancialReportService
             ];
         }
 
+        /** @var Collection<int, Account> $accounts */
         $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId)
             ->orderBy('code')
             ->get();
 
-        $comparisonCoaVersion = $this->resolveComparisonCoaVersion($comparisonFiscalYearId);
-
-        $comparisonBalanceByCurrentAccountId = $this->resolveComparisonBalanceMap(
+        ['comparisonBalanceByCurrentAccountId' => $comparisonBalanceByCurrentAccountId] = $this->prepareComparisonContext(
             $accounts,
             $comparisonFiscalYearId,
-            $comparisonCoaVersion
         );
 
         ['buckets' => $buckets, 'totals' => $totals] = $this->collectAccountBuckets(
@@ -291,6 +281,7 @@ class FinancialReportService
             return null;
         }
 
+        /** @var FiscalYear|null $comparisonFiscalYear */
         $comparisonFiscalYear = FiscalYear::find($comparisonFiscalYearId);
 
         return $comparisonFiscalYear
@@ -312,6 +303,24 @@ class FinancialReportService
             $comparisonFiscalYearId,
             $comparisonCoaVersion
         );
+    }
+
+    /**
+     * @param  Collection<int, Account>  $accounts
+     * @return array{comparisonCoaVersion: ?CoaVersion, comparisonBalanceByCurrentAccountId: array<int, float|int>}
+     */
+    private function prepareComparisonContext(Collection $accounts, ?int $comparisonFiscalYearId): array
+    {
+        $comparisonCoaVersion = $this->resolveComparisonCoaVersion($comparisonFiscalYearId);
+
+        return [
+            'comparisonCoaVersion' => $comparisonCoaVersion,
+            'comparisonBalanceByCurrentAccountId' => $this->resolveComparisonBalanceMap(
+                $accounts,
+                $comparisonFiscalYearId,
+                $comparisonCoaVersion,
+            ),
+        ];
     }
 
     private function buildReportItem(Account $account, float $balance, float $comparisonBalance): array
