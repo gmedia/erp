@@ -2,12 +2,11 @@
 
 namespace App\Http\Resources\PurchaseRequests;
 
+use App\Http\Resources\Concerns\BuildsProductUnitItemResourceData;
 use App\Models\Branch;
 use App\Models\Department;
-use App\Models\Product;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestItem;
-use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,6 +15,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class PurchaseRequestResource extends JsonResource
 {
+    use BuildsProductUnitItemResourceData;
+
     public function toArray($request): array
     {
         /** @var Branch|null $branch */
@@ -61,30 +62,13 @@ class PurchaseRequestResource extends JsonResource
                 'name' => $creator?->name,
             ] : null,
             'items' => $this->resource->relationLoaded('items')
-                ? $this->resource->items->map(static function ($item) {
-                    /** @var PurchaseRequestItem $item */
-                    /** @var Product|null $product */
-                    $product = $item->product;
-                    /** @var Unit|null $unit */
-                    $unit = $item->unit;
-
-                    return [
-                        'id' => $item->id,
-                        'product' => [
-                            'id' => $item->product_id,
-                            'name' => $product?->name,
-                        ],
-                        'unit' => [
-                            'id' => $item->unit_id,
-                            'name' => $unit?->name,
-                        ],
-                        'quantity' => (string) $item->quantity,
-                        'quantity_ordered' => (string) $item->quantity_ordered,
-                        'estimated_unit_price' => (string) $item->estimated_unit_price,
-                        'estimated_total' => (string) $item->estimated_total,
-                        'notes' => $item->notes,
-                    ];
-                })->values()
+                ? $this->resource->items->map(fn (PurchaseRequestItem $item) => $this->productUnitItemResourceData($item, [
+                    'quantity' => (string) $item->quantity,
+                    'quantity_ordered' => (string) $item->quantity_ordered,
+                    'estimated_unit_price' => (string) $item->estimated_unit_price,
+                    'estimated_total' => (string) $item->estimated_total,
+                    'notes' => $item->notes,
+                ]))->values()
                 : [],
             'created_at' => $this->resource->created_at?->toIso8601String(),
             'updated_at' => $this->resource->updated_at?->toIso8601String(),

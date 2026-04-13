@@ -2,11 +2,10 @@
 
 namespace App\Http\Resources\PurchaseOrders;
 
-use App\Models\Product;
+use App\Http\Resources\Concerns\BuildsProductUnitItemResourceData;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
-use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -16,6 +15,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class PurchaseOrderResource extends JsonResource
 {
+    use BuildsProductUnitItemResourceData;
+
     public function toArray($request): array
     {
         /** @var Supplier|null $supplier */
@@ -59,33 +60,16 @@ class PurchaseOrderResource extends JsonResource
                 'name' => $creator?->name,
             ] : null,
             'items' => $this->resource->relationLoaded('items')
-                ? $this->resource->items->map(static function ($item) {
-                    /** @var PurchaseOrderItem $item */
-                    /** @var Product|null $product */
-                    $product = $item->product;
-                    /** @var Unit|null $unit */
-                    $unit = $item->unit;
-
-                    return [
-                        'id' => $item->id,
-                        'purchase_request_item_id' => $item->purchase_request_item_id,
-                        'product' => [
-                            'id' => $item->product_id,
-                            'name' => $product?->name,
-                        ],
-                        'unit' => [
-                            'id' => $item->unit_id,
-                            'name' => $unit?->name,
-                        ],
-                        'quantity' => (string) $item->quantity,
-                        'quantity_received' => (string) $item->quantity_received,
-                        'unit_price' => (string) $item->unit_price,
-                        'discount_percent' => (string) $item->discount_percent,
-                        'tax_percent' => (string) $item->tax_percent,
-                        'line_total' => (string) $item->line_total,
-                        'notes' => $item->notes,
-                    ];
-                })->values()
+                ? $this->resource->items->map(fn (PurchaseOrderItem $item) => $this->productUnitItemResourceData($item, [
+                    'purchase_request_item_id' => $item->purchase_request_item_id,
+                    'quantity' => (string) $item->quantity,
+                    'quantity_received' => (string) $item->quantity_received,
+                    'unit_price' => (string) $item->unit_price,
+                    'discount_percent' => (string) $item->discount_percent,
+                    'tax_percent' => (string) $item->tax_percent,
+                    'line_total' => (string) $item->line_total,
+                    'notes' => $item->notes,
+                ]))->values()
                 : [],
             'created_at' => $this->resource->created_at?->toIso8601String(),
             'updated_at' => $this->resource->updated_at?->toIso8601String(),
