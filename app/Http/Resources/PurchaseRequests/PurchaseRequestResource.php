@@ -8,6 +8,7 @@ use App\Models\Department;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestItem;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -29,6 +30,24 @@ class PurchaseRequestResource extends JsonResource
         $approver = $this->resource->approver;
         /** @var User|null $creator */
         $creator = $this->resource->creator;
+
+        $items = [];
+
+        if ($this->resource->relationLoaded('items')) {
+            /** @var EloquentCollection<int, PurchaseRequestItem> $purchaseRequestItems */
+            $purchaseRequestItems = $this->resource->items;
+
+            $items = $purchaseRequestItems
+                ->map(fn (PurchaseRequestItem $item) => $this->productUnitItemResourceData($item, [
+                    'quantity' => (string) $item->quantity,
+                    'quantity_ordered' => (string) $item->quantity_ordered,
+                    'estimated_unit_price' => (string) $item->estimated_unit_price,
+                    'estimated_total' => (string) $item->estimated_total,
+                    'notes' => $item->notes,
+                ]))
+                ->values()
+                ->all();
+        }
 
         return [
             'id' => $this->resource->id,
@@ -61,15 +80,7 @@ class PurchaseRequestResource extends JsonResource
                 'id' => $this->resource->created_by,
                 'name' => $creator?->name,
             ] : null,
-            'items' => $this->resource->relationLoaded('items')
-                ? $this->resource->items->map(fn (PurchaseRequestItem $item) => $this->productUnitItemResourceData($item, [
-                    'quantity' => (string) $item->quantity,
-                    'quantity_ordered' => (string) $item->quantity_ordered,
-                    'estimated_unit_price' => (string) $item->estimated_unit_price,
-                    'estimated_total' => (string) $item->estimated_total,
-                    'notes' => $item->notes,
-                ]))->values()
-                : [],
+            'items' => $items,
             'created_at' => $this->resource->created_at?->toIso8601String(),
             'updated_at' => $this->resource->updated_at?->toIso8601String(),
         ];

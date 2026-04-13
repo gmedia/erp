@@ -8,6 +8,7 @@ use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Models\Warehouse;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -27,6 +28,27 @@ class PurchaseOrderResource extends JsonResource
         $approver = $this->resource->approver;
         /** @var User|null $creator */
         $creator = $this->resource->creator;
+
+        $items = [];
+
+        if ($this->resource->relationLoaded('items')) {
+            /** @var EloquentCollection<int, PurchaseOrderItem> $purchaseOrderItems */
+            $purchaseOrderItems = $this->resource->items;
+
+            $items = $purchaseOrderItems
+                ->map(fn (PurchaseOrderItem $item) => $this->productUnitItemResourceData($item, [
+                    'purchase_request_item_id' => $item->purchase_request_item_id,
+                    'quantity' => (string) $item->quantity,
+                    'quantity_received' => (string) $item->quantity_received,
+                    'unit_price' => (string) $item->unit_price,
+                    'discount_percent' => (string) $item->discount_percent,
+                    'tax_percent' => (string) $item->tax_percent,
+                    'line_total' => (string) $item->line_total,
+                    'notes' => $item->notes,
+                ]))
+                ->values()
+                ->all();
+        }
 
         return [
             'id' => $this->resource->id,
@@ -59,18 +81,7 @@ class PurchaseOrderResource extends JsonResource
                 'id' => $this->resource->created_by,
                 'name' => $creator?->name,
             ] : null,
-            'items' => $this->resource->relationLoaded('items')
-                ? $this->resource->items->map(fn (PurchaseOrderItem $item) => $this->productUnitItemResourceData($item, [
-                    'purchase_request_item_id' => $item->purchase_request_item_id,
-                    'quantity' => (string) $item->quantity,
-                    'quantity_received' => (string) $item->quantity_received,
-                    'unit_price' => (string) $item->unit_price,
-                    'discount_percent' => (string) $item->discount_percent,
-                    'tax_percent' => (string) $item->tax_percent,
-                    'line_total' => (string) $item->line_total,
-                    'notes' => $item->notes,
-                ]))->values()
-                : [],
+            'items' => $items,
             'created_at' => $this->resource->created_at?->toIso8601String(),
             'updated_at' => $this->resource->updated_at?->toIso8601String(),
         ];

@@ -14,19 +14,22 @@ trait BuildsProductUnitItemResourceData
      */
     protected function productUnitItemResourceData(Model $item, array $attributes): array
     {
+        $productRelation = $item->getRelationValue('product');
+        $unitRelation = $item->getRelationValue('unit');
+
         /** @var Product|null $product */
-        $product = $item->product;
+        $product = $productRelation instanceof Product ? $productRelation : null;
         /** @var Unit|null $unit */
-        $unit = $item->unit;
+        $unit = $unitRelation instanceof Unit ? $unitRelation : null;
 
         return array_merge([
-            'id' => $item->id,
+            'id' => $item->getAttribute('id'),
             'product' => [
-                'id' => $item->product_id,
+                'id' => $item->getAttribute('product_id'),
                 'name' => $product?->name,
             ],
             'unit' => [
-                'id' => $item->unit_id,
+                'id' => $item->getAttribute('unit_id'),
                 'name' => $unit?->name,
             ],
         ], $attributes);
