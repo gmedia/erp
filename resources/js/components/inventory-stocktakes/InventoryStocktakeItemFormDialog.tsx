@@ -3,7 +3,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import { InputField } from '@/components/common/InputField';
 import {
@@ -12,23 +11,10 @@ import {
     ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
-import { type InventoryStocktakeFormData } from '@/utils/schemas';
-
-const inventoryStocktakeItemSchema = z.object({
-    product_id: z.string().min(1, { message: 'Product is required.' }),
-    product_label: z.string().optional(),
-    unit_id: z.string().min(1, { message: 'Unit is required.' }),
-    unit_label: z.string().optional(),
-    system_quantity: z.coerce
-        .number()
-        .min(0, { message: 'System quantity must be at least 0.' }),
-    counted_quantity: z.coerce
-        .number()
-        .min(0, { message: 'Counted quantity must be at least 0.' })
-        .optional()
-        .default(0),
-    notes: z.string().optional(),
-});
+import {
+    inventoryStocktakeItemSchema,
+    type InventoryStocktakeFormData,
+} from '@/utils/schemas';
 
 type InventoryStocktakeItemFormData =
     InventoryStocktakeFormData['items'][number];

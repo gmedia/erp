@@ -700,6 +700,22 @@ export const stockTransferFormSchema = z.object({
 
 export type StockTransferFormData = z.infer<typeof stockTransferFormSchema>;
 
+export const inventoryStocktakeItemSchema = z.object({
+    product_id: z.string().min(1, { message: 'Product is required.' }),
+    product_label: z.string().optional(),
+    unit_id: z.string().min(1, { message: 'Unit is required.' }),
+    unit_label: z.string().optional(),
+    system_quantity: z.coerce
+        .number()
+        .min(0, { message: 'System quantity must be at least 0.' }),
+    counted_quantity: z.coerce
+        .number()
+        .min(0, { message: 'Counted quantity must be at least 0.' })
+        .optional()
+        .default(0),
+    notes: z.string().optional(),
+});
+
 export const inventoryStocktakeFormSchema = z.object({
     stocktake_number: z.string().optional(),
     warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
@@ -710,31 +726,34 @@ export const inventoryStocktakeFormSchema = z.object({
     product_category_id: z.string().optional(),
     notes: z.string().optional(),
     items: z
-        .array(
-            z.object({
-                product_id: z
-                    .string()
-                    .min(1, { message: 'Product is required.' }),
-                product_label: z.string().optional(),
-                unit_id: z.string().min(1, { message: 'Unit is required.' }),
-                unit_label: z.string().optional(),
-                system_quantity: z.coerce
-                    .number()
-                    .min(0, { message: 'System quantity must be at least 0.' }),
-                counted_quantity: z.coerce
-                    .number()
-                    .min(0, { message: 'Counted quantity must be at least 0.' })
-                    .optional()
-                    .default(0),
-                notes: z.string().optional(),
-            }),
-        )
+        .array(inventoryStocktakeItemSchema)
         .min(1, { message: 'At least 1 item is required.' }),
 });
 
 export type InventoryStocktakeFormData = z.infer<
     typeof inventoryStocktakeFormSchema
 >;
+
+export const stockAdjustmentItemSchema = z.object({
+    product_id: z.string().min(1, { message: 'Product is required.' }),
+    product_label: z.string().optional(),
+    unit_id: z.string().min(1, { message: 'Unit is required.' }),
+    unit_label: z.string().optional(),
+    quantity_before: z.coerce
+        .number()
+        .min(0, { message: 'Quantity before must be at least 0.' })
+        .optional()
+        .default(0),
+    quantity_adjusted: z.coerce.number().refine((n) => n !== 0, {
+        message: 'Quantity adjusted cannot be 0.',
+    }),
+    unit_cost: z.coerce
+        .number()
+        .min(0, { message: 'Unit cost must be at least 0.' })
+        .optional()
+        .default(0),
+    reason: z.string().optional(),
+});
 
 export const stockAdjustmentFormSchema = z.object({
     adjustment_number: z.string().optional(),
@@ -760,30 +779,7 @@ export const stockAdjustmentFormSchema = z.object({
     inventory_stocktake_id: z.string().optional(),
     notes: z.string().optional(),
     items: z
-        .array(
-            z.object({
-                product_id: z
-                    .string()
-                    .min(1, { message: 'Product is required.' }),
-                product_label: z.string().optional(),
-                unit_id: z.string().min(1, { message: 'Unit is required.' }),
-                unit_label: z.string().optional(),
-                quantity_before: z.coerce
-                    .number()
-                    .min(0, { message: 'Quantity before must be at least 0.' })
-                    .optional()
-                    .default(0),
-                quantity_adjusted: z.coerce.number().refine((n) => n !== 0, {
-                    message: 'Quantity adjusted cannot be 0.',
-                }),
-                unit_cost: z.coerce
-                    .number()
-                    .min(0, { message: 'Unit cost must be at least 0.' })
-                    .optional()
-                    .default(0),
-                reason: z.string().optional(),
-            }),
-        )
+        .array(stockAdjustmentItemSchema)
         .min(1, { message: 'At least 1 item is required.' }),
 });
 

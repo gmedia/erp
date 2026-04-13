@@ -3,7 +3,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import { InputField } from '@/components/common/InputField';
 import {
@@ -12,28 +11,10 @@ import {
 } from '@/components/common/ItemFormDialog';
 import { TextareaField } from '@/components/common/TextareaField';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
-import { type StockAdjustmentFormData } from '@/utils/schemas';
-
-const stockAdjustmentItemSchema = z.object({
-    product_id: z.string().min(1, { message: 'Product is required.' }),
-    product_label: z.string().optional(),
-    unit_id: z.string().min(1, { message: 'Unit is required.' }),
-    unit_label: z.string().optional(),
-    quantity_before: z.coerce
-        .number()
-        .min(0, { message: 'Quantity before must be at least 0.' })
-        .optional()
-        .default(0),
-    quantity_adjusted: z.coerce.number().refine((n) => n !== 0, {
-        message: 'Quantity adjusted cannot be 0.',
-    }),
-    unit_cost: z.coerce
-        .number()
-        .min(0, { message: 'Unit cost must be at least 0.' })
-        .optional()
-        .default(0),
-    reason: z.string().optional(),
-});
+import {
+    stockAdjustmentItemSchema,
+    type StockAdjustmentFormData,
+} from '@/utils/schemas';
 
 type StockAdjustmentItemFormData = StockAdjustmentFormData['items'][number];
 
