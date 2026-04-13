@@ -9,6 +9,36 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $po_number
+ * @property int $supplier_id
+ * @property int $warehouse_id
+ * @property \Illuminate\Support\Carbon $order_date
+ * @property \Illuminate\Support\Carbon|null $expected_delivery_date
+ * @property string $payment_terms
+ * @property string $currency
+ * @property numeric $subtotal
+ * @property numeric $tax_amount
+ * @property numeric $discount_amount
+ * @property numeric $grand_total
+ * @property string $status
+ * @property string|null $notes
+ * @property string|null $shipping_address
+ * @property int|null $approved_by
+ * @property \Illuminate\Support\Carbon|null $approved_at
+ * @property int|null $created_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PurchaseOrderItem> $items
+ * @property-read int|null $items_count
+ * @property-read \App\Models\Supplier $supplier
+ * @property-read \App\Models\Warehouse $warehouse
+ * @property-read \App\Models\User|null $approver
+ * @property-read \App\Models\User|null $creator
+ *
+ * @mixin \Eloquent
+ */
 class PurchaseOrder extends Model
 {
     use BuildsAttributeCasts, HasFactory, HasSupplierRelation;
