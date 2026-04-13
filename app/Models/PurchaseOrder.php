@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BuildsAttributeCasts;
+use App\Models\Concerns\HasSupplierRelation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PurchaseOrder extends Model
 {
-    use HasFactory;
+    use BuildsAttributeCasts, HasFactory, HasSupplierRelation;
 
     protected $fillable = [
         'po_number',
@@ -31,23 +33,6 @@ class PurchaseOrder extends Model
         'created_by',
     ];
 
-    protected $casts = [
-        'order_date' => 'date',
-        'expected_delivery_date' => 'date',
-        'subtotal' => 'decimal:2',
-        'tax_amount' => 'decimal:2',
-        'discount_amount' => 'decimal:2',
-        'grand_total' => 'decimal:2',
-        'approved_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
-    public function supplier(): BelongsTo
-    {
-        return $this->belongsTo(Supplier::class);
-    }
-
     public function warehouse(): BelongsTo
     {
         return $this->belongsTo(Warehouse::class);
@@ -66,5 +51,26 @@ class PurchaseOrder extends Model
     public function items(): HasMany
     {
         return $this->hasMany(PurchaseOrderItem::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            ...$this->dateCasts([
+                'order_date',
+                'expected_delivery_date',
+            ]),
+            ...$this->decimalCasts([
+                'subtotal',
+                'tax_amount',
+                'discount_amount',
+                'grand_total',
+            ]),
+            ...$this->datetimeCasts([
+                'approved_at',
+                'created_at',
+                'updated_at',
+            ]),
+        ];
     }
 }

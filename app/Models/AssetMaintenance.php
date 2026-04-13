@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BuildsAttributeCasts;
 use App\Models\Concerns\HasAssetAndCreatorRelations;
+use App\Models\Concerns\HasSupplierRelation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -45,7 +46,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AssetMaintenance extends Model
 {
-    use HasAssetAndCreatorRelations, HasFactory;
+    use BuildsAttributeCasts, HasAssetAndCreatorRelations, HasFactory, HasSupplierRelation;
 
     protected $fillable = [
         'asset_id',
@@ -59,17 +60,19 @@ class AssetMaintenance extends Model
         'created_by',
     ];
 
-    protected $casts = [
-        'scheduled_at' => 'datetime',
-        'performed_at' => 'datetime',
-        'cost' => 'decimal:2',
-        'asset_id' => 'integer',
-        'supplier_id' => 'integer',
-        'created_by' => 'integer',
-    ];
-
-    public function supplier(): BelongsTo
+    protected function casts(): array
     {
-        return $this->belongsTo(Supplier::class);
+        return [
+            ...$this->datetimeCasts([
+                'scheduled_at',
+                'performed_at',
+            ]),
+            ...$this->decimalCasts(['cost']),
+            ...$this->integerCasts([
+                'asset_id',
+                'supplier_id',
+                'created_by',
+            ]),
+        ];
     }
 }

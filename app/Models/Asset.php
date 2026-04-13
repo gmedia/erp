@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BuildsAttributeCasts;
+use App\Models\Concerns\HasSupplierRelation;
 use App\Traits\HasPipeline;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -110,7 +111,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Asset extends Model
 {
-    use BuildsAttributeCasts, HasFactory, HasPipeline, HasUlids, SoftDeletes;
+    use BuildsAttributeCasts, HasFactory, HasPipeline, HasSupplierRelation, HasUlids, SoftDeletes;
 
     protected $fillable = [
         'ulid',
@@ -170,11 +171,6 @@ class Asset extends Model
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
-    }
-
-    public function supplier(): BelongsTo
-    {
-        return $this->belongsTo(Supplier::class);
     }
 
     public function depreciationExpenseAccount(): BelongsTo

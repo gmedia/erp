@@ -5,6 +5,7 @@ namespace Tests\Unit\Models;
 use App\Models\Asset;
 use App\Models\AssetCategory;
 use App\Models\Branch;
+use App\Models\Supplier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('assets');
@@ -21,6 +22,13 @@ test('asset belongs to a category', function () {
     $asset = Asset::factory()->create(['asset_category_id' => $category->id]);
 
     expect($asset->category->id)->toBe($category->id);
+});
+
+test('asset belongs to a supplier', function () {
+    $supplier = Supplier::factory()->create();
+    $asset = Asset::factory()->create(['supplier_id' => $supplier->id]);
+
+    expect($asset->supplier->id)->toBe($supplier->id);
 });
 
 test('asset has ulid', function () {
