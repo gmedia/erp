@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo } from 'react';
-import { type Resolver, useForm } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 
 import { InputField } from '@/components/common/InputField';
 import {
