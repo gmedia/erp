@@ -17,6 +17,7 @@ import AppLayout from '@/layouts/app-layout';
 import axiosInstance from '@/lib/axios';
 import { type BreadcrumbItem } from '@/types';
 import { setRegionalDateFormatSettings } from '@/utils/date-format';
+import { mapFirstValidationErrors } from '@/utils/errorHandling';
 import { setRegionalNumberFormatSettings } from '@/utils/number-format';
 import { Transition } from '@headlessui/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -75,20 +76,6 @@ const CURRENCY_OPTIONS = [
     { value: 'CNY', label: 'CNY - Chinese Yuan' },
 ] as const;
 
-function mapValidationErrors(error: unknown): Record<string, string> {
-    if (!axios.isAxiosError(error) || error.response?.status !== 422) {
-        return {};
-    }
-
-    const newErrors: Record<string, string> = {};
-    const serverErrors = error.response.data.errors as Record<string, string[]>;
-    Object.keys(serverErrors).forEach((key) => {
-        newErrors[key] = serverErrors[key][0];
-    });
-
-    return newErrors;
-}
-
 async function submitJsonAdminSettings(
     e: React.FormEvent<HTMLFormElement>,
     setProcessing: (value: boolean) => void,
@@ -109,7 +96,7 @@ async function submitJsonAdminSettings(
         setRecentlySuccessful(true);
         setTimeout(() => setRecentlySuccessful(false), 3000);
     } catch (error: unknown) {
-        const newErrors = mapValidationErrors(error);
+        const newErrors = mapFirstValidationErrors(error);
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
         }
@@ -156,7 +143,7 @@ function GeneralSettings({
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
         } catch (error: unknown) {
-            const newErrors = mapValidationErrors(error);
+            const newErrors = mapFirstValidationErrors(error);
             if (Object.keys(newErrors).length > 0) {
                 setErrors(newErrors);
             }
@@ -350,7 +337,7 @@ function RegionalSettings({
             setRecentlySuccessful(true);
             setTimeout(() => setRecentlySuccessful(false), 3000);
         } catch (error: unknown) {
-            const newErrors = mapValidationErrors(error);
+            const newErrors = mapFirstValidationErrors(error);
             if (Object.keys(newErrors).length > 0) {
                 setErrors(newErrors);
             }
@@ -559,7 +546,7 @@ function SmtpSettings({
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 422) {
-                    const newErrors = mapValidationErrors(error);
+                    const newErrors = mapFirstValidationErrors(error);
                     setTestErrors(newErrors);
                 } else if (error.response?.data?.message) {
                     setTestErrors({ test_email: error.response.data.message });

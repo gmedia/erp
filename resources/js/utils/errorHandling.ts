@@ -131,6 +131,24 @@ export function handleApiError(
     return parsedError;
 }
 
+export function mapFirstValidationErrors(
+    error: unknown,
+): Record<string, string> {
+    const parsedError = parseApiError(error);
+
+    if (parsedError.type !== ErrorType.VALIDATION || !parsedError.details) {
+        return {};
+    }
+
+    const formattedErrors: Record<string, string> = {};
+
+    Object.keys(parsedError.details).forEach((key) => {
+        formattedErrors[key] = parsedError.details?.[key]?.[0] ?? '';
+    });
+
+    return formattedErrors;
+}
+
 // Create user-friendly error message for specific operations
 export function createOperationErrorMessage(
     operation: string,

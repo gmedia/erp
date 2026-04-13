@@ -1,5 +1,4 @@
 import axiosInstance from '@/lib/axios';
-import axios from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -11,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { mapFirstValidationErrors } from '@/utils/errorHandling';
 
 interface ResetPasswordProps {
     token?: string;
@@ -51,14 +51,9 @@ export default function ResetPassword({
             );
             navigate('/login', { replace: true });
         } catch (error: unknown) {
-            if (axios.isAxiosError(error) && error.response?.status === 422) {
-                const returnedErrors = error.response.data.errors || {};
-                const formattedErrors: Record<string, string> = {};
-                Object.keys(returnedErrors).forEach((key) => {
-                    formattedErrors[key] = Array.isArray(returnedErrors[key])
-                        ? returnedErrors[key][0]
-                        : returnedErrors[key];
-                });
+            const formattedErrors = mapFirstValidationErrors(error);
+
+            if (Object.keys(formattedErrors).length > 0) {
                 setErrors(formattedErrors);
             } else {
                 toast.error('An error occurred. Please try again later.');
