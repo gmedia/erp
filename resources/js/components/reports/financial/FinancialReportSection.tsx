@@ -42,11 +42,12 @@ type FinancialReportSectionGroupReport = Partial<
     Record<FinancialReportMetric, ReportAccountNode[]>
 >;
 
-export const financialPositionSectionConfigs: readonly FinancialReportSectionConfig[] = [
-    { title: 'Assets', metric: 'assets' },
-    { title: 'Liabilities', metric: 'liabilities' },
-    { title: 'Equity', metric: 'equity' },
-];
+export const financialPositionSectionConfigs: readonly FinancialReportSectionConfig[] =
+    [
+        { title: 'Assets', metric: 'assets' },
+        { title: 'Liabilities', metric: 'liabilities' },
+        { title: 'Equity', metric: 'equity' },
+    ];
 
 export const getChangeTextClass = (value: number): string => {
     if (value < 0) {

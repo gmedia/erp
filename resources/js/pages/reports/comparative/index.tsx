@@ -6,7 +6,6 @@ import {
 } from '@/components/reports/financial/FinancialReportPageShell';
 import {
     ComparisonFinancialReportSectionGroup,
-    FinancialReportSection,
     financialPositionSectionConfigs,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';

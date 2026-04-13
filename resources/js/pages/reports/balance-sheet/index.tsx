@@ -7,7 +7,6 @@ import {
 import {
     ComparisonFinancialReportSection,
     ComparisonFinancialReportSectionGroup,
-    FinancialReportSection,
     financialPositionSectionConfigs,
     type ReportAccountNode,
 } from '@/components/reports/financial/FinancialReportSection';
