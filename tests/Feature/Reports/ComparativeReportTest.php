@@ -47,7 +47,9 @@ test('can view comparative report properties via json', function () {
     Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/comparative')
         ->assertStatus(200)
-        ->assertJsonStructure(['fiscalYears', 'selectedYearId', 'comparisonYearId']);
+        ->assertJsonStructure(['fiscalYears', 'selectedYearId', 'comparisonYearId'])
+        ->assertJsonPath('selectedYearId', $this->fyCurr->id)
+        ->assertJsonPath('comparisonYearId', $this->fyPrev->id);
 });
 
 test('comparative uses archived previous year and mapping split allocated to LCA', function () {
