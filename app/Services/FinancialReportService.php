@@ -451,17 +451,33 @@ class FinancialReportService
 
     /**
      * @param  Collection<int, Account>  $accounts
+     * @param  callable(Account): (int|string)  $keyResolver
+     * @return array<int|string, float>
+     */
+    private function mapAccountBalances(Collection $accounts, callable $keyResolver): array
+    {
+        $balances = [];
+
+        foreach ($accounts as $account) {
+            $balances[$keyResolver($account)] = $this->computePostedBalance($account);
+        }
+
+        return $balances;
+    }
+
+    /**
+     * @param  Collection<int, Account>  $accounts
      * @return array<int, float>
      */
     private function mapAccountBalancesById(Collection $accounts): array
     {
-        $balanceById = [];
+        /** @var array<int, float> $balances */
+        $balances = $this->mapAccountBalances(
+            $accounts,
+            static fn (Account $account): int => $account->id,
+        );
 
-        foreach ($accounts as $account) {
-            $balanceById[$account->id] = $this->computePostedBalance($account);
-        }
-
-        return $balanceById;
+        return $balances;
     }
 
     /**
@@ -470,13 +486,13 @@ class FinancialReportService
      */
     private function mapAccountBalancesByCode(Collection $accounts): array
     {
-        $balanceByCode = [];
+        /** @var array<string, float> $balances */
+        $balances = $this->mapAccountBalances(
+            $accounts,
+            static fn (Account $account): string => $account->code,
+        );
 
-        foreach ($accounts as $account) {
-            $balanceByCode[$account->code] = $this->computePostedBalance($account);
-        }
-
-        return $balanceByCode;
+        return $balances;
     }
 
     private function buildComparisonBalanceMap(
