@@ -4,11 +4,6 @@ namespace App\Http\Requests\PurchaseRequests;
 
 class StorePurchaseRequestRequest extends AbstractPurchaseRequestRequest
 {
-    protected function prNumberUniqueRule(): string
-    {
-        return 'unique:purchase_requests,pr_number';
-    }
-
     protected function usesSometimes(): bool
     {
         return false;

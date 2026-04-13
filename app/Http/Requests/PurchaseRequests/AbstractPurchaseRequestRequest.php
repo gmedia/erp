@@ -3,10 +3,13 @@
 namespace App\Http\Requests\PurchaseRequests;
 
 use App\Http\Requests\AuthorizedFormRequest;
+use App\Http\Requests\Concerns\HasRouteIgnoredUniqueRule;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use Illuminate\Validation\Rules\Unique;
 
 abstract class AbstractPurchaseRequestRequest extends AuthorizedFormRequest
 {
+    use HasRouteIgnoredUniqueRule;
     use HasSometimesArrayRules;
 
     public function rules(): array
@@ -52,7 +55,10 @@ abstract class AbstractPurchaseRequestRequest extends AuthorizedFormRequest
         return ['nullable', 'date'];
     }
 
-    abstract protected function prNumberUniqueRule(): string|object;
+    protected function prNumberUniqueRule(): Unique
+    {
+        return $this->routeIgnoredUniqueRule('purchase_requests', 'pr_number', 'purchaseRequest');
+    }
 
     abstract protected function usesSometimes(): bool;
 }

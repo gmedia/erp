@@ -3,10 +3,13 @@
 namespace App\Http\Requests\GoodsReceipts;
 
 use App\Http\Requests\AuthorizedFormRequest;
+use App\Http\Requests\Concerns\HasRouteIgnoredUniqueRule;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use Illuminate\Validation\Rules\Unique;
 
 abstract class AbstractGoodsReceiptRequest extends AuthorizedFormRequest
 {
+    use HasRouteIgnoredUniqueRule;
     use HasSometimesArrayRules;
 
     public function rules(): array
@@ -40,7 +43,10 @@ abstract class AbstractGoodsReceiptRequest extends AuthorizedFormRequest
         ];
     }
 
-    abstract protected function grNumberUniqueRule(): string|object;
+    protected function grNumberUniqueRule(): Unique
+    {
+        return $this->routeIgnoredUniqueRule('goods_receipts', 'gr_number', 'goodsReceipt');
+    }
 
     abstract protected function usesSometimes(): bool;
 }

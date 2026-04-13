@@ -119,6 +119,34 @@ test('store creates purchase request with items', function () {
     assertDatabaseHas('purchase_request_items', ['purchase_request_id' => $id, 'product_id' => $product->id]);
 });
 
+test('store rejects duplicate purchase request number', function () {
+    $branch = Branch::factory()->create();
+    $product = Product::factory()->create();
+    $unit = Unit::factory()->create();
+    PurchaseRequest::factory()->create(['pr_number' => 'PR-DUP-001']);
+
+    $payload = [
+        'pr_number' => 'PR-DUP-001',
+        'branch_id' => $branch->id,
+        'request_date' => '2026-03-05',
+        'required_date' => '2026-03-08',
+        'priority' => 'normal',
+        'status' => 'draft',
+        'items' => [
+            [
+                'product_id' => $product->id,
+                'unit_id' => $unit->id,
+                'quantity' => 10,
+                'estimated_unit_price' => 5000,
+            ],
+        ],
+    ];
+
+    postJson('/api/purchase-requests', $payload)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['pr_number']);
+});
+
 test('show returns purchase request detail', function () {
     $purchaseRequest = PurchaseRequest::factory()->create();
     $product = Product::factory()->create();
@@ -158,6 +186,16 @@ test('update modifies purchase request and items', function () {
         ->assertJsonPath('data.priority', 'urgent')
         ->assertJsonPath('data.status', 'approved')
         ->assertJsonCount(1, 'data.items');
+});
+
+test('update keeps current purchase request number unique', function () {
+    $purchaseRequest = PurchaseRequest::factory()->create(['pr_number' => 'PR-KEEP-001']);
+
+    putJson('/api/purchase-requests/' . $purchaseRequest->id, [
+        'pr_number' => 'PR-KEEP-001',
+    ])
+        ->assertOk()
+        ->assertJsonPath('data.pr_number', 'PR-KEEP-001');
 });
 
 test('destroy removes purchase request', function () {

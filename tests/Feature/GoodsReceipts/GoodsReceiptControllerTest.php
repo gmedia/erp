@@ -141,6 +141,35 @@ test('store creates goods receipt with items', function () {
     ]);
 });
 
+test('store rejects duplicate goods receipt number', function () {
+    [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
+    $warehouse = Warehouse::factory()->create();
+    GoodsReceipt::factory()->create(['gr_number' => 'GR-DUP-001']);
+
+    $payload = [
+        'gr_number' => 'GR-DUP-001',
+        'purchase_order_id' => $purchaseOrder->id,
+        'warehouse_id' => $warehouse->id,
+        'receipt_date' => '2026-03-06',
+        'status' => 'draft',
+        'items' => [
+            [
+                'purchase_order_item_id' => $purchaseOrderItem->id,
+                'product_id' => $product->id,
+                'unit_id' => $unit->id,
+                'quantity_received' => 5,
+                'quantity_accepted' => 5,
+                'quantity_rejected' => 0,
+                'unit_price' => 5000,
+            ],
+        ],
+    ];
+
+    postJson('/api/goods-receipts', $payload)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['gr_number']);
+});
+
 test('show returns goods receipt detail', function () {
     [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
     $goodsReceipt = GoodsReceipt::factory()->create(['purchase_order_id' => $purchaseOrder->id]);
@@ -183,6 +212,16 @@ test('update modifies goods receipt and items', function () {
         ->assertOk()
         ->assertJsonPath('data.status', 'confirmed')
         ->assertJsonCount(1, 'data.items');
+});
+
+test('update keeps current goods receipt number unique', function () {
+    $goodsReceipt = GoodsReceipt::factory()->create(['gr_number' => 'GR-KEEP-001']);
+
+    putJson('/api/goods-receipts/' . $goodsReceipt->id, [
+        'gr_number' => 'GR-KEEP-001',
+    ])
+        ->assertOk()
+        ->assertJsonPath('data.gr_number', 'GR-KEEP-001');
 });
 
 test('destroy removes goods receipt', function () {
