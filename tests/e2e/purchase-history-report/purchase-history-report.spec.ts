@@ -15,31 +15,40 @@ test.describe('Purchase History Report', () => {
         const poNumber = await createPurchaseHistoryReportData(page);
         await openPurchaseHistoryReport(page);
 
-        const sortResponsePromise = page.waitForResponse(
-            (response) =>
-                response.url().includes('/api/reports/purchase-history') &&
-                response.url().includes('sort_by=product_name') &&
-                response.status() < 400,
-        );
-        await page.getByRole('button', { name: 'Product', exact: true }).click({ force: true });
-        await sortResponsePromise;
+        await Promise.all([
+            page.waitForResponse(
+                (response) =>
+                    response.url().includes('/api/reports/purchase-history') &&
+                    response.url().includes('sort_by=product_name') &&
+                    response.status() < 400,
+            ),
+            page
+                .getByRole('button', { name: 'Product', exact: true })
+                .click({ force: true }),
+        ]);
 
-        const exportResponsePromise = page.waitForResponse(
-            (response) =>
-                response.url().includes('/api/reports/purchase-history/export') &&
-                response.status() < 400,
-        );
-        await page.getByRole('button', { name: /export/i }).click({ force: true });
-        await exportResponsePromise;
+        await Promise.all([
+            page.waitForResponse(
+                (response) =>
+                    response.url().includes('/api/reports/purchase-history/export') &&
+                    response.status() < 400,
+            ),
+            page.getByRole('button', { name: /export/i }).click({ force: true }),
+        ]);
 
         const searchInput = page.getByRole('textbox').first();
-        await searchInput.fill(poNumber);
-        await searchInput.press('Enter');
-        await waitForPurchaseHistoryReportResponse(page);
+        await Promise.all([
+            waitForPurchaseHistoryReportResponse(page),
+            searchInput.fill(poNumber).then(async () => {
+                await searchInput.press('Enter');
+            }),
+        ]);
 
         await page.getByRole('button', { name: /filters/i }).click();
-        await page.getByRole('button', { name: 'Apply Filters' }).click();
-        await waitForPurchaseHistoryReportResponse(page);
+        await Promise.all([
+            waitForPurchaseHistoryReportResponse(page),
+            page.getByRole('button', { name: 'Apply Filters' }).click(),
+        ]);
 
         await expect(page.locator('table')).toBeVisible();
     });

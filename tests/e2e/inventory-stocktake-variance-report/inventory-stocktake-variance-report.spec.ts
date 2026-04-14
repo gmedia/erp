@@ -15,7 +15,7 @@ test.describe('Inventory Stocktake Variance Report', () => {
         await page
             .waitForResponse(
                 (r) =>
-                    r.url().includes('/reports/inventory-stocktake-variance') &&
+                    r.url().includes('/api/reports/inventory-stocktake-variance') &&
                     r.request().headers()['accept']?.includes(
                         'application/json',
                     ) &&
@@ -27,37 +27,40 @@ test.describe('Inventory Stocktake Variance Report', () => {
         await expect(page.locator('table')).toBeVisible();
         await expect(page.locator('tbody tr').first()).toBeVisible();
 
-        const sortResponsePromise = page.waitForResponse(
-            (r) =>
-                r.url().includes('/reports/inventory-stocktake-variance') &&
-                r.url().includes('sort_by=category_name') &&
-                r.status() < 400,
-            { timeout: 30000 },
-        );
-        await page.getByRole('button', { name: 'Category', exact: true }).click();
-        await sortResponsePromise;
+        await Promise.all([
+            page.waitForResponse(
+                (r) =>
+                    r.url().includes('/api/reports/inventory-stocktake-variance') &&
+                    r.url().includes('sort_by=category_name') &&
+                    r.status() < 400,
+                { timeout: 30000 },
+            ),
+            page.getByRole('button', { name: 'Category', exact: true }).click(),
+        ]);
 
-        const exportResponsePromise = page.waitForResponse(
-            (r) =>
-                r.url().includes(
-                    '/reports/inventory-stocktake-variance/export',
-                ) && r.status() < 400,
-        );
-        await page.getByRole('button', { name: /export/i }).click();
-        await exportResponsePromise;
+        await Promise.all([
+            page.waitForResponse(
+                (r) =>
+                    r.url().includes(
+                        '/api/reports/inventory-stocktake-variance/export',
+                    ) && r.status() < 400,
+            ),
+            page.getByRole('button', { name: /export/i }).click(),
+        ]);
 
         await page.getByRole('button', { name: /filters/i }).click();
-        await page.getByRole('button', { name: 'Apply Filters' }).click();
-
-        await page
-            .waitForResponse(
-                (r) =>
-                    r.url().includes('/reports/inventory-stocktake-variance') &&
-                    r.request().headers()['accept']?.includes(
-                        'application/json',
-                    ) &&
-                    r.status() < 400,
-            )
-            .catch(() => null);
+        await Promise.all([
+            page
+                .waitForResponse(
+                    (r) =>
+                        r.url().includes('/api/reports/inventory-stocktake-variance') &&
+                        r.request().headers()['accept']?.includes(
+                            'application/json',
+                        ) &&
+                        r.status() < 400,
+                )
+                .catch(() => null),
+            page.getByRole('button', { name: 'Apply Filters' }).click(),
+        ]);
     });
 });

@@ -15,31 +15,38 @@ test.describe('Goods Receipt Report', () => {
         const grNumber = await createGoodsReceiptReportData(page);
         await openGoodsReceiptReport(page);
 
-        const sortResponsePromise = page.waitForResponse(
-            (response) =>
-                response.url().includes('/reports/goods-receipt') &&
-                response.url().includes('sort_by=supplier_name') &&
-                response.status() < 400,
-        );
-        await page.getByRole('button', { name: 'Supplier', exact: true }).click();
-        await sortResponsePromise;
+        await Promise.all([
+            page.waitForResponse(
+                (response) =>
+                    response.url().includes('/api/reports/goods-receipt') &&
+                    response.url().includes('sort_by=supplier_name') &&
+                    response.status() < 400,
+            ),
+            page.getByRole('button', { name: 'Supplier', exact: true }).click(),
+        ]);
 
-        const exportResponsePromise = page.waitForResponse(
-            (response) =>
-                response.url().includes('/reports/goods-receipt/export') &&
-                response.status() < 400,
-        );
-        await page.getByRole('button', { name: /export/i }).click({ force: true });
-        await exportResponsePromise;
+        await Promise.all([
+            page.waitForResponse(
+                (response) =>
+                    response.url().includes('/api/reports/goods-receipt/export') &&
+                    response.status() < 400,
+            ),
+            page.getByRole('button', { name: /export/i }).click({ force: true }),
+        ]);
 
         const searchInput = page.getByRole('textbox').first();
-        await searchInput.fill(grNumber);
-        await searchInput.press('Enter');
-        await waitForGoodsReceiptReportResponse(page);
+        await Promise.all([
+            waitForGoodsReceiptReportResponse(page),
+            searchInput.fill(grNumber).then(async () => {
+                await searchInput.press('Enter');
+            }),
+        ]);
 
         await page.getByRole('button', { name: /filters/i }).click();
-        await page.getByRole('button', { name: 'Apply Filters' }).click();
-        await waitForGoodsReceiptReportResponse(page);
+        await Promise.all([
+            waitForGoodsReceiptReportResponse(page),
+            page.getByRole('button', { name: 'Apply Filters' }).click(),
+        ]);
 
         await expect(page.locator('table')).toBeVisible();
     });

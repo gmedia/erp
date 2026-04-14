@@ -11,7 +11,7 @@ export async function waitForGoodsReceiptReportResponse(
     await page
         .waitForResponse(
             (response) =>
-                response.url().includes('/reports/goods-receipt') &&
+                response.url().includes('/api/reports/goods-receipt') &&
                 response.request().headers()['accept']?.includes(
                     'application/json',
                 ) &&

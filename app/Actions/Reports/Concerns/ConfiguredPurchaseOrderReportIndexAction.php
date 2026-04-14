@@ -105,12 +105,15 @@ abstract class ConfiguredPurchaseOrderReportIndexAction
      */
     protected function purchaseOrderPartySelectColumns(): array
     {
+        // Use explicit table prefixes to avoid ambiguous column errors
         return [
             's.id as supplier_id',
             's.name as supplier_name',
             'w.id as warehouse_id',
             'w.code as warehouse_code',
             'w.name as warehouse_name',
+            'po.id as purchase_order_id',
+            'po.po_number as purchase_order_number',
         ];
     }
 
@@ -119,12 +122,15 @@ abstract class ConfiguredPurchaseOrderReportIndexAction
      */
     protected function purchaseOrderPartyGroupByColumns(): array
     {
+        // Use explicit table prefixes to avoid ambiguous column errors
         return [
             's.id',
             's.name',
             'w.id',
             'w.code',
             'w.name',
+            'po.id',
+            'po.po_number',
         ];
     }
 
@@ -253,6 +259,17 @@ abstract class ConfiguredPurchaseOrderReportIndexAction
      */
     protected function compileSelectColumns(array $columns): string
     {
-        return implode(",\n                ", $columns);
+        // Remove duplicate aliases (e.g., po.id as purchase_order_id appears twice)
+        $seen = [];
+        $filtered = [];
+        foreach ($columns as $col) {
+            if (preg_match('/ as ([a-zA-Z0-9_]+)/', $col, $m)) {
+                $alias = $m[1];
+                if (isset($seen[$alias])) continue;
+                $seen[$alias] = true;
+            }
+            $filtered[] = $col;
+        }
+        return implode(",\n                ", $filtered);
     }
 }

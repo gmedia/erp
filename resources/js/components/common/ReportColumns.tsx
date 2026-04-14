@@ -43,6 +43,7 @@ type WarehouseColumnOptions<TData> = {
 };
 
 type StatusBadgeColumnOptions<TData> = {
+    id?: string;
     accessorKey: string;
     header: string;
     getValue: (row: TData) => string | null | undefined;
@@ -136,8 +137,24 @@ export function StatusBadgeCell({
     );
 }
 
-function resolveReportColumnId(header: string, id?: string): string {
-    return id ?? header.toLowerCase().replaceAll(/\s+/g, '_');
+function resolveReportColumnId({
+    id,
+    accessorKey,
+    header,
+}: {
+    id?: string;
+    accessorKey?: string;
+    header: string;
+}): string {
+    if (id) {
+        return id;
+    }
+
+    if (accessorKey) {
+        return accessorKey.replaceAll('.', '_');
+    }
+
+    return header.toLowerCase().replaceAll(/\s+/g, '_');
 }
 
 function createReportDisplayColumn<TData>({
@@ -149,7 +166,11 @@ function createReportDisplayColumn<TData>({
 }: ReportDisplayColumnOptions<TData>): ColumnDef<TData> {
     const cell = ({ row }: CellContext<TData, unknown>) =>
         renderCell(row.original);
-    const columnId = resolveReportColumnId(header, id);
+    const columnId = resolveReportColumnId({
+        id,
+        accessorKey,
+        header,
+    });
 
     if (sortable && accessorKey) {
         return {
@@ -229,7 +250,14 @@ export function createReportWarehouseColumn<TData>(
 export function createReportStatusBadgeColumn<TData>(
     options: StatusBadgeColumnOptions<TData>,
 ): ColumnDef<TData> {
+    const columnId = resolveReportColumnId({
+        id: options.id,
+        accessorKey: options.accessorKey,
+        header: options.header,
+    });
+
     return {
+        id: columnId,
         accessorKey: options.accessorKey,
         ...createSortingHeader(options.header),
         cell: ({ row }: CellContext<TData, unknown>) => (

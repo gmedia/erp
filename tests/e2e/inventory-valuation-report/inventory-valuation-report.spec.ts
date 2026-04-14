@@ -13,7 +13,7 @@ test.describe('Inventory Valuation Report', () => {
         await page
             .waitForResponse(
                 (r) =>
-                    r.url().includes('/reports/inventory-valuation') &&
+                    r.url().includes('/api/reports/inventory-valuation') &&
                     r.request().headers()['accept']?.includes('application/json') &&
                     r.status() < 400,
             )
@@ -22,37 +22,45 @@ test.describe('Inventory Valuation Report', () => {
         await expect(page.locator('table')).toBeVisible();
         await expect(page.locator('tbody tr').first()).toBeVisible();
 
-        const exportResponsePromise = page.waitForResponse(
-            (r) =>
-                r.url().includes('/reports/inventory-valuation/export') &&
-                r.status() < 400,
-        );
-        await page.getByRole('button', { name: /export/i }).click();
-        await exportResponsePromise;
+        await Promise.all([
+            page.waitForResponse(
+                (r) =>
+                    r.url().includes('/api/reports/inventory-valuation/export') &&
+                    r.status() < 400,
+            ),
+            page.getByRole('button', { name: /export/i }).click(),
+        ]);
 
         const searchInput = page.getByRole('textbox').first();
-        await searchInput.fill('P-');
-        await searchInput.press('Enter');
-
-        await page
-            .waitForResponse(
-                (r) =>
-                    r.url().includes('/reports/inventory-valuation') &&
-                    r.request().headers()['accept']?.includes('application/json') &&
-                    r.status() < 400,
-            )
-            .catch(() => null);
+        await Promise.all([
+            page
+                .waitForResponse(
+                    (r) =>
+                        r.url().includes('/api/reports/inventory-valuation') &&
+                        r.request().headers()['accept']?.includes(
+                            'application/json',
+                        ) &&
+                        r.status() < 400,
+                )
+                .catch(() => null),
+            searchInput.fill('P-').then(async () => {
+                await searchInput.press('Enter');
+            }),
+        ]);
 
         await page.getByRole('button', { name: /filters/i }).click();
-        await page.getByRole('button', { name: 'Apply Filters' }).click();
-
-        await page
-            .waitForResponse(
-                (r) =>
-                    r.url().includes('/reports/inventory-valuation') &&
-                    r.request().headers()['accept']?.includes('application/json') &&
-                    r.status() < 400,
-            )
-            .catch(() => null);
+        await Promise.all([
+            page
+                .waitForResponse(
+                    (r) =>
+                        r.url().includes('/api/reports/inventory-valuation') &&
+                        r.request().headers()['accept']?.includes(
+                            'application/json',
+                        ) &&
+                        r.status() < 400,
+                )
+                .catch(() => null),
+            page.getByRole('button', { name: 'Apply Filters' }).click(),
+        ]);
     });
 });
