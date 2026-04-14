@@ -265,11 +265,14 @@ abstract class ConfiguredPurchaseOrderReportIndexAction
         foreach ($columns as $col) {
             if (preg_match('/ as ([a-zA-Z0-9_]+)/', $col, $m)) {
                 $alias = $m[1];
-                if (isset($seen[$alias])) continue;
+                if (isset($seen[$alias])) {
+                    continue;
+                }
                 $seen[$alias] = true;
             }
             $filtered[] = $col;
         }
+
         return implode(",\n                ", $filtered);
     }
 }
