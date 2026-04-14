@@ -40,6 +40,7 @@ _ide_helper.php
 # Playwright artifacts
 playwright-report/
 test-results/
+output_e2e_test.log
 
 # Pest artifacts
 coverage-html/

@@ -187,8 +187,6 @@ export async function login(
   email = 'admin@dokfin.id',
   password = 'password'
 ): Promise<void> {
-  if (page.url().includes('/dashboard')) return;
-
   // Listen for uncaught JS errors
   page.on('pageerror', exception => {
     console.error(`Uncaught exception: "${exception}"`);
@@ -228,37 +226,43 @@ export async function login(
     throw lastError instanceof Error ? lastError : new Error(String(lastError));
   };
 
-  // Go explicitly to /login. GuestRoute will redirect to /dashboard if already authenticated.
+  const clearStoredAuth = async (): Promise<void> => {
+    await page.context().clearCookies();
+    await page.evaluate(() => {
+      localStorage.removeItem('api_token');
+      sessionStorage.clear();
+    });
+  };
+
+  // Auth in this SPA is driven by a bearer token in localStorage, not cookies.
+  // Reset the client auth state before every login so stale tokens do not redirect
+  // us away from the login page or keep us logged in as the wrong user.
+  await gotoWithRetry('/login');
+  await clearStoredAuth();
   await gotoWithRetry('/login');
 
-  // Wait for either the dashboard url OR the login email input to appear
-  try {
-    await Promise.race([
-      page.waitForURL('**/dashboard', { timeout: 15000 }),
-      page.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 15000 })
-    ]);
-  } catch {
-    // Ignore timeout, we'll check states below
-  }
-
-  if (page.url().includes('/dashboard')) return;
-
   const emailInput = page.locator('input[name="email"]');
-  if (page.url().includes('/login') || (await emailInput.isVisible({ timeout: 10000 }).catch(() => false))) {
-    if (!page.url().includes('/login')) {
-      await gotoWithRetry('/login');
-    }
-    await expect(emailInput).toBeVisible({ timeout: 15000 });
-    await emailInput.fill(email);
-    await page.fill('input[name="password"]', password);
-    await page.evaluate(() => {
-      document.querySelector('vite-error-overlay')?.remove();
-    });
-    await page.locator('button[type="submit"], button[data-testid="login-button"]').first().click({ force: true });
-    await page.waitForURL('**/dashboard', { timeout: 60000 });
-    return;
-  }
+  await page.evaluate(() => {
+    document.querySelector('vite-error-overlay')?.remove();
+  });
+  await expect(emailInput).toBeVisible({ timeout: 15000 });
+  await emailInput.fill(email);
+  await page.fill('input[name="password"]', password);
 
+  const loginResponse = page.waitForResponse(
+    response =>
+      response.url().includes('/api/login') && response.request().method() === 'POST',
+    { timeout: 60000 },
+  ).catch(() => null);
+
+  await page
+    .locator(
+      'button[type="submit"], button[data-test="login-button"], button[data-testid="login-button"]',
+    )
+    .first()
+    .click({ force: true });
+
+  await loginResponse;
   await page.waitForURL('**/dashboard', { timeout: 60000 });
 }
 
