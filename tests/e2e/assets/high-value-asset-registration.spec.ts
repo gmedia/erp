@@ -25,13 +25,27 @@ async function goToAssetProfile(page: Page, assetName: string) {
 
   // Open actions dropdown → View
   await row.getByRole('button').last().click();
-  await page.getByRole('menuitem', { name: 'View' }).click();
 
-  // Wait for profile page to load
-  await expect(page).toHaveURL(/\/assets\/\w+/, { timeout: 15000 });
-  await page.waitForResponse(
-    r => r.url().includes('/api/entity-states/') && r.status() < 400
-  ).catch(() => null);
+  await Promise.all([
+    page.waitForURL(/\/assets\/[^/]+$/, { timeout: 15000 }),
+    page.waitForResponse(
+      r => /\/api\/assets\/[^/]+\/profile$/.test(r.url()) && r.status() < 400,
+      { timeout: 15000 }
+    ).catch(() => null),
+    page.waitForResponse(
+      r =>
+        r.url().includes('/api/entity-states/asset/') &&
+        !r.url().includes('/timeline') &&
+        !r.url().includes('/approvals') &&
+        r.status() < 400,
+      { timeout: 15000 }
+    ).catch(() => null),
+    page.getByRole('menuitem', { name: 'View' }).click(),
+  ]);
+
+  await expect(
+    page.getByRole('heading', { name: assetName, exact: true }),
+  ).toBeVisible({ timeout: 15000 });
 }
 
 test.describe('High Value Asset Registration — Approval Flow', () => {

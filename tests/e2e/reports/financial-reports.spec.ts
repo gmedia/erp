@@ -1,17 +1,18 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page, type Response } from '@playwright/test';
 import { login } from '../helpers';
 
 async function openFinancialReport(
-    page: Parameters<(typeof test)['beforeEach']>[0]['page'],
+    page: Page,
     path: string,
     endpoint: string,
     title: RegExp,
 ) {
     await Promise.all([
         page.waitForResponse(
-            (response) =>
+            (response: Response) =>
                 response.url().includes(`/api/reports/${endpoint}`) &&
                 response.status() < 400,
+            { timeout: 30000 },
         ),
         page.goto(path),
     ]);
@@ -54,9 +55,15 @@ test.describe('Financial Reports', () => {
         await expect(
             page.getByRole('heading', { name: 'Balance Sheet', level: 1 }),
         ).toBeVisible();
-        await expect(page.locator('[data-slot="card-title"]', { hasText: 'Assets' })).toBeVisible();
-        await expect(page.locator('[data-slot="card-title"]', { hasText: 'Liabilities' })).toBeVisible();
-        await expect(page.locator('[data-slot="card-title"]', { hasText: 'Equity' })).toBeVisible();
+        await expect(
+            page.locator('[data-slot="card-title"]', { hasText: 'Assets' }),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(
+            page.locator('[data-slot="card-title"]', { hasText: 'Liabilities' }),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(
+            page.locator('[data-slot="card-title"]', { hasText: 'Equity' }),
+        ).toBeVisible({ timeout: 15000 });
 
         await expect(page.getByText('Total Assets')).toBeVisible();
         await expect(page.getByText('Total Liabilities & Equity')).toBeVisible();
@@ -70,13 +77,16 @@ test.describe('Financial Reports', () => {
             /Balance Sheet/,
         );
 
-        const compareSelector = page.getByRole('combobox').filter({ hasText: /None|FY-/ }).first();
+        const selectors = page.getByRole('combobox');
+        await expect(selectors).toHaveCount(2, { timeout: 15000 });
 
-        if (await compareSelector.isVisible()) {
-            await expect(compareSelector).toBeVisible();
-            await compareSelector.click();
-            await expect(page.getByRole('option')).not.toHaveCount(0);
-        }
+        const compareSelector = selectors.nth(1);
+        await expect(compareSelector).toBeVisible({ timeout: 15000 });
+        await compareSelector.click();
+
+        await expect(
+            page.getByRole('option', { name: 'None' }),
+        ).toBeVisible({ timeout: 15000 });
     });
 
     test('can view income statement', async ({ page }) => {
