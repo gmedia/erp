@@ -35,9 +35,24 @@ export async function createAssetMaintenance(
   }
 
   const submitBtn = dialog.getByRole('button', { name: /Save Maintenance|Update Maintenance|Add|Create|Submit/i }).last();
+  const mutationResponsePromise = page.waitForResponse(
+    response =>
+      response.url().includes('/api/asset-maintenances') &&
+      ['POST', 'PUT', 'PATCH'].includes(response.request().method()) &&
+      response.status() < 400,
+    { timeout: 15000 },
+  ).catch(() => null);
   await submitBtn.click();
+  await mutationResponsePromise;
 
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
+  await page.waitForResponse(
+    response =>
+      response.url().includes('/api/asset-maintenances') &&
+      response.request().method() === 'GET' &&
+      response.status() < 400,
+    { timeout: 15000 },
+  ).catch(() => null);
 
   return identifier;
 }
@@ -46,8 +61,15 @@ export async function searchAssetMaintenance(page: Page, query: string): Promise
   const searchInput = page.getByPlaceholder(/Search/i).first();
   await expect(searchInput).toBeVisible();
   await searchInput.fill(query);
+  const responsePromise = page.waitForResponse(
+    response =>
+      response.url().includes('/api/asset-maintenances') &&
+      response.request().method() === 'GET' &&
+      response.status() < 400,
+    { timeout: 15000 },
+  ).catch(() => null);
   await searchInput.press('Enter');
-  await page.waitForLoadState('networkidle');
+  await responsePromise;
 }
 
 export async function deleteAssetMaintenance(page: Page, notes: string): Promise<void> {

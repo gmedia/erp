@@ -28,6 +28,10 @@ async function waitForBalanceSheetReady(page: Page) {
     await expect(
         page.getByText('Total Liabilities & Equity'),
     ).toBeVisible({ timeout: 30000 });
+    await expect(page.getByRole('combobox').nth(1)).toBeVisible({ timeout: 30000 });
+    await expect(
+        page.locator('[data-slot="card-title"]').filter({ hasText: /^Assets$/ }).first(),
+    ).toBeVisible({ timeout: 30000 });
 }
 
 test.describe('Financial Reports', () => {
@@ -63,9 +67,6 @@ test.describe('Financial Reports', () => {
         );
 
         await waitForBalanceSheetReady(page);
-        await expect(
-            page.locator('[data-slot="card-title"]', { hasText: 'Assets' }),
-        ).toBeVisible({ timeout: 30000 });
     });
 
     test('can use balance sheet comparison', async ({ page }) => {
@@ -78,12 +79,12 @@ test.describe('Financial Reports', () => {
 
         await waitForBalanceSheetReady(page);
 
-        const compareSelector = page.getByRole('combobox').last();
+        const compareSelector = page.getByRole('combobox').nth(1);
         await expect(compareSelector).toBeVisible({ timeout: 30000 });
         await compareSelector.click();
 
         await expect(
-            page.getByRole('option').filter({ hasText: /None|FY-/ }).first(),
+            page.getByRole('option', { name: 'None', exact: true }),
         ).toBeVisible({ timeout: 15000 });
     });
 

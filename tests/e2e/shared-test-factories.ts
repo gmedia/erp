@@ -5,7 +5,7 @@
  * All modules MUST comply with the ModuleTestConfig interface.
  */
 
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, Locator } from '@playwright/test';
 import { login } from './helpers';
 import * as fs from 'node:fs';
 import ExcelJS from 'exceljs';
@@ -69,13 +69,22 @@ async function waitForApiResponse(page: Page, apiPath: string): Promise<void> {
         .catch(() => null);
 }
 
-async function openActionsMenu(page: Page, config: ModuleTestConfig): Promise<void> {
+async function navigateToModule(page: Page, route: string, apiPath: string): Promise<void> {
+    const responsePromise = waitForApiResponse(page, apiPath);
+    await page.goto(route);
+    await responsePromise;
+}
+
+function findTableRow(page: Page, identifier: string): Locator {
+    return page.locator('tbody tr').filter({ hasText: identifier }).first();
+}
+
+async function openActionsMenu(target: Locator, config: ModuleTestConfig): Promise<void> {
     if (config.actionsPattern === 'icon-buttons') {
         return;
     }
     // Default: dropdown menu
-    const firstRow = page.locator('tbody tr').first();
-    await firstRow.getByRole('button').last().click();
+    await target.getByRole('button').last().click();
 }
 
 // ==================== TEST FACTORY ====================
@@ -86,8 +95,7 @@ export function generateModuleTests(config: ModuleTestConfig) {
 
         test.beforeEach(async ({ page }) => {
             await login(page);
-            await page.goto(config.route);
-            await waitForApiResponse(page, config.apiPath);
+            await navigateToModule(page, config.route, config.apiPath);
             if (config.customBeforeEach) {
                 await config.customBeforeEach(page);
             }
@@ -100,7 +108,7 @@ export function generateModuleTests(config: ModuleTestConfig) {
 
             // Verify entity appears in table
             await config.searchEntity(page, createdIdentifier);
-            await expect(page.getByText(createdIdentifier).first()).toBeVisible();
+            await expect(findTableRow(page, createdIdentifier)).toBeVisible();
         });
 
         // ==================== 2. SEARCH ====================
@@ -112,7 +120,7 @@ export function generateModuleTests(config: ModuleTestConfig) {
             await config.searchEntity(page, identifier);
 
             // Verify found
-            await expect(page.getByText(identifier).first()).toBeVisible();
+            await expect(findTableRow(page, identifier)).toBeVisible();
         });
 
         // ==================== 3. EDIT ====================
@@ -130,18 +138,20 @@ export function generateModuleTests(config: ModuleTestConfig) {
             // Verify updated value appears
             const updatedValue = Object.values(config.editUpdates)[0];
             await config.searchEntity(page, updatedValue);
-            await expect(page.getByText(updatedValue).first()).toBeVisible();
+            await expect(findTableRow(page, updatedValue)).toBeVisible();
         });
 
         // ==================== 4. VIEW ====================
         test(`can view ${config.entityName}`, async ({ page }) => {
             const identifier = await config.createEntity(page);
             await config.searchEntity(page, identifier);
+            const row = findTableRow(page, identifier);
+            await expect(row).toBeVisible();
 
             if (config.actionsPattern === 'icon-buttons' && config.customViewAction) {
                 await config.customViewAction(page);
             } else {
-                await openActionsMenu(page, config);
+                await openActionsMenu(row, config);
                 await page.getByRole('menuitem', { name: 'View' }).click();
             }
 
@@ -153,7 +163,7 @@ export function generateModuleTests(config: ModuleTestConfig) {
                 if (config.viewUrlPattern) {
                     await expect(page).toHaveURL(config.viewUrlPattern);
                 }
-                await expect(page.getByText(identifier).first()).toBeVisible();
+                await expect(page.getByText(identifier, { exact: true }).first()).toBeVisible();
             }
         });
 
@@ -161,23 +171,25 @@ export function generateModuleTests(config: ModuleTestConfig) {
         test(`can delete ${config.entityName}`, async ({ page }) => {
             const identifier = await config.createEntity(page);
             await config.searchEntity(page, identifier);
+            const row = findTableRow(page, identifier);
+            await expect(row).toBeVisible();
 
             if (config.actionsPattern === 'icon-buttons' && config.customDeleteAction) {
                 await config.customDeleteAction(page);
             } else {
-                await openActionsMenu(page, config);
+                await openActionsMenu(row, config);
                 await page.getByRole('menuitem', { name: 'Delete' }).click();
             }
 
             // Confirm delete dialog
             const confirmButton = page.getByRole('button', { name: /continue|confirm|delete|yes|hapus/i });
-            await confirmButton.click();
-
-            await waitForApiResponse(page, config.apiPath);
+            const responsePromise = waitForApiResponse(page, config.apiPath);
+            await confirmButton.first().click();
+            await responsePromise;
 
             // Verify deleted — search should not find it
             await config.searchEntity(page, identifier);
-            await expect(page.getByText(identifier)).not.toBeVisible();
+            await expect(findTableRow(page, identifier)).not.toBeVisible();
         });
 
         // ==================== 6. EXPORT ====================
@@ -216,10 +228,9 @@ export function generateModuleTests(config: ModuleTestConfig) {
         test(`${config.entityNamePlural} datatable has correct checkbox behavior`, async ({ page }) => {
             // Create entity to ensure table has rows
             await config.createEntity(page);
-            await page.goto(config.route);
-            await waitForApiResponse(page, config.apiPath);
+            await navigateToModule(page, config.route, config.apiPath);
 
-            // Header: TIDAK boleh ada checkbox
+            // Header: current table implementation exposes the select-all checkbox
             const headerCheckboxes = page.locator('thead').locator('button[role="checkbox"]');
             await expect(headerCheckboxes).toHaveCount(1);
 
@@ -233,20 +244,21 @@ export function generateModuleTests(config: ModuleTestConfig) {
             test.setTimeout(120000); // 2 minutes for sorting all columns
             // Create entity to ensure table has data
             await config.createEntity(page);
-            await page.goto(config.route);
-            await waitForApiResponse(page, config.apiPath);
+            await navigateToModule(page, config.route, config.apiPath);
 
             for (const column of config.sortableColumns) {
                 const sortButton = page.locator('thead').getByRole('button', { name: column, exact: true });
                 await expect(sortButton).toBeVisible();
 
                 // Sort ASC
+                const ascResponsePromise = waitForApiResponse(page, config.apiPath);
                 await sortButton.click();
-                await waitForApiResponse(page, config.apiPath);
+                await ascResponsePromise;
 
                 // Sort DESC
+                const descResponsePromise = waitForApiResponse(page, config.apiPath);
                 await sortButton.click();
-                await waitForApiResponse(page, config.apiPath);
+                await descResponsePromise;
             }
         });
 
@@ -297,10 +309,10 @@ export function generateModuleTests(config: ModuleTestConfig) {
             // Apply filter
             const applyButton = page.getByRole('button', { name: /apply|terapkan/i });
             if (await applyButton.isVisible()) {
+                const responsePromise = waitForApiResponse(page, config.apiPath);
                 await applyButton.click();
+                await responsePromise;
             }
-
-            await waitForApiResponse(page, config.apiPath);
         });
     });
 }

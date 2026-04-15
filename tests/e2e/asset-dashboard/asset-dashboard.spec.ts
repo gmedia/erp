@@ -1,6 +1,16 @@
 import { test, expect } from '@playwright/test';
 import { login } from '../helpers';
 
+async function waitForAssetDashboardData(page: Parameters<typeof test.beforeEach>[0]['page']) {
+  await page.waitForResponse(
+    response =>
+      response.url().includes('/api/asset-dashboard/data') &&
+      response.request().method() === 'GET' &&
+      response.status() < 400,
+    { timeout: 15000 },
+  ).catch(() => null);
+}
+
 test.describe('Asset Dashboard', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate and login
@@ -10,10 +20,12 @@ test.describe('Asset Dashboard', () => {
   test('can navigate to asset dashboard from menu and view cards', async ({ page }) => {
     // 1. Open Asset menu and click Asset Dashboard
     await page.getByRole('button', { name: 'Asset', exact: true }).first().click();
+    const dataPromise = waitForAssetDashboardData(page);
     await page.getByRole('link', { name: 'Asset Dashboard' }).click();
 
     // 2. Wait for navigation
     await page.waitForURL('**/asset-dashboard', { timeout: 15000 });
+    await dataPromise;
     await expect(page.getByRole('heading', { name: 'Asset Management Overview' })).toBeVisible();
 
     // 3. Verify cards exist and load data (or show 0/Rp0 if empty database)
@@ -26,16 +38,16 @@ test.describe('Asset Dashboard', () => {
 
     for (const card of cards) {
       const container = page
-        .locator('.border-l-4') // Our summary cards use border-l-4
+        .locator('[data-slot="card"]')
         .filter({ hasText: card.label })
         .first();
 
       await expect(container).toBeVisible({ timeout: 10000 });
       
       // Value should be visible (a number or currency string)
-      const value = container.locator('.text-3xl.font-bold').first();
+      const value = container.locator('[data-slot="card-content"]').first();
       await expect(value).toBeVisible();
-      await expect(value).toHaveText(/[\d.,Rp]+|0/);
+      await expect(value).toContainText(/[\d.,Rp]+/);
     }
     
     // 4. Verify charts and tables sections exist
