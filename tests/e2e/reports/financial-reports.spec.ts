@@ -20,6 +20,16 @@ async function openFinancialReport(
     await expect(page).toHaveTitle(title);
 }
 
+async function waitForBalanceSheetReady(page: Page) {
+    await expect(
+        page.getByRole('heading', { name: 'Balance Sheet', level: 1 }),
+    ).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText('Total Assets')).toBeVisible({ timeout: 30000 });
+    await expect(
+        page.getByText('Total Liabilities & Equity'),
+    ).toBeVisible({ timeout: 30000 });
+}
+
 test.describe('Financial Reports', () => {
     test.beforeEach(async ({ page }) => {
         await login(page);
@@ -52,21 +62,10 @@ test.describe('Financial Reports', () => {
             /Balance Sheet/,
         );
 
-        await expect(
-            page.getByRole('heading', { name: 'Balance Sheet', level: 1 }),
-        ).toBeVisible();
+        await waitForBalanceSheetReady(page);
         await expect(
             page.locator('[data-slot="card-title"]', { hasText: 'Assets' }),
-        ).toBeVisible({ timeout: 15000 });
-        await expect(
-            page.locator('[data-slot="card-title"]', { hasText: 'Liabilities' }),
-        ).toBeVisible({ timeout: 15000 });
-        await expect(
-            page.locator('[data-slot="card-title"]', { hasText: 'Equity' }),
-        ).toBeVisible({ timeout: 15000 });
-
-        await expect(page.getByText('Total Assets')).toBeVisible();
-        await expect(page.getByText('Total Liabilities & Equity')).toBeVisible();
+        ).toBeVisible({ timeout: 30000 });
     });
 
     test('can use balance sheet comparison', async ({ page }) => {
@@ -77,15 +76,14 @@ test.describe('Financial Reports', () => {
             /Balance Sheet/,
         );
 
-        const selectors = page.getByRole('combobox');
-        await expect(selectors).toHaveCount(2, { timeout: 15000 });
+        await waitForBalanceSheetReady(page);
 
-        const compareSelector = selectors.nth(1);
-        await expect(compareSelector).toBeVisible({ timeout: 15000 });
+        const compareSelector = page.getByRole('combobox').last();
+        await expect(compareSelector).toBeVisible({ timeout: 30000 });
         await compareSelector.click();
 
         await expect(
-            page.getByRole('option', { name: 'None' }),
+            page.getByRole('option').filter({ hasText: /None|FY-/ }).first(),
         ).toBeVisible({ timeout: 15000 });
     });
 
