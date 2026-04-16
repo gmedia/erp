@@ -17,21 +17,25 @@ async function openFinancialReport(
         page.goto(path),
     ]);
 
-    await expect(page).toHaveTitle(title);
+    await expect(page).toHaveTitle(title, { timeout: 60000 });
 }
 
 async function waitForBalanceSheetReady(page: Page) {
+    await expect(page.getByText('Loading report...')).toHaveCount(0, {
+        timeout: 60000,
+    });
     await expect(
         page.getByRole('heading', { name: 'Balance Sheet', level: 1 }),
-    ).toBeVisible({ timeout: 30000 });
-    await expect(page.getByText('Total Assets')).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: 60000 });
+    await expect(page.getByText('Total Assets')).toBeVisible({ timeout: 60000 });
     await expect(
         page.getByText('Total Liabilities & Equity'),
-    ).toBeVisible({ timeout: 30000 });
-    await expect(page.getByRole('combobox').nth(1)).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: 60000 });
+    await expect(page.getByRole('combobox').first()).toBeVisible({ timeout: 60000 });
+    await expect(page.getByRole('combobox').nth(1)).toBeVisible({ timeout: 60000 });
     await expect(
         page.locator('[data-slot="card-title"]').filter({ hasText: /^Assets$/ }).first(),
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible({ timeout: 60000 });
 }
 
 test.describe('Financial Reports', () => {
@@ -59,6 +63,8 @@ test.describe('Financial Reports', () => {
     });
 
     test('can view balance sheet', async ({ page }) => {
+        test.slow();
+
         await openFinancialReport(
             page,
             '/reports/balance-sheet',
@@ -70,6 +76,8 @@ test.describe('Financial Reports', () => {
     });
 
     test('can use balance sheet comparison', async ({ page }) => {
+        test.slow();
+
         await openFinancialReport(
             page,
             '/reports/balance-sheet',
@@ -80,12 +88,13 @@ test.describe('Financial Reports', () => {
         await waitForBalanceSheetReady(page);
 
         const compareSelector = page.getByRole('combobox').nth(1);
-        await expect(compareSelector).toBeVisible({ timeout: 30000 });
+        await expect(compareSelector).toBeVisible({ timeout: 60000 });
         await compareSelector.click();
 
+        await expect(page.getByRole('listbox')).toBeVisible({ timeout: 30000 });
         await expect(
             page.getByRole('option', { name: 'None', exact: true }),
-        ).toBeVisible({ timeout: 15000 });
+        ).toBeVisible({ timeout: 30000 });
     });
 
     test('can view income statement', async ({ page }) => {

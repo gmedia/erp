@@ -227,15 +227,19 @@ export function generateModuleTests(config: ModuleTestConfig) {
         // ==================== 7. CHECKBOX ====================
         test(`${config.entityNamePlural} datatable has correct checkbox behavior`, async ({ page }) => {
             // Create entity to ensure table has rows
-            await config.createEntity(page);
+            const identifier = await config.createEntity(page);
             await navigateToModule(page, config.route, config.apiPath);
+            await config.searchEntity(page, identifier);
 
             // Header: current table implementation exposes the select-all checkbox
-            const headerCheckboxes = page.locator('thead').locator('button[role="checkbox"]');
+            const headerCheckboxes = page.locator('thead [data-testid="select-all"]');
             await expect(headerCheckboxes).toHaveCount(1);
+            await expect(headerCheckboxes.first()).toBeVisible();
 
-            // Body: HARUS ada checkbox
-            const bodyCheckbox = page.locator('tbody tr').first().locator('button[role="checkbox"]');
+            // Body: HARUS ada checkbox on the created row, not just the first rendered row.
+            const row = findTableRow(page, identifier);
+            await expect(row).toBeVisible();
+            const bodyCheckbox = row.locator('[data-testid="select-row"]').first();
             await expect(bodyCheckbox).toBeVisible();
         });
 
