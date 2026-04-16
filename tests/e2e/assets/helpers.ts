@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { login, searchAndWaitForApi, waitForApiAfterAction } from '../helpers';
 
 async function pickAsyncOption(page: Page, label: string): Promise<void> {
   const option = page
@@ -8,6 +8,16 @@ async function pickAsyncOption(page: Page, label: string): Promise<void> {
     .first();
   await expect(option).toBeVisible({ timeout: 10000 });
   await option.click({ force: true });
+}
+
+async function ensureAuthenticated(page: Page): Promise<void> {
+  const hasApiToken = await page
+    .evaluate(() => Boolean(localStorage.getItem('api_token')))
+    .catch(() => false);
+
+  if (!hasApiToken) {
+    await login(page);
+  }
 }
 
 /**
@@ -33,8 +43,8 @@ export async function createAsset(
   const assetCode = overrides.asset_code ?? `AST-${timestamp}`;
   const assetName = overrides.name ?? `Test Asset ${timestamp}`;
 
-  await login(page);
-  await page.goto('/assets');
+  await ensureAuthenticated(page);
+  await waitForApiAfterAction(page, '/api/assets', () => page.goto('/assets'), 30000);
 
   // Open the "Add Asset" dialog
   await page.getByRole('button', { name: /Add/i }).click();
@@ -89,11 +99,26 @@ export async function createAsset(
 
   // Submit
   const submitBtn = dialog.getByRole('button', { name: /Add/i }).last();
+  const createResponsePromise = page.waitForResponse(
+    response =>
+      response.url().includes('/api/assets') &&
+      response.request().method() === 'POST' &&
+      response.status() < 400,
+    { timeout: 15000 },
+  ).catch(() => null);
+  const reloadResponsePromise = page.waitForResponse(
+    response =>
+      response.url().includes('/api/assets') &&
+      response.request().method() === 'GET' &&
+      response.status() < 400,
+    { timeout: 15000 },
+  ).catch(() => null);
   await submitBtn.click();
+  await createResponsePromise;
 
   // Wait for dialog to disappear, using passive wait pattern
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
-  await page.waitForResponse(r => r.url().includes('/api/assets') && r.status() === 200).catch(() => null);
+  await reloadResponsePromise;
 
   return assetName; // Returning name as it's often the primary column for verify
 }
@@ -104,11 +129,14 @@ export async function createAsset(
 export async function searchAsset(page: Page, query: string): Promise<void> {
   const searchInput = page.getByPlaceholder(/Search assets.../i);
   await expect(searchInput).toBeVisible();
-  await searchInput.fill(query);
-  await searchInput.press('Enter');
-  
-  // Wait for API response
-  await page.waitForResponse(r => r.url().includes('/api/assets') && r.status() === 200).catch(() => null);
+  await searchAndWaitForApi(
+    page,
+    searchInput,
+    query,
+    url => url.includes('/api/assets') && url.includes('search='),
+    15000,
+  );
+
   // Passive wait: don't assert rows here to allow for "search after delete" tests
 }
 

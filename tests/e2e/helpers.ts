@@ -2,6 +2,8 @@ import { Page, expect } from '@playwright/test';
 
 type ApiResponseMatcher = string | RegExp | ((url: string) => boolean);
 
+const pageDebugListenersAttached = new WeakSet<Page>();
+
 function matchesApiUrl(url: string, matcher: ApiResponseMatcher): boolean {
   if (typeof matcher === 'string') {
     return url.includes(matcher);
@@ -187,24 +189,28 @@ export async function login(
   email = 'admin@dokfin.id',
   password = 'password'
 ): Promise<void> {
-  // Listen for uncaught JS errors
-  page.on('pageerror', exception => {
-    console.error(`Uncaught exception: "${exception}"`);
-  });
-  
-  // Listen for console errors
-  page.on('console', msg => {
-    if (msg.type() === 'error') {
-      const text = msg.text();
-      // Ignore known expected errors to keep test output clean
-      if (text.includes('Failed to send logs: TypeError: Failed to fetch')) return; // Laravel Boost logger
-      if (text.includes('the server responded with a status of 422')) return; // Expected validation error
-      if (text.includes('AxiosError')) return; // Expected validation error
-      if (text.includes('Download the React DevTools')) return;
+  if (!pageDebugListenersAttached.has(page)) {
+    pageDebugListenersAttached.add(page);
 
-      console.error(`Console Error text: "${text}"`);
-    }
-  });
+    // Listen for uncaught JS errors
+    page.on('pageerror', exception => {
+      console.error(`Uncaught exception: "${exception}"`);
+    });
+
+    // Listen for console errors
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        const text = msg.text();
+        // Ignore known expected errors to keep test output clean
+        if (text.includes('Failed to send logs: TypeError: Failed to fetch')) return; // Laravel Boost logger
+        if (text.includes('the server responded with a status of 422')) return; // Expected validation error
+        if (text.includes('AxiosError')) return; // Expected validation error
+        if (text.includes('Download the React DevTools')) return;
+
+        console.error(`Console Error text: "${text}"`);
+      }
+    });
+  }
 
   const gotoWithRetry = async (url: string): Promise<void> => {
     let lastError: unknown;
@@ -254,6 +260,13 @@ export async function login(
       response.url().includes('/api/login') && response.request().method() === 'POST',
     { timeout: 60000 },
   ).catch(() => null);
+  const authStateResponse = page.waitForResponse(
+    response =>
+      response.url().includes('/api/me') &&
+      response.request().method() === 'GET' &&
+      response.status() < 400,
+    { timeout: 60000 },
+  ).catch(() => null);
 
   await page
     .locator(
@@ -264,6 +277,12 @@ export async function login(
 
   await loginResponse;
   await page.waitForURL('**/dashboard', { timeout: 60000 });
+  await authStateResponse;
+  await expect
+    .poll(async () =>
+      page.evaluate(() => Boolean(localStorage.getItem('api_token'))).catch(() => false),
+    )
+    .toBe(true);
 }
 
 
