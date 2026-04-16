@@ -94,6 +94,65 @@ class AuthController extends Controller
     }
 
     /**
+     * Destroy an authenticated session.
+     */
+    public function logout(Request $request)
+    {
+        // Revoke the token that was used to authenticate the current request...
+        $token = $request->user()?->currentAccessToken();
+
+        if ($token instanceof PersonalAccessToken) {
+            $token->delete();
+        }
+
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    /**
+     * Handle an incoming password reset link request.
+     */
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT
+                    ? response()->json(['status' => __($status)])
+                    : response()->json(['errors' => ['email' => [__($status)]]], 422);
+    }
+
+    /**
+     * Handle an incoming new password request.
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|string|confirmed|min:8',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                ])->setRememberToken(Str::random(60));
+                $user->save();
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+                    ? response()->json(['status' => __($status)])
+                    : response()->json(['errors' => ['email' => [__($status)]]], 422);
+    }
+
+    /**
      * @return array{companyName: string, companyLogoUrl: string|null, regionalSettings: array<string, mixed>}
      */
     protected function resolveSharedSettings(): array
@@ -190,64 +249,5 @@ class AuthController extends Controller
             'number_format_thousand' => '.',
             'number_format_hide_decimal' => false,
         ];
-    }
-
-    /**
-     * Destroy an authenticated session.
-     */
-    public function logout(Request $request)
-    {
-        // Revoke the token that was used to authenticate the current request...
-        $token = $request->user()?->currentAccessToken();
-
-        if ($token instanceof PersonalAccessToken) {
-            $token->delete();
-        }
-
-        return response()->json(['message' => 'Successfully logged out']);
-    }
-
-    /**
-     * Handle an incoming password reset link request.
-     */
-    public function forgotPassword(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
-
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        return $status === Password::RESET_LINK_SENT
-                    ? response()->json(['status' => __($status)])
-                    : response()->json(['errors' => ['email' => [__($status)]]], 422);
-    }
-
-    /**
-     * Handle an incoming new password request.
-     */
-    public function resetPassword(Request $request)
-    {
-        $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|string|confirmed|min:8',
-        ]);
-
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                ])->setRememberToken(Str::random(60));
-                $user->save();
-            }
-        );
-
-        return $status === Password::PASSWORD_RESET
-                    ? response()->json(['status' => __($status)])
-                    : response()->json(['errors' => ['email' => [__($status)]]], 422);
     }
 }
