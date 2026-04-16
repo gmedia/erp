@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MenuResource;
 use App\Models\ApprovalRequestStep;
+use App\Models\Employee;
 use App\Models\Menu;
 use App\Models\Setting;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\PersonalAccessToken;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -59,51 +62,10 @@ class AuthController extends Controller
         $user->load('employee.permissions');
         $employee = $user->employee;
 
-        // Get company settings
-        $companyName = Setting::get('company_name') ?? config('app.name', 'Laravel');
-        $logoPath = Setting::get('company_logo_path');
-        $companyLogoUrl = (! is_string($logoPath) || $logoPath === '')
-            ? null
-            : Storage::disk(config('filesystems.default'))->url($logoPath);
-
-        $regionalSettings = [
-            'currency' => Setting::get('currency', 'IDR'),
-            'date_format' => Setting::get('date_format', 'd/m/Y'),
-            'number_format_decimal' => Setting::get('number_format_decimal', ','),
-            'number_format_thousand' => Setting::get('number_format_thousand', '.'),
-            'number_format_hide_decimal' => (bool) Setting::get('number_format_hide_decimal', false),
-        ];
-
-        // Get Pending Approvals
-        $pendingApprovalsCount = 0;
-        if ($user->id) {
-            $pendingApprovalsCount = ApprovalRequestStep::pendingInboxForUser($user->id)
-                ->count();
-        }
-
-        // Get Menus
-        $menus = [];
-        if ($employee) {
-            $permissionIds = $employee->permissions()->pluck('permissions.id')->toArray();
-            $allowedMenus = Menu::with(['children' => function ($query) use ($permissionIds) {
-                $query->where(function ($q) use ($permissionIds) {
-                    $q->whereDoesntHave('permissions')
-                        ->orWhereHas('permissions', function ($subQ) use ($permissionIds) {
-                            $subQ->whereIn('permissions.id', $permissionIds);
-                        });
-                });
-            }])
-                ->whereNull('parent_id')
-                ->where(function ($query) use ($permissionIds) {
-                    $query->whereDoesntHave('permissions')
-                        ->orWhereHas('permissions', function ($q) use ($permissionIds) {
-                            $q->whereIn('permissions.id', $permissionIds);
-                        });
-                })
-                ->get();
-
-            $menus = MenuResource::collection($allowedMenus)->resolve();
-        }
+        ['companyName' => $companyName, 'companyLogoUrl' => $companyLogoUrl, 'regionalSettings' => $regionalSettings] =
+            $this->resolveSharedSettings();
+        $pendingApprovalsCount = $this->resolvePendingApprovalsCount($user->id);
+        $menus = $this->resolveMenus($employee);
 
         // Get Translations
         $locale = app()->getLocale();
@@ -132,12 +94,115 @@ class AuthController extends Controller
     }
 
     /**
+     * @return array{companyName: string, companyLogoUrl: string|null, regionalSettings: array<string, mixed>}
+     */
+    protected function resolveSharedSettings(): array
+    {
+        try {
+            $companyName = Setting::get('company_name') ?? config('app.name', 'Laravel');
+            $logoPath = Setting::get('company_logo_path');
+            $companyLogoUrl = (! is_string($logoPath) || $logoPath === '')
+                ? null
+                : Storage::disk(config('filesystems.default'))->url($logoPath);
+
+            return [
+                'companyName' => $companyName,
+                'companyLogoUrl' => $companyLogoUrl,
+                'regionalSettings' => [
+                    'currency' => Setting::get('currency', 'IDR'),
+                    'date_format' => Setting::get('date_format', 'd/m/Y'),
+                    'number_format_decimal' => Setting::get('number_format_decimal', ','),
+                    'number_format_thousand' => Setting::get('number_format_thousand', '.'),
+                    'number_format_hide_decimal' => (bool) Setting::get('number_format_hide_decimal', false),
+                ],
+            ];
+        } catch (Throwable $e) {
+            report($e);
+
+            return [
+                'companyName' => config('app.name', 'Laravel'),
+                'companyLogoUrl' => null,
+                'regionalSettings' => $this->defaultRegionalSettings(),
+            ];
+        }
+    }
+
+    protected function resolvePendingApprovalsCount(?int $userId): int
+    {
+        if (! $userId) {
+            return 0;
+        }
+
+        try {
+            return ApprovalRequestStep::pendingInboxForUser($userId)->count();
+        } catch (Throwable $e) {
+            report($e);
+
+            return 0;
+        }
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    protected function resolveMenus(?Employee $employee): array
+    {
+        if (! $employee) {
+            return [];
+        }
+
+        try {
+            $permissionIds = $employee->permissions()->pluck('permissions.id')->toArray();
+            $allowedMenus = Menu::with(['children' => function ($query) use ($permissionIds) {
+                $query->where(function ($q) use ($permissionIds) {
+                    $q->whereDoesntHave('permissions')
+                        ->orWhereHas('permissions', function ($subQ) use ($permissionIds) {
+                            $subQ->whereIn('permissions.id', $permissionIds);
+                        });
+                });
+            }])
+                ->whereNull('parent_id')
+                ->where(function ($query) use ($permissionIds) {
+                    $query->whereDoesntHave('permissions')
+                        ->orWhereHas('permissions', function ($q) use ($permissionIds) {
+                            $q->whereIn('permissions.id', $permissionIds);
+                        });
+                })
+                ->get();
+
+            return MenuResource::collection($allowedMenus)->resolve();
+        } catch (Throwable $e) {
+            report($e);
+
+            return [];
+        }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function defaultRegionalSettings(): array
+    {
+        return [
+            'currency' => 'IDR',
+            'date_format' => 'd/m/Y',
+            'number_format_decimal' => ',',
+            'number_format_thousand' => '.',
+            'number_format_hide_decimal' => false,
+        ];
+    }
+
+    /**
      * Destroy an authenticated session.
      */
     public function logout(Request $request)
     {
         // Revoke the token that was used to authenticate the current request...
-        $request->user()->currentAccessToken()->delete();
+        $token = $request->user()?->currentAccessToken();
+
+        if ($token instanceof PersonalAccessToken) {
+            $token->delete();
+        }
 
         return response()->json(['message' => 'Successfully logged out']);
     }
