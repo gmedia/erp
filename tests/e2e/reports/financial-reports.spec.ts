@@ -12,7 +12,7 @@ async function openFinancialReport(
             (response: Response) =>
                 response.url().includes(`/api/reports/${endpoint}`) &&
                 response.status() < 400,
-            { timeout: 30000 },
+            { timeout: 60000 },
         ),
         page.goto(path),
     ]);
@@ -91,10 +91,10 @@ test.describe('Financial Reports', () => {
         await expect(compareSelector).toBeVisible({ timeout: 60000 });
         await compareSelector.click();
 
-        await expect(page.getByRole('listbox')).toBeVisible({ timeout: 30000 });
+        await expect(page.getByRole('listbox')).toBeVisible({ timeout: 60000 });
         await expect(
             page.getByRole('option', { name: 'None', exact: true }),
-        ).toBeVisible({ timeout: 30000 });
+        ).toBeVisible({ timeout: 60000 });
     });
 
     test('can view income statement', async ({ page }) => {

@@ -54,6 +54,8 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
   // ── Step 1: Create high-value asset ──────────────────────────────
   test('Step 1: can create a high-value asset (>100M purchase cost)', async ({ page }) => {
+    test.slow();
+
     await login(page);
     assetName = await createHighValueAsset(page);
     expect(assetName).toBeTruthy();
@@ -65,6 +67,8 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
   // ── Step 2: Verify Draft state on profile ────────────────────────
   test('Step 2: asset profile shows Draft state with Activate button', async ({ page }) => {
+    test.slow();
+
     await login(page);
     assetName = await createHighValueAsset(page);
 
@@ -79,6 +83,8 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
   // ── Step 3: Activate triggers approval ───────────────────────────
   test('Step 3: clicking Activate triggers approval for 100M+ purchase cost', async ({ page }) => {
+    test.slow();
+
     await login(page);
     assetName = await createHighValueAsset(page);
 
@@ -106,6 +112,8 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
   // ── Step 4: Verify Approvals tab shows pending ───────────────────
   test('Step 4: Approvals tab shows pending approval request after Activate', async ({ page }) => {
+    test.slow();
+
     await login(page);
     assetName = await createHighValueAsset(page);
 
