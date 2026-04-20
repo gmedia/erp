@@ -1,5 +1,15 @@
 import { Page, expect } from '@playwright/test';
 
+async function closeVisibleAsyncSelectPopover(page: Page): Promise<void> {
+    const openPopovers = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible');
+    await expect(openPopovers)
+        .toHaveCount(0, { timeout: 3000 })
+        .catch(async () => {
+            await page.keyboard.press('Escape').catch(() => null);
+            await expect(openPopovers).toHaveCount(0, { timeout: 5000 }).catch(() => null);
+        });
+}
+
 /**
  * Create a new product via the UI.
  * NOTE: Assumes page is already on /products (handled by test.beforeEach).
@@ -41,32 +51,48 @@ export async function createProduct(
     // 3. Category (Async Select)
     const categoryTrigger = dialog.locator('button[role="combobox"]').filter({ hasText: /Select category/i });
     await categoryTrigger.click();
+    const catPopover = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
+    await expect(catPopover).toBeVisible({ timeout: 15000 });
     const catSearch = page.getByPlaceholder('Search...').filter({ visible: true }).last();
     const catName = overrides.category_id ?? 'Electronics';
     if (await catSearch.isVisible()) {
+        const categoryResponsePromise = page.waitForResponse(
+            r => r.url().includes('/api/product-categories') && r.status() < 400,
+            { timeout: 15000 },
+        );
         await catSearch.fill(catName);
-        await page.waitForResponse(r => r.url().includes('/api/product-categories') && r.status() < 400);
+        await categoryResponsePromise;
     }
-    await page
-        .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
-        .filter({ hasText: new RegExp(`^${catName}$`) })
-        .first()
-        .click({ force: true });
+    const categoryOption = catPopover
+        .locator('[role="option"], button')
+        .filter({ hasText: new RegExp(catName, 'i') })
+        .first();
+    await expect(categoryOption).toBeVisible({ timeout: 15000 });
+    await categoryOption.click({ force: true });
+    await closeVisibleAsyncSelectPopover(page);
 
     // 4. Unit (Async Select)
     const unitTrigger = dialog.locator('button[role="combobox"]').filter({ hasText: /Select unit/i });
     await unitTrigger.click();
+    const unitPopover = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
+    await expect(unitPopover).toBeVisible({ timeout: 15000 });
     const unitSearch = page.getByPlaceholder('Search...').filter({ visible: true }).last();
     const unitName = overrides.unit_id ?? 'Piece';
     if (await unitSearch.isVisible()) {
+        const unitResponsePromise = page.waitForResponse(
+            r => r.url().includes('/api/units') && r.status() < 400,
+            { timeout: 15000 },
+        );
         await unitSearch.fill(unitName);
-        await page.waitForResponse(r => r.url().includes('/api/units') && r.status() < 400);
+        await unitResponsePromise;
     }
-    await page
-        .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
-        .filter({ hasText: new RegExp(`^${unitName}$`) })
-        .first()
-        .click({ force: true });
+    const unitOption = unitPopover
+        .locator('[role="option"], button')
+        .filter({ hasText: new RegExp(unitName, 'i') })
+        .first();
+    await expect(unitOption).toBeVisible({ timeout: 15000 });
+    await unitOption.click({ force: true });
+    await closeVisibleAsyncSelectPopover(page);
 
     // 5. Pricing
     await dialog.locator('input[name="cost"]').fill(overrides.cost ?? '1000');
