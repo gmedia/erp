@@ -8,7 +8,7 @@ async function waitForAssetDashboardData(page: Parameters<typeof test.beforeEach
       response.request().method() === 'GET' &&
       response.status() < 400,
     { timeout: 15000 },
-  ).catch(() => null);
+  );
 }
 
 test.describe('Asset Dashboard', () => {

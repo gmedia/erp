@@ -83,8 +83,7 @@ export async function createApprovalFlow(
         response.request().method() === 'GET' &&
         response.status() < 400,
       { timeout: 10000 },
-    )
-    .catch(() => null);
+    );
 
   await clickDropdownOption(page, 'Admin User');
   await expect(approverCombobox).toHaveText(/Admin User/);
@@ -128,15 +127,21 @@ export async function createApprovalFlow(
 export async function searchApprovalFlow(page: Page, query: string): Promise<void> {
   const searchInput = page.getByPlaceholder(/Search/i).first();
   await expect(searchInput).toBeVisible();
+  const normalizedQuery = query.trim();
+  if ((await searchInput.inputValue()).trim() === normalizedQuery) {
+    return;
+  }
+
+  const responsePromise = page.waitForResponse(
+    r => r.url().includes('/api/approval-flows') && r.url().includes('search=') && r.status() === 200,
+    { timeout: 5000 }
+  );
   await searchInput.clear();
-  await searchInput.fill(query);
+  await searchInput.fill(normalizedQuery);
   await searchInput.press('Enter');
   
   // Wait for the API response instead of arbitrary timeout
-  await page.waitForResponse(
-    r => r.url().includes('/api/approval-flows') && r.url().includes('search=') && r.status() === 200,
-    { timeout: 5000 }
-  ).catch(() => null);
+  await responsePromise;
   
   // Wait for table to update by checking if the loading state finishes or the row appears
   const tableBody = page.locator('tbody');
@@ -178,8 +183,14 @@ export async function editApprovalFlow(
 
   const updateBtn = dialog.getByRole('button', { name: /Update|Save|Create|Submit/i });
   await expect(updateBtn).toBeVisible();
+  const updateResponsePromise = page.waitForResponse(
+    r =>
+      r.url().includes('/api/approval-flows') &&
+      ['PUT', 'PATCH'].includes(r.request().method()) &&
+      r.status() < 400,
+  );
   await updateBtn.click();
+  await updateResponsePromise;
   
   await expect(dialog).not.toBeVisible({ timeout: 10000 });
-  await page.waitForResponse(r => r.url().includes('/api/approval-flows') && ['PUT', 'PATCH'].includes(r.request().method()) && r.status() < 400).catch(() => null);
 }

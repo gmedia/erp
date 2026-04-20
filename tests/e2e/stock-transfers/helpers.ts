@@ -95,7 +95,7 @@ export async function createStockTransfer(page: Page): Promise<string> {
                 r.status() < 400,
             { timeout: 45000 },
         )
-        .catch(() => null);
+        ;
 
     await submitButton.click();
     await createResponse;
@@ -143,7 +143,7 @@ export async function editStockTransfer(
     const detailResponse = page.waitForResponse(
         (r) => r.url().match(/\/api\/stock-transfers\/\d+$/) && r.request().method() === 'GET',
         { timeout: 15000 }
-    ).catch(() => null);
+    );
 
     const dialog = page.getByRole('dialog', { name: /Edit Stock Transfer/i });
     await expect(dialog).toBeVisible();
@@ -163,7 +163,7 @@ export async function editStockTransfer(
                 r.status() < 400,
             { timeout: 45000 },
         )
-        .catch(() => null);
+        ;
 
     await updateBtn.click();
     await updateResponse;

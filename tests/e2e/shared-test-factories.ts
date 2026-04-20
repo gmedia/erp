@@ -62,11 +62,9 @@ export interface ModuleTestConfig {
 // ==================== HELPER FUNCTIONS ====================
 
 async function waitForApiResponse(page: Page, apiPath: string): Promise<void> {
-    await page
-        .waitForResponse(r => r.url().includes(apiPath) && r.status() < 400, {
-            timeout: 15000,
-        })
-        .catch(() => null);
+    await page.waitForResponse(r => r.url().includes(apiPath) && r.status() < 400, {
+        timeout: 15000,
+    });
 }
 
 async function navigateToModule(page: Page, route: string, apiPath: string): Promise<void> {
@@ -125,10 +123,10 @@ export function generateModuleTests(config: ModuleTestConfig) {
 
         // ==================== 3. EDIT ====================
         test(`can edit ${config.entityName}`, async ({ page }) => {
-            if (!config.editEntity || !config.editUpdates) {
-                test.skip();
-                return;
-            }
+            test.skip(
+                !config.editEntity || !config.editUpdates,
+                `${config.entityName} does not provide edit callback in module config`,
+            );
 
             const identifier = await config.createEntity(page);
             await config.searchEntity(page, identifier);

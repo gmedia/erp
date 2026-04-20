@@ -6,7 +6,7 @@ use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class)->group('auth');
 
-test('me endpoint falls back when shared menu data is unavailable', function () {
+test('me endpoint falls back for menu bootstrap failures in testing', function () {
     $user = createTestUserWithPermissions(['warehouse']);
 
     Schema::dropIfExists('menu_permission');

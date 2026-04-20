@@ -43,9 +43,24 @@ test.describe('Goods Receipt Report', () => {
         ]);
 
         await page.getByRole('button', { name: /filters/i }).click();
+        const filtersDialog = page.getByRole('dialog');
+        await expect(filtersDialog).toBeVisible();
+
+        const statusFilter = filtersDialog
+            .locator('button')
+            .filter({ hasText: /All statuses/i })
+            .first();
+        await statusFilter.click({ force: true });
+
+        const statusOption = page
+            .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+            .first();
+        await expect(statusOption).toBeVisible({ timeout: 10000 });
+        await statusOption.click({ force: true });
+
         await Promise.all([
             waitForGoodsReceiptReportResponse(page),
-            page.getByRole('button', { name: 'Apply Filters' }).click(),
+            filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
         ]);
 
         await expect(page.locator('table')).toBeVisible();

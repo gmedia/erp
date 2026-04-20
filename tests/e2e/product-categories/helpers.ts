@@ -32,11 +32,13 @@ export async function createProductCategory(page: Page): Promise<string> {
  */
 export async function searchProductCategory(page: Page, name: string): Promise<void> {
     const searchInput = page.getByPlaceholder('Search product categories...');
+    const responsePromise = page.waitForResponse(
+        r => r.url().includes('/api/product-categories') && r.status() < 400
+    );
+    await searchInput.clear();
     await searchInput.fill(name);
     await searchInput.press('Enter');
-    await page.waitForResponse(
-        r => r.url().includes('/api/product-categories') && r.status() < 400
-    ).catch(() => null);
+    await responsePromise;
 }
 
 /**

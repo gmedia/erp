@@ -87,7 +87,7 @@ test.describe('Supplier Returns Module', () => {
         await page.goto('/supplier-returns');
         await page
             .waitForResponse((response) => response.url().includes('/api/supplier-returns') && response.status() < 400)
-            .catch(() => null);
+            ;
     });
 
     test('add dialog starts with empty items and add item opens a dedicated dialog', async ({ page }) => {

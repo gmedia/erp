@@ -17,7 +17,7 @@ test.describe('Inventory Valuation Report', () => {
                     r.request().headers()['accept']?.includes('application/json') &&
                     r.status() < 400,
             )
-            .catch(() => null);
+            ;
 
         await expect(page.locator('table')).toBeVisible();
         await expect(page.locator('tbody tr').first()).toBeVisible();
@@ -42,13 +42,28 @@ test.describe('Inventory Valuation Report', () => {
                         ) &&
                         r.status() < 400,
                 )
-                .catch(() => null),
+                ,
             searchInput.fill('P-').then(async () => {
                 await searchInput.press('Enter');
             }),
         ]);
 
         await page.getByRole('button', { name: /filters/i }).click();
+        const filtersDialog = page.getByRole('dialog');
+        await expect(filtersDialog).toBeVisible();
+
+        const branchFilter = filtersDialog
+            .locator('button')
+            .filter({ hasText: /All branches/i })
+            .first();
+        await branchFilter.click({ force: true });
+
+        const branchOption = page
+            .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+            .first();
+        await expect(branchOption).toBeVisible({ timeout: 10000 });
+        await branchOption.click({ force: true });
+
         await Promise.all([
             page
                 .waitForResponse(
@@ -59,8 +74,8 @@ test.describe('Inventory Valuation Report', () => {
                         ) &&
                         r.status() < 400,
                 )
-                .catch(() => null),
-            page.getByRole('button', { name: 'Apply Filters' }).click(),
+                ,
+            filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
         ]);
     });
 });

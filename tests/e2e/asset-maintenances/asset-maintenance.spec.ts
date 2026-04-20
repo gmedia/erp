@@ -1,5 +1,9 @@
 import { generateModuleTests } from '../shared-test-factories';
-import { createAssetMaintenance, searchAssetMaintenance } from './helpers';
+import {
+  createAssetMaintenance,
+  editAssetMaintenance,
+  searchAssetMaintenance,
+} from './helpers';
 
 generateModuleTests({
   entityName: 'Asset Maintenance',
@@ -10,6 +14,8 @@ generateModuleTests({
 
   createEntity: createAssetMaintenance,
   searchEntity: searchAssetMaintenance,
+  editEntity: editAssetMaintenance,
+  editUpdates: { notes: `UPDATED-MAINT-${Date.now()}` },
 
   viewType: 'dialog',
 

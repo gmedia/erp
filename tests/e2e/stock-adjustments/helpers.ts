@@ -42,6 +42,39 @@ async function selectAsyncOption(
     }
 }
 
+interface AsyncOptionCandidate {
+    readonly searchText: string;
+    readonly optionText: string;
+}
+
+async function selectOptionWithCandidates(
+    page: Page,
+    trigger: ReturnType<Page['getByRole']>,
+    candidates: readonly AsyncOptionCandidate[],
+    fallback: AsyncOptionCandidate,
+): Promise<void> {
+    for (const candidate of candidates) {
+        try {
+            await selectAsyncOption(
+                page,
+                trigger,
+                candidate.searchText,
+                candidate.optionText,
+            );
+            return;
+        } catch {
+            // Try next candidate until one is available in current dataset.
+        }
+    }
+
+    await selectAsyncOption(
+        page,
+        trigger,
+        fallback.searchText,
+        fallback.optionText,
+    );
+}
+
 export async function createStockAdjustment(page: Page): Promise<string> {
     const adjustmentNumber = `SA-E2E-${Date.now()}`;
 
@@ -69,36 +102,58 @@ export async function createStockAdjustment(page: Page): Promise<string> {
     const itemDialog = page.getByRole('dialog', { name: /Add Item/i });
     await expect(itemDialog).toBeVisible();
 
-    await selectAsyncOption(
+    await selectOptionWithCandidates(
         page,
         itemDialog.getByRole('combobox', { name: /Product/i }),
-        '',
-        '.+',
+        [
+            { searchText: 'MDF Wood Panel', optionText: 'MDF Wood Panel' },
+            { searchText: 'Executive Office Desk', optionText: 'Executive Office Desk' },
+            { searchText: 'Wooden Table Legs', optionText: 'Wooden Table Legs' },
+            { searchText: 'Inventory Sample Product', optionText: 'Inventory Sample Product' },
+        ],
+        { searchText: '', optionText: '.+' },
     );
-    await selectAsyncOption(
+
+    await selectOptionWithCandidates(
         page,
         itemDialog.getByRole('combobox', { name: /Unit/i }),
-        '',
-        '.+',
+        [
+            { searchText: 'Sheet', optionText: 'Sheet' },
+            { searchText: 'pcs', optionText: 'pcs' },
+            { searchText: 'Set', optionText: 'Set' },
+            { searchText: 'Box', optionText: 'Box' },
+        ],
+        { searchText: '', optionText: '.+' },
     );
 
     await itemDialog.locator('input[name="quantity_adjusted"]').fill('2');
     await itemDialog.getByRole('button', { name: /Save Item/i }).click();
     await expect(itemDialog).not.toBeVisible({ timeout: 10000 });
 
+    // Ensure item append has been committed before submitting the main form.
+    const emptyItemsCell = dialog.getByText('No items added yet.');
+    if (await emptyItemsCell.isVisible().catch(() => false)) {
+        await expect(emptyItemsCell).not.toBeVisible({ timeout: 10000 });
+    }
+    await expect(dialog.locator('tbody tr')).toHaveCount(1, { timeout: 10000 });
+
+    // Close any lingering AsyncSelect popover that may intercept the submit click.
+    if (await page.locator('ul[aria-busy]:visible').count()) {
+        await page.keyboard.press('Escape').catch(() => null);
+    }
+
     const submitButton = dialog.getByRole('button', { name: 'Add', exact: true });
-    const createResponse = page
-        .waitForResponse(
-            (r) =>
-                r.url().includes('/api/stock-adjustments') &&
-                r.request().method() === 'POST' &&
-                r.status() < 400,
-            { timeout: 45000 },
-        )
-        .catch(() => null);
+    await expect(submitButton).toBeEnabled();
+    const createResponse = page.waitForResponse(
+        (r) =>
+            r.url().includes('/api/stock-adjustments') &&
+            r.request().method() === 'POST',
+        { timeout: 45000 },
+    );
 
     await submitButton.click();
-    await createResponse;
+    const response = await createResponse;
+    expect(response.status(), 'Stock adjustment create response should be successful').toBeLessThan(400);
 
     try {
         await expect(dialog).not.toBeVisible({ timeout: 5000 });
@@ -148,7 +203,7 @@ export async function editStockAdjustment(
     const detailResponse = page.waitForResponse(
         (r) => !!r.url().match(/\/api\/stock-adjustments\/\d+$/) && r.request().method() === 'GET',
         { timeout: 15000 },
-    ).catch(() => null);
+    );
 
     const dialog = page.getByRole('dialog', { name: /Edit Stock Adjustment/i });
     await expect(dialog).toBeVisible();
@@ -180,7 +235,7 @@ export async function editStockAdjustment(
                 r.status() < 400,
             { timeout: 45000 },
         )
-        .catch(() => null);
+        ;
 
     await updateBtn.scrollIntoViewIfNeeded();
     await updateBtn.click({ force: true });

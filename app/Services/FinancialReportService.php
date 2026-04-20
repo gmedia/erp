@@ -11,6 +11,33 @@ use Illuminate\Support\Collection;
 
 class FinancialReportService
 {
+    private function emptyBalanceSheetReport(): array
+    {
+        return [
+            'assets' => [],
+            'liabilities' => [],
+            'equity' => [],
+            'totals' => [
+                'assets' => 0,
+                'liabilities' => 0,
+                'equity' => 0,
+            ],
+        ];
+    }
+
+    private function emptyIncomeStatementReport(): array
+    {
+        return [
+            'revenues' => [],
+            'expenses' => [],
+            'totals' => [
+                'revenue' => 0,
+                'expense' => 0,
+                'net_income' => 0,
+            ],
+        ];
+    }
+
     /**
      * Get Trial Balance Report
      */
@@ -69,7 +96,7 @@ class FinancialReportService
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
         if (! $coaVersion) {
-            return [];
+            return $this->emptyBalanceSheetReport();
         }
 
         // 1. Get Asset, Liability, Equity Accounts
@@ -139,7 +166,7 @@ class FinancialReportService
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
         if (! $coaVersion) {
-            return [];
+            return $this->emptyIncomeStatementReport();
         }
 
         /** @var Collection<int, Account> $accounts */

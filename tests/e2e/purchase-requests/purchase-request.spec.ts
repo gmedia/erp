@@ -89,7 +89,7 @@ test.describe('Purchase Requests Module', () => {
         await page.goto('/purchase-requests');
         await page
             .waitForResponse((response) => response.url().includes('/api/purchase-requests') && response.status() < 400)
-            .catch(() => null);
+            ;
     });
 
     test('add dialog starts with empty items and add item button shows icon', async ({ page }) => {

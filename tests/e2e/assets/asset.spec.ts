@@ -1,5 +1,5 @@
 import { generateModuleTests } from '../shared-test-factories';
-import { createAsset, searchAsset } from './helpers';
+import { createAsset, editAsset, searchAsset } from './helpers';
 
 generateModuleTests({
   entityName: 'Asset',
@@ -10,6 +10,8 @@ generateModuleTests({
   
   createEntity: createAsset,
   searchEntity: searchAsset,
+  editEntity: editAsset,
+  editUpdates: { name: `Updated Asset ${Date.now()}` },
   
   // View is a page, not a dialog
   viewType: 'page',

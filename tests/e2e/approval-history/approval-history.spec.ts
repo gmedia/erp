@@ -36,7 +36,7 @@ test.describe('Approval History', () => {
     // Wait for the API response
     await page.waitForResponse(
         r => r.url().includes('/api/entity-states/asset/') && r.url().includes('/approvals') && r.status() < 400
-    ).catch(() => null);
+    );
 
     // Verify the tab panel is visible
     const tabContent = page.getByRole('tabpanel', { name: /Approvals/i });

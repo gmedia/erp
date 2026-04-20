@@ -1,5 +1,9 @@
 import { generateModuleTests } from '../shared-test-factories';
-import { createAssetMovement, searchAssetMovement } from './helpers';
+import {
+  createAssetMovement,
+  editAssetMovement,
+  searchAssetMovement,
+} from './helpers';
 
 generateModuleTests({
   entityName: 'Asset Movement',
@@ -10,6 +14,8 @@ generateModuleTests({
   
   createEntity: createAssetMovement,
   searchEntity: searchAssetMovement,
+  editEntity: editAssetMovement,
+  editUpdates: { reference: `UPDATED-MOV-${Date.now()}` },
   
   // View opens a dialog
   viewType: 'dialog',

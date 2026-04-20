@@ -3,6 +3,8 @@ import { Page, expect } from '@playwright/test';
 type ApiResponseMatcher = string | RegExp | ((url: string) => boolean);
 
 const pageDebugListenersAttached = new WeakSet<Page>();
+const DEFAULT_E2E_EMAIL = 'admin@dokfin.id';
+const DEFAULT_E2E_PASSWORD = 'password';
 
 function matchesApiUrl(url: string, matcher: ApiResponseMatcher): boolean {
   if (typeof matcher === 'string') {
@@ -22,13 +24,11 @@ export async function waitForApiAfterAction(
   action: () => Promise<unknown>,
   timeout = 10000,
 ): Promise<void> {
-  const responsePromise = page
-    .waitForResponse(
-      (response) =>
-        matchesApiUrl(response.url(), matcher) && response.status() < 400,
-      { timeout },
-    )
-    .catch(() => null);
+  const responsePromise = page.waitForResponse(
+    (response) =>
+      matchesApiUrl(response.url(), matcher) && response.status() < 400,
+    { timeout },
+  );
 
   await action();
   await responsePromise;
@@ -53,6 +53,7 @@ export async function searchAndWaitForApi(
     page,
     matcher,
     async () => {
+      await searchInput.clear();
       await searchInput.fill(value);
       await searchInput.press('Enter');
     },
@@ -186,8 +187,8 @@ export async function createEntity(
  */
 export async function login(
   page: Page,
-  email = 'admin@dokfin.id',
-  password = 'password'
+  email = DEFAULT_E2E_EMAIL,
+  password = DEFAULT_E2E_PASSWORD
 ): Promise<void> {
   if (!pageDebugListenersAttached.has(page)) {
     pageDebugListenersAttached.add(page);
@@ -240,6 +241,54 @@ export async function login(
     });
   };
 
+  const hasReusableSession = async (expectedEmail: string): Promise<boolean> => {
+    return page
+      .evaluate(async (targetEmail) => {
+        const token = localStorage.getItem('api_token');
+        if (!token) {
+          return false;
+        }
+
+        try {
+          const response = await fetch('/api/me', {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            return false;
+          }
+
+          const payload = (await response.json()) as { user?: { email?: string } };
+
+          return payload.user?.email === targetEmail;
+        } catch {
+          return false;
+        }
+      }, expectedEmail)
+      .catch(() => false);
+  };
+
+  const shouldAttemptSessionReuse =
+    email === DEFAULT_E2E_EMAIL && password === DEFAULT_E2E_PASSWORD;
+
+  if (shouldAttemptSessionReuse) {
+    if (await hasReusableSession(email)) {
+      return;
+    }
+
+    if (page.url() === 'about:blank') {
+      await gotoWithRetry('/dashboard');
+      if (await hasReusableSession(email)) {
+        await expect(page).toHaveURL(/\/dashboard/);
+        return;
+      }
+    }
+  }
+
   // Auth in this SPA is driven by a bearer token in localStorage, not cookies.
   // Reset the client auth state before every login so stale tokens do not redirect
   // us away from the login page or keep us logged in as the wrong user.
@@ -259,14 +308,14 @@ export async function login(
     response =>
       response.url().includes('/api/login') && response.request().method() === 'POST',
     { timeout: 60000 },
-  ).catch(() => null);
+  );
   const authStateResponse = page.waitForResponse(
     response =>
       response.url().includes('/api/me') &&
       response.request().method() === 'GET' &&
       response.status() < 400,
     { timeout: 60000 },
-  ).catch(() => null);
+  );
 
   await page
     .locator(

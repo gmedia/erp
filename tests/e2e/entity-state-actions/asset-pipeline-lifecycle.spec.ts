@@ -27,7 +27,7 @@ async function goToAssetProfile(page: Page, assetCode: string) {
     page.waitForResponse(
       r => /\/api\/assets\/[^/]+\/profile$/.test(r.url()) && r.status() < 400,
       { timeout: 15000 }
-    ).catch(() => null),
+    ),
     page.waitForResponse(
       r =>
         r.url().includes('/api/entity-states/asset/') &&
@@ -35,7 +35,7 @@ async function goToAssetProfile(page: Page, assetCode: string) {
         !r.url().includes('/approvals') &&
         r.status() < 400,
       { timeout: 15000 }
-    ).catch(() => null),
+    ),
     page.getByRole('menuitem', { name: 'View' }).click(),
   ]);
 
@@ -152,7 +152,7 @@ test.describe('Asset Pipeline Lifecycle — Per State', () => {
       page.waitForResponse(
         r => r.url().includes('/api/entity-states/') && r.url().includes('/timeline') && r.status() < 400,
         { timeout: 15000 }
-      ).catch(() => null),
+      ),
       page.getByRole('tab', { name: 'Timeline' }).click(),
     ]);
 

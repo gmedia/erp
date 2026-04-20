@@ -89,14 +89,18 @@ export async function createAssetModel(
 export async function searchAssetModel(page: Page, query: string): Promise<void> {
   const searchInput = page.getByPlaceholder('Search by model name or manufacturer...');
   await expect(searchInput).toBeVisible();
+  const normalizedQuery = query.trim();
+  if ((await searchInput.inputValue()).trim() === normalizedQuery) {
+    return;
+  }
 
   // Start listening for response before triggering search
   const responsePromise = page.waitForResponse(resp => 
     resp.url().includes('/api/asset-models') && resp.status() < 400
-  ).catch(() => null);
+  );
 
   await searchInput.clear();
-  await searchInput.fill(query);
+  await searchInput.fill(normalizedQuery);
   await searchInput.press('Enter');
   
   // Wait for the table to refresh
@@ -150,7 +154,7 @@ export async function editAssetModel(
   
   const responsePromise = page.waitForResponse(resp => 
     resp.url().includes('/api/asset-models') && resp.status() < 400
-  ).catch(() => null);
+  );
 
   await updateBtn.click();
   await responsePromise;
@@ -167,7 +171,7 @@ async function searchInputSafeClear(page: Page) {
   if (await searchInput.isVisible()) {
     const responsePromise = page.waitForResponse(resp => 
       resp.url().includes('/api/asset-models') && resp.status() < 400
-    ).catch(() => null);
+    );
     await searchInput.clear();
     await searchInput.press('Enter');
     await responsePromise;
@@ -202,7 +206,7 @@ export async function deleteAssetModel(page: Page, modelName: string): Promise<v
   
   const responsePromise = page.waitForResponse(resp => 
     resp.url().includes('/api/asset-models') && resp.status() < 400
-  ).catch(() => null);
+  );
   
   await deleteBtnConfirm.click();
   await responsePromise;

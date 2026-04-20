@@ -19,7 +19,7 @@ test.describe('Stock Monitor Dashboard', () => {
                     ) &&
                     r.status() < 400,
             )
-            .catch(() => null);
+            ;
 
         await expect(page.getByText('Total SKU-Warehouse')).toBeVisible();
         await expect(page.locator('table')).toBeVisible();
@@ -46,7 +46,7 @@ test.describe('Stock Monitor Dashboard', () => {
                     ) &&
                     r.status() < 400,
             )
-            .catch(() => null);
+            ;
 
         await expect(page.locator('tbody tr')).toHaveCount(1, {
             timeout: 15000,
@@ -65,7 +65,7 @@ test.describe('Stock Monitor Dashboard', () => {
                     ) &&
                     r.status() < 400,
             )
-            .catch(() => null);
+            ;
 
         await expect(page.getByText('Low Stock Items')).toBeVisible();
 

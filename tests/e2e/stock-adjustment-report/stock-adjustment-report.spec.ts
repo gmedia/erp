@@ -14,11 +14,10 @@ test.describe('Stock Adjustment Report', () => {
             .waitForResponse(
                 (r) =>
                     r.url().includes('/api/reports/stock-adjustment') &&
-                    r.request().headers()['accept']?.includes('application/json') &&
                     r.status() < 400,
                 { timeout: 30000 },
             )
-            .catch(() => null);
+            ;
 
         await expect(page.locator('table')).toBeVisible();
         await expect(page.locator('tbody tr').first()).toBeVisible();
@@ -46,18 +45,30 @@ test.describe('Stock Adjustment Report', () => {
         ]);
 
         await page.getByRole('button', { name: /filters/i }).click();
+        const filtersDialog = page.getByRole('dialog');
+        await expect(filtersDialog).toBeVisible();
+
+        const typeFilter = filtersDialog
+            .locator('button')
+            .filter({ hasText: /All types/i })
+            .first();
+        await typeFilter.click({ force: true });
+
+        const typeOption = page
+            .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+            .first();
+        await expect(typeOption).toBeVisible({ timeout: 10000 });
+        await typeOption.click({ force: true });
+
         await Promise.all([
             page
                 .waitForResponse(
                     (r) =>
                         r.url().includes('/api/reports/stock-adjustment') &&
-                        r.request().headers()['accept']?.includes(
-                            'application/json',
-                        ) &&
                         r.status() < 400,
                 )
-                .catch(() => null),
-            page.getByRole('button', { name: 'Apply Filters' }).click(),
+                ,
+            filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
         ]);
     });
 });

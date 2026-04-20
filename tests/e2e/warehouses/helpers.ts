@@ -25,7 +25,7 @@ export async function createWarehouse(page: Page): Promise<string> {
 
     const responsePromise = page.waitForResponse(
         (r) => r.url().includes('/api/warehouses') && r.status() < 400,
-    ).catch(() => null);
+    );
 
     await submitButton.click();
     await responsePromise;
@@ -37,11 +37,13 @@ export async function createWarehouse(page: Page): Promise<string> {
 
 export async function searchWarehouse(page: Page, name: string): Promise<void> {
     const searchInput = page.getByPlaceholder('Search warehouses...');
+    const responsePromise = page.waitForResponse(
+        r => r.url().includes('/api/warehouses') && r.status() < 400
+    );
+    await searchInput.clear();
     await searchInput.fill(name);
     await searchInput.press('Enter');
-    await page.waitForResponse(
-        r => r.url().includes('/api/warehouses') && r.status() < 400
-    ).catch(() => null);
+    await responsePromise;
 }
 
 export async function editWarehouse(
@@ -70,7 +72,7 @@ export async function editWarehouse(
 
     const responsePromise = page.waitForResponse(
         (r) => r.url().includes('/api/warehouses') && r.status() < 400,
-    ).catch(() => null);
+    );
 
     await updateBtn.click();
     await responsePromise;

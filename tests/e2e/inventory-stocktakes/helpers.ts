@@ -90,7 +90,7 @@ export async function createInventoryStocktake(page: Page): Promise<string> {
                 r.status() < 400,
             { timeout: 45000 },
         )
-        .catch(() => null);
+        ;
 
     await submitButton.click();
     await createResponse;
@@ -132,7 +132,7 @@ export async function editInventoryStocktake(
     const detailResponse = page.waitForResponse(
         (r) => r.url().match(/\/api\/inventory-stocktakes\/\d+$/) && r.request().method() === 'GET',
         { timeout: 15000 },
-    ).catch(() => null);
+    );
 
     const row = page.locator('tbody tr').filter({ hasText: identifier }).first();
     await expect(row).toBeVisible({ timeout: 15000 });
@@ -159,7 +159,7 @@ export async function editInventoryStocktake(
                 r.status() < 400,
             { timeout: 45000 },
         )
-        .catch(() => null);
+        ;
 
     await updateBtn.click();
     await updateResponse;

@@ -42,13 +42,21 @@ export async function createAssetCategory(
  */
 export async function searchAssetCategory(page: Page, query: string): Promise<void> {
   const searchInput = page.getByPlaceholder('Search asset categories...');
-  await searchInput.fill(query);
+  await expect(searchInput).toBeVisible();
+  const normalizedQuery = query.trim();
+  if ((await searchInput.inputValue()).trim() === normalizedQuery) {
+    return;
+  }
+
+  const responsePromise = page.waitForResponse(
+    r => r.url().includes('/api/asset-categories') && r.status() < 400
+  );
+  await searchInput.clear();
+  await searchInput.fill(normalizedQuery);
   await searchInput.press('Enter');
   
   // Wait for API response
-  await page.waitForResponse(
-    r => r.url().includes('/api/asset-categories') && r.status() < 400
-  ).catch(() => null);
+  await responsePromise;
 }
 
 /**

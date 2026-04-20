@@ -25,49 +25,48 @@ test.describe('Stock Movements (Kartu Stok)', () => {
         const refNumber = await refLink.innerText();
 
         const searchInput = page.getByRole('textbox').first();
+        const searchResponsePromise = page.waitForResponse(
+            (r) =>
+                r.url().includes('/stock-movements') &&
+                r.request().headers()['accept']?.includes('application/json') &&
+                r.status() < 400,
+        );
         await searchInput.fill(refNumber);
         await searchInput.press('Enter');
-
-        await page
-            .waitForResponse(
-                (r) =>
-                    r.url().includes('/stock-movements') &&
-                    r.request().headers()['accept']?.includes('application/json') &&
-                    r.status() < 400,
-            )
-            .catch(() => null);
+        await searchResponsePromise;
 
         await expect(page.getByText(refNumber).first()).toBeVisible();
 
-        await refLink.click();
-
         if (refNumber.toUpperCase().startsWith('ST-')) {
-            await expect(page).toHaveURL(/\/stock-transfers\?search=/);
-            await page
-                .waitForResponse(
+            await Promise.all([
+                page.waitForURL(/\/stock-transfers\?search=/),
+                page.waitForResponse(
                     (r) =>
                         r.url().includes('/api/stock-transfers') &&
                         r.status() < 400,
-                )
-                .catch(() => null);
+                ),
+                refLink.click(),
+            ]);
         } else if (refNumber.toUpperCase().startsWith('SA-')) {
-            await expect(page).toHaveURL(/\/stock-adjustments\?search=/);
-            await page
-                .waitForResponse(
+            await Promise.all([
+                page.waitForURL(/\/stock-adjustments\?search=/),
+                page.waitForResponse(
                     (r) =>
                         r.url().includes('/api/stock-adjustments') &&
                         r.status() < 400,
-                )
-                .catch(() => null);
+                ),
+                refLink.click(),
+            ]);
         } else {
-            await expect(page).toHaveURL(/\/inventory-stocktakes\?search=/);
-            await page
-                .waitForResponse(
+            await Promise.all([
+                page.waitForURL(/\/inventory-stocktakes\?search=/),
+                page.waitForResponse(
                     (r) =>
                         r.url().includes('/api/inventory-stocktakes') &&
                         r.status() < 400,
-                )
-                .catch(() => null);
+                ),
+                refLink.click(),
+            ]);
         }
 
         await expect(page.getByRole('textbox').first()).toHaveValue(refNumber);

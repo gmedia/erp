@@ -41,18 +41,11 @@ export async function createAssetMaintenance(
       ['POST', 'PUT', 'PATCH'].includes(response.request().method()) &&
       response.status() < 400,
     { timeout: 15000 },
-  ).catch(() => null);
+  );
   await submitBtn.click();
   await mutationResponsePromise;
 
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
-  await page.waitForResponse(
-    response =>
-      response.url().includes('/api/asset-maintenances') &&
-      response.request().method() === 'GET' &&
-      response.status() < 400,
-    { timeout: 15000 },
-  ).catch(() => null);
 
   return identifier;
 }
@@ -60,16 +53,59 @@ export async function createAssetMaintenance(
 export async function searchAssetMaintenance(page: Page, query: string): Promise<void> {
   const searchInput = page.getByPlaceholder(/Search/i).first();
   await expect(searchInput).toBeVisible();
-  await searchInput.fill(query);
+  const normalizedQuery = query.trim();
+  if ((await searchInput.inputValue()).trim() === normalizedQuery) {
+    return;
+  }
+
   const responsePromise = page.waitForResponse(
     response =>
       response.url().includes('/api/asset-maintenances') &&
       response.request().method() === 'GET' &&
       response.status() < 400,
     { timeout: 15000 },
-  ).catch(() => null);
+  );
+  await searchInput.clear();
+  await searchInput.fill(normalizedQuery);
   await searchInput.press('Enter');
   await responsePromise;
+}
+
+export async function editAssetMaintenance(
+  page: Page,
+  identifier: string,
+  updates: Record<string, string>,
+): Promise<void> {
+  await searchAssetMaintenance(page, identifier);
+
+  const row = page.locator('tbody tr').filter({ hasText: identifier }).first();
+  await expect(row).toBeVisible();
+
+  await row.getByRole('button', { name: /Actions/i }).click();
+  await page.getByRole('menuitem', { name: /Edit/i }).click();
+
+  const dialog = page.getByRole('dialog', { name: /Edit Asset Maintenance/i });
+  await expect(dialog).toBeVisible();
+
+  if (updates.notes) {
+    await dialog.locator('textarea[name="notes"]').fill(updates.notes);
+  }
+
+  if (updates.cost) {
+    await dialog.locator('input[name="cost"]').fill(updates.cost);
+  }
+
+  const updateResponsePromise = page.waitForResponse(
+    response =>
+      response.url().includes('/api/asset-maintenances') &&
+      ['PUT', 'PATCH'].includes(response.request().method()) &&
+      response.status() < 400,
+    { timeout: 15000 },
+  );
+
+  await dialog.getByRole('button', { name: /Update Maintenance|Save Maintenance|Update|Save/i }).last().click();
+  await updateResponsePromise;
+  await expect(dialog).not.toBeVisible({ timeout: 15000 });
 }
 
 export async function deleteAssetMaintenance(page: Page, notes: string): Promise<void> {

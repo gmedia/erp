@@ -233,8 +233,17 @@ class AuthController extends Controller
         } catch (Throwable $e) {
             report($e);
 
-            return [];
+            if ($this->usesTestingAuthFallbacks()) {
+                return [];
+            }
+
+            throw $e;
         }
+    }
+
+    protected function usesTestingAuthFallbacks(): bool
+    {
+        return app()->environment('testing');
     }
 
     /**

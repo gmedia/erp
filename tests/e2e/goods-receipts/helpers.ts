@@ -93,7 +93,9 @@ export async function createGoodsReceipt(page: Page): Promise<string> {
     expect(createResult.ok).toBeTruthy();
     expect(createResult.grNumber).not.toBe('');
 
-    await reloadAndWaitForApi(page, '/api/goods-receipts');
+    if (page.url().includes('/goods-receipts')) {
+        await reloadAndWaitForApi(page, '/api/goods-receipts');
+    }
 
     return String(createResult.grNumber);
 }

@@ -32,11 +32,13 @@ export async function createUnit(page: Page): Promise<string> {
  */
 export async function searchUnit(page: Page, name: string): Promise<void> {
     const searchInput = page.getByPlaceholder('Search units...');
+    const responsePromise = page.waitForResponse(
+        r => r.url().includes('/api/units') && r.status() < 400
+    );
+    await searchInput.clear();
     await searchInput.fill(name);
     await searchInput.press('Enter');
-    await page.waitForResponse(
-        r => r.url().includes('/api/units') && r.status() < 400
-    ).catch(() => null);
+    await responsePromise;
 }
 
 /**

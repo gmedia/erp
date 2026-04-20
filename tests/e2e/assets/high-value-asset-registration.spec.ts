@@ -31,7 +31,7 @@ async function goToAssetProfile(page: Page, assetName: string) {
     page.waitForResponse(
       r => /\/api\/assets\/[^/]+\/profile$/.test(r.url()) && r.status() < 400,
       { timeout: 15000 }
-    ).catch(() => null),
+    ),
     page.waitForResponse(
       r =>
         r.url().includes('/api/entity-states/asset/') &&
@@ -39,7 +39,7 @@ async function goToAssetProfile(page: Page, assetName: string) {
         !r.url().includes('/approvals') &&
         r.status() < 400,
       { timeout: 15000 }
-    ).catch(() => null),
+    ),
     page.getByRole('menuitem', { name: 'View' }).click(),
   ]);
 
@@ -93,14 +93,12 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
     // Click Activate
     const activateBtn = page.getByRole('button', { name: 'Activate' });
     await expect(activateBtn).toBeVisible();
-    await activateBtn.click();
-
-    // The transition has requires_approval: true
-    // It should either show success toast or confirmation dialog
-    // Wait for the API response from the transition execution
-    await page.waitForResponse(
-      r => r.url().includes('/api/entity-states/') && r.status() < 400
-    ).catch(() => null);
+    await Promise.all([
+      page.waitForResponse(
+        r => r.url().includes('/api/entity-states/') && r.status() < 400
+      ),
+      activateBtn.click(),
+    ]);
 
     // After activation with approval, the state should change to Active
     // (pipeline moves to active, but approval is pending)
@@ -121,10 +119,12 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
     // Activate the asset
     const activateBtn = page.getByRole('button', { name: 'Activate' });
-    await activateBtn.click();
-    await page.waitForResponse(
-      r => r.url().includes('/api/entity-states/') && r.status() < 400
-    ).catch(() => null);
+    await Promise.all([
+      page.waitForResponse(
+        r => r.url().includes('/api/entity-states/') && r.status() < 400
+      ),
+      activateBtn.click(),
+    ]);
 
     // Wait for success
     await expect(
@@ -133,12 +133,12 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
     // Navigate to Approvals tab
     const approvalsTab = page.getByRole('tab', { name: /Approvals/i });
-    await approvalsTab.click();
-
-    // Wait for approvals data to load
-    await page.waitForResponse(
-      r => r.url().includes('/approvals') && r.status() < 400
-    ).catch(() => null);
+    await Promise.all([
+      page.waitForResponse(
+        r => r.url().includes('/approvals') && r.status() < 400
+      ),
+      approvalsTab.click(),
+    ]);
 
     // Verify the tab panel is visible and shows approval data
     const tabContent = page.getByRole('tabpanel', { name: /Approvals/i });
@@ -158,10 +158,12 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
     await goToAssetProfile(page, assetName);
 
     const activateBtn = page.getByRole('button', { name: 'Activate' });
-    await activateBtn.click();
-    await page.waitForResponse(
-      r => r.url().includes('/api/entity-states/') && r.status() < 400
-    ).catch(() => null);
+    await Promise.all([
+      page.waitForResponse(
+        r => r.url().includes('/api/entity-states/') && r.status() < 400
+      ),
+      activateBtn.click(),
+    ]);
     await expect(
       page.getByText(/transition executed|success/i).first()
     ).toBeVisible({ timeout: 10000 });
@@ -188,12 +190,12 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
       // Confirm approval
       const confirmBtn = page.getByRole('button', { name: /Confirm|Submit|Approve/i }).last();
-      await confirmBtn.click();
-
-      // Wait for API response
-      await page.waitForResponse(
-        r => r.url().includes('/my-approvals') && r.status() < 400
-      ).catch(() => null);
+      await Promise.all([
+        page.waitForResponse(
+          r => r.url().includes('/my-approvals') && r.status() < 400
+        ),
+        confirmBtn.click(),
+      ]);
 
       // Verify success — toast message or the request disappears from pending
       await expect(
@@ -210,10 +212,12 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
     await goToAssetProfile(page, assetName);
 
     const activateBtn = page.getByRole('button', { name: 'Activate' });
-    await activateBtn.click();
-    await page.waitForResponse(
-      r => r.url().includes('/api/entity-states/') && r.status() < 400
-    ).catch(() => null);
+    await Promise.all([
+      page.waitForResponse(
+        r => r.url().includes('/api/entity-states/') && r.status() < 400
+      ),
+      activateBtn.click(),
+    ]);
     await expect(
       page.getByText(/transition executed|success/i).first()
     ).toBeVisible({ timeout: 10000 });
@@ -230,10 +234,12 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
       if (await commentsInput.isVisible({ timeout: 2000 }).catch(() => false)) {
         await commentsInput.fill('Approved by HR Manager');
       }
-      await page.getByRole('button', { name: /Confirm|Submit|Approve/i }).last().click();
-      await page.waitForResponse(
-        r => r.url().includes('/my-approvals') && r.status() < 400
-      ).catch(() => null);
+      await Promise.all([
+        page.waitForResponse(
+          r => r.url().includes('/my-approvals') && r.status() < 400
+        ),
+        page.getByRole('button', { name: /Confirm|Submit|Approve/i }).last().click(),
+      ]);
     }
 
     // Now login as Finance Director
@@ -250,11 +256,12 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
         await commentsInput.fill('Final approval by Finance Director - E2E Test');
       }
 
-      await page.getByRole('button', { name: /Confirm|Submit|Approve/i }).last().click();
-
-      await page.waitForResponse(
-        r => r.url().includes('/my-approvals') && r.status() < 400
-      ).catch(() => null);
+      await Promise.all([
+        page.waitForResponse(
+          r => r.url().includes('/my-approvals') && r.status() < 400
+        ),
+        page.getByRole('button', { name: /Confirm|Submit|Approve/i }).last().click(),
+      ]);
 
       await expect(
         page.getByText(/approved|success/i).first()
@@ -286,12 +293,12 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
     // Navigate to Approvals tab
     const approvalsTab = page.getByRole('tab', { name: /Approvals/i });
-    await approvalsTab.click();
-
-    // Wait for approvals data
-    await page.waitForResponse(
-      r => r.url().includes('/approvals') && r.status() < 400
-    ).catch(() => null);
+    await Promise.all([
+      page.waitForResponse(
+        r => r.url().includes('/approvals') && r.status() < 400
+      ),
+      approvalsTab.click(),
+    ]);
 
     const tabContent = page.getByRole('tabpanel', { name: /Approvals/i });
     await expect(tabContent).toBeVisible();
@@ -310,12 +317,12 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
     // Navigate to Timeline tab
     const timelineTab = page.getByRole('tab', { name: /Timeline/i });
-    await timelineTab.click();
-
-    // Wait for timeline data
-    await page.waitForResponse(
-      r => r.url().includes('/timeline') && r.status() < 400
-    ).catch(() => null);
+    await Promise.all([
+      page.waitForResponse(
+        r => r.url().includes('/timeline') && r.status() < 400
+      ),
+      timelineTab.click(),
+    ]);
 
     // Should show initial pipeline assignment
     await expect(

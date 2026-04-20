@@ -68,12 +68,9 @@ export async function waitForPurchaseOrderStatusReportResponse(page: Page): Prom
         .waitForResponse(
             (response) =>
                 response.url().includes('/api/reports/purchase-order-status') &&
-                response.request().headers()['accept']?.includes(
-                    'application/json',
-                ) &&
                 response.status() < 400,
         )
-        .catch(() => null);
+        ;
 }
 
 export async function openPurchaseOrderStatusReport(page: Page): Promise<void> {

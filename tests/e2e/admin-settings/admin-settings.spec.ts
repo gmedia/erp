@@ -27,7 +27,7 @@ async function waitForAdminSettingsRefresh(
                 response.request().method() === 'GET' &&
                 response.status() < 400,
         )
-        .catch(() => null);
+        ;
 }
 
 test.describe('Admin Settings', () => {

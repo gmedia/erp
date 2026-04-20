@@ -50,12 +50,20 @@ export async function createSupplier(
 export async function searchSupplier(page: Page, email: string): Promise<void> {
   const searchInput = page.getByPlaceholder('Search suppliers...');
   await expect(searchInput).toBeVisible();
+  const normalizedEmail = email.trim();
+  if ((await searchInput.inputValue()).trim() === normalizedEmail) {
+    return;
+  }
+
+  const responsePromise = page.waitForResponse(
+    r => r.url().includes('/api/suppliers') && r.status() === 200
+  );
   await searchInput.clear();
-  await searchInput.type(email);
+  await searchInput.type(normalizedEmail);
   await page.keyboard.press('Enter');
   
   // Wait for the API response to ensure the table has updated
-  await page.waitForResponse(r => r.url().includes('/api/suppliers') && r.status() === 200).catch(() => null);
+  await responsePromise;
   
   // Wait a small amount for the table context to re-render
   // This is the "passive" pattern to avoid intermittent timeouts

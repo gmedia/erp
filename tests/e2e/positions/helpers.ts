@@ -31,11 +31,13 @@ export async function createPosition(page: Page): Promise<string> {
  */
 export async function searchPosition(page: Page, name: string): Promise<void> {
     const searchInput = page.getByPlaceholder('Search positions...');
+    const responsePromise = page.waitForResponse(
+        r => r.url().includes('/api/positions') && r.status() < 400
+    );
+    await searchInput.clear();
     await searchInput.fill(name);
     await searchInput.press('Enter');
-    await page.waitForResponse(
-        r => r.url().includes('/api/positions') && r.status() < 400
-    ).catch(() => null);
+    await responsePromise;
 }
 
 /**

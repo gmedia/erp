@@ -47,7 +47,7 @@ export async function createAssetLocation(
   
   const responsePromise = page.waitForResponse(resp => 
     resp.url().includes('/api/asset-locations') && resp.status() < 400
-  ).catch(() => null);
+  );
 
   await submitButton.click();
   await responsePromise;
@@ -71,7 +71,7 @@ export async function searchAssetLocation(page: Page, query: string): Promise<vo
   // Start listening for response before triggering search
   const responsePromise = page.waitForResponse(resp => 
     resp.url().includes('/api/asset-locations') && resp.status() < 400
-  ).catch(() => null);
+  );
 
   await searchInput.clear();
   await searchInput.fill(query);
@@ -123,7 +123,7 @@ export async function editAssetLocation(
   
   const responsePromise = page.waitForResponse(resp => 
     resp.url().includes('/api/asset-locations') && resp.status() < 400
-  ).catch(() => null);
+  );
 
   await updateBtn.click();
   await responsePromise;
@@ -157,7 +157,7 @@ export async function deleteAssetLocation(page: Page, identifier: string): Promi
   
   const responsePromise = page.waitForResponse(resp => 
     resp.url().includes('/api/asset-locations') && resp.status() < 400
-  ).catch(() => null);
+  );
   
   await deleteBtnConfirm.click();
   await responsePromise;

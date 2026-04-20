@@ -12,12 +12,9 @@ export async function waitForGoodsReceiptReportResponse(
         .waitForResponse(
             (response) =>
                 response.url().includes('/api/reports/goods-receipt') &&
-                response.request().headers()['accept']?.includes(
-                    'application/json',
-                ) &&
                 response.status() < 400,
         )
-        .catch(() => null);
+        ;
 }
 
 export async function openGoodsReceiptReport(page: Page): Promise<void> {

@@ -90,7 +90,7 @@ test.describe('Purchase Orders Module', () => {
         await page.goto('/purchase-orders');
         await page
             .waitForResponse((response) => response.url().includes('/api/purchase-orders') && response.status() < 400)
-            .catch(() => null);
+            ;
     });
 
     test('add dialog starts with empty items and add item opens a dedicated dialog', async ({ page }) => {

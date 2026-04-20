@@ -28,3 +28,23 @@ test('balance sheet memasukkan current year earnings (net income) ke equity', fu
         ->assertJsonPath('report.equity.1.code', '9999-CYE')
         ->assertJsonPath('report.equity.1.balance', 5000000);
 });
+
+test('balance sheet returns an empty structured report when fiscal year has no coa version', function () {
+    $fiscalYearWithoutCoa = FiscalYear::create([
+        'name' => '2027',
+        'start_date' => '2027-01-01',
+        'end_date' => '2027-12-31',
+        'status' => 'open',
+    ]);
+
+    Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/balance-sheet?fiscal_year_id=' . $fiscalYearWithoutCoa->id)
+        ->assertOk()
+        ->assertJsonPath('selectedYearId', $fiscalYearWithoutCoa->id)
+        ->assertJsonPath('report.assets', [])
+        ->assertJsonPath('report.liabilities', [])
+        ->assertJsonPath('report.equity', [])
+        ->assertJsonPath('report.totals.assets', 0)
+        ->assertJsonPath('report.totals.liabilities', 0)
+        ->assertJsonPath('report.totals.equity', 0);
+});

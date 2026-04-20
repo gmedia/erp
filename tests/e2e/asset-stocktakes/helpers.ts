@@ -53,14 +53,57 @@ export async function createAssetStocktake(page: Page) {
 
 export async function searchAssetStocktake(page: Page, reference: string) {
     const searchInput = page.getByPlaceholder(/search/i);
+    await expect(searchInput).toBeVisible();
+    const normalizedReference = reference.trim();
+    if ((await searchInput.inputValue()).trim() === normalizedReference) {
+        return;
+    }
+
     const responsePromise = page
         .waitForResponse(
             resp => resp.url().includes('/api/asset-stocktakes') && resp.status() < 400,
             { timeout: 5000 },
         )
-        .catch(() => null);
-    await searchInput.fill(reference);
+        ;
+    await searchInput.clear();
+    await searchInput.fill(normalizedReference);
+    await searchInput.press('Enter');
     await responsePromise;
+}
+
+export async function editAssetStocktake(
+    page: Page,
+    reference: string,
+    updates: Record<string, string>,
+) {
+    await searchAssetStocktake(page, reference);
+
+    const row = page.locator('tbody tr').filter({ hasText: reference }).first();
+    await expect(row).toBeVisible();
+
+    await row.getByRole('button', { name: /Actions/i }).click();
+    await page.getByRole('menuitem', { name: /Edit/i }).click();
+
+    const formDialog = page.getByRole('dialog', {
+        name: /edit asset stocktake/i,
+    });
+    await expect(formDialog).toBeVisible();
+
+    if (updates.reference) {
+        await formDialog.getByLabel('Reference').fill(updates.reference);
+    }
+
+    const updateResponsePromise = page.waitForResponse(
+        (response) =>
+            response.url().includes('/api/asset-stocktakes') &&
+            ['PUT', 'PATCH'].includes(response.request().method()) &&
+            response.status() < 400,
+        { timeout: 15000 },
+    );
+
+    await formDialog.locator('button[type="submit"]').click();
+    await updateResponsePromise;
+    await expect(formDialog).not.toBeVisible({ timeout: 15000 });
 }
 
 export async function navigateToPerformStocktake(page: Page, reference: string) {

@@ -48,11 +48,19 @@ export async function createPipeline(
 export async function searchPipeline(page: Page, code: string): Promise<void> {
   const searchInput = page.getByPlaceholder('Search name, code, or description...');
   await expect(searchInput).toBeVisible();
+  const normalizedCode = code.trim();
+  if ((await searchInput.inputValue()).trim() === normalizedCode) {
+    return;
+  }
+
+  const responsePromise = page.waitForResponse(
+    r => r.url().includes('/api/pipelines') && r.status() === 200
+  );
   await searchInput.clear();
-  await searchInput.type(code);
+  await searchInput.type(normalizedCode);
   await page.keyboard.press('Enter');
   
-  await page.waitForResponse(r => r.url().includes('/api/pipelines') && r.status() === 200).catch(() => null);
+  await responsePromise;
   await page.waitForTimeout(500);
 }
 

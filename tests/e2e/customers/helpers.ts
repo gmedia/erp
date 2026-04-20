@@ -53,13 +53,21 @@ export async function searchCustomer(page: Page, email: string): Promise<void> {
   await page.waitForTimeout(500);
   const searchInput = page.getByPlaceholder('Search customers...');
   await expect(searchInput).toBeVisible();
+  const normalizedEmail = email.trim();
+  if ((await searchInput.inputValue()).trim() === normalizedEmail) {
+    return;
+  }
+
+  const responsePromise = page.waitForResponse(
+    r => r.url().includes('/api/customers') && r.status() === 200
+  );
   await searchInput.click();
   await searchInput.clear();
-  await searchInput.type(email, { delay: 50 });
+  await searchInput.type(normalizedEmail, { delay: 50 });
   await page.keyboard.press('Enter');
   
   // Wait for the API response to ensure the table has updated
-  await page.waitForResponse(r => r.url().includes('/api/customers') && r.status() === 200).catch(() => null);
+  await responsePromise;
   
   // Wait a small amount for the table context to re-render
   await page.waitForTimeout(500);

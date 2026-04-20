@@ -74,12 +74,9 @@ export async function waitForPurchaseHistoryReportResponse(
         .waitForResponse(
             (response) =>
                 response.url().includes('/api/reports/purchase-history') &&
-                response.request().headers()['accept']?.includes(
-                    'application/json',
-                ) &&
                 response.status() < 400,
         )
-        .catch(() => null);
+        ;
 }
 
 export async function openPurchaseHistoryReport(page: Page): Promise<void> {

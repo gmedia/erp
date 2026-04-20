@@ -75,9 +75,17 @@ export async function createFiscalYear(
 export async function searchFiscalYear(page: Page, name: string): Promise<void> {
   const searchInput = page.getByPlaceholder('Search fiscal years...');
   await searchInput.waitFor({ state: 'visible' });
+  if ((await searchInput.inputValue()) === name) {
+    return;
+  }
+
+  const responsePromise = page.waitForResponse(
+    r => r.url().includes('/api/fiscal-years') && r.status() < 400
+  );
+  await searchInput.clear();
   await searchInput.fill(name);
   await searchInput.press('Enter');
-  await page.waitForResponse(r => r.url().includes('/api/fiscal-years') && r.status() < 400).catch(() => null);
+  await responsePromise;
 }
 
 /**

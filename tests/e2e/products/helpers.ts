@@ -45,7 +45,7 @@ export async function createProduct(
     const catName = overrides.category_id ?? 'Electronics';
     if (await catSearch.isVisible()) {
         await catSearch.fill(catName);
-        await page.waitForResponse(r => r.url().includes('/api/product-categories') && r.status() < 400).catch(() => null);
+        await page.waitForResponse(r => r.url().includes('/api/product-categories') && r.status() < 400);
     }
     await page
         .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
@@ -60,7 +60,7 @@ export async function createProduct(
     const unitName = overrides.unit_id ?? 'Piece';
     if (await unitSearch.isVisible()) {
         await unitSearch.fill(unitName);
-        await page.waitForResponse(r => r.url().includes('/api/units') && r.status() < 400).catch(() => null);
+        await page.waitForResponse(r => r.url().includes('/api/units') && r.status() < 400);
     }
     await page
         .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
@@ -96,11 +96,13 @@ export async function createProduct(
  */
 export async function searchProduct(page: Page, query: string): Promise<void> {
     const searchInput = page.getByPlaceholder('Search code, name...');
+    const responsePromise = page.waitForResponse(
+        r => r.url().includes('/api/products') && r.status() < 400
+    );
+    await searchInput.clear();
     await searchInput.fill(query);
     await searchInput.press('Enter');
-    await page.waitForResponse(
-        r => r.url().includes('/api/products') && r.status() < 400
-    ).catch(() => null);
+    await responsePromise;
 }
 
 /**

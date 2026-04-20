@@ -105,14 +105,14 @@ export async function createAsset(
       response.request().method() === 'POST' &&
       response.status() < 400,
     { timeout: 15000 },
-  ).catch(() => null);
+  );
   const reloadResponsePromise = page.waitForResponse(
     response =>
       response.url().includes('/api/assets') &&
       response.request().method() === 'GET' &&
       response.status() < 400,
     { timeout: 15000 },
-  ).catch(() => null);
+  );
   await submitBtn.click();
   await createResponsePromise;
 
@@ -129,15 +129,57 @@ export async function createAsset(
 export async function searchAsset(page: Page, query: string): Promise<void> {
   const searchInput = page.getByPlaceholder(/Search assets.../i);
   await expect(searchInput).toBeVisible();
+  const normalizedQuery = query.trim();
+  if ((await searchInput.inputValue()).trim() === normalizedQuery) {
+    return;
+  }
+
   await searchAndWaitForApi(
     page,
     searchInput,
-    query,
+    normalizedQuery,
     url => url.includes('/api/assets') && url.includes('search='),
     15000,
   );
 
   // Passive wait: don't assert rows here to allow for "search after delete" tests
+}
+
+export async function editAsset(
+  page: Page,
+  identifier: string,
+  updates: Record<string, string>,
+): Promise<void> {
+  await searchAsset(page, identifier);
+
+  const row = page.locator('tbody tr').filter({ hasText: identifier }).first();
+  await expect(row).toBeVisible();
+
+  await row.getByRole('button', { name: /Actions/i }).click();
+  await page.getByRole('menuitem', { name: /Edit/i }).click();
+
+  const dialog = page.getByRole('dialog', { name: /Edit Asset/i });
+  await expect(dialog).toBeVisible();
+
+  if (updates.name) {
+    await dialog.locator('input[name="name"]').fill(updates.name);
+  }
+
+  if (updates.asset_code) {
+    await dialog.locator('input[name="asset_code"]').fill(updates.asset_code);
+  }
+
+  const updateResponsePromise = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/assets') &&
+      ['PUT', 'PATCH'].includes(response.request().method()) &&
+      response.status() < 400,
+    { timeout: 15000 },
+  );
+
+  await dialog.getByRole('button', { name: /Update|Save/i }).last().click();
+  await updateResponsePromise;
+  await expect(dialog).not.toBeVisible({ timeout: 15000 });
 }
 
 /**

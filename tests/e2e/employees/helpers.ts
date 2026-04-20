@@ -52,11 +52,20 @@ export async function createEmployee(
 export async function searchEmployee(page: Page, email: string): Promise<void> {
   const searchInput = page.getByPlaceholder('Search employees...');
   await expect(searchInput).toBeVisible();
-  await searchInput.fill(email);
+  const normalizedEmail = email.trim();
+  if ((await searchInput.inputValue()).trim() === normalizedEmail) {
+    return;
+  }
+
+  const responsePromise = page.waitForResponse(
+    r => r.url().includes('/api/employees') && r.status() === 200
+  );
+  await searchInput.clear();
+  await searchInput.fill(normalizedEmail);
   await searchInput.press('Enter');
   
   // Wait for API response
-  await page.waitForResponse(r => r.url().includes('/api/employees') && r.status() === 200).catch(() => null);
+  await responsePromise;
   
   // Small delay for UI stabilization
   await page.waitForTimeout(500);

@@ -53,10 +53,19 @@ export async function createCoaVersion(
 export async function searchCoaVersion(page: Page, name: string): Promise<void> {
   const searchInput = page.getByPlaceholder('Search COA versions...');
   await searchInput.waitFor({ state: 'visible' });
-  await searchInput.fill(name);
+  const normalizedName = name.trim();
+  if ((await searchInput.inputValue()).trim() === normalizedName) {
+    return;
+  }
+
+  const responsePromise = page.waitForResponse(
+    r => r.url().includes('/api/coa-versions') && r.status() < 400
+  );
+  await searchInput.clear();
+  await searchInput.fill(normalizedName);
   await searchInput.press('Enter');
   // Wait for response to ensure the table has updated
-  await page.waitForResponse(r => r.url().includes('/api/coa-versions') && r.status() < 400).catch(() => null);
+  await responsePromise;
 }
 
 /**

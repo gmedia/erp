@@ -95,18 +95,25 @@ export async function createJournalEntry(
   await saveBtn.click();
 
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
-  await page.waitForResponse(r => r.url().includes('/api/journal-entries') && r.status() === 200).catch(() => null);                                            
   return reference;
 }
 
 export async function searchJournalEntry(page: Page, query: string): Promise<void> {                                                                              
   const searchInput = page.getByPlaceholder(/Search/i);
   await expect(searchInput).toBeVisible({ timeout: 10000 });
+  const normalizedQuery = query.trim();
+  if ((await searchInput.inputValue()).trim() === normalizedQuery) {
+    return;
+  }
+
+  const responsePromise = page.waitForResponse(
+    r => r.url().includes('/api/journal-entries') && r.status() === 200
+  );
   await searchInput.clear();
-  await searchInput.fill(query);
+  await searchInput.fill(normalizedQuery);
   await searchInput.press('Enter');
   
-  await page.waitForResponse(r => r.url().includes('/api/journal-entries') && r.status() === 200).catch(() => null);                                            
+  await responsePromise;                                            
 }
 
 export async function editJournalEntry(
@@ -172,6 +179,5 @@ export async function deleteJournalEntry(page: Page, query: string): Promise<voi
         r.url().includes('/api/journal-entries') &&
         [200, 204].includes(r.status()),
       { timeout: 10000 },
-    )
-    .catch(() => null);
+    );
 }

@@ -107,11 +107,19 @@ export async function createApprovalDelegation(
 export async function searchApprovalDelegation(page: Page, query: string): Promise<void> {
   const searchInput = page.getByPlaceholder(/Search/i).first();
   await expect(searchInput).toBeVisible();
+  const normalizedQuery = query.trim();
+  if ((await searchInput.inputValue()).trim() === normalizedQuery) {
+    return;
+  }
+
+  const responsePromise = page.waitForResponse(
+    r => r.url().includes('/api/approval-delegations') && r.status() === 200
+  );
   await searchInput.clear();
-  await searchInput.fill(query);
+  await searchInput.fill(normalizedQuery);
   await searchInput.press('Enter');
   
-  await page.waitForResponse(r => r.url().includes('/api/approval-delegations') && r.status() === 200).catch(() => null);
+  await responsePromise;
   await page.waitForTimeout(500);
 }
 

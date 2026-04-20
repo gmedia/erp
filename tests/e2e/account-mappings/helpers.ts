@@ -113,18 +113,11 @@ export async function createAccountMapping(page: Page): Promise<{
       ['POST', 'PUT', 'PATCH'].includes(response.request().method()) &&
       response.status() < 400,
     { timeout: 15000 },
-  ).catch(() => null);
+  );
   await submitBtn.click();
   await mutationResponsePromise;
 
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
-  await page.waitForResponse(
-    (response) =>
-      response.url().includes('/api/account-mappings') &&
-      response.request().method() === 'GET' &&
-      response.status() < 400,
-    { timeout: 15000 },
-  ).catch(() => null);
   
   return { sourceCode: sourceCodeDerived || '52000', targetCode: targetCodeDerived || '11120', notes };
 }

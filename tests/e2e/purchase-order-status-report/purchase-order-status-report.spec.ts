@@ -38,13 +38,33 @@ test.describe('Purchase Order Status Report', () => {
         await exportResponsePromise;
 
         const searchInput = page.getByRole('textbox').first();
-        await searchInput.fill(poNumber);
-        await searchInput.press('Enter');
-        await waitForPurchaseOrderStatusReportResponse(page);
+        await Promise.all([
+            waitForPurchaseOrderStatusReportResponse(page),
+            searchInput.fill(poNumber).then(async () => {
+                await searchInput.press('Enter');
+            }),
+        ]);
 
         await page.getByRole('button', { name: /filters/i }).click();
-        await page.getByRole('button', { name: 'Apply Filters' }).click();
-        await waitForPurchaseOrderStatusReportResponse(page);
+        const filtersDialog = page.getByRole('dialog');
+        await expect(filtersDialog).toBeVisible();
+
+        const categoryFilter = filtersDialog
+            .locator('button')
+            .filter({ hasText: /All categories/i })
+            .first();
+        await categoryFilter.click({ force: true });
+
+        const categoryOption = page
+            .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+            .first();
+        await expect(categoryOption).toBeVisible({ timeout: 10000 });
+        await categoryOption.click({ force: true });
+
+        await Promise.all([
+            waitForPurchaseOrderStatusReportResponse(page),
+            filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
+        ]);
 
         await expect(page.locator('table')).toBeVisible();
     });
