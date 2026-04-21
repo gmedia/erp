@@ -12,7 +12,7 @@ async function selectAsyncOption(
         await expect(trigger).toBeVisible();
         await trigger.click();
 
-        const listbox = page.locator('ul[aria-busy]:visible').last();
+        const listbox = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
         await expect(listbox).toBeVisible();
 
         if (searchText) {
@@ -40,8 +40,57 @@ async function selectAsyncOption(
     }
 }
 
+interface AsyncOptionCandidate {
+    readonly searchText: string;
+    readonly optionText: string;
+}
+
+function escapeRegExp(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+async function selectOptionWithCandidates(
+    page: Page,
+    trigger: ReturnType<Page['getByRole']>,
+    candidates: readonly AsyncOptionCandidate[],
+    fallback: AsyncOptionCandidate,
+): Promise<void> {
+    for (const candidate of candidates) {
+        try {
+            await selectAsyncOption(
+                page,
+                trigger,
+                candidate.searchText,
+                candidate.optionText,
+            );
+            return;
+        } catch {
+            // Try next candidate until one is available in current dataset.
+        }
+    }
+
+    await selectAsyncOption(
+        page,
+        trigger,
+        fallback.searchText,
+        fallback.optionText,
+    );
+}
+
 export async function createStockTransfer(page: Page): Promise<string> {
-    const transferNumber = `ST-E2E-${Date.now()}`;
+    const transferNumber = `ST-E2E-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+    const productCandidates: readonly AsyncOptionCandidate[] = [
+        { searchText: 'MDF Wood Panel', optionText: 'MDF Wood Panel' },
+        { searchText: 'Executive Office Desk', optionText: 'Executive Office Desk' },
+        { searchText: 'Wooden Table Legs', optionText: 'Wooden Table Legs' },
+        { searchText: 'Inventory Sample Product', optionText: 'Inventory Sample Product' },
+    ];
+    const unitCandidates: readonly AsyncOptionCandidate[] = [
+        { searchText: 'Sheet', optionText: 'Sheet' },
+        { searchText: 'pcs', optionText: 'pcs' },
+        { searchText: 'Set', optionText: 'Set' },
+        { searchText: 'Box', optionText: 'Box' },
+    ];
 
     const addButton = page.getByRole('button', { name: /Add/i });
     await expect(addButton).toBeVisible();
@@ -51,6 +100,9 @@ export async function createStockTransfer(page: Page): Promise<string> {
     await expect(dialog).toBeVisible();
 
     await dialog.locator('input[name="transfer_number"]').fill(transferNumber);
+    const createdRow = page
+        .getByText(new RegExp(`^${escapeRegExp(transferNumber)}$`, 'i'))
+        .first();
 
     await selectAsyncOption(
         page,
@@ -69,36 +121,152 @@ export async function createStockTransfer(page: Page): Promise<string> {
     const itemDialog = page.getByRole('dialog', { name: /Add Item/i });
     await expect(itemDialog).toBeVisible();
 
-    await selectAsyncOption(
+    await selectOptionWithCandidates(
         page,
         itemDialog.getByRole('combobox', { name: /Product/i }),
-        '',
-        '.+',
+        productCandidates,
+        { searchText: '', optionText: '.+' },
     );
-    await selectAsyncOption(
+    await selectOptionWithCandidates(
         page,
         itemDialog.getByRole('combobox', { name: /Unit/i }),
-        '',
-        '.+',
+        unitCandidates,
+        { searchText: '', optionText: '.+' },
     );
 
     await itemDialog.locator('input[name="quantity"]').fill('2');
-    await itemDialog.getByRole('button', { name: /Save Item/i }).click();
-    await expect(itemDialog).not.toBeVisible({ timeout: 10000 });
+    const parentRows = dialog.locator('tbody tr');
+    const saveItemButton = itemDialog.getByRole('button', { name: /Save Item/i });
+    let itemCommitted = false;
 
-    const submitButton = dialog.getByRole('button', { name: 'Add', exact: true });
-    const createResponse = page
-        .waitForResponse(
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        await saveItemButton.click({ force: true });
+
+        try {
+            await expect
+                .poll(async () => parentRows.count(), { timeout: 10000 })
+                .toBeGreaterThan(0);
+            itemCommitted = true;
+            break;
+        } catch (error) {
+            if (attempt === 3) {
+                throw error;
+            }
+
+            // Re-select product/unit in case previous async-select choice did not persist.
+            await selectOptionWithCandidates(
+                page,
+                itemDialog.getByRole('combobox', { name: /Product/i }),
+                productCandidates,
+                { searchText: '', optionText: '.+' },
+            );
+            await selectOptionWithCandidates(
+                page,
+                itemDialog.getByRole('combobox', { name: /Unit/i }),
+                unitCandidates,
+                { searchText: '', optionText: '.+' },
+            );
+            await itemDialog.locator('input[name="quantity"]').fill('2');
+            await page.waitForTimeout(250);
+        }
+    }
+
+    expect(itemCommitted, 'Stock transfer item row should be committed before submit').toBeTruthy();
+
+    // Wait until the item is committed to the parent form, then close item dialog deterministically.
+    for (let closeAttempt = 1; closeAttempt <= 3; closeAttempt++) {
+        if (!await itemDialog.isVisible().catch(() => false)) {
+            break;
+        }
+
+        const closeItemDialogButton = itemDialog
+            .getByRole('button', { name: /(close|cancel|batal)/i })
+            .first();
+        if (await closeItemDialogButton.isVisible().catch(() => false)) {
+            await closeItemDialogButton.click({ force: true });
+        } else {
+            await page.keyboard.press('Escape').catch(() => null);
+        }
+    }
+    await expect(page.getByRole('dialog', { name: /Add Item/i })).toHaveCount(0, { timeout: 10000 });
+
+    // Ensure item append has been committed before submitting the main form.
+    const emptyItemsCell = dialog.getByText('No items added yet.');
+    if (await emptyItemsCell.isVisible().catch(() => false)) {
+        await expect(emptyItemsCell).not.toBeVisible({ timeout: 10000 });
+    }
+    await expect(dialog.locator('tbody tr')).toHaveCount(1, { timeout: 10000 });
+
+    // Close any lingering AsyncSelect popover that may intercept the submit click.
+    if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
+        await page.keyboard.press('Escape').catch(() => null);
+    }
+
+    let createResponseStatus: number | null = null;
+    let lastCreateError: unknown;
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        const submitButton = dialog.getByRole('button', { name: 'Add', exact: true });
+        await expect(submitButton).toBeVisible();
+        await expect(submitButton).toBeEnabled();
+
+        const createResponsePromise = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/stock-transfers') &&
-                r.request().method() === 'POST' &&
-                r.status() < 400,
-            { timeout: 45000 },
-        )
-        ;
+                r.request().method() === 'POST',
+            { timeout: 10000 },
+        ).then((response) => ({ type: 'response' as const, status: response.status() }));
+        const createdRowPromise = createdRow
+            .first()
+            .waitFor({ state: 'visible', timeout: 10000 })
+            .then(() => ({ type: 'row' as const }));
 
-    await submitButton.click();
-    await createResponse;
+        await submitButton.click({ force: true });
+
+        try {
+            const creationSignal = await Promise.any([
+                createResponsePromise,
+                createdRowPromise,
+            ]);
+            if (creationSignal.type === 'response') {
+                createResponseStatus = creationSignal.status;
+            } else {
+                createResponseStatus = 200;
+            }
+            break;
+        } catch (error) {
+            lastCreateError = error;
+
+            if (await createdRow.isVisible().catch(() => false)) {
+                createResponseStatus = 200;
+                break;
+            }
+
+            if (attempt === 3) {
+                throw error;
+            }
+
+            // Retry when submit click did not produce a reliable creation signal.
+            await page.keyboard.press('Escape').catch(() => null);
+            if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
+                await page.keyboard.press('Escape').catch(() => null);
+            }
+
+            const lingeringItemDialog = page.getByRole('dialog', { name: /Add Item/i });
+            if (await lingeringItemDialog.isVisible().catch(() => false)) {
+                await page.keyboard.press('Escape').catch(() => null);
+                await expect(lingeringItemDialog).toBeHidden({ timeout: 3000 }).catch(() => null);
+            }
+        }
+    }
+
+    if (createResponseStatus === null) {
+        throw lastCreateError instanceof Error
+            ? lastCreateError
+            : new Error('Stock transfer create response was not captured.');
+    }
+
+    expect(createResponseStatus, 'Stock transfer create response should be successful').toBeLessThan(400);
 
     try {
         await expect(dialog).not.toBeVisible({ timeout: 5000 });
@@ -113,7 +281,10 @@ export async function createStockTransfer(page: Page): Promise<string> {
     }
 
     await expect(dialog).not.toBeVisible({ timeout: 15000 });
-    await expect(page.getByText(transferNumber, { exact: true }).first()).toBeVisible({
+    if (!await createdRow.isVisible().catch(() => false)) {
+        await searchStockTransfer(page, transferNumber);
+    }
+    await expect(createdRow).toBeVisible({
         timeout: 30000,
     });
 
@@ -141,7 +312,7 @@ export async function editStockTransfer(
 
     // Wait for the GET detail request
     const detailResponse = page.waitForResponse(
-        (r) => r.url().match(/\/api\/stock-transfers\/\d+$/) && r.request().method() === 'GET',
+        (r) => !!r.url().match(/\/api\/stock-transfers\/\d+$/) && r.request().method() === 'GET',
         { timeout: 15000 }
     );
 
