@@ -47,6 +47,10 @@ interface AsyncOptionCandidate {
     readonly optionText: string;
 }
 
+function escapeRegExp(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 async function selectOptionWithCandidates(
     page: Page,
     trigger: ReturnType<Page['getByRole']>,
@@ -76,7 +80,7 @@ async function selectOptionWithCandidates(
 }
 
 export async function createStockAdjustment(page: Page): Promise<string> {
-    const adjustmentNumber = `SA-E2E-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const adjustmentNumber = `SA-E2E-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const productCandidates: readonly AsyncOptionCandidate[] = [
         { searchText: 'MDF Wood Panel', optionText: 'MDF Wood Panel' },
         { searchText: 'Executive Office Desk', optionText: 'Executive Office Desk' },
@@ -102,6 +106,9 @@ export async function createStockAdjustment(page: Page): Promise<string> {
     await dialog
         .locator('input[name="adjustment_number"]')
         .fill(adjustmentNumber);
+    const createdRow = page
+        .getByText(new RegExp(`^${escapeRegExp(adjustmentNumber)}$`, 'i'))
+        .first();
 
     await selectAsyncOption(
         page,
@@ -193,7 +200,7 @@ export async function createStockAdjustment(page: Page): Promise<string> {
     await expect(dialog.locator('tbody tr')).toHaveCount(1, { timeout: 10000 });
 
     // Close any lingering AsyncSelect popover that may intercept the submit click.
-    if (await page.locator('ul[aria-busy]:visible').count()) {
+    if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
         await page.keyboard.press('Escape').catch(() => null);
     }
 
@@ -211,13 +218,9 @@ export async function createStockAdjustment(page: Page): Promise<string> {
                 r.request().method() === 'POST',
             { timeout: 10000 },
         ).then((response) => ({ type: 'response' as const, status: response.status() }));
-        const createdRowPromise = page.getByText(adjustmentNumber, { exact: true })
-            .first()
+        const createdRowPromise = createdRow
             .waitFor({ state: 'visible', timeout: 10000 })
             .then(() => ({ type: 'row' as const }));
-        const dialogClosedPromise = dialog
-            .waitFor({ state: 'hidden', timeout: 10000 })
-            .then(() => ({ type: 'dialog' as const }));
 
         await submitButton.click({ force: true });
 
@@ -225,7 +228,6 @@ export async function createStockAdjustment(page: Page): Promise<string> {
             const creationSignal = await Promise.any([
                 createResponsePromise,
                 createdRowPromise,
-                dialogClosedPromise,
             ]);
             if (creationSignal.type === 'response') {
                 createResponseStatus = creationSignal.status;
@@ -236,7 +238,7 @@ export async function createStockAdjustment(page: Page): Promise<string> {
         } catch (error) {
             lastCreateError = error;
 
-            if (await page.getByText(adjustmentNumber, { exact: true }).first().isVisible().catch(() => false)) {
+            if (await createdRow.isVisible().catch(() => false)) {
                 createResponseStatus = 200;
                 break;
             }
@@ -247,7 +249,7 @@ export async function createStockAdjustment(page: Page): Promise<string> {
 
             // Retry when submit click did not produce a reliable creation signal.
             await page.keyboard.press('Escape').catch(() => null);
-            if (await page.locator('ul[aria-busy]:visible').count()) {
+            if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
                 await page.keyboard.press('Escape').catch(() => null);
             }
 
@@ -282,7 +284,10 @@ export async function createStockAdjustment(page: Page): Promise<string> {
     }
 
     await expect(dialog).not.toBeVisible({ timeout: 15000 });
-    await expect(page.getByText(adjustmentNumber, { exact: true }).first()).toBeVisible({
+    if (!await createdRow.isVisible().catch(() => false)) {
+        await searchStockAdjustment(page, adjustmentNumber);
+    }
+    await expect(createdRow).toBeVisible({
         timeout: 30000,
     });
 

@@ -1,5 +1,9 @@
 import { Page, expect } from '@playwright/test';
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 async function fillVisibleSearch(page: Page, value: string): Promise<void> {
   const input = page.locator('input[placeholder="Search..."]:visible');
   await expect(input).toHaveCount(1, { timeout: 15000 });
@@ -113,20 +117,78 @@ export async function createAccountMapping(page: Page): Promise<{
 
   const notes = `notes-${timestamp}`;
   await dialog.locator('textarea[name="notes"]').fill(notes);
+  const createdRow = page
+    .locator('tbody tr')
+    .filter({ hasText: new RegExp(escapeRegExp(notes), 'i') })
+    .first();
 
   const submitBtn = dialog.getByRole('button', { name: /Create|Submit/i });
   await expect(submitBtn).toBeVisible();
-  const mutationResponsePromise = page.waitForResponse(
-    (response) =>
-      response.url().includes('/api/account-mappings') &&
-      ['POST', 'PUT', 'PATCH'].includes(response.request().method()) &&
-      response.status() < 400,
-    { timeout: 15000 },
-  );
-  await submitBtn.click();
-  await mutationResponsePromise;
+
+  // Close any lingering popover that may intercept submit click.
+  if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
+    await page.keyboard.press('Escape').catch(() => null);
+  }
+
+  let mutationResponseStatus: number | null = null;
+  let lastMutationError: unknown;
+
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const mutationResponsePromise = page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/account-mappings') &&
+        ['POST', 'PUT', 'PATCH'].includes(response.request().method()),
+      { timeout: 10000 },
+    ).then((response) => ({ type: 'response' as const, status: response.status() }));
+    const createdRowPromise = createdRow
+      .waitFor({ state: 'visible', timeout: 10000 })
+      .then(() => ({ type: 'row' as const }));
+
+    await submitBtn.click({ force: true });
+
+    try {
+      const creationSignal = await Promise.any([
+        mutationResponsePromise,
+        createdRowPromise,
+      ]);
+      if (creationSignal.type === 'response') {
+        mutationResponseStatus = creationSignal.status;
+      } else {
+        mutationResponseStatus = 200;
+      }
+      break;
+    } catch (error) {
+      lastMutationError = error;
+
+      if (await createdRow.isVisible().catch(() => false)) {
+        mutationResponseStatus = 200;
+        break;
+      }
+
+      if (attempt === 3) {
+        throw error;
+      }
+
+      await page.keyboard.press('Escape').catch(() => null);
+      if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
+        await page.keyboard.press('Escape').catch(() => null);
+      }
+    }
+  }
+
+  if (mutationResponseStatus === null) {
+    throw lastMutationError instanceof Error
+      ? lastMutationError
+      : new Error('Account mapping create response was not captured.');
+  }
+
+  expect(mutationResponseStatus, 'Account mapping create response should be successful').toBeLessThan(400);
 
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
+  if (!await createdRow.isVisible().catch(() => false)) {
+    await searchAccountMappings(page, notes);
+  }
+  await expect(createdRow).toBeVisible({ timeout: 30000 });
   
   return { sourceCode: sourceCodeDerived || '52000', targetCode: targetCodeDerived || '11120', notes };
 }
