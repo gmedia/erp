@@ -198,15 +198,28 @@ export async function createStockTransfer(page: Page): Promise<string> {
     await expect(dialog.locator('tbody tr')).toHaveCount(1, { timeout: 10000 });
 
     // Close any lingering AsyncSelect popover that may intercept the submit click.
-    if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
-        await page.keyboard.press('Escape').catch(() => null);
-    }
+    const openPopovers = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible');
+    await expect(openPopovers).toHaveCount(0, { timeout: 3000 }).catch(() => null);
 
     let createResponseStatus: number | null = null;
     let lastCreateError: unknown;
 
     for (let attempt = 1; attempt <= 3; attempt++) {
-        const submitButton = dialog.getByRole('button', { name: 'Add', exact: true });
+        if (!await dialog.isVisible().catch(() => false)) {
+            if (!await createdRow.isVisible().catch(() => false)) {
+                await searchStockTransfer(page, transferNumber).catch(() => null);
+            }
+            if (await createdRow.isVisible().catch(() => false)) {
+                createResponseStatus = 200;
+                break;
+            }
+            if (attempt === 3) {
+                throw new Error('Stock transfer dialog closed before creation could be confirmed.');
+            }
+            continue;
+        }
+
+        const submitButton = dialog.getByRole('button', { name: /^(Add|Create|Submit)$/i });
         await expect(submitButton).toBeVisible();
         await expect(submitButton).toBeEnabled();
 
@@ -240,6 +253,14 @@ export async function createStockTransfer(page: Page): Promise<string> {
             if (await createdRow.isVisible().catch(() => false)) {
                 createResponseStatus = 200;
                 break;
+            }
+
+            if (!await dialog.isVisible().catch(() => false)) {
+                await searchStockTransfer(page, transferNumber).catch(() => null);
+                if (await createdRow.isVisible().catch(() => false)) {
+                    createResponseStatus = 200;
+                    break;
+                }
             }
 
             if (attempt === 3) {

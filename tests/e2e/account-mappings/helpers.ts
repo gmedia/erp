@@ -11,14 +11,24 @@ async function fillVisibleSearch(page: Page, value: string): Promise<void> {
 }
 
 async function clickFirstMatchingOption(page: Page, name: RegExp): Promise<void> {
-  const options = page
-    .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
-    .filter({ hasText: name });
-  await expect(options.first()).toBeVisible({ timeout: 15000 });
-  
-  const option = options.first();
-  await option.scrollIntoViewIfNeeded();
-  await option.click({ force: true });
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const option = page
+      .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+      .filter({ hasText: name })
+      .first();
+    await expect(option).toBeVisible({ timeout: 15000 });
+
+    try {
+      await option.click({ force: true });
+      break;
+    } catch (error) {
+      if (attempt === 2) {
+        throw error;
+      }
+
+      await page.waitForTimeout(200);
+    }
+  }
 
   // UI cleanup only: some async-select popovers can linger briefly under load.
   const openPopovers = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible');

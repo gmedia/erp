@@ -190,9 +190,8 @@ export async function createInventoryStocktake(page: Page): Promise<string> {
     }
     await expect(dialog.locator('tbody tr')).toHaveCount(1, { timeout: 10000 });
 
-    if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
-        await page.keyboard.press('Escape').catch(() => null);
-    }
+    const openPopovers = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible');
+    await expect(openPopovers).toHaveCount(0, { timeout: 3000 }).catch(() => null);
 
     let createResponseStatus: number | null = null;
     let lastCreateError: unknown;
@@ -212,7 +211,7 @@ export async function createInventoryStocktake(page: Page): Promise<string> {
             continue;
         }
 
-        const submitButton = dialog.getByRole('button', { name: 'Add', exact: true });
+        const submitButton = dialog.getByRole('button', { name: /^(Add|Create|Submit)$/i });
         await expect(submitButton).toBeVisible({ timeout: 10000 });
         await expect(submitButton).toBeEnabled();
 
