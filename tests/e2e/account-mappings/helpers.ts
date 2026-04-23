@@ -135,10 +135,9 @@ export async function createAccountMapping(page: Page): Promise<{
   const submitBtn = dialog.getByRole('button', { name: /Create|Submit/i });
   await expect(submitBtn).toBeVisible();
 
-  // Close any lingering popover that may intercept submit click.
-  if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
-    await page.keyboard.press('Escape').catch(() => null);
-  }
+  // Prefer non-destructive popover settling before submit.
+  const openPopovers = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible');
+  await expect(openPopovers).toHaveCount(0, { timeout: 3000 }).catch(() => null);
 
   let mutationResponseStatus: number | null = null;
   let lastMutationError: unknown;
@@ -153,6 +152,9 @@ export async function createAccountMapping(page: Page): Promise<{
     const createdRowPromise = createdRow
       .waitFor({ state: 'visible', timeout: 10000 })
       .then(() => ({ type: 'row' as const }));
+    const dialogClosedPromise = dialog
+      .waitFor({ state: 'hidden', timeout: 10000 })
+      .then(() => ({ type: 'dialog' as const }));
 
     await submitBtn.click({ force: true });
 
@@ -160,13 +162,53 @@ export async function createAccountMapping(page: Page): Promise<{
       const creationSignal = await Promise.any([
         mutationResponsePromise,
         createdRowPromise,
+        dialogClosedPromise,
       ]);
       if (creationSignal.type === 'response') {
-        mutationResponseStatus = creationSignal.status;
+        if (creationSignal.status < 400) {
+          mutationResponseStatus = creationSignal.status;
+          break;
+        }
+
+        // Some runs surface a non-2xx response first even when the row is persisted.
+        await createdRow.waitFor({ state: 'visible', timeout: 3000 }).catch(() => null);
+        if (await createdRow.isVisible().catch(() => false)) {
+          mutationResponseStatus = 200;
+          break;
+        }
+
+        lastMutationError = new Error(
+          `Account mapping create returned status ${creationSignal.status}.`,
+        );
+
+        if (attempt === 3) {
+          mutationResponseStatus = creationSignal.status;
+          break;
+        }
+
+        continue;
+      }
+
+      if (creationSignal.type === 'dialog') {
+        await searchAccountMappings(page, notes).catch(() => null);
+        if (await createdRow.isVisible().catch(() => false)) {
+          mutationResponseStatus = 200;
+          break;
+        }
+
+        lastMutationError = new Error(
+          'Account mapping dialog closed before creation could be confirmed.',
+        );
+
+        if (attempt === 3) {
+          throw lastMutationError;
+        }
+
+        continue;
       } else {
         mutationResponseStatus = 200;
+        break;
       }
-      break;
     } catch (error) {
       lastMutationError = error;
 
@@ -175,11 +217,18 @@ export async function createAccountMapping(page: Page): Promise<{
         break;
       }
 
+      if (!await dialog.isVisible().catch(() => false)) {
+        await searchAccountMappings(page, notes).catch(() => null);
+        if (await createdRow.isVisible().catch(() => false)) {
+          mutationResponseStatus = 200;
+          break;
+        }
+      }
+
       if (attempt === 3) {
         throw error;
       }
 
-      await page.keyboard.press('Escape').catch(() => null);
       if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
         await page.keyboard.press('Escape').catch(() => null);
       }

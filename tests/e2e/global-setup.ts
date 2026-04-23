@@ -1,9 +1,10 @@
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 
 const AUTH_STATE_PATH = 'e2e/.auth/admin.json';
 const DEFAULT_BASE_URL = 'http://localhost:80';
+const VITE_HOT_FILE_PATH = 'public/hot';
 
 type LoginResponse = {
     token?: string;
@@ -31,6 +32,11 @@ function resolvePhpBinary(): string {
     }
 
     throw new Error('Unable to resolve PHP binary. Set PLAYWRIGHT_PHP_BINARY or PHP_BINARY.');
+}
+
+function disableViteHotFile(): void {
+    // Force Laravel to use built assets during E2E runs.
+    rmSync(VITE_HOT_FILE_PATH, { force: true });
 }
 
 async function createAdminAuthState(baseUrl: string, authStatePath: string): Promise<void> {
@@ -98,6 +104,8 @@ export default async function globalSetup() {
     const baseUrl = process.env.PLAYWRIGHT_BASE_URL || DEFAULT_BASE_URL;
     const shouldPreloadAuthState = process.env.PLAYWRIGHT_PRELOAD_AUTH !== '0';
     const authStatePath = process.env.PLAYWRIGHT_STORAGE_STATE || AUTH_STATE_PATH;
+
+    disableViteHotFile();
 
     execFileSync(phpBinary, ['artisan', 'migrate:fresh', '--force'], {
         stdio: 'inherit',

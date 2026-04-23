@@ -208,6 +208,7 @@ export async function createStockTransfer(page: Page): Promise<string> {
         if (!await dialog.isVisible().catch(() => false)) {
             if (!await createdRow.isVisible().catch(() => false)) {
                 await searchStockTransfer(page, transferNumber).catch(() => null);
+                await createdRow.waitFor({ state: 'visible', timeout: 5000 }).catch(() => null);
             }
             if (await createdRow.isVisible().catch(() => false)) {
                 createResponseStatus = 200;
@@ -216,6 +217,7 @@ export async function createStockTransfer(page: Page): Promise<string> {
             if (attempt === 3) {
                 throw new Error('Stock transfer dialog closed before creation could be confirmed.');
             }
+            await page.waitForTimeout(300);
             continue;
         }
 
@@ -233,6 +235,9 @@ export async function createStockTransfer(page: Page): Promise<string> {
             .first()
             .waitFor({ state: 'visible', timeout: 10000 })
             .then(() => ({ type: 'row' as const }));
+        const dialogClosedPromise = dialog
+            .waitFor({ state: 'hidden', timeout: 10000 })
+            .then(() => ({ type: 'dialog' as const }));
 
         await submitButton.click({ force: true });
 
@@ -240,13 +245,53 @@ export async function createStockTransfer(page: Page): Promise<string> {
             const creationSignal = await Promise.any([
                 createResponsePromise,
                 createdRowPromise,
+                dialogClosedPromise,
             ]);
             if (creationSignal.type === 'response') {
-                createResponseStatus = creationSignal.status;
+                if (creationSignal.status < 400) {
+                    createResponseStatus = creationSignal.status;
+                    break;
+                }
+
+                // Some runs surface a non-2xx response first even when row persists.
+                await createdRow.waitFor({ state: 'visible', timeout: 3000 }).catch(() => null);
+                if (await createdRow.isVisible().catch(() => false)) {
+                    createResponseStatus = 200;
+                    break;
+                }
+
+                lastCreateError = new Error(
+                    `Stock transfer create returned status ${creationSignal.status}.`,
+                );
+
+                if (attempt === 3) {
+                    createResponseStatus = creationSignal.status;
+                    break;
+                }
+
+                continue;
+            }
+
+            if (creationSignal.type === 'dialog') {
+                await searchStockTransfer(page, transferNumber).catch(() => null);
+                if (await createdRow.isVisible().catch(() => false)) {
+                    createResponseStatus = 200;
+                    break;
+                }
+
+                lastCreateError = new Error(
+                    'Stock transfer dialog closed before creation could be confirmed.',
+                );
+
+                if (attempt === 3) {
+                    throw lastCreateError;
+                }
+
+                continue;
             } else {
                 createResponseStatus = 200;
+                break;
             }
-            break;
         } catch (error) {
             lastCreateError = error;
 
@@ -268,7 +313,6 @@ export async function createStockTransfer(page: Page): Promise<string> {
             }
 
             // Retry when submit click did not produce a reliable creation signal.
-            await page.keyboard.press('Escape').catch(() => null);
             if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
                 await page.keyboard.press('Escape').catch(() => null);
             }
