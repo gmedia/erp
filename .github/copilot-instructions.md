@@ -42,7 +42,7 @@ description: Aturan agent untuk project ERP
 
 ## 3. Sail
 
-Semua command terminal wajib via `./vendor/bin/sail <command>` (artisan/composer/npm/test). Jangan jalankan langsung di host.
+Semua command runtime project wajib via `./vendor/bin/sail <command>` (artisan/composer/npm/test). Command git (status/log/diff/commit) boleh dijalankan langsung di host.
 
 ## 4. Testing
 
@@ -108,3 +108,31 @@ Untuk task refactor berbasis SonarQube dengan target menurunkan duplikasi dan me
 
 5. **Penanganan Anomali Metrik**
 	- Jika `coverage`/metrik lain anomali (mis. `0.0`) namun test lokal lulus, catat sebagai anomali pipeline di progress doc dan lanjutkan verifikasi pada snapshot berikutnya.
+
+## 9. Session Handoff & Continuity (Lintas Laptop/Shift)
+
+- Karena user sering pindah laptop dengan Remote SSH server yang sama, agent **WAJIB** menjaga continuity via checkpoint repository.
+- `task.md` adalah sumber status aktif utama dan harus selalu bisa dipakai agent berikutnya tanpa konteks chat sebelumnya.
+
+### Aturan Wajib
+
+1. Saat memulai sesi baru untuk task berlanjut:
+	- Baca `task.md` terlebih dahulu.
+	- Verifikasi baseline cepat: `git rev-parse HEAD`, `git status --short`.
+
+2. Sebelum menutup sesi (atau setelah wave perubahan signifikan), update `task.md` minimal:
+	- `Last updated`
+	- `Current milestone`
+	- `What changed in this session`
+	- `Validated commands and outcomes`
+	- `Open risks/blockers`
+	- `Recommended next step`
+	- `Continuation Prompt`
+
+3. Gunakan prompt reusable untuk handoff:
+	- `.github/prompts/continue-progress.prompt.md`
+	- `.github/prompts/checkpoint-progress.prompt.md`
+
+4. Jika ada commit, tulis hash commit terbaru pada checkpoint.
+
+5. Jangan simpan log mentah panjang di `task.md`; simpan ringkasan terstruktur agar tetap terbaca.

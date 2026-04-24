@@ -46,20 +46,23 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 │   ├── refactor-backend/      # Refactor Laravel
 │   ├── refactor-frontend/     # Refactor React
 │   ├── database-migration/    # Migration, seeder
-│   └── testing-strategy/      # Tests
+│   ├── testing-strategy/      # Tests
+│   └── session-handoff/       # Checkpoint lintas sesi/laptop
 └── prompts/
     ├── create-feature.prompt.md
     ├── create-import.prompt.md
     ├── create-tests.prompt.md
     ├── refactor-module.prompt.md
-    └── refactor-sonar.prompt.md
+    ├── refactor-sonar.prompt.md
+    ├── continue-progress.prompt.md
+    └── checkpoint-progress.prompt.md
 ```
 
 ---
 
 ## 📋 Daftar Skills
 
-| Skill | Deskripsi | MCP Tools |
+| Skill | Deskripsi | Tools |
 |-------|-----------|-----------|
 | `feature-crud-simple` | CRUD 1 tabel | database-schema, list-routes, shadcn |
 | `feature-crud-complex` | CRUD + relasi | database-schema, tinker, shadcn |
@@ -68,6 +71,7 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 | `refactor-frontend` | Refactor React | shadcn, browser-logs |
 | `database-migration` | Migration | database-schema, search-docs |
 | `testing-strategy` | Tests | last-error, read-log-entries |
+| `session-handoff` | Checkpoint lintas sesi | read_file, git status, prompt workflow |
 
 ---
 
@@ -75,7 +79,7 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 
 1. **Pilih skill** → lihat [DECISION.md](./DECISION.md)
 2. **Baca SKILL.md** → `mcp_filesystem_read_file(path: ".github/skills/{skill}/SKILL.md")`
-3. **Gunakan MCP tools** → bukan command manual
+3. **Gunakan MCP tools bila relevan**; untuk operasi git gunakan git CLI
 4. **Referensi files existing** → bukan template
 
 ## 💡 Hemat Token MCP
@@ -97,6 +101,8 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 | `/refactor-module` | Refactor modul existing |
 | `/refactor-sonar` | Susun dan jalankan refactor plan berbasis data SonarQube MCP |
 | `/create-tests` | Buat test untuk fitur |
+| `/continue-progress` | Lanjutkan sesi dari checkpoint terbaru |
+| `/checkpoint-progress` | Simpan checkpoint sesi aktif |
 
 Catatan `/refactor-sonar`:
 Jika Sonar MCP tidak tersedia, gunakan fallback evidence dari `.sonarcloud.properties`, `coverage.xml`, dan perubahan file Git. Tetap mulai dari ringkasan metrik lalu drill-down ke cluster duplikasi prioritas untuk hemat token.

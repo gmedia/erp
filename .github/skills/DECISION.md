@@ -39,7 +39,9 @@ Apa yang ingin dilakukan?
 ├── Database
 │   └── Migration, seeder? ─────────→ database-migration
 │
-└── Testing ────────────────────────→ testing-strategy
+├── Testing ────────────────────────→ testing-strategy
+│
+└── Lanjutkan lintas laptop/shift ─→ session-handoff
 ```
 
 ---
@@ -56,6 +58,7 @@ Apa yang ingin dilakukan?
 | Prioritas refactor dari SonarQube | `workflow refactor-sonar` |
 | Migration, seeder | `database-migration` |
 | Buat tests | `testing-strategy` |
+| Pindah laptop/shift, perlu checkpoint rapi | `session-handoff` |
 
 ---
 
