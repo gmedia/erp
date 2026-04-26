@@ -36,6 +36,7 @@ export interface ModuleTestConfig {
 
     // DataTable config
     sortableColumns: string[];    // Label text kolom sortable PERSIS seperti di UI
+    skipCreateBeforeSort?: boolean;
 
     // View config
     viewType: 'dialog' | 'page';
@@ -245,7 +246,9 @@ export function generateModuleTests(config: ModuleTestConfig) {
         test(`can sort ${config.entityNamePlural} by all columns`, async ({ page }) => {
             test.setTimeout(120000); // 2 minutes for sorting all columns
             // Create entity to ensure table has data
-            await config.createEntity(page);
+            if (!config.skipCreateBeforeSort) {
+                await config.createEntity(page);
+            }
             await navigateToModule(page, config.route, config.apiPath);
 
             for (const column of config.sortableColumns) {

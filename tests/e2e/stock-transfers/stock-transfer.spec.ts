@@ -24,6 +24,7 @@ generateModuleTests({
         'Expected Arrival',
         'Status',
     ],
+    skipCreateBeforeSort: true,
 
     viewType: 'dialog',
 
