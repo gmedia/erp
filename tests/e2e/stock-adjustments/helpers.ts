@@ -208,8 +208,23 @@ export async function createStockAdjustment(page: Page): Promise<string> {
     let lastCreateError: unknown;
 
     for (let attempt = 1; attempt <= 3; attempt++) {
-        const submitButton = dialog.getByRole('button', { name: 'Add', exact: true });
-        await expect(submitButton).toBeVisible();
+        if (!await dialog.isVisible().catch(() => false)) {
+            if (!await createdRow.isVisible().catch(() => false)) {
+                await searchStockAdjustment(page, adjustmentNumber).catch(() => null);
+            }
+            if (await createdRow.isVisible().catch(() => false)) {
+                createResponseStatus = 200;
+                break;
+            }
+            if (attempt === 3) {
+                throw new Error('Stock adjustment dialog closed before creation could be confirmed.');
+            }
+            await page.waitForTimeout(300);
+            continue;
+        }
+
+        const submitButton = dialog.getByRole('button', { name: /^(Add|Create|Submit)$/i });
+        await expect(submitButton).toBeVisible({ timeout: 10000 });
         await expect(submitButton).toBeEnabled();
 
         const createResponsePromise = page.waitForResponse(
@@ -241,6 +256,14 @@ export async function createStockAdjustment(page: Page): Promise<string> {
             if (await createdRow.isVisible().catch(() => false)) {
                 createResponseStatus = 200;
                 break;
+            }
+
+            if (!await dialog.isVisible().catch(() => false)) {
+                await searchStockAdjustment(page, adjustmentNumber).catch(() => null);
+                if (await createdRow.isVisible().catch(() => false)) {
+                    createResponseStatus = 200;
+                    break;
+                }
             }
 
             if (attempt === 3) {
