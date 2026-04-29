@@ -23,8 +23,8 @@ export async function createPurchaseRequest(page: Page): Promise<string> {
                 getFirstId('/api/branches?per_page=1'),
                 getFirstId('/api/departments?per_page=1'),
                 getFirstId('/api/employees?per_page=1'),
-                getFirstId('/api/products?per_page=1'),
-                getFirstId('/api/units?per_page=1'),
+                getFirstId('/api/products?search=Executive%20Office%20Desk&per_page=1'),
+                getFirstId('/api/units?search=Piece&per_page=1'),
             ]);
 
         const response = await fetch('/api/purchase-requests', {

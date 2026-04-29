@@ -4,7 +4,7 @@ import { login } from '../helpers';
 test.describe('Asset Stocktake Variance Report E2E', () => {
     test.beforeEach(async ({ page }) => {
         // We use admin to have permission
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('it can view the variance dashboard and filter data', async ({ page }) => {

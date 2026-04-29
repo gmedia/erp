@@ -7,7 +7,7 @@ test.describe('Posting Journal End-to-End', () => {
 
   test('should bulk post draft journal entries', async ({ page }) => {
     // 1. Login and navigate to journal entries
-    await login(page);
+    await login(page, undefined, undefined, { requireDashboard: false });
     await page.goto('/journal-entries');
 
     // 2. Create a draft journal entry to ensure we have data
@@ -52,7 +52,7 @@ test.describe('Posting Journal End-to-End', () => {
   });
 
   test('should handle "Select All" functionality', async ({ page }) => {
-    await login(page);
+    await login(page, undefined, undefined, { requireDashboard: false });
     await page.goto('/posting-journals');
     await page.waitForLoadState('networkidle');
 

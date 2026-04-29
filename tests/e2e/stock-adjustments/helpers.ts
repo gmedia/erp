@@ -79,6 +79,28 @@ async function selectOptionWithCandidates(
     );
 }
 
+async function selectPersistedAsyncOption(
+    page: Page,
+    trigger: ReturnType<Page['getByRole']>,
+    searchText: string,
+    optionText: string,
+): Promise<void> {
+    const optionPattern = new RegExp(escapeRegExp(optionText), 'i');
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        await selectAsyncOption(page, trigger, searchText, optionText);
+
+        try {
+            await expect(trigger).toContainText(optionPattern, { timeout: 2000 });
+            return;
+        } catch (error) {
+            if (attempt === 3) {
+                throw error;
+            }
+        }
+    }
+}
+
 export async function createStockAdjustment(page: Page): Promise<string> {
     const adjustmentNumber = `SA-E2E-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const productCandidates: readonly AsyncOptionCandidate[] = [
@@ -110,7 +132,7 @@ export async function createStockAdjustment(page: Page): Promise<string> {
         .getByText(new RegExp(`^${escapeRegExp(adjustmentNumber)}$`, 'i'))
         .first();
 
-    await selectAsyncOption(
+    await selectPersistedAsyncOption(
         page,
         dialog.getByRole('combobox', { name: /Warehouse/i }),
         'Main',
@@ -204,22 +226,35 @@ export async function createStockAdjustment(page: Page): Promise<string> {
         await page.keyboard.press('Escape').catch(() => null);
     }
 
+    const confirmCreatedRow = async (): Promise<boolean> => {
+        if (await createdRow.isVisible().catch(() => false)) {
+            return true;
+        }
+
+        for (let confirmAttempt = 1; confirmAttempt <= 4; confirmAttempt++) {
+            await searchStockAdjustment(page, adjustmentNumber).catch(() => null);
+            if (await createdRow.isVisible().catch(() => false)) {
+                return true;
+            }
+            await page.waitForTimeout(300 * confirmAttempt);
+        }
+
+        return false;
+    };
+
     let createResponseStatus: number | null = null;
     let lastCreateError: unknown;
 
     for (let attempt = 1; attempt <= 3; attempt++) {
         if (!await dialog.isVisible().catch(() => false)) {
-            if (!await createdRow.isVisible().catch(() => false)) {
-                await searchStockAdjustment(page, adjustmentNumber).catch(() => null);
-            }
-            if (await createdRow.isVisible().catch(() => false)) {
+            if (await confirmCreatedRow()) {
                 createResponseStatus = 200;
                 break;
             }
             if (attempt === 3) {
                 throw new Error('Stock adjustment dialog closed before creation could be confirmed.');
             }
-            await page.waitForTimeout(300);
+            await page.waitForTimeout(300 * attempt);
             continue;
         }
 
@@ -258,12 +293,29 @@ export async function createStockAdjustment(page: Page): Promise<string> {
                 break;
             }
 
-            if (!await dialog.isVisible().catch(() => false)) {
-                await searchStockAdjustment(page, adjustmentNumber).catch(() => null);
-                if (await createdRow.isVisible().catch(() => false)) {
-                    createResponseStatus = 200;
-                    break;
-                }
+            const rowVisibleAfterDelay = await createdRow
+                .waitFor({ state: 'visible', timeout: 5000 })
+                .then(() => true)
+                .catch(() => false);
+
+            if (rowVisibleAfterDelay) {
+                createResponseStatus = 200;
+                break;
+            }
+
+            const dialogClosedAfterDelay = await dialog
+                .waitFor({ state: 'hidden', timeout: 3000 })
+                .then(() => true)
+                .catch(() => false);
+
+            if (dialogClosedAfterDelay && await confirmCreatedRow()) {
+                createResponseStatus = 200;
+                break;
+            }
+
+            if (!await dialog.isVisible().catch(() => false) && await confirmCreatedRow()) {
+                createResponseStatus = 200;
+                break;
             }
 
             if (attempt === 3) {
@@ -271,7 +323,6 @@ export async function createStockAdjustment(page: Page): Promise<string> {
             }
 
             // Retry when submit click did not produce a reliable creation signal.
-            await page.keyboard.press('Escape').catch(() => null);
             if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
                 await page.keyboard.press('Escape').catch(() => null);
             }

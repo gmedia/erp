@@ -5,7 +5,7 @@ import * as path from 'node:path';
 
 test.describe('Supplier Import E2E Tests', () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('can import suppliers via CSV', async ({ page }) => {

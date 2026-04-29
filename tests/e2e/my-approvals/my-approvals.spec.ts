@@ -4,7 +4,7 @@ import { login } from '../helpers';
 test.describe('My Approvals', () => {
     test.beforeEach(async ({ page }) => {
         // Authenticate using login helper
-        await login(page, 'admin@dokfin.id');
+        await login(page, 'admin@dokfin.id', undefined, { requireDashboard: false });
     });
 
     test('can view and approve pending request', async ({ page }) => {

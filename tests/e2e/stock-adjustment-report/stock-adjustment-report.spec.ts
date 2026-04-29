@@ -3,7 +3,7 @@ import { login } from '../helpers';
 
 test.describe('Stock Adjustment Report', () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('can view report, sort, filter, and export', async ({ page }) => {

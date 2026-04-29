@@ -136,3 +136,11 @@ Untuk task refactor berbasis SonarQube dengan target menurunkan duplikasi dan me
 4. Jika ada commit, tulis hash commit terbaru pada checkpoint.
 
 5. Jangan simpan log mentah panjang di `task.md`; simpan ringkasan terstruktur agar tetap terbaca.
+6. Pertahankan peran dokumen handoff berikut secara konsisten:
+	- `task.md` = status handoff aktif dan next action
+	- `task.changelog.md` = changelog produk/fitur
+	- `task.handoff-archive.md` = arsip checkpoint handoff E2E yang sudah tidak aktif
+7. Hindari duplikasi checkpoint historis di `task.md` atau `task.changelog.md` setelah dipindahkan ke `task.handoff-archive.md`.
+8. Jaga konsistensi bahasa per dokumen:
+	- `task.changelog.md` default menggunakan Bahasa Indonesia untuk isi changelog produk
+	- `task.md` dan `task.handoff-archive.md` boleh memakai English ringkas untuk handoff teknis jika lebih jelas

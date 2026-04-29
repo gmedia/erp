@@ -93,7 +93,7 @@ export function generateModuleTests(config: ModuleTestConfig) {
         let createdIdentifier: string;
 
         test.beforeEach(async ({ page }) => {
-            await login(page);
+            await login(page, undefined, undefined, { requireDashboard: false });
             await navigateToModule(page, config.route, config.apiPath);
             if (config.customBeforeEach) {
                 await config.customBeforeEach(page);

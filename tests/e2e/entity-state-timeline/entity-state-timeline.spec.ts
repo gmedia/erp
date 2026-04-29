@@ -1,125 +1,100 @@
 import { test, expect, Page } from '@playwright/test';
 import { login } from '../helpers';
-import { createAsset, searchAsset } from '../assets/helpers';
+import { searchAsset } from '../assets/helpers';
 
-let pipelineId: number | null = null;
-let assetName: string | null = null;
+async function openAssetProfile(page: Page, assetName: string): Promise<void> {
+  await page.goto('/assets');
+  await searchAsset(page, assetName);
 
-async function setupPipelineViaApi(page: Page) {
-  const apiToken = await page.evaluate(() => localStorage.getItem('api_token'));
-  const headers = { 
-    'Accept': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest',
-    'Authorization': `Bearer ${apiToken}`
-  };
+  const row = page.locator('tbody tr').filter({ hasText: assetName }).first();
+  await expect(row).toBeVisible({ timeout: 10000 });
 
-  // 0. Clean up existing pipelines for Asset to avoid shadowing
-  const pipelinesRes = await page.request.get('/api/pipelines', { headers });
-  if (pipelinesRes.ok()) {
-      const existingPipelines = (await pipelinesRes.json()).data;
-      for (const p of existingPipelines) {
-          if (p.entity_type === String.raw`App\Models\Asset`) {
-              await page.request.delete(`/api/pipelines/${p.id}`, { headers });
-          }
-      }
-  }
+  await row.getByRole('button').last().click();
 
-  // 1. Create Pipeline
-  const pipelineRes = await page.request.post('/api/pipelines', {
-    headers,
-    data: {
-      name: `E2E Timeline Pipeline ${Date.now()}`,
-      code: `e2e_timeline_pipeline_${Date.now()}`,
-      entity_type: String.raw`App\Models\Asset`,
-      description: 'Pipeline for E2E testing timeline module',
-      version: 1,
-      is_active: true
-    }
-  });
-  if (!pipelineRes.ok()) throw new Error(`Failed to create pipeline: ${await pipelineRes.text()}`);
-  const pipeline = (await pipelineRes.json()).data;
-  pipelineId = pipeline.id;
+  await Promise.all([
+    page.waitForURL(/\/assets\/[^/]+$/, { timeout: 15000 }),
+    page.waitForResponse(
+      response => /\/api\/assets\/[^/]+\/profile$/.test(response.url()) && response.status() < 400,
+      { timeout: 15000 },
+    ),
+    page.waitForResponse(
+      response =>
+        response.url().includes('/api/entity-states/asset/') &&
+        !response.url().includes('/timeline') &&
+        !response.url().includes('/approvals') &&
+        response.status() < 400,
+      { timeout: 15000 },
+    ),
+    page.getByRole('menuitem', { name: 'View' }).click(),
+  ]);
 
-  // 2. Create States
-  const draftRes = await page.request.post(`/api/pipelines/${pipelineId}/states`, {
-    headers,
-    data: { code: `draft_${Date.now()}`, name: 'Draft', type: 'initial', sort_order: 10 }
-  });
-  if (!draftRes.ok()) throw new Error(`Failed to create draft state: ${await draftRes.text()}`);
-  const draft = (await draftRes.json()).data;
+  await expect(page.getByText(assetName, { exact: true }).first()).toBeVisible({ timeout: 15000 });
+}
 
-  const reviewRes = await page.request.post(`/api/pipelines/${pipelineId}/states`, {
-    headers,
-    data: { code: `review_${Date.now()}`, name: 'Review', type: 'intermediate', sort_order: 20 }
-  });
-  if (!reviewRes.ok()) throw new Error(`Failed to create review state: ${await reviewRes.text()}`);
-  const review = (await reviewRes.json()).data;
-
-  // 3. Create Transition
-  const transRes = await page.request.post(`/api/pipelines/${pipelineId}/transitions`, {
-    headers,
-    data: {
-      name: 'Submit for Review',
-      code: `submit_review_${Date.now()}`,
-      from_state_id: draft.id,
-      to_state_id: review.id,
-      requires_comment: true,
-      requires_confirmation: false,
-      is_active: true,
-      sort_order: 10
-    }
-  });
-  if (!transRes.ok()) throw new Error(`Failed to create transition: ${await transRes.text()}`);
+async function reloadAssetProfile(page: Page): Promise<void> {
+  await Promise.all([
+    page.waitForResponse(
+      response => /\/api\/assets\/[^/]+\/profile$/.test(response.url()) && response.status() < 400,
+      { timeout: 15000 },
+    ),
+    page.waitForResponse(
+      response =>
+        response.url().includes('/api/entity-states/asset/') &&
+        !response.url().includes('/timeline') &&
+        !response.url().includes('/approvals') &&
+        response.status() < 400,
+      { timeout: 15000 },
+    ),
+    page.reload(),
+  ]);
 }
 
 test.describe('Entity State Timeline', () => {
-    test.beforeAll(async ({ browser }) => {
-        const page = await browser.newPage();
-        await login(page);
-        await setupPipelineViaApi(page);
-        await page.close();
-    });
+  test('records comment-required transition history for seeded asset', async ({ page }) => {
+    await login(page, undefined, undefined, { requireDashboard: false });
 
-    test('can view timeline history after transitions', async ({ page }) => {
-        await login(page);
+    await openAssetProfile(page, 'FA-000002');
 
-        // 1. Create a new asset to trigger initial pipeline assignment
-        assetName = `Timeline Test Asset ${Date.now()}`;
-        await createAsset(page, { name: assetName });
+    await expect(page.getByText('Active', { exact: true }).first()).toBeVisible();
 
-        // Navigate to the asset profile
-        await page.goto('/assets');
-        await searchAsset(page, assetName);
-        const row = page.locator('tr').filter({ hasText: assetName }).first();
-        await row.getByRole('button').last().click(); // Open actions dropdown
-        await page.getByRole('menuitem', { name: 'View' }).click();
-        await page.waitForTimeout(1000); // Wait for profile page to load and API to fetch state
-        await expect(page.getByText('Draft', { exact: true }).first()).toBeVisible();
+    await page.getByRole('button', { name: 'Dispose', exact: true }).first().click();
 
-        // 2. Verify initial timeline tab has only one entry (assignment)
-        await page.getByRole('tab', { name: 'Timeline' }).click();
-        await expect(page.getByText('Initial pipeline assignment').first()).toBeVisible();
+    const commentDialog = page.getByRole('dialog').filter({ hasText: 'Please provide a reason or comment for this action.' }).first();
+    await expect(commentDialog).toBeVisible();
+    await expect(commentDialog).toContainText('Dispose');
 
-        // 3. Execute a transition with comment
-        await page.getByRole('button', { name: 'Submit for Review' }).click();
-        
-        // Fill comment dialog
-        await page.getByPlaceholder('Enter your comment here...').fill('Ready for QA review');
-        await page.getByRole('button', { name: 'Submit' }).click();
-        
-        // Wait for success toast and badge update
-        await expect(page.getByText('Transition executed successfully')).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Submit for Review' })).not.toBeVisible();
-        await expect(page.locator('.gap-3 > .inline-flex', { hasText: 'Review' })).toBeVisible();
+    const comment = 'Disposed via E2E timeline verification.';
+    await commentDialog.getByPlaceholder('Enter your comment here...').fill(comment);
 
-        // 4. Verify Timeline tab has the new entry
-        await page.getByRole('tab', { name: 'Timeline' }).click();
-        
-        // Should have 2 items in timeline now. We check uniqueness by specific texts
-        await expect(page.getByText('Ready for QA review')).toBeVisible();
-        await expect(page.getByText('Submit for Review').first()).toBeVisible();
-        
-        // Performer should be recorded
-        await expect(page.getByText(/Performed by/i).first()).toBeVisible();
-    });
+    const transitionResponsePromise = page.waitForResponse(
+      response =>
+        response.url().includes('/api/entity-states/asset/') &&
+        response.url().includes('/transition') &&
+        response.request().method() === 'POST' &&
+        response.status() < 400,
+      { timeout: 15000 },
+    );
+
+    await commentDialog.getByRole('button', { name: 'Submit' }).click();
+    await transitionResponsePromise;
+
+    await expect(page.getByText('Transition executed successfully')).toBeVisible();
+    await reloadAssetProfile(page);
+    await expect(page.getByText('Disposed', { exact: true }).first()).toBeVisible();
+
+    await Promise.all([
+      page.waitForResponse(
+        response =>
+          response.url().includes('/api/entity-states/asset/') &&
+          response.url().includes('/timeline') &&
+          response.status() < 400,
+        { timeout: 15000 },
+      ),
+      page.getByRole('tab', { name: 'Timeline' }).click(),
+    ]);
+
+    await expect(page.getByText('Initial pipeline assignment').first()).toBeVisible();
+    await expect(page.getByText('Dispose').first()).toBeVisible();
+    await expect(page.getByText(comment).first()).toBeVisible();
+  });
 });

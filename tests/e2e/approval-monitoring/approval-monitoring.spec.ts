@@ -4,7 +4,7 @@ import { login } from '../helpers';
 test.describe('Approval Monitoring Dashboard', () => {
     test.beforeEach(async ({ page }) => {
         // Authenticate using login helper
-        await login(page, 'admin@dokfin.id');
+        await login(page, 'admin@dokfin.id', undefined, { requireDashboard: false });
     });
 
     test('can view approval monitoring dashboard and verify key elements', async ({ page }) => {

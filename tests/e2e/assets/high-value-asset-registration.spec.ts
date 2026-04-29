@@ -56,7 +56,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
   test('Step 1: can create a high-value asset (>100M purchase cost)', async ({ page }) => {
     test.slow();
 
-    await login(page);
+    await login(page, undefined, undefined, { requireDashboard: false });
     assetName = await createHighValueAsset(page);
     expect(assetName).toBeTruthy();
 
@@ -69,7 +69,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
   test('Step 2: asset profile shows Draft state with Activate button', async ({ page }) => {
     test.slow();
 
-    await login(page);
+    await login(page, undefined, undefined, { requireDashboard: false });
     assetName = await createHighValueAsset(page);
 
     await goToAssetProfile(page, assetName);
@@ -85,7 +85,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
   test('Step 3: clicking Activate triggers approval for 100M+ purchase cost', async ({ page }) => {
     test.slow();
 
-    await login(page);
+    await login(page, undefined, undefined, { requireDashboard: false });
     assetName = await createHighValueAsset(page);
 
     await goToAssetProfile(page, assetName);
@@ -112,7 +112,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
   test('Step 4: Approvals tab shows pending approval request after Activate', async ({ page }) => {
     test.slow();
 
-    await login(page);
+    await login(page, undefined, undefined, { requireDashboard: false });
     assetName = await createHighValueAsset(page);
 
     await goToAssetProfile(page, assetName);
@@ -153,7 +153,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
   // ── Step 5: HR Manager approves (Step 1) ─────────────────────────
   test('Step 5: HR Manager can approve step 1 via My Approvals', async ({ page }) => {
     // First, create and activate asset as admin
-    await login(page, 'admin@dokfin.id');
+    await login(page, 'admin@dokfin.id', undefined, { requireDashboard: false });
     assetName = await createHighValueAsset(page);
     await goToAssetProfile(page, assetName);
 
@@ -170,7 +170,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
     // Now login as HR Manager
     await page.context().clearCookies();
-    await login(page, 'manager.hr@dokfin.id');
+    await login(page, 'manager.hr@dokfin.id', undefined, { requireDashboard: false });
 
     // Navigate to My Approvals
     await page.goto('/my-approvals');
@@ -207,7 +207,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
   // ── Step 6: Finance Director approves (Step 2) ───────────────────
   test('Step 6: Finance Director can approve step 2 via My Approvals', async ({ page }) => {
     // First, create and activate asset as admin
-    await login(page, 'admin@dokfin.id');
+    await login(page, 'admin@dokfin.id', undefined, { requireDashboard: false });
     assetName = await createHighValueAsset(page);
     await goToAssetProfile(page, assetName);
 
@@ -224,7 +224,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
     // HR Manager approves first
     await page.context().clearCookies();
-    await login(page, 'manager.hr@dokfin.id');
+    await login(page, 'manager.hr@dokfin.id', undefined, { requireDashboard: false });
     await page.goto('/my-approvals');
 
     const hrApproveBtn = page.getByRole('button', { name: /Approve/i }).first();
@@ -244,7 +244,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
     // Now login as Finance Director
     await page.context().clearCookies();
-    await login(page, 'director.finance@dokfin.id');
+    await login(page, 'director.finance@dokfin.id', undefined, { requireDashboard: false });
     await page.goto('/my-approvals');
 
     const finApproveBtn = page.getByRole('button', { name: /Approve/i }).first();
@@ -273,7 +273,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
   test('Step 7: asset status changes to Active after all approvals', async ({ page }) => {
     // This test uses a fully approved asset from seed data (FA-000011, 450M, already active)
     // to verify that high-value assets can reach Active state
-    await login(page, 'admin@dokfin.id');
+    await login(page, 'admin@dokfin.id', undefined, { requireDashboard: false });
     await goToAssetProfile(page, 'Manager Car (Toyota Camry)');
 
     // Badge should show "Active" — this asset (450M) is already active in seeder
@@ -288,7 +288,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
   // ── Step 8: Verify Approval History shows trail ──────────────────
   test('Step 8: Approval History shows approval trail for high-value asset', async ({ page }) => {
     // Use seeded asset FA-000010 (High-End Server Rack, 150M) which has pending approval
-    await login(page, 'admin@dokfin.id');
+    await login(page, 'admin@dokfin.id', undefined, { requireDashboard: false });
     await goToAssetProfile(page, 'High-End Server Rack');
 
     // Navigate to Approvals tab
@@ -312,7 +312,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
   // ── Step 9: Verify Timeline shows lifecycle history ──────────────
   test('Step 9: Timeline shows lifecycle history on high-value asset profile', async ({ page }) => {
     // Use seeded asset FA-000010 (High-End Server Rack, 150M)
-    await login(page, 'admin@dokfin.id');
+    await login(page, 'admin@dokfin.id', undefined, { requireDashboard: false });
     await goToAssetProfile(page, 'High-End Server Rack');
 
     // Navigate to Timeline tab

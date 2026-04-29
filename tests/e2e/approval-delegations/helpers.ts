@@ -46,7 +46,7 @@ export async function createApprovalDelegation(
   const reason = overrides.reason ?? `Test Reason ${timestamp}`;
   const status = overrides.is_active ?? 'Active';
 
-  await login(page);
+  await login(page, undefined, undefined, { requireDashboard: false });
 
   await page.goto('/approval-delegations');
 

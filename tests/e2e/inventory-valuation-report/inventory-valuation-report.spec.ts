@@ -3,7 +3,7 @@ import { login } from '../helpers';
 
 test.describe('Inventory Valuation Report', () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('can view report, search, filter, and export', async ({ page }) => {

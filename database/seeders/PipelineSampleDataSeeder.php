@@ -22,7 +22,7 @@ class PipelineSampleDataSeeder extends Seeder
      */
     public function run(): void
     {
-        $adminUserId = User::where('email', config('app.admin'))->value('id');
+        $adminUserId = User::query()->where('email', config('app.admin'))->value('id');
 
         // ── Pipeline ────────────────────────────────────────────────
         $pipeline = Pipeline::firstOrCreate(
@@ -145,7 +145,7 @@ class PipelineSampleDataSeeder extends Seeder
                     [
                         'action_type' => 'update_field',
                         'execution_order' => 10,
-                        'config' => ['field' => 'status', 'value' => 'cancelled'],
+                        'config' => ['field' => 'status', 'value' => 'draft'],
                     ],
                 ],
             ],

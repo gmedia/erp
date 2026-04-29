@@ -32,7 +32,7 @@ async function waitForAdminSettingsRefresh(
 
 test.describe('Admin Settings', () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('page loads and shows General settings by default', async ({ page }) => {

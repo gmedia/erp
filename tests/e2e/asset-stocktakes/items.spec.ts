@@ -4,7 +4,7 @@ import { login } from '../helpers';
 
 test.describe('Asset Stocktake Items', () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
         await page.goto('/asset-stocktakes');
     });
 

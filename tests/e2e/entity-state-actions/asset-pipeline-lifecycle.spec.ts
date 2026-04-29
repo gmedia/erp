@@ -44,7 +44,7 @@ async function goToAssetProfile(page: Page, assetCode: string) {
 
 test.describe('Asset Pipeline Lifecycle — Per State', () => {
   test.beforeEach(async ({ page }) => {
-    await login(page);
+    await login(page, undefined, undefined, { requireDashboard: false });
   });
 
   // ── DRAFT STATE ──────────────────────────────────────────────────

@@ -11,7 +11,8 @@ import {
 async function getFirstAsyncOption(page: Page, url: string) {
     return page.evaluate(async (endpoint) => {
         const apiToken = localStorage.getItem('api_token') || '';
-        const response = await fetch(`${endpoint}?per_page=1`, {
+        const separator = endpoint.includes('?') ? '&' : '?';
+        const response = await fetch(`${endpoint}${separator}per_page=1`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 Authorization: `Bearer ${apiToken}`,
@@ -82,7 +83,7 @@ test.describe('Goods Receipts Module', () => {
     generateModuleTests(config);
 
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
         await page.goto('/goods-receipts');
         await page
             .waitForResponse((response) => response.url().includes('/api/goods-receipts') && response.status() < 400)
@@ -105,8 +106,8 @@ test.describe('Goods Receipts Module', () => {
 
     test('add dialog item table shows product and unit names after saving item dialog', async ({ page }) => {
         const [product, unit] = await Promise.all([
-            getFirstAsyncOption(page, '/api/products'),
-            getFirstAsyncOption(page, '/api/units'),
+            getFirstAsyncOption(page, '/api/products?search=Executive%20Office%20Desk'),
+            getFirstAsyncOption(page, '/api/units?search=Piece'),
         ]);
 
         await page.getByRole('button', { name: /^Add$/i }).first().click();
@@ -135,8 +136,8 @@ test.describe('Goods Receipts Module', () => {
 
     test('edit dialog opens dedicated edit item dialog and keeps item labels', async ({ page }) => {
         const [product, unit] = await Promise.all([
-            getFirstAsyncOption(page, '/api/products'),
-            getFirstAsyncOption(page, '/api/units'),
+            getFirstAsyncOption(page, '/api/products?search=Executive%20Office%20Desk'),
+            getFirstAsyncOption(page, '/api/units?search=Piece'),
         ]);
 
         const goodsReceiptNumber = await createGoodsReceipt(page);

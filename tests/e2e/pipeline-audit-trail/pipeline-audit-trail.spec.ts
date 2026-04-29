@@ -4,13 +4,10 @@ import { login } from '../helpers';
 test.describe('Pipeline Audit Trail', () => {
     test.beforeEach(async ({ page }) => {
         // Log in to gain session
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('can view pipeline audit trail list and open detail modal', async ({ page }) => {
-        // Ensure we hit the dashboard first
-        await page.waitForURL('**/dashboard', { timeout: 15000 });
-        
         // 1. Navigate to Pipeline Audit Trail page
         await page.goto('/pipeline-audit-trail');
         await page.waitForURL('**/pipeline-audit-trail', { timeout: 15000 });
@@ -72,9 +69,6 @@ test.describe('Pipeline Audit Trail', () => {
     });
 
     test('can export audit trail data', async ({ page }) => {
-        // Ensure we hit the dashboard first
-        await page.waitForURL('**/dashboard', { timeout: 15000 });
-        
         await page.goto('/pipeline-audit-trail');
         await page.waitForURL('**/pipeline-audit-trail', { timeout: 15000 });
         

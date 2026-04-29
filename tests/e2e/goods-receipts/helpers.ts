@@ -1,8 +1,10 @@
 import { expect, Page } from '@playwright/test';
 
-import { reloadAndWaitForApi, searchAndWaitForApi } from '../helpers';
+import { ensureAppOrigin, reloadAndWaitForApi, searchAndWaitForApi } from '../helpers';
 
 export async function createGoodsReceipt(page: Page): Promise<string> {
+    await ensureAppOrigin(page);
+
     const createResult = await page.evaluate(async () => {
         const apiToken = localStorage.getItem('api_token') || '';
 
@@ -21,8 +23,8 @@ export async function createGoodsReceipt(page: Page): Promise<string> {
         const [supplierId, warehouseId, productId, unitId] = await Promise.all([
             getFirstId('/api/suppliers?per_page=1'),
             getFirstId('/api/warehouses?per_page=1'),
-            getFirstId('/api/products?per_page=1'),
-            getFirstId('/api/units?per_page=1'),
+            getFirstId('/api/products?search=Executive%20Office%20Desk&per_page=1'),
+            getFirstId('/api/units?search=Piece&per_page=1'),
         ]);
 
         const poResponse = await fetch('/api/purchase-orders', {

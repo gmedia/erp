@@ -3,7 +3,7 @@ import { login } from '../helpers';
 
 test.describe('Stock Movements (Kartu Stok)', () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('can view stock movements and drill down by reference', async ({

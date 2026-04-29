@@ -3,7 +3,7 @@ import { login } from '../helpers';
 
 test.describe('Asset Depreciation Runs', () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('can access index page and open calculate modal', async ({ page }) => {

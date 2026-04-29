@@ -5,7 +5,7 @@ import * as path from 'node:path';
 
 test('export accounts to Excel works correctly', async ({ page }) => {
   test.setTimeout(120000);
-  await login(page);
+  await login(page, undefined, undefined, { requireDashboard: false });
   await createAccount(page, {
     coa_version: 'COA 2026 Enhanced',
     name: 'Export Test Account',

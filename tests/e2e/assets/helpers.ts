@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { login, searchAndWaitForApi, waitForApiAfterAction } from '../helpers';
+import { ensureAppOrigin, login, searchAndWaitForApi, waitForApiAfterAction } from '../helpers';
 
 async function pickAsyncOption(page: Page, label: string): Promise<void> {
   const option = page
@@ -11,12 +11,14 @@ async function pickAsyncOption(page: Page, label: string): Promise<void> {
 }
 
 async function ensureAuthenticated(page: Page): Promise<void> {
+  await ensureAppOrigin(page);
+
   const hasApiToken = await page
     .evaluate(() => Boolean(localStorage.getItem('api_token')))
     .catch(() => false);
 
   if (!hasApiToken) {
-    await login(page);
+    await login(page, undefined, undefined, { requireDashboard: false });
   }
 }
 

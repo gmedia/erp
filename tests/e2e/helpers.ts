@@ -6,6 +6,10 @@ const pageDebugListenersAttached = new WeakSet<Page>();
 const DEFAULT_E2E_EMAIL = 'admin@dokfin.id';
 const DEFAULT_E2E_PASSWORD = 'password';
 
+interface LoginOptions {
+  requireDashboard?: boolean;
+}
+
 function matchesApiUrl(url: string, matcher: ApiResponseMatcher): boolean {
   if (typeof matcher === 'string') {
     return url.includes(matcher);
@@ -61,6 +65,38 @@ export async function searchAndWaitForApi(
   );
 }
 
+export async function ensureAppOrigin(page: Page): Promise<void> {
+  const currentUrl = page.url();
+
+  if (currentUrl.startsWith('http://') || currentUrl.startsWith('https://')) {
+    return;
+  }
+
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      await page.goto('/login', { waitUntil: 'domcontentloaded', timeout: 60000 });
+      return;
+    } catch (error) {
+      lastError = error;
+      const message = error instanceof Error ? error.message : String(error);
+      const retriable =
+        message.includes('net::ERR_ABORTED') ||
+        message.toLowerCase().includes('frame was detached') ||
+        message.toLowerCase().includes('navigation');
+
+      if (!retriable) {
+        throw error;
+      }
+
+      await page.waitForTimeout(750);
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error(String(lastError));
+}
+
 // Generic entity creation helper
 export interface EntityField {
   name: string;
@@ -90,7 +126,7 @@ export async function createEntity(
   overrides: Record<string, string> = {}
 ): Promise<string> {
   // 1️⃣ Login
-  await login(page);
+  await login(page, undefined, undefined, { requireDashboard: false });
 
   // 2️⃣ Navigate to entity list page
   await page.goto(config.route);
@@ -188,8 +224,11 @@ export async function createEntity(
 export async function login(
   page: Page,
   email = DEFAULT_E2E_EMAIL,
-  password = DEFAULT_E2E_PASSWORD
+  password = DEFAULT_E2E_PASSWORD,
+  options: LoginOptions = {},
 ): Promise<void> {
+  const requireDashboard = options.requireDashboard ?? true;
+
   if (!pageDebugListenersAttached.has(page)) {
     pageDebugListenersAttached.add(page);
 
@@ -276,16 +315,17 @@ export async function login(
     email === DEFAULT_E2E_EMAIL && password === DEFAULT_E2E_PASSWORD;
 
   if (shouldAttemptSessionReuse) {
-    if (await hasReusableSession(email)) {
-      return;
+    if (page.url() === 'about:blank') {
+      await gotoWithRetry('/login');
     }
 
-    if (page.url() === 'about:blank') {
-      await gotoWithRetry('/dashboard');
-      if (await hasReusableSession(email)) {
+    if (await hasReusableSession(email)) {
+      if (requireDashboard) {
+        await gotoWithRetry('/dashboard');
         await expect(page).toHaveURL(/\/dashboard/);
-        return;
       }
+
+      return;
     }
   }
 
@@ -325,7 +365,9 @@ export async function login(
     .click({ force: true });
 
   await loginResponse;
-  await page.waitForURL('**/dashboard', { timeout: 60000 });
+  if (requireDashboard) {
+    await page.waitForURL('**/dashboard', { timeout: 60000 });
+  }
   await authStateResponse;
   await expect
     .poll(async () =>
@@ -357,7 +399,7 @@ export async function createAccount(
   const defaultCode = `CODE${timestamp.toString().slice(-5)}`;
 
   // 1️⃣ Login
-  await login(page);
+  await login(page, undefined, undefined, { requireDashboard: false });
 
   // 2️⃣ Navigate to Accounts page
   await page.goto('/accounts');

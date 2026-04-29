@@ -3,7 +3,7 @@ import { login } from '../helpers';
 
 test('user can change their name in profile settings', async ({ page }) => {
   // 1. Log in using existing credentials
-  await login(page);
+  await login(page, undefined, undefined, { requireDashboard: false });
 
   // Ensure login succeeded by checking for dashboard navigation
 

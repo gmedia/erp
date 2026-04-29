@@ -40,7 +40,7 @@ async function waitForBalanceSheetReady(page: Page) {
 
 test.describe('Financial Reports', () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('can view trial balance', async ({ page }) => {

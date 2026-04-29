@@ -8,7 +8,7 @@ import {
 
 test.describe('Goods Receipt Report', () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('can view report, sort, filter, and export', async ({ page }) => {

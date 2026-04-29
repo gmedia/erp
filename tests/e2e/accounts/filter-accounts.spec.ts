@@ -3,7 +3,7 @@ import { login, createAccount } from '../helpers';
 
 test('filter accounts by search end‑to‑end', async ({ page }) => {
   test.setTimeout(120000);
-  await login(page);
+  await login(page, undefined, undefined, { requireDashboard: false });
 
   // Create accounts with distinct properties
   const acc1Code = await createAccount(page, {

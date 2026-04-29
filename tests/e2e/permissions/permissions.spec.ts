@@ -14,7 +14,7 @@ async function selectAsyncOption(page: Page, text: string): Promise<void> {
 
 test.describe('Employee Permissions', () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('assign permissions to an employee', async ({ page }) => {

@@ -4,13 +4,10 @@ import { login } from '../helpers';
 test.describe('Approval Audit Trail', () => {
     test.beforeEach(async ({ page }) => {
         // Log in to gain session
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('can view approval audit trail list and open detail modal', async ({ page }) => {
-        // Ensure we hit the dashboard first
-        await page.waitForURL('**/dashboard', { timeout: 15000 });
-        
         // 1. Navigate to Approval Audit Trail page
         await page.goto('/approval-audit-trail');
         await page.waitForURL('**/approval-audit-trail', { timeout: 15000 });
@@ -73,9 +70,6 @@ test.describe('Approval Audit Trail', () => {
     });
 
     test('can export audit trail data', async ({ page }) => {
-        // Ensure we hit the dashboard first
-        await page.waitForURL('**/dashboard', { timeout: 15000 });
-        
         await page.goto('/approval-audit-trail');
         await page.waitForURL('**/approval-audit-trail', { timeout: 15000 });
         

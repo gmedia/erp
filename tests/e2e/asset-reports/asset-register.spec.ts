@@ -3,7 +3,7 @@ import { login } from '../helpers';
 
 test.describe('Asset Register Report', () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('can view and filter asset register report', async ({ page }) => {

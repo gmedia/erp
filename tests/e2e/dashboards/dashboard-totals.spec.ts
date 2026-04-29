@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { login } from '../helpers';
 
 test('dashboard shows totals cards', async ({ page }) => {
-  await login(page);
+  await login(page, undefined, undefined, { requireDashboard: false });
 
   await page.goto('/dashboard');
 

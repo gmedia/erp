@@ -18,7 +18,7 @@ async function selectAsyncOption(page: Page, text: string): Promise<void> {
 
 test.describe('User Management', () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('create and update user for an employee', async ({ page }) => {

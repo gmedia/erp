@@ -3,7 +3,7 @@ import { login } from '../helpers';
 
 test.describe('Stock Monitor Dashboard', () => {
     test.beforeEach(async ({ page }) => {
-        await login(page);
+        await login(page, undefined, undefined, { requireDashboard: false });
     });
 
     test('can view stock monitor summary and filter data', async ({ page }) => {

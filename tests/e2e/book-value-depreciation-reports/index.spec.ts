@@ -4,10 +4,7 @@ import { login } from '../helpers';
 test.describe('Book Value & Depreciation Report', () => {
     test.beforeEach(async ({ page }) => {
         // Authenticate with default permissions
-        await login(page);
-
-        // Ensure we actually reach dashboard before navigating away
-        await page.waitForURL('**/dashboard', { timeout: 15000 });
+        await login(page, undefined, undefined, { requireDashboard: false });
         
         // Then go to the report page
         await page.goto('/reports/book-value-depreciation');
