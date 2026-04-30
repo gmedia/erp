@@ -18,7 +18,7 @@ import { supplierFormSchema } from '@/utils/schemas';
 interface SupplierFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    supplier?: Supplier | null;
+    entity?: Supplier | null;
     onSubmit: (data: SupplierFormData) => void;
     isLoading?: boolean;
 }
@@ -103,13 +103,13 @@ const getSupplierFormDefaults = (
 export const SupplierForm = memo<SupplierFormProps>(function SupplierForm({
     open,
     onOpenChange,
-    supplier,
+    entity,
     onSubmit,
     isLoading = false,
 }) {
     const defaultValues = useMemo(
-        () => getSupplierFormDefaults(supplier),
-        [supplier],
+        () => getSupplierFormDefaults(entity),
+        [entity],
     );
 
     const form = useForm<z.input<typeof supplierFormSchema>>({
@@ -117,7 +117,7 @@ export const SupplierForm = memo<SupplierFormProps>(function SupplierForm({
         defaultValues,
     });
 
-    // Reset form when supplier changes (for edit mode)
+    // Reset form when entity changes (for edit mode)
     useEffect(() => {
         form.reset(defaultValues);
     }, [form, defaultValues]);
@@ -133,7 +133,7 @@ export const SupplierForm = memo<SupplierFormProps>(function SupplierForm({
             }
             open={open}
             onOpenChange={onOpenChange}
-            title={supplier ? 'Edit Supplier' : 'Add New Supplier'}
+            title={entity ? 'Edit Supplier' : 'Add New Supplier'}
             onSubmit={
                 onSubmit as unknown as (
                     data: z.input<typeof supplierFormSchema>,

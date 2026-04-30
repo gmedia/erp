@@ -17,7 +17,7 @@ import { customerFormSchema } from '@/utils/schemas';
 interface CustomerFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    customer?: Customer | null;
+    entity?: Customer | null;
     onSubmit: (data: CustomerFormData) => void;
     isLoading?: boolean;
 }
@@ -93,9 +93,9 @@ const renderCustomerNotesSection = () => (
  * Helper function to get default values for customer form
  */
 const getCustomerFormDefaults = (
-    customer?: Customer | null,
+    entity?: Customer | null,
 ): CustomerFormData => {
-    if (!customer) {
+    if (!entity) {
         return {
             name: '',
             email: '',
@@ -109,33 +109,33 @@ const getCustomerFormDefaults = (
     }
 
     return {
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone || '',
-        address: customer.address,
+        name: entity.name,
+        email: entity.email,
+        phone: entity.phone || '',
+        address: entity.address,
         branch_id:
-            typeof customer.branch === 'object'
-                ? String(customer.branch.id)
-                : String(customer.branch),
+            typeof entity.branch === 'object'
+                ? String(entity.branch.id)
+                : String(entity.branch),
         category_id:
-            typeof customer.category === 'object'
-                ? String(customer.category.id)
-                : String(customer.category_id),
-        status: customer.status,
-        notes: customer.notes || '',
+            typeof entity.category === 'object'
+                ? String(entity.category.id)
+                : String(entity.category_id),
+        status: entity.status,
+        notes: entity.notes || '',
     };
 };
 
 export const CustomerForm = memo<CustomerFormProps>(function CustomerForm({
     open,
     onOpenChange,
-    customer,
+    entity,
     onSubmit,
     isLoading = false,
 }) {
     const defaultValues = useMemo(
-        () => getCustomerFormDefaults(customer),
-        [customer],
+        () => getCustomerFormDefaults(entity),
+        [entity],
     );
 
     const form = useForm<CustomerFormData>({
@@ -143,7 +143,7 @@ export const CustomerForm = memo<CustomerFormProps>(function CustomerForm({
         defaultValues,
     });
 
-    // Reset form when customer changes (for edit mode)
+    // Reset form when entity changes (for edit mode)
     useEffect(() => {
         form.reset(defaultValues);
     }, [form, defaultValues]);
@@ -153,7 +153,7 @@ export const CustomerForm = memo<CustomerFormProps>(function CustomerForm({
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={customer ? 'Edit Customer' : 'Add New Customer'}
+            title={entity ? 'Edit Customer' : 'Add New Customer'}
             onSubmit={onSubmit}
             isLoading={isLoading}
         >

@@ -12,8 +12,6 @@ import { useForm } from 'react-hook-form';
 interface UnitFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    unit?: { name: string; symbol?: string | null } | null;
-    // entity prop is also passed by EntityCrudPage factory for multi-word compatibility
     entity?: { name: string; symbol?: string | null } | null;
     onSubmit: (data: UnitFormData) => void;
     isLoading?: boolean;
@@ -25,37 +23,34 @@ interface UnitFormProps {
 export function UnitForm({
     open,
     onOpenChange,
-    unit,
     entity,
     onSubmit,
     isLoading = false,
 }: Readonly<UnitFormProps>) {
-    const activeEntity = unit || entity;
-
     const form = useForm<UnitFormData>({
         resolver: zodResolver(unitFormSchema),
         defaultValues: {
-            name: activeEntity?.name || '',
-            symbol: activeEntity?.symbol || '',
+            name: entity?.name || '',
+            symbol: entity?.symbol || '',
         },
     });
 
-    // Reset form when unit changes (for edit mode)
+    // Reset form when entity changes (for edit mode)
     useEffect(() => {
         if (open) {
             form.reset({
-                name: activeEntity?.name || '',
-                symbol: activeEntity?.symbol || '',
+                name: entity?.name || '',
+                symbol: entity?.symbol || '',
             });
         }
-    }, [form, activeEntity, open]);
+    }, [form, entity, open]);
 
     return (
         <EntityForm
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={activeEntity ? 'Edit Unit' : 'Add New Unit'}
+            title={entity ? 'Edit Unit' : 'Add New Unit'}
             onSubmit={onSubmit}
             isLoading={isLoading}
         >
