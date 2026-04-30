@@ -1134,15 +1134,16 @@ Oleh karena itu, **shared E2E/Pest test helpers tidak perlu diubah** — semua t
 
 #### Remaining Backlog (Requires Depwire)
 
-| # | Item | Type | Effort |
-|---|------|------|--------|
-| 1 | Migrate `stock-movements`/`stock-monitor` from `DataTablePage` to `ReportDataTablePage` | Structural frontend | Medium |
-| 2 | Unify Index Action methods (`handleSearchOrPrimaryIndexRequest` vs `handleIndexRequest`) | Behavioral backend | High |
-| 3 | Unify request patterns (trait vs abstract class) across Warehouse vs Customer/Supplier | Structural backend | High |
-| 4 | Unify resource base classes (SimpleCrud* vs raw JsonResource + trait) | Structural backend | Medium |
-| 5 | Decide on DTO usage (Customer/AssetModel/Pipeline use DTOs, others don't) | Architectural | High |
-| 6 | Extend `createSimpleEntityConfig` for borderline-simple modules (product-categories, units, asset-categories) | Structural frontend | Medium |
-| 7 | Standardize GoodsReceipt controller to use `LoadsResourceRelations` trait | Structural backend | Low |
+| # | Item | Type | Effort | Status |
+|---|------|------|--------|--------|
+| 1 | ~~Migrate `stock-movements` from `DataTablePage` to `ReportDataTablePage`~~ | Structural frontend | Medium | ✅ Done |
+| 2 | `stock-monitor` tetap pakai `DataTablePage` — intentional (custom query + summary cards) | Exception | — | Intentional |
+| 3 | Unify Index Action methods (`handleSearchOrPrimaryIndexRequest` vs `handleIndexRequest`) | Behavioral backend | High | Backlog |
+| 4 | Unify request patterns (trait vs abstract class) across Warehouse vs Customer/Supplier | Structural backend | High | Backlog |
+| 5 | Unify resource base classes (SimpleCrud* vs raw JsonResource + trait) | Structural backend | Medium | Backlog |
+| 6 | Decide on DTO usage (Customer/AssetModel/Pipeline use DTOs, others don't) | Architectural | High | Backlog |
+| 7 | Extend `createSimpleEntityConfig` for borderline-simple modules (product-categories, units, asset-categories) | Structural frontend | Medium | Backlog |
+| 8 | Standardize GoodsReceipt controller to use `LoadsResourceRelations` trait | Structural backend | Low | Backlog |
 
 ## Urutan Eksekusi yang Direkomendasikan
 
