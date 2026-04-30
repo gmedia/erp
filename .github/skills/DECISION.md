@@ -16,8 +16,8 @@ Gunakan tabel ini untuk memilih skill yang tepat berdasarkan kebutuhan task.
 | Quality gate Sonar | `mcp_io_github_son_get_project_quality_gate_status(projectKey: "...")` |
 | Metrik duplikasi Sonar | `mcp_io_github_son_get_component_measures(projectKey: "...", metricKeys: [...])` |
 | Cluster duplikasi Sonar | `mcp_io_github_son_search_duplicated_files(projectKey: "...")` |
-| Ambil komponen UI | `mcp_shadcn-ui-mcp-server_get_component(componentName: "...")` |
-| Baca file referensi | `mcp_filesystem_read_file(path: "...")` |
+| Ambil komponen UI | `activate_shadcn_ui_code_retrieval()` lalu `mcp_shadcn-ui_get_component(componentName: "...")`; gunakan `mcp_shadcn-ui_get_block(blockName: "...")` untuk block besar |
+| Baca file referensi | `read_file(filePath: "/absolute/path/to/project/...", startLine: 1, endLine: 250)` |
 
 ---
 
@@ -95,6 +95,6 @@ Apa yang ingin dilakukan?
 ## 🚀 Cara Menggunakan
 
 1. **Pilih skill** dari decision tree
-2. **Baca SKILL.md**: `mcp_filesystem_read_file(path: ".github/skills/{skill}/SKILL.md")`
+2. **Baca SKILL.md**: mulai dengan `read_file(filePath: "/absolute/path/to/project/.github/skills/{skill}/SKILL.md", startLine: 1, endLine: 250)`, lalu lanjutkan range berikutnya sampai instruksi relevan selesai terbaca
 3. **Gunakan MCP tools** sesuai instruksi di SKILL.md
 4. **Referensi files existing**, bukan template

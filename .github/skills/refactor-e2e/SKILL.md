@@ -16,7 +16,7 @@ Baca modul existing yang sejenis sebagai referensi pattern sebelum refactoring.
 | `mcp_laravel-boost_last-error` | Debug backend errors saat test |
 | `mcp_laravel-boost_database-schema` | Verify kolom export match database |
 | `mcp_laravel-boost_list-routes` | Verify API routes per modul |
-| `mcp_filesystem_read_file` | Baca file referensi existing |
+| `read_file` | Baca file referensi existing |
 
 ---
 
@@ -35,15 +35,15 @@ Cari modul yang akan direfactor. Catat informasi berikut dari kode existing:
 
 Referensi modul yang sudah direfactor:
 ```
-mcp_filesystem_read_file(path: "tests/e2e/departments/helpers.ts")
-mcp_filesystem_read_file(path: "tests/e2e/departments/department.spec.ts")
+read_file(filePath: "/absolute/path/to/project/tests/e2e/departments/helpers.ts", startLine: 1, endLine: 220)
+read_file(filePath: "/absolute/path/to/project/tests/e2e/departments/department.spec.ts", startLine: 1, endLine: 260)
 ```
 
 ### Langkah 2: Periksa Frontend (SEBELUM Menulis Test)
 
 Baca file Columns modul:
 ```
-mcp_filesystem_read_file(path: "resources/js/components/{module}/{Module}Columns.tsx")
+read_file(filePath: "/absolute/path/to/project/resources/js/components/{module}/{Module}Columns.tsx", startLine: 1, endLine: 260)
 ```
 
 **Periksa dan perbaiki jika perlu:**
@@ -66,7 +66,7 @@ mcp_filesystem_read_file(path: "resources/js/components/{module}/{Module}Columns
 ### Langkah 3: Periksa Backend (SEBELUM Menulis Test)
 
 ```
-mcp_filesystem_read_file(path: "app/Http/Requests/{Module}/Index{Entity}Request.php")
+read_file(filePath: "/absolute/path/to/project/app/Http/Requests/{Module}/Index{Entity}Request.php", startLine: 1, endLine: 220)
 ```
 
 **Periksa:**
@@ -77,7 +77,7 @@ mcp_filesystem_read_file(path: "app/Http/Requests/{Module}/Index{Entity}Request.
 
 2. **Export columns** — Baca Export Action:
    ```
-   mcp_filesystem_read_file(path: "app/Actions/{Module}/Export{Module}Action.php")
+  read_file(filePath: "/absolute/path/to/project/app/Actions/{Module}/Export{Module}Action.php", startLine: 1, endLine: 220)
    ```
    - Pastikan semua kolom DataTable diexport
    - Jika missing: tambahkan ke Export Action dan Export class
@@ -85,12 +85,12 @@ mcp_filesystem_read_file(path: "app/Http/Requests/{Module}/Index{Entity}Request.
 ### Langkah 4: Cek Shared Test Factories
 
 ```
-mcp_filesystem_read_file(path: "tests/e2e/shared-test-factories.ts")
+read_file(filePath: "/absolute/path/to/project/tests/e2e/shared-test-factories.ts", startLine: 1, endLine: 260)
 ```
 
 Jika file **belum ada**, buat dulu menggunakan template:
 ```
-mcp_filesystem_read_file(path: ".github/skills/refactor-e2e/resources/shared-test-factories.ts.template")
+read_file(filePath: "/absolute/path/to/project/.github/skills/refactor-e2e/resources/shared-test-factories.ts.template", startLine: 1, endLine: 260)
 ```
 
 ### Langkah 5: Buat/Update Module Helpers
@@ -108,13 +108,13 @@ Buat file `tests/e2e/{module}/helpers.ts` jika belum ada.
 Referensi pattern helpers:
 ```
 # Simple CRUD:
-mcp_filesystem_read_file(path: "tests/e2e/departments/helpers.ts")
+read_file(filePath: "/absolute/path/to/project/tests/e2e/departments/helpers.ts", startLine: 1, endLine: 220)
 
 # Complex CRUD:
-mcp_filesystem_read_file(path: "tests/e2e/employees/helpers.ts")
+read_file(filePath: "/absolute/path/to/project/tests/e2e/employees/helpers.ts", startLine: 1, endLine: 260)
 
 # Complex dengan async select:
-mcp_filesystem_read_file(path: "tests/e2e/account-mappings/helpers.ts")
+read_file(filePath: "/absolute/path/to/project/tests/e2e/account-mappings/helpers.ts", startLine: 1, endLine: 260)
 ```
 
 ### Langkah 6: Buat Spec File
@@ -123,7 +123,7 @@ Buat file `tests/e2e/{module}/{entity}.spec.ts` menggunakan `generateModuleTests
 
 Gunakan template:
 ```
-mcp_filesystem_read_file(path: ".github/skills/refactor-e2e/resources/module.spec.ts.template")
+read_file(filePath: "/absolute/path/to/project/.github/skills/refactor-e2e/resources/module.spec.ts.template", startLine: 1, endLine: 260)
 ```
 
 ### Langkah 7: Verifikasi

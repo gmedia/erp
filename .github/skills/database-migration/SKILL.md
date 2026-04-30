@@ -14,9 +14,9 @@ Gunakan skill ini untuk membuat atau memodifikasi struktur database dengan aman.
 | Tool | Fungsi |
 |------|--------|
 | `mcp_laravel-boost_database-schema` | Lihat schema existing (tabel, kolom, FK, index) |
-| `mcp_laravel-boost_database-query` | Query read-only untuk verifikasi data |
 | `mcp_laravel-boost_search-docs` | Cari dokumentasi Laravel migrations |
-| `mcp_laravel-boost_tinker` | Test code snippet |
+| `mcp_laravel-boost_tinker` | Verifikasi sample data atau test code snippet |
+| `read_file` | Baca file referensi existing |
 
 ### Contoh Penggunaan
 
@@ -27,8 +27,8 @@ mcp_laravel-boost_database-schema()
 # Cari dokumentasi jika ragu:
 mcp_laravel-boost_search-docs(queries: ["migration foreign key"])
 
-# Verifikasi data setelah migrate:
-mcp_laravel-boost_database-query(query: "SELECT * FROM products LIMIT 5")
+# Verifikasi struktur tabel setelah migrate:
+mcp_laravel-boost_database-schema(summary: true, filter: "products")
 ```
 
 ---
@@ -78,7 +78,7 @@ Apa yang perlu dilakukan?
 | Factory | `database/factories/` | Ikuti pola `EmployeeFactory.php` |
 | Seeder | `database/seeders/` | Ikuti pola `EmployeeSeeder.php` |
 
-> **TIP**: Gunakan `mcp_filesystem_read_file` untuk baca file referensi, bukan template.
+> **TIP**: Gunakan `read_file` untuk baca file referensi, bukan template.
 
 ---
 
@@ -154,4 +154,4 @@ Schema::table('products', function (Blueprint $table) {
 ./vendor/bin/sail artisan migrate
 ```
 
-Setelah migrate, gunakan `mcp_laravel-boost_database-query` untuk verifikasi struktur tabel.
+Setelah migrate, gunakan `mcp_laravel-boost_database-schema(summary: true, filter: "{table}")` untuk verifikasi struktur tabel.

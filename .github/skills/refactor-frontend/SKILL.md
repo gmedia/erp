@@ -11,10 +11,11 @@ Lakukan refactor kode frontend secara **TERKONTROL** tanpa merusak frontend beha
 
 | Tool | Kapan Digunakan |
 |------|-----------------|
-| `mcp_shadcn-ui-mcp-server_get_component` | Ambil komponen UI untuk referensi pattern |
-| `mcp_shadcn-ui-mcp-server_get_component_demo` | Lihat contoh usage |
+| `activate_shadcn_ui_code_retrieval` | Aktifkan referensi source komponen UI untuk pattern |
+| `mcp_shadcn-ui_get_component` | Ambil source komponen UI untuk pattern |
+| `mcp_shadcn-ui_get_component_demo` | Lihat contoh usage bila perlu |
 | `mcp_laravel-boost_browser-logs` | Debug frontend errors |
-| `mcp_filesystem_read_file` | Baca file referensi |
+| `read_file` | Baca file referensi |
 
 ---
 
@@ -65,11 +66,17 @@ Lakukan refactor kode frontend secara **TERKONTROL** tanpa merusak frontend beha
 
 ```
 # Baca file referensi, bukan template:
-mcp_filesystem_read_file(path: "resources/js/pages/positions/index.tsx")
-mcp_filesystem_read_file(path: "resources/js/components/employees/EmployeeForm.tsx")
+read_file(filePath: "/absolute/path/to/project/resources/js/pages/positions/index.tsx", startLine: 1, endLine: 220)
+read_file(filePath: "/absolute/path/to/project/resources/js/components/employees/EmployeeForm.tsx", startLine: 1, endLine: 220)
 
-# Ambil komponen shadcn untuk referensi:
-mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
+# Aktifkan tool retrieval komponen shadcn bila perlu source/pattern:
+activate_shadcn_ui_code_retrieval()
+
+# Ambil source komponen:
+mcp_shadcn-ui_get_component(componentName: "table")
+
+# Ambil demo penggunaan komponen bila perlu:
+mcp_shadcn-ui_get_component_demo(componentName: "table")
 ```
 
 | Pattern | File Referensi |

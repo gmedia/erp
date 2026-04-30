@@ -129,8 +129,9 @@ tests/
 | `mcp_laravel-boost_tinker` | Test query relationships |
 | `mcp_laravel-boost_list-routes` | Verifikasi routes |
 | `mcp_laravel-boost_search-docs` | Cari dokumentasi Eloquent relationships |
-| `mcp_shadcn-ui-mcp-server_get_component` | Ambil komponen UI (select, date-picker) |
-| `mcp_filesystem_read_multiple_files` | Baca referensi dari Employee/Supplier/Customer |
+| `activate_shadcn_ui_code_retrieval` | Aktifkan retrieval source komponen UI (select, date-picker) |
+| `mcp_shadcn-ui_get_component` | Ambil source komponen UI yang relevan |
+| `read_file` | Baca referensi dari Employee/Supplier/Customer; paralelkan bila perlu |
 
 ---
 
@@ -138,23 +139,23 @@ tests/
 
 **ALWAYS** baca file referensi sebelum membuat modul baru:
 
-```bash
+```
 # Backend References
-mcp_filesystem_read_file("app/Models/Employee.php")
-mcp_filesystem_read_file("app/Http/Controllers/EmployeeController.php")
-mcp_filesystem_read_file("app/Actions/Employees/IndexEmployeesAction.php")
-mcp_filesystem_read_file("app/Domain/Employees/EmployeeFilterService.php")
-mcp_filesystem_read_file("app/DTOs/Employees/UpdateEmployeeData.php")
-mcp_filesystem_read_file("app/Exports/EmployeeExport.php")
+read_file(filePath: "/absolute/path/to/project/app/Models/Employee.php", startLine: 1, endLine: 200)
+read_file(filePath: "/absolute/path/to/project/app/Http/Controllers/EmployeeController.php", startLine: 1, endLine: 200)
+read_file(filePath: "/absolute/path/to/project/app/Actions/Employees/IndexEmployeesAction.php", startLine: 1, endLine: 200)
+read_file(filePath: "/absolute/path/to/project/app/Domain/Employees/EmployeeFilterService.php", startLine: 1, endLine: 200)
+read_file(filePath: "/absolute/path/to/project/app/DTOs/Employees/UpdateEmployeeData.php", startLine: 1, endLine: 200)
+read_file(filePath: "/absolute/path/to/project/app/Exports/EmployeeExport.php", startLine: 1, endLine: 200)
 
 # Frontend References
-mcp_filesystem_read_file("resources/js/components/employees/EmployeeForm.tsx")
-mcp_filesystem_read_file("resources/js/components/employees/EmployeeFilters.tsx")
-mcp_filesystem_read_file("resources/js/components/employees/EmployeeColumns.tsx")
-mcp_filesystem_read_file("resources/js/utils/entityConfigs.ts")  # Lihat employeeConfig
+read_file(filePath: "/absolute/path/to/project/resources/js/components/employees/EmployeeForm.tsx", startLine: 1, endLine: 220)
+read_file(filePath: "/absolute/path/to/project/resources/js/components/employees/EmployeeFilters.tsx", startLine: 1, endLine: 220)
+read_file(filePath: "/absolute/path/to/project/resources/js/components/employees/EmployeeColumns.tsx", startLine: 1, endLine: 220)
+read_file(filePath: "/absolute/path/to/project/resources/js/utils/entityConfigs.ts", startLine: 1, endLine: 260)  # Lihat employeeConfig
 
 # Test Examples
-mcp_filesystem_read_file("tests/Feature/EmployeeControllerTest.php")
+read_file(filePath: "/absolute/path/to/project/tests/Feature/EmployeeControllerTest.php", startLine: 1, endLine: 240)
 ```
 
 ---

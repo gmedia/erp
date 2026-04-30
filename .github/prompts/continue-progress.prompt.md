@@ -15,7 +15,7 @@ Gunakan prompt ini untuk melanjutkan sesi lintas laptop atau shift pada Remote S
 3. Baca `task.handoff-archive.md` hanya jika context aktif di `task.md` belum cukup untuk melanjutkan.
 4. Baca `task.changelog.md` hanya jika butuh riwayat perubahan produk/fitur yang relevan.
 5. `.github/copilot-instructions.md`
-6. `.claude/rules/agent-rules.md`
+6. Jika ada local workspace override, baca `.kilo/rules/erp-agent-rules.md`
 
 ## 2. Verifikasi Baseline Sesi
 

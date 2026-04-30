@@ -11,7 +11,7 @@ Skills adalah panduan terstruktur yang membantu AI dalam menyelesaikan task deng
 | **Laravel Boost** | `database-schema`, `list-routes`, `search-docs`, `tinker`, `last-error`, `read-log-entries`, `browser-logs` |
 | **SonarQube MCP** | `get_project_quality_gate_status`, `get_component_measures`, `search_duplicated_files`, `get_duplications` |
 | **Filesystem** | `read_file`, `write_file`, `edit_file`, `directory_tree` |
-| **Shadcn UI** | `get_component`, `get_component_demo`, `list_blocks`, `get_block` |
+| **Shadcn UI** | `activate_shadcn_ui_component_and_block_listing`, `activate_shadcn_ui_code_retrieval`, `mcp_shadcn-ui_get_component`, `mcp_shadcn-ui_get_block`, `mcp_shadcn-ui_get_component_demo` |
 
 ### Contoh Penggunaan MCP
 
@@ -26,8 +26,14 @@ mcp_laravel-boost_search-docs(queries: ["migration foreign key"])
 mcp_io_github_son_get_project_quality_gate_status(projectKey: "...")
 mcp_io_github_son_get_component_measures(projectKey: "...", metricKeys: ["duplicated_lines", "duplicated_blocks", "duplicated_lines_density", "ncloc", "coverage"])
 
-# Ambil komponen UI
-mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
+# Aktifkan retrieval/listing Shadcn UI bila perlu
+activate_shadcn_ui_code_retrieval()
+
+# Ambil source komponen UI
+mcp_shadcn-ui_get_component(componentName: "table")
+
+# Lihat demo penggunaan komponen UI bila perlu
+mcp_shadcn-ui_get_component_demo(componentName: "table")
 ```
 
 ---
@@ -78,7 +84,7 @@ mcp_shadcn-ui-mcp-server_get_component(componentName: "table")
 ## 🚀 Quick Start
 
 1. **Pilih skill** → lihat [DECISION.md](./DECISION.md)
-2. **Baca SKILL.md** → `mcp_filesystem_read_file(path: ".github/skills/{skill}/SKILL.md")`
+2. **Baca SKILL.md** → mulai dengan `read_file(filePath: "/absolute/path/to/project/.github/skills/{skill}/SKILL.md", startLine: 1, endLine: 250)`, lalu lanjutkan range berikutnya sampai instruksi relevan selesai terbaca
 3. **Gunakan MCP tools bila relevan**; untuk operasi git gunakan git CLI
 4. **Referensi files existing** → bukan template
 

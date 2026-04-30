@@ -37,10 +37,12 @@ Fitur ini NON-CRUD jika:
 | `mcp_laravel-boost_list-routes` | Lihat routes existing, plan custom routes |
 | `mcp_laravel-boost_search-docs` | Cari dokumentasi React Query, react-router-dom |
 | `mcp_laravel-boost_tinker` | Test relationships dan business logic |
-| `mcp_shadcn-ui-mcp-server_list_blocks` | Cari dashboard/UI blocks |
-| `mcp_shadcn-ui-mcp-server_get_block` | Ambil complex UI blocks |
-| `mcp_shadcn-ui-mcp-server_get_component` | Ambil komponen UI (combobox, tree-view) |
-| `mcp_filesystem_read_multiple_files` | Baca file referensi User/Permission |
+| `activate_shadcn_ui_component_and_block_listing` | Cari dashboard/UI blocks dan komponen tersedia |
+| `activate_shadcn_ui_code_retrieval` | Aktifkan pengambilan source block/komponen UI |
+| `mcp_shadcn-ui_get_block` | Ambil source complex UI blocks |
+| `mcp_shadcn-ui_get_component` | Ambil source komponen UI (combobox, tree-view) |
+| `mcp_shadcn-ui_get_component_demo` | Lihat demo penggunaan komponen UI bila perlu |
+| `read_file` | Baca file referensi User/Permission; paralelkan bila perlu |
 
 ---
 
@@ -1086,11 +1088,11 @@ describe('Permission API Access', function () {
    ```
 
 3. **Baca Referensi**
-   ```bash
+    ```
    # WAJIB baca file referensi sebelum coding
-   mcp_filesystem_read_file("app/Http/Controllers/UserController.php")
-   mcp_filesystem_read_file("app/Http/Controllers/PermissionController.php")
-   mcp_filesystem_read_file("tests/Feature/UserControllerTest.php")
+    read_file(filePath: "/absolute/path/to/project/app/Http/Controllers/UserController.php", startLine: 1, endLine: 220)
+    read_file(filePath: "/absolute/path/to/project/app/Http/Controllers/PermissionController.php", startLine: 1, endLine: 220)
+    read_file(filePath: "/absolute/path/to/project/tests/Feature/UserControllerTest.php", startLine: 1, endLine: 260)
    ```
 
 ### Phase 2: Backend Implementation
@@ -1358,20 +1360,22 @@ Pattern B (Matrix/Bulk):
 
 ### MCP Tool Examples
 
-```bash
+```
 # Check database relationships
 mcp_laravel-boost_database-schema()
 
 # Test relationships in tinker
-mcp_laravel-boost_tinker("
+mcp_laravel-boost_tinker(code: "
   \$employee = App\\Models\\Employee::first();
   \$employee->user;
   \$employee->permissions;
 ")
 
 # Find UI components
-mcp_shadcn-ui-mcp-server_list_components()
-mcp_shadcn-ui-mcp-server_get_component("combobox")
+activate_shadcn_ui_component_and_block_listing()
+activate_shadcn_ui_code_retrieval()
+mcp_shadcn-ui_get_component(componentName: "combobox")
+mcp_shadcn-ui_get_component_demo(componentName: "combobox")
 ```
 
 ### Reference Files

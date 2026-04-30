@@ -14,8 +14,9 @@ Gunakan skill ini untuk membuat fitur CRUD sederhana yang hanya melibatkan satu 
 | `mcp_laravel-boost_database-schema` | Sebelum buat migration, lihat existing tables |
 | `mcp_laravel-boost_list-routes` | Verifikasi routes setelah create |
 | `mcp_laravel-boost_search-docs` | Cari dokumentasi Laravel jika ragu |
-| `mcp_shadcn-ui-mcp-server_get_component` | Ambil komponen UI (table, form, button) |
-| `mcp_filesystem_read_file` | Baca file referensi existing |
+| `activate_shadcn_ui_code_retrieval` | Aktifkan retrieval source komponen UI (table, form, button) |
+| `mcp_shadcn-ui_get_component` | Ambil source komponen UI yang relevan |
+| `read_file` | Baca file referensi existing |
 
 ---
 

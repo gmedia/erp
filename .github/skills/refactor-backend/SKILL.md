@@ -16,7 +16,7 @@ Lakukan refactor kode backend secara **TERKONTROL** tanpa merusak API contract, 
 | `mcp_laravel-boost_search-docs` | Cari best practices Laravel |
 | `mcp_laravel-boost_tinker` | Test query Eloquent sebelum commit |
 | `mcp_laravel-boost_last-error` | Debug jika test gagal |
-| `mcp_filesystem_read_file` | Baca file referensi |
+| `read_file` | Baca file referensi |
 
 ---
 
@@ -70,8 +70,8 @@ Gunakan jika:
 mcp_laravel-boost_database-schema()
 
 # Baca file existing untuk pattern:
-mcp_filesystem_read_file(path: "app/Http/Controllers/PositionController.php")
-mcp_filesystem_read_file(path: "app/Http/Requests/Positions/StorePositionRequest.php")
+read_file(filePath: "/absolute/path/to/project/app/Http/Controllers/PositionController.php", startLine: 1, endLine: 220)
+read_file(filePath: "/absolute/path/to/project/app/Http/Requests/Positions/StorePositionRequest.php", startLine: 1, endLine: 220)
 ```
 
 | Pattern | File Referensi |
