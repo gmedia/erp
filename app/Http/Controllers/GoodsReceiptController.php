@@ -6,6 +6,7 @@ use App\Actions\GoodsReceipts\ExportGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\IndexGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\SyncGoodsReceiptItemsAction;
 use App\DTOs\GoodsReceipts\UpdateGoodsReceiptData;
+use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\GoodsReceipts\ExportGoodsReceiptRequest;
 use App\Http\Requests\GoodsReceipts\IndexGoodsReceiptRequest;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 
 class GoodsReceiptController extends Controller
 {
+    use LoadsResourceRelations;
     use StoresItemsInTransaction;
 
     public function index(IndexGoodsReceiptRequest $request, IndexGoodsReceiptsAction $action): JsonResponse
@@ -53,32 +55,12 @@ class GoodsReceiptController extends Controller
             },
         );
 
-        $goodsReceipt->load([
-            'purchaseOrder.supplier',
-            'warehouse',
-            'receiver',
-            'confirmer',
-            'creator',
-            'items.product',
-            'items.unit',
-        ]);
-
-        return (new GoodsReceiptResource($goodsReceipt))->response()->setStatusCode(201);
+        return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response()->setStatusCode(201);
     }
 
     public function show(GoodsReceipt $goodsReceipt): JsonResponse
     {
-        $goodsReceipt->load([
-            'purchaseOrder.supplier',
-            'warehouse',
-            'receiver',
-            'confirmer',
-            'creator',
-            'items.product',
-            'items.unit',
-        ]);
-
-        return (new GoodsReceiptResource($goodsReceipt))->response();
+        return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response();
     }
 
     public function update(
@@ -105,17 +87,7 @@ class GoodsReceiptController extends Controller
             },
         );
 
-        $goodsReceipt->load([
-            'purchaseOrder.supplier',
-            'warehouse',
-            'receiver',
-            'confirmer',
-            'creator',
-            'items.product',
-            'items.unit',
-        ]);
-
-        return (new GoodsReceiptResource($goodsReceipt))->response();
+        return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response();
     }
 
     public function destroy(GoodsReceipt $goodsReceipt): JsonResponse
@@ -126,5 +98,10 @@ class GoodsReceiptController extends Controller
     public function export(ExportGoodsReceiptRequest $request, ExportGoodsReceiptsAction $action): JsonResponse
     {
         return $action->execute($request);
+    }
+
+    protected function resourceRelations(): array
+    {
+        return ['purchaseOrder.supplier', 'warehouse', 'receiver', 'confirmer', 'creator', 'items.product', 'items.unit'];
     }
 }
