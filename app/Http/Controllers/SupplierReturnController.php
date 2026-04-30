@@ -110,9 +110,7 @@ class SupplierReturnController extends Controller
 
     public function destroy(SupplierReturn $supplierReturn): JsonResponse
     {
-        $supplierReturn->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($supplierReturn);
     }
 
     public function export(ExportSupplierReturnRequest $request, ExportSupplierReturnsAction $action): JsonResponse

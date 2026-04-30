@@ -39,8 +39,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Supplier extends Model
 {
+    /** @use HasFactory<\Database\Factories\SupplierFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'email',
@@ -51,11 +57,12 @@ class Supplier extends Model
         'status',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'branch_id' => 'integer',
         'category_id' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function branch(): BelongsTo

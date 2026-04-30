@@ -102,9 +102,7 @@ class ApprovalFlowController extends Controller
 
     public function destroy(ApprovalFlow $approvalFlow): JsonResponse
     {
-        $approvalFlow->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($approvalFlow);
     }
 
     public function export(ExportApprovalFlowRequest $request, ExportApprovalFlowsAction $action): JsonResponse

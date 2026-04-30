@@ -61,6 +61,14 @@ class Customer extends Model
     ];
 
     /**
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'branch_id' => 'integer',
+        'category_id' => 'integer',
+    ];
+
+    /**
      * Get the branch that the customer belongs to.
      */
     public function branch(): BelongsTo

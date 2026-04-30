@@ -72,8 +72,6 @@ class InventoryStocktake extends Model
     protected $casts = [
         'stocktake_date' => 'date',
         'completed_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function warehouse(): BelongsTo

@@ -51,8 +51,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class JournalEntry extends Model
 {
+    /** @use HasFactory<\Database\Factories\JournalEntryFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'fiscal_year_id',
         'entry_number',
@@ -65,6 +71,9 @@ class JournalEntry extends Model
         'posted_at',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'entry_date' => 'date',
         'posted_at' => 'datetime',

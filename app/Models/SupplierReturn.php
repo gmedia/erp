@@ -10,8 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SupplierReturn extends Model
 {
+    /** @use HasFactory<\Database\Factories\SupplierReturnFactory> */
     use HasFactory, HasSupplierRelation;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'return_number',
         'purchase_order_id',
@@ -25,10 +31,11 @@ class SupplierReturn extends Model
         'created_by',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'return_date' => 'date',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function purchaseOrder(): BelongsTo

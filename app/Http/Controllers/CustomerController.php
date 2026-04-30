@@ -51,7 +51,7 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer): JsonResponse
     {
-        $customer->load('branch');
+        $customer->load(['branch', 'category']);
 
         return (new CustomerResource($customer))->response();
     }
@@ -72,9 +72,7 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer): JsonResponse
     {
-        $customer->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($customer);
     }
 
     /**

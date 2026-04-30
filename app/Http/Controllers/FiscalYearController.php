@@ -63,9 +63,7 @@ class FiscalYearController extends Controller
      */
     public function destroy(FiscalYear $fiscalYear): JsonResponse
     {
-        $fiscalYear->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($fiscalYear);
     }
 
     /**

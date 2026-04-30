@@ -27,6 +27,11 @@ class CustomerCategory extends Model
     /** @use HasFactory<\Database\Factories\CustomerCategoryFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
     ];

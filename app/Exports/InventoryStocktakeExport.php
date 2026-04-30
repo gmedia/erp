@@ -6,11 +6,12 @@ use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\InventoryStocktake;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 
-class InventoryStocktakeExport implements FromQuery, WithHeadings, WithMapping, WithStyles
+class InventoryStocktakeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
     use InteractsWithExportFilters;
 

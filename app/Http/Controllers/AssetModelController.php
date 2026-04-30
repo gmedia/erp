@@ -50,9 +50,7 @@ class AssetModelController extends Controller
 
     public function destroy(AssetModel $assetModel): JsonResponse
     {
-        $assetModel->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($assetModel);
     }
 
     public function export(ExportAssetModelRequest $request, ExportAssetModelsAction $action): JsonResponse

@@ -27,6 +27,11 @@ class SupplierCategory extends Model
     /** @use HasFactory<\Database\Factories\SupplierCategoryFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
     ];

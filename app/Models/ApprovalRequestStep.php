@@ -51,11 +51,19 @@ class ApprovalRequestStep extends Model
     /** @use HasFactory<\Database\Factories\ApprovalRequestStepFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'approval_request_id', 'approval_flow_step_id', 'step_order', 'status',
         'acted_by', 'delegated_from', 'action', 'comments', 'acted_at', 'due_at',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'acted_at' => 'datetime',
         'due_at' => 'datetime',

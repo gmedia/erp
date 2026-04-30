@@ -6,11 +6,12 @@ use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 
-class SupplierExport implements FromQuery, WithHeadings, WithMapping, WithStyles
+class SupplierExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
     use InteractsWithExportFilters;
 
@@ -23,7 +24,7 @@ class SupplierExport implements FromQuery, WithHeadings, WithMapping, WithStyles
 
     public function query(): Builder
     {
-        $query = Supplier::query()->with(['branch']);
+        $query = Supplier::query()->with(['branch', 'category']);
 
         $this->applyConfiguredFilters($query, $this->filters, ['name', 'email', 'phone'], [
             'branch_id' => 'branch_id',

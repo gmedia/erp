@@ -15,7 +15,7 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
 {
     use InteractsWithExportFilters;
 
-    protected $filters;
+    protected array $filters;
 
     public function __construct(array $filters = [])
     {

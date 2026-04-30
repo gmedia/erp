@@ -48,11 +48,19 @@ class ApprovalAuditLog extends Model
 
     public const UPDATED_AT = null; // Spec says no updated_at
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'approval_request_id', 'approvable_type', 'approvable_id', 'event',
         'actor_user_id', 'step_order', 'metadata', 'ip_address', 'user_agent',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'metadata' => 'array',
     ];

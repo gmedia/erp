@@ -9,8 +9,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GoodsReceipt extends Model
 {
+    /** @use HasFactory<\Database\Factories\GoodsReceiptFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'gr_number',
         'purchase_order_id',
@@ -25,11 +31,12 @@ class GoodsReceipt extends Model
         'created_by',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'receipt_date' => 'date',
         'confirmed_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function purchaseOrder(): BelongsTo

@@ -6,11 +6,12 @@ use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\StockTransfer;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 
-class StockTransferExport implements FromQuery, WithHeadings, WithMapping, WithStyles
+class StockTransferExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
     use InteractsWithExportFilters;
 

@@ -41,8 +41,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class PurchaseOrder extends Model
 {
+    /** @use HasFactory<\Database\Factories\PurchaseOrderFactory> */
     use BuildsAttributeCasts, HasFactory, HasSupplierRelation;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'po_number',
         'supplier_id',
@@ -98,8 +104,6 @@ class PurchaseOrder extends Model
             ]),
             ...$this->datetimeCasts([
                 'approved_at',
-                'created_at',
-                'updated_at',
             ]),
         ];
     }

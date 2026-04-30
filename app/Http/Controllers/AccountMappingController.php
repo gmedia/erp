@@ -48,9 +48,7 @@ class AccountMappingController extends Controller
 
     public function destroy(AccountMapping $accountMapping): JsonResponse
     {
-        $accountMapping->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($accountMapping);
     }
 
     public function export(ExportAccountMappingRequest $request, ExportAccountMappingsAction $action): JsonResponse

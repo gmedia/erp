@@ -43,8 +43,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class AssetStocktake extends Model
 {
+    /** @use HasFactory<\Database\Factories\AssetStocktakeFactory> */
     use HasFactory, HasUlids;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'ulid',
         'branch_id',
@@ -55,6 +61,9 @@ class AssetStocktake extends Model
         'created_by',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'planned_at' => 'datetime',
         'performed_at' => 'datetime',

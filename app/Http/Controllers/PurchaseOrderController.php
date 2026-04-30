@@ -87,9 +87,7 @@ class PurchaseOrderController extends Controller
 
     public function destroy(PurchaseOrder $purchaseOrder): JsonResponse
     {
-        $purchaseOrder->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($purchaseOrder);
     }
 
     public function export(ExportPurchaseOrderRequest $request, ExportPurchaseOrdersAction $action): JsonResponse

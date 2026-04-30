@@ -2,6 +2,8 @@
 
 > Referensi metadata per-modul untuk testing (Pest + E2E).
 > Data ini digunakan oleh agent saat membuat atau refactoring test.
+>
+> Lihat juga: `docs/refactor-style-consistency-plan.md` untuk matriks klasifikasi implementasi aktual dan hasil audit per tahap.
 
 ---
 
@@ -9,23 +11,38 @@
 
 ### CRUD Simple
 
-Modul dengan satu tabel utama, tanpa relasi FK kompleks.
-- Frontend: `createSimpleEntityConfig` + `createSimpleEntityColumns`
-- Kolom standar: Select, Name, Created At, Updated At, Actions
-- Sortable: `Name`, `Created At`, `Updated At`
-- Form: `SimpleEntityForm`
-- View: `SimpleEntityViewModal` (dialog)
+Modul dengan satu tabel utama, tanpa relasi FK kompleks. **5 modul**: departments, positions, branches, customer-categories, supplier-categories.
+
+- Frontend: `createSimpleEntityConfig()` + `createEntityCrudPage()` (6-line page file)
+- Kolom: `createSimpleEntityColumns()` → Select, Name, Created At, Updated At, Actions
+- Filters: `createSimpleEntityFilterFields()` → search only
+- Form: `SimpleEntityForm` (shared)
+- View: `SimpleEntityViewModal` (shared, bound via factory)
+- Backend: `SimpleCrudStoreRequest`, `SimpleCrudUpdateRequest`, `SimpleCrudIndexRequest`, `SimpleCrudExportRequest`, `SimpleCrudResource`, `SimpleCrudCollection`, `SimpleCrudExport`
+- Controller: `destroyModel()` via base `Controller` class
 
 ### CRUD Complex
 
-Modul dengan relasi FK, filter multi-field, custom columns.
-- Frontend: `createComplexEntityConfig` + custom `{Module}Columns.tsx`
-- Form: custom `{Module}Form.tsx`
-- View: custom `{Module}ViewModal.tsx` atau page
+Modul dengan relasi FK, filter multi-field, custom columns. **28 modul** termasuk master data, transaction/nested form, dan borderline-simple.
+
+- Frontend: `createComplexEntityConfig()` + `createEntityCrudPage()` + sibling files (`Columns.tsx`, `Filters.tsx`, `Form.tsx`, `ViewModal.tsx`)
+- Form: custom `{Module}Form.tsx` menggunakan `EntityForm`, `AsyncSelectField`, `zodResolver`
+- View: custom `{Module}ViewModal.tsx` menggunakan `ViewModalShell`, `ViewField`
+- Transaction modules: tambahan `StoresItemsInTransaction` trait, `ItemFormDialog`, `ViewModalItemsTable`
+- Backend: custom Request/Resource/Export per module, `destroyModel()` atau soft-cancel pattern
+- Inventory transactions (`stock-transfers`, `inventory-stocktakes`, `stock-adjustments`): `destroy()` = soft-cancel (update status → cancelled)
 
 ### Non-CRUD
 
-Modul tanpa operasi CRUD standar (Auth, Settings, Dashboard, Reports, dll).
+Modul tanpa operasi CRUD standar. **29 modul** termasuk reports, dashboards, settings, workflows, dan embedded components.
+
+- Reports: `ReportDataTablePage` (11 modules) atau `FinancialReportPageShell` (5 modules)
+- Audit trails: `AuditTrailPage` (2 modules)
+- Dashboards: `AppLayout` + custom charts/cards (3 modules)
+- Settings: `AdminSettingsLayout` (1 module)
+- Workflows: `AppLayout` + custom domain logic (3 modules)
+- Embedded: components tanpa page shell (3 modules)
+- Backend: Action pattern via method DI, `AbstractReportIndexExport` atau `AbstractActionCollectionExport`
 
 ---
 
@@ -595,11 +612,8 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 3 | Branches | `branches` | `BranchControllerTest`, `BranchExportTest` | `BranchTest` |
 | 4 | Customer Categories | `customer-categories` | `CustomerCategoryControllerTest`, `CustomerCategoryExportTest` | `CustomerCategoryTest` |
 | 5 | Supplier Categories | `supplier-categories` | `SupplierCategoryControllerTest`, `SupplierCategoryExportTest` | `SupplierCategoryTest` |
-| 6 | Product Categories | `product-categories` | `ProductCategoryControllerTest`, `ProductCategoryExportTest` | `ProductCategoryTest` |
-| 7 | Units | `units` | `UnitControllerTest`, `UnitExportTest` | `UnitTest` |
-| 8 | Asset Categories | `asset-categories` | `AssetCategoryControllerTest`, `AssetCategoryExportTest` | `AssetCategoryTest` |
-| 9 | Asset Locations | `asset-locations` | `AssetLocationControllerTest`, `AssetLocationExportTest` | `AssetLocationTest` |
-| 10 | Asset Models | `asset-models` | `AssetModelControllerTest`, `AssetModelExportTest` | `AssetModelTest` |
+
+> **Catatan**: Product Categories, Units, Asset Categories, Asset Locations, dan Asset Models secara implementasi menggunakan `createComplexEntityConfig` (bukan simple) karena memiliki kolom/relasi tambahan. Mereka tercatat di Registry Pest — CRUD Complex di bawah meskipun domain-nya relatif sederhana.
 
 ---
 

@@ -54,9 +54,7 @@ class PipelineController extends Controller
 
     public function destroy(Pipeline $pipeline): JsonResponse
     {
-        $pipeline->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($pipeline);
     }
 
     public function export(ExportPipelineRequest $request, ExportPipelinesAction $action): JsonResponse

@@ -62,8 +62,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AssetMovement extends Model
 {
+    /** @use HasFactory<\Database\Factories\AssetMovementFactory> */
     use HasAssetAndCreatorRelations, HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'asset_id',
         'movement_type',
@@ -81,6 +87,9 @@ class AssetMovement extends Model
         'created_by',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'moved_at' => 'datetime',
         'asset_id' => 'integer',

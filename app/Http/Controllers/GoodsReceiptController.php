@@ -120,9 +120,7 @@ class GoodsReceiptController extends Controller
 
     public function destroy(GoodsReceipt $goodsReceipt): JsonResponse
     {
-        $goodsReceipt->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($goodsReceipt);
     }
 
     public function export(ExportGoodsReceiptRequest $request, ExportGoodsReceiptsAction $action): JsonResponse

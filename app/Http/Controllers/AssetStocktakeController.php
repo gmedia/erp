@@ -51,9 +51,7 @@ class AssetStocktakeController extends Controller
 
     public function destroy(AssetStocktake $assetStocktake): JsonResponse
     {
-        $assetStocktake->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($assetStocktake);
     }
 
     public function export(ExportAssetStocktakeRequest $request, ExportAssetStocktakesAction $action): JsonResponse

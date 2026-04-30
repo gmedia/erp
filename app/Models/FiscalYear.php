@@ -39,8 +39,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 class FiscalYear extends Model
 {
+    /** @use HasFactory<\Database\Factories\FiscalYearFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'start_date',
@@ -48,6 +54,9 @@ class FiscalYear extends Model
         'status',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',

@@ -45,6 +45,8 @@ class SupplierController extends Controller
      */
     public function show(Supplier $supplier): JsonResponse
     {
+        $supplier->load(['branch', 'category']);
+
         return (new SupplierResource($supplier))->response();
     }
 
@@ -61,11 +63,9 @@ class SupplierController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Supplier $supplier): \Illuminate\Http\Response
+    public function destroy(Supplier $supplier): JsonResponse
     {
-        $supplier->delete();
-
-        return response()->noContent();
+        return $this->destroyModel($supplier);
     }
 
     /**

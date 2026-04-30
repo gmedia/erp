@@ -63,9 +63,7 @@ class CoaVersionController extends Controller
      */
     public function destroy(CoaVersion $coaVersion): JsonResponse
     {
-        $coaVersion->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($coaVersion);
     }
 
     /**

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -42,6 +44,11 @@ class ApprovalFlow extends Model
     /** @use HasFactory<\Database\Factories\ApprovalFlowFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'code',
@@ -52,19 +59,20 @@ class ApprovalFlow extends Model
         'created_by',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'is_active' => 'boolean',
         'conditions' => 'array',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
-    public function steps(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function steps(): HasMany
     {
         return $this->hasMany(ApprovalFlowStep::class)->orderBy('step_order');
     }
 
-    public function creator(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }

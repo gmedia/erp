@@ -47,8 +47,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Pipeline extends Model
 {
+    /** @use HasFactory<\Database\Factories\PipelineFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'code',
@@ -60,12 +66,13 @@ class Pipeline extends Model
         'created_by',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'is_active' => 'boolean',
         'version' => 'integer',
         'conditions' => 'json',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function creator(): BelongsTo

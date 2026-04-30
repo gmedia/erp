@@ -96,8 +96,6 @@ class StockTransfer extends Model
         'approved_at' => 'datetime',
         'shipped_at' => 'datetime',
         'received_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function fromWarehouse(): BelongsTo

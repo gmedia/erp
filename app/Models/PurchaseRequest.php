@@ -9,8 +9,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PurchaseRequest extends Model
 {
+    /** @use HasFactory<\Database\Factories\PurchaseRequestFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'pr_number',
         'branch_id',
@@ -28,13 +34,14 @@ class PurchaseRequest extends Model
         'created_by',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'request_date' => 'date',
         'required_date' => 'date',
         'estimated_amount' => 'decimal:2',
         'approved_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function branch(): BelongsTo

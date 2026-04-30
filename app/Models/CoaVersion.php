@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -31,20 +33,26 @@ use Illuminate\Database\Eloquent\Model;
  */
 class CoaVersion extends Model
 {
+    /** @use HasFactory<\Database\Factories\CoaVersionFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'fiscal_year_id',
         'status',
     ];
 
-    public function fiscalYear(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function fiscalYear(): BelongsTo
     {
         return $this->belongsTo(FiscalYear::class);
     }
 
-    public function accounts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function accounts(): HasMany
     {
         return $this->hasMany(Account::class);
     }

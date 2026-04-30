@@ -46,8 +46,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class AssetDepreciationRun extends Model
 {
+    /** @use HasFactory<\Database\Factories\AssetDepreciationRunFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'fiscal_year_id',
         'period_start',
@@ -59,6 +65,9 @@ class AssetDepreciationRun extends Model
         'posted_at',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'period_start' => 'date',
         'period_end' => 'date',

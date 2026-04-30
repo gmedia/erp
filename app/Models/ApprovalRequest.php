@@ -49,11 +49,19 @@ class ApprovalRequest extends Model
     /** @use HasFactory<\Database\Factories\ApprovalRequestFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'approval_flow_id', 'approvable_type', 'approvable_id', 'current_step_order',
         'status', 'submitted_by', 'submitted_at', 'completed_at',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'submitted_at' => 'datetime',
         'completed_at' => 'datetime',

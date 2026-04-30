@@ -71,9 +71,7 @@ class EmployeeController extends Controller
      */
     public function destroy(Employee $employee): JsonResponse
     {
-        $employee->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($employee);
     }
 
     /**

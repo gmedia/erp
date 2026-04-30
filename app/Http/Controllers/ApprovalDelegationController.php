@@ -59,9 +59,7 @@ class ApprovalDelegationController extends Controller
 
     public function destroy(ApprovalDelegation $approvalDelegation): JsonResponse
     {
-        $approvalDelegation->delete();
-
-        return response()->json(null, 204);
+        return $this->destroyModel($approvalDelegation);
     }
 
     public function export(
