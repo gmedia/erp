@@ -1138,12 +1138,23 @@ Oleh karena itu, **shared E2E/Pest test helpers tidak perlu diubah** — semua t
 |---|------|------|--------|--------|
 | 1 | ~~Migrate `stock-movements` from `DataTablePage` to `ReportDataTablePage`~~ | Structural frontend | Medium | ✅ Done |
 | 2 | `stock-monitor` tetap pakai `DataTablePage` — intentional (custom query + summary cards) | Exception | — | Intentional |
-| 3 | Unify Index Action methods (`handleSearchOrPrimaryIndexRequest` vs `handleIndexRequest`) | Behavioral backend | High | Backlog |
-| 4 | Unify request patterns (trait vs abstract class) across Warehouse vs Customer/Supplier | Structural backend | High | Backlog |
-| 5 | Unify resource base classes (SimpleCrud* vs raw JsonResource + trait) | Structural backend | Medium | Backlog |
-| 6 | Decide on DTO usage (Customer/AssetModel/Pipeline use DTOs, others don't) | Architectural | High | Backlog |
+| 3 | Unify Index Action methods (`handleSearchOrPrimaryIndexRequest` vs `handleIndexRequest`) | Behavioral backend | High | ⏸️ Closed — Intentional Divergence |
+| 4 | Unify request patterns (trait vs abstract class) across Warehouse vs Customer/Supplier | Structural backend | High | ⏸️ Closed — Intentional Divergence |
+| 5 | Unify resource base classes (SimpleCrud* vs raw JsonResource + trait) | Structural backend | Medium | ⏸️ Closed — Intentional Divergence |
+| 6 | Decide on DTO usage (Customer/AssetModel/Pipeline use DTOs, others don't) | Architectural | High | ⏸️ Closed — Intentional Divergence |
 | 7 | ~~Extend `createSimpleEntityConfig` for borderline-simple modules~~ | Structural frontend | Medium | ❌ Rejected — cost of new abstraction outweighs benefit (see rationale below) |
 | 8 | ~~Standardize GoodsReceipt controller to use `LoadsResourceRelations` trait~~ | Structural backend | Low | ✅ Done |
+
+#### Rationale: Backlog #3–6 Closed as Intentional Divergence
+
+Analisis pada 2026-04-30 menunjukkan bahwa keempat item ini bukan "inconsistency" melainkan **evolutionary divergence** yang valid:
+
+- **#3 (Index Action methods)**: Warehouse sengaja pakai search-XOR-filter (`handleSearchOrPrimaryIndexRequest`) — jika user search, advanced filter diabaikan. Ini kemungkinan intentional UX choice. Mengubah ke additive search+filter bisa break expected behavior. Perlu product owner confirmation sebelum unify.
+- **#4 (Request patterns)**: Trait (`HasWarehouseRules`) vs abstract class (`usesSometimes()`) — keduanya valid pattern untuk shared validation rules. Perbedaan hanya internal organization, zero user-facing impact. ROI unification sangat rendah vs effort 10+ files.
+- **#5 (Resource base classes)**: `SimpleCrudResource` vs raw `JsonResource` + `BuildsPartyResourceData` trait — keduanya produce correct response shape. Unification hanya bermanfaat jika ada kebutuhan shared response transformation di masa depan.
+- **#6 (DTO usage)**: Module yang pakai DTO (`UpdateCustomerData`, `UpdateAssetModelData`, `UpdatePipelineData`) memiliki transform logic (nested data flattening, conditional field mapping). Module tanpa DTO hanya pass-through `$request->validated()`. Memaksa semua pakai DTO = over-engineering. Memaksa semua tanpa DTO = kehilangan transform layer yang dibutuhkan.
+
+**Kesimpulan**: Tutup sebagai intentional divergence. Buka kembali hanya jika ada kebutuhan konkret (e.g., product owner minta unify search behavior, atau ada shared transformation yang harus di-copy antar resource).
 
 #### Rationale: Backlog #7 Rejected
 
