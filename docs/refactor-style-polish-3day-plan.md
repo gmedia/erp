@@ -3,8 +3,9 @@
 > Lanjutan dari refactor Tahap 0–6 yang sudah selesai.
 > Fokus: mechanical consistency fixes yang zero-risk, meningkatkan DX untuk development fitur baru setelahnya.
 
-Tanggal mulai: 2026-05-01
-Deadline: 2026-05-03 (sebelum mulai fitur baru)
+Status: ✅ **SELESAI** — dieksekusi 2026-04-30 (lebih cepat dari jadwal)
+Tanggal rencana awal: 2026-05-01 – 2026-05-03
+Tanggal eksekusi aktual: 2026-04-30 (single session)
 
 ---
 
@@ -161,14 +162,22 @@ Wave 3A view modals:
 
 ## Definition of Done (Akhir Hari 3)
 
-- [ ] Semua model di codebase punya docblocks yang konsisten
-- [ ] Semua export pakai date formatting helper yang sama
-- [ ] Controller `show()` load relations yang dibutuhkan Resource
-- [ ] Frontend Form props konsisten (`entity` naming)
-- [ ] Frontend ViewModal pakai `ViewField` + `memo()` pattern
-- [ ] `npm run types` clean
-- [ ] `test:e2e:smoke-waves` green (160 passed)
-- [ ] Semua perubahan pushed ke remote
+- [x] Semua model di codebase punya docblocks yang konsisten — `010e8c37` (36 files)
+- [x] ~~Semua export pakai date formatting helper yang sama~~ — Audited: differences are intentional (date-only vs datetime vs ISO 8601). No changes needed.
+- [x] Controller `show()` load relations yang dibutuhkan Resource — `3a678300` (Employee + Product)
+- [x] Frontend Form props konsisten (`entity` naming) — `a30b7511` (Supplier, Customer, Unit)
+- [ ] Frontend ViewModal pakai `ViewField` + `memo()` pattern — Deferred (AssetCategoryViewModal only, low priority)
+- [x] `npm run types` clean
+- [x] `test:e2e:smoke-waves` green (160 passed) — validated pre-commit
+- [x] Semua perubahan pushed ke remote
+
+### Commits
+
+| # | Hash | Description | Files |
+|---|------|-------------|-------|
+| 1 | `010e8c37` | Model docblock sweep (Hari 1) | 36 |
+| 2 | `3a678300` | Controller show() relation loading (Hari 2) | 2 |
+| 3 | `a30b7511` | Frontend form prop naming (Hari 3) | 3 |
 
 ---
 
