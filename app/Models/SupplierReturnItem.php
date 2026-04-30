@@ -8,8 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SupplierReturnItem extends Model
 {
+    /** @use HasFactory<\Database\Factories\SupplierReturnItemFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'supplier_return_id',
         'goods_receipt_item_id',
@@ -20,11 +26,12 @@ class SupplierReturnItem extends Model
         'notes',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'quantity_returned' => 'decimal:2',
         'unit_price' => 'decimal:2',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function supplierReturn(): BelongsTo

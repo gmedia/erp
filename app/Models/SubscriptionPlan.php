@@ -53,6 +53,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class SubscriptionPlan extends Model
 {
+    /** @use HasFactory<\Database\Factories\SubscriptionPlanFactory> */
     use HasFactory;
 
     /**

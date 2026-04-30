@@ -53,6 +53,11 @@ class ApprovalFlowStep extends Model
     /** @use HasFactory<\Database\Factories\ApprovalFlowStepFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'approval_flow_id',
         'step_order',
@@ -68,6 +73,9 @@ class ApprovalFlowStep extends Model
         'can_reject',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'step_order' => 'integer',
         'approver_user_id' => 'integer',
@@ -77,8 +85,6 @@ class ApprovalFlowStep extends Model
         'escalate_after_hours' => 'integer',
         'escalation_user_id' => 'integer',
         'can_reject' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function flow(): \Illuminate\Database\Eloquent\Relations\BelongsTo

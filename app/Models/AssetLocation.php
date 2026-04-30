@@ -38,8 +38,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class AssetLocation extends Model
 {
+    /** @use HasFactory<\Database\Factories\AssetLocationFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'branch_id',
         'parent_id',
@@ -47,6 +53,9 @@ class AssetLocation extends Model
         'name',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'branch_id' => 'integer',
         'parent_id' => 'integer',

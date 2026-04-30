@@ -74,8 +74,6 @@ class InventoryStocktakeItem extends Model
         'counted_quantity' => 'decimal:2',
         'variance' => 'decimal:2',
         'counted_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function inventoryStocktake(): BelongsTo

@@ -50,10 +50,16 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class PipelineStateLog extends Model
 {
+    /** @use HasFactory<\Database\Factories\PipelineStateLogFactory> */
     use HasFactory;
 
     const UPDATED_AT = null; // Logs shouldn't be updated
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'pipeline_entity_state_id',
         'entity_type',
@@ -68,9 +74,11 @@ class PipelineStateLog extends Model
         'user_agent',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'metadata' => 'array',
-        'created_at' => 'datetime',
     ];
 
     public function pipelineEntityState(): BelongsTo

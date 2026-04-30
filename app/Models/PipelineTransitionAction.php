@@ -38,8 +38,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PipelineTransitionAction extends Model
 {
+    /** @use HasFactory<\Database\Factories\PipelineTransitionActionFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'pipeline_transition_id',
         'action_type',
@@ -50,6 +56,9 @@ class PipelineTransitionAction extends Model
         'is_active',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'config' => 'array',
         'is_async' => 'boolean',

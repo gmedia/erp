@@ -36,6 +36,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class BillOfMaterial extends Model
 {
+    /** @use HasFactory<\Database\Factories\BillOfMaterialFactory> */
     use HasFactory;
 
     /**

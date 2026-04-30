@@ -50,8 +50,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AssetStocktakeItem extends Model
 {
+    /** @use HasFactory<\Database\Factories\AssetStocktakeItemFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'asset_stocktake_id',
         'asset_id',
@@ -65,6 +71,9 @@ class AssetStocktakeItem extends Model
         'checked_by',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'checked_at' => 'datetime',
         'asset_stocktake_id' => 'integer',

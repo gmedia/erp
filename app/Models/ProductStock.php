@@ -39,6 +39,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ProductStock extends Model
 {
+    /** @use HasFactory<\Database\Factories\ProductStockFactory> */
     use HasFactory;
 
     /**

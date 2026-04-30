@@ -8,8 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GoodsReceiptItem extends Model
 {
+    /** @use HasFactory<\Database\Factories\GoodsReceiptItemFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'goods_receipt_id',
         'purchase_order_item_id',
@@ -22,13 +28,14 @@ class GoodsReceiptItem extends Model
         'notes',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'quantity_received' => 'decimal:2',
         'quantity_accepted' => 'decimal:2',
         'quantity_rejected' => 'decimal:2',
         'unit_price' => 'decimal:2',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function goodsReceipt(): BelongsTo

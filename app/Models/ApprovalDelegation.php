@@ -39,8 +39,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ApprovalDelegation extends Model
 {
+    /** @use HasFactory<\Database\Factories\ApprovalDelegationFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'delegator_user_id',
         'delegate_user_id',
@@ -51,12 +57,13 @@ class ApprovalDelegation extends Model
         'is_active',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
         'is_active' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     /**

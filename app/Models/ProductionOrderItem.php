@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ProductionOrderItem extends Model
 {
+    /** @use HasFactory<\Database\Factories\ProductionOrderItemFactory> */
     use HasFactory;
 
     /**

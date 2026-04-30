@@ -111,8 +111,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Asset extends Model
 {
+    /** @use HasFactory<\Database\Factories\AssetFactory> */
     use BuildsAttributeCasts, HasFactory, HasPipeline, HasSupplierRelation, HasUlids, SoftDeletes;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'ulid',
         'asset_code',

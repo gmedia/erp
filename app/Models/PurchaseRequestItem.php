@@ -8,8 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PurchaseRequestItem extends Model
 {
+    /** @use HasFactory<\Database\Factories\PurchaseRequestItemFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'purchase_request_id',
         'product_id',
@@ -21,13 +27,14 @@ class PurchaseRequestItem extends Model
         'notes',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'quantity' => 'decimal:2',
         'quantity_ordered' => 'decimal:2',
         'estimated_unit_price' => 'decimal:2',
         'estimated_total' => 'decimal:2',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function purchaseRequest(): BelongsTo

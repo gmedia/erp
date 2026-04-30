@@ -46,8 +46,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class AssetMaintenance extends Model
 {
+    /** @use HasFactory<\Database\Factories\AssetMaintenanceFactory> */
     use BuildsAttributeCasts, HasAssetAndCreatorRelations, HasFactory, HasSupplierRelation;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'asset_id',
         'maintenance_type',

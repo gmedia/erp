@@ -71,8 +71,6 @@ class StockAdjustmentItem extends Model
         'quantity_after' => 'decimal:2',
         'unit_cost' => 'decimal:2',
         'total_cost' => 'decimal:2',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     public function stockAdjustment(): BelongsTo

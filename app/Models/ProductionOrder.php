@@ -49,6 +49,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class ProductionOrder extends Model
 {
+    /** @use HasFactory<\Database\Factories\ProductionOrderFactory> */
     use HasFactory;
 
     /**

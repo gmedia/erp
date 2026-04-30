@@ -38,8 +38,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class JournalEntryLine extends Model
 {
+    /** @use HasFactory<\Database\Factories\JournalEntryLineFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'journal_entry_id',
         'account_id',
@@ -48,6 +54,9 @@ class JournalEntryLine extends Model
         'memo',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'debit' => 'decimal:2',
         'credit' => 'decimal:2',

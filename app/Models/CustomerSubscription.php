@@ -72,6 +72,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class CustomerSubscription extends Model
 {
+    /** @use HasFactory<\Database\Factories\CustomerSubscriptionFactory> */
     use HasFactory, SoftDeletes;
 
     /**

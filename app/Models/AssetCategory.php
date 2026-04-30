@@ -33,8 +33,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class AssetCategory extends Model
 {
+    /** @use HasFactory<\Database\Factories\AssetCategoryFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'code',
         'name',

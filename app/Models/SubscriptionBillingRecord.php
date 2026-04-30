@@ -67,6 +67,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class SubscriptionBillingRecord extends Model
 {
+    /** @use HasFactory<\Database\Factories\SubscriptionBillingRecordFactory> */
     use HasFactory;
 
     /**

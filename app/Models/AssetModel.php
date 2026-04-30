@@ -36,8 +36,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class AssetModel extends Model
 {
+    /** @use HasFactory<\Database\Factories\AssetModelFactory> */
     use BuildsAttributeCasts, HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'asset_category_id',
         'manufacturer',
@@ -60,7 +66,6 @@ class AssetModel extends Model
         return [
             ...$this->integerCasts(['asset_category_id']),
             'specs' => 'array',
-            ...$this->datetimeCasts(['created_at', 'updated_at']),
         ];
     }
 }

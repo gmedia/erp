@@ -45,8 +45,14 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class PipelineEntityState extends Model
 {
+    /** @use HasFactory<\Database\Factories\PipelineEntityStateFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'pipeline_id',
         'entity_type',
@@ -57,6 +63,9 @@ class PipelineEntityState extends Model
         'metadata',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'last_transitioned_at' => 'datetime',
         'metadata' => 'array',

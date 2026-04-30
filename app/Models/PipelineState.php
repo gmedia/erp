@@ -42,8 +42,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class PipelineState extends Model
 {
+    /** @use HasFactory<\Database\Factories\PipelineStateFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'pipeline_id',
         'code',
@@ -56,6 +62,9 @@ class PipelineState extends Model
         'metadata',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'metadata' => 'array',
         'sort_order' => 'integer',

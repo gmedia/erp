@@ -42,6 +42,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ProductDependency extends Model
 {
+    /** @use HasFactory<\Database\Factories\ProductDependencyFactory> */
     use HasFactory;
 
     /**

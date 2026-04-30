@@ -58,8 +58,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Account extends Model
 {
+    /** @use HasFactory<\Database\Factories\AccountFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'coa_version_id',
         'parent_id',
@@ -74,6 +80,9 @@ class Account extends Model
         'description',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'is_active' => 'boolean',
         'is_cash_flow' => 'boolean',

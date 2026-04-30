@@ -38,8 +38,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AssetDepreciationLine extends Model
 {
+    /** @use HasFactory<\Database\Factories\AssetDepreciationLineFactory> */
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'asset_depreciation_run_id',
         'asset_id',
@@ -49,6 +55,9 @@ class AssetDepreciationLine extends Model
         'book_value_after',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'amount' => 'decimal:2',
         'accumulated_before' => 'decimal:2',
