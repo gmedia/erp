@@ -1,11 +1,15 @@
 import { test, expect, type Page, type Response } from '@playwright/test';
 import { login } from '../helpers';
 
+function buildReportUrlPattern(path: string) {
+    return new RegExp(`${path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:\\?.*)?$`);
+}
+
 async function openFinancialReport(
     page: Page,
     path: string,
     endpoint: string,
-    title: RegExp,
+    heading: string,
 ) {
     await Promise.all([
         page.waitForResponse(
@@ -17,7 +21,12 @@ async function openFinancialReport(
         page.goto(path),
     ]);
 
-    await expect(page).toHaveTitle(title, { timeout: 60000 });
+    await expect(page).toHaveURL(buildReportUrlPattern(path), {
+        timeout: 60000,
+    });
+    await expect(page.getByRole('heading', { name: heading, level: 1 })).toBeVisible({
+        timeout: 60000,
+    });
 }
 
 async function waitForBalanceSheetReady(page: Page) {
@@ -48,7 +57,7 @@ test.describe('Financial Reports', () => {
             page,
             '/reports/trial-balance',
             'trial-balance',
-            /Trial Balance/,
+            'Trial Balance',
         );
 
         await expect(
@@ -69,7 +78,7 @@ test.describe('Financial Reports', () => {
             page,
             '/reports/balance-sheet',
             'balance-sheet',
-            /Balance Sheet/,
+            'Balance Sheet',
         );
 
         await waitForBalanceSheetReady(page);
@@ -82,7 +91,7 @@ test.describe('Financial Reports', () => {
             page,
             '/reports/balance-sheet',
             'balance-sheet',
-            /Balance Sheet/,
+            'Balance Sheet',
         );
 
         await waitForBalanceSheetReady(page);
@@ -102,7 +111,7 @@ test.describe('Financial Reports', () => {
             page,
             '/reports/income-statement',
             'income-statement',
-            /Income Statement/,
+            'Income Statement',
         );
 
         await expect(page.getByRole('heading', { name: 'Income Statement', level: 1 })).toBeVisible();
@@ -120,7 +129,7 @@ test.describe('Financial Reports', () => {
             page,
             '/reports/cash-flow',
             'cash-flow',
-            /Cash Flow/,
+            'Cash Flow',
         );
 
         await expect(page.getByRole('heading', { name: 'Cash Flow', level: 1 })).toBeVisible();
@@ -137,7 +146,7 @@ test.describe('Financial Reports', () => {
             page,
             '/reports/comparative',
             'comparative',
-            /Comparative Report/,
+            'Comparative Report',
         );
 
         await expect(page.getByRole('heading', { name: 'Comparative Report', level: 1 })).toBeVisible();
