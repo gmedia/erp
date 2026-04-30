@@ -12,24 +12,20 @@ Analisa requirement user:
 
 ## 2. Baca Skill yang Sesuai
 
-```
-// turbo
-```
 Untuk Simple:
-```bash
-cat .github/skills/feature-crud-simple/SKILL.md
+```text
+read_file(filePath: "/absolute/path/to/project/.github/skills/feature-crud-simple/SKILL.md", startLine: 1, endLine: 250)
 ```
 
 Untuk Complex:
-```bash
-cat .github/skills/feature-crud-complex/SKILL.md
+```text
+read_file(filePath: "/absolute/path/to/project/.github/skills/feature-crud-complex/SKILL.md", startLine: 1, endLine: 250)
 ```
+
+Jika implementasi dipicu library/framework tertentu di luar Laravel ecosystem, resolve docs dulu via Context7 sebelum coding.
 
 ## 3. Jalankan Scaffold Script
 
-```
-// turbo
-```
 Simple:
 ```bash
 bash .github/skills/feature-crud-simple/scripts/scaffold.sh {FeatureName} --dry-run
@@ -42,9 +38,6 @@ bash .github/skills/feature-crud-complex/scripts/scaffold.sh {FeatureName} --dry
 
 ## 4. Create Scaffold (setelah konfirmasi)
 
-```
-// turbo
-```
 ```bash
 bash .github/skills/feature-crud-simple/scripts/scaffold.sh {FeatureName}
 ```
@@ -65,9 +58,6 @@ Catatan penting:
 
 ## 6. Verifikasi
 
-```
-// turbo
-```
 ```bash
 ./vendor/bin/sail bin duster fix
 ```

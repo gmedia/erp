@@ -25,16 +25,17 @@ Spesifikasi:
 - Validasi per-row: [referensi ke aturan unik/format, misal: ikuti validasi StoreRequest]
 
 Instruksi:
-1. Gunakan skill `feature-import` → baca SKILL.md
+1. Gunakan skill `feature-import` → baca dengan `read_file(filePath: "/absolute/path/to/project/.github/skills/feature-import/SKILL.md", startLine: 1, endLine: 250)` lalu lanjutkan range berikutnya jika perlu
 2. Pelajari pattern import dari modul `Employees` sebagai referensi struktur.
-3. Output yang diharapkan:
+3. Jika format file, parser, atau dependency package import perlu referensi eksternal terbaru, gunakan Context7 sebelum implementasi.
+4. Output yang diharapkan:
    - Backend: Importer class (`app/Imports/{Module}Import.php`), Action class, Form Request, Controller methods, Route.
    - Frontend: Komponen Dialog Upload file & Summary tampilan, tombol navigasi di index.
    - Testing Pest: Test feature upload (`tests/Feature/{Modules}/{Module}ImportTest.php`). Test validasi dan test FK resolution.
    - Import semua dependency di header file. Hindari FQCN seperti `\App\Actions\...`, `\Laravel\Sanctum\Sanctum`, `\Illuminate\Support\Facades\Storage`, atau `\Carbon\Carbon` di body code/test.
-4. Standar testing:
+5. Standar testing:
    - Group annotation: `->group('{modul-names}')` di SEMUA test file (wajib).
-5. Verifikasi:
+6. Verifikasi:
    - `./vendor/bin/sail bin duster fix`
    - `./vendor/bin/sail test --group {modul-names}`
 ```

@@ -1,3 +1,4 @@
+---
 description: "Use when: menyimpan checkpoint sesi lintas laptop atau shift ke task.md sebelum pause, pindah perangkat, atau selesai kerja"
 ---
 
@@ -13,6 +14,7 @@ Gunakan prompt ini untuk menutup sesi lintas laptop atau shift sebelum pause, pi
 	- `task.changelog.md` = changelog produk/fitur
 	- `task.handoff-archive.md` = arsip checkpoint E2E lama
 3. Jangan pindahkan checkpoint teknis E2E ke `task.changelog.md`.
+4. Jika sesi aktif memakai MCP penting seperti `laravel-boost`, `context7`, atau `depwire`, catat penggunaannya secara ringkas di checkpoint.
 
 ## 2. Verifikasi Baseline Sesi
 
@@ -32,6 +34,7 @@ Ringkas checkpoint aktif di `task.md` dengan item berikut:
 2. File yang terdampak
 3. Commit hash (jika ada)
 4. Hal yang belum selesai
+5. MCP atau workflow agent penting yang dipakai pada sesi ini
 
 Jika ringkasan historis lama masih penting tetapi tidak lagi aktif, ringkas dan pindahkan ke `task.handoff-archive.md`.
 
@@ -53,6 +56,7 @@ Perbarui prompt siap pakai di bagian akhir `task.md` agar berisi:
 - constraint user
 - baseline command
 - command validasi berikutnya
+- MCP utama yang kemungkinan dipakai berikutnya bila sudah jelas
 
 ## 7. Output Final ke User
 

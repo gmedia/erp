@@ -38,7 +38,16 @@ Catatan hemat token:
 - Ambil ringkasan dulu, baru detail file yang masuk top duplicated clusters.
 - Hindari fetch issue/log panjang tanpa filter modul.
 
-## 2. Mapping ke Modul Registry
+## 2. Map Blast Radius Sebelum Refactor Struktural
+
+Sebelum rename, move, split, merge, atau extraction lintas file:
+
+- Gunakan `mcp_depwire_get_file_context(filePath: "...")` untuk melihat import/export dan file pemakai.
+- Gunakan `mcp_depwire_impact_analysis(symbol: "...", file: "...")` untuk symbol utama yang akan diubah.
+- Jika wave mengubah struktur file, jalankan `mcp_depwire_simulate_change(...)` sebelum edit.
+- Jika pola duplikasi dipicu API package/framework eksternal, ambil docs terbaru via Context7 sebelum menentukan abstraction target.
+
+## 3. Mapping ke Modul Registry
 
 Petakan temuan ke modul berdasarkan slug pada `docs/module-registry.md`:
 
@@ -47,7 +56,7 @@ Petakan temuan ke modul berdasarkan slug pada `docs/module-registry.md`:
 - `app/Domain/{Module}/*FilterService.php` -> slug modul domain terkait
 - `app/Http/Controllers/*ItemController.php` -> modul transaksi induk (`stock-transfers`, `stock-adjustments`, `inventory-stocktakes`)
 
-## 3. Kelompokkan Scope Refactor
+## 4. Kelompokkan Scope Refactor
 
 Prioritaskan urutan berikut:
 
@@ -67,7 +76,7 @@ Aturan ukuran wave:
 - Jika ada perubahan behavior query kompleks, turunkan ke 2-4 file per wave.
 - Setelah 2 wave stabil (test pass + metrik membaik), boleh naikkan ukuran wave berikutnya.
 
-## 4. Guard Konsistensi Antar Modul
+## 5. Guard Konsistensi Antar Modul
 
 Checklist wajib:
 
@@ -80,7 +89,13 @@ Checklist wajib:
 - Untuk pattern yang sama (FilterService / FormRequest), gunakan shared abstraction yang seragam antar modul
 - Untuk refactor style agent guidance, update di folder `.github` (source of truth)
 
-## 5. Eksekusi Refactor per Batch
+Checklist MCP-aware wave:
+
+- Jika extraction menyentuh banyak file, Depwire digunakan sebelum patch pertama.
+- Jika wave dipicu aturan package/framework, Context7 dipakai untuk syntax/behavior yang version-specific.
+- Jika wave hanya butuh data project Laravel, prioritaskan Laravel Boost daripada docs eksternal.
+
+## 6. Eksekusi Refactor per Batch
 
 Untuk tiap batch:
 
@@ -89,6 +104,7 @@ Untuk tiap batch:
 3. Refactor internal tanpa ubah API contract
 4. Tambah/rapikan Feature + Unit test modul tersebut
 5. Jalankan formatter/lint sesuai standar project
+6. Update evidence Depwire/Context7 di progress note jika dipakai untuk keputusan wave
 
 Checklist anti-regresi wave:
 
@@ -102,7 +118,7 @@ Contoh target extraction:
 - `*FilterService` dengan pola where/like/date-range -> composable filter map builder
 - Controller item transaksi (`*ItemController`) -> shared service untuk operasi item berulang
 
-## 6. Verifikasi Wajib Setelah Perubahan
+## 7. Verifikasi Wajib Setelah Perubahan
 
 Gunakan Sail:
 
@@ -129,15 +145,16 @@ Contoh:
 ./vendor/bin/sail artisan test --group=purchase-requests --group=purchase-orders --group=goods-receipts --group=supplier-returns --group=stock-adjustments --group=stock-movements
 ```
 
-## 7. Exit Criteria
+## 8. Exit Criteria
 
 - Metrik `duplicated_lines` dan `duplicated_blocks` turun pada batch yang dikerjakan
 - Metrik `duplicated_lines_density` project tidak naik setelah merge
 - Tidak ada perubahan route/payload API publik
 - Semua test batch (Pest + E2E) pass
 - Jika Sonar MCP tidak tersedia, keputusan refactor tetap menyertakan baseline + evidence fallback yang bisa diaudit
+- Jika refactor struktural dilakukan, evidence Depwire tercatat di progress note atau ringkasan wave
 
-## 8. Catatan Anomali Sonar
+## 9. Catatan Anomali Sonar
 
 Jika snapshot Sonar menunjukkan anomali (contoh `coverage = 0.0`) saat test lokal lulus:
 

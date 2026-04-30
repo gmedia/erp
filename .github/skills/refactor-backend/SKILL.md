@@ -15,7 +15,7 @@ Lakukan refactor kode backend secara **TERKONTROL** tanpa merusak API contract, 
 | `mcp_laravel-boost_list-routes` | Verifikasi routes tidak berubah |
 | `mcp_laravel-boost_search-docs` | Cari best practices Laravel |
 | `mcp_laravel-boost_tinker` | Test query Eloquent sebelum commit |
-| `mcp_laravel-boost_last-error` | Debug jika test gagal |
+| `activate_laravel_logging_and_debugging_tools()` | Aktifkan tool error/log jika test gagal |
 | `read_file` | Baca file referensi |
 
 ---
@@ -148,7 +148,8 @@ JANGAN buat DTO/Action/Domain Service jika:
 
 Jika test gagal:
 ```
-mcp_laravel-boost_last-error()
+activate_laravel_logging_and_debugging_tools()
+# lalu gunakan tool error/log Laravel yang tersedia untuk cek exception terbaru
 ```
 
 **Gunakan `mcp_laravel-boost_list-routes` untuk verify routes tidak berubah.**

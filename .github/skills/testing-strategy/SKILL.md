@@ -11,9 +11,9 @@ Gunakan skill ini untuk membuat test yang konsisten dengan pola testing di codeb
 
 | Tool | Kapan Digunakan |
 |------|-----------------|
-| `mcp_laravel-boost_last-error` | Debug test failures |
+| `activate_laravel_logging_and_debugging_tools()` | Aktifkan tool error/log saat test gagal |
 | `mcp_laravel-boost_tinker` | Inspect test data atau debug code snippets |
-| `mcp_laravel-boost_browser-logs` | Debug E2E frontend errors |
+| `activate_laravel_logging_and_debugging_tools()` | Aktifkan tool browser log untuk debug E2E frontend errors |
 | `read_file` | Baca file test referensi |
 
 ---
@@ -47,8 +47,8 @@ read_file(filePath: "/absolute/path/to/project/tests/Feature/EmployeeControllerT
 read_file(filePath: "/absolute/path/to/project/tests/e2e/employees/add-employee.spec.ts", startLine: 1, endLine: 260)
 
 # Debug test failure:
-mcp_laravel-boost_last-error()
-mcp_laravel-boost_browser-logs(entries: 10)  # untuk failure browser/E2E
+activate_laravel_logging_and_debugging_tools()
+# lalu gunakan tool error/log atau browser log Laravel yang tersedia
 ```
 
 | Pattern | File Referensi |
@@ -136,6 +136,6 @@ $this->assertTrue($validator->fails());
 
 Jika test gagal:
 ```
-mcp_laravel-boost_last-error()
-mcp_laravel-boost_browser-logs(entries: 20)  # untuk failure browser/E2E
+activate_laravel_logging_and_debugging_tools()
+# lalu gunakan tool error/log atau browser log Laravel yang tersedia
 ```

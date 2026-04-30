@@ -14,7 +14,7 @@ Lakukan refactor kode frontend secara **TERKONTROL** tanpa merusak frontend beha
 | `activate_shadcn_ui_code_retrieval` | Aktifkan referensi source komponen UI untuk pattern |
 | `mcp_shadcn-ui_get_component` | Ambil source komponen UI untuk pattern |
 | `mcp_shadcn-ui_get_component_demo` | Lihat contoh usage bila perlu |
-| `mcp_laravel-boost_browser-logs` | Debug frontend errors |
+| `activate_laravel_logging_and_debugging_tools()` | Aktifkan browser log jika frontend error |
 | `read_file` | Baca file referensi |
 
 ---
@@ -148,7 +148,8 @@ JANGAN:
 
 Jika frontend error:
 ```
-mcp_laravel-boost_browser-logs(entries: 20)
+activate_laravel_logging_and_debugging_tools()
+# lalu gunakan tool browser log Laravel yang tersedia
 ```
 
 ---

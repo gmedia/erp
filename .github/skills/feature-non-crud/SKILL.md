@@ -35,7 +35,8 @@ Fitur ini NON-CRUD jika:
 |------|-----------------|
 | `mcp_laravel-boost_database-schema` | Lihat model/tabel existing untuk relasi |
 | `mcp_laravel-boost_list-routes` | Lihat routes existing, plan custom routes |
-| `mcp_laravel-boost_search-docs` | Cari dokumentasi React Query, react-router-dom |
+| `mcp_laravel-boost_search-docs` | Cari dokumentasi Laravel ecosystem yang relevan dengan backend project |
+| `mcp_context7_resolve-library-id(...)` + `mcp_context7_query-docs(...)` | Cari dokumentasi React Query, react-router-dom, atau package non-Laravel lain |
 | `mcp_laravel-boost_tinker` | Test relationships dan business logic |
 | `activate_shadcn_ui_component_and_block_listing` | Cari dashboard/UI blocks dan komponen tersedia |
 | `activate_shadcn_ui_code_retrieval` | Aktifkan pengambilan source block/komponen UI |

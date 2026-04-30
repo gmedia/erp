@@ -38,7 +38,10 @@ description: Aturan agent untuk project ERP
 ## 2. Skills & MCP
 
 1) **Skills**: selalu cek Skill yang tersedia; pakai jika relevan; jika tidak, tulis alasan singkat.
-2) **MCP**: selalu cek MCP server/tools yang tersedia; prioritaskan untuk schema DB, routes, logs, docs, file ops, dan shadcn UI; jika tidak dipakai, tulis alasan singkat.
+2) **MCP**: selalu cek MCP server/tools yang tersedia; pilih server yang paling spesifik untuk task; jika tidak dipakai, tulis alasan singkat.
+	- `laravel-boost`: prioritaskan untuk schema DB, routes, logs, docs Laravel ecosystem, dan tinker di project ini.
+	- `context7`: wajib untuk docs library/framework/SDK/API/CLI yang butuh syntax, konfigurasi, migration, upgrade notes, version-specific behavior, atau debugging berbasis package docs. Mulai dengan `mcp_context7_resolve-library-id`, lalu `mcp_context7_query-docs` dengan query spesifik.
+	- `depwire`: wajib untuk dependency graph, blast radius, impact analysis, health score, dead code, security scan, dan refactor aman lintas file atau symbol. Sebelum rename/move/delete/split/merge, jalankan `mcp_depwire_get_file_context(...)`, `mcp_depwire_impact_analysis(...)`, atau `mcp_depwire_simulate_change(...)` sesuai scope.
 
 ## 3. Sail
 
@@ -73,7 +76,12 @@ class ExportBranchRequest extends SimpleCrudExportRequest
 - FQCN tetap boleh dipakai di PHPDoc, generic annotations, dan `::class` metadata jika memang dibutuhkan.
 - Setelah generate atau refactor file PHP, verifikasi dengan `./vendor/bin/sail bin duster fix` agar issue TLint semacam ini tidak lolos.
 
-## 7. MCP Security & Token Efficiency
+## 7. MCP Routing, Security & Token Efficiency
+
+- **Routing (WAJIB)**:
+	- Gunakan `laravel-boost` untuk schema DB, routes, browser/app logs, dan docs Laravel ecosystem yang sesuai versi project ini.
+	- Gunakan `context7` untuk docs package umum/non-Laravel atau saat butuh referensi API, syntax, atau konfigurasi yang version-specific dan up-to-date.
+	- Gunakan `depwire` untuk pertanyaan structural codebase seperti "siapa memakai file/symbol ini?", "apa yang rusak jika diubah?", atau "bagaimana health dependency graph saat ini?".
 
 - **Security**:
 	- Jangan hardcode API key/token/secrets di file repo (termasuk `.vscode/mcp.json`).
@@ -82,6 +90,9 @@ class ExportBranchRequest extends SimpleCrudExportRequest
 - **Token Efficiency (WAJIB)**:
 	- Untuk schema DB, selalu mulai dari mode ringkas: `mcp_laravel-boost_database-schema(summary: true)` lalu filter table spesifik jika perlu.
 	- Untuk docs search, gunakan query spesifik dan batasi package saat memungkinkan (`packages: [...]`).
+	- Untuk Context7, resolve library ID sekali lalu query docs dengan kata kunci spesifik; hindari query generik dan jangan pakai lebih dari yang dibutuhkan.
+	- Untuk Depwire, mulai dari target lokal seperti `mcp_depwire_get_architecture_summary()`, `mcp_depwire_get_file_context(...)`, atau `mcp_depwire_impact_analysis(...)` sebelum scan yang lebih lebar.
+	- Untuk perubahan struktural, jalankan `mcp_depwire_simulate_change(...)` sebelum edit file; jangan mulai dari rename/move manual.
 	- Gunakan `token_limit` secukupnya; mulai dari kecil lalu naikkan hanya jika hasil terpotong.
 	- Jangan fetch log/error panjang tanpa kebutuhan; mulai dari jumlah entry kecil.
 	- Saat butuh banyak data baca-only, prioritaskan pencarian terarah dulu (search/list), baru baca konten detail yang relevan saja.
@@ -101,10 +112,13 @@ Untuk task refactor berbasis SonarQube dengan target menurunkan duplikasi dan me
 3. **Guard Konsistensi Style Antar Modul**
 	- Saat satu modul dalam family diubah, terapkan pola style/struktur yang sama ke sibling module setara pada wave yang sama.
 	- Pertahankan API contract (route, payload, response keys, query params) dan arsitektur API-only.
+	- Untuk wave yang mencakup rename/move/split/merge atau extraction lintas file, jalankan Depwire lebih dulu untuk file context, impact analysis, atau simulate change sebelum patch pertama.
+	- Jika pola refactor dipicu API package/framework, gunakan Context7 untuk memastikan abstraction mengikuti docs versi project/package terbaru.
 
 4. **Verifikasi dan Tracking**
 	- Jalankan test terfokus modul terdampak via Sail.
 	- Update `docs/refactor-sonar-progress.md` setiap wave: baseline/delta, ringkasan perubahan, evidence test, snapshot Sonar.
+	- Jika Depwire atau Context7 dipakai untuk keputusan wave, catat evidence ringkasnya di progress doc.
 
 5. **Penanganan Anomali Metrik**
 	- Jika `coverage`/metrik lain anomali (mis. `0.0`) namun test lokal lulus, catat sebagai anomali pipeline di progress doc dan lanjutkan verifikasi pada snapshot berikutnya.

@@ -220,16 +220,19 @@ Instruksi:
    - duplicated_lines_density
    - ncloc
    - coverage
-2. Ambil shortlist cluster duplikasi prioritas, lalu pilih 1 wave semi-besar terkontrol (4-8 file) dengan pola refactor yang sama.
-3. Refactor hanya internal (shared concern/trait/helper), tanpa ubah route, payload, response keys, query param.
-4. Terapkan pola style/struktur yang sama ke sibling module setara pada wave yang sama.
-5. Jalankan test terfokus modul terdampak via Sail.
-6. Update `docs/refactor-sonar-progress.md`:
+2. Sebelum refactor struktural, gunakan Depwire untuk file context, impact analysis, dan simulate change bila wave mencakup rename/move/split/merge.
+3. Jika pola duplikasi dipicu behavior package/framework, gunakan Context7 untuk memastikan abstraction mengikuti docs versi terbaru.
+4. Ambil shortlist cluster duplikasi prioritas, lalu pilih 1 wave semi-besar terkontrol (4-8 file) dengan pola refactor yang sama.
+5. Refactor hanya internal (shared concern/trait/helper), tanpa ubah route, payload, response keys, query param.
+6. Terapkan pola style/struktur yang sama ke sibling module setara pada wave yang sama.
+7. Jalankan test terfokus modul terdampak via Sail.
+8. Update `docs/refactor-sonar-progress.md`:
    - baseline/delta metrik
    - ringkasan perubahan wave
+   - evidence Depwire/Context7 bila dipakai
    - evidence test
    - snapshot Sonar terbaru
-7. Jika `coverage` Sonar anomali (contoh `0.0`) tapi test lokal lulus, catat sebagai anomali pipeline dan verifikasi ulang pada snapshot berikutnya.
+9. Jika `coverage` Sonar anomali (contoh `0.0`) tapi test lokal lulus, catat sebagai anomali pipeline dan verifikasi ulang pada snapshot berikutnya.
 ```
 
 ### 10. Lanjutan Wave Sonar (Setelah Push)
@@ -245,10 +248,11 @@ Konteks:
 
 Langkah:
 1. Tarik ulang quality gate + metrik inti Sonar MCP.
-2. Jika snapshot belum berubah, lanjut 1 wave refactor 4-8 file dengan pola yang sama dan risiko rendah.
-3. Jalankan test terfokus hanya untuk modul terdampak.
-4. Commit + push.
-5. Tarik ulang Sonar MCP dan update delta + log di `docs/refactor-sonar-progress.md`.
+2. Gunakan Depwire lagi jika wave berikutnya mengubah symbol atau struktur file yang berbeda dari wave sebelumnya.
+3. Jika snapshot belum berubah, lanjut 1 wave refactor 4-8 file dengan pola yang sama dan risiko rendah.
+4. Jalankan test terfokus hanya untuk modul terdampak.
+5. Commit + push.
+6. Tarik ulang Sonar MCP dan update delta + log di `docs/refactor-sonar-progress.md`.
 
 Output wajib:
 - Daftar file yang direfactor

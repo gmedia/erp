@@ -12,8 +12,7 @@ Baca modul existing yang sejenis sebagai referensi pattern sebelum refactoring.
 
 | Tool | Kapan Digunakan |
 |------|-----------------|
-| `mcp_laravel-boost_browser-logs` | Debug E2E frontend errors |
-| `mcp_laravel-boost_last-error` | Debug backend errors saat test |
+| `activate_laravel_logging_and_debugging_tools()` | Aktifkan tool browser log dan backend error saat test gagal |
 | `mcp_laravel-boost_database-schema` | Verify kolom export match database |
 | `mcp_laravel-boost_list-routes` | Verify API routes per modul |
 | `read_file` | Baca file referensi existing |
@@ -135,8 +134,8 @@ npx playwright test tests/e2e/{module}/ --reporter=line
 
 Jika gagal:
 ```
-mcp_laravel-boost_browser-logs(entries: 20)
-mcp_laravel-boost_last-error()
+activate_laravel_logging_and_debugging_tools()
+# lalu gunakan browser log dan last backend exception tool yang tersedia
 ```
 
 ---

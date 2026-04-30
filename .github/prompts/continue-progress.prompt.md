@@ -1,3 +1,4 @@
+---
 description: "Use when: melanjutkan sesi lintas laptop atau shift dari task.md, checkpoint aktif, dan next action terbaru"
 ---
 
@@ -16,6 +17,7 @@ Gunakan prompt ini untuk melanjutkan sesi lintas laptop atau shift pada Remote S
 4. Baca `task.changelog.md` hanya jika butuh riwayat perubahan produk/fitur yang relevan.
 5. `.github/copilot-instructions.md`
 6. Jika ada local workspace override, baca `.kilo/rules/erp-agent-rules.md`
+7. Jika objective aktif menyentuh package/framework docs atau refactor struktural, prioritaskan Context7 atau Depwire sesuai routing terbaru di `.github/copilot-instructions.md`
 
 ## 2. Verifikasi Baseline Sesi
 
@@ -32,6 +34,7 @@ git status --short
 - Ringkas status aktif dalam 5-10 poin dari `task.md`.
 - Abaikan checkpoint historis dari `task.handoff-archive.md` kecuali benar-benar masih relevan dengan objective aktif.
 - Tentukan 1 objective aktif, 1 blocker utama, dan 1 next action terukur.
+- Tentukan juga MCP utama yang relevan untuk objective aktif: `laravel-boost`, `context7`, atau `depwire`.
 
 ## 4. Kerjakan Wave Kecil
 

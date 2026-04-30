@@ -13,37 +13,39 @@ Analisa request user:
 
 ## 2. Baca Skill yang Sesuai
 
-```
-// turbo
-```
 Backend:
-```bash
-cat .github/skills/refactor-backend/SKILL.md
+```text
+read_file(filePath: "/absolute/path/to/project/.github/skills/refactor-backend/SKILL.md", startLine: 1, endLine: 250)
 ```
 
 Frontend:
-```bash
-cat .github/skills/refactor-frontend/SKILL.md
+```text
+read_file(filePath: "/absolute/path/to/project/.github/skills/refactor-frontend/SKILL.md", startLine: 1, endLine: 250)
 ```
 
-## 3. Check Architecture (Backend)
+## 3. Map Blast Radius dan Dependency
 
-```
-// turbo
-```
+Sebelum edit:
+- Untuk file target, ambil konteks dengan `mcp_depwire_get_file_context(filePath: "app/Services/ExampleService.php")`
+- Untuk symbol yang mungkin diubah, jalankan `mcp_depwire_impact_analysis(symbol: "ExampleService", file: "app/Services/ExampleService.php")`
+- Jika akan rename/move/delete/split/merge file, jalankan `mcp_depwire_simulate_change(...)` lebih dulu
+- Jika refactor dipicu perubahan package/framework/API, resolve docs via Context7 sebelum edit
+
+## 4. Check Architecture (Backend)
+
 ```bash
 bash .github/skills/refactor-backend/scripts/check-architecture.sh {ModuleName}
 ```
 
-## 4. Identifikasi Issues
+## 5. Identifikasi Issues
 
-Dari output check-architecture atau review manual:
+Dari output Depwire, check-architecture, atau review manual:
 - [ ] Controller terlalu gemuk?
 - [ ] Validasi tidak di FormRequest?
 - [ ] Response tidak pakai Resource?
 - [ ] Business logic di Controller?
 
-## 5. Refactor Step by Step
+## 6. Refactor Step by Step
 
 ### PENTING: Jangan ubah sekaligus!
 
@@ -55,21 +57,15 @@ Catatan penting:
 - Jika menemukan wrapper request/resource kosong yang hanya mewarisi behavior dari base class, pertahankan body multiline dan tambahkan komentar intent seperti `// Intentionally empty. Behavior is inherited from the base class.` sebelum menjalankan formatter.
 - Untuk executable PHP code, pindahkan dependency ke import di bagian atas file. Hindari FQCN seperti `\App\...`, `\Illuminate\...`, `\Laravel\...`, atau `\Carbon\...` di body code kecuali untuk PHPDoc atau `::class` metadata.
 
-## 6. Verifikasi Setiap Step
+## 7. Verifikasi Setiap Step
 
-```
-// turbo
-```
 ```bash
 ./vendor/bin/sail test --filter={Module}
 ```
 
-## 7. Final Check
+## 8. Final Check
 
 Backend:
-```
-// turbo
-```
 ```bash
 ./vendor/bin/sail bin duster fix
 ```
@@ -83,7 +79,7 @@ E2E:
 ./vendor/bin/sail npm run test:e2e -- --grep={module}
 ```
 
-## 8. Dokumentasi
+## 9. Dokumentasi
 
 Buat ringkasan perubahan:
 - Layer yang di-refactor
