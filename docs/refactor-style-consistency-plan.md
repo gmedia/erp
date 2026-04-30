@@ -1142,8 +1142,18 @@ Oleh karena itu, **shared E2E/Pest test helpers tidak perlu diubah** — semua t
 | 4 | Unify request patterns (trait vs abstract class) across Warehouse vs Customer/Supplier | Structural backend | High | Backlog |
 | 5 | Unify resource base classes (SimpleCrud* vs raw JsonResource + trait) | Structural backend | Medium | Backlog |
 | 6 | Decide on DTO usage (Customer/AssetModel/Pipeline use DTOs, others don't) | Architectural | High | Backlog |
-| 7 | Extend `createSimpleEntityConfig` for borderline-simple modules (product-categories, units, asset-categories) | Structural frontend | Medium | Backlog |
+| 7 | ~~Extend `createSimpleEntityConfig` for borderline-simple modules~~ | Structural frontend | Medium | ❌ Rejected — cost of new abstraction outweighs benefit (see rationale below) |
 | 8 | Standardize GoodsReceipt controller to use `LoadsResourceRelations` trait | Structural backend | Low | Backlog |
+
+#### Rationale: Backlog #7 Rejected
+
+Analisis pada 2026-04-30 menunjukkan bahwa membuat `createExtendedSimpleEntityConfig` tidak cost-effective:
+
+- `product-categories` (1 extra field: description textarea) dan `units` (1 extra field: symbol input) masing-masing hanya punya 3 small files (30-93 lines) yang sudah bekerja.
+- `asset-categories` punya 3 fields (code, name, useful_life_months_default) dengan number type — terlalu complex untuk "extended simple".
+- Membuat abstraction baru memerlukan: extend `createSimpleEntityConfig` options, extend `SimpleEntityForm` untuk accept children/extra fields, extend `SimpleEntityViewModal` untuk extra view fields, extend `createSimpleEntityColumns` untuk extra columns.
+- Benefit: hapus ~6 small files. Cost: 1 new abstraction layer yang menambah cognitive load untuk 5 existing simple consumers.
+- Keputusan: biarkan sebagai `createComplexEntityConfig` — pattern ini sudah benar dan working.
 
 ## Urutan Eksekusi yang Direkomendasikan
 
