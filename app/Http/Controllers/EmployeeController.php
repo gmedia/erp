@@ -53,6 +53,8 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee): JsonResponse
     {
+        $employee->load(['department', 'position', 'branch']);
+
         return (new EmployeeResource($employee))->response();
     }
 

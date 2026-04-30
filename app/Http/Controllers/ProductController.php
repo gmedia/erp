@@ -46,6 +46,8 @@ class ProductController extends Controller
      */
     public function show(Product $product): JsonResponse
     {
+        $product->load(['category', 'unit', 'branch']);
+
         return (new ProductResource($product))->response();
     }
 
