@@ -1143,7 +1143,7 @@ Oleh karena itu, **shared E2E/Pest test helpers tidak perlu diubah** — semua t
 | 5 | Unify resource base classes (SimpleCrud* vs raw JsonResource + trait) | Structural backend | Medium | Backlog |
 | 6 | Decide on DTO usage (Customer/AssetModel/Pipeline use DTOs, others don't) | Architectural | High | Backlog |
 | 7 | ~~Extend `createSimpleEntityConfig` for borderline-simple modules~~ | Structural frontend | Medium | ❌ Rejected — cost of new abstraction outweighs benefit (see rationale below) |
-| 8 | Standardize GoodsReceipt controller to use `LoadsResourceRelations` trait | Structural backend | Low | Backlog |
+| 8 | ~~Standardize GoodsReceipt controller to use `LoadsResourceRelations` trait~~ | Structural backend | Low | ✅ Done |
 
 #### Rationale: Backlog #7 Rejected
 
