@@ -1,16 +1,15 @@
 'use client';
 
+import { memo } from 'react';
+
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
+import { useEntityForm } from '@/hooks/useEntityForm';
 import { AssetCategory } from '@/types/asset-category';
 import {
     AssetCategoryFormData,
     assetCategoryFormSchema,
 } from '@/utils/schemas';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useEffect } from 'react';
-import { useForm, type UseFormReturn } from 'react-hook-form';
-import { z } from 'zod';
 
 interface AssetCategoryFormProps {
     open: boolean;
@@ -20,6 +19,12 @@ interface AssetCategoryFormProps {
     isLoading?: boolean;
 }
 
+const getDefaults = (entity?: AssetCategory | null): AssetCategoryFormData => ({
+    code: entity?.code || '',
+    name: entity?.name || '',
+    useful_life_months_default: entity?.useful_life_months_default || 0,
+});
+
 export const AssetCategoryForm = memo<AssetCategoryFormProps>(
     function AssetCategoryForm({
         open,
@@ -28,43 +33,15 @@ export const AssetCategoryForm = memo<AssetCategoryFormProps>(
         onSubmit,
         isLoading = false,
     }) {
-        type AssetCategoryFormInput = z.input<typeof assetCategoryFormSchema>;
-
-        const form = useForm<AssetCategoryFormInput>({
-            resolver: zodResolver(assetCategoryFormSchema),
-            defaultValues: {
-                code: '',
-                name: '',
-                useful_life_months_default: 0,
-            },
+        const form = useEntityForm<AssetCategoryFormData, AssetCategory>({
+            schema: assetCategoryFormSchema,
+            getDefaults,
+            entity,
         });
-
-        useEffect(() => {
-            if (entity) {
-                form.reset({
-                    code: entity.code,
-                    name: entity.name,
-                    useful_life_months_default:
-                        entity.useful_life_months_default,
-                });
-            } else {
-                form.reset({
-                    code: '',
-                    name: '',
-                    useful_life_months_default: 0,
-                });
-            }
-        }, [entity, form]);
 
         return (
             <EntityForm<AssetCategoryFormData>
-                form={
-                    form as unknown as UseFormReturn<
-                        AssetCategoryFormData,
-                        unknown,
-                        AssetCategoryFormData
-                    >
-                }
+                form={form}
                 open={open}
                 onOpenChange={onOpenChange}
                 title={

@@ -1,14 +1,13 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
-import { useForm, type UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import * as z from 'zod';
 
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
+import { useEntityForm } from '@/hooks/useEntityForm';
 import { type FiscalYear } from '@/types/entity';
 import { fiscalYearFormSchema, type FiscalYearFormData } from '@/utils/schemas';
 import { format } from 'date-fns';
@@ -16,58 +15,41 @@ import { format } from 'date-fns';
 interface FiscalYearFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    fiscalYear?: FiscalYear | null;
     entity?: FiscalYear | null;
     onSubmit: (data: FiscalYearFormData) => void;
     isLoading?: boolean;
 }
 
+type FiscalYearFormInput = z.input<typeof fiscalYearFormSchema>;
+
+const getDefaults = (entity?: FiscalYear | null): FiscalYearFormInput => ({
+    name: entity?.name || '',
+    start_date: entity?.start_date
+        ? new Date(entity.start_date)
+        : (undefined as unknown as Date),
+    end_date: entity?.end_date
+        ? new Date(entity.end_date)
+        : (undefined as unknown as Date),
+    status: entity?.status || 'open',
+});
+
 export function FiscalYearForm({
     open,
     onOpenChange,
-    fiscalYear,
     entity,
     onSubmit,
     isLoading = false,
 }: Readonly<FiscalYearFormProps>) {
-    const activeEntity = fiscalYear || entity;
-
-    const form = useForm<z.input<typeof fiscalYearFormSchema>>({
-        resolver: zodResolver(fiscalYearFormSchema),
-        defaultValues: {
-            name: activeEntity?.name || '',
-            start_date: activeEntity?.start_date
-                ? new Date(activeEntity.start_date)
-                : (undefined as unknown as Date),
-            end_date: activeEntity?.end_date
-                ? new Date(activeEntity.end_date)
-                : (undefined as unknown as Date),
-            status: activeEntity?.status || 'open',
-        },
+    const form = useEntityForm<FiscalYearFormInput, FiscalYear>({
+        schema: fiscalYearFormSchema,
+        getDefaults,
+        entity,
     });
 
-    useEffect(() => {
-        if (open) {
-            form.reset({
-                name: activeEntity?.name || '',
-                start_date: activeEntity?.start_date
-                    ? new Date(activeEntity.start_date)
-                    : (undefined as unknown as Date),
-                end_date: activeEntity?.end_date
-                    ? new Date(activeEntity.end_date)
-                    : (undefined as unknown as Date),
-                status: activeEntity?.status || 'open',
-            });
-        }
-    }, [form, activeEntity, open]);
-
-    const handleFormSubmit = (data: z.input<typeof fiscalYearFormSchema>) => {
+    const handleFormSubmit = (data: FiscalYearFormInput) => {
         const payload = {
             ...data,
-            start_date: format(
-                data.start_date,
-                'yyyy-MM-dd',
-            ) as unknown as Date,
+            start_date: format(data.start_date, 'yyyy-MM-dd') as unknown as Date,
             end_date: format(data.end_date, 'yyyy-MM-dd') as unknown as Date,
         } as FiscalYearFormData;
         onSubmit(payload);
@@ -84,7 +66,7 @@ export function FiscalYearForm({
             }
             open={open}
             onOpenChange={onOpenChange}
-            title={activeEntity ? 'Edit Fiscal Year' : 'Add New Fiscal Year'}
+            title={entity ? 'Edit Fiscal Year' : 'Add New Fiscal Year'}
             onSubmit={handleFormSubmit}
             isLoading={isLoading}
         >
