@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\JournalEntry;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -9,11 +10,12 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class JournalEntryExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
-    protected $filters;
+    use InteractsWithExportFilters;
+
+    protected array $filters;
 
     public function __construct(array $filters = [])
     {
@@ -22,7 +24,7 @@ class JournalEntryExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
 
     public function query(): Builder
     {
-        $query = JournalEntry::query()->with(['fiscalYear', 'createdBy']);
+        $query = JournalEntry::query()->with(['fiscalYear', 'createdBy', 'lines']);
 
         if (! empty($this->filters['search'])) {
             $search = $this->filters['search'];
@@ -52,40 +54,30 @@ class JournalEntryExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'Entry Number',
-            'Date',
-            'Reference',
-            'Description',
-            'Total Amount',
-            'Fiscal Year',
-            'Status',
-            'Created By',
-            'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($journalEntry): array
     {
-        return [
-            $journalEntry->id,
-            $journalEntry->entry_number,
-            $journalEntry->entry_date->format('Y-m-d'),
-            $journalEntry->reference,
-            $journalEntry->description,
-            (float) $journalEntry->lines->sum('debit'),
-            $journalEntry->fiscalYear->name ?? '',
-            $journalEntry->status,
-            $journalEntry->createdBy->name ?? '',
-            $journalEntry->created_at->toIso8601String(),
-        ];
+        return $this->mapExportRow($journalEntry, $this->columns());
     }
 
-    public function styles(Worksheet $sheet)
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
     {
         return [
-            1 => ['font' => ['bold' => true]],
+            'ID' => fn (JournalEntry $je): mixed => $je->id,
+            'Entry Number' => fn (JournalEntry $je): mixed => $je->entry_number,
+            'Date' => fn (JournalEntry $je): mixed => $this->formatDateValue($je->entry_date, 'Y-m-d'),
+            'Reference' => fn (JournalEntry $je): mixed => $je->reference,
+            'Description' => fn (JournalEntry $je): mixed => $je->description,
+            'Total Amount' => fn (JournalEntry $je): mixed => (float) $je->lines->sum('debit'),
+            'Fiscal Year' => fn (JournalEntry $je): mixed => $this->relatedAttribute($je, 'fiscalYear', 'name'),
+            'Status' => fn (JournalEntry $je): mixed => $je->status,
+            'Created By' => fn (JournalEntry $je): mixed => $this->relatedAttribute($je, 'createdBy', 'name'),
+            'Created At' => fn (JournalEntry $je): mixed => $this->formatIso8601($je->created_at),
         ];
     }
 }

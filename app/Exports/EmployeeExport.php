@@ -53,18 +53,10 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         }
 
         $this->applySorting($query, $this->filters, [
-            'name',
-            'email',
-            'phone',
-            'employee_id',
-            'department_id',
-            'position_id',
-            'branch_id',
-            'salary',
-            'employment_status',
-            'hire_date',
-            'created_at',
-            'updated_at',
+            'name', 'email', 'phone', 'employee_id',
+            'department_id', 'position_id', 'branch_id',
+            'salary', 'employment_status', 'hire_date',
+            'created_at', 'updated_at',
         ]);
 
         return $query;
@@ -72,37 +64,32 @@ class EmployeeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'NIK',
-            'Name',
-            'Email',
-            'Phone',
-            'Department',
-            'Position',
-            'Branch',
-            'Salary',
-            'Status',
-            'Hire Date',
-            'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($employee): array
     {
+        return $this->mapExportRow($employee, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $employee->id,
-            $employee->employee_id,
-            $employee->name,
-            $employee->email,
-            $employee->phone,
-            $employee->department?->name,
-            $employee->position?->name,
-            $employee->branch?->name,
-            $employee->salary,
-            $employee->employment_status,
-            $employee->hire_date->format('Y-m-d'),
-            $employee->created_at?->toIso8601String(),
+            'ID' => fn (Employee $e): mixed => $e->id,
+            'NIK' => fn (Employee $e): mixed => $e->employee_id,
+            'Name' => fn (Employee $e): mixed => $e->name,
+            'Email' => fn (Employee $e): mixed => $e->email,
+            'Phone' => fn (Employee $e): mixed => $e->phone,
+            'Department' => fn (Employee $e): mixed => $this->relatedAttribute($e, 'department', 'name'),
+            'Position' => fn (Employee $e): mixed => $this->relatedAttribute($e, 'position', 'name'),
+            'Branch' => fn (Employee $e): mixed => $this->relatedAttribute($e, 'branch', 'name'),
+            'Salary' => fn (Employee $e): mixed => $e->salary,
+            'Status' => fn (Employee $e): mixed => $e->employment_status,
+            'Hire Date' => fn (Employee $e): mixed => $this->formatDateValue($e->hire_date, 'Y-m-d'),
+            'Created At' => fn (Employee $e): mixed => $this->formatIso8601($e->created_at),
         ];
     }
 }

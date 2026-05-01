@@ -16,7 +16,7 @@ class AssetMovementExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
 {
     use InteractsWithExportFilters;
 
-    protected $filters;
+    protected array $filters;
 
     public function __construct(array $filters = [])
     {
@@ -51,36 +51,37 @@ class AssetMovementExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
 
     public function headings(): array
     {
-        return [
-            'ID', 'Asset Code', 'Asset Name', 'Type', 'Date',
-            'Origin Branch', 'Destination Branch',
-            'Origin Location', 'Destination Location',
-            'Origin Department', 'Destination Department',
-            'Origin Employee', 'Destination Employee',
-            'Reference', 'Notes', 'Recorded By', 'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($movement): array
     {
+        return $this->mapExportRow($movement, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $movement->id,
-            $movement->asset?->asset_code,
-            $movement->asset?->name,
-            $movement->movement_type,
-            $movement->moved_at?->format('Y-m-d H:i:s'),
-            $movement->fromBranch?->name,
-            $movement->toBranch?->name,
-            $movement->fromLocation?->name,
-            $movement->toLocation?->name,
-            $movement->fromDepartment?->name,
-            $movement->toDepartment?->name,
-            $movement->fromEmployee?->name,
-            $movement->toEmployee?->name,
-            $movement->reference,
-            $movement->notes,
-            $movement->createdBy?->name,
-            $movement->created_at?->toIso8601String(),
+            'ID' => fn (AssetMovement $m): mixed => $m->id,
+            'Asset Code' => fn (AssetMovement $m): mixed => $m->asset->asset_code,
+            'Asset Name' => fn (AssetMovement $m): mixed => $m->asset->name,
+            'Type' => fn (AssetMovement $m): mixed => $m->movement_type,
+            'Date' => fn (AssetMovement $m): mixed => $this->formatDateValue($m->moved_at, 'Y-m-d H:i:s'),
+            'Origin Branch' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'fromBranch', 'name'),
+            'Destination Branch' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'toBranch', 'name'),
+            'Origin Location' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'fromLocation', 'name'),
+            'Destination Location' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'toLocation', 'name'),
+            'Origin Department' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'fromDepartment', 'name'),
+            'Destination Department' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'toDepartment', 'name'),
+            'Origin Employee' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'fromEmployee', 'name'),
+            'Destination Employee' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'toEmployee', 'name'),
+            'Reference' => fn (AssetMovement $m): mixed => $m->reference,
+            'Notes' => fn (AssetMovement $m): mixed => $m->notes,
+            'Recorded By' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'createdBy', 'name'),
+            'Created At' => fn (AssetMovement $m): mixed => $this->formatIso8601($m->created_at),
         ];
     }
 }
