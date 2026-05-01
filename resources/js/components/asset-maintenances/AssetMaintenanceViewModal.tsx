@@ -1,4 +1,10 @@
+'use client';
+
+import { memo } from 'react';
+
+import { ViewField } from '@/components/common/ViewField';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
+import { useTranslation } from '@/contexts/i18n-context';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
@@ -9,102 +15,74 @@ interface AssetMaintenanceViewModalProps {
     item: AssetMaintenance | null;
 }
 
-export function AssetMaintenanceViewModal({
-    open,
-    onClose,
-    item,
-}: Readonly<AssetMaintenanceViewModalProps>) {
-    if (!item) return null;
+export const AssetMaintenanceViewModal = memo<AssetMaintenanceViewModalProps>(
+    function AssetMaintenanceViewModal({ open, onClose, item }) {
+        const { t } = useTranslation();
+        if (!item) return null;
 
-    return (
-        <ViewModalShell
-            open={open}
-            onClose={onClose}
-            title="Maintenance Details"
-            description="View complete maintenance information for the selected asset."
-            contentClassName="sm:max-w-[600px]"
-        >
-            <div className="space-y-4 py-2">
-                <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
-                    <div>
-                        <span className="block text-xs text-muted-foreground">
-                            Asset
-                        </span>
-                        <span className="font-medium">
-                            {item.asset?.name || '-'} (
-                            {item.asset?.asset_code || '-'})
-                        </span>
-                    </div>
-                    <div>
-                        <span className="block text-xs text-muted-foreground">
-                            Type
-                        </span>
-                        <span className="capitalize">
-                            {item.maintenance_type}
-                        </span>
-                    </div>
-                    <div>
-                        <span className="block text-xs text-muted-foreground">
-                            Status
-                        </span>
-                        <span className="capitalize">{item.status}</span>
-                    </div>
-                    <div>
-                        <span className="block text-xs text-muted-foreground">
-                            Supplier
-                        </span>
-                        <span>{item.supplier || '-'}</span>
-                    </div>
-                    <div>
-                        <span className="block text-xs text-muted-foreground">
-                            Scheduled At
-                        </span>
-                        <span>
-                            {formatDateByRegionalSettings(item.scheduled_at)}
-                        </span>
-                    </div>
-                    <div>
-                        <span className="block text-xs text-muted-foreground">
-                            Performed At
-                        </span>
-                        <span>
-                            {formatDateByRegionalSettings(item.performed_at)}
-                        </span>
-                    </div>
-                    <div>
-                        <span className="block text-xs text-muted-foreground">
-                            Cost
-                        </span>
-                        <span>
-                            {formatCurrencyByRegionalSettings(
-                                Number(item.cost || 0),
-                                {
-                                    locale: 'id-ID',
-                                    currency: 'IDR',
-                                    minimumFractionDigits: 0,
-                                },
-                            )}
-                        </span>
-                    </div>
-                    <div>
-                        <span className="block text-xs text-muted-foreground">
-                            Recorded By
-                        </span>
-                        <span>{item.created_by || '-'}</span>
-                    </div>
+        return (
+            <ViewModalShell
+                open={open}
+                onClose={onClose}
+                title="View Asset Maintenance"
+                description={t('common.view_details')}
+                contentClassName="sm:max-w-[600px]"
+            >
+                <div className="space-y-4 py-4">
+                    <ViewField
+                        label="Asset"
+                        value={`${item.asset?.name || '-'} (${item.asset?.asset_code || '-'})`}
+                    />
+                    <ViewField
+                        label="Type"
+                        value={
+                            <span className="capitalize">
+                                {item.maintenance_type}
+                            </span>
+                        }
+                    />
+                    <ViewField
+                        label="Status"
+                        value={
+                            <span className="capitalize">{item.status}</span>
+                        }
+                    />
+                    <ViewField
+                        label="Supplier"
+                        value={item.supplier || '-'}
+                    />
+                    <ViewField
+                        label="Scheduled At"
+                        value={formatDateByRegionalSettings(item.scheduled_at)}
+                    />
+                    <ViewField
+                        label="Performed At"
+                        value={formatDateByRegionalSettings(item.performed_at)}
+                    />
+                    <ViewField
+                        label="Cost"
+                        value={formatCurrencyByRegionalSettings(
+                            Number(item.cost || 0),
+                            {
+                                locale: 'id-ID',
+                                currency: 'IDR',
+                                minimumFractionDigits: 0,
+                            },
+                        )}
+                    />
+                    <ViewField
+                        label="Recorded By"
+                        value={item.created_by || '-'}
+                    />
+                    {item.notes && (
+                        <ViewField
+                            label="Notes"
+                            value={item.notes}
+                            className="whitespace-pre-wrap"
+                        />
+                    )}
                 </div>
-
-                {item.notes && (
-                    <div>
-                        <span className="mb-1 block text-xs text-muted-foreground">
-                            Notes
-                        </span>
-                        <p className="rounded border bg-muted/30 p-2 text-sm">
-                            {item.notes}
-                        </p>
-                    </div>
-                )}
-            </div>
-        </ViewModalShell>
-    );
-}
+            </ViewModalShell>
+        );
+    },
+);
