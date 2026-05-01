@@ -22,8 +22,8 @@ import {
 interface AssetMovementFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    item?: AssetMovement | null; // For editing
-    asset?: Asset | null; // For creating from profile
+    entity?: AssetMovement | null; // For editing (passed by EntityCrudPage)
+    asset?: Asset | null; // For creating from asset profile page
     onSubmit: (data: AssetMovementFormData) => void;
     isLoading?: boolean;
 }
@@ -89,14 +89,14 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
     function AssetMovementForm({
         open,
         onOpenChange,
-        item,
+        entity,
         asset,
         onSubmit,
         isLoading = false,
     }) {
         const defaultValues = useMemo(
-            () => getAssetMovementFormDefaults(item, asset),
-            [item, asset],
+            () => getAssetMovementFormDefaults(entity, asset),
+            [entity, asset],
         );
 
         const form = useForm<z.input<typeof assetMovementFormSchema>>({
@@ -123,7 +123,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
             });
         };
 
-        const isEdit = !!item;
+        const isEdit = !!entity;
         let formTitle = 'Record Asset Movement';
 
         if (isEdit) {

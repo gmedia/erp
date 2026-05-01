@@ -21,9 +21,7 @@ import { ApprovalFlowStepManager } from './ApprovalFlowStepManager';
 interface ApprovalFlowFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    item?: ApprovalFlow | null;
+    entity?: ApprovalFlow | null;
     onSubmit: (data: ApprovalFlowFormData) => void;
     isLoading?: boolean;
 }
@@ -87,11 +85,11 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
     function ApprovalFlowForm({
         open,
         onOpenChange,
-        item,
+        entity,
         onSubmit,
         isLoading = false,
     }) {
-        const defaultValues = useMemo(() => getFormDefaults(item), [item]);
+        const defaultValues = useMemo(() => getFormDefaults(entity), [entity]);
 
         const form = useForm<
             ApprovalFlowFormInput,
@@ -134,7 +132,7 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
                 form={form}
                 open={open}
                 onOpenChange={onOpenChange}
-                title={item ? 'Edit Approval Flow' : 'Add New Approval Flow'}
+                title={entity ? 'Edit Approval Flow' : 'Add New Approval Flow'}
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
                 className="max-w-4xl"
