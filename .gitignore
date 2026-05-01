@@ -51,3 +51,4 @@ coverage-new.xml
 
 # SonarQube artifacts
 sonar-project.properties
+opencode.json
