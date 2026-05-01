@@ -21,7 +21,7 @@ import { PipelineTransitionManager } from './PipelineTransitionManager';
 interface PipelineFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    pipeline?: Pipeline | null;
+    entity?: Pipeline | null;
     onSubmit: (data: PipelineFormData) => void;
     isLoading?: boolean;
 }
@@ -106,13 +106,13 @@ const getPipelineFormDefaults = (
 export const PipelineForm = memo<PipelineFormProps>(function PipelineForm({
     open,
     onOpenChange,
-    pipeline,
+    entity,
     onSubmit,
     isLoading = false,
 }) {
     const defaultValues = useMemo(
-        () => getPipelineFormDefaults(pipeline),
-        [pipeline],
+        () => getPipelineFormDefaults(entity),
+        [entity],
     );
 
     const form = useForm<z.input<typeof pipelineFormSchema>>({
@@ -144,11 +144,11 @@ export const PipelineForm = memo<PipelineFormProps>(function PipelineForm({
             }
             open={open}
             onOpenChange={onOpenChange}
-            title={pipeline ? 'Edit Pipeline' : 'Add New Pipeline'}
+            title={entity ? 'Edit Pipeline' : 'Add New Pipeline'}
             onSubmit={handleSubmit}
             isLoading={isLoading}
         >
-            {pipeline ? (
+            {entity ? (
                 <Tabs defaultValue="details">
                     <TabsList className="mb-4">
                         <TabsTrigger value="details">Details</TabsTrigger>
@@ -164,11 +164,11 @@ export const PipelineForm = memo<PipelineFormProps>(function PipelineForm({
                     </TabsContent>
 
                     <TabsContent value="states" className="space-y-4">
-                        <PipelineStateManager pipelineId={pipeline.id} />
+                        <PipelineStateManager pipelineId={entity.id} />
                     </TabsContent>
 
                     <TabsContent value="transitions" className="space-y-4">
-                        <PipelineTransitionManager pipelineId={pipeline.id} />
+                        <PipelineTransitionManager pipelineId={entity.id} />
                     </TabsContent>
                 </Tabs>
             ) : (

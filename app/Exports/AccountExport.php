@@ -4,10 +4,11 @@ namespace App\Exports;
 
 use App\Models\Account;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class AccountExport implements FromCollection, WithHeadings, WithMapping
+class AccountExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
 {
     protected $filters;
 

@@ -19,7 +19,7 @@ import { AssetFormData, assetFormSchema } from '@/utils/schemas';
 interface AssetFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    asset?: Asset | null;
+    entity?: Asset | null;
     onSubmit: (data: AssetFormData) => void;
     isLoading?: boolean;
 }
@@ -152,11 +152,11 @@ const getAssetFormDefaults = (asset?: Asset | null): AssetFormData => {
 export const AssetForm = memo<AssetFormProps>(function AssetForm({
     open,
     onOpenChange,
-    asset,
+    entity,
     onSubmit,
     isLoading = false,
 }) {
-    const defaultValues = useMemo(() => getAssetFormDefaults(asset), [asset]);
+    const defaultValues = useMemo(() => getAssetFormDefaults(entity), [entity]);
 
     type AssetFormInput = z.input<typeof assetFormSchema>;
 
@@ -178,9 +178,9 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
         if (prevCategoryIdRef.current !== categoryId) {
             // Only reset if it's not the initial load from props
             const isInitialPropMatch =
-                asset &&
-                (String(asset.asset_category_id) === String(categoryId) ||
-                    String(asset.category?.id) === String(categoryId));
+                entity &&
+                (String(entity.asset_category_id) === String(categoryId) ||
+                    String(entity.category?.id) === String(categoryId));
 
             if (!isInitialPropMatch) {
                 const currentModelId = form.getValues('asset_model_id');
@@ -190,7 +190,7 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
             }
         }
         prevCategoryIdRef.current = categoryId;
-    }, [categoryId, asset, form]);
+    }, [categoryId, entity, form]);
 
     // Reset location when branch changes, but NOT on initial load
     const prevBranchIdRef = useRef(branchId);
@@ -198,9 +198,9 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
         if (prevBranchIdRef.current !== branchId) {
             // Only reset if it's not the initial load from props
             const isInitialPropMatch =
-                asset &&
-                (String(asset.branch_id) === String(branchId) ||
-                    String(asset.branch?.id) === String(branchId));
+                entity &&
+                (String(entity.branch_id) === String(branchId) ||
+                    String(entity.branch?.id) === String(branchId));
 
             if (!isInitialPropMatch) {
                 const currentLocationId = form.getValues('asset_location_id');
@@ -210,7 +210,7 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
             }
         }
         prevBranchIdRef.current = branchId;
-    }, [branchId, asset, form]);
+    }, [branchId, entity, form]);
 
     const handleFormSubmit = (data: AssetFormData) => {
         onSubmit({
@@ -245,7 +245,7 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
             }
             open={open}
             onOpenChange={onOpenChange}
-            title={asset ? 'Edit Asset' : 'Add New Asset'}
+            title={entity ? 'Edit Asset' : 'Add New Asset'}
             onSubmit={handleFormSubmit}
             isLoading={isLoading}
             className="sm:max-w-[700px]"
@@ -271,7 +271,7 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
                             label="Category"
                             url="/api/asset-categories"
                             placeholder="Select a category"
-                            initialLabel={asset?.category?.name}
+                            initialLabel={entity?.category?.name}
                         />
                         <AsyncSelectField
                             name="asset_model_id"
@@ -284,7 +284,7 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
                             placeholder="Select a model"
                             key={`model-select-${categoryId}`} // More stable key
                             initialLabel={
-                                asset?.model?.name || asset?.model?.model_name
+                                entity?.model?.name || entity?.model?.model_name
                             }
                             labelFn={getAssetModelOptionLabel}
                         />
@@ -311,7 +311,7 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
                             label="Branch"
                             url="/api/branches"
                             placeholder="Select a branch"
-                            initialLabel={asset?.branch?.name}
+                            initialLabel={entity?.branch?.name}
                         />
                         <AsyncSelectField
                             name="asset_location_id"
@@ -323,28 +323,28 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
                             }
                             placeholder="Select a location"
                             key={`location-select-${branchId}`}
-                            initialLabel={asset?.location?.name}
+                            initialLabel={entity?.location?.name}
                         />
                         <AsyncSelectField
                             name="department_id"
                             label="Department"
                             url="/api/departments"
                             placeholder="Select a department"
-                            initialLabel={asset?.department?.name}
+                            initialLabel={entity?.department?.name}
                         />
                         <AsyncSelectField
                             name="employee_id"
                             label="Employee"
                             url="/api/employees"
                             placeholder="Select an employee"
-                            initialLabel={asset?.employee?.name}
+                            initialLabel={entity?.employee?.name}
                         />
                         <AsyncSelectField
                             name="supplier_id"
                             label="Supplier"
                             url="/api/suppliers"
                             placeholder="Select a supplier"
-                            initialLabel={asset?.supplier?.name}
+                            initialLabel={entity?.supplier?.name}
                         />
                     </div>
                 </div>

@@ -21,7 +21,7 @@ import {
 interface AssetMaintenanceFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    item?: AssetMaintenance | null;
+    entity?: AssetMaintenance | null;
     onSubmit: (data: AssetMaintenanceFormData) => void;
     isLoading?: boolean;
 }
@@ -60,13 +60,13 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
     function AssetMaintenanceForm({
         open,
         onOpenChange,
-        item,
+        entity,
         onSubmit,
         isLoading = false,
     }) {
         const defaultValues = useMemo(
-            () => getAssetMaintenanceFormDefaults(item),
-            [item],
+            () => getAssetMaintenanceFormDefaults(entity),
+            [entity],
         );
 
         type AssetMaintenanceFormInput = z.input<
@@ -108,8 +108,8 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
             });
         };
 
-        const initialAssetLabel = item?.asset
-            ? `${item.asset.asset_code || ''} ${item.asset.name || ''}`.trim()
+        const initialAssetLabel = entity?.asset
+            ? `${entity.asset.asset_code || ''} ${entity.asset.name || ''}`.trim()
             : undefined;
 
         return (
@@ -124,11 +124,11 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
                 open={open}
                 onOpenChange={onOpenChange}
                 title={
-                    item
+                    entity
                         ? 'Edit Asset Maintenance'
                         : 'Add New Asset Maintenance'
                 }
-                submitLabel={item ? 'Update Maintenance' : 'Save Maintenance'}
+                submitLabel={entity ? 'Update Maintenance' : 'Save Maintenance'}
                 onSubmit={handleFormSubmit}
                 isLoading={isLoading}
                 className="sm:max-w-[650px]"
@@ -186,7 +186,7 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
                             label="Supplier"
                             url="/api/suppliers"
                             placeholder="Select supplier"
-                            initialLabel={item?.supplier || undefined}
+                            initialLabel={entity?.supplier || undefined}
                         />
                         <InputField
                             name="cost"

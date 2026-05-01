@@ -4,10 +4,11 @@ namespace App\Exports\ApprovalDelegations;
 
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class ApprovalDelegationExport implements FromQuery, WithHeadings, WithMapping
+class ApprovalDelegationExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping
 {
     public function __construct(
         private readonly Builder $query

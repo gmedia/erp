@@ -20,7 +20,7 @@ import { employeeFormSchema } from '@/utils/schemas';
 interface EmployeeFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    employee?: Employee | null;
+    entity?: Employee | null;
     onSubmit: (data: EmployeeFormData) => void;
     isLoading?: boolean;
 }
@@ -162,13 +162,13 @@ const getEmployeeFormDefaults = (
 export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
     open,
     onOpenChange,
-    employee,
+    entity,
     onSubmit,
     isLoading = false,
 }) {
     const defaultValues = useMemo(
-        () => getEmployeeFormDefaults(employee),
-        [employee],
+        () => getEmployeeFormDefaults(entity),
+        [entity],
     );
 
     const form = useForm<z.input<typeof employeeFormSchema>>({
@@ -176,7 +176,7 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
         defaultValues,
     });
 
-    // Reset form when employee changes (for edit mode)
+    // Reset form when entity changes (for edit mode)
     useEffect(() => {
         form.reset(defaultValues);
     }, [form, defaultValues]);
@@ -206,7 +206,7 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
             }
             open={open}
             onOpenChange={onOpenChange}
-            title={employee ? 'Edit Employee' : 'Add New Employee'}
+            title={entity ? 'Edit Employee' : 'Add New Employee'}
             onSubmit={handleFormSubmit}
             isLoading={isLoading}
         >

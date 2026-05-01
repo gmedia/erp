@@ -18,7 +18,7 @@ import { productFormSchema } from '@/utils/schemas';
 interface ProductFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    product?: Product | null;
+    entity?: Product | null;
     onSubmit: (data: ProductFormData) => void;
     isLoading?: boolean;
 }
@@ -201,13 +201,13 @@ const getProductFormDefaults = (product?: Product | null): ProductFormData => {
 export const ProductForm = memo<ProductFormProps>(function ProductForm({
     open,
     onOpenChange,
-    product,
+    entity,
     onSubmit,
     isLoading = false,
 }) {
     const defaultValues = useMemo(
-        () => getProductFormDefaults(product),
-        [product],
+        () => getProductFormDefaults(entity),
+        [entity],
     );
 
     const form = useForm<z.input<typeof productFormSchema>>({
@@ -230,7 +230,7 @@ export const ProductForm = memo<ProductFormProps>(function ProductForm({
             }
             open={open}
             onOpenChange={onOpenChange}
-            title={product ? 'Edit Product/Service' : 'Add New Product/Service'}
+            title={entity ? 'Edit Product/Service' : 'Add New Product/Service'}
             onSubmit={
                 onSubmit as unknown as (
                     data: z.input<typeof productFormSchema>,
