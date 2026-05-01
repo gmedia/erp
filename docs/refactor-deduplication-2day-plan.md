@@ -172,12 +172,30 @@ Pattern declarative lebih maintainable: tambah/hapus kolom = 1 line change.
 - [x] E2E 47 passed (warehouses + product-categories + units + customers + suppliers)
 - [x] Semua perubahan pushed ke remote
 
-### Commits
+### Commits (Initial Plan)
 
 | # | Hash | Description | Impact |
 |---|------|-------------|--------|
 | 1 | `8d8a7d44` | Extract useEntityForm hook + migrate 5 forms | -150 lines frontend |
 | 2 | `ea25834b` | Migrate 4 exports to columns() pattern | -14 lines backend, better maintainability |
+
+### Commits (Continuation Sessions)
+
+| # | Hash | Description | Impact |
+|---|------|-------------|--------|
+| 3 | `03f559df` | Migrate 3 more forms to useEntityForm (AssetLocation, AssetCategory, FiscalYear) | -89 lines frontend |
+| 4 | `6b7a1880` | Migrate 3 more exports to columns() (Employee, JournalEntry, AssetMovement) | -20 lines + N+1 fix |
+| 5 | `6dd37f55` | Migrate final 8 standalone exports to columns() pattern | +42 lines (more declarative, but single source of truth) |
+
+### Final Totals
+
+| Metric | Value |
+|--------|-------|
+| `useEntityForm` adopters | 8 forms |
+| `columns()` pattern exports | 15 exports (all standalone) |
+| Total lines reduced (forms) | ~239 lines |
+| Pest tests validated | 589 passed |
+| E2E tests validated | 74 passed |
 
 ---
 
