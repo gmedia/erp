@@ -15,7 +15,7 @@ class PipelineExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
 {
     use InteractsWithExportFilters;
 
-    protected $filters;
+    protected array $filters;
 
     public function __construct(array $filters = [])
     {
@@ -52,20 +52,28 @@ class PipelineExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
 
     public function headings(): array
     {
-        return ['ID', 'Name', 'Code', 'Entity Type', 'Version', 'Active', 'Created By', 'Created At'];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($pipeline): array
     {
+        return $this->mapExportRow($pipeline, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $pipeline->id,
-            $pipeline->name,
-            $pipeline->code,
-            $pipeline->entity_type,
-            $pipeline->version,
-            $pipeline->is_active ? 'Yes' : 'No',
-            $pipeline->creator?->name,
-            $pipeline->created_at?->toIso8601String(),
+            'ID' => fn (Pipeline $p): mixed => $p->id,
+            'Name' => fn (Pipeline $p): mixed => $p->name,
+            'Code' => fn (Pipeline $p): mixed => $p->code,
+            'Entity Type' => fn (Pipeline $p): mixed => $p->entity_type,
+            'Version' => fn (Pipeline $p): mixed => $p->version,
+            'Active' => fn (Pipeline $p): mixed => $p->is_active ? 'Yes' : 'No',
+            'Created By' => fn (Pipeline $p): mixed => $this->relatedAttribute($p, 'creator', 'name'),
+            'Created At' => fn (Pipeline $p): mixed => $this->formatIso8601($p->created_at),
         ];
     }
 }

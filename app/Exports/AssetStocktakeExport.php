@@ -15,7 +15,7 @@ class AssetStocktakeExport implements FromQuery, ShouldAutoSize, WithHeadings, W
 {
     use InteractsWithExportFilters;
 
-    protected $filters;
+    protected array $filters;
 
     public function __construct(array $filters = [])
     {
@@ -38,20 +38,28 @@ class AssetStocktakeExport implements FromQuery, ShouldAutoSize, WithHeadings, W
 
     public function headings(): array
     {
-        return ['ID', 'Reference', 'Branch', 'Planned At', 'Performed At', 'Status', 'Created By', 'Created At'];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($row): array
     {
+        return $this->mapExportRow($row, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $row->id,
-            $row->reference,
-            $row->branch?->name,
-            $row->planned_at?->format('Y-m-d H:i'),
-            $row->performed_at?->format('Y-m-d H:i'),
-            $row->status,
-            $row->createdBy?->name,
-            $row->created_at?->toIso8601String(),
+            'ID' => fn (AssetStocktake $s): mixed => $s->id,
+            'Reference' => fn (AssetStocktake $s): mixed => $s->reference,
+            'Branch' => fn (AssetStocktake $s): mixed => $this->relatedAttribute($s, 'branch', 'name'),
+            'Planned At' => fn (AssetStocktake $s): mixed => $this->formatDateValue($s->planned_at, 'Y-m-d H:i'),
+            'Performed At' => fn (AssetStocktake $s): mixed => $this->formatDateValue($s->performed_at, 'Y-m-d H:i'),
+            'Status' => fn (AssetStocktake $s): mixed => $s->status,
+            'Created By' => fn (AssetStocktake $s): mixed => $this->relatedAttribute($s, 'createdBy', 'name'),
+            'Created At' => fn (AssetStocktake $s): mixed => $this->formatIso8601($s->created_at),
         ];
     }
 }

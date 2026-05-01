@@ -15,7 +15,7 @@ class AssetModelExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
 {
     use InteractsWithExportFilters;
 
-    protected $filters;
+    protected array $filters;
 
     public function __construct(array $filters = [])
     {
@@ -55,18 +55,26 @@ class AssetModelExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
 
     public function headings(): array
     {
-        return ['ID', 'Model Name', 'Manufacturer', 'Category', 'Specs', 'Created At'];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($assetModel): array
     {
+        return $this->mapExportRow($assetModel, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $assetModel->id,
-            $assetModel->model_name,
-            $assetModel->manufacturer,
-            $assetModel->category?->name,
-            $assetModel->specs ? json_encode($assetModel->specs) : '',
-            $assetModel->created_at?->toIso8601String(),
+            'ID' => fn (AssetModel $m): mixed => $m->id,
+            'Model Name' => fn (AssetModel $m): mixed => $m->model_name,
+            'Manufacturer' => fn (AssetModel $m): mixed => $m->manufacturer,
+            'Category' => fn (AssetModel $m): mixed => $this->relatedAttribute($m, 'category', 'name'),
+            'Specs' => fn (AssetModel $m): mixed => $m->specs ? json_encode($m->specs) : '',
+            'Created At' => fn (AssetModel $m): mixed => $this->formatIso8601($m->created_at),
         ];
     }
 }

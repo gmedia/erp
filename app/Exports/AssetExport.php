@@ -16,7 +16,7 @@ class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
 {
     use InteractsWithExportFilters;
 
-    protected $filters;
+    protected array $filters;
 
     public function __construct(array $filters = [])
     {
@@ -78,38 +78,41 @@ class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
 
     public function headings(): array
     {
-        return [
-            'ID', 'Asset Code', 'Name', 'Category', 'Model', 'Serial Number', 'Barcode',
-            'Branch', 'Location', 'Department', 'Employee', 'Supplier',
-            'Purchase Date', 'Purchase Cost', 'Currency', 'Warranty End Date',
-            'Status', 'Condition', 'Depreciation Method', 'Useful Life (Months)', 'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($asset): array
     {
+        return $this->mapExportRow($asset, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $asset->id,
-            $asset->asset_code,
-            $asset->name,
-            $asset->category?->name,
-            $asset->model?->model_name,
-            $asset->serial_number,
-            $asset->barcode,
-            $asset->branch?->name,
-            $asset->location?->name,
-            $asset->department?->name,
-            $asset->employee?->name,
-            $asset->supplier?->name,
-            $asset->purchase_date?->format('Y-m-d'),
-            $asset->purchase_cost,
-            $asset->currency,
-            $asset->warranty_end_date?->format('Y-m-d'),
-            $asset->status,
-            $asset->condition,
-            $asset->depreciation_method,
-            $asset->useful_life_months,
-            $asset->created_at?->toIso8601String(),
+            'ID' => fn (Asset $a): mixed => $a->id,
+            'Asset Code' => fn (Asset $a): mixed => $a->asset_code,
+            'Name' => fn (Asset $a): mixed => $a->name,
+            'Category' => fn (Asset $a): mixed => $this->relatedAttribute($a, 'category', 'name'),
+            'Model' => fn (Asset $a): mixed => $a->model?->model_name,
+            'Serial Number' => fn (Asset $a): mixed => $a->serial_number,
+            'Barcode' => fn (Asset $a): mixed => $a->barcode,
+            'Branch' => fn (Asset $a): mixed => $this->relatedAttribute($a, 'branch', 'name'),
+            'Location' => fn (Asset $a): mixed => $this->relatedAttribute($a, 'location', 'name'),
+            'Department' => fn (Asset $a): mixed => $this->relatedAttribute($a, 'department', 'name'),
+            'Employee' => fn (Asset $a): mixed => $this->relatedAttribute($a, 'employee', 'name'),
+            'Supplier' => fn (Asset $a): mixed => $this->relatedAttribute($a, 'supplier', 'name'),
+            'Purchase Date' => fn (Asset $a): mixed => $this->formatDateValue($a->purchase_date, 'Y-m-d'),
+            'Purchase Cost' => fn (Asset $a): mixed => $a->purchase_cost,
+            'Currency' => fn (Asset $a): mixed => $a->currency,
+            'Warranty End Date' => fn (Asset $a): mixed => $this->formatDateValue($a->warranty_end_date, 'Y-m-d'),
+            'Status' => fn (Asset $a): mixed => $a->status,
+            'Condition' => fn (Asset $a): mixed => $a->condition,
+            'Depreciation Method' => fn (Asset $a): mixed => $a->depreciation_method,
+            'Useful Life (Months)' => fn (Asset $a): mixed => $a->useful_life_months,
+            'Created At' => fn (Asset $a): mixed => $this->formatIso8601($a->created_at),
         ];
     }
 }

@@ -15,7 +15,7 @@ class AssetLocationExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
 {
     use InteractsWithExportFilters;
 
-    protected $filters;
+    protected array $filters;
 
     public function __construct(array $filters = [])
     {
@@ -55,18 +55,26 @@ class AssetLocationExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
 
     public function headings(): array
     {
-        return ['ID', 'Code', 'Name', 'Branch', 'Parent Location', 'Created At'];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($assetLocation): array
     {
+        return $this->mapExportRow($assetLocation, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $assetLocation->id,
-            $assetLocation->code,
-            $assetLocation->name,
-            $assetLocation->branch?->name,
-            $assetLocation->parent?->name,
-            $assetLocation->created_at?->toIso8601String(),
+            'ID' => fn (AssetLocation $l): mixed => $l->id,
+            'Code' => fn (AssetLocation $l): mixed => $l->code,
+            'Name' => fn (AssetLocation $l): mixed => $l->name,
+            'Branch' => fn (AssetLocation $l): mixed => $this->relatedAttribute($l, 'branch', 'name'),
+            'Parent Location' => fn (AssetLocation $l): mixed => $this->relatedAttribute($l, 'parent', 'name'),
+            'Created At' => fn (AssetLocation $l): mixed => $this->formatIso8601($l->created_at),
         ];
     }
 }

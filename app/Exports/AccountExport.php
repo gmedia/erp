@@ -2,15 +2,19 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\InteractsWithExportFilters;
 use App\Models\Account;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithStyles;
 
-class AccountExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
+class AccountExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
 {
-    protected $filters;
+    use InteractsWithExportFilters;
+
+    protected array $filters;
 
     public function __construct(array $filters = [])
     {
@@ -42,27 +46,27 @@ class AccountExport implements FromCollection, ShouldAutoSize, WithHeadings, Wit
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'Code',
-            'Name',
-            'Type',
-            'Normal Balance',
-            'Active',
-            'Level',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($account): array
     {
+        return $this->mapExportRow($account, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $account->id,
-            $account->code,
-            $account->name,
-            $account->type,
-            $account->normal_balance,
-            $account->is_active ? 'Yes' : 'No',
-            $account->level,
+            'ID' => fn (Account $a): mixed => $a->id,
+            'Code' => fn (Account $a): mixed => $a->code,
+            'Name' => fn (Account $a): mixed => $a->name,
+            'Type' => fn (Account $a): mixed => $a->type,
+            'Normal Balance' => fn (Account $a): mixed => $a->normal_balance,
+            'Active' => fn (Account $a): mixed => $a->is_active ? 'Yes' : 'No',
+            'Level' => fn (Account $a): mixed => $a->level,
         ];
     }
 }

@@ -64,37 +64,32 @@ class AssetMaintenanceExport implements FromQuery, ShouldAutoSize, WithHeadings,
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'Asset Code',
-            'Asset Name',
-            'Maintenance Type',
-            'Status',
-            'Scheduled At',
-            'Performed At',
-            'Supplier',
-            'Cost',
-            'Notes',
-            'Created By',
-            'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($maintenance): array
     {
+        return $this->mapExportRow($maintenance, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $maintenance->id,
-            $maintenance->asset?->asset_code,
-            $maintenance->asset?->name,
-            $maintenance->maintenance_type,
-            $maintenance->status,
-            $maintenance->scheduled_at?->format('Y-m-d H:i:s'),
-            $maintenance->performed_at?->format('Y-m-d H:i:s'),
-            $maintenance->supplier?->name,
-            $maintenance->cost,
-            $maintenance->notes,
-            $maintenance->createdBy?->name,
-            $maintenance->created_at?->toIso8601String(),
+            'ID' => fn (AssetMaintenance $m): mixed => $m->id,
+            'Asset Code' => fn (AssetMaintenance $m): mixed => $m->asset->asset_code,
+            'Asset Name' => fn (AssetMaintenance $m): mixed => $m->asset->name,
+            'Maintenance Type' => fn (AssetMaintenance $m): mixed => $m->maintenance_type,
+            'Status' => fn (AssetMaintenance $m): mixed => $m->status,
+            'Scheduled At' => fn (AssetMaintenance $m): mixed => $this->formatDateValue($m->scheduled_at, 'Y-m-d H:i:s'),
+            'Performed At' => fn (AssetMaintenance $m): mixed => $this->formatDateValue($m->performed_at, 'Y-m-d H:i:s'),
+            'Supplier' => fn (AssetMaintenance $m): mixed => $m->supplier?->name,
+            'Cost' => fn (AssetMaintenance $m): mixed => $m->cost,
+            'Notes' => fn (AssetMaintenance $m): mixed => $m->notes,
+            'Created By' => fn (AssetMaintenance $m): mixed => $this->relatedAttribute($m, 'createdBy', 'name'),
+            'Created At' => fn (AssetMaintenance $m): mixed => $this->formatIso8601($m->created_at),
         ];
     }
 }

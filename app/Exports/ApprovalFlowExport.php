@@ -15,7 +15,7 @@ class ApprovalFlowExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
 {
     use InteractsWithExportFilters;
 
-    protected $filters;
+    protected array $filters;
 
     public function __construct(array $filters = [])
     {
@@ -38,19 +38,27 @@ class ApprovalFlowExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
 
     public function headings(): array
     {
-        return ['ID', 'Code', 'Name', 'Approvable Type', 'Is Active', 'Created By', 'Created At'];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($flow): array
     {
+        return $this->mapExportRow($flow, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $flow->id,
-            $flow->code,
-            $flow->name,
-            $flow->approvable_type,
-            $flow->is_active ? 'Yes' : 'No',
-            $flow->creator?->name,
-            $flow->created_at?->format('Y-m-d'),
+            'ID' => fn (ApprovalFlow $f): mixed => $f->id,
+            'Code' => fn (ApprovalFlow $f): mixed => $f->code,
+            'Name' => fn (ApprovalFlow $f): mixed => $f->name,
+            'Approvable Type' => fn (ApprovalFlow $f): mixed => $f->approvable_type,
+            'Is Active' => fn (ApprovalFlow $f): mixed => $f->is_active ? 'Yes' : 'No',
+            'Created By' => fn (ApprovalFlow $f): mixed => $this->relatedAttribute($f, 'creator', 'name'),
+            'Created At' => fn (ApprovalFlow $f): mixed => $this->formatDateValue($f->created_at, 'Y-m-d'),
         ];
     }
 }
