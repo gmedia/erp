@@ -18,7 +18,7 @@ TARGET="${1:-all}"
 
 sync_kilo() {
   echo "🔄 Syncing Kilo Code (.kilo/)..."
-  bash .kilo/sync-from-github.sh
+  bash scripts/sync-kilo.sh
   echo "   ✅ Kilo sync complete"
 }
 
