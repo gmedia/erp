@@ -46,35 +46,31 @@ class SupplierReturnExport implements FromQuery, ShouldAutoSize, WithHeadings, W
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'Return Number',
-            'PO Number',
-            'GR Number',
-            'Supplier',
-            'Warehouse',
-            'Return Date',
-            'Reason',
-            'Status',
-            'Notes',
-            'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($supplierReturn): array
     {
+        return $this->mapExportRow($supplierReturn, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $supplierReturn->id,
-            $supplierReturn->return_number,
-            $supplierReturn->purchaseOrder?->po_number,
-            $supplierReturn->goodsReceipt?->gr_number,
-            $supplierReturn->supplier?->name,
-            $supplierReturn->warehouse?->name,
-            $supplierReturn->return_date?->format('Y-m-d'),
-            $supplierReturn->reason,
-            $supplierReturn->status,
-            $supplierReturn->notes,
-            $supplierReturn->created_at?->toIso8601String(),
+            'ID' => fn (SupplierReturn $sr): mixed => $sr->id,
+            'Return Number' => fn (SupplierReturn $sr): mixed => $sr->return_number,
+            'PO Number' => fn (SupplierReturn $sr): mixed => $this->relatedAttribute($sr, 'purchaseOrder', 'po_number'),
+            'GR Number' => fn (SupplierReturn $sr): mixed => $this->relatedAttribute($sr, 'goodsReceipt', 'gr_number'),
+            'Supplier' => fn (SupplierReturn $sr): mixed => $this->relatedAttribute($sr, 'supplier', 'name'),
+            'Warehouse' => fn (SupplierReturn $sr): mixed => $this->relatedAttribute($sr, 'warehouse', 'name'),
+            'Return Date' => fn (SupplierReturn $sr): mixed => $this->formatDateValue($sr->return_date, 'Y-m-d'),
+            'Reason' => fn (SupplierReturn $sr): mixed => $sr->reason,
+            'Status' => fn (SupplierReturn $sr): mixed => $sr->status,
+            'Notes' => fn (SupplierReturn $sr): mixed => $sr->notes,
+            'Created At' => fn (SupplierReturn $sr): mixed => $this->formatIso8601($sr->created_at),
         ];
     }
 }

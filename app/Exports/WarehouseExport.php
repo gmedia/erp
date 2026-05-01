@@ -18,7 +18,7 @@ class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMa
 {
     use InteractsWithExportFilters;
 
-    protected $filters;
+    protected array $filters;
 
     public function __construct(array $filters = [])
     {
@@ -50,17 +50,25 @@ class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMa
 
     public function headings(): array
     {
-        return ['ID', 'Code', 'Name', 'Branch', 'Created At'];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($warehouse): array
     {
+        return $this->mapExportRow($warehouse, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $warehouse->id,
-            $warehouse->code,
-            $warehouse->name,
-            $warehouse->branch?->name,
-            $warehouse->created_at?->toIso8601String(),
+            'ID' => fn (Warehouse $warehouse): mixed => $warehouse->id,
+            'Code' => fn (Warehouse $warehouse): mixed => $warehouse->code,
+            'Name' => fn (Warehouse $warehouse): mixed => $warehouse->name,
+            'Branch' => fn (Warehouse $warehouse): mixed => $this->relatedAttribute($warehouse, 'branch', 'name'),
+            'Created At' => fn (Warehouse $warehouse): mixed => $this->formatIso8601($warehouse->created_at),
         ];
     }
 }

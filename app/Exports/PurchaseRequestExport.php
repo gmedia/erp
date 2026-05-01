@@ -38,15 +38,7 @@ class PurchaseRequestExport implements FromQuery, ShouldAutoSize, WithHeadings, 
                 'request_date' => ['from' => 'request_date_from', 'to' => 'request_date_to'],
                 'required_date' => ['from' => 'required_date_from', 'to' => 'required_date_to'],
             ],
-            [
-                'pr_number',
-                'request_date',
-                'required_date',
-                'priority',
-                'status',
-                'estimated_amount',
-                'created_at',
-            ],
+            ['pr_number', 'request_date', 'required_date', 'priority', 'status', 'estimated_amount', 'created_at'],
         );
 
         return $query;
@@ -54,37 +46,32 @@ class PurchaseRequestExport implements FromQuery, ShouldAutoSize, WithHeadings, 
 
     public function headings(): array
     {
-        return [
-            'ID',
-            'PR Number',
-            'Branch',
-            'Department',
-            'Requested By',
-            'Request Date',
-            'Required Date',
-            'Priority',
-            'Status',
-            'Estimated Amount',
-            'Notes',
-            'Created At',
-        ];
+        return $this->exportHeadings($this->columns());
     }
 
     public function map($purchaseRequest): array
     {
+        return $this->mapExportRow($purchaseRequest, $this->columns());
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
+    protected function columns(): array
+    {
         return [
-            $purchaseRequest->id,
-            $purchaseRequest->pr_number,
-            $purchaseRequest->branch?->name,
-            $purchaseRequest->department?->name,
-            $purchaseRequest->requester?->name,
-            $purchaseRequest->request_date?->format('Y-m-d'),
-            $purchaseRequest->required_date?->format('Y-m-d'),
-            $purchaseRequest->priority,
-            $purchaseRequest->status,
-            $purchaseRequest->estimated_amount,
-            $purchaseRequest->notes,
-            $purchaseRequest->created_at?->toIso8601String(),
+            'ID' => fn (PurchaseRequest $pr): mixed => $pr->id,
+            'PR Number' => fn (PurchaseRequest $pr): mixed => $pr->pr_number,
+            'Branch' => fn (PurchaseRequest $pr): mixed => $this->relatedAttribute($pr, 'branch', 'name'),
+            'Department' => fn (PurchaseRequest $pr): mixed => $this->relatedAttribute($pr, 'department', 'name'),
+            'Requested By' => fn (PurchaseRequest $pr): mixed => $this->relatedAttribute($pr, 'requester', 'name'),
+            'Request Date' => fn (PurchaseRequest $pr): mixed => $this->formatDateValue($pr->request_date, 'Y-m-d'),
+            'Required Date' => fn (PurchaseRequest $pr): mixed => $this->formatDateValue($pr->required_date, 'Y-m-d'),
+            'Priority' => fn (PurchaseRequest $pr): mixed => $pr->priority,
+            'Status' => fn (PurchaseRequest $pr): mixed => $pr->status,
+            'Estimated Amount' => fn (PurchaseRequest $pr): mixed => $pr->estimated_amount,
+            'Notes' => fn (PurchaseRequest $pr): mixed => $pr->notes,
+            'Created At' => fn (PurchaseRequest $pr): mixed => $this->formatIso8601($pr->created_at),
         ];
     }
 }
