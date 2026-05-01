@@ -1,50 +1,44 @@
 'use client';
 
+import { memo } from 'react';
+
+import { ViewField } from '@/components/common/ViewField';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/contexts/i18n-context';
 import { type Warehouse } from '@/types/entity';
 
 interface WarehouseViewModalProps {
-    readonly open: boolean;
-    readonly onClose: () => void;
-    readonly item: Warehouse | null;
+    open: boolean;
+    onClose: () => void;
+    item: Warehouse | null;
 }
 
-export function WarehouseViewModal({
-    open,
-    onClose,
-    item,
-}: WarehouseViewModalProps) {
-    if (!item) return null;
+export const WarehouseViewModal = memo<WarehouseViewModalProps>(
+    function WarehouseViewModal({ open, onClose, item }) {
+        const { t } = useTranslation();
+        if (!item) return null;
 
-    return (
-        <ViewModalShell
-            open={open}
-            onClose={onClose}
-            title={item.name}
-            description="View warehouse details"
-            contentClassName="max-w-md"
-        >
-            <div className="space-y-4 py-2">
-                <div className="space-y-1">
-                    <span className="text-sm font-medium text-muted-foreground">
-                        Code
-                    </span>
-                    <div className="text-sm font-medium break-words">
-                        {item.code}
-                    </div>
+        return (
+            <ViewModalShell
+                open={open}
+                onClose={onClose}
+                title="View Warehouse"
+                description={t('common.view_details')}
+            >
+                <div className="space-y-4 py-4">
+                    <ViewField label="Code" value={item.code} />
+                    <ViewField label="Name" value={item.name} />
+                    <ViewField
+                        label="Branch"
+                        value={
+                            <Badge variant="outline">
+                                {item.branch?.name || '-'}
+                            </Badge>
+                        }
+                    />
                 </div>
-                <div className="space-y-1">
-                    <span className="text-sm font-medium text-muted-foreground">
-                        Branch
-                    </span>
-                    <div>
-                        <Badge variant="outline">
-                            {item.branch?.name || 'N/A'}
-                        </Badge>
-                    </div>
-                </div>
-            </div>
-        </ViewModalShell>
-    );
-}
+            </ViewModalShell>
+        );
+    },
+);
