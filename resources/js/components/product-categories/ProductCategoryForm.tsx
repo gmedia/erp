@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
-
 import EntityForm from '@/components/common/EntityForm';
 import NameField from '@/components/common/NameField';
 import {
@@ -12,12 +10,11 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
+import { useEntityForm } from '@/hooks/useEntityForm';
 import {
     productCategoryFormSchema,
     type ProductCategoryFormData,
 } from '@/utils/schemas';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 
 interface ProductCategoryFormProps {
     open: boolean;
@@ -26,6 +23,15 @@ interface ProductCategoryFormProps {
     onSubmit: (data: ProductCategoryFormData) => void;
     isLoading?: boolean;
 }
+
+type ProductCategoryEntity = { name: string; description?: string | null };
+
+const getDefaults = (
+    entity?: ProductCategoryEntity | null,
+): ProductCategoryFormData => ({
+    name: entity?.name || '',
+    description: entity?.description || '',
+});
 
 /**
  * ProductCategoryForm – a custom form for product categories with name and description.
@@ -37,23 +43,11 @@ export function ProductCategoryForm({
     onSubmit,
     isLoading = false,
 }: Readonly<ProductCategoryFormProps>) {
-    const form = useForm<ProductCategoryFormData>({
-        resolver: zodResolver(productCategoryFormSchema),
-        defaultValues: {
-            name: entity?.name || '',
-            description: entity?.description || '',
-        },
+    const form = useEntityForm<ProductCategoryFormData, ProductCategoryEntity>({
+        schema: productCategoryFormSchema,
+        getDefaults,
+        entity,
     });
-
-    // Reset form when entity changes (for edit mode)
-    useEffect(() => {
-        if (open) {
-            form.reset({
-                name: entity?.name || '',
-                description: entity?.description || '',
-            });
-        }
-    }, [form, entity, open]);
 
     return (
         <EntityForm

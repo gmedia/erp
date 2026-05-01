@@ -1,9 +1,6 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useEffect, useMemo } from 'react';
-import { useForm, type UseFormReturn } from 'react-hook-form';
-import * as z from 'zod';
+import { memo } from 'react';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import EntityForm from '@/components/common/EntityForm';
@@ -11,6 +8,7 @@ import { InputField } from '@/components/common/InputField';
 import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { useEntityForm } from '@/hooks/useEntityForm';
 
 import { Supplier, SupplierFormData } from '@/types/entity';
 import { supplierFormSchema } from '@/utils/schemas';
@@ -23,61 +21,10 @@ interface SupplierFormProps {
     isLoading?: boolean;
 }
 
-const renderBasicInfoSection = () => (
-    <>
-        <NameField name="name" label="Name" placeholder="Supplier Name" />
-        <InputField
-            name="email"
-            label="Email"
-            type="email"
-            placeholder="supplier@example.com"
-        />
-        <InputField
-            name="phone"
-            label="Phone"
-            placeholder="+1 (555) 123-4567"
-        />
-    </>
-);
-
-const renderDetailsSection = () => (
-    <>
-        <AsyncSelectField
-            name="branch_id"
-            label="Branch"
-            url="/api/branches"
-            placeholder="Select a branch"
-        />
-        <AsyncSelectField
-            name="category_id"
-            label="Category"
-            url="/api/supplier-categories"
-            placeholder="Select a category"
-        />
-        <SelectField
-            name="status"
-            label="Status"
-            options={[
-                { value: 'active', label: 'Active' },
-                { value: 'inactive', label: 'Inactive' },
-            ]}
-            placeholder="Select status"
-        />
-    </>
-);
-
-const renderAddressSection = () => (
-    <TextareaField
-        name="address"
-        label="Address"
-        placeholder="123 Main St, City, Country"
-    />
-);
-
 const getSupplierFormDefaults = (
-    supplier?: Supplier | null,
+    entity?: Supplier | null,
 ): SupplierFormData => {
-    if (!supplier) {
+    if (!entity) {
         return {
             name: '',
             email: '',
@@ -90,13 +37,13 @@ const getSupplierFormDefaults = (
     }
 
     return {
-        name: supplier.name,
-        email: supplier.email,
-        phone: supplier.phone || '',
-        address: supplier.address,
-        branch_id: supplier.branch ? String(supplier.branch.id) : '',
-        category_id: supplier.category ? String(supplier.category.id) : '',
-        status: supplier.status,
+        name: entity.name,
+        email: entity.email,
+        phone: entity.phone || '',
+        address: entity.address,
+        branch_id: entity.branch ? String(entity.branch.id) : '',
+        category_id: entity.category ? String(entity.category.id) : '',
+        status: entity.status,
     };
 };
 
@@ -107,43 +54,59 @@ export const SupplierForm = memo<SupplierFormProps>(function SupplierForm({
     onSubmit,
     isLoading = false,
 }) {
-    const defaultValues = useMemo(
-        () => getSupplierFormDefaults(entity),
-        [entity],
-    );
-
-    const form = useForm<z.input<typeof supplierFormSchema>>({
-        resolver: zodResolver(supplierFormSchema),
-        defaultValues,
+    const form = useEntityForm<SupplierFormData, Supplier>({
+        schema: supplierFormSchema,
+        getDefaults: getSupplierFormDefaults,
+        entity,
     });
-
-    // Reset form when entity changes (for edit mode)
-    useEffect(() => {
-        form.reset(defaultValues);
-    }, [form, defaultValues]);
 
     return (
         <EntityForm<SupplierFormData>
-            form={
-                form as unknown as UseFormReturn<
-                    SupplierFormData,
-                    unknown,
-                    SupplierFormData
-                >
-            }
+            form={form}
             open={open}
             onOpenChange={onOpenChange}
             title={entity ? 'Edit Supplier' : 'Add New Supplier'}
-            onSubmit={
-                onSubmit as unknown as (
-                    data: z.input<typeof supplierFormSchema>,
-                ) => void
-            }
+            onSubmit={onSubmit}
             isLoading={isLoading}
         >
-            {renderBasicInfoSection()}
-            {renderDetailsSection()}
-            {renderAddressSection()}
+            <NameField name="name" label="Name" placeholder="Supplier Name" />
+            <InputField
+                name="email"
+                label="Email"
+                type="email"
+                placeholder="supplier@example.com"
+            />
+            <InputField
+                name="phone"
+                label="Phone"
+                placeholder="+1 (555) 123-4567"
+            />
+            <AsyncSelectField
+                name="branch_id"
+                label="Branch"
+                url="/api/branches"
+                placeholder="Select a branch"
+            />
+            <AsyncSelectField
+                name="category_id"
+                label="Category"
+                url="/api/supplier-categories"
+                placeholder="Select a category"
+            />
+            <SelectField
+                name="status"
+                label="Status"
+                options={[
+                    { value: 'active', label: 'Active' },
+                    { value: 'inactive', label: 'Inactive' },
+                ]}
+                placeholder="Select status"
+            />
+            <TextareaField
+                name="address"
+                label="Address"
+                placeholder="123 Main St, City, Country"
+            />
         </EntityForm>
     );
 });

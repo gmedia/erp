@@ -1,13 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
-
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import NameField from '@/components/common/NameField';
+import { useEntityForm } from '@/hooks/useEntityForm';
 import { unitFormSchema, type UnitFormData } from '@/utils/schemas';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 
 interface UnitFormProps {
     open: boolean;
@@ -16,6 +13,13 @@ interface UnitFormProps {
     onSubmit: (data: UnitFormData) => void;
     isLoading?: boolean;
 }
+
+type UnitEntity = { name: string; symbol?: string | null };
+
+const getDefaults = (entity?: UnitEntity | null): UnitFormData => ({
+    name: entity?.name || '',
+    symbol: entity?.symbol || '',
+});
 
 /**
  * UnitForm – a custom form for units with name and symbol.
@@ -27,23 +31,11 @@ export function UnitForm({
     onSubmit,
     isLoading = false,
 }: Readonly<UnitFormProps>) {
-    const form = useForm<UnitFormData>({
-        resolver: zodResolver(unitFormSchema),
-        defaultValues: {
-            name: entity?.name || '',
-            symbol: entity?.symbol || '',
-        },
+    const form = useEntityForm<UnitFormData, UnitEntity>({
+        schema: unitFormSchema,
+        getDefaults,
+        entity,
     });
-
-    // Reset form when entity changes (for edit mode)
-    useEffect(() => {
-        if (open) {
-            form.reset({
-                name: entity?.name || '',
-                symbol: entity?.symbol || '',
-            });
-        }
-    }, [form, entity, open]);
 
     return (
         <EntityForm
@@ -55,7 +47,6 @@ export function UnitForm({
             isLoading={isLoading}
         >
             <NameField name="name" label="Name" placeholder="e.g., Kilogram" />
-
             <InputField name="symbol" label="Symbol" placeholder="e.g., kg" />
         </EntityForm>
     );
