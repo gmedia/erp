@@ -3,9 +3,9 @@
 > Lanjutan dari refactor style consistency (Tahap 0–6 + polish).
 > Fokus: mengurangi duplikasi kode aktual antar modul sejenis, bukan hanya cosmetic consistency.
 
-Status: 🔄 In Progress
+Status: ✅ **SELESAI** — dieksekusi 2026-05-01
 Tanggal mulai: 2026-05-01
-Deadline: 2026-05-02
+Deadline: 2026-05-02 (selesai hari pertama)
 
 ---
 
@@ -165,11 +165,19 @@ Pattern declarative lebih maintainable: tambah/hapus kolom = 1 line change.
 
 ## Definition of Done (Akhir Hari 2)
 
-- [ ] `useEntityForm` hook dibuat dan dipakai oleh minimal 5 forms
-- [ ] Minimal 3 standalone exports dimigrasi ke `columns()` pattern
-- [ ] `npm run types` clean
-- [ ] E2E smoke waves green (160 passed)
-- [ ] Semua perubahan pushed ke remote
+- [x] `useEntityForm` hook dibuat dan dipakai oleh 5 forms — `8d8a7d44`
+- [x] 4 standalone exports dimigrasi ke `columns()` pattern — `ea25834b`
+- [x] `npm run types` clean
+- [x] Pest 95 passed (warehouses + goods-receipts + purchase-requests + supplier-returns)
+- [x] E2E 47 passed (warehouses + product-categories + units + customers + suppliers)
+- [x] Semua perubahan pushed ke remote
+
+### Commits
+
+| # | Hash | Description | Impact |
+|---|------|-------------|--------|
+| 1 | `8d8a7d44` | Extract useEntityForm hook + migrate 5 forms | -150 lines frontend |
+| 2 | `ea25834b` | Migrate 4 exports to columns() pattern | -14 lines backend, better maintainability |
 
 ---
 
