@@ -1,3 +1,4 @@
+<!-- implementation-status: implemented -->
 # Desain Database: Manajemen Aset Perusahaan
 
 Dokumen ini menjelaskan struktur database untuk modul Manajemen Aset (Fixed Assets & Asset Tracking) dalam sistem ERP. Fokus utama: pencatatan master aset, lokasi & penanggung jawab, pergerakan aset, pemeliharaan, stocktake, serta depresiasi yang terhubung ke jurnal akuntansi.

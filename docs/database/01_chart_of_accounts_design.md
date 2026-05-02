@@ -1,3 +1,4 @@
+<!-- implementation-status: implemented -->
 # Desain Database: Chart of Accounts (COA) dengan Versioning
 
 Dokumen ini menjelaskan struktur database untuk modul Chart of Accounts (COA) atau Daftar Akun yang mendukung versioning dan jurnal umum. Fokus utama: tahun fiskal, versi COA, hierarki akun, pemetaan antar versi, dan pencatatan jurnal umum.

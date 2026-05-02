@@ -1,3 +1,4 @@
+<!-- implementation-status: superseded-by-v2 -->
 # Desain Database: Produk, Layanan, dan Produksi
 
 Dokumen ini menjelaskan struktur database untuk modul Produk, Layanan, Produksi (Manufacturing), dan Langganan (Subscription) dalam sistem ERP.

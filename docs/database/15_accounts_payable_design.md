@@ -1,3 +1,4 @@
+<!-- implementation-status: designed-only -->
 # Desain Database: Accounts Payable (Hutang Usaha)
 
 Dokumen ini menjelaskan struktur database untuk modul Accounts Payable (AP) dalam sistem ERP. Fokus utama: pencatatan tagihan vendor (supplier bills), penjadwalan pembayaran, pelunasan hutang, dan integrasi dengan jurnal akuntansi.

@@ -1,3 +1,4 @@
+<!-- implementation-status: implemented -->
 # Desain Database: Purchasing (Pembelian)
 
 Dokumen ini menjelaskan struktur database untuk modul Purchasing dalam sistem ERP. Mencakup alur lengkap pembelian: Purchase Request (PR), Purchase Order (PO), Goods Receipt (Penerimaan Barang), serta Return to Supplier.

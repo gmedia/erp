@@ -1,3 +1,4 @@
+<!-- implementation-status: implemented -->
 # Desain Database: Pipeline & Lifecycle (State Machine)
 
 Dokumen ini menjelaskan struktur database untuk sistem **Pipeline & Lifecycle** yang bersifat **generik dan reusable** untuk seluruh modul ERP. Fokus utama: definisi state dan transisi, eksekusi lifecycle per entitas, automasi side-effect, guard/validasi, dan audit trail perubahan status.

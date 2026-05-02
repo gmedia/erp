@@ -1,3 +1,4 @@
+<!-- implementation-status: designed-only -->
 # Desain Database: General Ledger (Buku Besar)
 
 Dokumen ini menjelaskan struktur database tambahan untuk memperluas modul General Ledger (Buku Besar) yang fondasi-nya sudah dibangun di `01_chart_of_accounts_design.md`. Fokus utama: jurnal penyesuaian (adjusting entries), posting penutup (closing entries), rekonsiliasi bank, dan trial balance.

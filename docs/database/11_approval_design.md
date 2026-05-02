@@ -1,3 +1,4 @@
+<!-- implementation-status: implemented -->
 # Desain Database: Multi-Level Approval System
 
 Dokumen ini menjelaskan struktur database untuk sistem persetujuan berlapis (Multi-Level Approval) yang bersifat **generik dan reusable** untuk seluruh modul ERP. Fokus utama: konfigurasi alur approval, eksekusi approval per dokumen, delegasi, eskalasi, dan audit trail.

@@ -1,3 +1,4 @@
+<!-- implementation-status: implemented -->
 # Desain Database: Inventory (Persediaan)
 
 Dokumen ini menjelaskan struktur database untuk modul Inventory (Persediaan) dalam sistem ERP. Fokus utama: master gudang, transfer antar gudang, stock opname (inventarisasi fisik), penyesuaian stok, dan audit trail pergerakan stok.
