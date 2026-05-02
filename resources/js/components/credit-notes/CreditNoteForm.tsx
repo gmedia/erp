@@ -10,7 +10,6 @@ import {
     EntityFormItemEmptyRow,
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
-import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import {
@@ -28,7 +27,6 @@ import {
     type CreditNoteFormData,
 } from '@/types/credit-note';
 import {
-    formatItemReference,
     omitItemDisplayLabels,
 } from '@/utils/entity-form-item';
 import {
@@ -46,18 +44,6 @@ interface CreditNoteFormProps {
     onSubmit: (data: CreditNoteFormData) => void;
     isLoading?: boolean;
 }
-const createEmptyCreditNoteItem =
-    (): CreditNoteFormData['items'][number] => ({
-        product_id: '',
-        product_label: '',
-        account_id: '',
-        account_label: '',
-        description: '',
-        quantity: 1,
-        unit_price: 0,
-        tax_percent: 0,
-        notes: '',
-    });
 const getCreditNoteFormDefaults = (
     creditNote?: CreditNote | null,
 ): CreditNoteFormData => {

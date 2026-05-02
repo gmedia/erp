@@ -8,7 +8,6 @@ import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import {
     formatCurrencyByRegionalSettings,
-    formatNumberByRegionalSettings,
 } from '@/utils/number-format';
 import React from 'react';
 

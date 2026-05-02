@@ -30,7 +30,6 @@ import {
     type CustomerInvoiceFormData,
 } from '@/types/customer-invoice';
 import {
-    formatItemReference,
     omitItemDisplayLabels,
 } from '@/utils/entity-form-item';
 import {
@@ -50,21 +49,6 @@ interface CustomerInvoiceFormProps {
     isLoading?: boolean;
 }
 
-const createEmptyCustomerInvoiceItem =
-    (): CustomerInvoiceFormData['items'][number] => ({
-        product_id: '',
-        product_label: '',
-        account_id: '',
-        account_label: '',
-        unit_id: '',
-        unit_label: '',
-        description: '',
-        quantity: 1,
-        unit_price: 0,
-        discount_percent: 0,
-        tax_percent: 0,
-        notes: '',
-    });
 
 const getCustomerInvoiceFormDefaults = (
     customerInvoice?: CustomerInvoice | null,

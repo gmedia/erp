@@ -28,12 +28,9 @@ import {
     type ArReceiptFormData,
 } from '@/types/ar-receipt';
 import {
-    formatItemReference,
-    omitItemDisplayLabels,
 } from '@/utils/entity-form-item';
 import {
     formatCurrencyByRegionalSettings,
-    formatNumberByRegionalSettings,
 } from '@/utils/number-format';
 import { arReceiptFormSchema } from '@/utils/schemas';
 import { ArReceiptAllocationFormDialog } from './ArReceiptAllocationFormDialog';
@@ -46,14 +43,6 @@ interface ArReceiptFormProps {
     onSubmit: (data: ArReceiptFormData) => void;
     isLoading?: boolean;
 }
-const createEmptyArReceiptAllocation =
-    (): ArReceiptFormData['allocations'][number] => ({
-        customer_invoice_id: '',
-        invoice_label: '',
-        allocated_amount: 0,
-        discount_given: 0,
-        notes: '',
-    });
 const getArReceiptFormDefaults = (
     arReceipt?: ArReceipt | null,
 ): ArReceiptFormData => {
@@ -177,10 +166,9 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(
         const handleSubmit = (data: ArReceiptFormData) => {
             onSubmit({
                 ...data,
-                allocations: data.allocations.map((alloc) => {
-                    const { invoice_label, ...rest } = alloc;
-                    return rest;
-                }),
+                allocations: data.allocations.map((alloc) => Object.fromEntries(
+                    Object.entries(alloc).filter(([key]) => key !== 'invoice_label'),
+                )) as typeof data.allocations,
             });
         };
         return (
