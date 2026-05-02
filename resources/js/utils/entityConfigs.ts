@@ -632,7 +632,7 @@ export const productConfig = createComplexEntityConfig({
     breadcrumbs: [{ title: 'Products', href: '/products' }],
     initialFilters: {
         search: '',
-        category_id: '',
+        product_category_id: '',
         unit_id: '',
         branch_id: '',
         type: '',

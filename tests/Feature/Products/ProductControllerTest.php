@@ -43,10 +43,10 @@ describe('Product API Endpoints', function () {
 
     test('index supports filtering by category', function () {
         $cat = ProductCategory::factory()->create();
-        Product::factory()->create(['category_id' => $cat->id]);
+        Product::factory()->create(['product_category_id' => $cat->id]);
         Product::factory()->create();
 
-        $response = getJson("/api/products?category_id={$cat->id}");
+        $response = getJson("/api/products?product_category_id={$cat->id}");
 
         $response->assertOk();
         expect($response->json('data'))->toHaveCount(1)
@@ -102,8 +102,8 @@ describe('Product API Endpoints', function () {
         $categoryA = ProductCategory::factory()->create(['name' => 'AAA Category']);
         $categoryB = ProductCategory::factory()->create(['name' => 'BBB Category']);
 
-        Product::factory()->create(['category_id' => $categoryB->id]);
-        Product::factory()->create(['category_id' => $categoryA->id]);
+        Product::factory()->create(['product_category_id' => $categoryB->id]);
+        Product::factory()->create(['product_category_id' => $categoryA->id]);
 
         $response = getJson('/api/products?sort_by=category&sort_direction=asc&per_page=10');
 
@@ -120,18 +120,12 @@ describe('Product API Endpoints', function () {
             'code' => 'TEST-001',
             'name' => 'Test Product',
             'type' => 'finished_good',
-            'category_id' => $cat->id,
+            'product_category_id' => $cat->id,
             'unit_id' => $unit->id,
             'cost' => '500.00',
             'selling_price' => '750.00',
             'status' => 'active',
             'billing_model' => 'one_time',
-            'is_recurring' => false,
-            'allow_one_time_purchase' => true,
-            'is_manufactured' => false,
-            'is_purchasable' => true,
-            'is_sellable' => true,
-            'is_taxable' => true,
         ];
 
         $response = postJson('/api/products', $data);
@@ -145,11 +139,11 @@ describe('Product API Endpoints', function () {
 
     test('store fails with invalid data', function () {
         $response = postJson('/api/products', [
-            'name' => '', // required
+            'name' => '',
         ]);
 
         $response->assertUnprocessable()
-            ->assertJsonValidationErrors(['name', 'code', 'type', 'category_id', 'unit_id']);
+            ->assertJsonValidationErrors(['name', 'code', 'type', 'product_category_id', 'unit_id']);
     });
 
     test('show returns single product', function () {

@@ -15,8 +15,6 @@ class BillOfMaterialFactory extends Factory
     protected $model = BillOfMaterial::class;
 
     /**
-     * Define the model's default state.
-     *
      * @return array<string, mixed>
      */
     public function definition(): array
@@ -24,7 +22,8 @@ class BillOfMaterialFactory extends Factory
         return [
             'finished_product_id' => Product::factory()->finishedGood()->manufactured(),
             'raw_material_id' => Product::factory()->rawMaterial(),
-            'quantity_required' => fake()->randomFloat(4, 0.1, 100),
+            'quantity' => fake()->randomFloat(4, 0.1, 100),
+            'waste_percentage' => fake()->randomFloat(2, 0, 10),
             'unit_id' => Unit::factory(),
             'notes' => fake()->optional()->sentence(),
         ];

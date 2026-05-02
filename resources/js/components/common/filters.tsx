@@ -498,7 +498,7 @@ export function createSupplierCategoryFilterField(
 }
 
 export function createProductCategoryFilterField(
-    name = 'category_id',
+    name = 'product_category_id',
     label = 'Category',
     placeholder = 'Select category',
 ): FieldDescriptor {

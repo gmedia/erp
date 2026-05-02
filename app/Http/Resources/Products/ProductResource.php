@@ -20,9 +20,8 @@ class ProductResource extends JsonResource
             'description' => $this->resource->description,
             'type' => $this->resource->type,
 
-            // Nested Objects
             'category' => [
-                'id' => $this->resource->category_id,
+                'id' => $this->resource->product_category_id,
                 'name' => $this->resource->category?->name,
             ],
             'unit' => [
@@ -37,17 +36,8 @@ class ProductResource extends JsonResource
 
             'cost' => (string) $this->resource->cost,
             'selling_price' => (string) $this->resource->selling_price,
-            'markup_percentage' => (string) $this->resource->markup_percentage,
 
             'billing_model' => $this->resource->billing_model,
-            'is_recurring' => $this->resource->is_recurring,
-            'trial_period_days' => $this->resource->trial_period_days,
-            'allow_one_time_purchase' => $this->resource->allow_one_time_purchase,
-
-            'is_manufactured' => $this->resource->is_manufactured,
-            'is_purchasable' => $this->resource->is_purchasable,
-            'is_sellable' => $this->resource->is_sellable,
-            'is_taxable' => $this->resource->is_taxable,
 
             'status' => $this->resource->status,
             'notes' => $this->resource->notes,

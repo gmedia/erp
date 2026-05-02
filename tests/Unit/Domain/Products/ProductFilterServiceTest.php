@@ -13,11 +13,11 @@ test('applyAdvancedFilters applies category filter', function () {
     $service = new ProductFilterService;
     $cat = ProductCategory::factory()->create();
 
-    Product::factory()->create(['category_id' => $cat->id]);
+    Product::factory()->create(['product_category_id' => $cat->id]);
     Product::factory()->create();
 
     $query = Product::query();
-    $service->applyAdvancedFilters($query, ['category_id' => $cat->id]);
+    $service->applyAdvancedFilters($query, ['product_category_id' => $cat->id]);
 
     expect($query->count())->toBe(1);
 });
@@ -72,14 +72,14 @@ test('applyAdvancedFilters applies status filter', function () {
     expect($query->count())->toBe(1);
 });
 
-test('applyAdvancedFilters applies flag filters', function () {
+test('applyAdvancedFilters applies billing model filter', function () {
     $service = new ProductFilterService;
 
-    Product::factory()->create(['is_manufactured' => true]);
-    Product::factory()->create(['is_manufactured' => false]);
+    Product::factory()->create(['billing_model' => 'subscription']);
+    Product::factory()->create(['billing_model' => 'one_time']);
 
     $query = Product::query();
-    $service->applyAdvancedFilters($query, ['is_manufactured' => true]);
+    $service->applyAdvancedFilters($query, ['billing_model' => 'subscription']);
 
     expect($query->count())->toBe(1);
 });

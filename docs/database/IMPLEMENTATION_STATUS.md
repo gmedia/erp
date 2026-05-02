@@ -21,7 +21,7 @@
 
 | # | Module | Design Doc | Status | Catatan |
 |---|--------|-----------|--------|---------|
-| 00 | Products & Manufacturing | `00_products_design_v2.md` | 🔨 Partial | V1 implemented, V1→V2 migration pending |
+| 00 | Products & Manufacturing | `00_products_design_v2.md` | ✅ Implemented | V2 schema migrated |
 | 01 | Chart of Accounts & Journal | `01_chart_of_accounts_design.md` | ✅ Implemented | |
 | 10 | Pipeline (State Machine) | `10_pipeline_design.md` | ✅ Implemented | |
 | 11 | Approval System | `11_approval_design.md` | ✅ Implemented | |
@@ -37,25 +37,21 @@
 
 ## Detail per Module
 
-### ✅ Products & Manufacturing (Partial — V1 Implemented)
+### ✅ Products & Manufacturing (V2 Implemented)
 
 **Design doc:** `00_products_design_v2.md`
-**Migration note:** Schema V1 sudah live. Migrasi V1→V2 direncanakan di `migration_plan_v1_to_v2.md`.
 
 | Layer | Status | Files |
 |-------|--------|-------|
-| Migration | ✅ V1 | `2026_01_29_114411` — `2026_01_29_114422` (12 files) |
-| Model | ✅ | `Product`, `ProductCategory`, `Unit`, `ProductStock`, `ProductPrice`, `BillOfMaterial`, `ProductionOrder`, `ProductionOrderItem`, `ProductDependency`, `SubscriptionPlan`, `CustomerSubscription`, `SubscriptionBillingRecord` |
+| Migration | ✅ V2 | V1 creates (`2026_01_29_114411` — `114422`) + V2 aligns (`2026_05_02_000001`, `2026_05_02_000002`) |
+| Model | ✅ V2 | `Product`, `ProductCategory`, `Unit`, `ProductStock`, `ProductPrice`, `BillOfMaterial`, `ProductionOrder`, `ProductionOrderItem`, `ProductDependency`, `SubscriptionPlan`, `CustomerSubscription`, `SubscriptionBillingRecord` |
 | Controller | ✅ | `ProductController`, `ProductCategoryController`, `UnitController` |
-| Frontend | ✅ | `pages/products/`, `pages/product-categories/`, `pages/units/` |
-| Factory | ✅ | All product-related factories exist |
-| Tests | ✅ | Feature, Unit, E2E directories exist |
-| Seeder | ✅ | `ProductCategorySeeder`, `UnitSeeder`, `ProductSampleDataSeeder` |
+| Frontend | ✅ V2 | `pages/products/`, `pages/product-categories/`, `pages/units/` |
+| Factory | ✅ V2 | All product-related factories aligned to V2 schema |
+| Tests | ✅ V2 | 54 Pest tests passed, E2E helpers aligned |
+| Seeder | ✅ V2 | `ProductCategorySeeder`, `UnitSeeder`, `ProductSampleDataSeeder` |
 
-**Known gaps vs V2 design:**
-- Kolom `category_id` belum di-rename ke `product_category_id`
-- Tipe data `product_stocks.quantity_on_hand/reserved` masih Integer (V2: Decimal)
-- Kolom ekstra V1 belum di-drop (lihat `migration_plan_v1_to_v2.md`)
+**Remaining gap:**
 - `product_stocks.branch_id` belum diubah ke `warehouse_id` (menunggu Inventory integration)
 
 ---
@@ -289,4 +285,4 @@ Modul-modul berikut sudah diimplementasi sebagai master data pendukung:
 | 1 | `product_stocks.branch_id → warehouse_id` | `14_inventory_design.md` Section 8 | Products V2 migration + Inventory integration |
 | 2 | `journal_entry_id` di GR/SR | `13_purchasing_design.md` Section 6 | Purchasing ↔ Accounting integration |
 | 3 | `journal_entry_id` di stock adjustments | `14_inventory_design.md` Section 7 | Inventory ↔ Accounting integration |
-| 4 | Products V1→V2 migration timing | `migration_plan_v1_to_v2.md` | Blocking for full V2 compliance |
+| 4 | ~~Products V1→V2 migration timing~~ | `migration_plan_v1_to_v2.md` | ✅ Resolved — V2 migration complete |

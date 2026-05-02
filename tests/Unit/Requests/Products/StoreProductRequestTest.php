@@ -24,17 +24,11 @@ describe('StoreProductRequest', function () {
             'code',
             'name',
             'type',
-            'category_id',
+            'product_category_id',
             'unit_id',
             'cost',
             'selling_price',
             'billing_model',
-            'is_recurring',
-            'allow_one_time_purchase',
-            'is_manufactured',
-            'is_purchasable',
-            'is_sellable',
-            'is_taxable',
             'status',
         ]);
     });
@@ -48,18 +42,12 @@ describe('StoreProductRequest', function () {
             'code' => 'P-001',
             'name' => 'Test Product',
             'type' => 'finished_good',
-            'category_id' => $category->id,
+            'product_category_id' => $category->id,
             'unit_id' => $unit->id,
             'branch_id' => $branch->id,
             'cost' => 100.00,
             'selling_price' => 150.00,
             'billing_model' => 'one_time',
-            'is_recurring' => false,
-            'allow_one_time_purchase' => true,
-            'is_manufactured' => true,
-            'is_purchasable' => true,
-            'is_sellable' => true,
-            'is_taxable' => true,
             'status' => 'active',
         ];
 
@@ -75,7 +63,7 @@ describe('StoreProductRequest', function () {
             ->and($validator->errors()->has('name'))->toBeTrue()
             ->and($validator->errors()->has('code'))->toBeTrue()
             ->and($validator->errors()->has('type'))->toBeTrue()
-            ->and($validator->errors()->has('category_id'))->toBeTrue()
+            ->and($validator->errors()->has('product_category_id'))->toBeTrue()
             ->and($validator->errors()->has('unit_id'))->toBeTrue()
             ->and($validator->errors()->has('cost'))->toBeTrue()
             ->and($validator->errors()->has('selling_price'))->toBeTrue()
@@ -91,17 +79,11 @@ describe('StoreProductRequest', function () {
             'code' => 'DUPLICATE',
             'name' => 'Test Product',
             'type' => 'finished_good',
-            'category_id' => $category->id,
+            'product_category_id' => $category->id,
             'unit_id' => $unit->id,
             'cost' => 100.00,
             'selling_price' => 150.00,
             'billing_model' => 'one_time',
-            'is_recurring' => false,
-            'allow_one_time_purchase' => true,
-            'is_manufactured' => true,
-            'is_purchasable' => true,
-            'is_sellable' => true,
-            'is_taxable' => true,
             'status' => 'active',
         ];
 

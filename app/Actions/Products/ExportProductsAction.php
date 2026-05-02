@@ -15,7 +15,7 @@ class ExportProductsAction extends ConfiguredTimestampExportAction
     {
         $filters = [
             'search' => $validated['search'] ?? null,
-            'category_id' => $validated['category_id'] ?? null,
+            'product_category_id' => $validated['product_category_id'] ?? null,
             'unit_id' => $validated['unit_id'] ?? null,
             'branch_id' => $validated['branch_id'] ?? null,
             'type' => $validated['type'] ?? null,

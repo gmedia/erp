@@ -6,7 +6,6 @@ import { useForm, type UseFormReturn } from 'react-hook-form';
 import * as z from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
-import CheckboxField from '@/components/common/CheckboxField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
@@ -35,7 +34,7 @@ const renderGeneralInfoSection = () => (
             />
         </div>
         <AsyncSelectField
-            name="category_id"
+            name="product_category_id"
             label="Category"
             url="/api/product-categories"
             placeholder="Select category"
@@ -68,7 +67,7 @@ const renderGeneralInfoSection = () => (
 );
 
 const renderPricingSection = () => (
-    <div className="mt-2 grid grid-cols-1 gap-4 border-t pt-4 md:grid-cols-3">
+    <div className="mt-2 grid grid-cols-1 gap-4 border-t pt-4 md:grid-cols-2">
         <InputField
             name="cost"
             label="Cost"
@@ -82,12 +81,6 @@ const renderPricingSection = () => (
             type="number"
             placeholder="0.00"
             prefix="Rp"
-        />
-        <InputField
-            name="markup_percentage"
-            label="Markup %"
-            type="number"
-            placeholder="0.00"
         />
     </div>
 );
@@ -104,28 +97,6 @@ const renderConfigSection = () => (
             ]}
             placeholder="Select model"
         />
-        <InputField
-            name="trial_period_days"
-            label="Trial Period (Days)"
-            type="number"
-            placeholder="0"
-        />
-        <div className="grid grid-cols-2 gap-4 py-2 md:col-span-2 md:grid-cols-3">
-            <CheckboxField name="is_recurring" label="Is Recurring" />
-            <CheckboxField
-                name="allow_one_time_purchase"
-                label="Allow One-Time Purchase"
-            />
-            <CheckboxField name="is_manufactured" label="Is Manufactured" />
-            <CheckboxField name="is_purchasable" label="Is Purchasable" />
-            <CheckboxField name="is_sellable" label="Is Sellable" />
-            <CheckboxField name="is_taxable" label="Is Taxable" />
-        </div>
-    </div>
-);
-
-const renderOtherSection = () => (
-    <div className="mt-2 grid grid-cols-1 gap-4 border-t pt-4">
         <SelectField
             name="status"
             label="Status"
@@ -136,6 +107,11 @@ const renderOtherSection = () => (
             ]}
             placeholder="Select status"
         />
+    </div>
+);
+
+const renderOtherSection = () => (
+    <div className="mt-2 grid grid-cols-1 gap-4 border-t pt-4">
         <TextareaField
             name="notes"
             label="Notes"
@@ -151,20 +127,12 @@ const getProductFormDefaults = (product?: Product | null): ProductFormData => {
             name: '',
             description: '',
             type: 'finished_good',
-            category_id: '',
+            product_category_id: '',
             unit_id: '',
             branch_id: '',
             cost: '0',
             selling_price: '0',
-            markup_percentage: '',
             billing_model: 'one_time',
-            is_recurring: false,
-            trial_period_days: '',
-            allow_one_time_purchase: true,
-            is_manufactured: false,
-            is_purchasable: true,
-            is_sellable: true,
-            is_taxable: true,
             status: 'active',
             notes: '',
         };
@@ -175,24 +143,12 @@ const getProductFormDefaults = (product?: Product | null): ProductFormData => {
         name: product.name,
         description: product.description || '',
         type: product.type,
-        category_id: String(product.category.id),
+        product_category_id: String(product.category.id),
         unit_id: String(product.unit.id),
         branch_id: product.branch ? String(product.branch.id) : '',
         cost: String(product.cost),
         selling_price: String(product.selling_price),
-        markup_percentage: product.markup_percentage
-            ? String(product.markup_percentage)
-            : '',
         billing_model: product.billing_model,
-        is_recurring: product.is_recurring,
-        trial_period_days: product.trial_period_days
-            ? String(product.trial_period_days)
-            : '',
-        allow_one_time_purchase: product.allow_one_time_purchase,
-        is_manufactured: product.is_manufactured,
-        is_purchasable: product.is_purchasable,
-        is_sellable: product.is_sellable,
-        is_taxable: product.is_taxable,
         status: product.status,
         notes: product.notes || '',
     };

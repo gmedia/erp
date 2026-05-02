@@ -22,7 +22,7 @@ Purchase Request (PR)  →  Purchase Order (PO)  →  Goods Receipt (GR)
 | :--- | :--- | :--- |
 | **Pipeline** | `10_pipeline_design.md` | PR & PO lifecycle dikelola oleh pipeline |
 | **Approval** | `11_approval_design.md` | PR & PO memerlukan approval sebelum diproses |
-| **Products** | `00_products_design.md` | Produk yang dibeli & update stok |
+| **Products** | `00_products_design_v2.md` | Produk yang dibeli & update stok |
 | **Chart of Accounts** | `01_chart_of_accounts_design.md` | Posting AP dan inventory ke jurnal |
 
 ### Komponen Utama

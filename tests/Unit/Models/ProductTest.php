@@ -17,7 +17,7 @@ test('product has correct relationships', function () {
     $branch = Branch::factory()->create();
 
     $product = Product::factory()->create([
-        'category_id' => $category->id,
+        'product_category_id' => $category->id,
         'unit_id' => $unit->id,
         'branch_id' => $branch->id,
     ]);
@@ -59,17 +59,15 @@ test('product has stocks relationship', function () {
 });
 
 test('product has bill of materials relationship', function () {
-    $finishedProduct = Product::factory()->create(['is_manufactured' => true]);
+    $finishedProduct = Product::factory()->finishedGood()->create();
     BillOfMaterial::factory()->count(2)->create(['finished_product_id' => $finishedProduct->id]);
 
     expect($finishedProduct->billOfMaterials)->toHaveCount(2);
 });
 
-test('product has additional scopes', function () {
-    Product::factory()->create(['is_sellable' => true, 'is_purchasable' => false, 'is_manufactured' => true]);
-    Product::factory()->create(['is_sellable' => false, 'is_purchasable' => true, 'is_manufactured' => false]);
+test('product has ofType scope', function () {
+    Product::factory()->create(['type' => 'service']);
+    Product::factory()->create(['type' => 'raw_material']);
 
-    expect(Product::sellable()->count())->toBe(1)
-        ->and(Product::purchasable()->count())->toBe(1)
-        ->and(Product::manufactured()->count())->toBe(1);
+    expect(Product::ofType('service')->count())->toBe(1);
 });

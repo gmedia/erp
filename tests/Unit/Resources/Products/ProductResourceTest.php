@@ -15,7 +15,7 @@ test('ProductResource transforms product correctly', function () {
     $branch = Branch::factory()->create(['name' => 'Main Branch']);
 
     $product = Product::factory()->create([
-        'category_id' => $category->id,
+        'product_category_id' => $category->id,
         'unit_id' => $unit->id,
         'branch_id' => $branch->id,
         'cost' => 10.50,

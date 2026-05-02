@@ -9,13 +9,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property int $id
  * @property int $product_id
- * @property int $customer_category_id
+ * @property int|null $customer_category_id
  * @property numeric $price
- * @property \Illuminate\Support\Carbon|null $effective_from
+ * @property \Illuminate\Support\Carbon $effective_from
  * @property \Illuminate\Support\Carbon|null $effective_until
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\CustomerCategory $customerCategory
+ * @property-read \App\Models\CustomerCategory|null $customerCategory
  * @property-read \App\Models\Product $product
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice effective()
@@ -23,14 +23,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereCustomerCategoryId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereEffectiveFrom($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereEffectiveUntil($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereProductId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */
@@ -40,8 +32,6 @@ class ProductPrice extends Model
     use HasFactory;
 
     /**
-     * The attributes that are mass assignable.
-     *
      * @var list<string>
      */
     protected $fillable = [
@@ -53,8 +43,6 @@ class ProductPrice extends Model
     ];
 
     /**
-     * The attributes that should be cast.
-     *
      * @var array<string, string>
      */
     protected $casts = [
@@ -63,33 +51,22 @@ class ProductPrice extends Model
         'effective_until' => 'date',
     ];
 
-    /**
-     * Get the product that this price belongs to.
-     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    /**
-     * Get the customer category that this price applies to.
-     */
     public function customerCategory(): BelongsTo
     {
         return $this->belongsTo(CustomerCategory::class, 'customer_category_id');
     }
 
-    /**
-     * Scope a query to only include currently effective prices.
-     */
     public function scopeEffective($query)
     {
-        return $query->where(function ($q) {
-            $q->whereNull('effective_from')
-                ->orWhere('effective_from', '<=', now());
-        })->where(function ($q) {
-            $q->whereNull('effective_until')
-                ->orWhere('effective_until', '>=', now());
-        });
+        return $query->where('effective_from', '<=', now())
+            ->where(function ($q) {
+                $q->whereNull('effective_until')
+                    ->orWhere('effective_until', '>=', now());
+            });
     }
 }

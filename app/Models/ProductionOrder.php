@@ -12,18 +12,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $order_number
  * @property int $product_id
  * @property int|null $branch_id
- * @property numeric $quantity_to_produce
- * @property \Illuminate\Support\Carbon $production_date
- * @property \Illuminate\Support\Carbon|null $completion_date
+ * @property numeric $quantity
+ * @property int $unit_id
+ * @property \Illuminate\Support\Carbon|null $planned_start_date
+ * @property \Illuminate\Support\Carbon|null $planned_end_date
+ * @property \Illuminate\Support\Carbon|null $actual_start_date
+ * @property \Illuminate\Support\Carbon|null $actual_end_date
  * @property string $status
  * @property numeric $total_cost
  * @property string|null $notes
+ * @property int|null $created_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Branch|null $branch
+ * @property-read \App\Models\User|null $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductionOrderItem> $items
  * @property-read int|null $items_count
  * @property-read \App\Models\Product $product
+ * @property-read \App\Models\Unit $unit
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder completed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder draft()
@@ -32,18 +38,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereBranchId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereCompletionDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereNotes($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereOrderNumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereProductId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereProductionDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereQuantityToProduce($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereTotalCost($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */
@@ -53,77 +47,71 @@ class ProductionOrder extends Model
     use HasFactory;
 
     /**
-     * The attributes that are mass assignable.
-     *
      * @var list<string>
      */
     protected $fillable = [
         'order_number',
         'product_id',
         'branch_id',
-        'quantity_to_produce',
-        'production_date',
-        'completion_date',
+        'quantity',
+        'unit_id',
+        'planned_start_date',
+        'planned_end_date',
+        'actual_start_date',
+        'actual_end_date',
         'status',
         'total_cost',
         'notes',
+        'created_by',
     ];
 
     /**
-     * The attributes that should be cast.
-     *
      * @var array<string, string>
      */
     protected $casts = [
-        'quantity_to_produce' => 'decimal:2',
+        'quantity' => 'decimal:2',
         'total_cost' => 'decimal:2',
-        'production_date' => 'date',
-        'completion_date' => 'date',
+        'planned_start_date' => 'date',
+        'planned_end_date' => 'date',
+        'actual_start_date' => 'date',
+        'actual_end_date' => 'date',
     ];
 
-    /**
-     * Get the product being produced.
-     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    /**
-     * Get the branch where production occurs.
-     */
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
     }
 
-    /**
-     * Get the items (raw materials) used in this production order.
-     */
+    public function unit(): BelongsTo
+    {
+        return $this->belongsTo(Unit::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(ProductionOrderItem::class);
     }
 
-    /**
-     * Scope a query to only include in-progress orders.
-     */
     public function scopeInProgress($query)
     {
         return $query->where('status', 'in_progress');
     }
 
-    /**
-     * Scope a query to only include completed orders.
-     */
     public function scopeCompleted($query)
     {
         return $query->where('status', 'completed');
     }
 
-    /**
-     * Scope a query to only include draft orders.
-     */
     public function scopeDraft($query)
     {
         return $query->where('status', 'draft');

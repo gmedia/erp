@@ -14,25 +14,20 @@ test('execute returns paginated products without filters', function () {
 
     Product::factory()->count(5)->create();
 
-    // Mock request
     $request = Mockery::mock(IndexProductRequest::class);
     $request->shouldReceive('filled')->with('search')->andReturn(false);
     $request->shouldReceive('get')->with('search')->andReturn(null);
-    $request->shouldReceive('get')->with('category_id')->andReturn(null);
+    $request->shouldReceive('get')->with('product_category_id')->andReturn(null);
     $request->shouldReceive('get')->with('unit_id')->andReturn(null);
     $request->shouldReceive('get')->with('branch_id')->andReturn(null);
     $request->shouldReceive('get')->with('type')->andReturn(null);
     $request->shouldReceive('get')->with('status')->andReturn(null);
     $request->shouldReceive('get')->with('billing_model')->andReturn(null);
-    $request->shouldReceive('get')->with('is_manufactured')->andReturn(null);
-    $request->shouldReceive('get')->with('is_purchasable')->andReturn(null);
-    $request->shouldReceive('get')->with('is_sellable')->andReturn(null);
     $request->shouldReceive('get')->with('sort_by', 'created_at')->andReturn('created_at');
     $request->shouldReceive('get')->with('sort_direction', 'desc')->andReturn('desc');
     $request->shouldReceive('get')->with('per_page', 15)->andReturn(15);
     $request->shouldReceive('get')->with('page', 1)->andReturn(1);
 
-    // Mock filter service calls
     $filterService->shouldReceive('applyAdvancedFilters')
         ->twice()
         ->with(Mockery::type('Illuminate\Database\Eloquent\Builder'), Mockery::type('array'));
@@ -49,7 +44,7 @@ test('execute returns paginated products without filters', function () {
                 'name',
                 'type',
                 'category',
-                'category_id',
+                'product_category_id',
                 'unit_id',
                 'cost',
                 'selling_price',
@@ -71,22 +66,17 @@ test('execute applies search filter when provided', function () {
 
     Product::factory()->create(['name' => 'Widget']);
 
-    // Mock request with search
     $request = Mockery::mock(IndexProductRequest::class);
     $request->shouldReceive('filled')->with('search')->andReturn(true);
     $request->shouldReceive('get')->with('search')->andReturn('widget');
     $request->shouldReceive('get')->with('type')->andReturn(null);
     $request->shouldReceive('get')->with('status')->andReturn(null);
     $request->shouldReceive('get')->with('billing_model')->andReturn(null);
-    $request->shouldReceive('get')->with('is_manufactured')->andReturn(null);
-    $request->shouldReceive('get')->with('is_purchasable')->andReturn(null);
-    $request->shouldReceive('get')->with('is_sellable')->andReturn(null);
     $request->shouldReceive('get')->with('sort_by', 'created_at')->andReturn('created_at');
     $request->shouldReceive('get')->with('sort_direction', 'desc')->andReturn('desc');
     $request->shouldReceive('get')->with('per_page', 15)->andReturn(15);
     $request->shouldReceive('get')->with('page', 1)->andReturn(1);
 
-    // Mock filter service calls
     $filterService->shouldReceive('applySearch')
         ->once()
         ->with(
@@ -101,9 +91,6 @@ test('execute applies search filter when provided', function () {
             'type' => null,
             'status' => null,
             'billing_model' => null,
-            'is_manufactured' => null,
-            'is_purchasable' => null,
-            'is_sellable' => null,
         ]);
 
     $filterService->shouldReceive('applySorting')
@@ -118,7 +105,7 @@ test('execute applies search filter when provided', function () {
                 'name',
                 'type',
                 'category',
-                'category_id',
+                'product_category_id',
                 'unit_id',
                 'cost',
                 'selling_price',

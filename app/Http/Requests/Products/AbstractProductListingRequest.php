@@ -10,7 +10,7 @@ abstract class AbstractProductListingRequest extends BaseListingRequest
     {
         return [
             'search' => ['nullable', 'string'],
-            'category_id' => ['nullable', 'exists:product_categories,id'],
+            'product_category_id' => ['nullable', 'exists:product_categories,id'],
             'unit_id' => ['nullable', 'exists:units,id'],
             'branch_id' => ['nullable', 'exists:branches,id'],
             'type' => ['nullable', 'in:raw_material,work_in_progress,finished_good,purchased_good,service'],

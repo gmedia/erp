@@ -27,7 +27,7 @@ class ProductExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
         $query = Product::query()->with(['category', 'unit', 'branch']);
 
         $this->applyConfiguredFilters($query, $this->filters, ['name', 'code', 'description'], [
-            'category_id' => 'category_id',
+            'product_category_id' => 'product_category_id',
             'unit_id' => 'unit_id',
             'branch_id' => 'branch_id',
             'type' => 'type',

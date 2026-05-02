@@ -32,14 +32,14 @@ describe('ProductExport', function () {
         $cat1 = ProductCategory::factory()->create();
         $cat2 = ProductCategory::factory()->create();
 
-        Product::factory()->create(['category_id' => $cat1->id]);
-        Product::factory()->create(['category_id' => $cat2->id]);
+        Product::factory()->create(['product_category_id' => $cat1->id]);
+        Product::factory()->create(['product_category_id' => $cat2->id]);
 
-        $export = new ProductExport(['category_id' => $cat1->id]);
+        $export = new ProductExport(['product_category_id' => $cat1->id]);
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(1)
-            ->and($results->first()->category_id)->toBe($cat1->id);
+            ->and($results->first()->product_category_id)->toBe($cat1->id);
     });
 
     test('query applies unit filter', function () {
@@ -100,7 +100,7 @@ describe('ProductExport', function () {
             'code' => 'P-001',
             'name' => 'Smartphone',
             'type' => 'finished_good',
-            'category_id' => $category->id,
+            'product_category_id' => $category->id,
             'unit_id' => $unit->id,
             'cost' => 500.00,
             'selling_price' => 750.00,
