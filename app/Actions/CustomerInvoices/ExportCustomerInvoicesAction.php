@@ -4,19 +4,39 @@ namespace App\Actions\CustomerInvoices;
 
 use App\Actions\Concerns\ConfiguredTransactionExportAction;
 use App\Exports\CustomerInvoiceExport;
-use App\Http\Requests\CustomerInvoices\ExportCustomerInvoiceRequest;
-use Illuminate\Http\JsonResponse;
 
-class ExportCustomerInvoicesAction
+class ExportCustomerInvoicesAction extends ConfiguredTransactionExportAction
 {
-    use ConfiguredTransactionExportAction;
-
-    public function execute(ExportCustomerInvoiceRequest $request): JsonResponse
+    /**
+     * @return array<string, mixed>
+     */
+    protected function filterDefaults(): array
     {
-        return $this->exportWithConfiguration(
-            'customer_invoices',
-            $request,
-            CustomerInvoiceExport::class
-        );
+        return [
+            'search' => null,
+            'customer' => null,
+            'branch' => null,
+            'status' => null,
+            'currency' => null,
+            'invoice_date_from' => null,
+            'invoice_date_to' => null,
+            'due_date_from' => null,
+            'due_date_to' => null,
+            'sort_by' => 'created_at',
+            'sort_direction' => 'desc',
+        ];
+    }
+
+    protected function filenamePrefix(): string
+    {
+        return 'customer_invoices';
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new CustomerInvoiceExport($filters);
     }
 }

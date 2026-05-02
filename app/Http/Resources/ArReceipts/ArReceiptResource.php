@@ -42,7 +42,7 @@ class ArReceiptResource extends JsonResource
                 ->map(fn (ArReceiptAllocation $allocation) => [
                     'id' => $allocation->id,
                     'customer_invoice_id' => $allocation->customer_invoice_id,
-                    'invoice_number' => $allocation->customerInvoice?->invoice_number,
+                    'invoice_number' => $allocation->customerInvoice->invoice_number,
                     'allocated_amount' => (string) $allocation->allocated_amount,
                     'discount_given' => (string) $allocation->discount_given,
                     'notes' => $allocation->notes,

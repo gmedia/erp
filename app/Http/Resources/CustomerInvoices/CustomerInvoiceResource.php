@@ -41,7 +41,7 @@ class CustomerInvoiceResource extends JsonResource
             $items = $customerInvoiceItems
                 ->map(fn (CustomerInvoiceItem $item) => $this->productUnitItemResourceData($item, [
                     'account_id' => $item->account_id,
-                    'account_name' => $item->account?->name,
+                    'account_name' => $item->account->name,
                     'description' => $item->description,
                     'quantity' => (string) $item->quantity,
                     'unit_price' => (string) $item->unit_price,

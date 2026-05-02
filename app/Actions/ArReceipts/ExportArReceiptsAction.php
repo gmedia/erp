@@ -4,19 +4,38 @@ namespace App\Actions\ArReceipts;
 
 use App\Actions\Concerns\ConfiguredTransactionExportAction;
 use App\Exports\ArReceiptExport;
-use App\Http\Requests\ArReceipts\ExportArReceiptRequest;
-use Illuminate\Http\JsonResponse;
 
-class ExportArReceiptsAction
+class ExportArReceiptsAction extends ConfiguredTransactionExportAction
 {
-    use ConfiguredTransactionExportAction;
-
-    public function execute(ExportArReceiptRequest $request): JsonResponse
+    /**
+     * @return array<string, mixed>
+     */
+    protected function filterDefaults(): array
     {
-        return $this->exportWithConfiguration(
-            'ar_receipts',
-            $request,
-            ArReceiptExport::class
-        );
+        return [
+            'search' => null,
+            'customer' => null,
+            'branch' => null,
+            'status' => null,
+            'payment_method' => null,
+            'currency' => null,
+            'receipt_date_from' => null,
+            'receipt_date_to' => null,
+            'sort_by' => 'created_at',
+            'sort_direction' => 'desc',
+        ];
+    }
+
+    protected function filenamePrefix(): string
+    {
+        return 'ar_receipts';
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new ArReceiptExport($filters);
     }
 }

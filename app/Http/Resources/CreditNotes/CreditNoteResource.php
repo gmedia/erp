@@ -44,7 +44,7 @@ class CreditNoteResource extends JsonResource
                     'product_id' => $item->product_id,
                     'product_name' => $item->product?->name,
                     'account_id' => $item->account_id,
-                    'account_name' => $item->account?->name,
+                    'account_name' => $item->account->name,
                     'description' => $item->description,
                     'quantity' => (string) $item->quantity,
                     'unit_price' => (string) $item->unit_price,

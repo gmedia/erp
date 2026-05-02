@@ -4,19 +4,37 @@ namespace App\Actions\CreditNotes;
 
 use App\Actions\Concerns\ConfiguredTransactionExportAction;
 use App\Exports\CreditNoteExport;
-use App\Http\Requests\CreditNotes\ExportCreditNoteRequest;
-use Illuminate\Http\JsonResponse;
 
-class ExportCreditNotesAction
+class ExportCreditNotesAction extends ConfiguredTransactionExportAction
 {
-    use ConfiguredTransactionExportAction;
-
-    public function execute(ExportCreditNoteRequest $request): JsonResponse
+    /**
+     * @return array<string, mixed>
+     */
+    protected function filterDefaults(): array
     {
-        return $this->exportWithConfiguration(
-            'credit_notes',
-            $request,
-            CreditNoteExport::class
-        );
+        return [
+            'search' => null,
+            'customer' => null,
+            'branch' => null,
+            'reason' => null,
+            'status' => null,
+            'credit_note_date_from' => null,
+            'credit_note_date_to' => null,
+            'sort_by' => 'created_at',
+            'sort_direction' => 'desc',
+        ];
+    }
+
+    protected function filenamePrefix(): string
+    {
+        return 'credit_notes';
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    protected function makeExport(array $filters): object
+    {
+        return new CreditNoteExport($filters);
     }
 }
