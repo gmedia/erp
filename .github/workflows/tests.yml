@@ -11,7 +11,7 @@ on:
       - main
 
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 env:
@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
           repository: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
@@ -53,6 +53,9 @@ jobs:
           mkdir -p storage/tmp
           chmod -R u+rwX,g+rwX,o-rwx storage/tmp
 
+      - name: Validate Composer configuration
+        run: composer validate --strict
+
       - name: Bootstrap Sail dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
@@ -65,8 +68,11 @@ jobs:
 
       - name: Pull CI Sail image
         shell: bash
+        timeout-minutes: 5
         run: |
           branch_tag="${GITHUB_BASE_REF:-${GITHUB_REF_NAME}}"
+          branch_tag=$(echo "$branch_tag" | tr -cd '[:alnum:]._-')
+
           candidates=(
             "$CI_SAIL_IMAGE"
             "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:${branch_tag}"
@@ -74,25 +80,31 @@ jobs:
           )
 
           for image in "${candidates[@]}"; do
-            for attempt in 1 2 3 4 5; do
-              if docker pull "$image"; then
+            for attempt in 1 2 3; do
+              if timeout 60s docker pull "$image"; then
                 docker tag "$image" sail-8.4/app
                 exit 0
               fi
 
-              echo "CI Sail image $image not available yet. Retry ${attempt}/5 in 15s..."
-              sleep 15
+              if [ "$attempt" -lt 3 ]; then
+                echo "CI Sail image $image not available. Retry ${attempt}/3 in 10s..."
+                sleep 10
+              fi
             done
           done
 
-          echo "Unable to pull any CI Sail image candidate." >&2
+          echo "::error::Unable to pull any CI Sail image candidate after retries."
           exit 1
 
       - name: Start Sail
         run: ./vendor/bin/sail up -d --wait
 
-      - name: Validate Composer configuration
-        run: ./vendor/bin/sail composer validate --strict
+      - name: Cache npm dependencies
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
 
       - name: Install Node dependencies
         run: ./vendor/bin/sail npm ci
@@ -116,6 +128,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           HEAD_REPOSITORY: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
           TARGET_BRANCH: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ -z "$(git status --porcelain)" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -126,12 +139,12 @@ jobs:
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
           if [ "$GITHUB_ACTOR" = "github-actions[bot]" ]; then
-            echo "Lint autofixes are still changing files on the bot rerun." >&2
+            echo "::error::Lint autofixes are still changing files on the bot rerun."
             exit 1
           fi
 
           if [ "$EVENT_NAME" = "pull_request" ] && [ "$HEAD_REPOSITORY" != "$GITHUB_REPOSITORY" ]; then
-            echo "Lint autofixes were generated, but this pull request comes from a fork so CI cannot push them back." >&2
+            echo "::error::Lint autofixes were generated, but this PR comes from a fork so CI cannot push them back."
             exit 1
           fi
 
@@ -139,7 +152,20 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "style: apply CI autofixes"
-          git push origin "HEAD:$TARGET_BRANCH"
+
+          push_url="https://x-access-token:${PUSH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          for attempt in 1 2 3; do
+            if git push "$push_url" "HEAD:$TARGET_BRANCH"; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "Push failed, rebasing and retrying (attempt $attempt/3)..."
+              git fetch "$push_url" "$TARGET_BRANCH"
+              git rebase "FETCH_HEAD"
+            fi
+          done
+          echo "::error::Failed to push autofixes after 3 attempts."
+          exit 1
 
       - name: Configure MinIO bucket
         if: steps.autofix.outputs.changed != 'true'
@@ -177,8 +203,8 @@ jobs:
         run: ./vendor/bin/sail test --colors=always
 
       - name: Run SonarQube Cloud scan
-        if: ${{ always() && steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
-        uses: SonarSource/sonarqube-scan-action@v6
+        if: ${{ success() && steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
@@ -192,10 +218,12 @@ jobs:
       - name: Upload failure logs
         if: failure() && steps.autofix.outputs.changed != 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        continue-on-error: true
         with:
-          name: laravel-logs
+          name: laravel-logs-${{ github.run_id }}
           path: storage/logs
           if-no-files-found: ignore
+          retention-days: 7
 
       - name: Stop Sail
         if: always()
