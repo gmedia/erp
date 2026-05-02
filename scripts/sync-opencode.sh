@@ -13,6 +13,7 @@ echo "Generating opencode.json from .github/ source..."
 # Collect instruction files
 INSTRUCTIONS_JSON=$(cat <<'EOF'
 [
+  "AGENTS.md",
   ".github/copilot-instructions.md",
   "docs/development-patterns.md",
   "docs/module-registry.md"
@@ -110,14 +111,7 @@ cat > opencode.json <<EOF
     },
     "depwire": {
       "type": "local",
-      "command": ["npx", "-y", "depwire@latest", "mcp"],
-      "environment": {
-        "DEPWIRE_ROOT": "$ROOT_DIR"
-      }
-    },
-    "filesystem": {
-      "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "$ROOT_DIR"]
+      "command": ["npx", "-y", "depwire-cli", "mcp"]
     }
   }
 }
@@ -126,5 +120,5 @@ EOF
 echo "✅ opencode.json generated successfully"
 echo "   Instructions: $(echo "$INSTRUCTIONS_JSON" | grep -c '"' || true) references"
 echo "   Commands: $(echo "$COMMANDS_JSON" | grep -c 'template' || true) prompts"
-echo "   MCP servers: context7, laravel-boost, depwire, filesystem"
+echo "   MCP servers: context7, laravel-boost, depwire"
 echo "   Agents: code (primary), plan (primary), safe-refactor (sub), context7-research (sub)"
