@@ -5,8 +5,8 @@ import {
     createReportSummaryColumn,
     createReportTextColumn,
 } from '@/components/common/ReportColumns';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type ApAgingReportItem = {
@@ -23,9 +23,18 @@ export type ApAgingReportItem = {
     };
     supplier: { id: number; name: string };
     branch: { id: number; name: string };
-    references: { purchase_order_number: string | null; goods_receipt_number: string | null };
+    references: {
+        purchase_order_number: string | null;
+        goods_receipt_number: string | null;
+    };
     amounts: { grand_total: string; amount_paid: string; amount_due: string };
-    aging_buckets: { current: string; days_1_30: string; days_31_60: string; days_61_90: string; days_over_90: string };
+    aging_buckets: {
+        current: string;
+        days_1_30: string;
+        days_31_60: string;
+        days_61_90: string;
+        days_over_90: string;
+    };
 };
 
 function formatDate(value: string | null | undefined): string {
