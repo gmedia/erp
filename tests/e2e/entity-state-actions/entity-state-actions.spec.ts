@@ -31,24 +31,6 @@ async function openAssetProfile(page: Page, assetName: string): Promise<void> {
   await expect(page.getByText(assetName, { exact: true }).first()).toBeVisible({ timeout: 15000 });
 }
 
-async function reloadAssetProfile(page: Page): Promise<void> {
-  await Promise.all([
-    page.waitForResponse(
-      response => /\/api\/assets\/[^/]+\/profile$/.test(response.url()) && response.status() < 400,
-      { timeout: 15000 },
-    ),
-    page.waitForResponse(
-      response =>
-        response.url().includes('/api/entity-states/asset/') &&
-        !response.url().includes('/timeline') &&
-        !response.url().includes('/approvals') &&
-        response.status() < 400,
-      { timeout: 15000 },
-    ),
-    page.reload(),
-  ]);
-}
-
 test.describe('Entity State Actions', () => {
   test.beforeEach(async ({ page }) => {
     await login(page, undefined, undefined, { requireDashboard: false });
