@@ -3,7 +3,7 @@
 > Referensi metadata per-modul untuk testing (Pest + E2E).
 > Data ini digunakan oleh agent saat membuat atau refactoring test.
 >
-> Lihat juga: `docs/refactor-style-consistency-plan.md` untuk matriks klasifikasi implementasi aktual dan hasil audit per tahap.
+> Lihat juga: `docs/archive/refactor-style-consistency-plan.md` untuk matriks klasifikasi implementasi aktual dan hasil audit per tahap.
 
 ---
 

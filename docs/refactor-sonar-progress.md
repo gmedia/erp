@@ -46,7 +46,7 @@ Isi setelah batch selesai dan sebelum merge.
 ## Snapshot & Wave History
 
 > Detail snapshot Sonar, prioritas duplikasi per-batch, rencana refactor fokus, dan log perubahan wave telah dipindahkan ke:
-> **`docs/refactor-sonar-progress-archive.md`**
+> **`docs/archive/refactor-sonar-progress-archive.md`**
 >
 > File ini hanya menyimpan batch tracker dan metrik aktif agar tetap ringkas dan mudah dibaca.
 
@@ -65,4 +65,4 @@ Isi setelah batch selesai dan sebelum merge.
 
 - Batch D (financial-reporting) masih in-progress — local waves sudah PASS, menunggu push + CI verification.
 - Jika snapshot berikutnya masih 0 duplikasi, fokus bisa bergeser ke coverage improvement atau fitur baru.
-- Untuk detail histori wave, lihat `docs/refactor-sonar-progress-archive.md`.
+- Untuk detail histori wave, lihat `docs/archive/refactor-sonar-progress-archive.md`.
