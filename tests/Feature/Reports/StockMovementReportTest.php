@@ -36,7 +36,7 @@ test('it can fetch aggregated stock movement report data', function () {
     $product = Product::factory()->create([
         'name' => 'Kertas A4',
         'code' => 'P-001',
-        'category_id' => $category->id,
+        'product_category_id' => $category->id,
     ]);
 
     StockMovement::factory()->create([
@@ -81,8 +81,8 @@ test('it can filter by date and dimensions', function () {
     $warehouseB = Warehouse::factory()->create(['branch_id' => $branchB->id, 'name' => 'Warehouse B']);
     $categoryA = ProductCategory::factory()->create(['name' => 'Kategori A']);
     $categoryB = ProductCategory::factory()->create(['name' => 'Kategori B']);
-    $productA = Product::factory()->create(['name' => 'Produk A', 'code' => 'PA-01', 'category_id' => $categoryA->id]);
-    $productB = Product::factory()->create(['name' => 'Produk B', 'code' => 'PB-01', 'category_id' => $categoryB->id]);
+    $productA = Product::factory()->create(['name' => 'Produk A', 'code' => 'PA-01', 'product_category_id' => $categoryA->id]);
+    $productB = Product::factory()->create(['name' => 'Produk B', 'code' => 'PB-01', 'product_category_id' => $categoryB->id]);
 
     StockMovement::factory()->create([
         'product_id' => $productA->id,

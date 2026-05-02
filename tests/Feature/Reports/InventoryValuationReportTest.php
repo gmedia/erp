@@ -38,7 +38,7 @@ test('it can fetch inventory valuation data via json', function () {
     $product = Product::factory()->create([
         'name' => 'Kertas A4',
         'code' => 'P-001',
-        'category_id' => $category->id,
+        'product_category_id' => $category->id,
         'unit_id' => $unit->id,
         'cost' => 5000,
     ]);
@@ -79,13 +79,13 @@ test('it can filter by product, warehouse, branch, category and search', functio
     $productA = Product::factory()->create([
         'name' => 'Produk A',
         'code' => 'PA-01',
-        'category_id' => $categoryA->id,
+        'product_category_id' => $categoryA->id,
         'unit_id' => $unit->id,
     ]);
     $productB = Product::factory()->create([
         'name' => 'Produk B',
         'code' => 'PB-01',
-        'category_id' => $categoryB->id,
+        'product_category_id' => $categoryB->id,
         'unit_id' => $unit->id,
     ]);
 

@@ -19,7 +19,7 @@ test('inventory valuation report resource returns stock movement payload with un
     $product = Product::factory()->create([
         'code' => 'PRD-INV-001',
         'name' => 'Inventory Product',
-        'category_id' => $category->id,
+        'product_category_id' => $category->id,
         'unit_id' => $unit->id,
     ]);
     $warehouse = Warehouse::factory()->create([

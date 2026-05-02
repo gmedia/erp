@@ -18,7 +18,7 @@ describe('ExportProductRequest', function () {
 
         $data = [
             'search' => 'test',
-            'category_id' => $category->id,
+            'product_category_id' => $category->id,
             'type' => 'finished_good',
             'status' => 'active',
             'sort_by' => 'name',

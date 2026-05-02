@@ -22,7 +22,7 @@ describe('IndexProductRequest', function () {
 
         $data = [
             'search' => 'test',
-            'category_id' => $category->id,
+            'product_category_id' => $category->id,
             'unit_id' => $unit->id,
             'branch_id' => $branch->id,
             'type' => 'finished_good',

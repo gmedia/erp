@@ -18,7 +18,7 @@ class IndexInventoryStocktakeVarianceReportAction
             ->from('inventory_stocktake_items as isi')
             ->join('inventory_stocktakes as st', 'isi.inventory_stocktake_id', '=', 'st.id')
             ->join('products as p', 'isi.product_id', '=', 'p.id')
-            ->leftJoin('product_categories as pc', 'p.category_id', '=', 'pc.id')
+            ->leftJoin('product_categories as pc', 'p.product_category_id', '=', 'pc.id')
             ->join('warehouses as w', 'st.warehouse_id', '=', 'w.id')
             ->leftJoin('branches as b', 'w.branch_id', '=', 'b.id')
             ->leftJoin('users as u', 'isi.counted_by', '=', 'u.id')
@@ -60,7 +60,7 @@ class IndexInventoryStocktakeVarianceReportAction
             'product_id' => 'isi.product_id',
             'warehouse_id' => 'st.warehouse_id',
             'branch_id' => 'w.branch_id',
-            'category_id' => 'p.category_id',
+            'category_id' => 'p.product_category_id',
         ]);
         $this->applyStringFilters($request, $query, [
             'result' => 'isi.result',

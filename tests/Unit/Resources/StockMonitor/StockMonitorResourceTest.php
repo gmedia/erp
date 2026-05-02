@@ -19,7 +19,7 @@ test('stock monitor resource returns stock movement payload without unit details
     $product = Product::factory()->create([
         'code' => 'PRD-STK-001',
         'name' => 'Stock Monitor Product',
-        'category_id' => $category->id,
+        'product_category_id' => $category->id,
         'unit_id' => $unit->id,
     ]);
     $warehouse = Warehouse::factory()->create([

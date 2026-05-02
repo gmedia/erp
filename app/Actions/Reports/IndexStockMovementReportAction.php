@@ -35,7 +35,7 @@ class IndexStockMovementReportAction
             ->join('products as p', 'sm.product_id', '=', 'p.id')
             ->join('warehouses as w', 'sm.warehouse_id', '=', 'w.id')
             ->leftJoin('branches as b', 'w.branch_id', '=', 'b.id')
-            ->leftJoin('product_categories as pc', 'p.category_id', '=', 'pc.id')
+            ->leftJoin('product_categories as pc', 'p.product_category_id', '=', 'pc.id')
             ->selectRaw('
                 sm.product_id,
                 sm.warehouse_id,
@@ -80,7 +80,7 @@ class IndexStockMovementReportAction
             'product_id' => 'sm.product_id',
             'warehouse_id' => 'sm.warehouse_id',
             'branch_id' => 'w.branch_id',
-            'category_id' => 'p.category_id',
+            'category_id' => 'p.product_category_id',
         ]);
         $this->applySearchFilter($request, $query, [
             'p.name',

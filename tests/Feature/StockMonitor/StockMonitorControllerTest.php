@@ -29,7 +29,7 @@ test('it returns current stock snapshot per product and warehouse', function () 
     ]);
     $category = ProductCategory::factory()->create(['name' => 'ATK']);
     $product = Product::factory()->create([
-        'category_id' => $category->id,
+        'product_category_id' => $category->id,
         'name' => 'Kertas A4',
         'code' => 'P-001',
         'cost' => 5000,
@@ -75,8 +75,8 @@ test('it can filter by branch, warehouse, category, product, and low stock thres
     $warehouseB = Warehouse::factory()->create(['branch_id' => $branchB->id, 'name' => 'Warehouse B']);
     $categoryA = ProductCategory::factory()->create(['name' => 'Kategori A']);
     $categoryB = ProductCategory::factory()->create(['name' => 'Kategori B']);
-    $productA = Product::factory()->create(['name' => 'Produk A', 'category_id' => $categoryA->id]);
-    $productB = Product::factory()->create(['name' => 'Produk B', 'category_id' => $categoryB->id]);
+    $productA = Product::factory()->create(['name' => 'Produk A', 'product_category_id' => $categoryA->id]);
+    $productB = Product::factory()->create(['name' => 'Produk B', 'product_category_id' => $categoryB->id]);
 
     StockMovement::factory()->create([
         'product_id' => $productA->id,
@@ -123,8 +123,8 @@ test('it preserves filter query string in pagination links', function () {
     $branch = Branch::factory()->create(['name' => 'Cabang A']);
     $warehouse = Warehouse::factory()->create(['branch_id' => $branch->id, 'name' => 'Warehouse A']);
     $category = ProductCategory::factory()->create(['name' => 'Kategori A']);
-    $productA = Product::factory()->create(['name' => 'Produk A', 'category_id' => $category->id]);
-    $productB = Product::factory()->create(['name' => 'Produk B', 'category_id' => $category->id]);
+    $productA = Product::factory()->create(['name' => 'Produk A', 'product_category_id' => $category->id]);
+    $productB = Product::factory()->create(['name' => 'Produk B', 'product_category_id' => $category->id]);
 
     StockMovement::factory()->create([
         'product_id' => $productA->id,

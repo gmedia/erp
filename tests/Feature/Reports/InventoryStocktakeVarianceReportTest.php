@@ -35,7 +35,7 @@ test('it can fetch inventory stocktake variance report data via json', function 
     $product = Product::factory()->create([
         'name' => 'Kertas A4',
         'code' => 'P-001',
-        'category_id' => $category->id,
+        'product_category_id' => $category->id,
         'unit_id' => $unit->id,
     ]);
     $stocktake = InventoryStocktake::factory()->create([
@@ -84,12 +84,12 @@ test('it can filter by dimensions and result', function () {
     $categoryB = ProductCategory::factory()->create(['name' => 'Kategori B']);
     $unit = Unit::factory()->create();
     $productA = Product::factory()->create([
-        'category_id' => $categoryA->id,
+        'product_category_id' => $categoryA->id,
         'unit_id' => $unit->id,
         'code' => 'PA-01',
     ]);
     $productB = Product::factory()->create([
-        'category_id' => $categoryB->id,
+        'product_category_id' => $categoryB->id,
         'unit_id' => $unit->id,
         'code' => 'PB-01',
     ]);

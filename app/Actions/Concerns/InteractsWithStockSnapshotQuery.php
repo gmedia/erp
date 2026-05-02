@@ -27,7 +27,7 @@ trait InteractsWithStockSnapshotQuery
             ->join('products', 'stock_movements.product_id', '=', 'products.id')
             ->join('warehouses', 'stock_movements.warehouse_id', '=', 'warehouses.id')
             ->leftJoin('branches', 'warehouses.branch_id', '=', 'branches.id')
-            ->leftJoin('product_categories', 'products.category_id', '=', 'product_categories.id')
+            ->leftJoin('product_categories', 'products.product_category_id', '=', 'product_categories.id')
             ->select([
                 'stock_movements.*',
                 DB::raw('stock_movements.balance_after as quantity_on_hand'),
@@ -70,7 +70,7 @@ trait InteractsWithStockSnapshotQuery
         }
 
         if ($request->filled('category_id')) {
-            $query->where('products.category_id', $request->integer('category_id'));
+            $query->where('products.product_category_id', $request->integer('category_id'));
         }
 
         if (! $request->filled('search')) {
