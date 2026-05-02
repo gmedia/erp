@@ -111,8 +111,8 @@ test('it can export customer statement report', function () {
     Excel::fake();
     Storage::fake('public');
 
-    $customer = \App\Models\Customer::factory()->create();
-    \App\Models\CustomerInvoice::factory()->create(['customer_id' => $customer->id]);
+    $customer = Customer::factory()->create();
+    CustomerInvoice::factory()->create(['customer_id' => $customer->id]);
 
     Sanctum::actingAs($this->user, ['*']);
     $response = postJson('/api/reports/customer-statement/export', [
