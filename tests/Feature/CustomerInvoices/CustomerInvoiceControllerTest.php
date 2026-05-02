@@ -92,17 +92,18 @@ test('store creates customer invoice with items', function () {
         'fiscal_year_id' => $fiscalYear->id,
         'invoice_date' => '2026-03-06',
         'due_date' => '2026-04-06',
+        'currency' => 'IDR',
         'status' => 'draft',
         'items' => [
             [
                 'product_id' => $product->id,
                 'unit_id' => $unit->id,
                 'account_id' => $account->id,
+                'description' => 'Test item',
                 'quantity' => 5,
                 'unit_price' => 10000,
                 'discount_percent' => 0,
                 'tax_percent' => 11,
-                'line_total' => 55500,
             ],
         ],
     ];
@@ -132,6 +133,7 @@ test('show returns customer invoice detail', function () {
         'product_id' => $product->id,
         'unit_id' => $unit->id,
         'account_id' => $account->id,
+        'description' => 'Test item',
         'quantity' => 3,
         'unit_price' => 1000,
         'discount_percent' => 0,
@@ -153,6 +155,7 @@ test('update modifies customer invoice and sets sent_by when status changes to s
         'fiscal_year_id' => $fiscalYear->id,
         'status' => 'draft',
         'sent_by' => null,
+        'sent_at' => null,
     ]);
 
     $payload = [
@@ -162,11 +165,11 @@ test('update modifies customer invoice and sets sent_by when status changes to s
                 'product_id' => $product->id,
                 'unit_id' => $unit->id,
                 'account_id' => $account->id,
+                'description' => 'Updated item',
                 'quantity' => 7,
                 'unit_price' => 10000,
                 'discount_percent' => 0,
                 'tax_percent' => 11,
-                'line_total' => 77700,
             ],
         ],
     ];

@@ -111,13 +111,18 @@ test('it can export customer statement report', function () {
     Excel::fake();
     Storage::fake('public');
 
+    $customer = \App\Models\Customer::factory()->create();
+    \App\Models\CustomerInvoice::factory()->create(['customer_id' => $customer->id]);
+
     Sanctum::actingAs($this->user, ['*']);
-    $response = postJson('/api/reports/customer-statement/export')
+    $response = postJson('/api/reports/customer-statement/export', [
+        'customer_id' => $customer->id,
+    ])
         ->assertOk()
         ->assertJsonStructure(['url', 'filename']);
 
     $filename = $response->json('filename');
-    expect($filename)->toStartWith('customer_statement_report_2026-03-04_10-00-00_');
+    expect($filename)->toStartWith('customer_statement_2026-03-04_10-00-00_');
     expect($filename)->toEndWith('.xlsx');
 
     Excel::assertStored('exports/' . $filename, 'public');

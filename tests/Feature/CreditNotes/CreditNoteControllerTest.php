@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Account;
+use App\Models\Branch;
 use App\Models\CreditNote;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
@@ -88,22 +90,25 @@ test('index supports search and filters', function () {
 test('store creates credit note with items', function () {
     [$customer, $fiscalYear, $invoice, $product, $unit] = createCreditNoteWithItem();
 
+    $branch = Branch::factory()->create();
+    $account = Account::factory()->create();
+
     $payload = [
         'customer_id' => $customer->id,
+        'branch_id' => $branch->id,
         'fiscal_year_id' => $fiscalYear->id,
         'customer_invoice_id' => $invoice->id,
         'credit_note_date' => '2026-03-06',
-        'reason' => 'Product return',
+        'reason' => 'return',
         'status' => 'draft',
         'items' => [
             [
                 'product_id' => $product->id,
-                'unit_id' => $unit->id,
+                'account_id' => $account->id,
+                'description' => 'Returned item',
                 'quantity' => 2,
                 'unit_price' => 10000,
-                'discount_percent' => 0,
                 'tax_percent' => 11,
-                'line_total' => 22200,
             ],
         ],
     ];
@@ -112,7 +117,7 @@ test('store creates credit note with items', function () {
 
     $response->assertCreated()
         ->assertJsonPath('data.customer.id', $customer->id)
-        ->assertJsonPath('data.items.0.product.id', $product->id);
+        ->assertJsonPath('data.items.0.product_id', $product->id);
 
     $id = $response->json('data.id');
     assertDatabaseHas('credit_notes', ['id' => $id, 'customer_id' => $customer->id]);
@@ -131,10 +136,10 @@ test('show returns credit note detail', function () {
     ]);
     $creditNote->items()->create([
         'product_id' => $product->id,
-        'unit_id' => $unit->id,
+        'account_id' => Account::factory()->create()->id,
+        'description' => 'Test CN item',
         'quantity' => 1,
         'unit_price' => 5000,
-        'discount_percent' => 0,
         'tax_percent' => 11,
         'line_total' => 5550,
     ]);
@@ -154,24 +159,24 @@ test('update modifies credit note and items', function () {
         'status' => 'draft',
     ]);
 
+    $account = Account::factory()->create();
     $payload = [
-        'status' => 'approved',
+        'status' => 'confirmed',
         'items' => [
             [
                 'product_id' => $product->id,
-                'unit_id' => $unit->id,
+                'account_id' => $account->id,
+                'description' => 'Updated CN item',
                 'quantity' => 3,
                 'unit_price' => 8000,
-                'discount_percent' => 0,
                 'tax_percent' => 11,
-                'line_total' => 26640,
             ],
         ],
     ];
 
     putJson('/api/credit-notes/' . $creditNote->id, $payload)
         ->assertOk()
-        ->assertJsonPath('data.status', 'approved')
+        ->assertJsonPath('data.status', 'confirmed')
         ->assertJsonCount(1, 'data.items');
 });
 

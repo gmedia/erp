@@ -121,7 +121,7 @@ test('it can export ar aging report', function () {
         ->assertJsonStructure(['url', 'filename']);
 
     $filename = $response->json('filename');
-    expect($filename)->toStartWith('ar_aging_report_2026-03-04_10-00-00_');
+    expect($filename)->toStartWith('ar_aging_2026-03-04_10-00-00_');
     expect($filename)->toEndWith('.xlsx');
 
     Excel::assertStored('exports/' . $filename, 'public');

@@ -26,7 +26,7 @@ test('it can export credit notes', function () {
         ->assertJsonStructure(['url', 'filename']);
 
     $filename = $response->json('filename');
-    expect($filename)->toStartWith('credit_notes_2026-03-04_10-00-00_');
+    expect($filename)->toStartWith('credit_notes_export_2026-03-04_10-00-00_');
     expect($filename)->toEndWith('.xlsx');
 
     Excel::assertStored('exports/' . $filename, 'public');

@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Account;
 use App\Models\ArReceipt;
+use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
@@ -71,7 +73,9 @@ test('index supports search and filters', function () {
 
 test('store creates ar receipt with allocations', function () {
     $customer = Customer::factory()->create();
+    $branch = Branch::factory()->create();
     $fiscalYear = FiscalYear::factory()->create();
+    $bankAccount = Account::factory()->create();
     $invoice = CustomerInvoice::factory()->create([
         'customer_id' => $customer->id,
         'fiscal_year_id' => $fiscalYear->id,
@@ -80,10 +84,13 @@ test('store creates ar receipt with allocations', function () {
 
     $payload = [
         'customer_id' => $customer->id,
+        'branch_id' => $branch->id,
         'fiscal_year_id' => $fiscalYear->id,
         'receipt_date' => '2026-03-06',
         'payment_method' => 'bank_transfer',
-        'amount' => 50000,
+        'bank_account_id' => $bankAccount->id,
+        'currency' => 'IDR',
+        'total_amount' => 50000,
         'status' => 'draft',
         'allocations' => [
             [
@@ -97,7 +104,7 @@ test('store creates ar receipt with allocations', function () {
 
     $response->assertCreated()
         ->assertJsonPath('data.customer.id', $customer->id)
-        ->assertJsonPath('data.allocations.0.customer_invoice.id', $invoice->id);
+        ->assertJsonPath('data.allocations.0.customer_invoice_id', $invoice->id);
 
     $id = $response->json('data.id');
     assertDatabaseHas('ar_receipts', ['id' => $id, 'customer_id' => $customer->id]);
