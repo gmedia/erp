@@ -974,3 +974,116 @@ export const supplierReturnFormSchema = z.object({
 });
 
 export type SupplierReturnFormData = z.infer<typeof supplierReturnFormSchema>;
+
+export const customerInvoiceFormSchema = z.object({
+    customer_id: z.string().min(1, { message: 'Customer is required.' }),
+    branch_id: z.string().min(1, { message: 'Branch is required.' }),
+    fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
+    invoice_date: z.date({ message: 'Invoice date is required.' }),
+    due_date: z.date({ message: 'Due date is required.' }),
+    payment_terms: z.string().optional(),
+    currency: z.string().min(1, { message: 'Currency is required.' }),
+    status: z.enum(
+        ['draft', 'sent', 'partially_paid', 'paid', 'overdue', 'cancelled', 'void'],
+        { message: 'Status is required.' },
+    ),
+    notes: z.string().optional(),
+    items: z
+        .array(
+            z.object({
+                product_id: z.string().optional(),
+                product_label: z.string().optional(),
+                account_id: z.string().min(1, { message: 'Account is required.' }),
+                account_label: z.string().optional(),
+                unit_id: z.string().optional(),
+                unit_label: z.string().optional(),
+                description: z.string().min(1, { message: 'Description is required.' }),
+                quantity: z.coerce.number().gt(0, {
+                    message: 'Quantity must be greater than 0.',
+                }),
+                unit_price: z.coerce.number().min(0, {
+                    message: 'Unit price must be at least 0.',
+                }),
+                discount_percent: z.coerce.number().min(0).max(100).optional().default(0),
+                tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
+                notes: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least 1 item is required.' }),
+});
+
+export type CustomerInvoiceFormData = z.infer<typeof customerInvoiceFormSchema>;
+
+export const arReceiptFormSchema = z.object({
+    customer_id: z.string().min(1, { message: 'Customer is required.' }),
+    branch_id: z.string().min(1, { message: 'Branch is required.' }),
+    fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
+    receipt_date: z.date({ message: 'Receipt date is required.' }),
+    payment_method: z.enum(
+        ['bank_transfer', 'cash', 'check', 'giro', 'credit_card', 'other'],
+        { message: 'Payment method is required.' },
+    ),
+    bank_account_id: z.string().optional(),
+    currency: z.string().min(1, { message: 'Currency is required.' }),
+    total_amount: z.coerce.number().gt(0, {
+        message: 'Total amount must be greater than 0.',
+    }),
+    reference: z.string().optional(),
+    status: z.enum(['draft', 'confirmed', 'reconciled', 'cancelled', 'void'], {
+        message: 'Status is required.',
+    }),
+    notes: z.string().optional(),
+    allocations: z
+        .array(
+            z.object({
+                customer_invoice_id: z.string().min(1, {
+                    message: 'Customer invoice is required.',
+                }),
+                invoice_label: z.string().optional(),
+                allocated_amount: z.coerce.number().gt(0, {
+                    message: 'Allocated amount must be greater than 0.',
+                }),
+                discount_given: z.coerce.number().min(0).optional().default(0),
+                notes: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least 1 allocation is required.' }),
+});
+
+export type ArReceiptFormData = z.infer<typeof arReceiptFormSchema>;
+
+export const creditNoteFormSchema = z.object({
+    customer_id: z.string().min(1, { message: 'Customer is required.' }),
+    customer_invoice_id: z.string().optional(),
+    branch_id: z.string().min(1, { message: 'Branch is required.' }),
+    fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
+    credit_note_date: z.date({ message: 'Credit note date is required.' }),
+    reason: z.enum(['return', 'discount', 'correction', 'bad_debt', 'other'], {
+        message: 'Reason is required.',
+    }),
+    status: z.enum(['draft', 'confirmed', 'applied', 'cancelled', 'void'], {
+        message: 'Status is required.',
+    }),
+    notes: z.string().optional(),
+    items: z
+        .array(
+            z.object({
+                product_id: z.string().optional(),
+                product_label: z.string().optional(),
+                account_id: z.string().min(1, { message: 'Account is required.' }),
+                account_label: z.string().optional(),
+                description: z.string().min(1, { message: 'Description is required.' }),
+                quantity: z.coerce.number().gt(0, {
+                    message: 'Quantity must be greater than 0.',
+                }),
+                unit_price: z.coerce.number().min(0, {
+                    message: 'Unit price must be at least 0.',
+                }),
+                tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
+                notes: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least 1 item is required.' }),
+});
+
+export type CreditNoteFormData = z.infer<typeof creditNoteFormSchema>;

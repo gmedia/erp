@@ -988,6 +988,106 @@ export const approvalDelegationConfig =
         formType: 'complex',
         entityNameForSearch: 'approval delegation',
         viewModalComponent: ApprovalDelegationViewModal,
-        getDeleteMessage: () =>
-            `This action cannot be undone. This will permanently delete the selected approval delegation.`,
+    getDeleteMessage: () =>
+        `This action cannot be undone. This will permanently delete the selected approval delegation.`,
     });
+
+// Import AR module components
+import { customerInvoiceColumns } from '@/components/customer-invoices/CustomerInvoiceColumns';
+import { createCustomerInvoiceFilterFields } from '@/components/customer-invoices/CustomerInvoiceFilters';
+import { CustomerInvoiceForm } from '@/components/customer-invoices/CustomerInvoiceForm';
+import { CustomerInvoiceViewModal } from '@/components/customer-invoices/CustomerInvoiceViewModal';
+import { type CustomerInvoice } from '@/types/customer-invoice';
+
+import { arReceiptColumns } from '@/components/ar-receipts/ArReceiptColumns';
+import { createArReceiptFilterFields } from '@/components/ar-receipts/ArReceiptFilters';
+import { ArReceiptForm } from '@/components/ar-receipts/ArReceiptForm';
+import { ArReceiptViewModal } from '@/components/ar-receipts/ArReceiptViewModal';
+import { type ArReceipt } from '@/types/ar-receipt';
+
+import { creditNoteColumns } from '@/components/credit-notes/CreditNoteColumns';
+import { createCreditNoteFilterFields } from '@/components/credit-notes/CreditNoteFilters';
+import { CreditNoteForm } from '@/components/credit-notes/CreditNoteForm';
+import { CreditNoteViewModal } from '@/components/credit-notes/CreditNoteViewModal';
+import { type CreditNote } from '@/types/credit-note';
+
+export const customerInvoiceConfig = createComplexEntityConfig<CustomerInvoice>({
+    entityName: 'Customer Invoice',
+    entityNamePlural: 'Customer Invoices',
+    apiEndpoint: '/api/customer-invoices',
+    exportEndpoint: '/api/customer-invoices/export',
+    queryKey: ['customer-invoices'],
+    breadcrumbs: [{ title: 'Customer Invoices', href: '/customer-invoices' }],
+    initialFilters: {
+        search: '',
+        customer_id: '',
+        branch_id: '',
+        status: '',
+        currency: '',
+        invoice_date_from: '',
+        invoice_date_to: '',
+        due_date_from: '',
+        due_date_to: '',
+    },
+    columns: customerInvoiceColumns,
+    filterFields: createCustomerInvoiceFilterFields(),
+    formComponent: CustomerInvoiceForm,
+    formType: 'complex',
+    entityNameForSearch: 'customer invoice',
+    viewModalComponent: CustomerInvoiceViewModal,
+    getDeleteMessage: (item: { invoice_number?: string | null }) =>
+        `This action cannot be undone. This will permanently delete invoice ${item.invoice_number}.`,
+});
+
+export const arReceiptConfig = createComplexEntityConfig<ArReceipt>({
+    entityName: 'AR Receipt',
+    entityNamePlural: 'AR Receipts',
+    apiEndpoint: '/api/ar-receipts',
+    exportEndpoint: '/api/ar-receipts/export',
+    queryKey: ['ar-receipts'],
+    breadcrumbs: [{ title: 'AR Receipts', href: '/ar-receipts' }],
+    initialFilters: {
+        search: '',
+        customer_id: '',
+        branch_id: '',
+        status: '',
+        payment_method: '',
+        currency: '',
+        receipt_date_from: '',
+        receipt_date_to: '',
+    },
+    columns: arReceiptColumns,
+    filterFields: createArReceiptFilterFields(),
+    formComponent: ArReceiptForm,
+    formType: 'complex',
+    entityNameForSearch: 'ar receipt',
+    viewModalComponent: ArReceiptViewModal,
+    getDeleteMessage: (item: { receipt_number?: string | null }) =>
+        `This action cannot be undone. This will permanently delete receipt ${item.receipt_number}.`,
+});
+
+export const creditNoteConfig = createComplexEntityConfig<CreditNote>({
+    entityName: 'Credit Note',
+    entityNamePlural: 'Credit Notes',
+    apiEndpoint: '/api/credit-notes',
+    exportEndpoint: '/api/credit-notes/export',
+    queryKey: ['credit-notes'],
+    breadcrumbs: [{ title: 'Credit Notes', href: '/credit-notes' }],
+    initialFilters: {
+        search: '',
+        customer_id: '',
+        branch_id: '',
+        reason: '',
+        status: '',
+        credit_note_date_from: '',
+        credit_note_date_to: '',
+    },
+    columns: creditNoteColumns,
+    filterFields: createCreditNoteFilterFields(),
+    formComponent: CreditNoteForm,
+    formType: 'complex',
+    entityNameForSearch: 'credit note',
+    viewModalComponent: CreditNoteViewModal,
+    getDeleteMessage: (item: { credit_note_number?: string | null }) =>
+        `This action cannot be undone. This will permanently delete credit note ${item.credit_note_number}.`,
+});
