@@ -34,7 +34,6 @@ COPY --from=composer /app ${APPDIR}
 
 # Copy built assets from asset-builder stage
 COPY --from=asset-builder /app/public/build ${APPDIR}/public/build
-COPY --from=asset-builder /app/node_modules ${APPDIR}/node_modules
 
 # Setup scripts and permissions
 COPY docker/dist/scripts/start-container.sh /usr/local/bin/start-container
