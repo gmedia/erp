@@ -957,12 +957,77 @@ export const approvalFlowConfig = createComplexEntityConfig<ApprovalFlow>({
         `This action cannot be undone. This will permanently delete the approval flow "${item.name}".`,
 });
 
+import { apPaymentColumns } from '@/components/ap-payments/ApPaymentColumns';
+import { createApPaymentFilterFields } from '@/components/ap-payments/ApPaymentFilters';
+import { ApPaymentForm } from '@/components/ap-payments/ApPaymentForm';
+import { ApPaymentViewModal } from '@/components/ap-payments/ApPaymentViewModal';
+import { supplierBillColumns } from '@/components/supplier-bills/SupplierBillColumns';
+import { createSupplierBillFilterFields } from '@/components/supplier-bills/SupplierBillFilters';
+import { SupplierBillForm } from '@/components/supplier-bills/SupplierBillForm';
+import { SupplierBillViewModal } from '@/components/supplier-bills/SupplierBillViewModal';
 import { approvalDelegationColumns } from '@/components/approval-delegations/ApprovalDelegationColumns';
 import { createApprovalDelegationFilterFields } from '@/components/approval-delegations/ApprovalDelegationFilters';
 import { ApprovalDelegationForm } from '@/components/approval-delegations/ApprovalDelegationForm';
 import { ApprovalDelegationViewModal } from '@/components/approval-delegations/ApprovalDelegationViewModal';
 
+import { type ApPayment } from '@/types/ap-payment';
 import { type ApprovalDelegation } from '@/types/approval-delegation';
+import { type SupplierBill } from '@/types/supplier-bill';
+
+export const supplierBillConfig = createComplexEntityConfig<SupplierBill>({
+    entityName: 'Supplier Bill',
+    entityNamePlural: 'Supplier Bills',
+    apiEndpoint: '/api/supplier-bills',
+    exportEndpoint: '/api/supplier-bills/export',
+    queryKey: ['supplier-bills'],
+    breadcrumbs: [{ title: 'Supplier Bills', href: '/supplier-bills' }],
+    initialFilters: {
+        search: '',
+        supplier_id: '',
+        branch_id: '',
+        status: '',
+        currency: '',
+        bill_date_from: '',
+        bill_date_to: '',
+        due_date_from: '',
+        due_date_to: '',
+    },
+    columns: supplierBillColumns,
+    filterFields: createSupplierBillFilterFields(),
+    formComponent: SupplierBillForm,
+    formType: 'complex',
+    entityNameForSearch: 'supplier bill',
+    viewModalComponent: SupplierBillViewModal,
+    getDeleteMessage: (bill: { bill_number?: string | null }) =>
+        `This action cannot be undone. This will delete supplier bill ${bill.bill_number || ''}.`,
+});
+
+export const apPaymentConfig = createComplexEntityConfig<ApPayment>({
+    entityName: 'AP Payment',
+    entityNamePlural: 'AP Payments',
+    apiEndpoint: '/api/ap-payments',
+    exportEndpoint: '/api/ap-payments/export',
+    queryKey: ['ap-payments'],
+    breadcrumbs: [{ title: 'AP Payments', href: '/ap-payments' }],
+    initialFilters: {
+        search: '',
+        supplier_id: '',
+        branch_id: '',
+        status: '',
+        payment_method: '',
+        currency: '',
+        payment_date_from: '',
+        payment_date_to: '',
+    },
+    columns: apPaymentColumns,
+    filterFields: createApPaymentFilterFields(),
+    formComponent: ApPaymentForm,
+    formType: 'complex',
+    entityNameForSearch: 'AP payment',
+    viewModalComponent: ApPaymentViewModal,
+    getDeleteMessage: (payment: { payment_number?: string | null }) =>
+        `This action cannot be undone. This will delete AP payment ${payment.payment_number || ''}.`,
+});
 
 export const approvalDelegationConfig =
     createComplexEntityConfig<ApprovalDelegation>({
