@@ -1,6 +1,6 @@
 # Implementation Status — Database Modules
 
-> **Last updated:** 2026-03-14
+> **Last updated:** 2026-05-02
 >
 > **Purpose:** Referensi cepat untuk AI agent dan developer tentang status implementasi setiap modul database. Dokumen ini adalah satu-satunya sumber kebenaran untuk status implementasi — jangan duplikasi informasi ini di file desain individual.
 
@@ -21,7 +21,7 @@
 
 | # | Module | Design Doc | Status | Catatan |
 |---|--------|-----------|--------|---------|
-| 00 | Products & Manufacturing | `00_products_design_v2.md` | ✅ Implemented | V2 schema migrated |
+| 00 | Products & Manufacturing | `00_products_design.md` | ✅ Implemented | V2 schema migrated |
 | 01 | Chart of Accounts & Journal | `01_chart_of_accounts_design.md` | ✅ Implemented | |
 | 10 | Pipeline (State Machine) | `10_pipeline_design.md` | ✅ Implemented | |
 | 11 | Approval System | `11_approval_design.md` | ✅ Implemented | |
@@ -39,7 +39,7 @@
 
 ### ✅ Products & Manufacturing (V2 Implemented)
 
-**Design doc:** `00_products_design_v2.md`
+**Design doc:** `00_products_design.md`
 
 | Layer | Status | Files |
 |-------|--------|-------|
@@ -285,4 +285,4 @@ Modul-modul berikut sudah diimplementasi sebagai master data pendukung:
 | 1 | `product_stocks.branch_id → warehouse_id` | `14_inventory_design.md` Section 8 | Products V2 migration + Inventory integration |
 | 2 | `journal_entry_id` di GR/SR | `13_purchasing_design.md` Section 6 | Purchasing ↔ Accounting integration |
 | 3 | `journal_entry_id` di stock adjustments | `14_inventory_design.md` Section 7 | Inventory ↔ Accounting integration |
-| 4 | ~~Products V1→V2 migration timing~~ | `migration_plan_v1_to_v2.md` | ✅ Resolved — V2 migration complete |
+| 4 | ~~Products V1→V2 migration timing~~ | `archive/migration_plan_v1_to_v2.md` | ✅ Resolved — V2 migration complete |

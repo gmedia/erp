@@ -7,12 +7,12 @@ Dokumen ini menjelaskan struktur database untuk modul Inventory (Persediaan) dal
 
 ### Filosofi Desain
 
-Modul Inventory melengkapi infrastruktur stok yang sudah ada di `product_stocks` (`00_products_design_v2.md`) dengan menambahkan **master gudang (`warehouses`)** dan **operasi gudang** — transfer, opname, dan adjustment. Satu cabang (`branch`) bisa memiliki beberapa gudang (`warehouses`), dan seluruh operasi stok dikelola pada level **gudang** (bukan cabang). Setiap pergerakan stok (masuk/keluar) dicatat di `stock_movements` sebagai **kartu stok digital** yang menyediakan audit trail lengkap dan memungkinkan rekonsiliasi historis.
+Modul Inventory melengkapi infrastruktur stok yang sudah ada di `product_stocks` (`00_products_design.md`) dengan menambahkan **master gudang (`warehouses`)** dan **operasi gudang** — transfer, opname, dan adjustment. Satu cabang (`branch`) bisa memiliki beberapa gudang (`warehouses`), dan seluruh operasi stok dikelola pada level **gudang** (bukan cabang). Setiap pergerakan stok (masuk/keluar) dicatat di `stock_movements` sebagai **kartu stok digital** yang menyediakan audit trail lengkap dan memungkinkan rekonsiliasi historis.
 
 > [!IMPORTANT]
-> Dokumen ini **tidak menduplikasi** desain yang sudah ada. Tabel `products`, `product_stocks`, `product_categories`, dan `units` sudah didefinisikan di `00_products_design_v2.md`. Tabel `goods_receipts` dan `supplier_returns` sudah didefinisikan di `13_purchasing_design.md`. Dokumen ini menambahkan tabel `warehouses` sebagai master lokasi gudang dan tabel baru untuk operasi gudang serta audit trail stok.
+> Dokumen ini **tidak menduplikasi** desain yang sudah ada. Tabel `products`, `product_stocks`, `product_categories`, dan `units` sudah didefinisikan di `00_products_design.md`. Tabel `goods_receipts` dan `supplier_returns` sudah didefinisikan di `13_purchasing_design.md`. Dokumen ini menambahkan tabel `warehouses` sebagai master lokasi gudang dan tabel baru untuk operasi gudang serta audit trail stok.
 >
-> **Perubahan penting**: Dokumen ini mengubah granularitas stok dari **per-branch** menjadi **per-warehouse**. Tabel `product_stocks` (di `00_products_design_v2.md`) perlu diupdate: `branch_id` → `warehouse_id`. Lihat Section 8 untuk detail dampak.
+> **Perubahan penting**: Dokumen ini mengubah granularitas stok dari **per-branch** menjadi **per-warehouse**. Tabel `product_stocks` (di `00_products_design.md`) perlu diupdate: `branch_id` → `warehouse_id`. Lihat Section 8 untuk detail dampak.
 
 ### Perbedaan dengan Manajemen Aset
 
@@ -42,7 +42,7 @@ Modul Inventory melengkapi infrastruktur stok yang sudah ada di `product_stocks`
 
 | Modul                 | Referensi Desain                 | Hubungan                                                     |
 | :-------------------- | :------------------------------- | :----------------------------------------------------------- |
-| **Products**          | `00_products_design_v2.md`       | Master produk & stok per gudang (`product_stocks`)           |
+| **Products**          | `00_products_design.md`       | Master produk & stok per gudang (`product_stocks`)           |
 | **Purchasing**        | `13_purchasing_design.md`        | Goods Receipt menambah stok, Supplier Return mengurangi stok |
 | **Pipeline**          | `10_pipeline_design.md`          | Stock transfer lifecycle dikelola oleh pipeline              |
 | **Approval**          | `11_approval_design.md`          | Transfer bernilai tinggi & adjustment memerlukan approval    |
@@ -409,8 +409,8 @@ Audit trail setiap pergerakan stok per produk per gudang. Berfungsi sebagai **ka
 | **`transfer_in`**        | IN   | Penerimaan stok dari gudang lain.                              | `stock_transfers`                                |
 | **`adjustment_in`**      | IN   | Penambahan stok via adjustment (surplus, correction, initial). | `stock_adjustments`                              |
 | **`adjustment_out`**     | OUT  | Pengurangan stok via adjustment (damage, expired, shrinkage).  | `stock_adjustments`                              |
-| **`production_consume`** | OUT  | Konsumsi bahan baku untuk produksi.                            | `production_orders` (`00_products_design_v2.md`) |
-| **`production_output`**  | IN   | Output produk jadi dari produksi.                              | `production_orders` (`00_products_design_v2.md`) |
+| **`production_consume`** | OUT  | Konsumsi bahan baku untuk produksi.                            | `production_orders` (`00_products_design.md`) |
+| **`production_output`**  | IN   | Output produk jadi dari produksi.                              | `production_orders` (`00_products_design.md`) |
 | **`sales`**              | OUT  | Pengiriman barang ke pelanggan (future: Sales module).         | —                                                |
 | **`sales_return`**       | IN   | Pengembalian barang dari pelanggan (future: Sales module).     | —                                                |
 
@@ -618,7 +618,7 @@ Fitur khusus:
 
 Tujuan: memonitor stok per produk per gudang, termasuk alert stok rendah.
 
-Jenis menu: Non-CRUD (read-only, existing dari `00_products_design_v2.md`)
+Jenis menu: Non-CRUD (read-only, existing dari `00_products_design.md`)
 Agent skill: `feature-non-crud`
 
 Tabel terlibat:
@@ -636,7 +636,7 @@ Fitur khusus:
 - Filter: product, warehouse, branch, category, low stock threshold.
 
 > [!NOTE]
-> Menu ini sudah didesain di `00_products_design_v2.md` sebagai "Product Stocks (Monitor)" — bagian 5.B.5. Perlu diperluas untuk mendukung filter per warehouse (bukan hanya per branch).
+> Menu ini sudah didesain di `00_products_design.md` sebagai "Product Stocks (Monitor)" — bagian 5.B.5. Perlu diperluas untuk mendukung filter per warehouse (bukan hanya per branch).
 
 ---
 
@@ -861,7 +861,7 @@ Saat siap diintegrasikan dengan modul akuntansi, berikut posting jurnal yang umu
 > [!CAUTION]
 > Penambahan tabel `warehouses` mengubah granularitas pengelolaan stok dari **per-branch** menjadi **per-warehouse**. Berikut perubahan yang diperlukan pada modul existing:
 
-#### A. `product_stocks` (`00_products_design_v2.md`)
+#### A. `product_stocks` (`00_products_design.md`)
 
 Tabel `product_stocks` perlu diubah:
 
@@ -891,7 +891,7 @@ Tabel `goods_receipts` perlu diubah:
 
 Penerimaan barang dari supplier sekarang diterima ke **gudang** spesifik, bukan hanya ke cabang.
 
-#### C. `production_orders` (`00_products_design_v2.md`)
+#### C. `production_orders` (`00_products_design.md`)
 
 Tabel `production_orders` perlu diubah:
 
@@ -909,8 +909,8 @@ Agar `stock_movements` menjadi satu sumber kebenaran (single source of truth) un
 | :----------------------------------------- | :------------------------------------------------ | :------------------- |
 | **Purchasing** (`13_purchasing_design.md`) | Goods Receipt confirmed                           | `goods_receipt`      |
 | **Purchasing** (`13_purchasing_design.md`) | Supplier Return confirmed                         | `supplier_return`    |
-| **Products** (`00_products_design_v2.md`)  | Production Order completed (consume raw material) | `production_consume` |
-| **Products** (`00_products_design_v2.md`)  | Production Order completed (output finished good) | `production_output`  |
+| **Products** (`00_products_design.md`)  | Production Order completed (consume raw material) | `production_consume` |
+| **Products** (`00_products_design.md`)  | Production Order completed (output finished good) | `production_output`  |
 
 > [!NOTE]
 > Update ini bersifat **additive** — hanya menambahkan penulisan ke `stock_movements`, tidak mengubah logika existing. Tabel `product_stocks` tetap di-update seperti biasa, hanya FK-nya berubah dari `branch_id` ke `warehouse_id`.

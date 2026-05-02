@@ -1,6 +1,8 @@
 # Rencana Migrasi Database: V1 → V2
 
-> **Konteks:** Dokumen ini berisi gap analysis antara schema database saat ini (v1) dan desain baru (v2), serta tahapan migrasi yang harus dilakukan. Gunakan dokumen ini sebagai referensi utama saat mengerjakan migrasi.
+> **✅ COMPLETED — 2026-05-02.** Migrasi selesai dan merged ke `main` (`8a694a6b`). Dokumen ini diarsipkan sebagai referensi historis.
+>
+> **Konteks:** Dokumen ini berisi gap analysis antara schema database saat ini (v1) dan desain baru (v2), serta tahapan migrasi yang harus dilakukan.
 
 ---
 
@@ -8,7 +10,7 @@
 
 | Modul | V1 (Saat Ini) | V2 (Target) |
 | :--- | :--- | :--- |
-| Products | `docs/database/00_products_design.md` | `docs/database/00_products_design_v2.md` |
+| Products | _(removed)_ | `docs/database/00_products_design.md` |
 
 ---
 

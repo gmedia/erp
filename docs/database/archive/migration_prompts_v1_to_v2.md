@@ -1,6 +1,8 @@
 # Rekomendasi Prompt: Migrasi Database V1 → V2
 
-> **Cara pakai:** Copy-paste prompt di bawah ini saat memulai sesi baru. Urutan eksekusi mengikuti nomor fase. Setiap prompt dirancang untuk 1 sesi kerja.
+> **✅ COMPLETED — 2026-05-02.** Semua 8 fase selesai. Dokumen ini diarsipkan sebagai referensi historis.
+>
+> **Cara pakai (archived):** Copy-paste prompt di bawah ini saat memulai sesi baru. Urutan eksekusi mengikuti nomor fase.
 
 ---
 
@@ -11,7 +13,7 @@ Buat migration baru untuk menyesuaikan schema Products CORE ke desain V2.
 
 Referensi:
 - Gap analysis: `docs/database/migration_plan_v1_to_v2.md` bagian "Detail Gap: Products Module (Core)"
-- Desain target: `docs/database/00_products_design_v2.md`
+- Desain target: `docs/database/00_products_design.md`
 - Migration existing: `database/migrations/2026_01_29_114413_create_products_table.php` s/d `114419`
 
 Instruksi:
@@ -40,7 +42,7 @@ Buat migration terpisah untuk menyederhanakan subscription tables ke V2.
 
 Referensi:
 - Gap analysis: `docs/database/migration_plan_v1_to_v2.md` bagian "Detail Gap: Subscription Module"
-- Desain target: `docs/database/00_products_design_v2.md` Section 3.D
+- Desain target: `docs/database/00_products_design.md` Section 3.D
 
 Instruksi:
 1. Karena subscription module BELUM punya frontend/controller/tests, gunakan strategi DROP & RECREATE:
@@ -64,7 +66,7 @@ Update Eloquent Models agar sesuai dengan schema V2 setelah migration dijalankan
 Referensi:
 - Gap analysis: `docs/database/migration_plan_v1_to_v2.md` bagian "Fase 3: Model Updates"
 - Migration baru yang dibuat di Fase 1 & 2
-- Desain V2: `docs/database/00_products_design_v2.md`
+- Desain V2: `docs/database/00_products_design.md`
 
 Instruksi:
 1. Baca migration baru untuk tahu perubahan schema yang pasti
@@ -162,7 +164,7 @@ Update Laravel Factories dan Seeders agar sesuai dengan schema V2.
 
 Referensi:
 - Migration baru dan model yang sudah di-update
-- `docs/database/00_products_design_v2.md`
+- `docs/database/00_products_design.md`
 
 Instruksi:
 1. Update factories di `database/factories/`:
@@ -259,7 +261,7 @@ Fase 1 (Migration Core) → Fase 2 (Migration Subscription) → Fase 3 (Model)
 
 ### Sebelum Mulai Setiap Fase
 1. Baca `docs/database/migration_plan_v1_to_v2.md` untuk konteks (terutama Blast Radius Summary)
-2. Baca desain V2 yang relevan (`00_products_design_v2.md`)
+2. Baca desain V2 yang relevan (`00_products_design.md`)
 3. Review hasil fase sebelumnya
 
 ### Skill yang Digunakan

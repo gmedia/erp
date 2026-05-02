@@ -23,7 +23,7 @@ Sales Order (future)  →  Customer Invoice  →  Receipt Allocation  →  Bank 
 
 | Modul | Referensi Desain | Hubungan |
 | :--- | :--- | :--- |
-| **Products** | `00_products_design_v2.md` | Produk/jasa yang dijual dan dicantumkan di invoice |
+| **Products** | `00_products_design.md` | Produk/jasa yang dijual dan dicantumkan di invoice |
 | **Chart of Accounts** | `01_chart_of_accounts_design.md` | Invoice & receipt diposting ke jurnal (AR, revenue, kas/bank) |
 | **Pipeline** | `10_pipeline_design.md` | Invoice lifecycle dikelola oleh pipeline |
 | **Approval** | `11_approval_design.md` | Opsional: invoice bernilai tinggi atau credit note memerlukan approval |
