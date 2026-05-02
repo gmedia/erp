@@ -33,7 +33,7 @@ class IndexApOutstandingReportAction
                 's.name as supplier_name',
                 'b.id as branch_id',
                 'b.name as branch_name',
-                "CASE WHEN sb.due_date < CURDATE() THEN DATEDIFF(CURDATE(), sb.due_date) ELSE 0 END as days_overdue",
+                'CASE WHEN sb.due_date < CURDATE() THEN DATEDIFF(CURDATE(), sb.due_date) ELSE 0 END as days_overdue',
             ]))
             ->whereIn('sb.status', ['confirmed', 'partially_paid', 'overdue'])
             ->withCasts([

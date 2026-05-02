@@ -6,9 +6,7 @@ import {
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import {
-    formatCurrencyByRegionalSettings,
-} from '@/utils/number-format';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import React from 'react';
 
 import { ApPayment, type ApPaymentAllocation } from '@/types/ap-payment';
@@ -62,7 +60,8 @@ export const ApPaymentViewModal = React.memo(
                 maximumFractionDigits: 2,
             });
 
-        const allocationColumns = createApPaymentAllocationColumns(formatAmount);
+        const allocationColumns =
+            createApPaymentAllocationColumns(formatAmount);
 
         return (
             <ViewModalShell

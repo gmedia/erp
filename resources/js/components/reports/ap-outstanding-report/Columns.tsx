@@ -45,65 +45,66 @@ function formatDate(value: string | null | undefined): string {
     return formatDateByRegionalSettings(value);
 }
 
-export const apOutstandingReportColumns: ColumnDef<ApOutstandingReportItem>[] = [
-    createReportSummaryColumn<ApOutstandingReportItem>({
-        id: 'col',
-        header: 'Bill Number',
-        getPrimary: (item) => item.bill?.number,
-        getSecondary: (item) => formatDate(item.bill?.bill_date),
-        sortable: true,
-    }),
-    createReportTextColumn<ApOutstandingReportItem>({
-        id: 'col',
-        header: 'Supplier',
-        getValue: (item) => item.supplier?.name,
-        sortable: true,
-    }),
-    createReportTextColumn<ApOutstandingReportItem>({
-        id: 'col',
-        header: 'Branch',
-        getValue: (item) => item.branch?.name,
-        sortable: true,
-    }),
-    createReportTextColumn<ApOutstandingReportItem>({
-        id: 'col',
-        header: 'Due Date',
-        getValue: (item) => formatDate(item.bill?.due_date),
-        sortable: true,
-    }),
-    createCurrencyColumn<ApOutstandingReportItem>({
-        id: 'col',
-        label: 'Grand Total',
-        currency: 'IDR',
-        locale: 'id-ID',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }),
-    createCurrencyColumn<ApOutstandingReportItem>({
-        id: 'col',
-        label: 'Amount Paid',
-        currency: 'IDR',
-        locale: 'id-ID',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }),
-    createCurrencyColumn<ApOutstandingReportItem>({
-        id: 'col',
-        label: 'Amount Due',
-        currency: 'IDR',
-        locale: 'id-ID',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }),
-    createNumberColumn<ApOutstandingReportItem>({
-        accessorKey: 'days_overdue',
-        label: 'Days Overdue',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    }),
-    createReportStatusBadgeColumn<ApOutstandingReportItem>({
-        id: 'status',
-        header: 'Status',
-        getValue: (item) => item.bill?.status,
-    }),
-];
+export const apOutstandingReportColumns: ColumnDef<ApOutstandingReportItem>[] =
+    [
+        createReportSummaryColumn<ApOutstandingReportItem>({
+            id: 'col',
+            header: 'Bill Number',
+            getPrimary: (item) => item.bill?.number,
+            getSecondary: (item) => formatDate(item.bill?.bill_date),
+            sortable: true,
+        }),
+        createReportTextColumn<ApOutstandingReportItem>({
+            id: 'col',
+            header: 'Supplier',
+            getValue: (item) => item.supplier?.name,
+            sortable: true,
+        }),
+        createReportTextColumn<ApOutstandingReportItem>({
+            id: 'col',
+            header: 'Branch',
+            getValue: (item) => item.branch?.name,
+            sortable: true,
+        }),
+        createReportTextColumn<ApOutstandingReportItem>({
+            id: 'col',
+            header: 'Due Date',
+            getValue: (item) => formatDate(item.bill?.due_date),
+            sortable: true,
+        }),
+        createCurrencyColumn<ApOutstandingReportItem>({
+            id: 'col',
+            label: 'Grand Total',
+            currency: 'IDR',
+            locale: 'id-ID',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }),
+        createCurrencyColumn<ApOutstandingReportItem>({
+            id: 'col',
+            label: 'Amount Paid',
+            currency: 'IDR',
+            locale: 'id-ID',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }),
+        createCurrencyColumn<ApOutstandingReportItem>({
+            id: 'col',
+            label: 'Amount Due',
+            currency: 'IDR',
+            locale: 'id-ID',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }),
+        createNumberColumn<ApOutstandingReportItem>({
+            accessorKey: 'days_overdue',
+            label: 'Days Overdue',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }),
+        createReportStatusBadgeColumn<ApOutstandingReportItem>({
+            id: 'status',
+            header: 'Status',
+            getValue: (item) => item.bill?.status,
+        }),
+    ];

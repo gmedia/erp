@@ -1,13 +1,13 @@
+import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     createAsyncSelectFilterField,
     createSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
-import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 
 export function createApOutstandingReportFilterFields(): FieldDescriptor[] {
-    const statusOptions: Array<{value: string, label: string}> = [
+    const statusOptions: Array<{ value: string; label: string }> = [
         { value: 'confirmed', label: 'Confirmed' },
         { value: 'partially_paid', label: 'Partially Paid' },
         { value: 'overdue', label: 'Overdue' },
@@ -31,7 +31,12 @@ export function createApOutstandingReportFilterFields(): FieldDescriptor[] {
             'Select branch',
             '/api/branches/select-options',
         ),
-        createSelectFilterField('status', 'Status', statusOptions, 'Select status'),
+        createSelectFilterField(
+            'status',
+            'Status',
+            statusOptions,
+            'Select status',
+        ),
         {
             name: 'due_date_from',
             label: 'Due Date From',

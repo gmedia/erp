@@ -196,9 +196,7 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                 form={form}
                 open={open}
                 onOpenChange={onOpenChange}
-                title={
-                    entity ? 'Edit Supplier Bill' : 'Add New Supplier Bill'
-                }
+                title={entity ? 'Edit Supplier Bill' : 'Add New Supplier Bill'}
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
                 className="sm:max-w-[1100px]"
@@ -216,7 +214,10 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                         options={[
                             { value: 'draft', label: 'Draft' },
                             { value: 'confirmed', label: 'Confirmed' },
-                            { value: 'partially_paid', label: 'Partially Paid' },
+                            {
+                                value: 'partially_paid',
+                                label: 'Partially Paid',
+                            },
                             { value: 'paid', label: 'Paid' },
                             { value: 'overdue', label: 'Overdue' },
                             { value: 'cancelled', label: 'Cancelled' },

@@ -21,7 +21,9 @@ const renderBranchCell = ({ row }: { row: { original: ApPayment } }) => (
 );
 
 const renderPaymentMethodCell = ({ row }: { row: { original: ApPayment } }) => (
-    <Badge variant="outline">{row.original.payment_method.replace('_', ' ')}</Badge>
+    <Badge variant="outline">
+        {row.original.payment_method.replace('_', ' ')}
+    </Badge>
 );
 
 const renderStatusCell = ({ row }: { row: { original: ApPayment } }) => (
@@ -81,12 +83,15 @@ export const apPaymentColumns: ColumnDef<ApPayment>[] = [
         ...createSortingHeader('Unallocated'),
         cell: ({ row }) => (
             <div className="text-right">
-                {formatCurrencyByRegionalSettings(row.original.total_unallocated, {
-                    locale: 'id-ID',
-                    currency: row.original.currency || undefined,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                })}
+                {formatCurrencyByRegionalSettings(
+                    row.original.total_unallocated,
+                    {
+                        locale: 'id-ID',
+                        currency: row.original.currency || undefined,
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    },
+                )}
             </div>
         ),
     },

@@ -1,3 +1,4 @@
+import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     createAsyncSelectFilterField,
     createSelectFilterField,
@@ -5,7 +6,6 @@ import {
     type FieldDescriptor,
     type SelectOption,
 } from '@/components/common/filters';
-import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 
 export function createApPaymentHistoryReportFilterFields(): FieldDescriptor[] {
     const paymentMethodOptions: SelectOption[] = [
@@ -39,8 +39,18 @@ export function createApPaymentHistoryReportFilterFields(): FieldDescriptor[] {
             'Select branch',
             '/api/branches/select-options',
         ),
-        createSelectFilterField('payment_method', 'Payment Method', paymentMethodOptions, 'Select method'),
-        createSelectFilterField('status', 'Status', statusOptions, 'Select status'),
+        createSelectFilterField(
+            'payment_method',
+            'Payment Method',
+            paymentMethodOptions,
+            'Select method',
+        ),
+        createSelectFilterField(
+            'status',
+            'Status',
+            statusOptions,
+            'Select status',
+        ),
         {
             name: 'payment_date_from',
             label: 'Payment Date From',

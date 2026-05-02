@@ -5,7 +5,6 @@ namespace App\Actions\Reports;
 use App\Actions\Reports\Concerns\HandlesReportQuery;
 use App\Models\ApPayment;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
 

@@ -990,19 +990,39 @@ export const supplierBillFormSchema = z.object({
     currency: z.string().min(1, { message: 'Currency is required.' }),
     status: z.string().min(1, { message: 'Status is required.' }),
     notes: z.string().optional(),
-    items: z.array(z.object({
-        product_id: z.string().optional(),
-        product_label: z.string().optional(),
-        account_id: z.string().min(1, { message: 'Account is required.' }),
-        account_label: z.string().optional(),
-        description: z.string().min(1, { message: 'Description is required.' }),
-        quantity: z.coerce.number().gt(0, { message: 'Quantity must be > 0.' }),
-        unit_price: z.coerce.number().min(0),
-        discount_percent: z.coerce.number().min(0).max(100).optional().default(0),
-        tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
-        goods_receipt_item_id: z.string().optional(),
-        notes: z.string().optional(),
-    })).min(1, { message: 'At least one item is required.' }),
+    items: z
+        .array(
+            z.object({
+                product_id: z.string().optional(),
+                product_label: z.string().optional(),
+                account_id: z
+                    .string()
+                    .min(1, { message: 'Account is required.' }),
+                account_label: z.string().optional(),
+                description: z
+                    .string()
+                    .min(1, { message: 'Description is required.' }),
+                quantity: z.coerce
+                    .number()
+                    .gt(0, { message: 'Quantity must be > 0.' }),
+                unit_price: z.coerce.number().min(0),
+                discount_percent: z.coerce
+                    .number()
+                    .min(0)
+                    .max(100)
+                    .optional()
+                    .default(0),
+                tax_percent: z.coerce
+                    .number()
+                    .min(0)
+                    .max(100)
+                    .optional()
+                    .default(0),
+                goods_receipt_item_id: z.string().optional(),
+                notes: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least one item is required.' }),
 });
 
 export type SupplierBillFormData = z.infer<typeof supplierBillFormSchema>;
@@ -1013,20 +1033,34 @@ export const apPaymentFormSchema = z.object({
     branch_id: z.string().min(1, { message: 'Branch is required.' }),
     fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
     payment_date: z.date({ message: 'Payment date is required.' }),
-    payment_method: z.string().min(1, { message: 'Payment method is required.' }),
-    bank_account_id: z.string().min(1, { message: 'Bank account is required.' }),
+    payment_method: z
+        .string()
+        .min(1, { message: 'Payment method is required.' }),
+    bank_account_id: z
+        .string()
+        .min(1, { message: 'Bank account is required.' }),
     currency: z.string().min(1, { message: 'Currency is required.' }),
-    total_amount: z.coerce.number().gt(0, { message: 'Total amount must be > 0.' }),
+    total_amount: z.coerce
+        .number()
+        .gt(0, { message: 'Total amount must be > 0.' }),
     reference: z.string().optional(),
     status: z.string().min(1, { message: 'Status is required.' }),
     notes: z.string().optional(),
-    allocations: z.array(z.object({
-        supplier_bill_id: z.string().min(1, { message: 'Bill is required.' }),
-        bill_label: z.string().optional(),
-        allocated_amount: z.coerce.number().gt(0, { message: 'Amount must be > 0.' }),
-        discount_taken: z.coerce.number().min(0).optional().default(0),
-        notes: z.string().optional(),
-    })).min(1, { message: 'At least one allocation is required.' }),
+    allocations: z
+        .array(
+            z.object({
+                supplier_bill_id: z
+                    .string()
+                    .min(1, { message: 'Bill is required.' }),
+                bill_label: z.string().optional(),
+                allocated_amount: z.coerce
+                    .number()
+                    .gt(0, { message: 'Amount must be > 0.' }),
+                discount_taken: z.coerce.number().min(0).optional().default(0),
+                notes: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least one allocation is required.' }),
 });
 
 export type ApPaymentFormData = z.infer<typeof apPaymentFormSchema>;

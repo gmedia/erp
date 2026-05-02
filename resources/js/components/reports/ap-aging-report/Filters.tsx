@@ -1,3 +1,4 @@
+import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     createAsyncSelectFilterField,
     createSelectFilterField,
@@ -5,7 +6,6 @@ import {
     type FieldDescriptor,
     type SelectOption,
 } from '@/components/common/filters';
-import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 
 export function createApAgingReportFilterFields(): FieldDescriptor[] {
     const statusOptions: SelectOption[] = [
@@ -32,11 +32,18 @@ export function createApAgingReportFilterFields(): FieldDescriptor[] {
             'Select branch',
             '/api/branches/select-options',
         ),
-        createSelectFilterField('status', 'Status', statusOptions, 'Select status'),
+        createSelectFilterField(
+            'status',
+            'Status',
+            statusOptions,
+            'Select status',
+        ),
         {
             name: 'as_of_date',
             label: 'As of Date',
-            component: <FilterDatePicker placeholder="Select aging calculation date" />,
+            component: (
+                <FilterDatePicker placeholder="Select aging calculation date" />
+            ),
         },
     ];
 }
