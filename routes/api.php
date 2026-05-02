@@ -14,6 +14,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
 
+    require __DIR__ . '/api/ap-payments.php';
     require __DIR__ . '/api/account-mappings.php';
     require __DIR__ . '/api/accounts.php';
     require __DIR__ . '/api/admin-settings.php';
@@ -56,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/stock-monitor.php';
     require __DIR__ . '/api/stock-movements.php';
     require __DIR__ . '/api/stock-transfers.php';
+    require __DIR__ . '/api/supplier-bills.php';
     require __DIR__ . '/api/supplier-categories.php';
     require __DIR__ . '/api/supplier-returns.php';
     require __DIR__ . '/api/suppliers.php';
