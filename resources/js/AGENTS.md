@@ -28,18 +28,18 @@ resources/js/
 
 ## WHERE TO LOOK
 
-| Task | Location |
-|------|----------|
-| Add page route | `app-routes.tsx` — lazy `<Route>` |
-| Simple CRUD page | `pages/{slug}/index.tsx` — 6 lines with `createEntityCrudPage` |
-| Complex CRUD page | `pages/{slug}/index.tsx` + `components/{slug}/` (4 sibling files) |
-| Report page | `pages/reports/{slug}/index.tsx` — `ReportDataTablePage` |
-| Entity config | `utils/entityConfigs.ts` — `createSimpleEntityConfig` or `createComplexEntityConfig` |
-| Form schema | `utils/schemas.ts` or inline — Zod |
-| Shared hooks | `hooks/useEntityForm.ts`, `hooks/useCrudQuery.ts`, `hooks/useCrudMutations.ts` |
-| UI primitives | `components/ui/` — Shadcn (button, dialog, table, etc.) |
-| Common components | `components/common/` — EntityForm, ViewField, ViewModalShell, DataTable |
-| Type defs | `types/{module}.ts` |
+| Task              | Location                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------ |
+| Add page route    | `app-routes.tsx` — lazy `<Route>`                                                    |
+| Simple CRUD page  | `pages/{slug}/index.tsx` — 6 lines with `createEntityCrudPage`                       |
+| Complex CRUD page | `pages/{slug}/index.tsx` + `components/{slug}/` (4 sibling files)                    |
+| Report page       | `pages/reports/{slug}/index.tsx` — `ReportDataTablePage`                             |
+| Entity config     | `utils/entityConfigs.ts` — `createSimpleEntityConfig` or `createComplexEntityConfig` |
+| Form schema       | `utils/schemas.ts` or inline — Zod                                                   |
+| Shared hooks      | `hooks/useEntityForm.ts`, `hooks/useCrudQuery.ts`, `hooks/useCrudMutations.ts`       |
+| UI primitives     | `components/ui/` — Shadcn (button, dialog, table, etc.)                              |
+| Common components | `components/common/` — EntityForm, ViewField, ViewModalShell, DataTable              |
+| Type defs         | `types/{module}.ts`                                                                  |
 
 ## CONVENTIONS
 

@@ -49,7 +49,10 @@ export function FiscalYearForm({
     const handleFormSubmit = (data: FiscalYearFormInput) => {
         const payload = {
             ...data,
-            start_date: format(data.start_date, 'yyyy-MM-dd') as unknown as Date,
+            start_date: format(
+                data.start_date,
+                'yyyy-MM-dd',
+            ) as unknown as Date,
             end_date: format(data.end_date, 'yyyy-MM-dd') as unknown as Date,
         } as FiscalYearFormData;
         onSubmit(payload);

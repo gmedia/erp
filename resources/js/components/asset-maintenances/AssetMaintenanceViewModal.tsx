@@ -47,10 +47,7 @@ export const AssetMaintenanceViewModal = memo<AssetMaintenanceViewModalProps>(
                             <span className="capitalize">{item.status}</span>
                         }
                     />
-                    <ViewField
-                        label="Supplier"
-                        value={item.supplier || '-'}
-                    />
+                    <ViewField label="Supplier" value={item.supplier || '-'} />
                     <ViewField
                         label="Scheduled At"
                         value={formatDateByRegionalSettings(item.scheduled_at)}
