@@ -28,7 +28,6 @@ import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues
 import { type ApPayment, type ApPaymentFormData } from '@/types/ap-payment';
 import {
     formatItemReference,
-    omitItemDisplayLabels,
 } from '@/utils/entity-form-item';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { apPaymentFormSchema } from '@/utils/schemas';
@@ -150,7 +149,9 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
     const handleSubmit = (data: ApPaymentFormData) => {
         onSubmit({
             ...data,
-            allocations: data.allocations.map(omitItemDisplayLabels),
+            allocations: data.allocations.map((alloc) => Object.fromEntries(
+                Object.entries(alloc).filter(([key]) => key !== 'bill_label'),
+            )) as typeof data.allocations,
         });
     };
 
