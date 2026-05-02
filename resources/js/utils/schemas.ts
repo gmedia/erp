@@ -187,7 +187,9 @@ export const productFormSchema = z.object({
             message: 'Product type is required.',
         },
     ),
-    product_category_id: z.string().min(1, { message: 'Category is required.' }),
+    product_category_id: z
+        .string()
+        .min(1, { message: 'Category is required.' }),
     unit_id: z.string().min(1, { message: 'Unit is required.' }),
     branch_id: z.string().optional(),
     cost: z.string().min(1, { message: 'Cost is required.' }),
