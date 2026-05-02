@@ -33,10 +33,7 @@ import {
     formatItemReference,
     omitItemDisplayLabels,
 } from '@/utils/entity-form-item';
-import {
-    formatCurrencyByRegionalSettings,
-    formatNumberByRegionalSettings,
-} from '@/utils/number-format';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { apPaymentFormSchema } from '@/utils/schemas';
 import { ApPaymentAllocationFormDialog } from './ApPaymentAllocationFormDialog';
 
@@ -163,10 +160,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(
         const handleSubmit = (data: ApPaymentFormData) => {
             onSubmit({
                 ...data,
-                allocations: data.allocations.map((allocation) => {
-                    const { bill_label, ...rest } = allocation;
-                    return rest;
-                }),
+                allocations: data.allocations.map(omitItemDisplayLabels),
             });
         };
 

@@ -5,7 +5,7 @@ import {
     createReportSummaryColumn,
     createReportTextColumn,
 } from '@/components/common/ReportColumns';
-import { createCurrencyColumn, createNumberColumn } from '@/utils/columns';
+import { createCurrencyColumn } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -53,32 +53,32 @@ function formatDate(value: string | null | undefined): string {
 
 export const apAgingReportColumns: ColumnDef<ApAgingReportItem>[] = [
     createReportSummaryColumn<ApAgingReportItem>({
-        accessorKey: 'bill.number' as any,
+        id: 'bill_number',
         header: 'Bill Number',
         getPrimary: (item) => item.bill?.number,
         getSecondary: (item) => formatDate(item.bill?.bill_date),
         sortable: true,
     }),
     createReportTextColumn<ApAgingReportItem>({
-        accessorKey: 'supplier.name' as any,
+        id: 'supplier_name',
         header: 'Supplier',
         getValue: (item) => item.supplier?.name,
         sortable: true,
     }),
     createReportTextColumn<ApAgingReportItem>({
-        accessorKey: 'branch.name' as any,
+        id: 'branch_name',
         header: 'Branch',
         getValue: (item) => item.branch?.name,
         sortable: true,
     }),
     createReportTextColumn<ApAgingReportItem>({
-        accessorKey: 'bill.due_date' as any,
+        id: 'due_date',
         header: 'Due Date',
         getValue: (item) => formatDate(item.bill?.due_date),
         sortable: true,
     }),
     createCurrencyColumn<ApAgingReportItem>({
-        accessorKey: 'amounts.grand_total' as any,
+        id: 'grand_total',
         label: 'Grand Total',
         currency: 'IDR',
         locale: 'id-ID',
@@ -86,7 +86,7 @@ export const apAgingReportColumns: ColumnDef<ApAgingReportItem>[] = [
         maximumFractionDigits: 2,
     }),
     createCurrencyColumn<ApAgingReportItem>({
-        accessorKey: 'amounts.amount_due' as any,
+        id: 'amount_due',
         label: 'Amount Due',
         currency: 'IDR',
         locale: 'id-ID',
@@ -94,7 +94,7 @@ export const apAgingReportColumns: ColumnDef<ApAgingReportItem>[] = [
         maximumFractionDigits: 2,
     }),
     createCurrencyColumn<ApAgingReportItem>({
-        accessorKey: 'aging_buckets.current' as any,
+        id: 'current',
         label: 'Current',
         currency: 'IDR',
         locale: 'id-ID',
@@ -102,7 +102,7 @@ export const apAgingReportColumns: ColumnDef<ApAgingReportItem>[] = [
         maximumFractionDigits: 2,
     }),
     createCurrencyColumn<ApAgingReportItem>({
-        accessorKey: 'aging_buckets.days_1_30' as any,
+        id: 'days_1_30',
         label: '1-30 Days',
         currency: 'IDR',
         locale: 'id-ID',
@@ -110,7 +110,7 @@ export const apAgingReportColumns: ColumnDef<ApAgingReportItem>[] = [
         maximumFractionDigits: 2,
     }),
     createCurrencyColumn<ApAgingReportItem>({
-        accessorKey: 'aging_buckets.days_31_60' as any,
+        id: 'days_31_60',
         label: '31-60 Days',
         currency: 'IDR',
         locale: 'id-ID',
@@ -118,7 +118,7 @@ export const apAgingReportColumns: ColumnDef<ApAgingReportItem>[] = [
         maximumFractionDigits: 2,
     }),
     createCurrencyColumn<ApAgingReportItem>({
-        accessorKey: 'aging_buckets.days_61_90' as any,
+        id: 'days_61_90',
         label: '61-90 Days',
         currency: 'IDR',
         locale: 'id-ID',
@@ -126,7 +126,7 @@ export const apAgingReportColumns: ColumnDef<ApAgingReportItem>[] = [
         maximumFractionDigits: 2,
     }),
     createCurrencyColumn<ApAgingReportItem>({
-        accessorKey: 'aging_buckets.days_over_90' as any,
+        id: 'days_over_90',
         label: '>90 Days',
         currency: 'IDR',
         locale: 'id-ID',
@@ -134,7 +134,7 @@ export const apAgingReportColumns: ColumnDef<ApAgingReportItem>[] = [
         maximumFractionDigits: 2,
     }),
     createReportStatusBadgeColumn<ApAgingReportItem>({
-        accessorKey: 'bill.status',
+        id: 'status',
         header: 'Status',
         getValue: (item) => item.bill?.status,
     }),

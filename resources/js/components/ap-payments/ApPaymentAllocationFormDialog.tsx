@@ -6,10 +6,7 @@ import { type Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { InputField } from '@/components/common/InputField';
-import {
-    ItemFormDialogShell,
-    ItemNotesField,
-} from '@/components/common/ItemFormDialog';
+import { ItemFormDialogShell } from '@/components/common/ItemFormDialog';
 import { TextareaField } from '@/components/common/TextareaField';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ApPaymentFormData } from '@/types/ap-payment';

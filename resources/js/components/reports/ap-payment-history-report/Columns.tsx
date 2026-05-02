@@ -47,44 +47,44 @@ function formatDate(value: string | null | undefined): string {
 export const apPaymentHistoryReportColumns: ColumnDef<ApPaymentHistoryReportItem>[] =
     [
         createReportSummaryColumn<ApPaymentHistoryReportItem>({
-            accessorKey: 'payment.number' as any,
+            id: 'col',
             header: 'Payment Number',
             getPrimary: (item) => item.payment?.number,
             getSecondary: (item) => formatDate(item.payment?.date),
             sortable: true,
         }),
         createReportTextColumn<ApPaymentHistoryReportItem>({
-            accessorKey: 'supplier.name' as any,
+            id: 'col',
             header: 'Supplier',
             getValue: (item) => item.supplier?.name,
             sortable: true,
         }),
         createReportTextColumn<ApPaymentHistoryReportItem>({
-            accessorKey: 'branch.name' as any,
+            id: 'col',
             header: 'Branch',
             getValue: (item) => item.branch?.name,
             sortable: true,
         }),
         createReportTextColumn<ApPaymentHistoryReportItem>({
-            accessorKey: 'payment.date' as any,
+            id: 'col',
             header: 'Payment Date',
             getValue: (item) => formatDate(item.payment?.date),
             sortable: true,
         }),
         createReportTextColumn<ApPaymentHistoryReportItem>({
-            accessorKey: 'payment.method' as any,
+            id: 'col',
             header: 'Payment Method',
             getValue: (item) => item.payment?.method,
             sortable: true,
         }),
         createReportTextColumn<ApPaymentHistoryReportItem>({
-            accessorKey: 'bank_account.name' as any,
+            id: 'col',
             header: 'Bank Account',
             getValue: (item) => item.bank_account?.name,
             sortable: true,
         }),
         createCurrencyColumn<ApPaymentHistoryReportItem>({
-            accessorKey: 'amounts.total' as any,
+            id: 'col',
             label: 'Total Amount',
             currency: 'IDR',
             locale: 'id-ID',
@@ -92,7 +92,7 @@ export const apPaymentHistoryReportColumns: ColumnDef<ApPaymentHistoryReportItem
             maximumFractionDigits: 2,
         }),
         createCurrencyColumn<ApPaymentHistoryReportItem>({
-            accessorKey: 'amounts.allocated' as any,
+            id: 'col',
             label: 'Allocated Amount',
             currency: 'IDR',
             locale: 'id-ID',
@@ -100,7 +100,7 @@ export const apPaymentHistoryReportColumns: ColumnDef<ApPaymentHistoryReportItem
             maximumFractionDigits: 2,
         }),
         createCurrencyColumn<ApPaymentHistoryReportItem>({
-            accessorKey: 'amounts.unallocated' as any,
+            id: 'col',
             label: 'Unallocated Amount',
             currency: 'IDR',
             locale: 'id-ID',
@@ -108,7 +108,7 @@ export const apPaymentHistoryReportColumns: ColumnDef<ApPaymentHistoryReportItem
             maximumFractionDigits: 2,
         }),
         createReportStatusBadgeColumn<ApPaymentHistoryReportItem>({
-            accessorKey: 'payment.status',
+            id: 'status',
             header: 'Status',
             getValue: (item) => item.payment?.status,
         }),

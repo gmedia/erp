@@ -185,10 +185,7 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
         const handleSubmit = (data: SupplierBillFormData) => {
             onSubmit({
                 ...data,
-                items: data.items.map((item) => {
-                    const { product_label, account_label, ...rest } = item;
-                    return rest;
-                }),
+                items: data.items.map(omitItemDisplayLabels),
             });
         };
 

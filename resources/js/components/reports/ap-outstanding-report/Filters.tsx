@@ -3,7 +3,6 @@ import {
     createSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
-    type SelectOption,
 } from '@/components/common/filters';
 import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 

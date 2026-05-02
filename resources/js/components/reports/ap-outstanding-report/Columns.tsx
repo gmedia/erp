@@ -47,32 +47,32 @@ function formatDate(value: string | null | undefined): string {
 
 export const apOutstandingReportColumns: ColumnDef<ApOutstandingReportItem>[] = [
     createReportSummaryColumn<ApOutstandingReportItem>({
-        accessorKey: 'bill.number' as any,
+        id: 'col',
         header: 'Bill Number',
         getPrimary: (item) => item.bill?.number,
         getSecondary: (item) => formatDate(item.bill?.bill_date),
         sortable: true,
     }),
     createReportTextColumn<ApOutstandingReportItem>({
-        accessorKey: 'supplier.name' as any,
+        id: 'col',
         header: 'Supplier',
         getValue: (item) => item.supplier?.name,
         sortable: true,
     }),
     createReportTextColumn<ApOutstandingReportItem>({
-        accessorKey: 'branch.name' as any,
+        id: 'col',
         header: 'Branch',
         getValue: (item) => item.branch?.name,
         sortable: true,
     }),
     createReportTextColumn<ApOutstandingReportItem>({
-        accessorKey: 'bill.due_date' as any,
+        id: 'col',
         header: 'Due Date',
         getValue: (item) => formatDate(item.bill?.due_date),
         sortable: true,
     }),
     createCurrencyColumn<ApOutstandingReportItem>({
-        accessorKey: 'amounts.grand_total' as any,
+        id: 'col',
         label: 'Grand Total',
         currency: 'IDR',
         locale: 'id-ID',
@@ -80,7 +80,7 @@ export const apOutstandingReportColumns: ColumnDef<ApOutstandingReportItem>[] = 
         maximumFractionDigits: 2,
     }),
     createCurrencyColumn<ApOutstandingReportItem>({
-        accessorKey: 'amounts.amount_paid' as any,
+        id: 'col',
         label: 'Amount Paid',
         currency: 'IDR',
         locale: 'id-ID',
@@ -88,7 +88,7 @@ export const apOutstandingReportColumns: ColumnDef<ApOutstandingReportItem>[] = 
         maximumFractionDigits: 2,
     }),
     createCurrencyColumn<ApOutstandingReportItem>({
-        accessorKey: 'amounts.amount_due' as any,
+        id: 'col',
         label: 'Amount Due',
         currency: 'IDR',
         locale: 'id-ID',
@@ -102,7 +102,7 @@ export const apOutstandingReportColumns: ColumnDef<ApOutstandingReportItem>[] = 
         maximumFractionDigits: 0,
     }),
     createReportStatusBadgeColumn<ApOutstandingReportItem>({
-        accessorKey: 'bill.status',
+        id: 'status',
         header: 'Status',
         getValue: (item) => item.bill?.status,
     }),
