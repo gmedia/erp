@@ -267,22 +267,129 @@ Modul-modul berikut sudah diimplementasi sebagai master data pendukung:
 
 ---
 
-## Urutan Implementasi yang Direkomendasikan (Modul Belum Implemented)
+## Roadmap Implementasi
 
-```
-1. Accounts Payable (15)     ← depends on: COA ✅, Purchasing ✅
-2. Accounts Receivable (16)  ← depends on: COA ✅, Customers ✅
-3. General Ledger Ext (17)   ← depends on: COA ✅, AP, AR
-4. Financial Reports (18)    ← depends on: GL Extended, AP, AR
-```
+### Fase 1 — Accounts Payable & Receivable (paralel)
+
+Kedua modul ini bisa dikerjakan paralel karena tidak saling bergantung.
+
+**1A. Accounts Payable (15)**
+
+| Step | Scope | Skill | Estimasi |
+|------|-------|-------|----------|
+| 1 | Migration: `supplier_bills`, `supplier_bill_items`, `ap_payments`, `ap_payment_allocations` | `database-migration` | 30m |
+| 2 | Models + Relations | `refactor-backend` | 1h |
+| 3 | Backend: Controllers, Requests, Resources, Actions, Exports | `feature-crud-complex` | 3h |
+| 4 | Frontend: Pages, Forms, Columns, Filters, ViewModals | `feature-crud-complex` | 3h |
+| 5 | Factories, Seeders | `testing-strategy` | 30m |
+| 6 | Tests: Feature, Unit, E2E | `testing-strategy` | 2h |
+
+Dependencies: COA (✅), Purchasing (✅), Suppliers (✅)
+Design doc: `15_accounts_payable_design.md`
+Pending decision: `journal_entry_id` di GR/SR (lihat Pending Decisions #2)
+
+**1B. Accounts Receivable (16)**
+
+| Step | Scope | Skill | Estimasi |
+|------|-------|-------|----------|
+| 1 | Migration: `customer_invoices`, `customer_invoice_items`, `ar_receipts`, `ar_receipt_allocations`, `credit_notes`, `credit_note_items` | `database-migration` | 30m |
+| 2 | Models + Relations | `refactor-backend` | 1h |
+| 3 | Backend: Controllers, Requests, Resources, Actions, Exports | `feature-crud-complex` | 3h |
+| 4 | Frontend: Pages, Forms, Columns, Filters, ViewModals | `feature-crud-complex` | 3h |
+| 5 | Factories, Seeders | `testing-strategy` | 30m |
+| 6 | Tests: Feature, Unit, E2E | `testing-strategy` | 2h |
+
+Dependencies: COA (✅), Customers (✅), Products (✅)
+Design doc: `16_accounts_receivable_design.md`
+
+### Fase 2 — General Ledger Extended (17)
+
+Harus menunggu AP + AR selesai karena GL Extended mengintegrasikan journal entries dari kedua modul.
+
+| Step | Scope | Skill | Estimasi |
+|------|-------|-------|----------|
+| 1 | Migration: `account_balances`, `recurring_journals`, `recurring_journal_lines`, `bank_reconciliations`, `bank_reconciliation_items`, `period_closings` | `database-migration` | 30m |
+| 2 | Extend existing JournalEntry model: tambah `journal_type`, `source_type/source_id` | `refactor-backend` | 1h |
+| 3 | Backend: Controllers, Requests, Resources, Actions | `feature-crud-complex` + `feature-non-crud` | 4h |
+| 4 | Frontend: Pages (recurring journals, bank recon, period closing) | `feature-crud-complex` + `feature-non-crud` | 4h |
+| 5 | Factories, Seeders, Tests | `testing-strategy` | 3h |
+
+Dependencies: COA (✅), AP (Fase 1A), AR (Fase 1B)
+Design doc: `17_general_ledger_design.md`
+Note: Sebagian fitur GL dasar (journal entries, posting) sudah ada di COA module. Fase ini menambahkan fitur lanjutan.
+
+### Fase 3 — Financial Reports (18)
+
+Harus menunggu GL Extended selesai karena laporan keuangan membutuhkan data dari semua modul akuntansi.
+
+| Step | Scope | Skill | Estimasi |
+|------|-------|-------|----------|
+| 1 | Migration: `report_configurations`, `report_sections` | `database-migration` | 15m |
+| 2 | Models + Backend | `feature-non-crud` | 2h |
+| 3 | Frontend: Report pages (balance sheet, income statement, cash flow, dll) | `feature-non-crud` | 4h |
+| 4 | Tests | `testing-strategy` | 2h |
+
+Dependencies: GL Extended (Fase 2), AP (Fase 1A), AR (Fase 1B)
+Design doc: `18_financial_reports_design.md`
+Note: Partial implementation sudah ada (`ReportController`, `pages/reports/`). Fase ini memperluas dengan konfigurasi report dan section yang dinamis.
+
+### Fase 4 — Integration & Remaining Gaps
+
+Task-task ini bisa dikerjakan kapan saja, tidak harus menunggu Fase 1-3.
+
+| # | Task | Context | Blocked By | Estimasi |
+|---|------|---------|------------|----------|
+| 1 | `product_stocks.branch_id → warehouse_id` | `14_inventory_design.md` Section 8 | Pending Decision #1 | 2h |
+| 2 | `journal_entry_id` di GR/SR | `13_purchasing_design.md` Section 6 | AP (Fase 1A) | 1h |
+| 3 | `journal_entry_id` di stock adjustments | `14_inventory_design.md` Section 7 | GL Extended (Fase 2) | 1h |
+| 4 | Subscription frontend (CRUD pages) | `00_products_design.md` Section 5.D | — | 4h |
 
 ---
 
 ## Pending Decisions
 
-| # | Decision | Context | Impact |
-|---|----------|---------|--------|
-| 1 | `product_stocks.branch_id → warehouse_id` | `14_inventory_design.md` Section 8 | Products V2 migration + Inventory integration |
-| 2 | `journal_entry_id` di GR/SR | `13_purchasing_design.md` Section 6 | Purchasing ↔ Accounting integration |
-| 3 | `journal_entry_id` di stock adjustments | `14_inventory_design.md` Section 7 | Inventory ↔ Accounting integration |
-| 4 | ~~Products V1→V2 migration timing~~ | `archive/migration_plan_v1_to_v2.md` | ✅ Resolved — V2 migration complete |
+| # | Decision | Context | Impact | Status |
+|---|----------|---------|--------|--------|
+| 1 | `product_stocks.branch_id → warehouse_id` | `14_inventory_design.md` Section 8 | Products + Inventory integration | ⏳ Open |
+| 2 | `journal_entry_id` di GR/SR | `13_purchasing_design.md` Section 6 | Purchasing ↔ Accounting integration | ⏳ Open |
+| 3 | `journal_entry_id` di stock adjustments | `14_inventory_design.md` Section 7 | Inventory ↔ Accounting integration | ⏳ Open |
+| 4 | ~~Products V1→V2 migration timing~~ | `archive/migration_plan_v1_to_v2.md` | — | ✅ Resolved |
+
+---
+
+## Handoff Notes
+
+> Section ini berisi context penting untuk agent atau developer yang melanjutkan pekerjaan.
+
+### Arsitektur & Konvensi
+
+- **Stack**: Laravel API + React Full SPA (BUKAN Inertia). Lihat `.github/copilot-instructions.md`.
+- **Auth**: Sanctum Bearer Token (stateless). Feature tests wajib `Sanctum::actingAs()`.
+- **Pattern**: Controller tipis → Action classes → FilterService. Export pakai `columns()` pattern.
+- **Skill docs**: `.github/skills/` berisi template dan instruksi per tipe task.
+- **Prompt docs**: `.github/prompts/` berisi workflow reusable (continue, checkpoint, create-feature, dll).
+
+### Baseline Test
+
+| Suite | Count | Command |
+|-------|-------|---------|
+| Pest (all) | ~1,247 | `./vendor/bin/sail test` |
+| Pest (products) | 54 | `./vendor/bin/sail test --group products` |
+| E2E smoke | 160 | `./vendor/bin/sail npm run test:e2e:smoke-waves` |
+
+### Completed Milestones
+
+| Date | Milestone |
+|------|-----------|
+| 2026-05-02 | Products V1→V2 migration complete (Fase 1-8) |
+| 2026-05-01 | Style deduplication refactor complete |
+| 2026-04-30 | Style consistency polish complete (Tahap 0-6) |
+| 2026-04-13 | Sonar refactor: 0% duplication, 89.3% coverage |
+
+### Cara Melanjutkan
+
+1. Baca `task.md` untuk status handoff aktif.
+2. Baca `.github/prompts/continue-progress.prompt.md` untuk workflow standar.
+3. Pilih task dari Roadmap di atas berdasarkan prioritas bisnis.
+4. Gunakan skill yang sesuai dari `.github/skills/` (lihat kolom Skill di roadmap).
+5. Setelah selesai, update dokumen ini dan `task.md`.
