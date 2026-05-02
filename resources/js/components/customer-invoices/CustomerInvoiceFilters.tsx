@@ -26,8 +26,18 @@ export function createCustomerInvoiceFilterFields(): FieldDescriptor[] {
             'Search',
             'Search invoice number, customer, or notes...',
         ),
-        createAsyncSelectFilterField('customer_id', 'Customer', '/api/customers', 'Select Customer'),
-        createAsyncSelectFilterField('branch_id', 'Branch', '/api/branches', 'Select Branch'),
+        createAsyncSelectFilterField(
+            'customer_id',
+            'Customer',
+            '/api/customers',
+            'Select Customer',
+        ),
+        createAsyncSelectFilterField(
+            'branch_id',
+            'Branch',
+            '/api/branches',
+            'Select Branch',
+        ),
         ...createSelectFilterFields([
             {
                 name: 'status',

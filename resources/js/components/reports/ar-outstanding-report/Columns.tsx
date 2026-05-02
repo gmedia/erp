@@ -5,11 +5,11 @@ import {
     createReportSummaryColumn,
     createReportTextColumn,
 } from '@/components/common/ReportColumns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
-import { formatDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type ArOutstandingReportItem = {
@@ -90,8 +90,7 @@ export const arOutstandingReportColumns: ColumnDef<ArOutstandingReportItem>[] =
         {
             id: 'grand_total',
             header: 'Grand Total',
-            cell: ({ row }) =>
-                formatCurrency(row.original.amounts.grand_total),
+            cell: ({ row }) => formatCurrency(row.original.amounts.grand_total),
         },
         {
             id: 'amount_received',

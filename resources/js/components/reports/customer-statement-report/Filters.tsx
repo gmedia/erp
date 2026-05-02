@@ -9,11 +9,7 @@ import {
 
 export function createCustomerStatementReportFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search invoice number...',
-        ),
+        createTextFilterField('search', 'Search', 'Search invoice number...'),
         createAsyncSelectFilterField(
             'customer_id',
             'Customer',

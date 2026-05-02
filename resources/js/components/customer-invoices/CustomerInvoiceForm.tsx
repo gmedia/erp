@@ -29,9 +29,7 @@ import {
     type CustomerInvoice,
     type CustomerInvoiceFormData,
 } from '@/types/customer-invoice';
-import {
-    omitItemDisplayLabels,
-} from '@/utils/entity-form-item';
+import { omitItemDisplayLabels } from '@/utils/entity-form-item';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
@@ -48,7 +46,6 @@ interface CustomerInvoiceFormProps {
     onSubmit: (data: CustomerInvoiceFormData) => void;
     isLoading?: boolean;
 }
-
 
 const getCustomerInvoiceFormDefaults = (
     customerInvoice?: CustomerInvoice | null,
@@ -217,10 +214,7 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                             name="invoice_date"
                             label="Invoice Date"
                         />
-                        <DatePickerField
-                            name="due_date"
-                            label="Due Date"
-                        />
+                        <DatePickerField name="due_date" label="Due Date" />
                         <InputField
                             name="payment_terms"
                             label="Payment Terms"
@@ -277,7 +271,9 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                                     <TableHead className="text-right">
                                         Line Total
                                     </TableHead>
-                                    <TableHead className="w-20">Actions</TableHead>
+                                    <TableHead className="w-20">
+                                        Actions
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -285,7 +281,9 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                                     const lineTotal =
                                         field.quantity *
                                         field.unit_price *
-                                        (1 - (field.discount_percent || 0) / 100) *
+                                        (1 -
+                                            (field.discount_percent || 0) /
+                                                100) *
                                         (1 + (field.tax_percent || 0) / 100);
                                     return (
                                         <TableRow key={field.id}>
@@ -318,17 +316,17 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                     {formatCurrencyByRegionalSettings(
-                                                         field.unit_price,
-                                                         {
-                                                             locale: 'id-ID',
-                                                             currency:
-                                                                 selectedCurrency ||
-                                                                 'IDR',
-                                                             minimumFractionDigits: 2,
-                                                             maximumFractionDigits: 2,
-                                                         },
-                                                     )}
+                                                {formatCurrencyByRegionalSettings(
+                                                    field.unit_price,
+                                                    {
+                                                        locale: 'id-ID',
+                                                        currency:
+                                                            selectedCurrency ||
+                                                            'IDR',
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2,
+                                                    },
+                                                )}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 {formatNumberByRegionalSettings(

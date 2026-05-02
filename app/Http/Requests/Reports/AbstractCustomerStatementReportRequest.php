@@ -2,8 +2,6 @@
 
 namespace App\Http\Requests\Reports;
 
-use Illuminate\Validation\Rule;
-
 abstract class AbstractCustomerStatementReportRequest extends AbstractReportRequest
 {
     protected function customerStatementRules(): array

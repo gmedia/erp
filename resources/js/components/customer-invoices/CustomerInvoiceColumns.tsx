@@ -12,9 +12,11 @@ import {
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
 
-const renderCustomerCell = ({ row }: { row: { original: CustomerInvoice } }) => (
-    <div>{row.original.customer?.name ?? '-'}</div>
-);
+const renderCustomerCell = ({
+    row,
+}: {
+    row: { original: CustomerInvoice };
+}) => <div>{row.original.customer?.name ?? '-'}</div>;
 
 const renderBranchCell = ({ row }: { row: { original: CustomerInvoice } }) => (
     <div>{row.original.branch?.name ?? '-'}</div>

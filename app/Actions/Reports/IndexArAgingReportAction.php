@@ -149,7 +149,7 @@ class IndexArAgingReportAction
 
     private function agingBucketSelectSql(): string
     {
-        return "CASE
+        return 'CASE
             WHEN DATEDIFF(CURDATE(), ci.due_date) <= 0 THEN ci.amount_due
             ELSE 0
         END as aging_current,
@@ -168,7 +168,7 @@ class IndexArAgingReportAction
         CASE
             WHEN DATEDIFF(CURDATE(), ci.due_date) > 90 THEN ci.amount_due
             ELSE 0
-        END as aging_over_90";
+        END as aging_over_90';
     }
 
     /**

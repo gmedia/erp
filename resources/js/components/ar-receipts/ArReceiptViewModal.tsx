@@ -6,9 +6,7 @@ import {
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import {
-    formatCurrencyByRegionalSettings,
-} from '@/utils/number-format';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import React from 'react';
 
 import { ArReceipt, type ArReceiptAllocation } from '@/types/ar-receipt';
@@ -57,7 +55,8 @@ export const ArReceiptViewModal = React.memo(
                 maximumFractionDigits: 2,
             });
 
-        const allocationColumns = createArReceiptAllocationColumns(formatAmount);
+        const allocationColumns =
+            createArReceiptAllocationColumns(formatAmount);
 
         return (
             <ViewModalShell
@@ -68,25 +67,54 @@ export const ArReceiptViewModal = React.memo(
             >
                 <div className="space-y-4 py-4">
                     <div className="grid grid-cols-2 gap-4">
-                        <ViewField label="Receipt Number" value={item.receipt_number || '-'} />
-                        <ViewField label="Customer" value={item.customer?.name || '-'} />
-                        <ViewField label="Branch" value={item.branch?.name || '-'} />
-                        <ViewField label="Fiscal Year" value={item.fiscal_year?.name || '-'} />
+                        <ViewField
+                            label="Receipt Number"
+                            value={item.receipt_number || '-'}
+                        />
+                        <ViewField
+                            label="Customer"
+                            value={item.customer?.name || '-'}
+                        />
+                        <ViewField
+                            label="Branch"
+                            value={item.branch?.name || '-'}
+                        />
+                        <ViewField
+                            label="Fiscal Year"
+                            value={item.fiscal_year?.name || '-'}
+                        />
                         <ViewField
                             label="Receipt Date"
-                            value={formatDateByRegionalSettings(item.receipt_date, {
-                                locale: 'id-ID',
-                            })}
+                            value={formatDateByRegionalSettings(
+                                item.receipt_date,
+                                {
+                                    locale: 'id-ID',
+                                },
+                            )}
                         />
                         <ViewField
                             label="Payment Method"
-                            value={<Badge variant="outline">{item.payment_method.replace('_', ' ')}</Badge>}
+                            value={
+                                <Badge variant="outline">
+                                    {item.payment_method.replace('_', ' ')}
+                                </Badge>
+                            }
                         />
-                        <ViewField label="Bank Account" value={item.bank_account?.name || '-'} />
-                        <ViewField label="Currency" value={item.currency || '-'} />
+                        <ViewField
+                            label="Bank Account"
+                            value={item.bank_account?.name || '-'}
+                        />
+                        <ViewField
+                            label="Currency"
+                            value={item.currency || '-'}
+                        />
                         <ViewField
                             label="Status"
-                            value={<Badge variant="outline">{item.status.replace('_', ' ')}</Badge>}
+                            value={
+                                <Badge variant="outline">
+                                    {item.status.replace('_', ' ')}
+                                </Badge>
+                            }
                         />
                         <ViewField
                             label="Total Amount"
@@ -100,7 +128,10 @@ export const ArReceiptViewModal = React.memo(
                             label="Total Unallocated"
                             value={formatAmount(item.total_unallocated)}
                         />
-                        <ViewField label="Reference" value={item.reference || '-'} />
+                        <ViewField
+                            label="Reference"
+                            value={item.reference || '-'}
+                        />
                     </div>
 
                     {item.notes && (
@@ -109,7 +140,9 @@ export const ArReceiptViewModal = React.memo(
 
                     {item.allocations && item.allocations.length > 0 && (
                         <div className="pt-4">
-                            <h3 className="mb-2 text-lg font-semibold">Allocations</h3>
+                            <h3 className="mb-2 text-lg font-semibold">
+                                Allocations
+                            </h3>
                             <ViewModalItemsTable
                                 items={item.allocations}
                                 columns={allocationColumns}
@@ -120,13 +153,19 @@ export const ArReceiptViewModal = React.memo(
                     )}
 
                     <div className="pt-4 text-sm text-muted-foreground">
-                        <div>Created by: {item.created_by?.name || 'System'}</div>
+                        <div>
+                            Created by: {item.created_by?.name || 'System'}
+                        </div>
                         {item.confirmed_at && (
                             <div>
-                                Confirmed by: {item.confirmed_by?.name || 'System'} on{' '}
-                                {formatDateByRegionalSettings(item.confirmed_at, {
-                                    locale: 'id-ID',
-                                })}
+                                Confirmed by:{' '}
+                                {item.confirmed_by?.name || 'System'} on{' '}
+                                {formatDateByRegionalSettings(
+                                    item.confirmed_at,
+                                    {
+                                        locale: 'id-ID',
+                                    },
+                                )}
                             </div>
                         )}
                     </div>

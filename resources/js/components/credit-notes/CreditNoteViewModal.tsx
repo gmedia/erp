@@ -105,24 +105,48 @@ export const CreditNoteViewModal = React.memo(
             >
                 <div className="space-y-4 py-4">
                     <div className="grid grid-cols-2 gap-4">
-                        <ViewField label="Credit Note Number" value={item.credit_note_number || '-'} />
-                        <ViewField label="Customer" value={item.customer?.name || '-'} />
-                        <ViewField label="Customer Invoice" value={item.customer_invoice?.invoice_number || '-'} />
-                        <ViewField label="Branch" value={item.branch?.name || '-'} />
-                        <ViewField label="Fiscal Year" value={item.fiscal_year?.name || '-'} />
+                        <ViewField
+                            label="Credit Note Number"
+                            value={item.credit_note_number || '-'}
+                        />
+                        <ViewField
+                            label="Customer"
+                            value={item.customer?.name || '-'}
+                        />
+                        <ViewField
+                            label="Customer Invoice"
+                            value={item.customer_invoice?.invoice_number || '-'}
+                        />
+                        <ViewField
+                            label="Branch"
+                            value={item.branch?.name || '-'}
+                        />
+                        <ViewField
+                            label="Fiscal Year"
+                            value={item.fiscal_year?.name || '-'}
+                        />
                         <ViewField
                             label="Credit Note Date"
-                            value={formatDateByRegionalSettings(item.credit_note_date, {
-                                locale: 'id-ID',
-                            })}
+                            value={formatDateByRegionalSettings(
+                                item.credit_note_date,
+                                {
+                                    locale: 'id-ID',
+                                },
+                            )}
                         />
                         <ViewField
                             label="Reason"
-                            value={<Badge variant="outline">{item.reason}</Badge>}
+                            value={
+                                <Badge variant="outline">{item.reason}</Badge>
+                            }
                         />
                         <ViewField
                             label="Status"
-                            value={<Badge variant="outline">{item.status.replace('_', ' ')}</Badge>}
+                            value={
+                                <Badge variant="outline">
+                                    {item.status.replace('_', ' ')}
+                                </Badge>
+                            }
                         />
                         <ViewField
                             label="Subtotal"
@@ -144,7 +168,9 @@ export const CreditNoteViewModal = React.memo(
 
                     {item.items && item.items.length > 0 && (
                         <div className="pt-4">
-                            <h3 className="mb-2 text-lg font-semibold">Credit Note Items</h3>
+                            <h3 className="mb-2 text-lg font-semibold">
+                                Credit Note Items
+                            </h3>
                             <ViewModalItemsTable
                                 items={item.items}
                                 columns={itemColumns}
@@ -155,13 +181,19 @@ export const CreditNoteViewModal = React.memo(
                     )}
 
                     <div className="pt-4 text-sm text-muted-foreground">
-                        <div>Created by: {item.created_by?.name || 'System'}</div>
+                        <div>
+                            Created by: {item.created_by?.name || 'System'}
+                        </div>
                         {item.confirmed_at && (
                             <div>
-                                Confirmed by: {item.confirmed_by?.name || 'System'} on{' '}
-                                {formatDateByRegionalSettings(item.confirmed_at, {
-                                    locale: 'id-ID',
-                                })}
+                                Confirmed by:{' '}
+                                {item.confirmed_by?.name || 'System'} on{' '}
+                                {formatDateByRegionalSettings(
+                                    item.confirmed_at,
+                                    {
+                                        locale: 'id-ID',
+                                    },
+                                )}
                             </div>
                         )}
                     </div>

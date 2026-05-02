@@ -5,8 +5,8 @@ import {
     createReportSummaryColumn,
     createReportTextColumn,
 } from '@/components/common/ReportColumns';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type CustomerStatementReportItem = {
@@ -78,8 +78,7 @@ export const customerStatementReportColumns: ColumnDef<CustomerStatementReportIt
         {
             id: 'grand_total',
             header: 'Grand Total',
-            cell: ({ row }) =>
-                formatCurrency(row.original.amounts.grand_total),
+            cell: ({ row }) => formatCurrency(row.original.amounts.grand_total),
         },
         {
             id: 'amount_received',

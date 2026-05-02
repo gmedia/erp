@@ -12,7 +12,10 @@ import {
 } from '@/utils/number-format';
 import React from 'react';
 
-import { CustomerInvoice, type CustomerInvoiceItem } from '@/types/customer-invoice';
+import {
+    CustomerInvoice,
+    type CustomerInvoiceItem,
+} from '@/types/customer-invoice';
 
 interface CustomerInvoiceViewModalProps {
     open: boolean;
@@ -111,15 +114,30 @@ export const CustomerInvoiceViewModal = React.memo(
             >
                 <div className="space-y-4 py-4">
                     <div className="grid grid-cols-2 gap-4">
-                        <ViewField label="Invoice Number" value={item.invoice_number || '-'} />
-                        <ViewField label="Customer" value={item.customer?.name || '-'} />
-                        <ViewField label="Branch" value={item.branch?.name || '-'} />
-                        <ViewField label="Fiscal Year" value={item.fiscal_year?.name || '-'} />
+                        <ViewField
+                            label="Invoice Number"
+                            value={item.invoice_number || '-'}
+                        />
+                        <ViewField
+                            label="Customer"
+                            value={item.customer?.name || '-'}
+                        />
+                        <ViewField
+                            label="Branch"
+                            value={item.branch?.name || '-'}
+                        />
+                        <ViewField
+                            label="Fiscal Year"
+                            value={item.fiscal_year?.name || '-'}
+                        />
                         <ViewField
                             label="Invoice Date"
-                            value={formatDateByRegionalSettings(item.invoice_date, {
-                                locale: 'id-ID',
-                            })}
+                            value={formatDateByRegionalSettings(
+                                item.invoice_date,
+                                {
+                                    locale: 'id-ID',
+                                },
+                            )}
                         />
                         <ViewField
                             label="Due Date"
@@ -127,11 +145,21 @@ export const CustomerInvoiceViewModal = React.memo(
                                 locale: 'id-ID',
                             })}
                         />
-                        <ViewField label="Payment Terms" value={item.payment_terms || '-'} />
-                        <ViewField label="Currency" value={item.currency || '-'} />
+                        <ViewField
+                            label="Payment Terms"
+                            value={item.payment_terms || '-'}
+                        />
+                        <ViewField
+                            label="Currency"
+                            value={item.currency || '-'}
+                        />
                         <ViewField
                             label="Status"
-                            value={<Badge variant="outline">{item.status.replace('_', ' ')}</Badge>}
+                            value={
+                                <Badge variant="outline">
+                                    {item.status.replace('_', ' ')}
+                                </Badge>
+                            }
                         />
                         <ViewField
                             label="Subtotal"
@@ -169,7 +197,9 @@ export const CustomerInvoiceViewModal = React.memo(
 
                     {item.items && item.items.length > 0 && (
                         <div className="pt-4">
-                            <h3 className="mb-2 text-lg font-semibold">Invoice Items</h3>
+                            <h3 className="mb-2 text-lg font-semibold">
+                                Invoice Items
+                            </h3>
                             <ViewModalItemsTable
                                 items={item.items}
                                 columns={itemColumns}
@@ -180,7 +210,9 @@ export const CustomerInvoiceViewModal = React.memo(
                     )}
 
                     <div className="pt-4 text-sm text-muted-foreground">
-                        <div>Created by: {item.created_by?.name || 'System'}</div>
+                        <div>
+                            Created by: {item.created_by?.name || 'System'}
+                        </div>
                         {item.sent_at && (
                             <div>
                                 Sent by: {item.sent_by?.name || 'System'} on{' '}

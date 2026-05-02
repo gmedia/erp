@@ -16,7 +16,9 @@ import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues
 import { type ArReceiptFormData } from '@/types/ar-receipt';
 
 const arReceiptAllocationSchema = z.object({
-    customer_invoice_id: z.string().min(1, { message: 'Customer Invoice is required.' }),
+    customer_invoice_id: z
+        .string()
+        .min(1, { message: 'Customer Invoice is required.' }),
     invoice_label: z.string().optional(),
     allocated_amount: z.coerce
         .number()

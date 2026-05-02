@@ -69,7 +69,7 @@ class IndexCustomerStatementReportAction
         if ($request->filled('customer_id')) {
             $query->where('ci.customer_id', $request->integer('customer_id'));
         }
-        
+
         $this->applyDateRangeFilter($request, $query, 'ci.invoice_date');
         $this->applySearchFilter($request, $query, $this->searchColumns());
     }
@@ -136,11 +136,11 @@ class IndexCustomerStatementReportAction
 
     private function runningBalanceSelectSql(): string
     {
-        return "SUM(ci.amount_due) OVER (
-            PARTITION BY ci.customer_id 
+        return 'SUM(ci.amount_due) OVER (
+            PARTITION BY ci.customer_id
             ORDER BY ci.invoice_date, ci.id
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-        ) as running_balance";
+        ) as running_balance';
     }
 
     /**

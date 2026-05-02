@@ -988,8 +988,8 @@ export const approvalDelegationConfig =
         formType: 'complex',
         entityNameForSearch: 'approval delegation',
         viewModalComponent: ApprovalDelegationViewModal,
-    getDeleteMessage: () =>
-        `This action cannot be undone. This will permanently delete the selected approval delegation.`,
+        getDeleteMessage: () =>
+            `This action cannot be undone. This will permanently delete the selected approval delegation.`,
     });
 
 // Import AR module components
@@ -1011,33 +1011,37 @@ import { CreditNoteForm } from '@/components/credit-notes/CreditNoteForm';
 import { CreditNoteViewModal } from '@/components/credit-notes/CreditNoteViewModal';
 import { type CreditNote } from '@/types/credit-note';
 
-export const customerInvoiceConfig = createComplexEntityConfig<CustomerInvoice>({
-    entityName: 'Customer Invoice',
-    entityNamePlural: 'Customer Invoices',
-    apiEndpoint: '/api/customer-invoices',
-    exportEndpoint: '/api/customer-invoices/export',
-    queryKey: ['customer-invoices'],
-    breadcrumbs: [{ title: 'Customer Invoices', href: '/customer-invoices' }],
-    initialFilters: {
-        search: '',
-        customer_id: '',
-        branch_id: '',
-        status: '',
-        currency: '',
-        invoice_date_from: '',
-        invoice_date_to: '',
-        due_date_from: '',
-        due_date_to: '',
+export const customerInvoiceConfig = createComplexEntityConfig<CustomerInvoice>(
+    {
+        entityName: 'Customer Invoice',
+        entityNamePlural: 'Customer Invoices',
+        apiEndpoint: '/api/customer-invoices',
+        exportEndpoint: '/api/customer-invoices/export',
+        queryKey: ['customer-invoices'],
+        breadcrumbs: [
+            { title: 'Customer Invoices', href: '/customer-invoices' },
+        ],
+        initialFilters: {
+            search: '',
+            customer_id: '',
+            branch_id: '',
+            status: '',
+            currency: '',
+            invoice_date_from: '',
+            invoice_date_to: '',
+            due_date_from: '',
+            due_date_to: '',
+        },
+        columns: customerInvoiceColumns,
+        filterFields: createCustomerInvoiceFilterFields(),
+        formComponent: CustomerInvoiceForm,
+        formType: 'complex',
+        entityNameForSearch: 'customer invoice',
+        viewModalComponent: CustomerInvoiceViewModal,
+        getDeleteMessage: (item: { invoice_number?: string | null }) =>
+            `This action cannot be undone. This will permanently delete invoice ${item.invoice_number}.`,
     },
-    columns: customerInvoiceColumns,
-    filterFields: createCustomerInvoiceFilterFields(),
-    formComponent: CustomerInvoiceForm,
-    formType: 'complex',
-    entityNameForSearch: 'customer invoice',
-    viewModalComponent: CustomerInvoiceViewModal,
-    getDeleteMessage: (item: { invoice_number?: string | null }) =>
-        `This action cannot be undone. This will permanently delete invoice ${item.invoice_number}.`,
-});
+);
 
 export const arReceiptConfig = createComplexEntityConfig<ArReceipt>({
     entityName: 'AR Receipt',

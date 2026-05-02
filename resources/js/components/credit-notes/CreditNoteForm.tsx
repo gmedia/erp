@@ -1,7 +1,4 @@
 'use client';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useMemo } from 'react';
-import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
@@ -22,18 +19,16 @@ import {
 } from '@/components/ui/table';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
-import {
-    type CreditNote,
-    type CreditNoteFormData,
-} from '@/types/credit-note';
-import {
-    omitItemDisplayLabels,
-} from '@/utils/entity-form-item';
+import { type CreditNote, type CreditNoteFormData } from '@/types/credit-note';
+import { omitItemDisplayLabels } from '@/utils/entity-form-item';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
 import { creditNoteFormSchema } from '@/utils/schemas';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { memo, useMemo } from 'react';
+import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 import { CreditNoteItemFormDialog } from './CreditNoteItemFormDialog';
 interface CreditNoteFormProps {
     open: boolean;
@@ -67,9 +62,7 @@ const getCreditNoteFormDefaults = (
         customer_invoice_id: creditNote.customer_invoice?.id
             ? String(creditNote.customer_invoice.id)
             : '',
-        branch_id: creditNote.branch?.id
-            ? String(creditNote.branch.id)
-            : '',
+        branch_id: creditNote.branch?.id ? String(creditNote.branch.id) : '',
         fiscal_year_id: creditNote.fiscal_year?.id
             ? String(creditNote.fiscal_year.id)
             : '',
@@ -109,11 +102,7 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
             () => getCreditNoteFormDefaults(activeCreditNote),
             [activeCreditNote],
         );
-        const form = useForm<
-            CreditNoteFormData,
-            unknown,
-            CreditNoteFormData
-        >({
+        const form = useForm<CreditNoteFormData, unknown, CreditNoteFormData>({
             resolver: zodResolver(creditNoteFormSchema) as Resolver<
                 CreditNoteFormData,
                 unknown,
@@ -249,7 +238,9 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                                     <TableHead className="text-right">
                                         Line Total
                                     </TableHead>
-                                    <TableHead className="w-20">Actions</TableHead>
+                                    <TableHead className="w-20">
+                                        Actions
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
