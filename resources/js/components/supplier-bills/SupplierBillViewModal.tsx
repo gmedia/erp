@@ -4,12 +4,14 @@ import {
     type ViewModalItemsTableColumn,
 } from '@/components/common/ViewModalItemsTable';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
+import {
+    createAmountFormatter,
+    formatPercent,
+    formatQuantity,
+    type FormatValueInput,
+} from '@/components/common/report-format-helpers';
 import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import {
-    formatCurrencyByRegionalSettings,
-    formatNumberByRegionalSettings,
-} from '@/utils/number-format';
 import React from 'react';
 
 import { SupplierBill, type SupplierBillItem } from '@/types/supplier-bill';
@@ -19,22 +21,6 @@ interface SupplierBillViewModalProps {
     onClose: () => void;
     item: SupplierBill | null;
 }
-
-type FormatValueInput = string | number | null | undefined;
-
-const formatQuantity = (value: FormatValueInput) =>
-    formatNumberByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    });
-
-const formatPercent = (value: FormatValueInput) =>
-    `${formatNumberByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    })}%`;
 
 function createSupplierBillItemColumns(
     formatAmount: (value: FormatValueInput) => string,
@@ -87,13 +73,7 @@ export const SupplierBillViewModal = React.memo(
     ({ item, open, onClose }: SupplierBillViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = (value: FormatValueInput) =>
-            formatCurrencyByRegionalSettings(value ?? 0, {
-                locale: 'id-ID',
-                currency: item.currency || undefined,
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            });
+        const formatAmount = createAmountFormatter(item.currency);
 
         const itemColumns = createSupplierBillItemColumns(formatAmount);
 

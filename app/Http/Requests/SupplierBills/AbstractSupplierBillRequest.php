@@ -4,10 +4,12 @@ namespace App\Http\Requests\SupplierBills;
 
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use App\Http\Requests\Concerns\HasTransactionAmountRules;
 
 abstract class AbstractSupplierBillRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
+    use HasTransactionAmountRules;
 
     public function rules(): array
     {

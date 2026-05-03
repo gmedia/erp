@@ -1064,3 +1064,14 @@ export const apPaymentFormSchema = z.object({
 });
 
 export type ApPaymentFormData = z.infer<typeof apPaymentFormSchema>;
+
+export const transactionItemPricingSchema = {
+    quantity: z.coerce
+        .number()
+        .gt(0, { message: 'Quantity must be greater than 0.' }),
+    unit_price: z.coerce
+        .number()
+        .min(0, { message: 'Unit price must be at least 0.' }),
+    discount_percent: z.coerce.number().min(0).max(100).optional().default(0),
+    tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
+};

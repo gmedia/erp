@@ -9,6 +9,7 @@ import { InputField } from '@/components/common/InputField';
 import { ItemFormDialogShell } from '@/components/common/ItemFormDialog';
 import { TextareaField } from '@/components/common/TextareaField';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
+import { transactionItemPricingSchema } from '@/utils/schemas';
 import { type SupplierBillFormData } from '@/types/supplier-bill';
 
 const supplierBillItemSchema = z.object({
@@ -17,14 +18,7 @@ const supplierBillItemSchema = z.object({
     account_id: z.string().min(1, { message: 'Account is required.' }),
     account_label: z.string().optional(),
     description: z.string().min(1, { message: 'Description is required.' }),
-    quantity: z.coerce
-        .number()
-        .gt(0, { message: 'Quantity must be greater than 0.' }),
-    unit_price: z.coerce
-        .number()
-        .min(0, { message: 'Unit price must be at least 0.' }),
-    discount_percent: z.coerce.number().min(0).max(100).optional().default(0),
-    tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
+    ...transactionItemPricingSchema,
     goods_receipt_item_id: z.string().optional(),
     notes: z.string().optional(),
 });

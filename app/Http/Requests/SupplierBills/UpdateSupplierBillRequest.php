@@ -21,13 +21,6 @@ class UpdateSupplierBillRequest extends AbstractSupplierBillRequest
      */
     protected function totalAmountRules(): array
     {
-        return [
-            'subtotal' => ['sometimes', 'nullable', 'numeric', 'min:0'],
-            'tax_amount' => ['sometimes', 'nullable', 'numeric', 'min:0'],
-            'discount_amount' => ['sometimes', 'nullable', 'numeric', 'min:0'],
-            'grand_total' => ['sometimes', 'nullable', 'numeric', 'min:0'],
-            'amount_paid' => ['sometimes', 'nullable', 'numeric', 'min:0'],
-            'amount_due' => ['sometimes', 'nullable', 'numeric', 'min:0'],
-        ];
+        return $this->transactionAmountRules(['amount_paid', 'amount_due']);
     }
 }

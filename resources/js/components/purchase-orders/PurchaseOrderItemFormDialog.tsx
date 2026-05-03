@@ -12,6 +12,7 @@ import {
     ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
+import { transactionItemPricingSchema } from '@/utils/schemas';
 import { type PurchaseOrderFormData } from '@/types/purchase-order';
 
 const purchaseOrderItemSchema = z.object({
@@ -20,14 +21,7 @@ const purchaseOrderItemSchema = z.object({
     product_label: z.string().optional(),
     unit_id: z.string().min(1, { message: 'Unit is required.' }),
     unit_label: z.string().optional(),
-    quantity: z.coerce
-        .number()
-        .gt(0, { message: 'Quantity must be greater than 0.' }),
-    unit_price: z.coerce
-        .number()
-        .min(0, { message: 'Unit price must be at least 0.' }),
-    discount_percent: z.coerce.number().min(0).max(100).optional().default(0),
-    tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
+    ...transactionItemPricingSchema,
     notes: z.string().optional(),
 });
 
