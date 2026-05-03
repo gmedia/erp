@@ -80,6 +80,11 @@ const FiscalYears = lazy(() => import('./pages/fiscal-years/index'));
 const JournalEntries = lazy(() => import('./pages/journal-entries/index'));
 const PostingJournals = lazy(() => import('./pages/posting-journals/index'));
 
+// AR Module (Accounts Receivable)
+const CustomerInvoices = lazy(() => import('./pages/customer-invoices/index'));
+const ArReceipts = lazy(() => import('./pages/ar-receipts/index'));
+const CreditNotes = lazy(() => import('./pages/credit-notes/index'));
+
 // Pipeline & Approvals
 const PurchaseRequests = lazy(() => import('./pages/purchase-requests/index'));
 const PurchaseOrders = lazy(() => import('./pages/purchase-orders/index'));
@@ -155,6 +160,15 @@ const ReportStockAdjustment = lazy(
 );
 const ReportGoodsReceipt = lazy(
     () => import('./pages/reports/goods-receipt/index'),
+);
+const ReportArAging = lazy(
+    () => import('./pages/reports/ar-aging-report/index'),
+);
+const ReportArOutstanding = lazy(
+    () => import('./pages/reports/ar-outstanding-report/index'),
+);
+const ReportCustomerStatement = lazy(
+    () => import('./pages/reports/customer-statement-report/index'),
 );
 
 // Helper to wrap protected routes
@@ -506,6 +520,32 @@ export default function AppRoutes() {
                     }
                 />
 
+                {/* AR Module (Accounts Receivable) */}
+                <Route
+                    path="/customer-invoices"
+                    element={
+                        <P>
+                            <CustomerInvoices />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/ar-receipts"
+                    element={
+                        <P>
+                            <ArReceipts />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/credit-notes"
+                    element={
+                        <P>
+                            <CreditNotes />
+                        </P>
+                    }
+                />
+
                 {/* Pipeline & Approvals */}
                 <Route
                     path="/purchase-requests"
@@ -790,6 +830,30 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <ReportGoodsReceipt />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/reports/ar-aging"
+                    element={
+                        <P>
+                            <ReportArAging />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/reports/ar-outstanding"
+                    element={
+                        <P>
+                            <ReportArOutstanding />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/reports/customer-statement"
+                    element={
+                        <P>
+                            <ReportCustomerStatement />
                         </P>
                     }
                 />

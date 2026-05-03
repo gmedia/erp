@@ -2,6 +2,9 @@
 
 namespace App\Actions\Concerns;
 
+use App\Models\ArReceipt;
+use App\Models\CreditNote;
+use App\Models\CustomerInvoice;
 use App\Models\GoodsReceipt;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
@@ -22,6 +25,152 @@ final class TransactionMappedIndexConfigurations
      * }>
      */
     private const CONFIGURATIONS = [
+        'customer_invoices' => [
+            'model_class' => CustomerInvoice::class,
+            'with' => [
+                'customer',
+                'branch',
+                'fiscalYear',
+                'creator',
+                'sender',
+                'items.product',
+                'items.account',
+                'items.unit',
+            ],
+            'search_fields' => [
+                'invoice_number',
+                'payment_terms',
+                'notes',
+            ],
+            'filter_keys' => [
+                'customer_id',
+                'branch_id',
+                'fiscal_year_id',
+                'status',
+                'currency',
+                'invoice_date_from',
+                'invoice_date_to',
+                'due_date_from',
+                'due_date_to',
+                'grand_total_min',
+                'grand_total_max',
+                'amount_due_min',
+                'amount_due_max',
+            ],
+            'default_sort_by' => 'created_at',
+            'allowed_sorts' => [
+                'id',
+                'invoice_number',
+                'customer_id',
+                'branch_id',
+                'invoice_date',
+                'due_date',
+                'currency',
+                'status',
+                'grand_total',
+                'amount_due',
+                'created_at',
+                'updated_at',
+            ],
+            'sort_map' => [
+                'customer' => 'customer_id',
+                'branch' => 'branch_id',
+            ],
+        ],
+        'ar_receipts' => [
+            'model_class' => ArReceipt::class,
+            'with' => [
+                'customer',
+                'branch',
+                'fiscalYear',
+                'bankAccount',
+                'creator',
+                'confirmer',
+                'allocations.customerInvoice',
+            ],
+            'search_fields' => [
+                'receipt_number',
+                'reference',
+                'notes',
+            ],
+            'filter_keys' => [
+                'customer_id',
+                'branch_id',
+                'fiscal_year_id',
+                'bank_account_id',
+                'status',
+                'payment_method',
+                'currency',
+                'receipt_date_from',
+                'receipt_date_to',
+                'total_amount_min',
+                'total_amount_max',
+            ],
+            'default_sort_by' => 'created_at',
+            'allowed_sorts' => [
+                'id',
+                'receipt_number',
+                'customer_id',
+                'branch_id',
+                'receipt_date',
+                'payment_method',
+                'currency',
+                'status',
+                'total_amount',
+                'created_at',
+                'updated_at',
+            ],
+            'sort_map' => [
+                'customer' => 'customer_id',
+                'branch' => 'branch_id',
+            ],
+        ],
+        'credit_notes' => [
+            'model_class' => CreditNote::class,
+            'with' => [
+                'customer',
+                'customerInvoice',
+                'branch',
+                'fiscalYear',
+                'creator',
+                'confirmer',
+                'items.product',
+                'items.account',
+            ],
+            'search_fields' => [
+                'credit_note_number',
+                'notes',
+            ],
+            'filter_keys' => [
+                'customer_id',
+                'customer_invoice_id',
+                'branch_id',
+                'fiscal_year_id',
+                'reason',
+                'status',
+                'credit_note_date_from',
+                'credit_note_date_to',
+                'grand_total_min',
+                'grand_total_max',
+            ],
+            'default_sort_by' => 'created_at',
+            'allowed_sorts' => [
+                'id',
+                'credit_note_number',
+                'customer_id',
+                'branch_id',
+                'credit_note_date',
+                'reason',
+                'status',
+                'grand_total',
+                'created_at',
+                'updated_at',
+            ],
+            'sort_map' => [
+                'customer' => 'customer_id',
+                'branch' => 'branch_id',
+            ],
+        ],
         'goods_receipts' => [
             'model_class' => GoodsReceipt::class,
             'with' => [

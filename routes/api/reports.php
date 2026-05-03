@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\ArAgingReportController;
+use App\Http\Controllers\ArOutstandingReportController;
 use App\Http\Controllers\AssetReportController;
 use App\Http\Controllers\BookValueDepreciationReportController;
+use App\Http\Controllers\CustomerStatementReportController;
 use App\Http\Controllers\GoodsReceiptReportController;
 use App\Http\Controllers\InventoryStocktakeVarianceReportController;
 use App\Http\Controllers\InventoryValuationReportController;
@@ -62,4 +65,16 @@ Route::prefix('reports')->group(function () {
         ->middleware('permission:goods_receipt_report');
     Route::post('goods-receipt/export', [GoodsReceiptReportController::class, 'export'])
         ->middleware('permission:goods_receipt_report');
+    Route::get('ar-aging', [ArAgingReportController::class, 'index'])
+        ->middleware('permission:ar_aging_report');
+    Route::post('ar-aging/export', [ArAgingReportController::class, 'export'])
+        ->middleware('permission:ar_aging_report');
+    Route::get('ar-outstanding', [ArOutstandingReportController::class, 'index'])
+        ->middleware('permission:ar_outstanding_report');
+    Route::post('ar-outstanding/export', [ArOutstandingReportController::class, 'export'])
+        ->middleware('permission:ar_outstanding_report');
+    Route::get('customer-statement', [CustomerStatementReportController::class, 'index'])
+        ->middleware('permission:customer_statement_report');
+    Route::post('customer-statement/export', [CustomerStatementReportController::class, 'export'])
+        ->middleware('permission:customer_statement_report');
 });
