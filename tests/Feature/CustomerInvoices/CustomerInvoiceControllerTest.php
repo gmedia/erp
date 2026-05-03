@@ -64,7 +64,7 @@ test('index supports search and filters', function () {
         'branch_id' => $branch->id,
         'status' => 'draft',
     ]);
-    CustomerInvoice::factory()->create();
+    CustomerInvoice::factory()->sent()->create();
 
     getJson('/api/customer-invoices?search=INV-SEARCH-001')
         ->assertOk()

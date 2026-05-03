@@ -68,7 +68,7 @@ test('index supports search and filters', function () {
         'customer_invoice_id' => $invoice->id,
         'status' => 'draft',
     ]);
-    CreditNote::factory()->create();
+    CreditNote::factory()->confirmed()->create();
 
     getJson('/api/credit-notes?search=CN-SEARCH-001')
         ->assertOk()
