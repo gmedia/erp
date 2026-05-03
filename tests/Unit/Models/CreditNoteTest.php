@@ -11,7 +11,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('credit-notes');
 
 test('credit note has expected relationships', function () {
-    $creditNote = CreditNote::factory()->create();
+    $invoice = CustomerInvoice::factory()->create();
+    $creditNote = CreditNote::factory()->create(['customer_invoice_id' => $invoice->id]);
     $item = CreditNoteItem::factory()->create(['credit_note_id' => $creditNote->id]);
 
     expect($creditNote->customer)->toBeInstanceOf(Customer::class)

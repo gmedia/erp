@@ -52,7 +52,7 @@ test('index supports search and filters', function () {
         'fiscal_year_id' => $fiscalYear->id,
         'status' => 'draft',
     ]);
-    ArReceipt::factory()->create();
+    ArReceipt::factory()->confirmed()->create();
 
     getJson('/api/ar-receipts?search=RCP-SEARCH-001')
         ->assertOk()
