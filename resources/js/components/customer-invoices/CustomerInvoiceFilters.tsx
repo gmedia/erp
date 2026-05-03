@@ -1,13 +1,13 @@
 'use client';
 
 import {
-    createAsyncSelectFilterField,
     createDateFilterFields,
     createSelectFilterFields,
     createTextFilterField,
     currencyOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';
+import { createCustomerBranchFilterFields } from '@/components/common/customer-branch-filters';
 
 export function createCustomerInvoiceFilterFields(): FieldDescriptor[] {
     const customerInvoiceStatusOptions = [
@@ -26,18 +26,7 @@ export function createCustomerInvoiceFilterFields(): FieldDescriptor[] {
             'Search',
             'Search invoice number, customer, or notes...',
         ),
-        createAsyncSelectFilterField(
-            'customer_id',
-            'Customer',
-            '/api/customers',
-            'Select Customer',
-        ),
-        createAsyncSelectFilterField(
-            'branch_id',
-            'Branch',
-            '/api/branches',
-            'Select Branch',
-        ),
+        ...createCustomerBranchFilterFields(),
         ...createSelectFilterFields([
             {
                 name: 'status',

@@ -6,10 +6,10 @@ import {
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import React from 'react';
 
 import { ArReceipt, type ArReceiptAllocation } from '@/types/ar-receipt';
+import { createAmountFormatter } from '@/components/common/report-format-helpers';
 
 interface ArReceiptViewModalProps {
     open: boolean;
@@ -17,10 +17,8 @@ interface ArReceiptViewModalProps {
     item: ArReceipt | null;
 }
 
-type FormatValueInput = string | number | null | undefined;
-
 function createArReceiptAllocationColumns(
-    formatAmount: (value: FormatValueInput) => string,
+    formatAmount: ReturnType<typeof createAmountFormatter>,
 ): ViewModalItemsTableColumn<ArReceiptAllocation>[] {
     return [
         {
@@ -47,13 +45,7 @@ export const ArReceiptViewModal = React.memo(
     ({ item, open, onClose }: ArReceiptViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = (value: FormatValueInput) =>
-            formatCurrencyByRegionalSettings(value ?? 0, {
-                locale: 'id-ID',
-                currency: item.currency || undefined,
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            });
+        const formatAmount = createAmountFormatter('id-ID', item.currency || 'IDR');
 
         const allocationColumns =
             createArReceiptAllocationColumns(formatAmount);

@@ -11,6 +11,7 @@ import {
     ItemNotesField,
     ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
+import { ItemPricingFields } from '@/components/common/ItemPricingFields';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type CustomerInvoiceFormData } from '@/types/customer-invoice';
 
@@ -126,40 +127,7 @@ export function CustomerInvoiceItemFormDialog({
                     placeholder="Enter description"
                 />
             </div>
-            <div className="grid grid-cols-3 gap-4">
-                <InputField
-                    name="quantity"
-                    label="Quantity"
-                    type="number"
-                    min={0}
-                    step={0.01}
-                />
-                <InputField
-                    name="unit_price"
-                    label="Unit Price"
-                    type="number"
-                    min={0}
-                    step={0.01}
-                />
-                <InputField
-                    name="discount_percent"
-                    label="Discount %"
-                    type="number"
-                    min={0}
-                    max={100}
-                    step={0.01}
-                />
-            </div>
-            <div className="grid grid-cols-1 gap-4">
-                <InputField
-                    name="tax_percent"
-                    label="Tax %"
-                    type="number"
-                    min={0}
-                    max={100}
-                    step={0.01}
-                />
-            </div>
+            <ItemPricingFields />
             <ItemNotesField />
         </ItemFormDialogShell>
     );

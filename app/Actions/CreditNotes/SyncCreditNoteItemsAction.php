@@ -2,23 +2,23 @@
 
 namespace App\Actions\CreditNotes;
 
+use App\Actions\Concerns\CalculatesTransactionLineTotals;
 use App\Actions\Concerns\RecreatesItems;
 use App\Models\CreditNote;
 
 class SyncCreditNoteItemsAction
 {
+    use CalculatesTransactionLineTotals;
     use RecreatesItems;
 
     public function execute(CreditNote $creditNote, array $items): void
     {
-        $normalized = $this->recreateItems($creditNote->items(), $items, static function (array $item): array {
+        $normalized = $this->recreateItems($creditNote->items(), $items, function (array $item): array {
             $quantity = (float) $item['quantity'];
             $unitPrice = (float) $item['unit_price'];
             $taxPercent = (float) ($item['tax_percent'] ?? 0);
 
-            $subtotal = $quantity * $unitPrice;
-            $tax = $subtotal * ($taxPercent / 100);
-            $lineTotal = $subtotal + $tax;
+            $lineTotal = $this->calculateLineTotal($quantity, $unitPrice, 0, $taxPercent);
 
             return [
                 'product_id' => $item['product_id'] ?? null,
@@ -32,15 +32,9 @@ class SyncCreditNoteItemsAction
             ];
         });
 
-        $subtotal = collect($normalized)
-            ->sum(static fn (array $row) => (float) ($row['quantity'] * $row['unit_price']));
-        $taxAmount = collect($normalized)
-            ->sum(static function (array $row): float {
-                $lineSubtotal = (float) ($row['quantity'] * $row['unit_price']);
-
-                return (float) ($lineSubtotal * ($row['tax_percent'] / 100));
-            });
-        $grandTotal = collect($normalized)->sum(static fn (array $row) => (float) ($row['line_total']));
+        $subtotal = $this->calculateSubtotal($normalized);
+        $taxAmount = $this->calculateTaxAmount($normalized);
+        $grandTotal = $this->calculateGrandTotal($normalized);
 
         $creditNote->update([
             'subtotal' => (string) $subtotal,

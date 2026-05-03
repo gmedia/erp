@@ -2,23 +2,24 @@
 
 namespace App\Actions\CustomerInvoices;
 
+use App\Actions\Concerns\CalculatesTransactionLineTotals;
 use App\Actions\Concerns\RecreatesItems;
 use App\Models\CustomerInvoice;
 
 class SyncCustomerInvoiceItemsAction
 {
+    use CalculatesTransactionLineTotals;
     use RecreatesItems;
 
     public function execute(CustomerInvoice $customerInvoice, array $items): void
     {
-        $normalized = $this->recreateItems($customerInvoice->items(), $items, static function (array $item): array {
+        $normalized = $this->recreateItems($customerInvoice->items(), $items, function (array $item): array {
             $quantity = (float) $item['quantity'];
             $unitPrice = (float) $item['unit_price'];
             $discountPercent = (float) ($item['discount_percent'] ?? 0);
             $taxPercent = (float) ($item['tax_percent'] ?? 0);
 
-            $lineBeforeTax = $quantity * $unitPrice * (1 - ($discountPercent / 100));
-            $lineTotal = $lineBeforeTax * (1 + ($taxPercent / 100));
+            $lineTotal = $this->calculateLineTotal($quantity, $unitPrice, $discountPercent, $taxPercent);
 
             return [
                 'product_id' => $item['product_id'] ?? null,
@@ -34,22 +35,10 @@ class SyncCustomerInvoiceItemsAction
             ];
         });
 
-        $subtotal = collect($normalized)
-            ->sum(static fn (array $row) => (float) ($row['quantity'] * $row['unit_price']));
-        $discountAmount = collect($normalized)
-            ->sum(static function (array $row): float {
-                $lineSubtotal = (float) ($row['quantity'] * $row['unit_price']);
-
-                return (float) ($lineSubtotal * ($row['discount_percent'] / 100));
-            });
-        $taxAmount = collect($normalized)
-            ->sum(static function (array $row): float {
-                $lineSubtotal = (float) ($row['quantity'] * $row['unit_price']);
-                $discountedSubtotal = $lineSubtotal * (1 - ($row['discount_percent'] / 100));
-
-                return (float) ($discountedSubtotal * ($row['tax_percent'] / 100));
-            });
-        $grandTotal = collect($normalized)->sum(static fn (array $row) => (float) ($row['line_total']));
+        $subtotal = $this->calculateSubtotal($normalized);
+        $discountAmount = $this->calculateDiscountAmount($normalized);
+        $taxAmount = $this->calculateTaxAmount($normalized);
+        $grandTotal = $this->calculateGrandTotal($normalized);
 
         $amountReceived = (float) $customerInvoice->amount_received;
         $creditNoteAmount = (float) $customerInvoice->credit_note_amount;

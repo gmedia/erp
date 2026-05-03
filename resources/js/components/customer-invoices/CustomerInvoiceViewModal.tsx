@@ -6,16 +6,16 @@ import {
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import {
-    formatCurrencyByRegionalSettings,
-    formatNumberByRegionalSettings,
-} from '@/utils/number-format';
 import React from 'react';
 
 import {
     CustomerInvoice,
     type CustomerInvoiceItem,
 } from '@/types/customer-invoice';
+import {
+    createAmountFormatter,
+    createPricingColumns,
+} from '@/components/common/report-format-helpers';
 
 interface CustomerInvoiceViewModalProps {
     open: boolean;
@@ -23,24 +23,8 @@ interface CustomerInvoiceViewModalProps {
     item: CustomerInvoice | null;
 }
 
-type FormatValueInput = string | number | null | undefined;
-
-const formatQuantity = (value: FormatValueInput) =>
-    formatNumberByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    });
-
-const formatPercent = (value: FormatValueInput) =>
-    `${formatNumberByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    })}%`;
-
 function createCustomerInvoiceItemColumns(
-    formatAmount: (value: FormatValueInput) => string,
+    formatAmount: ReturnType<typeof createAmountFormatter>,
 ): ViewModalItemsTableColumn<CustomerInvoiceItem>[] {
     return [
         {
@@ -58,36 +42,7 @@ function createCustomerInvoiceItemColumns(
             header: 'Description',
             render: (item) => item.description || '-',
         },
-        {
-            key: 'quantity',
-            header: 'Qty',
-            align: 'right',
-            render: (item) => formatQuantity(item.quantity),
-        },
-        {
-            key: 'unit_price',
-            header: 'Unit Price',
-            align: 'right',
-            render: (item) => formatAmount(item.unit_price),
-        },
-        {
-            key: 'discount_percent',
-            header: 'Disc %',
-            align: 'right',
-            render: (item) => formatPercent(item.discount_percent),
-        },
-        {
-            key: 'tax_percent',
-            header: 'Tax %',
-            align: 'right',
-            render: (item) => formatPercent(item.tax_percent),
-        },
-        {
-            key: 'line_total',
-            header: 'Line Total',
-            align: 'right',
-            render: (item) => formatAmount(item.line_total),
-        },
+        ...createPricingColumns<CustomerInvoiceItem>(formatAmount),
     ];
 }
 
@@ -95,13 +50,7 @@ export const CustomerInvoiceViewModal = React.memo(
     ({ item, open, onClose }: CustomerInvoiceViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = (value: FormatValueInput) =>
-            formatCurrencyByRegionalSettings(value ?? 0, {
-                locale: 'id-ID',
-                currency: item.currency || undefined,
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            });
+        const formatAmount = createAmountFormatter('id-ID', item.currency || 'IDR');
 
         const itemColumns = createCustomerInvoiceItemColumns(formatAmount);
 

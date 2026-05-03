@@ -6,13 +6,14 @@ import {
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import {
-    formatCurrencyByRegionalSettings,
-    formatNumberByRegionalSettings,
-} from '@/utils/number-format';
 import React from 'react';
 
 import { CreditNote, type CreditNoteItem } from '@/types/credit-note';
+import {
+    createAmountFormatter,
+    formatQuantity,
+    formatPercent,
+} from '@/components/common/report-format-helpers';
 
 interface CreditNoteViewModalProps {
     open: boolean;
@@ -20,24 +21,8 @@ interface CreditNoteViewModalProps {
     item: CreditNote | null;
 }
 
-type FormatValueInput = string | number | null | undefined;
-
-const formatQuantity = (value: FormatValueInput) =>
-    formatNumberByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    });
-
-const formatPercent = (value: FormatValueInput) =>
-    `${formatNumberByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    })}%`;
-
 function createCreditNoteItemColumns(
-    formatAmount: (value: FormatValueInput) => string,
+    formatAmount: ReturnType<typeof createAmountFormatter>,
 ): ViewModalItemsTableColumn<CreditNoteItem>[] {
     return [
         {
@@ -86,13 +71,7 @@ export const CreditNoteViewModal = React.memo(
     ({ item, open, onClose }: CreditNoteViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = (value: FormatValueInput) =>
-            formatCurrencyByRegionalSettings(value ?? 0, {
-                locale: 'id-ID',
-                currency: 'IDR',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            });
+        const formatAmount = createAmountFormatter('id-ID', 'IDR');
 
         const itemColumns = createCreditNoteItemColumns(formatAmount);
 

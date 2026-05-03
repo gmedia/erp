@@ -1,13 +1,13 @@
 'use client';
 
 import {
-    createAsyncSelectFilterField,
     createDateFilterFields,
     createSelectFilterFields,
     createTextFilterField,
     currencyOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';
+import { createCustomerBranchFilterFields } from '@/components/common/customer-branch-filters';
 
 export function createArReceiptFilterFields(): FieldDescriptor[] {
     const arReceiptStatusOptions = [
@@ -33,18 +33,7 @@ export function createArReceiptFilterFields(): FieldDescriptor[] {
             'Search',
             'Search receipt number, customer, or reference...',
         ),
-        createAsyncSelectFilterField(
-            'customer_id',
-            'Customer',
-            '/api/customers',
-            'Select Customer',
-        ),
-        createAsyncSelectFilterField(
-            'branch_id',
-            'Branch',
-            '/api/branches',
-            'Select Branch',
-        ),
+        ...createCustomerBranchFilterFields(),
         ...createSelectFilterFields([
             {
                 name: 'status',

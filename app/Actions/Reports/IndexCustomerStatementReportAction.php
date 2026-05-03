@@ -2,8 +2,8 @@
 
 namespace App\Actions\Reports;
 
+use App\Actions\Reports\Concerns\BuildsCustomerInvoiceReportQuery;
 use App\Actions\Reports\Concerns\HandlesReportQuery;
-use App\Models\CustomerInvoice;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -11,6 +11,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class IndexCustomerStatementReportAction
 {
+    use BuildsCustomerInvoiceReportQuery;
     use HandlesReportQuery;
 
     public function execute(FormRequest $request): LengthAwarePaginator|Collection
@@ -33,35 +34,10 @@ class IndexCustomerStatementReportAction
 
     protected function buildQuery(): Builder
     {
-        return CustomerInvoice::query()
-            ->from('customer_invoices as ci')
-            ->join('customers as c', 'ci.customer_id', '=', 'c.id')
-            ->leftJoin('branches as b', 'ci.branch_id', '=', 'b.id')
-            ->selectRaw($this->compileSelectColumns([
-                'ci.id as customer_invoice_id',
-                'ci.invoice_number',
-                'ci.invoice_date',
-                'ci.due_date',
-                'ci.grand_total',
-                'ci.amount_received',
-                'ci.credit_note_amount',
-                'ci.amount_due',
-                'ci.status',
-                'c.id as customer_id',
-                'c.name as customer_name',
-                'b.id as branch_id',
-                'b.name as branch_name',
-                $this->runningBalanceSelectSql(),
-            ]))
-            ->withCasts([
-                'invoice_date' => 'date',
-                'due_date' => 'date',
-                'grand_total' => 'decimal:2',
-                'amount_received' => 'decimal:2',
-                'credit_note_amount' => 'decimal:2',
-                'amount_due' => 'decimal:2',
+        return $this->buildBaseCustomerInvoiceQuery([$this->runningBalanceSelectSql()])
+            ->withCasts(array_merge($this->getBaseCasts(), [
                 'running_balance' => 'decimal:2',
-            ]);
+            ]));
     }
 
     protected function applyCustomerStatementReportFilters(FormRequest $request, Builder $query): void
@@ -71,17 +47,7 @@ class IndexCustomerStatementReportAction
         }
 
         $this->applyDateRangeFilter($request, $query, 'ci.invoice_date');
-        $this->applySearchFilter($request, $query, $this->searchColumns());
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    protected function searchColumns(): array
-    {
-        return [
-            'ci.invoice_number',
-        ];
+        $this->applySearchFilter($request, $query, ['ci.invoice_number']);
     }
 
     protected function defaultSortBy(): string
@@ -89,9 +55,6 @@ class IndexCustomerStatementReportAction
         return 'invoice_date';
     }
 
-    /**
-     * @return array<string, string>
-     */
     protected function sortAliases(): array
     {
         return [
@@ -102,9 +65,6 @@ class IndexCustomerStatementReportAction
         ];
     }
 
-    /**
-     * @return array<int, string>
-     */
     protected function plainSortableColumns(): array
     {
         return [
@@ -119,9 +79,6 @@ class IndexCustomerStatementReportAction
         ];
     }
 
-    /**
-     * @return array<int, string>
-     */
     protected function aggregateSortableColumns(): array
     {
         return [
@@ -141,26 +98,5 @@ class IndexCustomerStatementReportAction
             ORDER BY ci.invoice_date, ci.id
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ) as running_balance';
-    }
-
-    /**
-     * @param  array<int, string>  $columns
-     */
-    private function compileSelectColumns(array $columns): string
-    {
-        $seen = [];
-        $filtered = [];
-        foreach ($columns as $col) {
-            if (preg_match('/ as ([a-zA-Z0-9_]+)/', $col, $m)) {
-                $alias = $m[1];
-                if (isset($seen[$alias])) {
-                    continue;
-                }
-                $seen[$alias] = true;
-            }
-            $filtered[] = $col;
-        }
-
-        return implode(",\n                ", $filtered);
     }
 }

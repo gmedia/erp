@@ -1,12 +1,12 @@
 'use client';
 
 import {
-    createAsyncSelectFilterField,
     createDateFilterFields,
     createSelectFilterFields,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
+import { createCustomerBranchFilterFields } from '@/components/common/customer-branch-filters';
 
 export function createCreditNoteFilterFields(): FieldDescriptor[] {
     const creditNoteStatusOptions = [
@@ -31,18 +31,7 @@ export function createCreditNoteFilterFields(): FieldDescriptor[] {
             'Search',
             'Search credit note number, customer, or notes...',
         ),
-        createAsyncSelectFilterField(
-            'customer_id',
-            'Customer',
-            '/api/customers',
-            'Select Customer',
-        ),
-        createAsyncSelectFilterField(
-            'branch_id',
-            'Branch',
-            '/api/branches',
-            'Select Branch',
-        ),
+        ...createCustomerBranchFilterFields(),
         ...createSelectFilterFields([
             {
                 name: 'reason',
