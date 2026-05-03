@@ -15,8 +15,10 @@ use App\Http\Requests\ArReceipts\UpdateArReceiptRequest;
 use App\Http\Resources\ArReceipts\ArReceiptCollection;
 use App\Http\Resources\ArReceipts\ArReceiptResource;
 use App\Models\ArReceipt;
+use App\Models\ArReceiptAllocation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ArReceiptController extends Controller
 {
@@ -87,7 +89,22 @@ class ArReceiptController extends Controller
 
     public function destroy(ArReceipt $arReceipt): JsonResponse
     {
-        return $this->destroyModel($arReceipt);
+        DB::transaction(function () use ($arReceipt) {
+            /** @var ArReceiptAllocation $allocation */
+            foreach ($arReceipt->allocations()->with('customerInvoice')->get() as $allocation) {
+                $invoice = $allocation->customerInvoice;
+
+                $newAmountReceived = (float) $invoice->amount_received - (float) $allocation->allocated_amount;
+                $invoice->update([
+                    'amount_received' => (string) max(0, $newAmountReceived),
+                    'amount_due' => (string) ((float) $invoice->grand_total - max(0, $newAmountReceived) - (float) $invoice->credit_note_amount),
+                ]);
+                $invoice->updatePaymentStatus();
+            }
+            $arReceipt->delete();
+        });
+
+        return response()->json(null, 204);
     }
 
     public function export(ExportArReceiptRequest $request, ExportArReceiptsAction $action): JsonResponse

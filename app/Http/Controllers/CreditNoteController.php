@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreditNotes\ApplyCreditNoteAction;
 use App\Actions\CreditNotes\ExportCreditNotesAction;
 use App\Actions\CreditNotes\IndexCreditNotesAction;
 use App\Actions\CreditNotes\SyncCreditNoteItemsAction;
@@ -17,6 +18,7 @@ use App\Http\Resources\CreditNotes\CreditNoteResource;
 use App\Models\CreditNote;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use InvalidArgumentException;
 
 class CreditNoteController extends Controller
 {
@@ -88,6 +90,17 @@ class CreditNoteController extends Controller
     public function destroy(CreditNote $creditNote): JsonResponse
     {
         return $this->destroyModel($creditNote);
+    }
+
+    public function apply(CreditNote $creditNote, ApplyCreditNoteAction $action): JsonResponse
+    {
+        try {
+            $creditNote = $action->execute($creditNote);
+
+            return (new CreditNoteResource($this->loadResourceRelations($creditNote)))->response();
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
     }
 
     public function export(ExportCreditNoteRequest $request, ExportCreditNotesAction $action): JsonResponse

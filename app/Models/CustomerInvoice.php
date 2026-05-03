@@ -138,6 +138,26 @@ class CustomerInvoice extends Model
         );
     }
 
+    public function updatePaymentStatus(): void
+    {
+        if (in_array($this->status, ['cancelled', 'void', 'draft'], true)) {
+            return;
+        }
+
+        $received = (float) $this->amount_received;
+        $creditNotes = (float) $this->credit_note_amount;
+        $total = (float) $this->grand_total;
+        $totalSettled = $received + $creditNotes;
+
+        if ($total > 0 && $totalSettled >= $total) {
+            $this->update(['status' => 'paid']);
+        } elseif ($totalSettled > 0 && $totalSettled < $total) {
+            $this->update(['status' => 'partially_paid']);
+        } elseif ($totalSettled <= 0 && $this->status === 'partially_paid') {
+            $this->update(['status' => 'sent']);
+        }
+    }
+
     protected function casts(): array
     {
         return [

@@ -80,6 +80,7 @@ test('store creates ar receipt with allocations', function () {
         'customer_id' => $customer->id,
         'fiscal_year_id' => $fiscalYear->id,
         'grand_total' => 100000,
+        'status' => 'sent',
     ]);
 
     $payload = [
@@ -120,6 +121,7 @@ test('show returns ar receipt detail', function () {
     $invoice = CustomerInvoice::factory()->create([
         'customer_id' => $customer->id,
         'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'sent',
     ]);
     $receipt = ArReceipt::factory()->create([
         'customer_id' => $customer->id,
@@ -142,6 +144,7 @@ test('update modifies ar receipt and allocations', function () {
     $invoice = CustomerInvoice::factory()->create([
         'customer_id' => $customer->id,
         'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'sent',
     ]);
     $receipt = ArReceipt::factory()->create([
         'customer_id' => $customer->id,

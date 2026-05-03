@@ -4,6 +4,8 @@ namespace App\Http\Requests\ArReceipts;
 
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use App\Models\ArReceiptAllocation;
+use App\Models\CustomerInvoice;
 
 abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
 {
@@ -44,6 +46,47 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
             'allocations.*.discount_given' => ['nullable', 'numeric', 'min:0'],
             'allocations.*.notes' => ['nullable', 'string'],
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $allocations = $this->input('allocations', []);
+            $receiptId = $this->route('arReceipt')?->id;
+
+            foreach ($allocations as $index => $allocation) {
+                if (empty($allocation['customer_invoice_id']) || empty($allocation['allocated_amount'])) {
+                    continue;
+                }
+
+                $invoice = CustomerInvoice::find($allocation['customer_invoice_id']);
+                if (! $invoice) {
+                    continue;
+                }
+
+                if (in_array($invoice->status, ['void', 'cancelled'], true)) {
+                    $validator->errors()->add(
+                        "allocations.{$index}.customer_invoice_id",
+                        "Cannot allocate to a {$invoice->status} invoice."
+                    );
+
+                    continue;
+                }
+
+                $existingAllocated = ArReceiptAllocation::where('customer_invoice_id', $invoice->id)
+                    ->when($receiptId, fn ($q) => $q->whereHas('receipt', fn ($q2) => $q2->where('id', '!=', $receiptId)))
+                    ->sum('allocated_amount');
+
+                $maxAllocation = (float) $invoice->grand_total - $existingAllocated - (float) $invoice->credit_note_amount;
+
+                if ((float) $allocation['allocated_amount'] > $maxAllocation) {
+                    $validator->errors()->add(
+                        "allocations.{$index}.allocated_amount",
+                        'Allocation exceeds invoice outstanding amount. Maximum: ' . $maxAllocation
+                    );
+                }
+            }
+        });
     }
 
     abstract protected function receiptNumberUniqueRule(): string|object;
