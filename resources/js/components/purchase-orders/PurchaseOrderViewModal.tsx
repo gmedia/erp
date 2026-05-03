@@ -24,8 +24,16 @@ function createPurchaseOrderItemColumns(
     formatAmount: (value: string | number | null | undefined) => string,
 ): ViewModalItemsTableColumn<PurchaseOrderItem>[] {
     return [
-        { key: 'product', header: 'Product', render: (item) => item.product?.name || '-' },
-        { key: 'unit', header: 'Unit', render: (item) => item.unit?.name || '-' },
+        {
+            key: 'product',
+            header: 'Product',
+            render: (item) => item.product?.name || '-',
+        },
+        {
+            key: 'unit',
+            header: 'Unit',
+            render: (item) => item.unit?.name || '-',
+        },
         ...createPricingColumns<PurchaseOrderItem>(formatAmount),
     ];
 }

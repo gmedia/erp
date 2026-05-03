@@ -18,11 +18,36 @@ export function createPricingColumns<T extends PricingItem>(
     formatAmount: (value: FormatValueInput) => string,
 ): ViewModalItemsTableColumn<T>[] {
     return [
-        { key: 'quantity', header: 'Qty', align: 'right', render: (item) => formatQuantity(item.quantity) },
-        { key: 'unit_price', header: 'Unit Price', align: 'right', render: (item) => formatAmount(item.unit_price) },
-        { key: 'discount_percent', header: 'Disc %', align: 'right', render: (item) => formatPercent(item.discount_percent) },
-        { key: 'tax_percent', header: 'Tax %', align: 'right', render: (item) => formatPercent(item.tax_percent) },
-        { key: 'line_total', header: 'Line Total', align: 'right', render: (item) => formatAmount(item.line_total) },
+        {
+            key: 'quantity',
+            header: 'Qty',
+            align: 'right',
+            render: (item) => formatQuantity(item.quantity),
+        },
+        {
+            key: 'unit_price',
+            header: 'Unit Price',
+            align: 'right',
+            render: (item) => formatAmount(item.unit_price),
+        },
+        {
+            key: 'discount_percent',
+            header: 'Disc %',
+            align: 'right',
+            render: (item) => formatPercent(item.discount_percent),
+        },
+        {
+            key: 'tax_percent',
+            header: 'Tax %',
+            align: 'right',
+            render: (item) => formatPercent(item.tax_percent),
+        },
+        {
+            key: 'line_total',
+            header: 'Line Total',
+            align: 'right',
+            render: (item) => formatAmount(item.line_total),
+        },
     ];
 }
 

@@ -24,8 +24,16 @@ function createSupplierBillItemColumns(
     formatAmount: (value: string | number | null | undefined) => string,
 ): ViewModalItemsTableColumn<SupplierBillItem>[] {
     return [
-        { key: 'description', header: 'Description', render: (item) => item.description || '-' },
-        { key: 'account', header: 'Account', render: (item) => item.account_name || '-' },
+        {
+            key: 'description',
+            header: 'Description',
+            render: (item) => item.description || '-',
+        },
+        {
+            key: 'account',
+            header: 'Account',
+            render: (item) => item.account_name || '-',
+        },
         ...createPricingColumns<SupplierBillItem>(formatAmount),
     ];
 }
