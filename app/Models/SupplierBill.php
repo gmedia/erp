@@ -147,6 +147,24 @@ class SupplierBill extends Model
         );
     }
 
+    public function updatePaymentStatus(): void
+    {
+        if (in_array($this->status, ['cancelled', 'void', 'draft'], true)) {
+            return;
+        }
+
+        $paid = (float) $this->amount_paid;
+        $total = (float) $this->grand_total;
+
+        if ($total > 0 && $paid >= $total) {
+            $this->update(['status' => 'paid']);
+        } elseif ($paid > 0 && $paid < $total) {
+            $this->update(['status' => 'partially_paid']);
+        } elseif ($paid <= 0 && $this->status === 'partially_paid') {
+            $this->update(['status' => 'confirmed']);
+        }
+    }
+
     protected function casts(): array
     {
         return [
