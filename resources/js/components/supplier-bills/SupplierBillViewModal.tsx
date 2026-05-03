@@ -6,9 +6,7 @@ import {
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import {
     createAmountFormatter,
-    formatPercent,
-    formatQuantity,
-    type FormatValueInput,
+    createPricingColumns,
 } from '@/components/common/report-format-helpers';
 import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
@@ -23,49 +21,12 @@ interface SupplierBillViewModalProps {
 }
 
 function createSupplierBillItemColumns(
-    formatAmount: (value: FormatValueInput) => string,
+    formatAmount: (value: string | number | null | undefined) => string,
 ): ViewModalItemsTableColumn<SupplierBillItem>[] {
     return [
-        {
-            key: 'description',
-            header: 'Description',
-            render: (item) => item.description || '-',
-        },
-        {
-            key: 'account',
-            header: 'Account',
-            render: (item) => item.account_name || '-',
-        },
-        {
-            key: 'quantity',
-            header: 'Qty',
-            align: 'right',
-            render: (item) => formatQuantity(item.quantity),
-        },
-        {
-            key: 'unit_price',
-            header: 'Unit Price',
-            align: 'right',
-            render: (item) => formatAmount(item.unit_price),
-        },
-        {
-            key: 'discount_percent',
-            header: 'Disc %',
-            align: 'right',
-            render: (item) => formatPercent(item.discount_percent),
-        },
-        {
-            key: 'tax_percent',
-            header: 'Tax %',
-            align: 'right',
-            render: (item) => formatPercent(item.tax_percent),
-        },
-        {
-            key: 'line_total',
-            header: 'Line Total',
-            align: 'right',
-            render: (item) => formatAmount(item.line_total),
-        },
+        { key: 'description', header: 'Description', render: (item) => item.description || '-' },
+        { key: 'account', header: 'Account', render: (item) => item.account_name || '-' },
+        ...createPricingColumns<SupplierBillItem>(formatAmount),
     ];
 }
 
