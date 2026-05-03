@@ -1,5 +1,8 @@
-import { formatCurrencyByRegionalSettings, formatNumberByRegionalSettings } from '@/utils/number-format';
 import type { ViewModalItemsTableColumn } from '@/components/common/ViewModalItemsTable';
+import {
+    formatCurrencyByRegionalSettings,
+    formatNumberByRegionalSettings,
+} from '@/utils/number-format';
 
 type FormatValueInput = string | number | null | undefined;
 
@@ -41,31 +44,36 @@ export function createPricingColumns<T>(
             key: 'quantity',
             header: 'Qty',
             align: 'right',
-            render: (item) => formatQuantity((item as ItemWithPricing).quantity),
+            render: (item) =>
+                formatQuantity((item as ItemWithPricing).quantity),
         },
         {
             key: 'unit_price',
             header: 'Unit Price',
             align: 'right',
-            render: (item) => formatAmount((item as ItemWithPricing).unit_price),
+            render: (item) =>
+                formatAmount((item as ItemWithPricing).unit_price),
         },
         {
             key: 'discount_percent',
             header: 'Disc %',
             align: 'right',
-            render: (item) => formatPercent((item as ItemWithPricing).discount_percent),
+            render: (item) =>
+                formatPercent((item as ItemWithPricing).discount_percent),
         },
         {
             key: 'tax_percent',
             header: 'Tax %',
             align: 'right',
-            render: (item) => formatPercent((item as ItemWithPricing).tax_percent),
+            render: (item) =>
+                formatPercent((item as ItemWithPricing).tax_percent),
         },
         {
             key: 'line_total',
             header: 'Line Total',
             align: 'right',
-            render: (item) => formatAmount((item as ItemWithPricing).line_total),
+            render: (item) =>
+                formatAmount((item as ItemWithPricing).line_total),
         },
     ];
 }

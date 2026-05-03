@@ -9,13 +9,13 @@ import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
 import {
-    CustomerInvoice,
-    type CustomerInvoiceItem,
-} from '@/types/customer-invoice';
-import {
     createAmountFormatter,
     createPricingColumns,
 } from '@/components/common/report-format-helpers';
+import {
+    CustomerInvoice,
+    type CustomerInvoiceItem,
+} from '@/types/customer-invoice';
 
 interface CustomerInvoiceViewModalProps {
     open: boolean;
@@ -50,7 +50,10 @@ export const CustomerInvoiceViewModal = React.memo(
     ({ item, open, onClose }: CustomerInvoiceViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = createAmountFormatter('id-ID', item.currency || 'IDR');
+        const formatAmount = createAmountFormatter(
+            'id-ID',
+            item.currency || 'IDR',
+        );
 
         const itemColumns = createCustomerInvoiceItemColumns(formatAmount);
 

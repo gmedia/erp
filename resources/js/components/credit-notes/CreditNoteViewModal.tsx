@@ -8,12 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
-import { CreditNote, type CreditNoteItem } from '@/types/credit-note';
 import {
     createAmountFormatter,
-    formatQuantity,
     formatPercent,
+    formatQuantity,
 } from '@/components/common/report-format-helpers';
+import { CreditNote, type CreditNoteItem } from '@/types/credit-note';
 
 interface CreditNoteViewModalProps {
     open: boolean;

@@ -8,8 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
-import { ArReceipt, type ArReceiptAllocation } from '@/types/ar-receipt';
 import { createAmountFormatter } from '@/components/common/report-format-helpers';
+import { ArReceipt, type ArReceiptAllocation } from '@/types/ar-receipt';
 
 interface ArReceiptViewModalProps {
     open: boolean;
@@ -45,7 +45,10 @@ export const ArReceiptViewModal = React.memo(
     ({ item, open, onClose }: ArReceiptViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = createAmountFormatter('id-ID', item.currency || 'IDR');
+        const formatAmount = createAmountFormatter(
+            'id-ID',
+            item.currency || 'IDR',
+        );
 
         const allocationColumns =
             createArReceiptAllocationColumns(formatAmount);

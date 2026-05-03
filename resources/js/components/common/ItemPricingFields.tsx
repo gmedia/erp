@@ -4,10 +4,18 @@ interface ItemPricingFieldsProps {
     includeDiscount?: boolean;
 }
 
-export function ItemPricingFields({ includeDiscount = true }: ItemPricingFieldsProps) {
+export function ItemPricingFields({
+    includeDiscount = true,
+}: ItemPricingFieldsProps) {
     return (
         <>
-            <div className={includeDiscount ? 'grid grid-cols-3 gap-4' : 'grid grid-cols-2 gap-4'}>
+            <div
+                className={
+                    includeDiscount
+                        ? 'grid grid-cols-3 gap-4'
+                        : 'grid grid-cols-2 gap-4'
+                }
+            >
                 <InputField
                     name="quantity"
                     label="Quantity"

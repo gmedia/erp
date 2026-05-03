@@ -1,5 +1,6 @@
 'use client';
 
+import { createCustomerBranchFilterFields } from '@/components/common/customer-branch-filters';
 import {
     createDateFilterFields,
     createSelectFilterFields,
@@ -7,7 +8,6 @@ import {
     currencyOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';
-import { createCustomerBranchFilterFields } from '@/components/common/customer-branch-filters';
 
 export function createCustomerInvoiceFilterFields(): FieldDescriptor[] {
     const customerInvoiceStatusOptions = [
