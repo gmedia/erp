@@ -49,60 +49,6 @@ readonly class UpdateArReceiptData
 
     public function toArray(): array
     {
-        $payload = [];
-
-        if ($this->receipt_number !== null) {
-            $payload['receipt_number'] = $this->receipt_number;
-        }
-        if ($this->customer_id !== null) {
-            $payload['customer_id'] = $this->customer_id;
-        }
-        if ($this->branch_id !== null) {
-            $payload['branch_id'] = $this->branch_id;
-        }
-        if ($this->fiscal_year_id !== null) {
-            $payload['fiscal_year_id'] = $this->fiscal_year_id;
-        }
-        if ($this->receipt_date !== null) {
-            $payload['receipt_date'] = $this->receipt_date;
-        }
-        if ($this->payment_method !== null) {
-            $payload['payment_method'] = $this->payment_method;
-        }
-        if ($this->bank_account_id !== null) {
-            $payload['bank_account_id'] = $this->bank_account_id;
-        }
-        if ($this->currency !== null) {
-            $payload['currency'] = $this->currency;
-        }
-        if ($this->total_amount !== null) {
-            $payload['total_amount'] = $this->total_amount;
-        }
-        if ($this->total_allocated !== null) {
-            $payload['total_allocated'] = $this->total_allocated;
-        }
-        if ($this->total_unallocated !== null) {
-            $payload['total_unallocated'] = $this->total_unallocated;
-        }
-        if ($this->reference !== null) {
-            $payload['reference'] = $this->reference;
-        }
-        if ($this->status !== null) {
-            $payload['status'] = $this->status;
-        }
-        if ($this->notes !== null) {
-            $payload['notes'] = $this->notes;
-        }
-        if ($this->journal_entry_id !== null) {
-            $payload['journal_entry_id'] = $this->journal_entry_id;
-        }
-        if ($this->confirmed_by !== null) {
-            $payload['confirmed_by'] = $this->confirmed_by;
-        }
-        if ($this->confirmed_at !== null) {
-            $payload['confirmed_at'] = $this->confirmed_at;
-        }
-
-        return $payload;
+        return array_filter(get_object_vars($this), static fn (mixed $value): bool => $value !== null);
     }
 }
