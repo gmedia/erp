@@ -1,6 +1,0 @@
-- generic [ref=e2]:
-  - generic [ref=e5]:
-    - status [ref=e7]:
-      - generic [ref=e9]: Loading...
-    - generic [ref=e10]: Loading SonarQube Cloud...
-  - region "Focus toasts messages with alt+T"
