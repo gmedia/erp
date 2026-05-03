@@ -31,7 +31,9 @@ export function formatArReportDate(value: string | null | undefined): string {
     return formatDateByRegionalSettings(value);
 }
 
-export function formatArReportCurrency(value: string | null | undefined): string {
+export function formatArReportCurrency(
+    value: string | null | undefined,
+): string {
     if (!value) return '-';
     return formatCurrencyByRegionalSettings(value, {
         currency: 'IDR',
@@ -41,13 +43,16 @@ export function formatArReportCurrency(value: string | null | undefined): string
     });
 }
 
-export function createArInvoiceBaseColumns<T extends ArInvoiceReportBase>(): ColumnDef<T>[] {
+export function createArInvoiceBaseColumns<
+    T extends ArInvoiceReportBase,
+>(): ColumnDef<T>[] {
     return [
         createReportSummaryColumn<T>({
             accessorKey: 'customer_invoice.invoice_number',
             header: 'Invoice Number',
             getPrimary: (item) => item.customer_invoice?.invoice_number,
-            getSecondary: (item) => formatArReportDate(item.customer_invoice?.invoice_date),
+            getSecondary: (item) =>
+                formatArReportDate(item.customer_invoice?.invoice_date),
             sortable: true,
         }),
         createReportTextColumn<T>({
@@ -70,22 +75,26 @@ export function createArInvoiceBaseColumns<T extends ArInvoiceReportBase>(): Col
         {
             id: 'grand_total',
             header: 'Grand Total',
-            cell: ({ row }) => formatArReportCurrency(row.original.amounts.grand_total),
+            cell: ({ row }) =>
+                formatArReportCurrency(row.original.amounts.grand_total),
         },
         {
             id: 'amount_received',
             header: 'Amount Received',
-            cell: ({ row }) => formatArReportCurrency(row.original.amounts.amount_received),
+            cell: ({ row }) =>
+                formatArReportCurrency(row.original.amounts.amount_received),
         },
         {
             id: 'credit_note_amount',
             header: 'Credit Note Amount',
-            cell: ({ row }) => formatArReportCurrency(row.original.amounts.credit_note_amount),
+            cell: ({ row }) =>
+                formatArReportCurrency(row.original.amounts.credit_note_amount),
         },
         {
             id: 'amount_due',
             header: 'Amount Due',
-            cell: ({ row }) => formatArReportCurrency(row.original.amounts.amount_due),
+            cell: ({ row }) =>
+                formatArReportCurrency(row.original.amounts.amount_due),
         },
     ];
 }

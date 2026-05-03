@@ -18,6 +18,7 @@ export const customerStatementReportColumns: ColumnDef<CustomerStatementReportIt
             id: 'running_balance',
             accessorKey: 'running_balance',
             header: 'Running Balance',
-            cell: ({ row }) => formatArReportCurrency(row.original.running_balance),
+            cell: ({ row }) =>
+                formatArReportCurrency(row.original.running_balance),
         },
     ];
