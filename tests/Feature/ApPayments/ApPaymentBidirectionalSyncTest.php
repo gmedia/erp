@@ -9,7 +9,6 @@ use App\Models\SupplierBill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
-use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
@@ -109,7 +108,7 @@ test('updating payment allocation updates supplier bill amounts', function () {
         ],
     ];
 
-    putJson('/api/ap-payments/'.$apPayment->id, $payload)->assertOk();
+    putJson('/api/ap-payments/' . $apPayment->id, $payload)->assertOk();
 
     $supplierBill->refresh();
     expect($supplierBill->amount_paid)->toBe('1000000.00');
@@ -145,7 +144,7 @@ test('deleting payment reverts supplier bill amounts', function () {
         'discount_taken' => 0,
     ]);
 
-    deleteJson('/api/ap-payments/'.$apPayment->id)->assertNoContent();
+    deleteJson('/api/ap-payments/' . $apPayment->id)->assertNoContent();
 
     $supplierBill->refresh();
     expect($supplierBill->amount_paid)->toBe('0.00');
