@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { InputField } from '@/components/common/InputField';
 import { ItemFormDialogShell } from '@/components/common/ItemFormDialog';
+import { ItemPricingFields } from '@/components/common/ItemPricingFields';
 import { TextareaField } from '@/components/common/TextareaField';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type SupplierBillFormData } from '@/types/supplier-bill';
@@ -106,40 +107,7 @@ export function SupplierBillItemFormDialog({
                     placeholder="Account ID"
                     disabled
                 />
-                <InputField
-                    name="quantity"
-                    label="Quantity"
-                    type="number"
-                    min={0}
-                    step="any"
-                    placeholder="1"
-                />
-                <InputField
-                    name="unit_price"
-                    label="Unit Price"
-                    type="number"
-                    min={0}
-                    step="any"
-                    placeholder="0"
-                />
-                <InputField
-                    name="discount_percent"
-                    label="Discount Percent"
-                    type="number"
-                    min={0}
-                    max={100}
-                    step="any"
-                    placeholder="0"
-                />
-                <InputField
-                    name="tax_percent"
-                    label="Tax Percent"
-                    type="number"
-                    min={0}
-                    max={100}
-                    step="any"
-                    placeholder="0"
-                />
+                <ItemPricingFields />
             </div>
 
             <TextareaField

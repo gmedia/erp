@@ -5,12 +5,12 @@ import { useMemo } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { InputField } from '@/components/common/InputField';
 import {
     ItemFormDialogShell,
     ItemNotesField,
     ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
+import { ItemPricingFields } from '@/components/common/ItemPricingFields';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type PurchaseOrderFormData } from '@/types/purchase-order';
 import { transactionItemPricingSchema } from '@/utils/schemas';
@@ -103,40 +103,7 @@ export function PurchaseOrderItemFormDialog({
                     unitInitialId={defaultValues.unit_id}
                     unitInitialLabel={defaultValues.unit_label}
                 />
-                <InputField
-                    name="quantity"
-                    label="Quantity"
-                    type="number"
-                    min={0}
-                    step="any"
-                    placeholder="1"
-                />
-                <InputField
-                    name="unit_price"
-                    label="Unit Price"
-                    type="number"
-                    min={0}
-                    step="any"
-                    placeholder="0"
-                />
-                <InputField
-                    name="discount_percent"
-                    label="Discount Percent"
-                    type="number"
-                    min={0}
-                    max={100}
-                    step="any"
-                    placeholder="0"
-                />
-                <InputField
-                    name="tax_percent"
-                    label="Tax Percent"
-                    type="number"
-                    min={0}
-                    max={100}
-                    step="any"
-                    placeholder="0"
-                />
+                <ItemPricingFields />
             </div>
 
             <ItemNotesField />
