@@ -1,6 +1,5 @@
 import { test } from '@playwright/test';
 
-import { login } from '../helpers';
 import { generateModuleTests, ModuleTestConfig } from '../shared-test-factories';
 import { createSupplierBill, editSupplierBill, searchSupplierBill } from './helpers';
 

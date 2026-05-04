@@ -184,7 +184,7 @@ export async function editApPayment(
                 reference: detail.reference ?? null,
                 status: detail.status,
                 notes: detail.notes ?? '',
-                allocations: (detail.allocations || []).map((allocation: any) => ({
+                allocations: (detail.allocations || []).map((allocation: Record<string, unknown>) => ({
                     supplier_bill_id: allocation.supplier_bill?.id,
                     allocated_amount: allocation.allocated_amount,
                 })),

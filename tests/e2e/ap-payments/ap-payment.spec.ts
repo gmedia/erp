@@ -1,6 +1,5 @@
 import { test } from '@playwright/test';
 
-import { login } from '../helpers';
 import { generateModuleTests, ModuleTestConfig } from '../shared-test-factories';
 import { createApPayment, editApPayment, searchApPayment } from './helpers';
 
