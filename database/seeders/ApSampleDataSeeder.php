@@ -259,6 +259,9 @@ class ApSampleDataSeeder extends Seeder
     ): void {
         $year = now()->format('Y');
 
+        $bill3GrandTotal = (float) ($supplierBills[2]->grand_total ?? 0);
+        $bill4GrandTotal = (float) ($supplierBills[3]->grand_total ?? 0);
+
         $paymentDefinitions = [
             [
                 'number' => "PAY-{$year}-000001",
@@ -273,19 +276,19 @@ class ApSampleDataSeeder extends Seeder
                 'number' => "PAY-{$year}-000002",
                 'status' => 'confirmed',
                 'supplier_index' => 2,
-                'total_amount' => 20000000,
+                'total_amount' => $bill4GrandTotal,
                 'allocations' => [
-                    ['bill_index' => 3, 'amount' => 20000000],
+                    ['bill_index' => 3, 'amount' => $bill4GrandTotal],
                 ],
             ],
             [
                 'number' => "PAY-{$year}-000003",
                 'status' => 'confirmed',
-                'supplier_index' => 1,
+                'supplier_index' => 0,
                 'total_amount' => 15000000,
                 'allocations' => [
                     ['bill_index' => 2, 'amount' => 5000000],
-                    ['bill_index' => 1, 'amount' => 10000000],
+                    ['bill_index' => 4, 'amount' => 10000000],
                 ],
             ],
         ];
