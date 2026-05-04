@@ -160,6 +160,7 @@ class DatabaseSeeder extends Seeder
             ApprovalDelegationSampleDataSeeder::class,
             ProductSampleDataSeeder::class,
             PurchasingSampleDataSeeder::class,
+            ApSampleDataSeeder::class,
             AssetSampleDataSeeder::class,
             StockTransferSampleDataSeeder::class,
             InventoryStocktakeSampleDataSeeder::class,
