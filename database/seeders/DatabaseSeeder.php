@@ -165,6 +165,7 @@ class DatabaseSeeder extends Seeder
             InventoryStocktakeSampleDataSeeder::class,
             StockAdjustmentSampleDataSeeder::class,
             StockMovementSampleDataSeeder::class,
+            ArSampleDataSeeder::class,
         ]);
 
         // Assign all permissions to sample users for easy testing
