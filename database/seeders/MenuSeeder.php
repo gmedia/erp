@@ -326,7 +326,7 @@ class MenuSeeder extends Seeder
                     'ap_outstanding_report',
                     'ap_payment_history_report',
                 ],
-                'icon' => 'Receipt',
+                'icon' => 'ClipboardList',
                 'url' => null,
                 'child' => [
                     [
@@ -359,16 +359,16 @@ class MenuSeeder extends Seeder
                         'name' => 'ap_aging_report',
                         'display_name' => 'AP Aging Report',
                         'permissions' => ['ap_aging_report'],
-                        'icon' => 'Clock',
-                        'url' => 'reports/ap-aging-report',
+                        'icon' => 'Calendar',
+                        'url' => 'reports/ap-aging',
                         'child' => [],
                     ],
                     [
                         'name' => 'ap_outstanding_report',
                         'display_name' => 'AP Outstanding',
                         'permissions' => ['ap_outstanding_report'],
-                        'icon' => 'AlertCircle',
-                        'url' => 'reports/ap-outstanding-report',
+                        'icon' => 'AlertTriangle',
+                        'url' => 'reports/ap-outstanding',
                         'child' => [],
                     ],
                     [
@@ -376,7 +376,7 @@ class MenuSeeder extends Seeder
                         'display_name' => 'Payment History',
                         'permissions' => ['ap_payment_history_report'],
                         'icon' => 'History',
-                        'url' => 'reports/ap-payment-history-report',
+                        'url' => 'reports/ap-payment-history',
                         'child' => [],
                     ],
                 ],
