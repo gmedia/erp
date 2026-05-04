@@ -974,3 +974,104 @@ export const supplierReturnFormSchema = z.object({
 });
 
 export type SupplierReturnFormData = z.infer<typeof supplierReturnFormSchema>;
+
+export const supplierBillFormSchema = z.object({
+    bill_number: z.string().optional(),
+    supplier_id: z.string().min(1, { message: 'Supplier is required.' }),
+    branch_id: z.string().min(1, { message: 'Branch is required.' }),
+    fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
+    purchase_order_id: z.string().optional(),
+    goods_receipt_id: z.string().optional(),
+    supplier_invoice_number: z.string().optional(),
+    supplier_invoice_date: z.date().nullable().optional(),
+    bill_date: z.date({ message: 'Bill date is required.' }),
+    due_date: z.date({ message: 'Due date is required.' }),
+    payment_terms: z.string().optional(),
+    currency: z.string().min(1, { message: 'Currency is required.' }),
+    status: z.string().min(1, { message: 'Status is required.' }),
+    notes: z.string().optional(),
+    items: z
+        .array(
+            z.object({
+                product_id: z.string().optional(),
+                product_label: z.string().optional(),
+                account_id: z
+                    .string()
+                    .min(1, { message: 'Account is required.' }),
+                account_label: z.string().optional(),
+                description: z
+                    .string()
+                    .min(1, { message: 'Description is required.' }),
+                quantity: z.coerce
+                    .number()
+                    .gt(0, { message: 'Quantity must be > 0.' }),
+                unit_price: z.coerce.number().min(0),
+                discount_percent: z.coerce
+                    .number()
+                    .min(0)
+                    .max(100)
+                    .optional()
+                    .default(0),
+                tax_percent: z.coerce
+                    .number()
+                    .min(0)
+                    .max(100)
+                    .optional()
+                    .default(0),
+                goods_receipt_item_id: z.string().optional(),
+                notes: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least one item is required.' }),
+});
+
+export type SupplierBillFormData = z.infer<typeof supplierBillFormSchema>;
+
+export const apPaymentFormSchema = z.object({
+    payment_number: z.string().optional(),
+    supplier_id: z.string().min(1, { message: 'Supplier is required.' }),
+    branch_id: z.string().min(1, { message: 'Branch is required.' }),
+    fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
+    payment_date: z.date({ message: 'Payment date is required.' }),
+    payment_method: z
+        .string()
+        .min(1, { message: 'Payment method is required.' }),
+    bank_account_id: z
+        .string()
+        .min(1, { message: 'Bank account is required.' }),
+    currency: z.string().min(1, { message: 'Currency is required.' }),
+    total_amount: z.coerce
+        .number()
+        .gt(0, { message: 'Total amount must be > 0.' }),
+    reference: z.string().optional(),
+    status: z.string().min(1, { message: 'Status is required.' }),
+    notes: z.string().optional(),
+    allocations: z
+        .array(
+            z.object({
+                supplier_bill_id: z
+                    .string()
+                    .min(1, { message: 'Bill is required.' }),
+                bill_label: z.string().optional(),
+                allocated_amount: z.coerce
+                    .number()
+                    .gt(0, { message: 'Amount must be > 0.' }),
+                discount_taken: z.coerce.number().min(0).optional().default(0),
+                notes: z.string().optional(),
+            }),
+        )
+        .min(1, { message: 'At least one allocation is required.' }),
+});
+
+export type ApPaymentFormData = z.infer<typeof apPaymentFormSchema>;
+
+export const transactionItemPricingSchema = {
+    quantity: z.coerce
+        .number()
+        .gt(0, { message: 'Quantity must be greater than 0.' }),
+    unit_price: z.coerce
+        .number()
+        .min(0, { message: 'Unit price must be at least 0.' }),
+    discount_percent: z.coerce.number().min(0).max(100).optional().default(0),
+    tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
+};

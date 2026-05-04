@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\ApAgingReportController;
+use App\Http\Controllers\ApOutstandingReportController;
+use App\Http\Controllers\ApPaymentHistoryReportController;
 use App\Http\Controllers\AssetReportController;
 use App\Http\Controllers\BookValueDepreciationReportController;
 use App\Http\Controllers\GoodsReceiptReportController;
@@ -62,4 +65,16 @@ Route::prefix('reports')->group(function () {
         ->middleware('permission:goods_receipt_report');
     Route::post('goods-receipt/export', [GoodsReceiptReportController::class, 'export'])
         ->middleware('permission:goods_receipt_report');
+    Route::get('ap-aging', [ApAgingReportController::class, 'index'])
+        ->middleware('permission:ap_aging_report');
+    Route::post('ap-aging/export', [ApAgingReportController::class, 'export'])
+        ->middleware('permission:ap_aging_report');
+    Route::get('ap-outstanding', [ApOutstandingReportController::class, 'index'])
+        ->middleware('permission:ap_outstanding_report');
+    Route::post('ap-outstanding/export', [ApOutstandingReportController::class, 'export'])
+        ->middleware('permission:ap_outstanding_report');
+    Route::get('ap-payment-history', [ApPaymentHistoryReportController::class, 'index'])
+        ->middleware('permission:ap_payment_history_report');
+    Route::post('ap-payment-history/export', [ApPaymentHistoryReportController::class, 'export'])
+        ->middleware('permission:ap_payment_history_report');
 });
