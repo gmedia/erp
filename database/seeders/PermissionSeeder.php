@@ -474,6 +474,39 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'supplier_bill',
+                'display_name' => 'Supplier Bill',
+                'child' => [
+                    ['name' => 'supplier_bill.create', 'display_name' => 'Create Supplier Bill', 'child' => []],
+                    ['name' => 'supplier_bill.edit', 'display_name' => 'Edit Supplier Bill', 'child' => []],
+                    ['name' => 'supplier_bill.delete', 'display_name' => 'Delete Supplier Bill', 'child' => []],
+                ],
+            ],
+            [
+                'name' => 'ap_payment',
+                'display_name' => 'AP Payment',
+                'child' => [
+                    ['name' => 'ap_payment.create', 'display_name' => 'Create AP Payment', 'child' => []],
+                    ['name' => 'ap_payment.edit', 'display_name' => 'Edit AP Payment', 'child' => []],
+                    ['name' => 'ap_payment.delete', 'display_name' => 'Delete AP Payment', 'child' => []],
+                ],
+            ],
+            [
+                'name' => 'ap_aging_report',
+                'display_name' => 'AP Aging Report',
+                'child' => [],
+            ],
+            [
+                'name' => 'ap_outstanding_report',
+                'display_name' => 'AP Outstanding Report',
+                'child' => [],
+            ],
+            [
+                'name' => 'ap_payment_history_report',
+                'display_name' => 'AP Payment History Report',
+                'child' => [],
+            ],
+            [
                 'name' => 'supplier_category',
                 'display_name' => 'Supplier Category',
                 'child' => [
