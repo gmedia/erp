@@ -9,6 +9,7 @@ use App\Models\Branch;
 use App\Models\CreditNote;
 use App\Models\CreditNoteItem;
 use App\Models\Customer;
+use App\Models\CustomerCategory;
 use App\Models\CustomerInvoice;
 use App\Models\CustomerInvoiceItem;
 use App\Models\FiscalYear;
@@ -43,7 +44,7 @@ class ArSampleDataSeeder extends Seeder
 
         $customers = Customer::query()->take(5)->get();
         if ($customers->isEmpty()) {
-            $categoryId = \App\Models\CustomerCategory::query()->value('id');
+            $categoryId = CustomerCategory::query()->value('id');
             foreach (['PT Maju Bersama', 'CV Sejahtera Abadi', 'PT Karya Mandiri', 'UD Sumber Rezeki', 'PT Global Teknik'] as $name) {
                 Customer::create([
                     'name' => $name,
