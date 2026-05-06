@@ -62,7 +62,7 @@ export const CustomerInvoiceViewModal = React.memo(
                 open={open}
                 onClose={onClose}
                 title="Customer Invoice Details"
-                description={`Invoice ${item.invoice_number || 'N/A'}`}
+                description="View invoice details and items"
             >
                 <div className="space-y-4 py-4">
                     <div className="grid grid-cols-2 gap-4">

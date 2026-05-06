@@ -80,7 +80,7 @@ export const CreditNoteViewModal = React.memo(
                 open={open}
                 onClose={onClose}
                 title="Credit Note Details"
-                description={`Credit Note ${item.credit_note_number || 'N/A'}`}
+                description="View credit note details and items"
             >
                 <div className="space-y-4 py-4">
                     <div className="grid grid-cols-2 gap-4">

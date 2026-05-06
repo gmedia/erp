@@ -58,7 +58,7 @@ export const ArReceiptViewModal = React.memo(
                 open={open}
                 onClose={onClose}
                 title="AR Receipt Details"
-                description={`Receipt ${item.receipt_number || 'N/A'}`}
+                description="View receipt details and allocations"
             >
                 <div className="space-y-4 py-4">
                     <div className="grid grid-cols-2 gap-4">
