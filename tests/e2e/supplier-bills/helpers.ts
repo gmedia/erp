@@ -157,7 +157,7 @@ export async function editSupplierBill(
                 amount_due: detail.amount_due,
                 notes: detail.notes ?? '',
                 items: (detail.items || []).map((item: Record<string, unknown>) => ({
-                    account_id: item.account?.id,
+                    account_id: item.account_id,
                     description: item.description,
                     quantity: item.quantity,
                     unit_price: item.unit_price,
