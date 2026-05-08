@@ -4,12 +4,6 @@ import {
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
 
-import {
-    formatCurrencyByRegionalSettings,
-    formatNumberByRegionalSettings,
-} from '@/utils/number-format';
-import { ViewModalItemsTableColumn } from '@/components/common/ViewModalItemsTable';
-
 export type FormatValueInput = string | number | null | undefined;
 
 interface PricingItem {

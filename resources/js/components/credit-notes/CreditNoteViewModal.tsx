@@ -71,7 +71,7 @@ export const CreditNoteViewModal = React.memo(
     ({ item, open, onClose }: CreditNoteViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = createAmountFormatter('id-ID', 'IDR');
+        const formatAmount = createAmountFormatter('IDR');
 
         const itemColumns = createCreditNoteItemColumns(formatAmount);
 

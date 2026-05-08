@@ -51,7 +51,6 @@ export const CustomerInvoiceViewModal = React.memo(
         if (!item) return null;
 
         const formatAmount = createAmountFormatter(
-            'id-ID',
             item.currency || 'IDR',
         );
 
