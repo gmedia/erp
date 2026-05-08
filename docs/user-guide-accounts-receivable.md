@@ -13,9 +13,9 @@ Modul Accounts Receivable mengelola **siklus piutang lengkap** — dari penerbit
 | Customer Invoices | `/customer-invoices` | Kelola faktur pelanggan |
 | AR Receipts | `/ar-receipts` | Kelola penerimaan pembayaran |
 | Credit Notes | `/credit-notes` | Kelola nota kredit |
-| AR Aging Report | `/reports/ar-aging-report` | Laporan umur piutang |
-| AR Outstanding Report | `/reports/ar-outstanding-report` | Daftar faktur belum lunas |
-| Customer Statement | `/reports/customer-statement-report` | Laporan transaksi per pelanggan |
+| AR Aging Report | `/reports/ar-aging` | Laporan umur piutang |
+| AR Outstanding Report | `/reports/ar-outstanding` | Daftar faktur belum lunas |
+| Customer Statement | `/reports/customer-statement` | Laporan transaksi per pelanggan |
 
 ---
 
