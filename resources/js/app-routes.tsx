@@ -167,6 +167,7 @@ const ReportApOutstanding = lazy(
 const ReportApPaymentHistory = lazy(
     () => import('./pages/reports/ap-payment-history-report/index'),
 );
+const UserGuide = lazy(() => import('./pages/user-guide/index'));
 
 // Helper to wrap protected routes
 const P = ({ children }: { children: React.ReactNode }) => (
@@ -841,6 +842,16 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <ReportApPaymentHistory />
+                        </P>
+                    }
+                />
+
+                {/* User Guide */}
+                <Route
+                    path="/user-guide"
+                    element={
+                        <P>
+                            <UserGuide />
                         </P>
                     }
                 />

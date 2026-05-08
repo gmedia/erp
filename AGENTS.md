@@ -40,6 +40,8 @@ erp/
 | Form schemas | `resources/js/utils/schemas.ts` (or per-module) | Zod validation |
 | Type definitions | `resources/js/types/` | 36 type files |
 | Hooks | `resources/js/hooks/` | `useEntityForm`, `useCrudQuery`, `useCrudMutations` |
+| User guide content | `docs/user-guide-*.md` | Markdown files served via `/api/user-guide` |
+| User guide page | `resources/js/pages/user-guide/index.tsx` | Renders markdown from API |
 | Module metadata | `docs/module-registry.md` | Full E2E + Pest registry |
 | Dev patterns | `docs/development-patterns.md` | Canonical implementation guide |
 | Session handoff | `task.md` | Active status + next action |

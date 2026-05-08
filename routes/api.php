@@ -58,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/stock-movements.php';
     require __DIR__ . '/api/stock-transfers.php';
     require __DIR__ . '/api/supplier-bills.php';
+    require __DIR__ . '/api/user-guide.php';
     require __DIR__ . '/api/supplier-categories.php';
     require __DIR__ . '/api/supplier-returns.php';
     require __DIR__ . '/api/suppliers.php';
