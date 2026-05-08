@@ -27,7 +27,7 @@ yarn-error.log
 /.vscode
 /.zed
 /.agent*
-task.*
+# task.* — tracked for AI agent handoff continuity
 /.cline*
 /.roo*
 /.kilo*
@@ -52,3 +52,4 @@ coverage-new.xml
 # SonarQube artifacts
 sonar-project.properties
 opencode.json
+.playwright-mcp/

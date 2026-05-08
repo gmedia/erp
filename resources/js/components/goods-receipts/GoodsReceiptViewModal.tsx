@@ -74,7 +74,7 @@ export const GoodsReceiptViewModal = React.memo(
                         <div className="space-y-2">
                             <h4 className="text-sm font-semibold">Items</h4>
                             <div className="overflow-x-auto rounded-md border">
-                                <table className="min-w-[840px] text-sm">
+                                <table className="w-full min-w-[840px] text-sm">
                                     <thead>
                                         <tr className="border-b">
                                             <th className="p-2 text-left">

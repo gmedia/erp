@@ -36,7 +36,7 @@ export function ViewModalItemsTable<TItem>({
         <div className="space-y-2">
             <h4 className="text-sm font-semibold">{title}</h4>
             <div className="overflow-x-auto rounded-md border">
-                <table className={`${minWidthClassName} text-sm`}>
+                <table className={`w-full ${minWidthClassName} text-sm`}>
                     <thead>
                         <tr className="border-b">
                             {columns.map((column) => (

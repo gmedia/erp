@@ -3,6 +3,7 @@ import {
     AlertTriangle,
     ArrowDownUp,
     ArrowLeftRight,
+    Banknote,
     BarChart,
     BarChart3,
     Book,
@@ -63,6 +64,7 @@ import {
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
+    Banknote,
     BookOpen,
     Folder,
     IdCard,

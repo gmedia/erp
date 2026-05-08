@@ -2,9 +2,11 @@
 
 namespace App\Actions\Concerns;
 
+use App\Models\ApPayment;
 use App\Models\GoodsReceipt;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
+use App\Models\SupplierBill;
 use App\Models\SupplierReturn;
 use InvalidArgumentException;
 
@@ -22,6 +24,57 @@ final class TransactionMappedIndexConfigurations
      * }>
      */
     private const CONFIGURATIONS = [
+        'ap_payments' => [
+            'model_class' => ApPayment::class,
+            'with' => [
+                'supplier',
+                'branch',
+                'fiscalYear',
+                'bankAccount',
+                'approver',
+                'creator',
+                'confirmer',
+                'allocations.supplierBill',
+            ],
+            'search_fields' => [
+                'payment_number',
+                'reference',
+                'notes',
+            ],
+            'filter_keys' => [
+                'supplier_id',
+                'branch_id',
+                'fiscal_year_id',
+                'bank_account_id',
+                'status',
+                'payment_method',
+                'currency',
+                'payment_date_from',
+                'payment_date_to',
+                'total_amount_min',
+                'total_amount_max',
+            ],
+            'default_sort_by' => 'created_at',
+            'allowed_sorts' => [
+                'id',
+                'payment_number',
+                'supplier_id',
+                'branch_id',
+                'payment_date',
+                'payment_method',
+                'currency',
+                'status',
+                'total_amount',
+                'total_allocated',
+                'total_unallocated',
+                'created_at',
+                'updated_at',
+            ],
+            'sort_map' => [
+                'supplier' => 'supplier_id',
+                'branch' => 'branch_id',
+            ],
+        ],
         'goods_receipts' => [
             'model_class' => GoodsReceipt::class,
             'with' => [
@@ -158,6 +211,61 @@ final class TransactionMappedIndexConfigurations
                 'branch' => 'branch_id',
                 'department' => 'department_id',
                 'requester' => 'requested_by',
+            ],
+        ],
+        'supplier_bills' => [
+            'model_class' => SupplierBill::class,
+            'with' => [
+                'supplier',
+                'branch',
+                'fiscalYear',
+                'purchaseOrder',
+                'goodsReceipt',
+                'creator',
+                'confirmer',
+                'items.product',
+                'items.account',
+            ],
+            'search_fields' => [
+                'bill_number',
+                'supplier_invoice_number',
+                'payment_terms',
+                'notes',
+            ],
+            'filter_keys' => [
+                'supplier_id',
+                'branch_id',
+                'fiscal_year_id',
+                'status',
+                'currency',
+                'bill_date_from',
+                'bill_date_to',
+                'due_date_from',
+                'due_date_to',
+                'grand_total_min',
+                'grand_total_max',
+                'amount_due_min',
+                'amount_due_max',
+            ],
+            'default_sort_by' => 'created_at',
+            'allowed_sorts' => [
+                'id',
+                'bill_number',
+                'supplier_id',
+                'branch_id',
+                'bill_date',
+                'due_date',
+                'currency',
+                'status',
+                'grand_total',
+                'amount_paid',
+                'amount_due',
+                'created_at',
+                'updated_at',
+            ],
+            'sort_map' => [
+                'supplier' => 'supplier_id',
+                'branch' => 'branch_id',
             ],
         ],
         'supplier_returns' => [

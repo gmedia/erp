@@ -21,11 +21,6 @@ class UpdatePurchaseOrderRequest extends AbstractPurchaseOrderRequest
      */
     protected function totalAmountRules(): array
     {
-        return [
-            'subtotal' => ['sometimes', 'nullable', 'numeric', 'min:0'],
-            'tax_amount' => ['sometimes', 'nullable', 'numeric', 'min:0'],
-            'discount_amount' => ['sometimes', 'nullable', 'numeric', 'min:0'],
-            'grand_total' => ['sometimes', 'nullable', 'numeric', 'min:0'],
-        ];
+        return $this->transactionAmountRules();
     }
 }
