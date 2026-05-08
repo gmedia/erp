@@ -128,7 +128,7 @@ export default function UserGuidePage() {
                                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                             </div>
                         ) : content ? (
-                            <article className="prose prose-neutral dark:prose-invert prose-headings:scroll-mt-20 prose-h1:text-2xl prose-h2:border-b prose-h2:pb-2 prose-h2:text-lg prose-h3:text-base prose-table:text-sm prose-th:bg-muted/50 prose-th:px-3 prose-th:py-2 prose-td:border prose-td:px-3 prose-td:py-2 prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-pre:bg-muted max-w-none">
+                            <article className="prose max-w-none prose-neutral dark:prose-invert prose-headings:scroll-mt-20 prose-h1:text-2xl prose-h2:border-b prose-h2:pb-2 prose-h2:text-lg prose-h3:text-base prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-pre:bg-muted prose-table:text-sm prose-th:bg-muted/50 prose-th:px-3 prose-th:py-2 prose-td:border prose-td:px-3 prose-td:py-2">
                                 <Markdown remarkPlugins={[remarkGfm]}>
                                     {content.content}
                                 </Markdown>
