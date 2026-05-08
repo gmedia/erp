@@ -8,7 +8,9 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
+import { BookOpen } from 'lucide-react';
 import { type ComponentPropsWithoutRef } from 'react';
+import { Link } from 'react-router-dom';
 
 export function NavFooter({
     items,
@@ -26,6 +28,19 @@ export function NavFooter({
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <LanguageSwitcher />
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton
+                            asChild
+                            className="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100"
+                        >
+                            <Link to="/user-guide">
+                                <BookOpen className="h-5 w-5" />
+                                <span className="group-data-[collapsible=icon]:hidden">
+                                    User Guide
+                                </span>
+                            </Link>
+                        </SidebarMenuButton>
                     </SidebarMenuItem>
                     {items.map((item) => (
                         <SidebarMenuItem key={item.title}>

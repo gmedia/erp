@@ -90,6 +90,8 @@ const PurchaseRequests = lazy(() => import('./pages/purchase-requests/index'));
 const PurchaseOrders = lazy(() => import('./pages/purchase-orders/index'));
 const GoodsReceipts = lazy(() => import('./pages/goods-receipts/index'));
 const SupplierReturns = lazy(() => import('./pages/supplier-returns/index'));
+const SupplierBills = lazy(() => import('./pages/supplier-bills/index'));
+const ApPayments = lazy(() => import('./pages/ap-payments/index'));
 const Pipelines = lazy(() => import('./pages/pipelines/index'));
 const PipelineDashboard = lazy(
     () => import('./pages/pipeline-dashboard/index'),
@@ -161,6 +163,15 @@ const ReportStockAdjustment = lazy(
 const ReportGoodsReceipt = lazy(
     () => import('./pages/reports/goods-receipt/index'),
 );
+const ReportApAging = lazy(
+    () => import('./pages/reports/ap-aging-report/index'),
+);
+const ReportApOutstanding = lazy(
+    () => import('./pages/reports/ap-outstanding-report/index'),
+);
+const ReportApPaymentHistory = lazy(
+    () => import('./pages/reports/ap-payment-history-report/index'),
+);
 const ReportArAging = lazy(
     () => import('./pages/reports/ar-aging-report/index'),
 );
@@ -170,6 +181,7 @@ const ReportArOutstanding = lazy(
 const ReportCustomerStatement = lazy(
     () => import('./pages/reports/customer-statement-report/index'),
 );
+const UserGuide = lazy(() => import('./pages/user-guide/index'));
 
 // Helper to wrap protected routes
 const P = ({ children }: { children: React.ReactNode }) => (
@@ -580,6 +592,22 @@ export default function AppRoutes() {
                     }
                 />
                 <Route
+                    path="/supplier-bills"
+                    element={
+                        <P>
+                            <SupplierBills />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/ap-payments"
+                    element={
+                        <P>
+                            <ApPayments />
+                        </P>
+                    }
+                />
+                <Route
                     path="/pipelines"
                     element={
                         <P>
@@ -834,6 +862,31 @@ export default function AppRoutes() {
                     }
                 />
                 <Route
+                <Route
+                    path="/reports/ap-aging"
+                    element={
+                        <P>
+                            <ReportApAging />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/reports/ap-outstanding"
+                    element={
+                        <P>
+                            <ReportApOutstanding />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/reports/ap-payment-history"
+                    element={
+                        <P>
+                            <ReportApPaymentHistory />
+                        </P>
+                    }
+                />
+                <Route
                     path="/reports/ar-aging"
                     element={
                         <P>
@@ -854,6 +907,16 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <ReportCustomerStatement />
+                        </P>
+                    }
+                />
+
+                {/* User Guide */}
+                <Route
+                    path="/user-guide"
+                    element={
+                        <P>
+                            <UserGuide />
                         </P>
                     }
                 />

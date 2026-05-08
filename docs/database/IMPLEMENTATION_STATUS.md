@@ -28,7 +28,7 @@
 | 12 | Asset Management | `12_asset_management_design.md` | ✅ Implemented | |
 | 13 | Purchasing (PR/PO/GR/SR) | `13_purchasing_design.md` | ✅ Implemented | |
 | 14 | Inventory (Warehouse/Transfer/Opname) | `14_inventory_design.md` | ✅ Implemented | |
-| 15 | Accounts Payable | `15_accounts_payable_design.md` | 📐 Designed Only | |
+| 15 | Accounts Payable | `15_accounts_payable_design.md` | ✅ Implemented | PR #10 |
 | 16 | Accounts Receivable | `16_accounts_receivable_design.md` | 📐 Designed Only | |
 | 17 | General Ledger (Extended) | `17_general_ledger_design.md` | 📐 Designed Only | |
 | 18 | Financial Reports | `18_financial_reports_design.md` | 📐 Designed Only | |
@@ -169,22 +169,26 @@
 
 ---
 
-### 📐 Accounts Payable
+### ✅ Accounts Payable
 
 **Design doc:** `15_accounts_payable_design.md`
 
-| Layer | Status |
-|-------|--------|
-| Migration | ❌ Not created |
-| Model | ❌ Not created |
-| Controller | ❌ Not created |
-| Frontend | ❌ Not created |
-| Factory | ❌ Not created |
-| Tests | ❌ Not created |
+| Layer | Status | Files |
+|-------|--------|-------|
+| Migration | ✅ | `2026_05_10_000000` — `2026_05_10_000300` (4 files) |
+| Model | ✅ | `SupplierBill`, `SupplierBillItem`, `ApPayment`, `ApPaymentAllocation` |
+| Controller | ✅ | `SupplierBillController`, `ApPaymentController`, `ApAgingReportController`, `ApOutstandingReportController`, `ApPaymentHistoryReportController` |
+| Frontend | ✅ | `pages/supplier-bills/`, `pages/ap-payments/`, `pages/reports/ap-aging-report/`, `pages/reports/ap-outstanding-report/`, `pages/reports/ap-payment-history-report/` |
+| Factory | ✅ | `SupplierBillFactory`, `SupplierBillItemFactory`, `ApPaymentFactory`, `ApPaymentAllocationFactory` |
+| Tests | ✅ | 31 Pest tests passed (180 assertions) |
+| Seeder | ✅ | Pipeline: `supplier_bill_lifecycle` (7 states, 10 transitions), `ap_payment_lifecycle` (6 states, 7 transitions) |
 
-**Tables to create:** `supplier_bills`, `supplier_bill_items`, `ap_payments`, `ap_payment_allocations`
+**Dependencies:** COA (✅), Purchasing (✅), Suppliers (✅)
 
-**Dependencies:** Requires COA (✅), Purchasing (✅), Suppliers (✅)
+**Known gaps vs design:**
+- Journal auto-posting on bill confirm / payment confirm belum diimplementasi (akan ditambahkan saat GL Extended selesai)
+- Three-way matching (PO ↔ GR ↔ Bill) belum diimplementasi (opsional per design doc)
+- Overdue detection menggunakan computed on-the-fly (bukan scheduler)
 
 ---
 
@@ -273,16 +277,9 @@ Modul-modul berikut sudah diimplementasi sebagai master data pendukung:
 
 Kedua modul ini bisa dikerjakan paralel karena tidak saling bergantung.
 
-**1A. Accounts Payable (15)**
+**1A. Accounts Payable (15) — ✅ COMPLETE**
 
-| Step | Scope | Skill | Estimasi |
-|------|-------|-------|----------|
-| 1 | Migration: `supplier_bills`, `supplier_bill_items`, `ap_payments`, `ap_payment_allocations` | `database-migration` | 30m |
-| 2 | Models + Relations | `refactor-backend` | 1h |
-| 3 | Backend: Controllers, Requests, Resources, Actions, Exports | `feature-crud-complex` | 3h |
-| 4 | Frontend: Pages, Forms, Columns, Filters, ViewModals | `feature-crud-complex` | 3h |
-| 5 | Factories, Seeders | `testing-strategy` | 30m |
-| 6 | Tests: Feature, Unit, E2E | `testing-strategy` | 2h |
+Implemented in PR #10 (`feature/accounts-payable`). 110 files, +7303 lines, 31 Pest tests (180 assertions).
 
 Dependencies: COA (✅), Purchasing (✅), Suppliers (✅)
 Design doc: `15_accounts_payable_design.md`
@@ -381,6 +378,7 @@ Task-task ini bisa dikerjakan kapan saja, tidak harus menunggu Fase 1-3.
 
 | Date | Milestone |
 |------|-----------|
+| 2026-05-10 | Accounts Payable module complete (PR #10) |
 | 2026-05-02 | Products V1→V2 migration complete (Fase 1-8) |
 | 2026-05-01 | Style deduplication refactor complete |
 | 2026-04-30 | Style consistency polish complete (Tahap 0-6) |

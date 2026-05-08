@@ -1,3 +1,5 @@
+'use client';
+
 import { InputField } from '@/components/common/InputField';
 
 interface ItemPricingFieldsProps {
@@ -22,6 +24,7 @@ export function ItemPricingFields({
                     type="number"
                     min={0}
                     step={0.01}
+                    placeholder="1"
                 />
                 <InputField
                     name="unit_price"
@@ -29,6 +32,7 @@ export function ItemPricingFields({
                     type="number"
                     min={0}
                     step={0.01}
+                    placeholder="0"
                 />
                 {includeDiscount && (
                     <InputField
@@ -38,6 +42,7 @@ export function ItemPricingFields({
                         min={0}
                         max={100}
                         step={0.01}
+                        placeholder="0"
                     />
                 )}
             </div>
@@ -49,6 +54,7 @@ export function ItemPricingFields({
                     min={0}
                     max={100}
                     step={0.01}
+                    placeholder="0"
                 />
             </div>
         </>

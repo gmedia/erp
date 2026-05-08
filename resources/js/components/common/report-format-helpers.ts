@@ -4,39 +4,23 @@ import {
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
 
-type FormatValueInput = string | number | null | undefined;
+import {
+    formatCurrencyByRegionalSettings,
+    formatNumberByRegionalSettings,
+} from '@/utils/number-format';
+import { ViewModalItemsTableColumn } from '@/components/common/ViewModalItemsTable';
 
-interface ItemWithPricing {
-    quantity?: FormatValueInput;
-    unit_price?: FormatValueInput;
-    discount_percent?: FormatValueInput;
-    tax_percent?: FormatValueInput;
-    line_total?: FormatValueInput;
+export type FormatValueInput = string | number | null | undefined;
+
+interface PricingItem {
+    quantity: string;
+    unit_price: string;
+    discount_percent: string;
+    tax_percent: string;
+    line_total: string;
 }
 
-export const formatQuantity = (value: FormatValueInput) =>
-    formatNumberByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    });
-
-export const formatPercent = (value: FormatValueInput) =>
-    `${formatNumberByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    })}%`;
-
-export const createAmountFormatter = (locale = 'id-ID', currency = 'IDR') => {
-    return (value: FormatValueInput) =>
-        formatCurrencyByRegionalSettings(value ?? 0, {
-            locale,
-            currency,
-        });
-};
-
-export function createPricingColumns<T>(
+export function createPricingColumns<T extends PricingItem>(
     formatAmount: (value: FormatValueInput) => string,
 ): ViewModalItemsTableColumn<T>[] {
     return [
@@ -44,36 +28,57 @@ export function createPricingColumns<T>(
             key: 'quantity',
             header: 'Qty',
             align: 'right',
-            render: (item) =>
-                formatQuantity((item as ItemWithPricing).quantity),
+            render: (item) => formatQuantity(item.quantity),
         },
         {
             key: 'unit_price',
             header: 'Unit Price',
             align: 'right',
-            render: (item) =>
-                formatAmount((item as ItemWithPricing).unit_price),
+            render: (item) => formatAmount(item.unit_price),
         },
         {
             key: 'discount_percent',
             header: 'Disc %',
             align: 'right',
-            render: (item) =>
-                formatPercent((item as ItemWithPricing).discount_percent),
+            render: (item) => formatPercent(item.discount_percent),
         },
         {
             key: 'tax_percent',
             header: 'Tax %',
             align: 'right',
-            render: (item) =>
-                formatPercent((item as ItemWithPricing).tax_percent),
+            render: (item) => formatPercent(item.tax_percent),
         },
         {
             key: 'line_total',
             header: 'Line Total',
             align: 'right',
-            render: (item) =>
-                formatAmount((item as ItemWithPricing).line_total),
+            render: (item) => formatAmount(item.line_total),
         },
     ];
+}
+
+export function createAmountFormatter(currency?: string) {
+    return (value: FormatValueInput) =>
+        formatCurrencyByRegionalSettings(value ?? 0, {
+            locale: 'id-ID',
+            currency: currency || undefined,
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+}
+
+export function formatQuantity(value: FormatValueInput) {
+    return formatNumberByRegionalSettings(value ?? 0, {
+        locale: 'id-ID',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    });
+}
+
+export function formatPercent(value: FormatValueInput) {
+    return `${formatNumberByRegionalSettings(value ?? 0, {
+        locale: 'id-ID',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    })}%`;
 }
