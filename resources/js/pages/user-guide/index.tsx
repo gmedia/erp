@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { BookOpen, ChevronRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { BookOpen, ChevronRight, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface GuideItem {
     slug: string;
@@ -34,7 +34,10 @@ async function fetchGuides(apiToken: string): Promise<GuideItem[]> {
     return json.data || [];
 }
 
-async function fetchGuideContent(slug: string, apiToken: string): Promise<GuideContent | null> {
+async function fetchGuideContent(
+    slug: string,
+    apiToken: string,
+): Promise<GuideContent | null> {
     const response = await fetch(`/api/user-guide/${slug}`, {
         headers: {
             Authorization: `Bearer ${apiToken}`,
@@ -103,20 +106,28 @@ export default function UserGuidePage() {
                             {guides.map((guide) => (
                                 <Button
                                     key={guide.slug}
-                                    variant={activeSlug === guide.slug ? 'secondary' : 'ghost'}
+                                    variant={
+                                        activeSlug === guide.slug
+                                            ? 'secondary'
+                                            : 'ghost'
+                                    }
                                     className={cn(
                                         'w-full justify-start gap-2 text-left',
-                                        activeSlug === guide.slug && 'font-medium',
+                                        activeSlug === guide.slug &&
+                                            'font-medium',
                                     )}
                                     onClick={() => setActiveSlug(guide.slug)}
                                 >
                                     <ChevronRight
                                         className={cn(
                                             'h-4 w-4 shrink-0 transition-transform',
-                                            activeSlug === guide.slug && 'rotate-90',
+                                            activeSlug === guide.slug &&
+                                                'rotate-90',
                                         )}
                                     />
-                                    <span className="truncate">{guide.title}</span>
+                                    <span className="truncate">
+                                        {guide.title}
+                                    </span>
                                 </Button>
                             ))}
                         </nav>
@@ -131,7 +142,7 @@ export default function UserGuidePage() {
                                     <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                                 </div>
                             ) : content ? (
-                                <article className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-h1:text-3xl prose-h2:border-b prose-h2:pb-2 prose-h2:text-xl prose-h3:text-lg prose-table:text-sm prose-th:bg-muted/50 prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2">
+                                <article className="prose prose-neutral dark:prose-invert prose-headings:scroll-mt-20 prose-h1:text-3xl prose-h2:border-b prose-h2:pb-2 prose-h2:text-xl prose-h3:text-lg prose-table:text-sm prose-th:bg-muted/50 prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2 max-w-none">
                                     <Markdown remarkPlugins={[remarkGfm]}>
                                         {content.content}
                                     </Markdown>
