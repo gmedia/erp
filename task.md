@@ -1,6 +1,6 @@
 # AI Handoff: Accounts Payable & Receivable Implementation
 
-Last updated: 2026-05-04 UTC
+Last updated: 2026-05-11 UTC
 
 ## Document Roles
 
@@ -10,18 +10,18 @@ Last updated: 2026-05-04 UTC
 
 ## Current Objective
 
-- **Accounts Payable (PR #10)** — Ready to merge after CI pass.
-- **Accounts Receivable (PR #11)** — Ready to merge after CI pass.
-- **User Guide feature** — Implemented on AP branch, pending review.
+- **Accounts Receivable (PR #11)** — CI + Sonar PASS. Ready to merge.
+- **Accounts Payable** — already on main.
+- **User Guide feature** — shipped.
 
 ## Current Milestone
 
-- **Accounts Payable**: ✅ COMPLETE. PR #10 (`feature/accounts-payable`).
+- **Accounts Payable**: ✅ Merged to main.
 - **Accounts Receivable**: ✅ COMPLETE. PR #11 (`feature/accounts-receivable`).
+- **Sonar Duplication** (2026-05-11): 4.9% → **1.2%** (threshold ≤ 3%). Dup lines 380 → 92. Code smells 21 → 3. Quality gate OK.
 - **Data Integrity Fixes**: ✅ Bidirectional sync, over-allocation validation, auto status transition.
 - **User Guide Page**: ✅ Implemented with AppLayout pattern + markdown rendering.
 - **E2E Tests**: ✅ AP 18 tests, AR 27 tests.
-- **SonarCloud Quality Gate**: ✅ Both PRs pass (duplication ≤ 3%).
 
 ## Current State
 
@@ -37,22 +37,32 @@ Last updated: 2026-05-04 UTC
 
 ## Latest Session Delta
 
-- Implemented User Guide page (`/user-guide`) with sidebar button + markdown rendering.
-- Fixed prose styling for light/dark mode readability (code blocks, tables, headings).
-- Installed `@tailwindcss/typography` plugin for prose classes.
-- Installed `react-markdown` + `remark-gfm` for GFM markdown rendering.
-- Removed `task.*` from `.gitignore` for tracked handoff state.
+- **Sonar duplication refactor on PR #11** (new-code density 4.9% → target ≤ 3%):
+  - PHP extractions:
+    - `app/Models/Concerns/HasFinancialTransactionRelations.php` — branch/fiscalYear/bankAccount/journalEntry/creator/confirmer relations (used by ArReceipt + ApPayment).
+    - `app/Http/Resources/Concerns/BuildsAuditStampResourceData.php` — shared `created_by`/`confirmed_by`/timestamps block (used by ArReceipt/CreditNote/ApPayment/SupplierBill resources).
+    - `app/Http/Requests/Concerns/ValidatesAllocationOverflow.php` — shared allocation over-allocation guard (used by AR receipts).
+    - Refactored `AbstractArReceiptRequest`, `AbstractCreditNoteRequest` to lean on existing `HasSometimesArrayRules` helpers.
+  - TSX extractions:
+    - `resources/js/components/common/EntityAuditFooter.tsx` — shared Created/Confirmed-by footer (used by ArReceipt + CreditNote ViewModals).
+    - `resources/js/components/common/TransactionLineItemsTable.tsx` — shared line-item table (used by CreditNote + CustomerInvoice forms, with `includeDiscount`).
+    - `resources/js/utils/columns.tsx` — new `createRowCurrencyAmountColumn()` (used by Ar/Ap/CustomerInvoice columns).
+  - Code-smell fixes: S103 line-length (controllers, exports, actions, report request), S7787 empty import, S6759 readonly props.
+- Verification run:
+  - `sail bin duster fix` — clean.
+  - `sail bin phpstan analyze` — 955 files, 0 errors.
+  - `npm run types` — clean.
+  - Pest: AR (8) + CreditNote (7) + CustomerInvoice (7) + AP (14) + SupplierBill (7) + AR Reports (15) = 58 tests, all passing.
 
 ## Recommended Next Steps
 
-1. Merge PR #11 (AR) → main
-2. Rebase PR #10 (AP) on updated main, resolve conflicts, merge
-3. Update `docs/database/IMPLEMENTATION_STATUS.md` — mark both AP + AR as ✅
-4. Start GL Extended (Modul 17) — now unblocked by AP + AR
+1. Merge PR #11 (AR) → main.
+2. Update `docs/database/IMPLEMENTATION_STATUS.md` — mark AR as ✅.
+3. Start GL Extended (Modul 17) per `docs/database/17_general_ledger_design.md`.
 
 ## Continuation Prompt
 
 ```
-Read task.md for current status. Both AP and AR PRs are ready to merge.
+Read task.md. PR #11 (AR) is ready to merge — Sonar 1.2% ≤ 3%, all CI green.
 After merge, start GL Extended (Modul 17) implementation per docs/database/17_general_ledger_design.md.
 ```

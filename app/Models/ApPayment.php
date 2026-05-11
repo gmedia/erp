@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BuildsAttributeCasts;
+use App\Models\Concerns\HasFinancialTransactionRelations;
 use App\Models\Concerns\HasSupplierRelation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -50,7 +51,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 class ApPayment extends Model
 {
     /** @use HasFactory<\Database\Factories\ApPaymentFactory> */
-    use BuildsAttributeCasts, HasFactory, HasSupplierRelation;
+    use BuildsAttributeCasts, HasFactory, HasFinancialTransactionRelations, HasSupplierRelation;
 
     /**
      * The attributes that are mass assignable.
@@ -80,39 +81,9 @@ class ApPayment extends Model
         'confirmed_at',
     ];
 
-    public function branch(): BelongsTo
-    {
-        return $this->belongsTo(Branch::class);
-    }
-
-    public function fiscalYear(): BelongsTo
-    {
-        return $this->belongsTo(FiscalYear::class);
-    }
-
-    public function bankAccount(): BelongsTo
-    {
-        return $this->belongsTo(Account::class, 'bank_account_id');
-    }
-
-    public function journalEntry(): BelongsTo
-    {
-        return $this->belongsTo(JournalEntry::class);
-    }
-
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
-    }
-
-    public function creator(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function confirmer(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'confirmed_by');
     }
 
     public function allocations(): HasMany

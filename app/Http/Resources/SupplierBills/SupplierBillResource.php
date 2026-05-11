@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\SupplierBills;
 
+use App\Http\Resources\Concerns\BuildsAuditStampResourceData;
 use App\Models\Branch;
 use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
@@ -9,7 +10,6 @@ use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Models\SupplierBill;
 use App\Models\SupplierBillItem;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,6 +18,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class SupplierBillResource extends JsonResource
 {
+    use BuildsAuditStampResourceData;
+
     public function toArray($request): array
     {
         /** @var Supplier|null $supplier */
@@ -30,10 +32,6 @@ class SupplierBillResource extends JsonResource
         $purchaseOrder = $this->resource->purchaseOrder;
         /** @var GoodsReceipt|null $goodsReceipt */
         $goodsReceipt = $this->resource->goodsReceipt;
-        /** @var User|null $creator */
-        $creator = $this->resource->creator;
-        /** @var User|null $confirmer */
-        $confirmer = $this->resource->confirmer;
 
         $items = [];
 
@@ -99,18 +97,8 @@ class SupplierBillResource extends JsonResource
             'status' => $this->resource->status,
             'notes' => $this->resource->notes,
             'journal_entry_id' => $this->resource->journal_entry_id,
-            'created_by' => $this->resource->created_by ? [
-                'id' => $this->resource->created_by,
-                'name' => $creator?->name,
-            ] : null,
-            'confirmed_by' => $this->resource->confirmed_by ? [
-                'id' => $this->resource->confirmed_by,
-                'name' => $confirmer?->name,
-            ] : null,
-            'confirmed_at' => $this->resource->confirmed_at?->toIso8601String(),
+            ...$this->auditStampFields($this->resource),
             'items' => $items,
-            'created_at' => $this->resource->created_at?->toIso8601String(),
-            'updated_at' => $this->resource->updated_at?->toIso8601String(),
         ];
     }
 }

@@ -507,6 +507,48 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'customer_invoice',
+                'display_name' => 'Customer Invoice',
+                'child' => [
+                    ['name' => 'customer_invoice.create', 'display_name' => 'Create Customer Invoice', 'child' => []],
+                    ['name' => 'customer_invoice.edit', 'display_name' => 'Edit Customer Invoice', 'child' => []],
+                    ['name' => 'customer_invoice.delete', 'display_name' => 'Delete Customer Invoice', 'child' => []],
+                ],
+            ],
+            [
+                'name' => 'ar_receipt',
+                'display_name' => 'AR Receipt',
+                'child' => [
+                    ['name' => 'ar_receipt.create', 'display_name' => 'Create AR Receipt', 'child' => []],
+                    ['name' => 'ar_receipt.edit', 'display_name' => 'Edit AR Receipt', 'child' => []],
+                    ['name' => 'ar_receipt.delete', 'display_name' => 'Delete AR Receipt', 'child' => []],
+                ],
+            ],
+            [
+                'name' => 'credit_note',
+                'display_name' => 'Credit Note',
+                'child' => [
+                    ['name' => 'credit_note.create', 'display_name' => 'Create Credit Note', 'child' => []],
+                    ['name' => 'credit_note.edit', 'display_name' => 'Edit Credit Note', 'child' => []],
+                    ['name' => 'credit_note.delete', 'display_name' => 'Delete Credit Note', 'child' => []],
+                ],
+            ],
+            [
+                'name' => 'ar_aging_report',
+                'display_name' => 'AR Aging Report',
+                'child' => [],
+            ],
+            [
+                'name' => 'ar_outstanding_report',
+                'display_name' => 'AR Outstanding Report',
+                'child' => [],
+            ],
+            [
+                'name' => 'customer_statement_report',
+                'display_name' => 'Customer Statement Report',
+                'child' => [],
+            ],
+            [
                 'name' => 'supplier_category',
                 'display_name' => 'Supplier Category',
                 'child' => [
