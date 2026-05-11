@@ -461,8 +461,7 @@ export function createBadgeColumn<T = Record<string, unknown>>(
 // Simple text column without sorting (alias for createTextColumn with enableSorting: false)
 export const createSimpleTextColumn = <T = Record<string, unknown>,>(
     options: Omit<ColumnBuilderOptions<T>, 'enableSorting'>,
-): ColumnDef<T> =>
-    createTextColumn<T>({ ...options, enableSorting: false });
+): ColumnDef<T> => createTextColumn<T>({ ...options, enableSorting: false });
 
 export function createRowCurrencyAmountColumn<
     T extends { currency?: string | null },

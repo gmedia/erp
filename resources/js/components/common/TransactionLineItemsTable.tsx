@@ -47,7 +47,10 @@ function computeLineTotal(item: TransactionLineItem, includeDiscount: boolean) {
         ? 1 - (item.discount_percent ?? 0) / 100
         : 1;
     return (
-        item.quantity * item.unit_price * discountFactor * (1 + (item.tax_percent ?? 0) / 100)
+        item.quantity *
+        item.unit_price *
+        discountFactor *
+        (1 + (item.tax_percent ?? 0) / 100)
     );
 }
 
