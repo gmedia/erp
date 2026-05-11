@@ -15,8 +15,8 @@ class TrialBalanceReportRequest extends FormRequest
     {
         return [
             'fiscal_year_id' => ['required', 'integer', 'exists:fiscal_years,id'],
-            'period_month' => ['required', 'integer', 'between:1,12'],
-            'period_year' => ['required', 'integer', 'between:2000,2100'],
+            'period_month' => ['nullable', 'integer', 'between:1,12'],
+            'period_year' => ['nullable', 'integer', 'between:2000,2100'],
         ];
     }
 }

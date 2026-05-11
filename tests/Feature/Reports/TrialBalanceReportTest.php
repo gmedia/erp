@@ -21,7 +21,7 @@ test('it can get trial balance report', function () {
     $account = Account::factory()->create(['code' => '1010', 'name' => 'Cash', 'type' => 'asset']);
     AccountBalance::factory()->create(['account_id' => $account->id, 'fiscal_year_id' => $fiscalYear->id, 'period_month' => 1, 'period_year' => 2026, 'closing_balance' => 1000]);
 
-    getJson("/api/reports/trial-balance?fiscal_year_id={$fiscalYear->id}&period_month=1&period_year=2026")
+    getJson("/api/reports/trial-balance-detailed?fiscal_year_id={$fiscalYear->id}&period_month=1&period_year=2026")
         ->assertOk()
         ->assertJsonPath('data.0.account_name', 'Cash')
         ->assertJsonPath('summary.total_debit', 1000);
@@ -34,7 +34,7 @@ test('it filters by fiscal year and period', function () {
     AccountBalance::factory()->create(['account_id' => $account->id, 'fiscal_year_id' => $fiscalYear->id, 'period_month' => 2, 'period_year' => 2026, 'closing_balance' => 1500]);
     AccountBalance::factory()->create(['fiscal_year_id' => $otherFiscalYear->id, 'period_month' => 1, 'period_year' => 2026, 'closing_balance' => 2500]);
 
-    getJson("/api/reports/trial-balance?fiscal_year_id={$fiscalYear->id}&period_month=2&period_year=2026")
+    getJson("/api/reports/trial-balance-detailed?fiscal_year_id={$fiscalYear->id}&period_month=2&period_year=2026")
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.account_name', 'Filtered Cash');
@@ -43,7 +43,7 @@ test('it filters by fiscal year and period', function () {
 test('it can export trial balance report', function () {
     $fiscalYear = FiscalYear::factory()->create();
 
-    $response = postJson('/api/reports/trial-balance/export', [
+    $response = postJson('/api/reports/trial-balance-detailed/export', [
         'fiscal_year_id' => $fiscalYear->id,
         'period_month' => 1,
         'period_year' => 2026,
