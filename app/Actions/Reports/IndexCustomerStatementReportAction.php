@@ -62,6 +62,8 @@ class IndexCustomerStatementReportAction
             'customer_invoice_invoice_date' => 'invoice_date',
             'customer_invoice_due_date' => 'due_date',
             'customer_invoice_status' => 'status',
+            'customer_name' => 'customer_name',
+            'branch_name' => 'branch_name',
         ];
     }
 
@@ -72,6 +74,8 @@ class IndexCustomerStatementReportAction
             'invoice_date',
             'due_date',
             'status',
+            'customer_name',
+            'branch_name',
             'grand_total',
             'amount_received',
             'credit_note_amount',

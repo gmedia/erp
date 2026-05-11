@@ -190,6 +190,7 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                     }
                     onSubmit={handleSubmit}
                     isLoading={isLoading}
+                    className="sm:max-w-[1100px]"
                 >
                     <div className="grid grid-cols-2 gap-4">
                         <AsyncSelectField
@@ -244,13 +245,16 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                         onAddItem={handleCreateNewItem}
                     />
 
-                    {fields.length === 0 ? (
-                        <EntityFormItemEmptyRow
-                            colSpan={8}
-                            message="No items added yet. Click 'Add Item' to start."
-                        />
-                    ) : (
-                        <Table>
+                    <Table>
+                        {fields.length === 0 ? (
+                            <TableBody>
+                                <EntityFormItemEmptyRow
+                                    colSpan={9}
+                                    message="No items added yet. Click 'Add Item' to start."
+                                />
+                            </TableBody>
+                        ) : (
+                            <>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-12">#</TableHead>
@@ -374,8 +378,9 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                                     );
                                 })}
                             </TableBody>
-                        </Table>
-                    )}
+                            </>
+                        )}
+                    </Table>
                 </EntityForm>
 
                 <CustomerInvoiceItemFormDialog

@@ -115,6 +115,8 @@ final class TransactionMappedIndexConfigurations
                 'receipt_date',
                 'currency',
                 'status',
+                'total_amount',
+                'total_unallocated',
                 'grand_total',
                 'created_at',
                 'updated_at',

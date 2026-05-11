@@ -16,7 +16,7 @@ class ExportArReceiptRequest extends AbstractArReceiptListingRequest
             ],
             $this->listingSortRules(
                 'id,receipt_number,customer,customer_id,branch,branch_id,receipt_date,' .
-                    'payment_method,currency,status,total_amount,created_at,updated_at'
+                    'payment_method,currency,status,total_amount,total_unallocated,created_at,updated_at'
             ),
         );
     }

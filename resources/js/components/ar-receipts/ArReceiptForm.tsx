@@ -171,6 +171,7 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                 title={activeArReceipt ? 'Edit AR Receipt' : 'Add AR Receipt'}
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
+                className="sm:max-w-[1100px]"
             >
                 <div className="grid grid-cols-2 gap-4">
                     <AsyncSelectField
@@ -238,13 +239,16 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                     title="Allocations"
                     onAddItem={handleCreateNewItem}
                 />
-                {fields.length === 0 ? (
-                    <EntityFormItemEmptyRow
-                        colSpan={4}
-                        message="No allocations added yet. Click 'Add Allocation' to start."
-                    />
-                ) : (
-                    <Table>
+                <Table>
+                    {fields.length === 0 ? (
+                        <TableBody>
+                            <EntityFormItemEmptyRow
+                                colSpan={5}
+                                message="No allocations added yet. Click 'Add Allocation' to start."
+                            />
+                        </TableBody>
+                    ) : (
+                        <>
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-12">#</TableHead>
@@ -302,8 +306,9 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                                 </TableRow>
                             ))}
                         </TableBody>
-                    </Table>
-                )}
+                        </>
+                    )}
+                </Table>
             </EntityForm>
             <ArReceiptAllocationFormDialog
                 open={isItemDialogOpen}

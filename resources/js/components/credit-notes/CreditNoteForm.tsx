@@ -162,6 +162,7 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                     }
                     onSubmit={handleSubmit}
                     isLoading={isLoading}
+                    className="sm:max-w-[1100px]"
                 >
                     <div className="grid grid-cols-2 gap-4">
                         <AsyncSelectField
@@ -214,13 +215,16 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                         title="Credit Note Items"
                         onAddItem={handleCreateNewItem}
                     />
-                    {fields.length === 0 ? (
-                        <EntityFormItemEmptyRow
-                            colSpan={7}
-                            message="No items added yet. Click 'Add Item' to start."
-                        />
-                    ) : (
-                        <Table>
+                    <Table>
+                        {fields.length === 0 ? (
+                            <TableBody>
+                                <EntityFormItemEmptyRow
+                                    colSpan={8}
+                                    message="No items added yet. Click 'Add Item' to start."
+                                />
+                            </TableBody>
+                        ) : (
+                            <>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-12">#</TableHead>
@@ -323,8 +327,9 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                                     );
                                 })}
                             </TableBody>
-                        </Table>
-                    )}
+                            </>
+                        )}
+                    </Table>
                 </EntityForm>
                 <CreditNoteItemFormDialog
                     open={isItemDialogOpen}

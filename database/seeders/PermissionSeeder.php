@@ -471,6 +471,8 @@ class PermissionSeeder extends Seeder
             [
                 'name' => 'goods_receipt_report',
                 'display_name' => 'Goods Receipt Report',
+                'child' => [],
+            ],
             [
                 "name" => "supplier_bill",
                 "display_name" => "Supplier Bill",
@@ -545,17 +547,6 @@ class PermissionSeeder extends Seeder
                 "name" => "customer_statement_report",
                 "display_name" => "Customer Statement Report",
                 "child" => [],
-            ],
-            [
-                'name' => 'ap_outstanding_report',
-                'display_name' => 'AP Outstanding Report',
-                'child' => [],
-            ],
-            [
-                'name' => 'ap_payment_history_report',
-                'display_name' => 'AP Payment History Report',
->>>>>>> origin/main
-                'child' => [],
             ],
             [
                 'name' => 'supplier_category',

@@ -9,7 +9,7 @@ abstract class AbstractCustomerStatementReportRequest extends AbstractReportRequ
         return array_merge(
             $this->searchRules(),
             [
-                'customer_id' => ['required', 'integer', 'exists:customers,id'],
+                'customer_id' => ['nullable', 'integer', 'exists:customers,id'],
             ],
             $this->dateRangeRules(),
             $this->sortByEnumRules([
@@ -21,6 +21,8 @@ abstract class AbstractCustomerStatementReportRequest extends AbstractReportRequ
                 'customer_invoice_due_date',
                 'status',
                 'customer_invoice_status',
+                'customer_name',
+                'branch_name',
                 'grand_total',
                 'amount_received',
                 'credit_note_amount',

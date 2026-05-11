@@ -58,6 +58,7 @@ export const ArReceiptViewModal = React.memo(
                 onClose={onClose}
                 title="AR Receipt Details"
                 description="View receipt details and allocations"
+                contentClassName="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden sm:max-w-7xl"
             >
                 <div className="space-y-4 py-4">
                     <div className="grid grid-cols-2 gap-4">
