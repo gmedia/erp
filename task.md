@@ -10,15 +10,15 @@ Last updated: 2026-05-11 UTC
 
 ## Current Objective
 
-- **Accounts Receivable (PR #11)** — Sonar duplication refactor pushed, awaiting CI re-scan.
+- **Accounts Receivable (PR #11)** — CI + Sonar PASS. Ready to merge.
 - **Accounts Payable** — already on main.
 - **User Guide feature** — shipped.
 
 ## Current Milestone
 
 - **Accounts Payable**: ✅ Merged to main.
-- **Accounts Receivable**: ✅ Functionally complete. PR #11 (`feature/accounts-receivable`).
-- **Sonar Duplication** (2026-05-11): refactor wave — baseline 4.9% (380 dup lines / 7823 new), target ≤ 3%.
+- **Accounts Receivable**: ✅ COMPLETE. PR #11 (`feature/accounts-receivable`).
+- **Sonar Duplication** (2026-05-11): 4.9% → **1.2%** (threshold ≤ 3%). Dup lines 380 → 92. Code smells 21 → 3. Quality gate OK.
 - **Data Integrity Fixes**: ✅ Bidirectional sync, over-allocation validation, auto status transition.
 - **User Guide Page**: ✅ Implemented with AppLayout pattern + markdown rendering.
 - **E2E Tests**: ✅ AP 18 tests, AR 27 tests.
@@ -56,15 +56,13 @@ Last updated: 2026-05-11 UTC
 
 ## Recommended Next Steps
 
-1. Wait for CI + SonarCloud re-scan on PR #11; expect new-code duplication ≤ 3%.
-2. If Sonar still fails, inspect top remaining hotspots via SonarCloud and apply a second wave (candidates: CreditNoteResource items mapper, ArReceipt/CreditNote Form default builders).
-3. Merge PR #11 once Sonar passes.
-4. Start GL Extended (Modul 17) per `docs/database/17_general_ledger_design.md`.
+1. Merge PR #11 (AR) → main.
+2. Update `docs/database/IMPLEMENTATION_STATUS.md` — mark AR as ✅.
+3. Start GL Extended (Modul 17) per `docs/database/17_general_ledger_design.md`.
 
 ## Continuation Prompt
 
 ```
-Read task.md. PR #11 (AR) Sonar duplication refactor just pushed. Check SonarCloud re-scan:
-  webfetch https://sonarcloud.io/api/qualitygates/project_status?projectKey=gmedia_erp&pullRequest=11
-If passing, report status. If failing, fetch top dup files and apply a second wave.
+Read task.md. PR #11 (AR) is ready to merge — Sonar 1.2% ≤ 3%, all CI green.
+After merge, start GL Extended (Modul 17) implementation per docs/database/17_general_ledger_design.md.
 ```
