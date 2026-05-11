@@ -5,6 +5,8 @@ use App\Http\Controllers\ApOutstandingReportController;
 use App\Http\Controllers\ApPaymentHistoryReportController;
 use App\Http\Controllers\ArAgingReportController;
 use App\Http\Controllers\ArOutstandingReportController;
+use App\Http\Controllers\AssetReportController;
+use App\Http\Controllers\BookValueDepreciationReportController;
 use App\Http\Controllers\CustomerStatementReportController;
 use App\Http\Controllers\GoodsReceiptReportController;
 use App\Http\Controllers\InventoryStocktakeVarianceReportController;
