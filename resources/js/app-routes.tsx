@@ -78,8 +78,12 @@ const AccountMappings = lazy(() => import('./pages/account-mappings/index'));
 const CoaVersions = lazy(() => import('./pages/coa-versions/index'));
 const FiscalYears = lazy(() => import('./pages/fiscal-years/index'));
 const JournalEntries = lazy(() => import('./pages/journal-entries/index'));
-const RecurringJournals = lazy(() => import('./pages/recurring-journals/index'));
-const BankReconciliations = lazy(() => import('./pages/bank-reconciliations/index'));
+const RecurringJournals = lazy(
+    () => import('./pages/recurring-journals/index'),
+);
+const BankReconciliations = lazy(
+    () => import('./pages/bank-reconciliations/index'),
+);
 const PeriodClosings = lazy(() => import('./pages/period-closings/index'));
 const PostingJournals = lazy(() => import('./pages/posting-journals/index'));
 
@@ -133,7 +137,9 @@ const IncomeStatement = lazy(
     () => import('./pages/reports/income-statement/index'),
 );
 const TrialBalance = lazy(() => import('./pages/reports/trial-balance/index'));
-const GeneralLedger = lazy(() => import('./pages/reports/general-ledger/index'));
+const GeneralLedger = lazy(
+    () => import('./pages/reports/general-ledger/index'),
+);
 const ReportAssetRegister = lazy(
     () => import('./pages/reports/assets/register/index'),
 );

@@ -19,8 +19,22 @@ const activeStatusOptions = [
 
 export function createRecurringJournalFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search name, description...'),
-        createSelectFilterField('frequency', 'Frequency', frequencyOptions, 'Select Frequency'),
-        createSelectFilterField('is_active', 'Status', activeStatusOptions, 'Select Status'),
+        createTextFilterField(
+            'search',
+            'Search',
+            'Search name, description...',
+        ),
+        createSelectFilterField(
+            'frequency',
+            'Frequency',
+            frequencyOptions,
+            'Select Frequency',
+        ),
+        createSelectFilterField(
+            'is_active',
+            'Status',
+            activeStatusOptions,
+            'Select Status',
+        ),
     ];
 }

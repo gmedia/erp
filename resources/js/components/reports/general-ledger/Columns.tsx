@@ -1,9 +1,9 @@
 'use client';
 
-import { type ColumnDef } from '@tanstack/react-table';
 import { createSortingHeader, createTextColumn } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
+import { type ColumnDef } from '@tanstack/react-table';
 
 export interface GeneralLedgerItem {
     entry_date: string;

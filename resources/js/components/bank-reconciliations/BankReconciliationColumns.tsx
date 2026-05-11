@@ -12,7 +12,6 @@ import { type BankReconciliation } from '@/types/bank-reconciliation';
 import {
     createSelectColumn,
     createSortingHeader,
-    createTextColumn,
     type CustomTableMeta,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
@@ -44,7 +43,9 @@ export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
         accessorKey: 'period_start',
         ...createSortingHeader('Period Start'),
         cell: ({ row }) =>
-            formatDateByRegionalSettings(row.getValue('period_start') as string),
+            formatDateByRegionalSettings(
+                row.getValue('period_start') as string,
+            ),
     },
     {
         accessorKey: 'period_end',
@@ -103,7 +104,11 @@ export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
             return (
-                <Badge variant={getStatusVariant(status as BankReconciliation['status'])}>
+                <Badge
+                    variant={getStatusVariant(
+                        status as BankReconciliation['status'],
+                    )}
+                >
                     {status === 'in_progress' ? 'In Progress' : 'Completed'}
                 </Badge>
             );
@@ -112,9 +117,12 @@ export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
     {
         id: 'row-actions',
         cell: ({ row, table }) => {
-            const meta = table.options.meta as CustomTableMeta<BankReconciliation>;
-            const canComplete = row.original.status === 'in_progress' && row.original.difference === 0;
-            
+            const meta = table.options
+                .meta as CustomTableMeta<BankReconciliation>;
+            const canComplete =
+                row.original.status === 'in_progress' &&
+                row.original.difference === 0;
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -124,22 +132,35 @@ export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => meta?.onView?.(row.original)}>
+                        <DropdownMenuItem
+                            onClick={() => meta?.onView?.(row.original)}
+                        >
                             <Eye className="mr-2 h-4 w-4" />
                             View
                         </DropdownMenuItem>
                         {row.original.status === 'in_progress' && (
                             <>
-                                <DropdownMenuItem onClick={() => meta?.onEdit?.(row.original)}>
+                                <DropdownMenuItem
+                                    onClick={() => meta?.onEdit?.(row.original)}
+                                >
                                     <Pencil className="mr-2 h-4 w-4" />
                                     Edit
                                 </DropdownMenuItem>
                                 {canComplete && (
                                     <DropdownMenuItem
                                         onClick={() => {
-                                            const customAction = meta?.onCustomAction as ((action: string, item: BankReconciliation) => void) | undefined;
+                                            const customAction =
+                                                meta?.onCustomAction as
+                                                    | ((
+                                                          action: string,
+                                                          item: BankReconciliation,
+                                                      ) => void)
+                                                    | undefined;
                                             if (customAction) {
-                                                customAction('complete', row.original);
+                                                customAction(
+                                                    'complete',
+                                                    row.original,
+                                                );
                                             }
                                         }}
                                     >
@@ -148,7 +169,9 @@ export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
                                     </DropdownMenuItem>
                                 )}
                                 <DropdownMenuItem
-                                    onClick={() => meta?.onDelete?.(row.original)}
+                                    onClick={() =>
+                                        meta?.onDelete?.(row.original)
+                                    }
                                     className="text-red-600"
                                 >
                                     <Trash className="mr-2 h-4 w-4" />

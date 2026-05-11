@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
 import { Pencil, Plus, Trash } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import {
@@ -16,9 +15,9 @@ import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import {
     Table,
     TableBody,
@@ -29,7 +28,10 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-import { type RecurringJournal, type RecurringJournalLine } from '@/types/recurring-journal';
+import {
+    type RecurringJournal,
+    type RecurringJournalLine,
+} from '@/types/recurring-journal';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { RecurringJournalLineFormDialog } from './RecurringJournalLineFormDialog';
 
@@ -51,7 +53,9 @@ const recurringJournalFormSchema = z.object({
     auto_post: z.boolean().default(false),
     is_active: z.boolean().default(true),
     reference_template: z.string().optional(),
-    description_template: z.string().min(1, { message: 'Description template is required.' }),
+    description_template: z
+        .string()
+        .min(1, { message: 'Description template is required.' }),
     lines: z.array(recurringJournalLineSchema).min(1, {
         message: 'At least one line is required.',
     }),
@@ -166,11 +170,21 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
         };
 
         const totalDebit = useMemo(() => {
-            return lines?.reduce((sum, line) => sum + (Number(line.debit) || 0), 0) || 0;
+            return (
+                lines?.reduce(
+                    (sum, line) => sum + (Number(line.debit) || 0),
+                    0,
+                ) || 0
+            );
         }, [lines]);
 
         const totalCredit = useMemo(() => {
-            return lines?.reduce((sum, line) => sum + (Number(line.credit) || 0), 0) || 0;
+            return (
+                lines?.reduce(
+                    (sum, line) => sum + (Number(line.credit) || 0),
+                    0,
+                ) || 0
+            );
         }, [lines]);
 
         const isBalanced = totalDebit === totalCredit;
@@ -181,7 +195,11 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                     form={form as UseFormReturn<RecurringJournalFormData>}
                     open={open}
                     onOpenChange={onOpenChange}
-                    title={isEdit ? 'Edit Recurring Journal' : 'Add New Recurring Journal'}
+                    title={
+                        isEdit
+                            ? 'Edit Recurring Journal'
+                            : 'Add New Recurring Journal'
+                    }
                     onSubmit={onSubmit}
                     isLoading={isLoading}
                 >
@@ -200,7 +218,10 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                         { value: 'daily', label: 'Daily' },
                                         { value: 'weekly', label: 'Weekly' },
                                         { value: 'monthly', label: 'Monthly' },
-                                        { value: 'quarterly', label: 'Quarterly' },
+                                        {
+                                            value: 'quarterly',
+                                            label: 'Quarterly',
+                                        },
                                         { value: 'yearly', label: 'Yearly' },
                                     ]}
                                 />
@@ -217,20 +238,30 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                             id="auto_post"
                                             checked={form.watch('auto_post')}
                                             onCheckedChange={(checked) =>
-                                                form.setValue('auto_post', !!checked)
+                                                form.setValue(
+                                                    'auto_post',
+                                                    !!checked,
+                                                )
                                             }
                                         />
-                                        <Label htmlFor="auto_post">Auto Post</Label>
+                                        <Label htmlFor="auto_post">
+                                            Auto Post
+                                        </Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Checkbox
                                             id="is_active"
                                             checked={form.watch('is_active')}
                                             onCheckedChange={(checked) =>
-                                                form.setValue('is_active', !!checked)
+                                                form.setValue(
+                                                    'is_active',
+                                                    !!checked,
+                                                )
                                             }
                                         />
-                                        <Label htmlFor="is_active">Is Active</Label>
+                                        <Label htmlFor="is_active">
+                                            Is Active
+                                        </Label>
                                     </div>
                                 </div>
                             </div>
@@ -249,7 +280,9 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
 
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-lg font-semibold">Lines</h3>
+                                    <h3 className="text-lg font-semibold">
+                                        Lines
+                                    </h3>
                                     <Button
                                         type="button"
                                         variant="outline"
@@ -263,7 +296,8 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
 
                                 {!isBalanced && lines && lines.length > 0 && (
                                     <div className="rounded-md bg-yellow-50 p-3 text-sm text-yellow-800">
-                                        Warning: Total Debit and Total Credit must be equal.
+                                        Warning: Total Debit and Total Credit
+                                        must be equal.
                                     </div>
                                 )}
 
@@ -291,7 +325,8 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                                         colSpan={5}
                                                         className="text-center text-muted-foreground"
                                                     >
-                                                        No lines added yet. Click "Add Line" to
+                                                        No lines added yet.
+                                                        Click "Add Line" to
                                                         start.
                                                     </TableCell>
                                                 </TableRow>
@@ -300,32 +335,55 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                                     <TableRow key={field.id}>
                                                         <TableCell>
                                                             <div>
-                                                                {lines?.[index]?.account_code}
+                                                                {
+                                                                    lines?.[
+                                                                        index
+                                                                    ]
+                                                                        ?.account_code
+                                                                }
                                                             </div>
                                                             <div className="text-sm text-gray-500">
-                                                                {lines?.[index]?.account_name}
+                                                                {
+                                                                    lines?.[
+                                                                        index
+                                                                    ]
+                                                                        ?.account_name
+                                                                }
                                                             </div>
                                                         </TableCell>
                                                         <TableCell className="text-right">
                                                             {formatCurrencyByRegionalSettings(
-                                                                Number(lines?.[index]?.debit || 0),
+                                                                Number(
+                                                                    lines?.[
+                                                                        index
+                                                                    ]?.debit ||
+                                                                        0,
+                                                                ),
                                                                 {
                                                                     locale: 'id-ID',
-                                                                    currency: 'IDR',
+                                                                    currency:
+                                                                        'IDR',
                                                                 },
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="text-right">
                                                             {formatCurrencyByRegionalSettings(
-                                                                Number(lines?.[index]?.credit || 0),
+                                                                Number(
+                                                                    lines?.[
+                                                                        index
+                                                                    ]?.credit ||
+                                                                        0,
+                                                                ),
                                                                 {
                                                                     locale: 'id-ID',
-                                                                    currency: 'IDR',
+                                                                    currency:
+                                                                        'IDR',
                                                                 },
                                                             )}
                                                         </TableCell>
                                                         <TableCell>
-                                                            {lines?.[index]?.memo || '-'}
+                                                            {lines?.[index]
+                                                                ?.memo || '-'}
                                                         </TableCell>
                                                         <TableCell>
                                                             <div className="flex items-center gap-2">
@@ -334,7 +392,9 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                                                     variant="ghost"
                                                                     size="icon"
                                                                     onClick={() =>
-                                                                        handleEditLine(index)
+                                                                        handleEditLine(
+                                                                            index,
+                                                                        )
                                                                     }
                                                                 >
                                                                     <Pencil className="h-4 w-4" />
@@ -344,7 +404,9 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                                                     variant="ghost"
                                                                     size="icon"
                                                                     onClick={() =>
-                                                                        handleRemoveLine(index)
+                                                                        handleRemoveLine(
+                                                                            index,
+                                                                        )
                                                                     }
                                                                 >
                                                                     <Trash className="h-4 w-4 text-red-500" />
@@ -361,16 +423,22 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                                     Total
                                                 </TableCell>
                                                 <TableCell className="text-right font-semibold">
-                                                    {formatCurrencyByRegionalSettings(totalDebit, {
-                                                        locale: 'id-ID',
-                                                        currency: 'IDR',
-                                                    })}
+                                                    {formatCurrencyByRegionalSettings(
+                                                        totalDebit,
+                                                        {
+                                                            locale: 'id-ID',
+                                                            currency: 'IDR',
+                                                        },
+                                                    )}
                                                 </TableCell>
                                                 <TableCell className="text-right font-semibold">
-                                                    {formatCurrencyByRegionalSettings(totalCredit, {
-                                                        locale: 'id-ID',
-                                                        currency: 'IDR',
-                                                    })}
+                                                    {formatCurrencyByRegionalSettings(
+                                                        totalCredit,
+                                                        {
+                                                            locale: 'id-ID',
+                                                            currency: 'IDR',
+                                                        },
+                                                    )}
                                                 </TableCell>
                                                 <TableCell colSpan={2} />
                                             </TableRow>
@@ -385,14 +453,22 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                 <RecurringJournalLineFormDialog
                     open={isItemDialogOpen}
                     onOpenChange={setIsItemDialogOpen}
-                    item={editingIndex !== null && lines?.[editingIndex] ? {
-                        account_id: Number(lines[editingIndex].account_id),
-                        account_name: lines[editingIndex].account_name,
-                        account_code: lines[editingIndex].account_code,
-                        debit: Number(lines[editingIndex].debit),
-                        credit: Number(lines[editingIndex].credit),
-                        memo: lines[editingIndex].memo,
-                    } : null}
+                    item={
+                        editingIndex !== null && lines?.[editingIndex]
+                            ? {
+                                  account_id: Number(
+                                      lines[editingIndex].account_id,
+                                  ),
+                                  account_name:
+                                      lines[editingIndex].account_name,
+                                  account_code:
+                                      lines[editingIndex].account_code,
+                                  debit: Number(lines[editingIndex].debit),
+                                  credit: Number(lines[editingIndex].credit),
+                                  memo: lines[editingIndex].memo,
+                              }
+                            : null
+                    }
                     onSave={handleSaveLine}
                 />
             </>

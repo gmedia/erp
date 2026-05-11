@@ -1,8 +1,8 @@
 'use client';
 
-import { type ColumnDef } from '@tanstack/react-table';
 import { createSortingHeader, createTextColumn } from '@/utils/columns';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
+import { type ColumnDef } from '@tanstack/react-table';
 
 export interface TrialBalanceItem {
     account_code: string;

@@ -12,13 +12,19 @@ import { type PeriodClosing } from '@/types/period-closing';
 import {
     createSelectColumn,
     createSortingHeader,
-    createTextColumn,
     type CustomTableMeta,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
-import { Eye, Lock, LockOpen, MoreHorizontal, Pencil, Trash } from 'lucide-react';
+import {
+    Eye,
+    Lock,
+    LockOpen,
+    MoreHorizontal,
+    Pencil,
+    Trash,
+} from 'lucide-react';
 
 function getStatusVariant(status: PeriodClosing['status']) {
     return status === 'closed' ? 'default' : 'secondary';
@@ -54,7 +60,11 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
             return (
-                <Badge variant={getStatusVariant(status as PeriodClosing['status'])}>
+                <Badge
+                    variant={getStatusVariant(
+                        status as PeriodClosing['status'],
+                    )}
+                >
                     {status === 'draft' ? 'Draft' : 'Closed'}
                 </Badge>
             );
@@ -89,7 +99,7 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
             const meta = table.options.meta as CustomTableMeta<PeriodClosing>;
             const isDraft = row.original.status === 'draft';
             const isClosed = row.original.status === 'closed';
-            
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -99,19 +109,29 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => meta?.onView?.(row.original)}>
+                        <DropdownMenuItem
+                            onClick={() => meta?.onView?.(row.original)}
+                        >
                             <Eye className="mr-2 h-4 w-4" />
                             View
                         </DropdownMenuItem>
                         {isDraft && (
                             <>
-                                <DropdownMenuItem onClick={() => meta?.onEdit?.(row.original)}>
+                                <DropdownMenuItem
+                                    onClick={() => meta?.onEdit?.(row.original)}
+                                >
                                     <Pencil className="mr-2 h-4 w-4" />
                                     Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => {
-                                        const customAction = meta?.onCustomAction as ((action: string, item: PeriodClosing) => void) | undefined;
+                                        const customAction =
+                                            meta?.onCustomAction as
+                                                | ((
+                                                      action: string,
+                                                      item: PeriodClosing,
+                                                  ) => void)
+                                                | undefined;
                                         if (customAction) {
                                             customAction('close', row.original);
                                         }
@@ -121,7 +141,9 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
                                     Close Period
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={() => meta?.onDelete?.(row.original)}
+                                    onClick={() =>
+                                        meta?.onDelete?.(row.original)
+                                    }
                                     className="text-red-600"
                                 >
                                     <Trash className="mr-2 h-4 w-4" />
@@ -132,7 +154,13 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
                         {isClosed && (
                             <DropdownMenuItem
                                 onClick={() => {
-                                    const customAction = meta?.onCustomAction as ((action: string, item: PeriodClosing) => void) | undefined;
+                                    const customAction =
+                                        meta?.onCustomAction as
+                                            | ((
+                                                  action: string,
+                                                  item: PeriodClosing,
+                                              ) => void)
+                                            | undefined;
                                     if (customAction) {
                                         customAction('reopen', row.original);
                                     }

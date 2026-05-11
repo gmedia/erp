@@ -1,25 +1,31 @@
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
-import { type BankReconciliation } from '@/types/bank-reconciliation';
 import { useEntityForm } from '@/hooks/useEntityForm';
+import { type BankReconciliation } from '@/types/bank-reconciliation';
 import * as z from 'zod';
 
-const bankReconciliationFormSchema = z.object({
-    account_id: z.string().min(1, { message: 'Account is required.' }),
-    fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
-    period_start: z.date({ message: 'Period start is required.' }),
-    period_end: z.date({ message: 'Period end is required.' }),
-    statement_balance: z.coerce.number({ message: 'Statement balance is required.' }),
-}).refine((data) => data.period_end >= data.period_start, {
-    message: 'Period end must be after or equal to period start.',
-    path: ['period_end'],
-});
+const bankReconciliationFormSchema = z
+    .object({
+        account_id: z.string().min(1, { message: 'Account is required.' }),
+        fiscal_year_id: z
+            .string()
+            .min(1, { message: 'Fiscal year is required.' }),
+        period_start: z.date({ message: 'Period start is required.' }),
+        period_end: z.date({ message: 'Period end is required.' }),
+        statement_balance: z.coerce.number({
+            message: 'Statement balance is required.',
+        }),
+    })
+    .refine((data) => data.period_end >= data.period_start, {
+        message: 'Period end must be after or equal to period start.',
+        path: ['period_end'],
+    });
 
 type BankReconciliationFormData = z.infer<typeof bankReconciliationFormSchema>;
 
@@ -61,7 +67,10 @@ export const BankReconciliationForm = memo<BankReconciliationFormProps>(
         onSubmit,
         isLoading = false,
     }) {
-        const form = useEntityForm<BankReconciliationFormData, BankReconciliation>({
+        const form = useEntityForm<
+            BankReconciliationFormData,
+            BankReconciliation
+        >({
             schema: bankReconciliationFormSchema,
             getDefaults: getBankReconciliationFormDefaults,
             entity,
@@ -76,7 +85,11 @@ export const BankReconciliationForm = memo<BankReconciliationFormProps>(
                 form={form}
                 open={open}
                 onOpenChange={onOpenChange}
-                title={entity ? 'Edit Bank Reconciliation' : 'Add New Bank Reconciliation'}
+                title={
+                    entity
+                        ? 'Edit Bank Reconciliation'
+                        : 'Add New Bank Reconciliation'
+                }
                 onSubmit={onSubmit}
                 isLoading={isLoading}
             >
@@ -109,14 +122,8 @@ export const BankReconciliationForm = memo<BankReconciliationFormProps>(
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <DatePickerField
-                        name="period_start"
-                        label="Period Start"
-                    />
-                    <DatePickerField
-                        name="period_end"
-                        label="Period End"
-                    />
+                    <DatePickerField name="period_start" label="Period Start" />
+                    <DatePickerField name="period_end" label="Period End" />
                 </div>
 
                 <InputField

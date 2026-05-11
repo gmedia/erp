@@ -1167,23 +1167,26 @@ import { RecurringJournalForm } from '@/components/recurring-journals/RecurringJ
 import { RecurringJournalViewModal } from '@/components/recurring-journals/RecurringJournalViewModal';
 import { type RecurringJournal } from '@/types/recurring-journal';
 
-export const recurringJournalConfig = createComplexEntityConfig<RecurringJournal>({
-    entityName: 'Recurring Journal',
-    entityNamePlural: 'Recurring Journals',
-    apiEndpoint: '/api/recurring-journals',
-    exportEndpoint: '/api/recurring-journals/export',
-    queryKey: ['recurring-journals'],
-    breadcrumbs: [{ title: 'Recurring Journals', href: '/recurring-journals' }],
-    initialFilters: { search: '', frequency: '', is_active: '' },
-    columns: recurringJournalColumns,
-    filterFields: createRecurringJournalFilterFields(),
-    formComponent: RecurringJournalForm,
-    formType: 'complex',
-    entityNameForSearch: 'recurring journal',
-    viewModalComponent: RecurringJournalViewModal,
-    getDeleteMessage: (item: { name?: string }) =>
-        `This action cannot be undone. This will permanently delete recurring journal ${item.name}.`,
-});
+export const recurringJournalConfig =
+    createComplexEntityConfig<RecurringJournal>({
+        entityName: 'Recurring Journal',
+        entityNamePlural: 'Recurring Journals',
+        apiEndpoint: '/api/recurring-journals',
+        exportEndpoint: '/api/recurring-journals/export',
+        queryKey: ['recurring-journals'],
+        breadcrumbs: [
+            { title: 'Recurring Journals', href: '/recurring-journals' },
+        ],
+        initialFilters: { search: '', frequency: '', is_active: '' },
+        columns: recurringJournalColumns,
+        filterFields: createRecurringJournalFilterFields(),
+        formComponent: RecurringJournalForm,
+        formType: 'complex',
+        entityNameForSearch: 'recurring journal',
+        viewModalComponent: RecurringJournalViewModal,
+        getDeleteMessage: (item: { name?: string }) =>
+            `This action cannot be undone. This will permanently delete recurring journal ${item.name}.`,
+    });
 
 import { bankReconciliationColumns } from '@/components/bank-reconciliations/BankReconciliationColumns';
 import { createBankReconciliationFilterFields } from '@/components/bank-reconciliations/BankReconciliationFilters';
@@ -1191,23 +1194,26 @@ import { BankReconciliationForm } from '@/components/bank-reconciliations/BankRe
 import { BankReconciliationViewModal } from '@/components/bank-reconciliations/BankReconciliationViewModal';
 import { type BankReconciliation } from '@/types/bank-reconciliation';
 
-export const bankReconciliationConfig = createComplexEntityConfig<BankReconciliation>({
-    entityName: 'Bank Reconciliation',
-    entityNamePlural: 'Bank Reconciliations',
-    apiEndpoint: '/api/bank-reconciliations',
-    exportEndpoint: '/api/bank-reconciliations/export',
-    queryKey: ['bank-reconciliations'],
-    breadcrumbs: [{ title: 'Bank Reconciliations', href: '/bank-reconciliations' }],
-    initialFilters: { search: '', status: '', account_id: '' },
-    columns: bankReconciliationColumns,
-    filterFields: createBankReconciliationFilterFields(),
-    formComponent: BankReconciliationForm,
-    formType: 'complex',
-    entityNameForSearch: 'bank reconciliation',
-    viewModalComponent: BankReconciliationViewModal,
-    getDeleteMessage: () =>
-        'This action cannot be undone. This will permanently delete this bank reconciliation.',
-});
+export const bankReconciliationConfig =
+    createComplexEntityConfig<BankReconciliation>({
+        entityName: 'Bank Reconciliation',
+        entityNamePlural: 'Bank Reconciliations',
+        apiEndpoint: '/api/bank-reconciliations',
+        exportEndpoint: '/api/bank-reconciliations/export',
+        queryKey: ['bank-reconciliations'],
+        breadcrumbs: [
+            { title: 'Bank Reconciliations', href: '/bank-reconciliations' },
+        ],
+        initialFilters: { search: '', status: '', account_id: '' },
+        columns: bankReconciliationColumns,
+        filterFields: createBankReconciliationFilterFields(),
+        formComponent: BankReconciliationForm,
+        formType: 'complex',
+        entityNameForSearch: 'bank reconciliation',
+        viewModalComponent: BankReconciliationViewModal,
+        getDeleteMessage: () =>
+            'This action cannot be undone. This will permanently delete this bank reconciliation.',
+    });
 
 import { periodClosingColumns } from '@/components/period-closings/PeriodClosingColumns';
 import { createPeriodClosingFilterFields } from '@/components/period-closings/PeriodClosingFilters';
@@ -1222,7 +1228,12 @@ export const periodClosingConfig = createComplexEntityConfig<PeriodClosing>({
     exportEndpoint: '/api/period-closings/export',
     queryKey: ['period-closings'],
     breadcrumbs: [{ title: 'Period Closings', href: '/period-closings' }],
-    initialFilters: { search: '', status: '', closing_type: '', fiscal_year_id: '' },
+    initialFilters: {
+        search: '',
+        status: '',
+        closing_type: '',
+        fiscal_year_id: '',
+    },
     columns: periodClosingColumns,
     filterFields: createPeriodClosingFilterFields(),
     formComponent: PeriodClosingForm,

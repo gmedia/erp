@@ -47,7 +47,9 @@ export const recurringJournalColumns: ColumnDef<RecurringJournal>[] = [
         accessorKey: 'next_run_date',
         ...createSortingHeader('Next Run Date'),
         cell: ({ row }) =>
-            formatDateByRegionalSettings(row.getValue('next_run_date') as string),
+            formatDateByRegionalSettings(
+                row.getValue('next_run_date') as string,
+            ),
     },
     {
         accessorKey: 'total_amount',
@@ -68,7 +70,9 @@ export const recurringJournalColumns: ColumnDef<RecurringJournal>[] = [
         accessorKey: 'auto_post',
         ...createSortingHeader('Auto Post'),
         cell: ({ row }) => (
-            <Badge variant={row.getValue('auto_post') ? 'default' : 'secondary'}>
+            <Badge
+                variant={row.getValue('auto_post') ? 'default' : 'secondary'}
+            >
                 {row.getValue('auto_post') ? 'Yes' : 'No'}
             </Badge>
         ),
@@ -77,7 +81,9 @@ export const recurringJournalColumns: ColumnDef<RecurringJournal>[] = [
         accessorKey: 'is_active',
         ...createSortingHeader('Is Active'),
         cell: ({ row }) => (
-            <Badge variant={row.getValue('is_active') ? 'default' : 'secondary'}>
+            <Badge
+                variant={row.getValue('is_active') ? 'default' : 'secondary'}
+            >
                 {row.getValue('is_active') ? 'Active' : 'Inactive'}
             </Badge>
         ),
@@ -91,7 +97,8 @@ export const recurringJournalColumns: ColumnDef<RecurringJournal>[] = [
     {
         id: 'row-actions',
         cell: ({ row, table }) => {
-            const meta = table.options.meta as CustomTableMeta<RecurringJournal>;
+            const meta = table.options
+                .meta as CustomTableMeta<RecurringJournal>;
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -101,17 +108,26 @@ export const recurringJournalColumns: ColumnDef<RecurringJournal>[] = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => meta?.onView?.(row.original)}>
+                        <DropdownMenuItem
+                            onClick={() => meta?.onView?.(row.original)}
+                        >
                             <Eye className="mr-2 h-4 w-4" />
                             View
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => meta?.onEdit?.(row.original)}>
+                        <DropdownMenuItem
+                            onClick={() => meta?.onEdit?.(row.original)}
+                        >
                             <Pencil className="mr-2 h-4 w-4" />
                             Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={() => {
-                                const customAction = meta?.onCustomAction as ((action: string, item: RecurringJournal) => void) | undefined;
+                                const customAction = meta?.onCustomAction as
+                                    | ((
+                                          action: string,
+                                          item: RecurringJournal,
+                                      ) => void)
+                                    | undefined;
                                 if (customAction) {
                                     customAction('execute', row.original);
                                 }

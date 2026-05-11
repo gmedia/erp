@@ -1,5 +1,5 @@
-import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { ViewField } from '@/components/common/ViewField';
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { PeriodClosing } from '@/types/period-closing';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
@@ -39,14 +39,8 @@ export function PeriodClosingViewModal({
                     value={item.fiscal_year?.name || '-'}
                 />
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <ViewField
-                        label="Period Month"
-                        value={item.period_month}
-                    />
-                    <ViewField
-                        label="Period Year"
-                        value={item.period_year}
-                    />
+                    <ViewField label="Period Month" value={item.period_month} />
+                    <ViewField label="Period Year" value={item.period_year} />
                 </div>
                 <ViewField
                     label="Closing Type"
@@ -93,10 +87,7 @@ export function PeriodClosingViewModal({
                         />
                     </>
                 )}
-                <ViewField
-                    label="Created By"
-                    value={item.created_by.name}
-                />
+                <ViewField label="Created By" value={item.created_by.name} />
                 <ViewField
                     label="Created At"
                     value={formatDateByRegionalSettings(item.created_at)}

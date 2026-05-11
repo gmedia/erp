@@ -1,5 +1,4 @@
 import { ViewModalShell } from '@/components/common/ViewModalShell';
-import { ViewField } from '@/components/common/ViewField';
 import { Badge } from '@/components/ui/badge';
 import {
     Table,
@@ -45,7 +44,9 @@ export function BankReconciliationViewModal({
                             <p className="text-sm font-medium text-gray-500">
                                 Account
                             </p>
-                            <p>{item.account_code} - {item.account_name}</p>
+                            <p>
+                                {item.account_code} - {item.account_name}
+                            </p>
                         </div>
                         <div className="min-w-0">
                             <p className="text-sm font-medium text-gray-500">
@@ -57,23 +58,32 @@ export function BankReconciliationViewModal({
                             <p className="text-sm font-medium text-gray-500">
                                 Period Start
                             </p>
-                            <p>{formatDateByRegionalSettings(item.period_start)}</p>
+                            <p>
+                                {formatDateByRegionalSettings(
+                                    item.period_start,
+                                )}
+                            </p>
                         </div>
                         <div className="min-w-0">
                             <p className="text-sm font-medium text-gray-500">
                                 Period End
                             </p>
-                            <p>{formatDateByRegionalSettings(item.period_end)}</p>
+                            <p>
+                                {formatDateByRegionalSettings(item.period_end)}
+                            </p>
                         </div>
                         <div className="min-w-0">
                             <p className="text-sm font-medium text-gray-500">
                                 Statement Balance
                             </p>
                             <p>
-                                {formatCurrencyByRegionalSettings(item.statement_balance, {
-                                    locale: 'id-ID',
-                                    currency: 'IDR',
-                                })}
+                                {formatCurrencyByRegionalSettings(
+                                    item.statement_balance,
+                                    {
+                                        locale: 'id-ID',
+                                        currency: 'IDR',
+                                    },
+                                )}
                             </p>
                         </div>
                         <div className="min-w-0">
@@ -81,10 +91,13 @@ export function BankReconciliationViewModal({
                                 Book Balance
                             </p>
                             <p>
-                                {formatCurrencyByRegionalSettings(item.book_balance, {
-                                    locale: 'id-ID',
-                                    currency: 'IDR',
-                                })}
+                                {formatCurrencyByRegionalSettings(
+                                    item.book_balance,
+                                    {
+                                        locale: 'id-ID',
+                                        currency: 'IDR',
+                                    },
+                                )}
                             </p>
                         </div>
                         <div className="min-w-0">
@@ -92,10 +105,13 @@ export function BankReconciliationViewModal({
                                 Difference
                             </p>
                             <p>
-                                {formatCurrencyByRegionalSettings(item.difference, {
-                                    locale: 'id-ID',
-                                    currency: 'IDR',
-                                })}
+                                {formatCurrencyByRegionalSettings(
+                                    item.difference,
+                                    {
+                                        locale: 'id-ID',
+                                        currency: 'IDR',
+                                    },
+                                )}
                             </p>
                         </div>
                         <div className="min-w-0">
@@ -103,7 +119,9 @@ export function BankReconciliationViewModal({
                                 Status
                             </p>
                             <Badge variant={getStatusVariant(item.status)}>
-                                {item.status === 'in_progress' ? 'In Progress' : 'Completed'}
+                                {item.status === 'in_progress'
+                                    ? 'In Progress'
+                                    : 'Completed'}
                             </Badge>
                         </div>
                         {item.completed_at && (
@@ -112,7 +130,11 @@ export function BankReconciliationViewModal({
                                     <p className="text-sm font-medium text-gray-500">
                                         Completed At
                                     </p>
-                                    <p>{formatDateByRegionalSettings(item.completed_at)}</p>
+                                    <p>
+                                        {formatDateByRegionalSettings(
+                                            item.completed_at,
+                                        )}
+                                    </p>
                                 </div>
                                 <div className="min-w-0">
                                     <p className="text-sm font-medium text-gray-500">
@@ -125,7 +147,9 @@ export function BankReconciliationViewModal({
                     </div>
 
                     <div className="space-y-2">
-                        <h3 className="text-lg font-semibold">Reconciliation Items</h3>
+                        <h3 className="text-lg font-semibold">
+                            Reconciliation Items
+                        </h3>
                         <div className="min-w-0 rounded-md border">
                             <Table className="min-w-[600px]">
                                 <TableHeader>
@@ -133,8 +157,12 @@ export function BankReconciliationViewModal({
                                         <TableHead>Date</TableHead>
                                         <TableHead>Journal Entry</TableHead>
                                         <TableHead>Description</TableHead>
-                                        <TableHead className="text-right">Debit</TableHead>
-                                        <TableHead className="text-right">Credit</TableHead>
+                                        <TableHead className="text-right">
+                                            Debit
+                                        </TableHead>
+                                        <TableHead className="text-right">
+                                            Credit
+                                        </TableHead>
                                         <TableHead>Reconciled</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -152,12 +180,17 @@ export function BankReconciliationViewModal({
                                         item.items.map((itemRow) => (
                                             <TableRow key={itemRow.id}>
                                                 <TableCell>
-                                                    {formatDateByRegionalSettings(itemRow.transaction_date)}
+                                                    {formatDateByRegionalSettings(
+                                                        itemRow.transaction_date,
+                                                    )}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {itemRow.journal_entry_number || '-'}
+                                                    {itemRow.journal_entry_number ||
+                                                        '-'}
                                                 </TableCell>
-                                                <TableCell>{itemRow.description}</TableCell>
+                                                <TableCell>
+                                                    {itemRow.description}
+                                                </TableCell>
                                                 <TableCell className="text-right">
                                                     {formatCurrencyByRegionalSettings(
                                                         itemRow.debit,
@@ -184,7 +217,9 @@ export function BankReconciliationViewModal({
                                                                 : 'secondary'
                                                         }
                                                     >
-                                                        {itemRow.is_reconciled ? 'Yes' : 'No'}
+                                                        {itemRow.is_reconciled
+                                                            ? 'Yes'
+                                                            : 'No'}
                                                     </Badge>
                                                 </TableCell>
                                             </TableRow>

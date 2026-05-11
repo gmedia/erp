@@ -6,16 +6,26 @@ import AsyncSelectField from '@/components/common/AsyncSelectField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
-import { type PeriodClosing } from '@/types/period-closing';
 import { useEntityForm } from '@/hooks/useEntityForm';
+import { type PeriodClosing } from '@/types/period-closing';
 import * as z from 'zod';
 
 const periodClosingFormSchema = z.object({
     fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
-    period_month: z.coerce.number().min(1).max(12, { message: 'Period month must be between 1 and 12.' }),
-    period_year: z.coerce.number().min(2000).max(2100, { message: 'Period year must be between 2000 and 2100.' }),
-    closing_type: z.enum(['monthly', 'yearly'], { message: 'Closing type is required.' }),
-    retained_earnings_account_id: z.string().min(1, { message: 'Retained earnings account is required.' }),
+    period_month: z.coerce
+        .number()
+        .min(1)
+        .max(12, { message: 'Period month must be between 1 and 12.' }),
+    period_year: z.coerce
+        .number()
+        .min(2000)
+        .max(2100, { message: 'Period year must be between 2000 and 2100.' }),
+    closing_type: z.enum(['monthly', 'yearly'], {
+        message: 'Closing type is required.',
+    }),
+    retained_earnings_account_id: z
+        .string()
+        .min(1, { message: 'Retained earnings account is required.' }),
 });
 
 type PeriodClosingFormData = z.infer<typeof periodClosingFormSchema>;
@@ -47,7 +57,9 @@ const getPeriodClosingFormDefaults = (
         period_month: entity.period_month,
         period_year: entity.period_year,
         closing_type: entity.closing_type,
-        retained_earnings_account_id: String(entity.retained_earnings_account_id),
+        retained_earnings_account_id: String(
+            entity.retained_earnings_account_id,
+        ),
     };
 };
 
@@ -66,15 +78,19 @@ export const PeriodClosingForm = memo<PeriodClosingFormProps>(
         });
 
         const fiscalYearName = entity?.fiscal_year?.name;
-        const retainedEarningsAccountCode = entity?.retained_earnings_account?.code;
-        const retainedEarningsAccountName = entity?.retained_earnings_account?.name;
+        const retainedEarningsAccountCode =
+            entity?.retained_earnings_account?.code;
+        const retainedEarningsAccountName =
+            entity?.retained_earnings_account?.name;
 
         return (
             <EntityForm
                 form={form}
                 open={open}
                 onOpenChange={onOpenChange}
-                title={entity ? 'Edit Period Closing' : 'Add New Period Closing'}
+                title={
+                    entity ? 'Edit Period Closing' : 'Add New Period Closing'
+                }
                 onSubmit={onSubmit}
                 isLoading={isLoading}
             >
@@ -128,7 +144,8 @@ export const PeriodClosingForm = memo<PeriodClosingFormProps>(
                     placeholder="Select Retained Earnings Account"
                     labelFn={(acc) => `${acc.code} - ${acc.name}`}
                     initialLabel={
-                        retainedEarningsAccountCode && retainedEarningsAccountName
+                        retainedEarningsAccountCode &&
+                        retainedEarningsAccountName
                             ? `${retainedEarningsAccountCode} - ${retainedEarningsAccountName}`
                             : ''
                     }

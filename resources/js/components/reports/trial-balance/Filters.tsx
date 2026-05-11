@@ -1,8 +1,8 @@
+import { AsyncSelect } from '@/components/common/AsyncSelect';
 import {
     createSelectFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
-import { AsyncSelect } from '@/components/common/AsyncSelect';
 
 const monthOptions = [
     { value: '1', label: 'January' },
@@ -30,9 +30,24 @@ export function createTrialBalanceFilterFields(): FieldDescriptor[] {
         {
             name: 'fiscal_year_id',
             label: 'Fiscal Year (Required)',
-            component: <AsyncSelect url="/api/fiscal-years" placeholder="Select Fiscal Year" />,
+            component: (
+                <AsyncSelect
+                    url="/api/fiscal-years"
+                    placeholder="Select Fiscal Year"
+                />
+            ),
         },
-        createSelectFilterField('period_month', 'Period Month', monthOptions, 'Select Month'),
-        createSelectFilterField('period_year', 'Period Year', yearOptions, 'Select Year'),
+        createSelectFilterField(
+            'period_month',
+            'Period Month',
+            monthOptions,
+            'Select Month',
+        ),
+        createSelectFilterField(
+            'period_year',
+            'Period Year',
+            yearOptions,
+            'Select Year',
+        ),
     ];
 }

@@ -7,11 +7,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class)->group('period-closings');
 
 test('it has correct fillable attributes', function () {
-    expect((new PeriodClosing())->getFillable())->toBe(['fiscal_year_id', 'period_month', 'period_year', 'closing_type', 'status', 'closing_journal_entry_id', 'retained_earnings_account_id', 'net_income', 'notes', 'closed_by', 'closed_at', 'reopened_by', 'reopened_at', 'created_by']);
+    expect((new PeriodClosing)->getFillable())->toBe(['fiscal_year_id', 'period_month', 'period_year', 'closing_type', 'status', 'closing_journal_entry_id', 'retained_earnings_account_id', 'net_income', 'notes', 'closed_by', 'closed_at', 'reopened_by', 'reopened_at', 'created_by']);
 });
 
 test('it belongs to fiscal year', function () {
-    expect((new PeriodClosing())->fiscalYear())->toBeInstanceOf(BelongsTo::class);
+    expect((new PeriodClosing)->fiscalYear())->toBeInstanceOf(BelongsTo::class);
 });
 
 test('isClosed returns true when status is closed', function () {

@@ -37,8 +37,14 @@ export function RecurringJournalViewModal({
 }: Readonly<RecurringJournalViewModalProps>) {
     if (!item) return null;
 
-    const totalDebit = item.lines.reduce((sum, line) => sum + Number(line.debit), 0);
-    const totalCredit = item.lines.reduce((sum, line) => sum + Number(line.credit), 0);
+    const totalDebit = item.lines.reduce(
+        (sum, line) => sum + Number(line.debit),
+        0,
+    );
+    const totalCredit = item.lines.reduce(
+        (sum, line) => sum + Number(line.credit),
+        0,
+    );
 
     return (
         <ViewModalShell
@@ -68,7 +74,9 @@ export function RecurringJournalViewModal({
                                 Next Run Date
                             </p>
                             <p>
-                                {formatDateByRegionalSettings(item.next_run_date)}
+                                {formatDateByRegionalSettings(
+                                    item.next_run_date,
+                                )}
                             </p>
                         </div>
                         <div className="min-w-0">
@@ -77,7 +85,9 @@ export function RecurringJournalViewModal({
                             </p>
                             <p>
                                 {item.last_run_date
-                                    ? formatDateByRegionalSettings(item.last_run_date)
+                                    ? formatDateByRegionalSettings(
+                                          item.last_run_date,
+                                      )
                                     : '-'}
                             </p>
                         </div>
@@ -85,7 +95,11 @@ export function RecurringJournalViewModal({
                             <p className="text-sm font-medium text-gray-500">
                                 Auto Post
                             </p>
-                            <Badge variant={item.auto_post ? 'default' : 'secondary'}>
+                            <Badge
+                                variant={
+                                    item.auto_post ? 'default' : 'secondary'
+                                }
+                            >
                                 {item.auto_post ? 'Yes' : 'No'}
                             </Badge>
                         </div>
@@ -93,7 +107,11 @@ export function RecurringJournalViewModal({
                             <p className="text-sm font-medium text-gray-500">
                                 Status
                             </p>
-                            <Badge variant={item.is_active ? 'default' : 'secondary'}>
+                            <Badge
+                                variant={
+                                    item.is_active ? 'default' : 'secondary'
+                                }
+                            >
                                 {item.is_active ? 'Active' : 'Inactive'}
                             </Badge>
                         </div>
@@ -108,10 +126,13 @@ export function RecurringJournalViewModal({
                                 Total Amount
                             </p>
                             <p>
-                                {formatCurrencyByRegionalSettings(item.total_amount, {
-                                    locale: 'id-ID',
-                                    currency: 'IDR',
-                                })}
+                                {formatCurrencyByRegionalSettings(
+                                    item.total_amount,
+                                    {
+                                        locale: 'id-ID',
+                                        currency: 'IDR',
+                                    },
+                                )}
                             </p>
                         </div>
                         <div className="min-w-0 sm:col-span-2">
@@ -163,7 +184,9 @@ export function RecurringJournalViewModal({
                                                 },
                                             )}
                                         </TableCell>
-                                        <TableCell>{line.memo || '-'}</TableCell>
+                                        <TableCell>
+                                            {line.memo || '-'}
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -173,16 +196,22 @@ export function RecurringJournalViewModal({
                                         Total
                                     </TableCell>
                                     <TableCell className="text-right font-semibold">
-                                        {formatCurrencyByRegionalSettings(totalDebit, {
-                                            locale: 'id-ID',
-                                            currency: 'IDR',
-                                        })}
+                                        {formatCurrencyByRegionalSettings(
+                                            totalDebit,
+                                            {
+                                                locale: 'id-ID',
+                                                currency: 'IDR',
+                                            },
+                                        )}
                                     </TableCell>
                                     <TableCell className="text-right font-semibold">
-                                        {formatCurrencyByRegionalSettings(totalCredit, {
-                                            locale: 'id-ID',
-                                            currency: 'IDR',
-                                        })}
+                                        {formatCurrencyByRegionalSettings(
+                                            totalCredit,
+                                            {
+                                                locale: 'id-ID',
+                                                currency: 'IDR',
+                                            },
+                                        )}
                                     </TableCell>
                                     <TableCell />
                                 </TableRow>

@@ -17,7 +17,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
-import { type RecurringJournalLine } from '@/types/recurring-journal';
 
 const recurringJournalLineSchema = z.object({
     account_id: z.coerce.number().min(1, { message: 'Account is required.' }),

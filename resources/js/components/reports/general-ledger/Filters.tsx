@@ -1,9 +1,9 @@
+import { AsyncSelect } from '@/components/common/AsyncSelect';
 import {
     createDateRangeFilterFields,
     createSelectFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
-import { AsyncSelect } from '@/components/common/AsyncSelect';
 
 const journalTypeOptions = [
     { value: 'general', label: 'General' },
@@ -18,14 +18,29 @@ export function createGeneralLedgerFilterFields(): FieldDescriptor[] {
         {
             name: 'account_id',
             label: 'Account (Required)',
-            component: <AsyncSelect url="/api/accounts?is_active=1&has_children=0" placeholder="Select Account" />,
+            component: (
+                <AsyncSelect
+                    url="/api/accounts?is_active=1&has_children=0"
+                    placeholder="Select Account"
+                />
+            ),
         },
         {
             name: 'fiscal_year_id',
             label: 'Fiscal Year',
-            component: <AsyncSelect url="/api/fiscal-years" placeholder="Select Fiscal Year" />,
+            component: (
+                <AsyncSelect
+                    url="/api/fiscal-years"
+                    placeholder="Select Fiscal Year"
+                />
+            ),
         },
         ...createDateRangeFilterFields(),
-        createSelectFilterField('journal_type', 'Journal Type', journalTypeOptions, 'Select Type'),
+        createSelectFilterField(
+            'journal_type',
+            'Journal Type',
+            journalTypeOptions,
+            'Select Type',
+        ),
     ];
 }
