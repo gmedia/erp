@@ -45,9 +45,7 @@ export const ArReceiptViewModal = React.memo(
     ({ item, open, onClose }: ArReceiptViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = createAmountFormatter(
-            item.currency || 'IDR',
-        );
+        const formatAmount = createAmountFormatter(item.currency || 'IDR');
 
         const allocationColumns =
             createArReceiptAllocationColumns(formatAmount);

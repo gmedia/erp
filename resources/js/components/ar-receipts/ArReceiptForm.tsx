@@ -249,63 +249,67 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                         </TableBody>
                     ) : (
                         <>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-12">#</TableHead>
-                                <TableHead>Invoice</TableHead>
-                                <TableHead className="text-right">
-                                    Allocated Amount
-                                </TableHead>
-                                <TableHead className="text-right">
-                                    Discount Given
-                                </TableHead>
-                                <TableHead className="w-20">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {fields.map((field, index) => (
-                                <TableRow key={field.id}>
-                                    <TableCell className="font-mono text-xs text-muted-foreground">
-                                        {String(index + 1)}
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="font-medium">
-                                            {field.invoice_label ||
-                                                'No Invoice'}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        {formatCurrencyByRegionalSettings(
-                                            field.allocated_amount,
-                                            {
-                                                locale: 'id-ID',
-                                                currency:
-                                                    selectedCurrency || 'IDR',
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2,
-                                            },
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        {formatCurrencyByRegionalSettings(
-                                            field.discount_given || 0,
-                                            {
-                                                locale: 'id-ID',
-                                                currency:
-                                                    selectedCurrency || 'IDR',
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2,
-                                            },
-                                        )}
-                                    </TableCell>
-                                    <EntityFormItemActionsCell
-                                        index={index}
-                                        onEdit={() => handleEditItem(index)}
-                                        onRemove={() => remove(index)}
-                                    />
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="w-12">#</TableHead>
+                                    <TableHead>Invoice</TableHead>
+                                    <TableHead className="text-right">
+                                        Allocated Amount
+                                    </TableHead>
+                                    <TableHead className="text-right">
+                                        Discount Given
+                                    </TableHead>
+                                    <TableHead className="w-20">
+                                        Actions
+                                    </TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
+                            </TableHeader>
+                            <TableBody>
+                                {fields.map((field, index) => (
+                                    <TableRow key={field.id}>
+                                        <TableCell className="font-mono text-xs text-muted-foreground">
+                                            {String(index + 1)}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="font-medium">
+                                                {field.invoice_label ||
+                                                    'No Invoice'}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            {formatCurrencyByRegionalSettings(
+                                                field.allocated_amount,
+                                                {
+                                                    locale: 'id-ID',
+                                                    currency:
+                                                        selectedCurrency ||
+                                                        'IDR',
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2,
+                                                },
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            {formatCurrencyByRegionalSettings(
+                                                field.discount_given || 0,
+                                                {
+                                                    locale: 'id-ID',
+                                                    currency:
+                                                        selectedCurrency ||
+                                                        'IDR',
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2,
+                                                },
+                                            )}
+                                        </TableCell>
+                                        <EntityFormItemActionsCell
+                                            index={index}
+                                            onEdit={() => handleEditItem(index)}
+                                            onRemove={() => remove(index)}
+                                        />
+                                    </TableRow>
+                                ))}
+                            </TableBody>
                         </>
                     )}
                 </Table>

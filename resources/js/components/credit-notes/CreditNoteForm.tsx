@@ -225,108 +225,113 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                             </TableBody>
                         ) : (
                             <>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-12">#</TableHead>
-                                    <TableHead>Product/Account</TableHead>
-                                    <TableHead>Description</TableHead>
-                                    <TableHead className="text-right">
-                                        Qty
-                                    </TableHead>
-                                    <TableHead className="text-right">
-                                        Unit Price
-                                    </TableHead>
-                                    <TableHead className="text-right">
-                                        Tax %
-                                    </TableHead>
-                                    <TableHead className="text-right">
-                                        Line Total
-                                    </TableHead>
-                                    <TableHead className="w-20">
-                                        Actions
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {fields.map((field, index) => {
-                                    const lineTotal =
-                                        field.quantity *
-                                        field.unit_price *
-                                        (1 + (field.tax_percent || 0) / 100);
-                                    return (
-                                        <TableRow key={field.id}>
-                                            <TableCell className="font-mono text-xs text-muted-foreground">
-                                                {String(index + 1)}
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="space-y-1">
-                                                    <div className="font-medium">
-                                                        {field.product_label ||
-                                                            'No Product'}
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-12">
+                                            #
+                                        </TableHead>
+                                        <TableHead>Product/Account</TableHead>
+                                        <TableHead>Description</TableHead>
+                                        <TableHead className="text-right">
+                                            Qty
+                                        </TableHead>
+                                        <TableHead className="text-right">
+                                            Unit Price
+                                        </TableHead>
+                                        <TableHead className="text-right">
+                                            Tax %
+                                        </TableHead>
+                                        <TableHead className="text-right">
+                                            Line Total
+                                        </TableHead>
+                                        <TableHead className="w-20">
+                                            Actions
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {fields.map((field, index) => {
+                                        const lineTotal =
+                                            field.quantity *
+                                            field.unit_price *
+                                            (1 +
+                                                (field.tax_percent || 0) / 100);
+                                        return (
+                                            <TableRow key={field.id}>
+                                                <TableCell className="font-mono text-xs text-muted-foreground">
+                                                    {String(index + 1)}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="space-y-1">
+                                                        <div className="font-medium">
+                                                            {field.product_label ||
+                                                                'No Product'}
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground">
+                                                            {field.account_label ||
+                                                                'No Account'}
+                                                        </div>
                                                     </div>
-                                                    <div className="text-xs text-muted-foreground">
-                                                        {field.account_label ||
-                                                            'No Account'}
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                {field.description || '-'}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                {formatNumberByRegionalSettings(
-                                                    field.quantity,
-                                                    {
-                                                        locale: 'id-ID',
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2,
-                                                    },
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                {formatCurrencyByRegionalSettings(
-                                                    field.unit_price,
-                                                    {
-                                                        locale: 'id-ID',
-                                                        currency: 'IDR',
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2,
-                                                    },
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                {formatNumberByRegionalSettings(
-                                                    field.tax_percent || 0,
-                                                    {
-                                                        locale: 'id-ID',
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2,
-                                                    },
-                                                )}
-                                                %
-                                            </TableCell>
-                                            <TableCell className="text-right font-medium">
-                                                {formatCurrencyByRegionalSettings(
-                                                    lineTotal,
-                                                    {
-                                                        locale: 'id-ID',
-                                                        currency: 'IDR',
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2,
-                                                    },
-                                                )}
-                                            </TableCell>
-                                            <EntityFormItemActionsCell
-                                                index={index}
-                                                onEdit={() =>
-                                                    handleEditItem(index)
-                                                }
-                                                onRemove={() => remove(index)}
-                                            />
-                                        </TableRow>
-                                    );
-                                })}
-                            </TableBody>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {field.description || '-'}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    {formatNumberByRegionalSettings(
+                                                        field.quantity,
+                                                        {
+                                                            locale: 'id-ID',
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2,
+                                                        },
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    {formatCurrencyByRegionalSettings(
+                                                        field.unit_price,
+                                                        {
+                                                            locale: 'id-ID',
+                                                            currency: 'IDR',
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2,
+                                                        },
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    {formatNumberByRegionalSettings(
+                                                        field.tax_percent || 0,
+                                                        {
+                                                            locale: 'id-ID',
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2,
+                                                        },
+                                                    )}
+                                                    %
+                                                </TableCell>
+                                                <TableCell className="text-right font-medium">
+                                                    {formatCurrencyByRegionalSettings(
+                                                        lineTotal,
+                                                        {
+                                                            locale: 'id-ID',
+                                                            currency: 'IDR',
+                                                            minimumFractionDigits: 2,
+                                                            maximumFractionDigits: 2,
+                                                        },
+                                                    )}
+                                                </TableCell>
+                                                <EntityFormItemActionsCell
+                                                    index={index}
+                                                    onEdit={() =>
+                                                        handleEditItem(index)
+                                                    }
+                                                    onRemove={() =>
+                                                        remove(index)
+                                                    }
+                                                />
+                                            </TableRow>
+                                        );
+                                    })}
+                                </TableBody>
                             </>
                         )}
                     </Table>

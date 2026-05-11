@@ -17,7 +17,7 @@ class PipelineSampleDataSeeder extends Seeder
 
         // ── Supplier Bill Lifecycle Pipeline ─────────────────────────
         $this->seedSupplierBillLifecycle($adminUserId);
-        
+
         // ── AP Payment Lifecycle Pipeline ──────────────────────────
         $this->seedApPaymentLifecycle($adminUserId);
 

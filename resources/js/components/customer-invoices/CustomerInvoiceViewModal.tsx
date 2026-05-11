@@ -50,9 +50,7 @@ export const CustomerInvoiceViewModal = React.memo(
     ({ item, open, onClose }: CustomerInvoiceViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = createAmountFormatter(
-            item.currency || 'IDR',
-        );
+        const formatAmount = createAmountFormatter(item.currency || 'IDR');
 
         const itemColumns = createCustomerInvoiceItemColumns(formatAmount);
 
