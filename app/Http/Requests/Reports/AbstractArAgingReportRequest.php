@@ -6,6 +6,10 @@ use Illuminate\Validation\Rule;
 
 abstract class AbstractArAgingReportRequest extends AbstractReportRequest
 {
+    private const STATUS_VALUES = [
+        'draft', 'sent', 'partially_paid', 'paid', 'overdue', 'cancelled', 'void',
+    ];
+
     protected function arAgingRules(): array
     {
         return array_merge(
@@ -13,7 +17,7 @@ abstract class AbstractArAgingReportRequest extends AbstractReportRequest
             [
                 'customer_id' => ['nullable', 'integer', 'exists:customers,id'],
                 'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
-                'status' => ['nullable', 'string', Rule::in(['draft', 'sent', 'partially_paid', 'paid', 'overdue', 'cancelled', 'void'])],
+                'status' => ['nullable', 'string', Rule::in(self::STATUS_VALUES)],
             ],
             $this->dateRangeRules(),
             $this->sortByEnumRules([

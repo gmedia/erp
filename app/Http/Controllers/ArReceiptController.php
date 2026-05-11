@@ -52,7 +52,9 @@ class ArReceiptController extends Controller
             },
         );
 
-        return (new ArReceiptResource($this->loadResourceRelations($arReceipt)))->response()->setStatusCode(201);
+        return (new ArReceiptResource($this->loadResourceRelations($arReceipt)))
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function show(ArReceipt $arReceipt): JsonResponse
@@ -78,7 +80,9 @@ class ArReceiptController extends Controller
             model: $arReceipt,
             attributes: $validated,
             items: $allocations,
-            payloadResolver: static fn (array $attributes): array => UpdateArReceiptData::fromArray($attributes)->toArray(),
+            payloadResolver: static fn (array $attributes): array => UpdateArReceiptData::fromArray(
+                $attributes
+            )->toArray(),
             syncItems: function (ArReceipt $arReceipt, array $allocations) use ($syncAllocations): void {
                 $syncAllocations->execute($arReceipt, $allocations);
             },
@@ -95,9 +99,14 @@ class ArReceiptController extends Controller
                 $invoice = $allocation->customerInvoice;
 
                 $newAmountReceived = (float) $invoice->amount_received - (float) $allocation->allocated_amount;
+                $clampedAmount = max(0, $newAmountReceived);
                 $invoice->update([
-                    'amount_received' => (string) max(0, $newAmountReceived),
-                    'amount_due' => (string) ((float) $invoice->grand_total - max(0, $newAmountReceived) - (float) $invoice->credit_note_amount),
+                    'amount_received' => (string) $clampedAmount,
+                    'amount_due' => (string) (
+                        (float) $invoice->grand_total
+                        - $clampedAmount
+                        - (float) $invoice->credit_note_amount
+                    ),
                 ]);
                 $invoice->updatePaymentStatus();
             }
@@ -114,6 +123,9 @@ class ArReceiptController extends Controller
 
     protected function resourceRelations(): array
     {
-        return ['customer', 'branch', 'fiscalYear', 'bankAccount', 'creator', 'confirmer', 'allocations.customerInvoice'];
+        return [
+            'customer', 'branch', 'fiscalYear', 'bankAccount',
+            'creator', 'confirmer', 'allocations.customerInvoice',
+        ];
     }
 }

@@ -461,7 +461,36 @@ export function createBadgeColumn<T = Record<string, unknown>>(
 // Simple text column without sorting (alias for createTextColumn with enableSorting: false)
 export const createSimpleTextColumn = <T = Record<string, unknown>,>(
     options: Omit<ColumnBuilderOptions<T>, 'enableSorting'>,
-): ColumnDef<T> => createTextColumn<T>({ ...options, enableSorting: false });
+): ColumnDef<T> =>
+    createTextColumn<T>({ ...options, enableSorting: false });
+
+export function createRowCurrencyAmountColumn<
+    T extends { currency?: string | null },
+>(options: {
+    accessorKey: keyof T;
+    label: string;
+    className?: string;
+}): ColumnDef<T> {
+    const { accessorKey, label, className = 'text-right' } = options;
+
+    return {
+        accessorKey: accessorKey as string,
+        ...createSortingHeader(label),
+        cell: ({ row }) => (
+            <div className={className}>
+                {formatCurrencyByRegionalSettings(
+                    row.getValue(accessorKey as string) as string | number,
+                    {
+                        locale: 'id-ID',
+                        currency: row.original.currency || undefined,
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    },
+                )}
+            </div>
+        ),
+    };
+}
 
 // Simple entity columns for basic CRUD entities (departments, positions)
 export function createSimpleEntityColumns<

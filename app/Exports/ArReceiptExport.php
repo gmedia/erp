@@ -66,7 +66,11 @@ class ArReceiptExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMa
             'Fiscal Year' => fn (ArReceipt $receipt): mixed => $this->relatedAttribute($receipt, 'fiscalYear', 'name'),
             'Receipt Date' => fn (ArReceipt $receipt): mixed => $this->formatDateValue($receipt->receipt_date, 'Y-m-d'),
             'Payment Method' => fn (ArReceipt $receipt): mixed => $receipt->payment_method,
-            'Bank Account' => fn (ArReceipt $receipt): mixed => $this->relatedAttribute($receipt, 'bankAccount', 'name'),
+            'Bank Account' => fn (ArReceipt $receipt): mixed => $this->relatedAttribute(
+                $receipt,
+                'bankAccount',
+                'name'
+            ),
             'Currency' => fn (ArReceipt $receipt): mixed => $receipt->currency,
             'Status' => fn (ArReceipt $receipt): mixed => $receipt->status,
             'Total Amount' => fn (ArReceipt $receipt): mixed => $receipt->total_amount,

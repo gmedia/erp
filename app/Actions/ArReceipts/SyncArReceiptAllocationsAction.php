@@ -15,14 +15,18 @@ class SyncArReceiptAllocationsAction
     public function execute(ArReceipt $arReceipt, array $allocations): void
     {
         DB::transaction(function () use ($arReceipt, $allocations) {
-            $normalized = $this->recreateItems($arReceipt->allocations(), $allocations, static function (array $allocation): array {
-                return [
-                    'customer_invoice_id' => (int) $allocation['customer_invoice_id'],
-                    'allocated_amount' => (float) $allocation['allocated_amount'],
-                    'discount_given' => (float) ($allocation['discount_given'] ?? 0),
-                    'notes' => $allocation['notes'] ?? null,
-                ];
-            });
+            $normalized = $this->recreateItems(
+                $arReceipt->allocations(),
+                $allocations,
+                static function (array $allocation): array {
+                    return [
+                        'customer_invoice_id' => (int) $allocation['customer_invoice_id'],
+                        'allocated_amount' => (float) $allocation['allocated_amount'],
+                        'discount_given' => (float) ($allocation['discount_given'] ?? 0),
+                        'notes' => $allocation['notes'] ?? null,
+                    ];
+                }
+            );
 
             $totalAllocated = collect($normalized)->sum(static fn (array $row) => (float) $row['allocated_amount']);
             $totalAmount = (float) $arReceipt->total_amount;
@@ -42,9 +46,12 @@ class SyncArReceiptAllocationsAction
                 }
 
                 $totalReceived = ArReceiptAllocation::where('customer_invoice_id', $invoiceId)->sum('allocated_amount');
+                $amountDue = (float) $invoice->grand_total
+                    - $totalReceived
+                    - (float) $invoice->credit_note_amount;
                 $invoice->update([
                     'amount_received' => (string) $totalReceived,
-                    'amount_due' => (string) ((float) $invoice->grand_total - $totalReceived - (float) $invoice->credit_note_amount),
+                    'amount_due' => (string) $amountDue,
                 ]);
                 $invoice->updatePaymentStatus();
             }

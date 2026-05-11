@@ -21,7 +21,6 @@ import {
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ArReceipt, type ArReceiptFormData } from '@/types/ar-receipt';
-import {} from '@/utils/entity-form-item';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { arReceiptFormSchema } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';

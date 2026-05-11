@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\ApPayments;
 
+use App\Http\Resources\Concerns\BuildsAuditStampResourceData;
 use App\Models\Account;
 use App\Models\ApPayment;
 use App\Models\ApPaymentAllocation;
@@ -17,6 +18,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class ApPaymentResource extends JsonResource
 {
+    use BuildsAuditStampResourceData;
+
     public function toArray($request): array
     {
         /** @var Supplier|null $supplier */
@@ -29,10 +32,6 @@ class ApPaymentResource extends JsonResource
         $bankAccount = $this->resource->bankAccount;
         /** @var User|null $approver */
         $approver = $this->resource->approver;
-        /** @var User|null $creator */
-        $creator = $this->resource->creator;
-        /** @var User|null $confirmer */
-        $confirmer = $this->resource->confirmer;
 
         $allocations = [];
 
@@ -87,18 +86,8 @@ class ApPaymentResource extends JsonResource
                 'name' => $approver?->name,
             ] : null,
             'approved_at' => $this->resource->approved_at?->toIso8601String(),
-            'created_by' => $this->resource->created_by ? [
-                'id' => $this->resource->created_by,
-                'name' => $creator?->name,
-            ] : null,
-            'confirmed_by' => $this->resource->confirmed_by ? [
-                'id' => $this->resource->confirmed_by,
-                'name' => $confirmer?->name,
-            ] : null,
-            'confirmed_at' => $this->resource->confirmed_at?->toIso8601String(),
+            ...$this->auditStampFields($this->resource),
             'allocations' => $allocations,
-            'created_at' => $this->resource->created_at?->toIso8601String(),
-            'updated_at' => $this->resource->updated_at?->toIso8601String(),
         ];
     }
 }

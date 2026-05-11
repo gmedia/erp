@@ -27,9 +27,12 @@ class ApplyCreditNoteAction
             $creditNote->update(['status' => 'applied']);
 
             $newCreditNoteAmount = (float) $invoice->credit_note_amount + (float) $creditNote->grand_total;
+            $amountDue = (float) $invoice->grand_total
+                - (float) $invoice->amount_received
+                - $newCreditNoteAmount;
             $invoice->update([
                 'credit_note_amount' => (string) $newCreditNoteAmount,
-                'amount_due' => (string) ((float) $invoice->grand_total - (float) $invoice->amount_received - $newCreditNoteAmount),
+                'amount_due' => (string) $amountDue,
             ]);
             $invoice->updatePaymentStatus();
 

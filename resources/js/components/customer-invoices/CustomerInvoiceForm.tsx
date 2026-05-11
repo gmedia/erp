@@ -7,22 +7,11 @@ import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
-import {
-    EntityFormItemActionsCell,
-    EntityFormItemEmptyRow,
-    EntityFormItemSectionHeader,
-} from '@/components/common/EntityFormItemTable';
+import { EntityFormItemSectionHeader } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { TransactionLineItemsTable } from '@/components/common/TransactionLineItemsTable';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import {
@@ -30,10 +19,6 @@ import {
     type CustomerInvoiceFormData,
 } from '@/types/customer-invoice';
 import { omitItemDisplayLabels } from '@/utils/entity-form-item';
-import {
-    formatCurrencyByRegionalSettings,
-    formatNumberByRegionalSettings,
-} from '@/utils/number-format';
 import { customerInvoiceFormSchema } from '@/utils/schemas';
 import { CustomerInvoiceItemFormDialog } from './CustomerInvoiceItemFormDialog';
 
@@ -245,148 +230,13 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                         onAddItem={handleCreateNewItem}
                     />
 
-                    <Table>
-                        {fields.length === 0 ? (
-                            <TableBody>
-                                <EntityFormItemEmptyRow
-                                    colSpan={9}
-                                    message="No items added yet. Click 'Add Item' to start."
-                                />
-                            </TableBody>
-                        ) : (
-                            <>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-12">
-                                            #
-                                        </TableHead>
-                                        <TableHead>Product/Account</TableHead>
-                                        <TableHead>Description</TableHead>
-                                        <TableHead className="text-right">
-                                            Qty
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Unit Price
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Discount %
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Tax %
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Line Total
-                                        </TableHead>
-                                        <TableHead className="w-20">
-                                            Actions
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {fields.map((field, index) => {
-                                        const lineTotal =
-                                            field.quantity *
-                                            field.unit_price *
-                                            (1 -
-                                                (field.discount_percent || 0) /
-                                                    100) *
-                                            (1 +
-                                                (field.tax_percent || 0) / 100);
-                                        return (
-                                            <TableRow key={field.id}>
-                                                <TableCell className="font-mono text-xs text-muted-foreground">
-                                                    {String(index + 1)}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="space-y-1">
-                                                        <div className="font-medium">
-                                                            {field.product_label ||
-                                                                'No Product'}
-                                                        </div>
-                                                        <div className="text-xs text-muted-foreground">
-                                                            {field.account_label ||
-                                                                'No Account'}
-                                                        </div>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {field.description || '-'}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    {formatNumberByRegionalSettings(
-                                                        field.quantity,
-                                                        {
-                                                            locale: 'id-ID',
-                                                            minimumFractionDigits: 2,
-                                                            maximumFractionDigits: 2,
-                                                        },
-                                                    )}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    {formatCurrencyByRegionalSettings(
-                                                        field.unit_price,
-                                                        {
-                                                            locale: 'id-ID',
-                                                            currency:
-                                                                selectedCurrency ||
-                                                                'IDR',
-                                                            minimumFractionDigits: 2,
-                                                            maximumFractionDigits: 2,
-                                                        },
-                                                    )}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    {formatNumberByRegionalSettings(
-                                                        field.discount_percent ||
-                                                            0,
-                                                        {
-                                                            locale: 'id-ID',
-                                                            minimumFractionDigits: 2,
-                                                            maximumFractionDigits: 2,
-                                                        },
-                                                    )}
-                                                    %
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    {formatNumberByRegionalSettings(
-                                                        field.tax_percent || 0,
-                                                        {
-                                                            locale: 'id-ID',
-                                                            minimumFractionDigits: 2,
-                                                            maximumFractionDigits: 2,
-                                                        },
-                                                    )}
-                                                    %
-                                                </TableCell>
-                                                <TableCell className="text-right font-medium">
-                                                    {formatCurrencyByRegionalSettings(
-                                                        lineTotal,
-                                                        {
-                                                            locale: 'id-ID',
-                                                            currency:
-                                                                selectedCurrency ||
-                                                                'IDR',
-                                                            minimumFractionDigits: 2,
-                                                            maximumFractionDigits: 2,
-                                                        },
-                                                    )}
-                                                </TableCell>
-                                                <EntityFormItemActionsCell
-                                                    index={index}
-                                                    onEdit={() =>
-                                                        handleEditItem(index)
-                                                    }
-                                                    onRemove={() =>
-                                                        remove(index)
-                                                    }
-                                                />
-                                            </TableRow>
-                                        );
-                                    })}
-                                </TableBody>
-                            </>
-                        )}
-                    </Table>
+                    <TransactionLineItemsTable
+                        items={fields}
+                        includeDiscount
+                        currency={selectedCurrency}
+                        onEdit={handleEditItem}
+                        onRemove={remove}
+                    />
                 </EntityForm>
 
                 <CustomerInvoiceItemFormDialog

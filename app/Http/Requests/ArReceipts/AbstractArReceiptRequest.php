@@ -4,12 +4,15 @@ namespace App\Http\Requests\ArReceipts;
 
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use App\Http\Requests\Concerns\ValidatesAllocationOverflow;
 use App\Models\ArReceiptAllocation;
 use App\Models\CustomerInvoice;
+use Illuminate\Contracts\Validation\Validator;
 
 abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
+    use ValidatesAllocationOverflow;
 
     public function rules(): array
     {
@@ -41,51 +44,25 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
             ...$this->totalAmountRules(),
 
             'allocations' => $this->itemsRules(),
-            'allocations.*.customer_invoice_id' => [$this->itemRequiredRule(), 'integer', 'exists:customer_invoices,id'],
-            'allocations.*.allocated_amount' => [$this->itemRequiredRule(), 'numeric', 'gt:0'],
+            'allocations.*.customer_invoice_id' => $this->requiredIntegerItemRule('exists:customer_invoices,id'),
+            'allocations.*.allocated_amount' => $this->requiredNumericItemRule('gt:0'),
             'allocations.*.discount_given' => ['nullable', 'numeric', 'min:0'],
-            'allocations.*.notes' => ['nullable', 'string'],
+            'allocations.*.notes' => $this->nullableStringItemRule(),
         ];
     }
 
-    public function withValidator($validator): void
+    public function withValidator(Validator $validator): void
     {
-        $validator->after(function ($validator) {
-            $allocations = $this->input('allocations', []);
+        $validator->after(function ($validator): void {
             $receiptId = $this->route('arReceipt')?->id;
 
-            foreach ($allocations as $index => $allocation) {
-                if (empty($allocation['customer_invoice_id']) || empty($allocation['allocated_amount'])) {
-                    continue;
-                }
-
-                $invoice = CustomerInvoice::find($allocation['customer_invoice_id']);
-                if (! $invoice) {
-                    continue;
-                }
-
-                if (in_array($invoice->status, ['void', 'cancelled'], true)) {
-                    $validator->errors()->add(
-                        "allocations.{$index}.customer_invoice_id",
-                        "Cannot allocate to a {$invoice->status} invoice."
-                    );
-
-                    continue;
-                }
-
-                $existingAllocated = ArReceiptAllocation::where('customer_invoice_id', $invoice->id)
-                    ->when($receiptId, fn ($q) => $q->whereHas('receipt', fn ($q2) => $q2->where('id', '!=', $receiptId)))
-                    ->sum('allocated_amount');
-
-                $maxAllocation = (float) $invoice->grand_total - $existingAllocated - (float) $invoice->credit_note_amount;
-
-                if ((float) $allocation['allocated_amount'] > $maxAllocation) {
-                    $validator->errors()->add(
-                        "allocations.{$index}.allocated_amount",
-                        'Allocation exceeds invoice outstanding amount. Maximum: ' . $maxAllocation
-                    );
-                }
-            }
+            $this->validateAllocationOverflow(
+                $validator,
+                'allocations',
+                'customer_invoice_id',
+                'Allocation exceeds invoice outstanding amount. Maximum',
+                fn (int $invoiceId) => $this->maxInvoiceAllocation($validator, $invoiceId, $receiptId),
+            );
         });
     }
 
@@ -96,5 +73,37 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
     protected function totalAmountRules(): array
     {
         return [];
+    }
+
+    private function maxInvoiceAllocation(
+        Validator $validator,
+        int $invoiceId,
+        ?int $receiptId,
+    ): ?float {
+        $invoice = CustomerInvoice::find($invoiceId);
+
+        if ($invoice === null) {
+            return null;
+        }
+
+        if (in_array($invoice->status, ['void', 'cancelled'], true)) {
+            $validator->errors()->add(
+                'allocations.customer_invoice_id',
+                "Cannot allocate to a {$invoice->status} invoice.",
+            );
+
+            return null;
+        }
+
+        $existingAllocated = ArReceiptAllocation::where('customer_invoice_id', $invoice->id)
+            ->when($receiptId, fn ($q) => $q->whereHas(
+                'receipt',
+                fn ($q2) => $q2->where('id', '!=', $receiptId),
+            ))
+            ->sum('allocated_amount');
+
+        return (float) $invoice->grand_total
+            - (float) $existingAllocated
+            - (float) $invoice->credit_note_amount;
     }
 }

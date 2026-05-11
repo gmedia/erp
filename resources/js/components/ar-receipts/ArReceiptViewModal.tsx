@@ -1,3 +1,4 @@
+import { EntityAuditFooter } from '@/components/common/EntityAuditFooter';
 import { ViewField } from '@/components/common/ViewField';
 import {
     ViewModalItemsTable,
@@ -145,23 +146,11 @@ export const ArReceiptViewModal = React.memo(
                         </div>
                     )}
 
-                    <div className="pt-4 text-sm text-muted-foreground">
-                        <div>
-                            Created by: {item.created_by?.name || 'System'}
-                        </div>
-                        {item.confirmed_at && (
-                            <div>
-                                Confirmed by:{' '}
-                                {item.confirmed_by?.name || 'System'} on{' '}
-                                {formatDateByRegionalSettings(
-                                    item.confirmed_at,
-                                    {
-                                        locale: 'id-ID',
-                                    },
-                                )}
-                            </div>
-                        )}
-                    </div>
+                    <EntityAuditFooter
+                        createdBy={item.created_by}
+                        confirmedBy={item.confirmed_by}
+                        confirmedAt={item.confirmed_at}
+                    />
                 </div>
             </ViewModalShell>
         );

@@ -8,7 +8,7 @@ interface ItemPricingFieldsProps {
 
 export function ItemPricingFields({
     includeDiscount = true,
-}: ItemPricingFieldsProps) {
+}: Readonly<ItemPricingFieldsProps>) {
     return (
         <>
             <div

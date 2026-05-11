@@ -63,9 +63,19 @@ class CustomerInvoiceExport implements FromQuery, ShouldAutoSize, WithHeadings, 
             'Invoice Number' => fn (CustomerInvoice $invoice): mixed => $invoice->invoice_number,
             'Customer' => fn (CustomerInvoice $invoice): mixed => $this->relatedAttribute($invoice, 'customer', 'name'),
             'Branch' => fn (CustomerInvoice $invoice): mixed => $this->relatedAttribute($invoice, 'branch', 'name'),
-            'Fiscal Year' => fn (CustomerInvoice $invoice): mixed => $this->relatedAttribute($invoice, 'fiscalYear', 'name'),
-            'Invoice Date' => fn (CustomerInvoice $invoice): mixed => $this->formatDateValue($invoice->invoice_date, 'Y-m-d'),
-            'Due Date' => fn (CustomerInvoice $invoice): mixed => $this->formatDateValue($invoice->due_date, 'Y-m-d'),
+            'Fiscal Year' => fn (CustomerInvoice $invoice): mixed => $this->relatedAttribute(
+                $invoice,
+                'fiscalYear',
+                'name'
+            ),
+            'Invoice Date' => fn (CustomerInvoice $invoice): mixed => $this->formatDateValue(
+                $invoice->invoice_date,
+                'Y-m-d'
+            ),
+            'Due Date' => fn (CustomerInvoice $invoice): mixed => $this->formatDateValue(
+                $invoice->due_date,
+                'Y-m-d'
+            ),
             'Payment Terms' => fn (CustomerInvoice $invoice): mixed => $invoice->payment_terms,
             'Currency' => fn (CustomerInvoice $invoice): mixed => $invoice->currency,
             'Status' => fn (CustomerInvoice $invoice): mixed => $invoice->status,

@@ -52,7 +52,9 @@ class CreditNoteController extends Controller
             },
         );
 
-        return (new CreditNoteResource($this->loadResourceRelations($creditNote)))->response()->setStatusCode(201);
+        return (new CreditNoteResource($this->loadResourceRelations($creditNote)))
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function show(CreditNote $creditNote): JsonResponse
@@ -78,7 +80,9 @@ class CreditNoteController extends Controller
             model: $creditNote,
             attributes: $validated,
             items: $items,
-            payloadResolver: static fn (array $attributes): array => UpdateCreditNoteData::fromArray($attributes)->toArray(),
+            payloadResolver: static fn (array $attributes): array => UpdateCreditNoteData::fromArray(
+                $attributes
+            )->toArray(),
             syncItems: function (CreditNote $creditNote, array $items) use ($syncItems): void {
                 $syncItems->execute($creditNote, $items);
             },
@@ -110,6 +114,9 @@ class CreditNoteController extends Controller
 
     protected function resourceRelations(): array
     {
-        return ['customer', 'customerInvoice', 'branch', 'fiscalYear', 'creator', 'confirmer', 'items.product', 'items.account'];
+        return [
+            'customer', 'customerInvoice', 'branch', 'fiscalYear',
+            'creator', 'confirmer', 'items.product', 'items.account',
+        ];
     }
 }

@@ -5,11 +5,11 @@ import { CustomerInvoice } from '@/types/customer-invoice';
 import {
     createActionsColumn,
     createDateColumn,
+    createRowCurrencyAmountColumn,
     createSelectColumn,
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
 
 const renderCustomerCell = ({
@@ -59,33 +59,13 @@ export const customerInvoiceColumns: ColumnDef<CustomerInvoice>[] = [
         ...createSortingHeader('Status'),
         cell: renderStatusCell,
     },
-    {
+    createRowCurrencyAmountColumn<CustomerInvoice>({
         accessorKey: 'grand_total',
-        ...createSortingHeader('Grand Total'),
-        cell: ({ row }) => (
-            <div className="text-right">
-                {formatCurrencyByRegionalSettings(row.original.grand_total, {
-                    locale: 'id-ID',
-                    currency: row.original.currency || undefined,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                })}
-            </div>
-        ),
-    },
-    {
+        label: 'Grand Total',
+    }),
+    createRowCurrencyAmountColumn<CustomerInvoice>({
         accessorKey: 'amount_due',
-        ...createSortingHeader('Amount Due'),
-        cell: ({ row }) => (
-            <div className="text-right">
-                {formatCurrencyByRegionalSettings(row.original.amount_due, {
-                    locale: 'id-ID',
-                    currency: row.original.currency || undefined,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                })}
-            </div>
-        ),
-    },
+        label: 'Amount Due',
+    }),
     createActionsColumn<CustomerInvoice>(),
 ];

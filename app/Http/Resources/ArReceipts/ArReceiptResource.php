@@ -2,13 +2,13 @@
 
 namespace App\Http\Resources\ArReceipts;
 
+use App\Http\Resources\Concerns\BuildsAuditStampResourceData;
 use App\Models\Account;
 use App\Models\ArReceipt;
 use App\Models\ArReceiptAllocation;
 use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\FiscalYear;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,6 +17,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class ArReceiptResource extends JsonResource
 {
+    use BuildsAuditStampResourceData;
+
     public function toArray($request): array
     {
         /** @var Customer|null $customer */
@@ -27,10 +29,6 @@ class ArReceiptResource extends JsonResource
         $fiscalYear = $this->resource->fiscalYear;
         /** @var Account|null $bankAccount */
         $bankAccount = $this->resource->bankAccount;
-        /** @var User|null $creator */
-        $creator = $this->resource->creator;
-        /** @var User|null $confirmer */
-        $confirmer = $this->resource->confirmer;
 
         $allocations = [];
 
@@ -80,17 +78,7 @@ class ArReceiptResource extends JsonResource
             'status' => $this->resource->status,
             'notes' => $this->resource->notes,
             'journal_entry_id' => $this->resource->journal_entry_id,
-            'created_by' => $this->resource->created_by ? [
-                'id' => $this->resource->created_by,
-                'name' => $creator?->name,
-            ] : null,
-            'confirmed_by' => $this->resource->confirmed_by ? [
-                'id' => $this->resource->confirmed_by,
-                'name' => $confirmer?->name,
-            ] : null,
-            'confirmed_at' => $this->resource->confirmed_at?->toIso8601String(),
-            'created_at' => $this->resource->created_at?->toIso8601String(),
-            'updated_at' => $this->resource->updated_at?->toIso8601String(),
+            ...$this->auditStampFields($this->resource),
             'allocations' => $allocations,
         ];
     }

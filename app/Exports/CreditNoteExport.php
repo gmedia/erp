@@ -60,7 +60,11 @@ class CreditNoteExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
             'ID' => fn (CreditNote $cn): mixed => $cn->id,
             'Credit Note Number' => fn (CreditNote $cn): mixed => $cn->credit_note_number,
             'Customer' => fn (CreditNote $cn): mixed => $this->relatedAttribute($cn, 'customer', 'name'),
-            'Invoice Number' => fn (CreditNote $cn): mixed => $this->relatedAttribute($cn, 'customerInvoice', 'invoice_number'),
+            'Invoice Number' => fn (CreditNote $cn): mixed => $this->relatedAttribute(
+                $cn,
+                'customerInvoice',
+                'invoice_number'
+            ),
             'Branch' => fn (CreditNote $cn): mixed => $this->relatedAttribute($cn, 'branch', 'name'),
             'Fiscal Year' => fn (CreditNote $cn): mixed => $this->relatedAttribute($cn, 'fiscalYear', 'name'),
             'Credit Note Date' => fn (CreditNote $cn): mixed => $this->formatDateValue($cn->credit_note_date, 'Y-m-d'),

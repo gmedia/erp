@@ -5,11 +5,11 @@ import { ArReceipt } from '@/types/ar-receipt';
 import {
     createActionsColumn,
     createDateColumn,
+    createRowCurrencyAmountColumn,
     createSelectColumn,
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
 
 const renderCustomerCell = ({ row }: { row: { original: ArReceipt } }) => (
@@ -64,36 +64,13 @@ export const arReceiptColumns: ColumnDef<ArReceipt>[] = [
         ...createSortingHeader('Status'),
         cell: renderStatusCell,
     },
-    {
+    createRowCurrencyAmountColumn<ArReceipt>({
         accessorKey: 'total_amount',
-        ...createSortingHeader('Total Amount'),
-        cell: ({ row }) => (
-            <div className="text-right">
-                {formatCurrencyByRegionalSettings(row.original.total_amount, {
-                    locale: 'id-ID',
-                    currency: row.original.currency || undefined,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                })}
-            </div>
-        ),
-    },
-    {
+        label: 'Total Amount',
+    }),
+    createRowCurrencyAmountColumn<ArReceipt>({
         accessorKey: 'total_unallocated',
-        ...createSortingHeader('Unallocated'),
-        cell: ({ row }) => (
-            <div className="text-right">
-                {formatCurrencyByRegionalSettings(
-                    row.original.total_unallocated,
-                    {
-                        locale: 'id-ID',
-                        currency: row.original.currency || undefined,
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                    },
-                )}
-            </div>
-        ),
-    },
+        label: 'Unallocated',
+    }),
     createActionsColumn<ArReceipt>(),
 ];

@@ -50,7 +50,9 @@ class CustomerInvoiceController extends Controller
             },
         );
 
-        return (new CustomerInvoiceResource($this->loadResourceRelations($customerInvoice)))->response()->setStatusCode(201);
+        return (new CustomerInvoiceResource($this->loadResourceRelations($customerInvoice)))
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function show(CustomerInvoice $customerInvoice): JsonResponse
@@ -76,7 +78,9 @@ class CustomerInvoiceController extends Controller
             model: $customerInvoice,
             attributes: $validated,
             items: $items,
-            payloadResolver: static fn (array $attributes): array => UpdateCustomerInvoiceData::fromArray($attributes)->toArray(),
+            payloadResolver: static fn (array $attributes): array => UpdateCustomerInvoiceData::fromArray(
+                $attributes
+            )->toArray(),
             syncItems: function (CustomerInvoice $customerInvoice, array $items) use ($syncItems): void {
                 $syncItems->execute($customerInvoice, $items);
             },
@@ -97,6 +101,9 @@ class CustomerInvoiceController extends Controller
 
     protected function resourceRelations(): array
     {
-        return ['customer', 'branch', 'fiscalYear', 'creator', 'sender', 'items.product', 'items.account', 'items.unit'];
+        return [
+            'customer', 'branch', 'fiscalYear', 'creator', 'sender',
+            'items.product', 'items.account', 'items.unit',
+        ];
     }
 }
