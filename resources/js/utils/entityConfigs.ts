@@ -1160,3 +1160,75 @@ export const creditNoteConfig = createComplexEntityConfig<CreditNote>({
     getDeleteMessage: (item: { credit_note_number?: string | null }) =>
         `This action cannot be undone. This will permanently delete credit note ${item.credit_note_number}.`,
 });
+
+import { recurringJournalColumns } from '@/components/recurring-journals/RecurringJournalColumns';
+import { createRecurringJournalFilterFields } from '@/components/recurring-journals/RecurringJournalFilters';
+import { RecurringJournalForm } from '@/components/recurring-journals/RecurringJournalForm';
+import { RecurringJournalViewModal } from '@/components/recurring-journals/RecurringJournalViewModal';
+import { type RecurringJournal } from '@/types/recurring-journal';
+
+export const recurringJournalConfig = createComplexEntityConfig<RecurringJournal>({
+    entityName: 'Recurring Journal',
+    entityNamePlural: 'Recurring Journals',
+    apiEndpoint: '/api/recurring-journals',
+    exportEndpoint: '/api/recurring-journals/export',
+    queryKey: ['recurring-journals'],
+    breadcrumbs: [{ title: 'Recurring Journals', href: '/recurring-journals' }],
+    initialFilters: { search: '', frequency: '', is_active: '' },
+    columns: recurringJournalColumns,
+    filterFields: createRecurringJournalFilterFields(),
+    formComponent: RecurringJournalForm,
+    formType: 'complex',
+    entityNameForSearch: 'recurring journal',
+    viewModalComponent: RecurringJournalViewModal,
+    getDeleteMessage: (item: { name?: string }) =>
+        `This action cannot be undone. This will permanently delete recurring journal ${item.name}.`,
+});
+
+import { bankReconciliationColumns } from '@/components/bank-reconciliations/BankReconciliationColumns';
+import { createBankReconciliationFilterFields } from '@/components/bank-reconciliations/BankReconciliationFilters';
+import { BankReconciliationForm } from '@/components/bank-reconciliations/BankReconciliationForm';
+import { BankReconciliationViewModal } from '@/components/bank-reconciliations/BankReconciliationViewModal';
+import { type BankReconciliation } from '@/types/bank-reconciliation';
+
+export const bankReconciliationConfig = createComplexEntityConfig<BankReconciliation>({
+    entityName: 'Bank Reconciliation',
+    entityNamePlural: 'Bank Reconciliations',
+    apiEndpoint: '/api/bank-reconciliations',
+    exportEndpoint: '/api/bank-reconciliations/export',
+    queryKey: ['bank-reconciliations'],
+    breadcrumbs: [{ title: 'Bank Reconciliations', href: '/bank-reconciliations' }],
+    initialFilters: { search: '', status: '', account_id: '' },
+    columns: bankReconciliationColumns,
+    filterFields: createBankReconciliationFilterFields(),
+    formComponent: BankReconciliationForm,
+    formType: 'complex',
+    entityNameForSearch: 'bank reconciliation',
+    viewModalComponent: BankReconciliationViewModal,
+    getDeleteMessage: () =>
+        'This action cannot be undone. This will permanently delete this bank reconciliation.',
+});
+
+import { periodClosingColumns } from '@/components/period-closings/PeriodClosingColumns';
+import { createPeriodClosingFilterFields } from '@/components/period-closings/PeriodClosingFilters';
+import { PeriodClosingForm } from '@/components/period-closings/PeriodClosingForm';
+import { PeriodClosingViewModal } from '@/components/period-closings/PeriodClosingViewModal';
+import { type PeriodClosing } from '@/types/period-closing';
+
+export const periodClosingConfig = createComplexEntityConfig<PeriodClosing>({
+    entityName: 'Period Closing',
+    entityNamePlural: 'Period Closings',
+    apiEndpoint: '/api/period-closings',
+    exportEndpoint: '/api/period-closings/export',
+    queryKey: ['period-closings'],
+    breadcrumbs: [{ title: 'Period Closings', href: '/period-closings' }],
+    initialFilters: { search: '', status: '', closing_type: '', fiscal_year_id: '' },
+    columns: periodClosingColumns,
+    filterFields: createPeriodClosingFilterFields(),
+    formComponent: PeriodClosingForm,
+    formType: 'complex',
+    entityNameForSearch: 'period closing',
+    viewModalComponent: PeriodClosingViewModal,
+    getDeleteMessage: () =>
+        'This action cannot be undone. This will permanently delete this period closing.',
+});

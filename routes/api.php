@@ -30,6 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/asset-movements.php';
     require __DIR__ . '/api/asset-stocktakes.php';
     require __DIR__ . '/api/assets.php';
+    require __DIR__ . '/api/bank-reconciliations.php';
     require __DIR__ . '/api/branches.php';
     require __DIR__ . '/api/coa-versions.php';
     require __DIR__ . '/api/customer-categories.php';
@@ -44,7 +45,9 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/goods-receipts.php';
     require __DIR__ . '/api/inventory-stocktakes.php';
     require __DIR__ . '/api/journal-entries.php';
+    require __DIR__ . '/api/general-ledger-report.php';
     require __DIR__ . '/api/my-approvals.php';
+    require __DIR__ . '/api/period-closings.php';
     require __DIR__ . '/api/permissions.php';
     require __DIR__ . '/api/pipeline-audit-trail.php';
     require __DIR__ . '/api/pipeline-dashboard.php';
@@ -53,6 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/posting-journals.php';
     require __DIR__ . '/api/product-categories.php';
     require __DIR__ . '/api/products.php';
+    require __DIR__ . '/api/recurring-journals.php';
     require __DIR__ . '/api/purchase-orders.php';
     require __DIR__ . '/api/purchase-requests.php';
     require __DIR__ . '/api/reports.php';
@@ -61,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/stock-movements.php';
     require __DIR__ . '/api/stock-transfers.php';
     require __DIR__ . '/api/supplier-bills.php';
+    require __DIR__ . '/api/trial-balance-report.php';
     require __DIR__ . '/api/user-guide.php';
     require __DIR__ . '/api/supplier-categories.php';
     require __DIR__ . '/api/supplier-returns.php';

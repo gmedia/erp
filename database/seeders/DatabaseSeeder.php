@@ -167,6 +167,7 @@ class DatabaseSeeder extends Seeder
             StockAdjustmentSampleDataSeeder::class,
             StockMovementSampleDataSeeder::class,
             ArSampleDataSeeder::class,
+            GlExtendedSampleDataSeeder::class,
         ]);
 
         // Assign all permissions to sample users for easy testing

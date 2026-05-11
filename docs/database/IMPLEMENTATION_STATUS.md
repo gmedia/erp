@@ -29,8 +29,8 @@
 | 13 | Purchasing (PR/PO/GR/SR) | `13_purchasing_design.md` | ✅ Implemented | |
 | 14 | Inventory (Warehouse/Transfer/Opname) | `14_inventory_design.md` | ✅ Implemented | |
 | 15 | Accounts Payable | `15_accounts_payable_design.md` | ✅ Implemented | PR #10 |
-| 16 | Accounts Receivable | `16_accounts_receivable_design.md` | 📐 Designed Only | |
-| 17 | General Ledger (Extended) | `17_general_ledger_design.md` | 📐 Designed Only | |
+| 16 | Accounts Receivable | `16_accounts_receivable_design.md` | ✅ Implemented | PR #11 |
+| 17 | General Ledger (Extended) | `17_general_ledger_design.md` | ✅ Implemented | PR pending |
 | 18 | Financial Reports | `18_financial_reports_design.md` | 📐 Designed Only | |
 
 ---
@@ -192,41 +192,48 @@
 
 ---
 
-### 📐 Accounts Receivable
+### ✅ Accounts Receivable
 
 **Design doc:** `16_accounts_receivable_design.md`
 
-| Layer | Status |
-|-------|--------|
-| Migration | ❌ Not created |
-| Model | ❌ Not created |
-| Controller | ❌ Not created |
-| Frontend | ❌ Not created |
-| Factory | ❌ Not created |
-| Tests | ❌ Not created |
+| Layer | Status | Files |
+|-------|--------|-------|
+| Migration | ✅ | `2026_05_10_100000` — `2026_05_10_100300` (4 files) |
+| Model | ✅ | `CustomerInvoice`, `CustomerInvoiceItem`, `ArReceipt`, `ArReceiptAllocation`, `CreditNote`, `CreditNoteItem` |
+| Controller | ✅ | `CustomerInvoiceController`, `ArReceiptController`, `CreditNoteController`, `ArAgingReportController`, `ArOutstandingReportController`, `ArReceiptHistoryReportController` |
+| Frontend | ✅ | `pages/customer-invoices/`, `pages/ar-receipts/`, `pages/credit-notes/`, `pages/reports/ar-aging-report/`, `pages/reports/ar-outstanding-report/`, `pages/reports/ar-receipt-history-report/` |
+| Factory | ✅ | `CustomerInvoiceFactory`, `CustomerInvoiceItemFactory`, `ArReceiptFactory`, `ArReceiptAllocationFactory`, `CreditNoteFactory`, `CreditNoteItemFactory` |
+| Tests | ✅ | 39 Pest tests passed, 27 E2E tests |
+| Seeder | ✅ | Pipeline: `customer_invoice_lifecycle`, `ar_receipt_lifecycle`, `credit_note_lifecycle` |
 
-**Tables to create:** `customer_invoices`, `customer_invoice_items`, `ar_receipts`, `ar_receipt_allocations`, `credit_notes`, `credit_note_items`
+**Dependencies:** COA (✅), Customers (✅), Products (✅)
 
-**Dependencies:** Requires COA (✅), Customers (✅), Products (✅)
+**Known gaps vs design:**
+- Journal auto-posting on invoice confirm / receipt confirm belum diimplementasi (akan ditambahkan saat GL Extended selesai)
+- Overdue detection menggunakan computed on-the-fly (bukan scheduler)
 
 ---
 
-### 📐 General Ledger (Extended)
+### ✅ General Ledger (Extended)
 
 **Design doc:** `17_general_ledger_design.md`
 
-| Layer | Status |
-|-------|--------|
-| Migration | ❌ Not created |
-| Model | ❌ Not created |
-| Controller | ❌ Not created |
-| Frontend | ❌ Not created |
-| Factory | ❌ Not created |
-| Tests | ❌ Not created |
+| Layer | Status | Files |
+|-------|--------|-------|
+| Migration | ✅ | `2026_05_11_000000` — `2026_05_11_000600` (7 files) |
+| Model | ✅ | `AccountBalance`, `RecurringJournal`, `RecurringJournalLine`, `BankReconciliation`, `BankReconciliationItem`, `PeriodClosing` |
+| Controller | ✅ | `RecurringJournalController`, `BankReconciliationController`, `PeriodClosingController`, `GeneralLedgerReportController`, `TrialBalanceReportController` |
+| Frontend | ✅ | `pages/recurring-journals/`, `pages/bank-reconciliations/`, `pages/period-closings/`, `pages/reports/general-ledger/`, `pages/reports/trial-balance/` |
+| Factory | ✅ | `AccountBalanceFactory`, `RecurringJournalFactory`, `RecurringJournalLineFactory`, `BankReconciliationFactory`, `BankReconciliationItemFactory`, `PeriodClosingFactory` |
+| Tests | ✅ | 54 Pest tests passed (155 assertions) |
+| Seeder | ✅ | `GlExtendedSampleDataSeeder` |
 
-**Tables to create:** `account_balances`, `recurring_journals`, `recurring_journal_lines`, `bank_reconciliations`, `bank_reconciliation_items`, `period_closings`
+**Dependencies:** COA (✅), AP (✅), AR (✅)
 
-**Dependencies:** Requires COA (✅), AP (📐), AR (📐)
+**Known gaps vs design:**
+- Recurring journal scheduler (auto-execution via cron) not yet implemented — manual execute action available
+- Bank reconciliation CSV/Excel import for bank statements not yet implemented
+- Journal auto-posting integration from AP/AR modules pending (will connect when those modules add journal_entry_id)
 
 **Note:** Sebagian fitur GL dasar (journal entries, posting) sudah ada di COA module. Dokumen ini menambahkan fitur lanjutan.
 
@@ -247,7 +254,7 @@
 
 **Tables to create:** `report_configurations`, `report_sections`
 
-**Dependencies:** Requires GL Extended (📐), AP (📐), AR (📐)
+**Dependencies:** Requires GL Extended (📐), AP (✅), AR (✅)
 
 ---
 
@@ -285,16 +292,9 @@ Dependencies: COA (✅), Purchasing (✅), Suppliers (✅)
 Design doc: `15_accounts_payable_design.md`
 Pending decision: `journal_entry_id` di GR/SR (lihat Pending Decisions #2)
 
-**1B. Accounts Receivable (16)**
+**1B. Accounts Receivable (16) — ✅ COMPLETE**
 
-| Step | Scope | Skill | Estimasi |
-|------|-------|-------|----------|
-| 1 | Migration: `customer_invoices`, `customer_invoice_items`, `ar_receipts`, `ar_receipt_allocations`, `credit_notes`, `credit_note_items` | `database-migration` | 30m |
-| 2 | Models + Relations | `refactor-backend` | 1h |
-| 3 | Backend: Controllers, Requests, Resources, Actions, Exports | `feature-crud-complex` | 3h |
-| 4 | Frontend: Pages, Forms, Columns, Filters, ViewModals | `feature-crud-complex` | 3h |
-| 5 | Factories, Seeders | `testing-strategy` | 30m |
-| 6 | Tests: Feature, Unit, E2E | `testing-strategy` | 2h |
+Implemented in PR #11 (`feature/accounts-receivable`). 39 Pest tests, 27 E2E tests. Sonar new-code duplication 1.2%.
 
 Dependencies: COA (✅), Customers (✅), Products (✅)
 Design doc: `16_accounts_receivable_design.md`
@@ -311,7 +311,7 @@ Harus menunggu AP + AR selesai karena GL Extended mengintegrasikan journal entri
 | 4 | Frontend: Pages (recurring journals, bank recon, period closing) | `feature-crud-complex` + `feature-non-crud` | 4h |
 | 5 | Factories, Seeders, Tests | `testing-strategy` | 3h |
 
-Dependencies: COA (✅), AP (Fase 1A), AR (Fase 1B)
+Dependencies: COA (✅), AP (✅ Fase 1A), AR (✅ Fase 1B)
 Design doc: `17_general_ledger_design.md`
 Note: Sebagian fitur GL dasar (journal entries, posting) sudah ada di COA module. Fase ini menambahkan fitur lanjutan.
 
@@ -378,6 +378,7 @@ Task-task ini bisa dikerjakan kapan saja, tidak harus menunggu Fase 1-3.
 
 | Date | Milestone |
 |------|-----------|
+| 2026-05-11 | Accounts Receivable module complete (PR #11) |
 | 2026-05-10 | Accounts Payable module complete (PR #10) |
 | 2026-05-02 | Products V1→V2 migration complete (Fase 1-8) |
 | 2026-05-01 | Style deduplication refactor complete |

@@ -1,33 +1,33 @@
-# AI Handoff: Accounts Payable & Receivable Implementation
+# AI Handoff: GL Extended Implementation
 
 Last updated: 2026-05-11 UTC
 
 ## Document Roles
 
-- `task.md` stores the active handoff state and the next recommended action.
-- `task.changelog.md` stores product and feature changelog entries.
-- `task.handoff-archive.md` stores condensed historical E2E handoff checkpoints.
+- `task.md` stores active handoff state and next recommended action.
+- `task.changelog.md` stores product/feature changelog entries.
+- `task.handoff-archive.md` stores condensed historical checkpoints.
 
 ## Current Objective
 
-- **Accounts Receivable (PR #11)** — CI + Sonar PASS. Ready to merge.
-- **Accounts Payable** — already on main.
-- **User Guide feature** — shipped.
+- **GL Extended (Modul 17)** — COMPLETE on `feature/general-ledger-extended`. Ready for PR.
 
 ## Current Milestone
 
-- **Accounts Payable**: ✅ Merged to main.
-- **Accounts Receivable**: ✅ COMPLETE. PR #11 (`feature/accounts-receivable`).
-- **Sonar Duplication** (2026-05-11): 4.9% → **1.2%** (threshold ≤ 3%). Dup lines 380 → 92. Code smells 21 → 3. Quality gate OK.
-- **Data Integrity Fixes**: ✅ Bidirectional sync, over-allocation validation, auto status transition.
-- **User Guide Page**: ✅ Implemented with AppLayout pattern + markdown rendering.
-- **E2E Tests**: ✅ AP 18 tests, AR 27 tests.
+- **Accounts Payable**: ✅ Merged to main (PR #10).
+- **Accounts Receivable**: ✅ Merged to main (PR #11).
+- **GL Extended**: ✅ COMPLETE on branch `feature/general-ledger-extended`.
+  - 7 migrations, 6 models, 5 controllers, 5 route files
+  - Full frontend: 5 pages (recurring journals, bank recon, period closing, GL report, trial balance)
+  - 54 Pest tests (155 assertions), all passing
+  - PHPStan 0 errors, TypeScript clean
+- **Sonar Duplication**: Last known 1.2% (PR #11).
 
 ## Current State
 
-- Branch `feature/accounts-payable`: CI green, 37 Pest tests, 18 E2E tests.
-- Branch `feature/accounts-receivable`: CI green, 39 Pest tests, 27 E2E tests.
-- Both branches have: permissions, sidebar menus, sample data seeders, pipeline seeders, user guides.
+- Branch `feature/general-ledger-extended` from `main` at `704b5a2`.
+- All verification passing: PHPStan 0 errors, `npm run types` clean, 54 Pest tests green.
+- No E2E tests yet (can be added post-merge or in follow-up).
 
 ## Active Constraints
 
@@ -37,32 +37,41 @@ Last updated: 2026-05-11 UTC
 
 ## Latest Session Delta
 
-- **Sonar duplication refactor on PR #11** (new-code density 4.9% → target ≤ 3%):
-  - PHP extractions:
-    - `app/Models/Concerns/HasFinancialTransactionRelations.php` — branch/fiscalYear/bankAccount/journalEntry/creator/confirmer relations (used by ArReceipt + ApPayment).
-    - `app/Http/Resources/Concerns/BuildsAuditStampResourceData.php` — shared `created_by`/`confirmed_by`/timestamps block (used by ArReceipt/CreditNote/ApPayment/SupplierBill resources).
-    - `app/Http/Requests/Concerns/ValidatesAllocationOverflow.php` — shared allocation over-allocation guard (used by AR receipts).
-    - Refactored `AbstractArReceiptRequest`, `AbstractCreditNoteRequest` to lean on existing `HasSometimesArrayRules` helpers.
-  - TSX extractions:
-    - `resources/js/components/common/EntityAuditFooter.tsx` — shared Created/Confirmed-by footer (used by ArReceipt + CreditNote ViewModals).
-    - `resources/js/components/common/TransactionLineItemsTable.tsx` — shared line-item table (used by CreditNote + CustomerInvoice forms, with `includeDiscount`).
-    - `resources/js/utils/columns.tsx` — new `createRowCurrencyAmountColumn()` (used by Ar/Ap/CustomerInvoice columns).
-  - Code-smell fixes: S103 line-length (controllers, exports, actions, report request), S7787 empty import, S6759 readonly props.
-- Verification run:
-  - `sail bin duster fix` — clean.
-  - `sail bin phpstan analyze` — 955 files, 0 errors.
-  - `npm run types` — clean.
-  - Pest: AR (8) + CreditNote (7) + CustomerInvoice (7) + AP (14) + SupplierBill (7) + AR Reports (15) = 58 tests, all passing.
+- Created GL Extended module end-to-end:
+  - **Migrations**: `2026_05_11_000000` — `2026_05_11_000600` (extend journal_entries + 6 new tables)
+  - **Models**: AccountBalance, RecurringJournal, RecurringJournalLine, BankReconciliation, BankReconciliationItem, PeriodClosing
+  - **Backend**: 5 controllers, 12 requests, 5 resources/collections, 12 actions, 5 exports, 3 filter services, 5 route files
+  - **Frontend**: 5 pages with full CRUD/report UI (configs, columns, filters, forms, view modals, types)
+  - **Tests**: 54 Pest tests (16 recurring-journals, 15 bank-reconciliations, 13 period-closings, 4 GL report, 3 trial balance, 3 unit)
+  - **Seeder**: GlExtendedSampleDataSeeder
+  - **Docs**: Updated IMPLEMENTATION_STATUS.md — GL Extended marked ✅
+- Fixed PHPStan Collection covariance issues in resources (`.values()->all()` pattern)
+
+## Validated Commands and Outcomes
+
+- `./vendor/bin/sail artisan migrate` — 7 migrations DONE
+- `./vendor/bin/sail bin phpstan analyze` — 0 errors
+- `./vendor/bin/sail npm run types` — clean
+- `./vendor/bin/sail test --group=recurring-journals --group=bank-reconciliations --group=period-closings --group=general-ledger-report --group=trial-balance-report --group=general-ledger` — 54 tests, 155 assertions, all passing
+
+## Open Risks / Blockers
+
+- No E2E tests yet (Playwright) — can be added in follow-up.
+- Recurring journal scheduler (cron auto-execution) not implemented — manual execute available.
+- Bank reconciliation CSV import not implemented — manual item entry available.
+- Journal auto-posting from AP/AR not yet wired (pending integration task).
 
 ## Recommended Next Steps
 
-1. Merge PR #11 (AR) → main.
-2. Update `docs/database/IMPLEMENTATION_STATUS.md` — mark AR as ✅.
-3. Start GL Extended (Modul 17) per `docs/database/17_general_ledger_design.md`.
+1. Create PR for `feature/general-ledger-extended` → main.
+2. After merge, start Financial Reports (Modul 18) per `docs/database/18_financial_reports_design.md`.
+3. Optionally: add E2E tests for GL Extended modules.
+4. Optionally: implement recurring journal scheduler command.
 
 ## Continuation Prompt
 
 ```
-Read task.md. PR #11 (AR) is ready to merge — Sonar 1.2% ≤ 3%, all CI green.
-After merge, start GL Extended (Modul 17) implementation per docs/database/17_general_ledger_design.md.
+Read task.md. GL Extended (Modul 17) is complete on branch feature/general-ledger-extended.
+PHPStan 0 errors, TypeScript clean, 54 Pest tests passing.
+Create PR to main, then start Financial Reports (Modul 18) per docs/database/18_financial_reports_design.md.
 ```
