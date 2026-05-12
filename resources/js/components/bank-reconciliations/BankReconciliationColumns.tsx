@@ -10,12 +10,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { type BankReconciliation } from '@/types/bank-reconciliation';
 import {
+    createRowCurrencyAmountColumn,
     createSelectColumn,
     createSortingHeader,
     type CustomTableMeta,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 import { CheckCircle, Eye, MoreHorizontal, Pencil, Trash } from 'lucide-react';
 
@@ -53,51 +53,18 @@ export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
         cell: ({ row }) =>
             formatDateByRegionalSettings(row.getValue('period_end') as string),
     },
-    {
+    createRowCurrencyAmountColumn<BankReconciliation & { currency?: string | null }>({
         accessorKey: 'statement_balance',
-        ...createSortingHeader('Statement Balance'),
-        cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('statement_balance'));
-            return (
-                <div className="text-right font-medium">
-                    {formatCurrencyByRegionalSettings(amount, {
-                        locale: 'id-ID',
-                        currency: 'IDR',
-                    })}
-                </div>
-            );
-        },
-    },
-    {
+        label: 'Statement Balance',
+    }),
+    createRowCurrencyAmountColumn<BankReconciliation & { currency?: string | null }>({
         accessorKey: 'book_balance',
-        ...createSortingHeader('Book Balance'),
-        cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('book_balance'));
-            return (
-                <div className="text-right font-medium">
-                    {formatCurrencyByRegionalSettings(amount, {
-                        locale: 'id-ID',
-                        currency: 'IDR',
-                    })}
-                </div>
-            );
-        },
-    },
-    {
+        label: 'Book Balance',
+    }),
+    createRowCurrencyAmountColumn<BankReconciliation & { currency?: string | null }>({
         accessorKey: 'difference',
-        ...createSortingHeader('Difference'),
-        cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('difference'));
-            return (
-                <div className="text-right font-medium">
-                    {formatCurrencyByRegionalSettings(amount, {
-                        locale: 'id-ID',
-                        currency: 'IDR',
-                    })}
-                </div>
-            );
-        },
-    },
+        label: 'Difference',
+    }),
     {
         accessorKey: 'status',
         ...createSortingHeader('Status'),

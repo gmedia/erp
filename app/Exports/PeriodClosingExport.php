@@ -20,11 +20,13 @@ class PeriodClosingExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
     public function query(): Builder
     {
         $query = PeriodClosing::query()->with(['fiscalYear', 'closedBy', 'reopenedBy']);
-        foreach (['status', 'closing_type', 'fiscal_year_id', 'period_year', 'period_month'] as $filter) {
-            if (! empty($this->filters[$filter])) {
-                $query->where($filter, $this->filters[$filter]);
-            }
-        }
+
+        $this->applyConfiguredFilters(
+            $query,
+            $this->filters,
+            [],
+            ['status' => 'status', 'closing_type' => 'closing_type', 'fiscal_year_id' => 'fiscal_year_id', 'period_year' => 'period_year', 'period_month' => 'period_month'],
+        );
 
         return $query->orderByDesc('period_year')->orderByDesc('period_month');
     }

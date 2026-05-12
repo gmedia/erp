@@ -21,19 +21,13 @@ class BankReconciliationExport implements FromQuery, ShouldAutoSize, WithHeading
     {
         $query = BankReconciliation::query()->with(['account', 'fiscalYear', 'completedBy']);
 
-        foreach (['status', 'account_id', 'fiscal_year_id'] as $filter) {
-            if (! empty($this->filters[$filter])) {
-                $query->where($filter, $this->filters[$filter]);
-            }
-        }
-
-        if (! empty($this->filters['date_from'])) {
-            $query->whereDate('reconciliation_date', '>=', $this->filters['date_from']);
-        }
-
-        if (! empty($this->filters['date_to'])) {
-            $query->whereDate('reconciliation_date', '<=', $this->filters['date_to']);
-        }
+        $this->applyConfiguredFilters(
+            $query,
+            $this->filters,
+            ['notes'],
+            ['status' => 'status', 'account_id' => 'account_id', 'fiscal_year_id' => 'fiscal_year_id'],
+            ['reconciliation_date' => ['from' => 'date_from', 'to' => 'date_to']],
+        );
 
         return $query->orderBy('reconciliation_date', 'desc');
     }

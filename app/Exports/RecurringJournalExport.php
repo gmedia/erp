@@ -21,9 +21,13 @@ class RecurringJournalExport implements FromQuery, ShouldAutoSize, WithHeadings,
     {
         $query = RecurringJournal::query()->with(['fiscalYear', 'creator', 'lines']);
 
-        $this->applySearch($query, ['name', 'description']);
-        $this->applyExact($query, ['frequency', 'is_active', 'fiscal_year_id']);
-        $this->applyDateRange($query, 'next_run_date', 'next_run_from', 'next_run_to');
+        $this->applyConfiguredFilters(
+            $query,
+            $this->filters,
+            ['name', 'description'],
+            ['frequency' => 'frequency', 'is_active' => 'is_active', 'fiscal_year_id' => 'fiscal_year_id'],
+            ['next_run_date' => ['from' => 'next_run_from', 'to' => 'next_run_to']],
+        );
 
         return $query->orderBy('next_run_date');
     }
@@ -52,39 +56,5 @@ class RecurringJournalExport implements FromQuery, ShouldAutoSize, WithHeadings,
             'Fiscal Year' => fn (RecurringJournal $item): mixed => $this->relatedAttribute($item, 'fiscalYear', 'name'),
             'Created By' => fn (RecurringJournal $item): mixed => $this->relatedAttribute($item, 'creator', 'name'),
         ];
-    }
-
-    private function applySearch(Builder $query, array $columns): void
-    {
-        if (empty($this->filters['search'])) {
-            return;
-        }
-
-        $search = $this->filters['search'];
-        $query->where(function (Builder $q) use ($columns, $search): void {
-            foreach ($columns as $column) {
-                $q->orWhere($column, 'like', "%{$search}%");
-            }
-        });
-    }
-
-    private function applyExact(Builder $query, array $columns): void
-    {
-        foreach ($columns as $column) {
-            if (array_key_exists($column, $this->filters)) {
-                $query->where($column, $this->filters[$column]);
-            }
-        }
-    }
-
-    private function applyDateRange(Builder $query, string $column, string $from, string $to): void
-    {
-        if (! empty($this->filters[$from])) {
-            $query->whereDate($column, '>=', $this->filters[$from]);
-        }
-
-        if (! empty($this->filters[$to])) {
-            $query->whereDate($column, '<=', $this->filters[$to]);
-        }
     }
 }

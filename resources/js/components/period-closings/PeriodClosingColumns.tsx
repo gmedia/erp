@@ -10,12 +10,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { type PeriodClosing } from '@/types/period-closing';
 import {
+    createRowCurrencyAmountColumn,
     createSelectColumn,
     createSortingHeader,
     type CustomTableMeta,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 import {
     Eye,
@@ -70,21 +70,10 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
             );
         },
     },
-    {
+    createRowCurrencyAmountColumn<PeriodClosing & { currency?: string | null }>({
         accessorKey: 'net_income',
-        ...createSortingHeader('Net Income'),
-        cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('net_income'));
-            return (
-                <div className="text-right font-medium">
-                    {formatCurrencyByRegionalSettings(amount, {
-                        locale: 'id-ID',
-                        currency: 'IDR',
-                    })}
-                </div>
-            );
-        },
-    },
+        label: 'Net Income',
+    }),
     {
         accessorKey: 'closed_at',
         ...createSortingHeader('Closed At'),
