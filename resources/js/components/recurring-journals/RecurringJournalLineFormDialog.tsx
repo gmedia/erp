@@ -7,16 +7,7 @@ import { z } from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { InputField } from '@/components/common/InputField';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import { Form } from '@/components/ui/form';
+import { ItemFormDialogShell } from '@/components/common/ItemFormDialog';
 
 const recurringJournalLineSchema = z.object({
     account_id: z.coerce.number().min(1, { message: 'Account is required.' }),
@@ -84,99 +75,72 @@ export function RecurringJournalLineFormDialog({
     }, [open, defaultValues, form]);
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle>{item ? 'Edit Line' : 'Add Line'}</DialogTitle>
-                    <DialogDescription className="sr-only">
-                        {item
-                            ? 'Edit recurring journal line.'
-                            : 'Add recurring journal line.'}
-                    </DialogDescription>
-                </DialogHeader>
+        <ItemFormDialogShell
+            open={open}
+            onOpenChange={onOpenChange}
+            item={item}
+            form={form}
+            onSave={onSave}
+            itemDescription="recurring journal line"
+        >
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
+                <AsyncSelectField<{
+                    code: string;
+                    name: string;
+                    normal_balance: string;
+                }>
+                    key={`account-${defaultValues.account_id || 'new'}-${open ? 'open' : 'closed'}`}
+                    name="account_id"
+                    label="Account"
+                    url="/api/accounts?is_active=1&has_children=0"
+                    placeholder="Select Account"
+                    labelFn={(acc) =>
+                        `${acc.code} - ${acc.name} (${acc.normal_balance})`
+                    }
+                    initialLabel={
+                        defaultValues.account_code
+                            ? `${defaultValues.account_code} - ${defaultValues.account_name}`
+                            : ''
+                    }
+                    onItemSelect={(account) => {
+                        form.setValue(
+                            'account_name',
+                            account?.name || '',
+                            { shouldDirty: true },
+                        );
+                        form.setValue(
+                            'account_code',
+                            account?.code || '',
+                            { shouldDirty: true },
+                        );
+                    }}
+                />
+            </div>
 
-                <Form {...form}>
-                    <form
-                        onSubmit={(event) => {
-                            event.stopPropagation();
-                            form.handleSubmit(onSave)(event);
-                        }}
-                        className="space-y-4"
-                    >
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
-                            <AsyncSelectField<{
-                                code: string;
-                                name: string;
-                                normal_balance: string;
-                            }>
-                                key={`account-${defaultValues.account_id || 'new'}-${open ? 'open' : 'closed'}`}
-                                name="account_id"
-                                label="Account"
-                                url="/api/accounts?is_active=1&has_children=0"
-                                placeholder="Select Account"
-                                labelFn={(acc) =>
-                                    `${acc.code} - ${acc.name} (${acc.normal_balance})`
-                                }
-                                initialLabel={
-                                    defaultValues.account_code
-                                        ? `${defaultValues.account_code} - ${defaultValues.account_name}`
-                                        : ''
-                                }
-                                onItemSelect={(account) => {
-                                    form.setValue(
-                                        'account_name',
-                                        account?.name || '',
-                                        { shouldDirty: true },
-                                    );
-                                    form.setValue(
-                                        'account_code',
-                                        account?.code || '',
-                                        { shouldDirty: true },
-                                    );
-                                }}
-                            />
-                        </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <InputField
+                    name="debit"
+                    label="Debit"
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    placeholder="0"
+                />
+                <InputField
+                    name="credit"
+                    label="Credit"
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    placeholder="0"
+                />
+            </div>
 
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <InputField
-                                name="debit"
-                                label="Debit"
-                                type="number"
-                                min={0}
-                                step="0.01"
-                                placeholder="0"
-                            />
-                            <InputField
-                                name="credit"
-                                label="Credit"
-                                type="number"
-                                min={0}
-                                step="0.01"
-                                placeholder="0"
-                            />
-                        </div>
-
-                        <InputField
-                            name="memo"
-                            label="Memo"
-                            placeholder="Line Memo"
-                        />
-
-                        <DialogFooter>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => onOpenChange(false)}
-                            >
-                                Cancel
-                            </Button>
-                            <Button type="submit">
-                                {item ? 'Update Line' : 'Save Line'}
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
-            </DialogContent>
-        </Dialog>
+            <InputField
+                name="memo"
+                label="Memo"
+                placeholder="Line Memo"
+            />
+        </ItemFormDialogShell>
     );
 }
