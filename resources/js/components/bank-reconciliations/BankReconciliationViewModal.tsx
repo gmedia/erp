@@ -2,16 +2,15 @@ import { memo } from 'react';
 
 import { ViewField } from '@/components/common/ViewField';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
+import {
+    ViewModalItemsTable,
+    type ViewModalItemsTableColumn,
+} from '@/components/common/ViewModalItemsTable';
 import { Badge } from '@/components/ui/badge';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { BankReconciliation } from '@/types/bank-reconciliation';
+    BankReconciliation,
+    type BankReconciliationItem,
+} from '@/types/bank-reconciliation';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 
@@ -22,6 +21,37 @@ interface BankReconciliationViewModalProps {
 }
 
 const currencyOpts = { locale: 'id-ID', currency: 'IDR' } as const;
+
+const itemColumns: ViewModalItemsTableColumn<BankReconciliationItem>[] = [
+    {
+        key: 'transaction_date',
+        header: 'Date',
+        render: (row) => formatDateByRegionalSettings(row.transaction_date),
+    },
+    { key: 'description', header: 'Description', render: (row) => row.description },
+    {
+        key: 'debit',
+        header: 'Debit',
+        align: 'right',
+        render: (row) => formatCurrencyByRegionalSettings(row.debit, currencyOpts),
+    },
+    {
+        key: 'credit',
+        header: 'Credit',
+        align: 'right',
+        render: (row) => formatCurrencyByRegionalSettings(row.credit, currencyOpts),
+    },
+    { key: 'type', header: 'Type', render: (row) => row.type },
+    {
+        key: 'reconciled',
+        header: 'Reconciled',
+        render: (row) => (
+            <Badge variant={row.is_reconciled ? 'default' : 'secondary'}>
+                {row.is_reconciled ? 'Yes' : 'No'}
+            </Badge>
+        ),
+    },
+];
 
 export const BankReconciliationViewModal =
     memo<BankReconciliationViewModalProps>(
@@ -114,88 +144,13 @@ export const BankReconciliationViewModal =
                                 )}
                             </div>
 
-                            <div className="space-y-2">
-                                <h3 className="text-lg font-semibold">
-                                    Reconciliation Items
-                                </h3>
-                                <div className="min-w-0 rounded-md border">
-                                    <Table className="min-w-[600px]">
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Date</TableHead>
-                                                <TableHead>
-                                                    Description
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Debit
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Credit
-                                                </TableHead>
-                                                <TableHead>Type</TableHead>
-                                                <TableHead>
-                                                    Reconciled
-                                                </TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {item.items.length === 0 ? (
-                                                <TableRow>
-                                                    <TableCell
-                                                        colSpan={6}
-                                                        className="text-center text-muted-foreground"
-                                                    >
-                                                        No items found.
-                                                    </TableCell>
-                                                </TableRow>
-                                            ) : (
-                                                item.items.map((itemRow) => (
-                                                    <TableRow key={itemRow.id}>
-                                                        <TableCell>
-                                                            {formatDateByRegionalSettings(
-                                                                itemRow.transaction_date,
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {
-                                                                itemRow.description
-                                                            }
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            {formatCurrencyByRegionalSettings(
-                                                                itemRow.debit,
-                                                                currencyOpts,
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            {formatCurrencyByRegionalSettings(
-                                                                itemRow.credit,
-                                                                currencyOpts,
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {itemRow.type}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Badge
-                                                                variant={
-                                                                    itemRow.is_reconciled
-                                                                        ? 'default'
-                                                                        : 'secondary'
-                                                                }
-                                                            >
-                                                                {itemRow.is_reconciled
-                                                                    ? 'Yes'
-                                                                    : 'No'}
-                                                            </Badge>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))
-                                            )}
-                                        </TableBody>
-                                    </Table>
-                                </div>
-                            </div>
+                            <ViewModalItemsTable
+                                items={item.items}
+                                columns={itemColumns}
+                                minWidthClassName="min-w-[600px]"
+                                title="Reconciliation Items"
+                                getRowKey={(row) => row.id ?? 0}
+                            />
                         </div>
                     </div>
                 </ViewModalShell>
