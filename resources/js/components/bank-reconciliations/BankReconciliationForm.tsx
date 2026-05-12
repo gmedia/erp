@@ -37,19 +37,10 @@ interface BankReconciliationFormProps {
     isLoading?: boolean;
 }
 
-const getBankReconciliationFormDefaults = (
-    entity?: BankReconciliation | null,
-): BankReconciliationFormData => {
+const getBankReconciliationFormDefaults = (entity?: BankReconciliation | null): BankReconciliationFormData => {
     if (!entity) {
-        return {
-            account_id: '',
-            fiscal_year_id: '',
-            period_start: new Date(),
-            period_end: new Date(),
-            statement_balance: 0,
-        };
+        return { account_id: '', fiscal_year_id: '', period_start: new Date(), period_end: new Date(), statement_balance: 0 };
     }
-
     return {
         account_id: String(entity.account_id),
         fiscal_year_id: String(entity.fiscal_year_id),
