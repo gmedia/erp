@@ -10,13 +10,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { type RecurringJournal } from '@/types/recurring-journal';
 import {
+    createRowCurrencyAmountColumn,
     createSelectColumn,
     createSortingHeader,
     createTextColumn,
     type CustomTableMeta,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 import { Eye, MoreHorizontal, Pencil, Play, Trash } from 'lucide-react';
 
@@ -51,21 +51,10 @@ export const recurringJournalColumns: ColumnDef<RecurringJournal>[] = [
                 row.getValue('next_run_date') as string,
             ),
     },
-    {
+    createRowCurrencyAmountColumn<RecurringJournal & { currency?: string | null }>({
         accessorKey: 'total_amount',
-        ...createSortingHeader('Total Amount'),
-        cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('total_amount'));
-            return (
-                <div className="text-right font-medium">
-                    {formatCurrencyByRegionalSettings(amount, {
-                        locale: 'id-ID',
-                        currency: 'IDR',
-                    })}
-                </div>
-            );
-        },
-    },
+        label: 'Total Amount',
+    }),
     {
         accessorKey: 'auto_post',
         ...createSortingHeader('Auto Post'),

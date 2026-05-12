@@ -6,6 +6,7 @@ export interface BankReconciliationItem {
     description: string;
     debit: number;
     credit: number;
+    type: string;
     is_reconciled: boolean;
 }
 
