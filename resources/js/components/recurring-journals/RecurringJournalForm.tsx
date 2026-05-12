@@ -354,20 +354,26 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                                             </div>
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                            {formatCurrencyByRegionalSettings(Number(
-                                                                lines?.[
-                                                                    index
-                                                                ]?.debit ||
-                                                                    0,
-                                                            ), currencyOpts)}
+                                                            {formatCurrencyByRegionalSettings(
+                                                                Number(
+                                                                    lines?.[
+                                                                        index
+                                                                    ]?.debit ||
+                                                                        0,
+                                                                ),
+                                                                currencyOpts,
+                                                            )}
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                            {formatCurrencyByRegionalSettings(Number(
-                                                                lines?.[
-                                                                    index
-                                                                ]?.credit ||
-                                                                    0,
-                                                            ), currencyOpts)}
+                                                            {formatCurrencyByRegionalSettings(
+                                                                Number(
+                                                                    lines?.[
+                                                                        index
+                                                                    ]?.credit ||
+                                                                        0,
+                                                                ),
+                                                                currencyOpts,
+                                                            )}
                                                         </TableCell>
                                                         <TableCell>
                                                             {lines?.[index]
@@ -411,10 +417,16 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                                     Total
                                                 </TableCell>
                                                 <TableCell className="text-right font-semibold">
-                                                    {formatCurrencyByRegionalSettings(totalDebit, currencyOpts)}
+                                                    {formatCurrencyByRegionalSettings(
+                                                        totalDebit,
+                                                        currencyOpts,
+                                                    )}
                                                 </TableCell>
                                                 <TableCell className="text-right font-semibold">
-                                                    {formatCurrencyByRegionalSettings(totalCredit, currencyOpts)}
+                                                    {formatCurrencyByRegionalSettings(
+                                                        totalCredit,
+                                                        currencyOpts,
+                                                    )}
                                                 </TableCell>
                                                 <TableCell colSpan={2} />
                                             </TableRow>
