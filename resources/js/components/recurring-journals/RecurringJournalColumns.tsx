@@ -1,24 +1,16 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { type RecurringJournal } from '@/types/recurring-journal';
 import {
+    createActionsColumn,
     createRowCurrencyAmountColumn,
     createSelectColumn,
     createSortingHeader,
     createTextColumn,
-    type CustomTableMeta,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { type ColumnDef } from '@tanstack/react-table';
-import { Eye, MoreHorizontal, Pencil, Play, Trash } from 'lucide-react';
 
 function getFrequencyLabel(frequency: RecurringJournal['frequency']) {
     const labels = {
@@ -85,58 +77,5 @@ export const recurringJournalColumns: ColumnDef<RecurringJournal>[] = [
         cell: ({ row }) =>
             formatDateByRegionalSettings(row.getValue('created_at') as string),
     },
-    {
-        id: 'row-actions',
-        cell: ({ row, table }) => {
-            const meta = table.options
-                .meta as CustomTableMeta<RecurringJournal>;
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            onClick={() => meta?.onView?.(row.original)}
-                        >
-                            <Eye className="mr-2 h-4 w-4" />
-                            View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={() => meta?.onEdit?.(row.original)}
-                        >
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={() => {
-                                const customAction = meta?.onCustomAction as
-                                    | ((
-                                          action: string,
-                                          item: RecurringJournal,
-                                      ) => void)
-                                    | undefined;
-                                if (customAction) {
-                                    customAction('execute', row.original);
-                                }
-                            }}
-                        >
-                            <Play className="mr-2 h-4 w-4" />
-                            Execute
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={() => meta?.onDelete?.(row.original)}
-                            className="text-red-600"
-                        >
-                            <Trash className="mr-2 h-4 w-4" />
-                            Delete
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            );
-        },
-    },
+    createActionsColumn<RecurringJournal>(),
 ];
