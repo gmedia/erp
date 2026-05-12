@@ -103,16 +103,12 @@ export function RecurringJournalLineFormDialog({
                             : ''
                     }
                     onItemSelect={(account) => {
-                        form.setValue(
-                            'account_name',
-                            account?.name || '',
-                            { shouldDirty: true },
-                        );
-                        form.setValue(
-                            'account_code',
-                            account?.code || '',
-                            { shouldDirty: true },
-                        );
+                        form.setValue('account_name', account?.name || '', {
+                            shouldDirty: true,
+                        });
+                        form.setValue('account_code', account?.code || '', {
+                            shouldDirty: true,
+                        });
                     }}
                 />
             </div>
@@ -136,11 +132,7 @@ export function RecurringJournalLineFormDialog({
                 />
             </div>
 
-            <InputField
-                name="memo"
-                label="Memo"
-                placeholder="Line Memo"
-            />
+            <InputField name="memo" label="Memo" placeholder="Line Memo" />
         </ItemFormDialogShell>
     );
 }

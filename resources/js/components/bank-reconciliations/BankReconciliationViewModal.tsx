@@ -1,11 +1,11 @@
 import { memo } from 'react';
 
 import { ViewField } from '@/components/common/ViewField';
-import { ViewModalShell } from '@/components/common/ViewModalShell';
 import {
     ViewModalItemsTable,
     type ViewModalItemsTableColumn,
 } from '@/components/common/ViewModalItemsTable';
+import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import {
     BankReconciliation,
@@ -28,18 +28,24 @@ const itemColumns: ViewModalItemsTableColumn<BankReconciliationItem>[] = [
         header: 'Date',
         render: (row) => formatDateByRegionalSettings(row.transaction_date),
     },
-    { key: 'description', header: 'Description', render: (row) => row.description },
+    {
+        key: 'description',
+        header: 'Description',
+        render: (row) => row.description,
+    },
     {
         key: 'debit',
         header: 'Debit',
         align: 'right',
-        render: (row) => formatCurrencyByRegionalSettings(row.debit, currencyOpts),
+        render: (row) =>
+            formatCurrencyByRegionalSettings(row.debit, currencyOpts),
     },
     {
         key: 'credit',
         header: 'Credit',
         align: 'right',
-        render: (row) => formatCurrencyByRegionalSettings(row.credit, currencyOpts),
+        render: (row) =>
+            formatCurrencyByRegionalSettings(row.credit, currencyOpts),
     },
     { key: 'type', header: 'Type', render: (row) => row.type },
     {
