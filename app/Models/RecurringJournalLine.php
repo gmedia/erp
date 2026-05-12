@@ -19,9 +19,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Account $account
  *
  * @method static \Database\Factories\RecurringJournalLineFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournalLine newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournalLine newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournalLine query()
  *
  * @mixin \Eloquent
  */

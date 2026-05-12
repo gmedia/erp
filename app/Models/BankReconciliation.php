@@ -33,9 +33,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $items_count
  *
  * @method static \Database\Factories\BankReconciliationFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation query()
  *
  * @mixin \Eloquent
  */

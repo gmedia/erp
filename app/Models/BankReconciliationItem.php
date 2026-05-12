@@ -24,9 +24,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\JournalEntryLine|null $journalEntryLine
  *
  * @method static \Database\Factories\BankReconciliationItemFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem query()
  *
  * @mixin \Eloquent
  */

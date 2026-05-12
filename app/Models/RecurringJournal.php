@@ -32,9 +32,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Database\Factories\RecurringJournalFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal due()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal query()
  *
  * @mixin \Eloquent
  */

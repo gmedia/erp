@@ -32,9 +32,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\User|null $creator
  *
  * @method static \Database\Factories\PeriodClosingFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing query()
  *
  * @mixin \Eloquent
  */

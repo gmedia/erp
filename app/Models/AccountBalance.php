@@ -24,9 +24,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\FiscalYear $fiscalYear
  *
  * @method static \Database\Factories\AccountBalanceFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance query()
  *
  * @mixin \Eloquent
  */
