@@ -159,12 +159,20 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
         const handleRemoveLine = (index: number) => remove(index);
 
         const totalDebit = useMemo(
-            () => lines?.reduce((sum, line) => sum + (Number(line.debit) || 0), 0) || 0,
+            () =>
+                lines?.reduce(
+                    (sum, line) => sum + (Number(line.debit) || 0),
+                    0,
+                ) || 0,
             [lines],
         );
 
         const totalCredit = useMemo(
-            () => lines?.reduce((sum, line) => sum + (Number(line.credit) || 0), 0) || 0,
+            () =>
+                lines?.reduce(
+                    (sum, line) => sum + (Number(line.credit) || 0),
+                    0,
+                ) || 0,
             [lines],
         );
 
@@ -285,10 +293,16 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                 <RecurringJournalLinesTable
                                     lines={fields.map((_, index) => ({
                                         id: index,
-                                        account_code: lines?.[index]?.account_code,
-                                        account_name: lines?.[index]?.account_name,
-                                        debit: Number(lines?.[index]?.debit || 0),
-                                        credit: Number(lines?.[index]?.credit || 0),
+                                        account_code:
+                                            lines?.[index]?.account_code,
+                                        account_name:
+                                            lines?.[index]?.account_name,
+                                        debit: Number(
+                                            lines?.[index]?.debit || 0,
+                                        ),
+                                        credit: Number(
+                                            lines?.[index]?.credit || 0,
+                                        ),
                                         memo: lines?.[index]?.memo,
                                     }))}
                                     totalDebit={totalDebit}
@@ -296,10 +310,24 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                     emptyMessage='No lines added yet. Click "Add Line" to start.'
                                     actions={(index) => (
                                         <div className="flex items-center gap-2">
-                                            <Button type="button" variant="ghost" size="icon" onClick={() => handleEditLine(index)}>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() =>
+                                                    handleEditLine(index)
+                                                }
+                                            >
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
-                                            <Button type="button" variant="ghost" size="icon" onClick={() => handleRemoveLine(index)}>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() =>
+                                                    handleRemoveLine(index)
+                                                }
+                                            >
                                                 <Trash className="h-4 w-4 text-red-500" />
                                             </Button>
                                         </div>
