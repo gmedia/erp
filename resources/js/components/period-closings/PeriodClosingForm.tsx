@@ -12,10 +12,20 @@ import * as z from 'zod';
 
 const periodClosingFormSchema = z.object({
     fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
-    period_month: z.coerce.number().min(1).max(12, { message: 'Period month must be between 1 and 12.' }),
-    period_year: z.coerce.number().min(2000).max(2100, { message: 'Period year must be between 2000 and 2100.' }),
-    closing_type: z.enum(['monthly', 'yearly'], { message: 'Closing type is required.' }),
-    retained_earnings_account_id: z.string().min(1, { message: 'Retained earnings account is required.' }),
+    period_month: z.coerce
+        .number()
+        .min(1)
+        .max(12, { message: 'Period month must be between 1 and 12.' }),
+    period_year: z.coerce
+        .number()
+        .min(2000)
+        .max(2100, { message: 'Period year must be between 2000 and 2100.' }),
+    closing_type: z.enum(['monthly', 'yearly'], {
+        message: 'Closing type is required.',
+    }),
+    retained_earnings_account_id: z
+        .string()
+        .min(1, { message: 'Retained earnings account is required.' }),
 });
 
 type PeriodClosingFormData = z.infer<typeof periodClosingFormSchema>;
@@ -28,17 +38,27 @@ interface PeriodClosingFormProps {
     isLoading?: boolean;
 }
 
-const getPeriodClosingFormDefaults = (entity?: PeriodClosing | null): PeriodClosingFormData => {
+const getPeriodClosingFormDefaults = (
+    entity?: PeriodClosing | null,
+): PeriodClosingFormData => {
     const now = new Date();
     if (!entity) {
-        return { fiscal_year_id: '', period_month: now.getMonth() + 1, period_year: now.getFullYear(), closing_type: 'monthly', retained_earnings_account_id: '' };
+        return {
+            fiscal_year_id: '',
+            period_month: now.getMonth() + 1,
+            period_year: now.getFullYear(),
+            closing_type: 'monthly',
+            retained_earnings_account_id: '',
+        };
     }
     return {
         fiscal_year_id: String(entity.fiscal_year_id),
         period_month: entity.period_month,
         period_year: entity.period_year,
         closing_type: entity.closing_type,
-        retained_earnings_account_id: String(entity.retained_earnings_account_id),
+        retained_earnings_account_id: String(
+            entity.retained_earnings_account_id,
+        ),
     };
 };
 
