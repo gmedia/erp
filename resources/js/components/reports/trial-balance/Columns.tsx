@@ -1,6 +1,9 @@
 'use client';
 
-import { createRowCurrencyAmountColumn, createTextColumn } from '@/utils/columns';
+import {
+    createRowCurrencyAmountColumn,
+    createTextColumn,
+} from '@/utils/columns';
 import { type ColumnDef } from '@tanstack/react-table';
 
 export interface TrialBalanceItem {

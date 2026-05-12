@@ -295,11 +295,19 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                 <RecurringJournalLinesTable
                                     lines={
                                         fields.map((_, index) => ({
-                                            id: fields[index]?.id ? Number(fields[index].id) : index,
-                                            account_code: lines?.[index]?.account_code,
-                                            account_name: lines?.[index]?.account_name,
-                                            debit: Number(lines?.[index]?.debit || 0),
-                                            credit: Number(lines?.[index]?.credit || 0),
+                                            id: fields[index]?.id
+                                                ? Number(fields[index].id)
+                                                : index,
+                                            account_code:
+                                                lines?.[index]?.account_code,
+                                            account_name:
+                                                lines?.[index]?.account_name,
+                                            debit: Number(
+                                                lines?.[index]?.debit || 0,
+                                            ),
+                                            credit: Number(
+                                                lines?.[index]?.credit || 0,
+                                            ),
                                             memo: lines?.[index]?.memo,
                                         })) || []
                                     }
