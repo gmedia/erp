@@ -1,8 +1,11 @@
 'use client';
 
-import { createSortingHeader, createTextColumn } from '@/utils/columns';
+import {
+    createRowCurrencyAmountColumn,
+    createSortingHeader,
+    createTextColumn,
+} from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 
 export interface GeneralLedgerItem {
@@ -14,6 +17,8 @@ export interface GeneralLedgerItem {
     credit: number;
     running_balance: number;
 }
+
+type GLItemWithCurrency = GeneralLedgerItem & { currency?: string | null };
 
 export const generalLedgerColumns: ColumnDef<GeneralLedgerItem>[] = [
     {
@@ -35,49 +40,16 @@ export const generalLedgerColumns: ColumnDef<GeneralLedgerItem>[] = [
         accessorKey: 'reference',
         label: 'Reference',
     }),
-    {
+    createRowCurrencyAmountColumn<GLItemWithCurrency>({
         accessorKey: 'debit',
-        ...createSortingHeader('Debit'),
-        cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('debit'));
-            return (
-                <div className="text-right font-medium">
-                    {formatCurrencyByRegionalSettings(amount, {
-                        locale: 'id-ID',
-                        currency: 'IDR',
-                    })}
-                </div>
-            );
-        },
-    },
-    {
+        label: 'Debit',
+    }),
+    createRowCurrencyAmountColumn<GLItemWithCurrency>({
         accessorKey: 'credit',
-        ...createSortingHeader('Credit'),
-        cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('credit'));
-            return (
-                <div className="text-right font-medium">
-                    {formatCurrencyByRegionalSettings(amount, {
-                        locale: 'id-ID',
-                        currency: 'IDR',
-                    })}
-                </div>
-            );
-        },
-    },
-    {
+        label: 'Credit',
+    }),
+    createRowCurrencyAmountColumn<GLItemWithCurrency>({
         accessorKey: 'running_balance',
-        ...createSortingHeader('Running Balance'),
-        cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('running_balance'));
-            return (
-                <div className="text-right font-medium">
-                    {formatCurrencyByRegionalSettings(amount, {
-                        locale: 'id-ID',
-                        currency: 'IDR',
-                    })}
-                </div>
-            );
-        },
-    },
+        label: 'Running Balance',
+    }),
 ];

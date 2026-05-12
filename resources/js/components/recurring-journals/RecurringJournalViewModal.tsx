@@ -3,18 +3,10 @@ import { memo } from 'react';
 import { ViewField } from '@/components/common/ViewField';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
 import { RecurringJournal } from '@/types/recurring-journal';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
+import { RecurringJournalLinesTable } from './RecurringJournalLinesTable';
 
 interface RecurringJournalViewModalProps {
     item: RecurringJournal | null;
@@ -121,69 +113,11 @@ export const RecurringJournalViewModal = memo<RecurringJournalViewModalProps>(
                             />
                         </div>
 
-                        <div className="min-w-0 rounded-md border">
-                            <Table className="min-w-[600px]">
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Account</TableHead>
-                                        <TableHead className="text-right">
-                                            Debit
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Credit
-                                        </TableHead>
-                                        <TableHead>Memo</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {item.lines.map((line) => (
-                                        <TableRow key={line.id}>
-                                            <TableCell>
-                                                <div>{line.account_code}</div>
-                                                <div className="text-sm text-gray-500">
-                                                    {line.account_name}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                {formatCurrencyByRegionalSettings(
-                                                    line.debit,
-                                                    currencyOpts,
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                {formatCurrencyByRegionalSettings(
-                                                    line.credit,
-                                                    currencyOpts,
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {line.memo || '-'}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                                <TableFooter>
-                                    <TableRow>
-                                        <TableCell className="font-semibold">
-                                            Total
-                                        </TableCell>
-                                        <TableCell className="text-right font-semibold">
-                                            {formatCurrencyByRegionalSettings(
-                                                totalDebit,
-                                                currencyOpts,
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="text-right font-semibold">
-                                            {formatCurrencyByRegionalSettings(
-                                                totalCredit,
-                                                currencyOpts,
-                                            )}
-                                        </TableCell>
-                                        <TableCell />
-                                    </TableRow>
-                                </TableFooter>
-                            </Table>
-                        </div>
+                        <RecurringJournalLinesTable
+                            lines={item.lines}
+                            totalDebit={totalDebit}
+                            totalCredit={totalCredit}
+                        />
                     </div>
                 </div>
             </ViewModalShell>

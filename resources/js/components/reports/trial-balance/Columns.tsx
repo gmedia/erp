@@ -1,7 +1,6 @@
 'use client';
 
-import { createSortingHeader, createTextColumn } from '@/utils/columns';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
+import { createRowCurrencyAmountColumn, createTextColumn } from '@/utils/columns';
 import { type ColumnDef } from '@tanstack/react-table';
 
 export interface TrialBalanceItem {
@@ -11,6 +10,8 @@ export interface TrialBalanceItem {
     debit_balance: number;
     credit_balance: number;
 }
+
+type TBItemWithCurrency = TrialBalanceItem & { currency?: string | null };
 
 export const trialBalanceColumns: ColumnDef<TrialBalanceItem>[] = [
     createTextColumn<TrialBalanceItem>({
@@ -28,34 +29,12 @@ export const trialBalanceColumns: ColumnDef<TrialBalanceItem>[] = [
         label: 'Account Type',
         enableSorting: true,
     }),
-    {
+    createRowCurrencyAmountColumn<TBItemWithCurrency>({
         accessorKey: 'debit_balance',
-        ...createSortingHeader('Debit Balance'),
-        cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('debit_balance'));
-            return (
-                <div className="text-right font-medium">
-                    {formatCurrencyByRegionalSettings(amount, {
-                        locale: 'id-ID',
-                        currency: 'IDR',
-                    })}
-                </div>
-            );
-        },
-    },
-    {
+        label: 'Debit Balance',
+    }),
+    createRowCurrencyAmountColumn<TBItemWithCurrency>({
         accessorKey: 'credit_balance',
-        ...createSortingHeader('Credit Balance'),
-        cell: ({ row }) => {
-            const amount = Number.parseFloat(row.getValue('credit_balance'));
-            return (
-                <div className="text-right font-medium">
-                    {formatCurrencyByRegionalSettings(amount, {
-                        locale: 'id-ID',
-                        currency: 'IDR',
-                    })}
-                </div>
-            );
-        },
-    },
+        label: 'Credit Balance',
+    }),
 ];

@@ -18,24 +18,13 @@ import SelectField from '@/components/common/SelectField';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
 
 import {
     type RecurringJournal,
     type RecurringJournalLine,
 } from '@/types/recurring-journal';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { RecurringJournalLineFormDialog } from './RecurringJournalLineFormDialog';
-
-const currencyOpts = { locale: 'id-ID', currency: 'IDR' } as const;
+import { RecurringJournalLinesTable } from './RecurringJournalLinesTable';
 
 const recurringJournalLineSchema = z.object({
     account_id: z.coerce.number().min(1, { message: 'Account is required.' }),
@@ -303,136 +292,45 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                     </div>
                                 )}
 
-                                <div className="min-w-0 rounded-md border">
-                                    <Table className="min-w-[600px]">
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Account</TableHead>
-                                                <TableHead className="text-right">
-                                                    Debit
-                                                </TableHead>
-                                                <TableHead className="text-right">
-                                                    Credit
-                                                </TableHead>
-                                                <TableHead>Memo</TableHead>
-                                                <TableHead className="w-[100px]">
-                                                    Actions
-                                                </TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {fields.length === 0 ? (
-                                                <TableRow>
-                                                    <TableCell
-                                                        colSpan={5}
-                                                        className="text-center text-muted-foreground"
-                                                    >
-                                                        No lines added yet.
-                                                        Click "Add Line" to
-                                                        start.
-                                                    </TableCell>
-                                                </TableRow>
-                                            ) : (
-                                                fields.map((field, index) => (
-                                                    <TableRow key={field.id}>
-                                                        <TableCell>
-                                                            <div>
-                                                                {
-                                                                    lines?.[
-                                                                        index
-                                                                    ]
-                                                                        ?.account_code
-                                                                }
-                                                            </div>
-                                                            <div className="text-sm text-gray-500">
-                                                                {
-                                                                    lines?.[
-                                                                        index
-                                                                    ]
-                                                                        ?.account_name
-                                                                }
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            {formatCurrencyByRegionalSettings(
-                                                                Number(
-                                                                    lines?.[
-                                                                        index
-                                                                    ]?.debit ||
-                                                                        0,
-                                                                ),
-                                                                currencyOpts,
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            {formatCurrencyByRegionalSettings(
-                                                                Number(
-                                                                    lines?.[
-                                                                        index
-                                                                    ]?.credit ||
-                                                                        0,
-                                                                ),
-                                                                currencyOpts,
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {lines?.[index]
-                                                                ?.memo || '-'}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="flex items-center gap-2">
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    onClick={() =>
-                                                                        handleEditLine(
-                                                                            index,
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <Pencil className="h-4 w-4" />
-                                                                </Button>
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    onClick={() =>
-                                                                        handleRemoveLine(
-                                                                            index,
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <Trash className="h-4 w-4 text-red-500" />
-                                                                </Button>
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))
-                                            )}
-                                        </TableBody>
-                                        <TableFooter>
-                                            <TableRow>
-                                                <TableCell className="font-semibold">
-                                                    Total
-                                                </TableCell>
-                                                <TableCell className="text-right font-semibold">
-                                                    {formatCurrencyByRegionalSettings(
-                                                        totalDebit,
-                                                        currencyOpts,
-                                                    )}
-                                                </TableCell>
-                                                <TableCell className="text-right font-semibold">
-                                                    {formatCurrencyByRegionalSettings(
-                                                        totalCredit,
-                                                        currencyOpts,
-                                                    )}
-                                                </TableCell>
-                                                <TableCell colSpan={2} />
-                                            </TableRow>
-                                        </TableFooter>
-                                    </Table>
-                                </div>
+                                <RecurringJournalLinesTable
+                                    lines={
+                                        fields.map((_, index) => ({
+                                            id: fields[index]?.id ? Number(fields[index].id) : index,
+                                            account_code: lines?.[index]?.account_code,
+                                            account_name: lines?.[index]?.account_name,
+                                            debit: Number(lines?.[index]?.debit || 0),
+                                            credit: Number(lines?.[index]?.credit || 0),
+                                            memo: lines?.[index]?.memo,
+                                        })) || []
+                                    }
+                                    totalDebit={totalDebit}
+                                    totalCredit={totalCredit}
+                                    emptyMessage='No lines added yet. Click "Add Line" to start.'
+                                    actions={(index) => (
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() =>
+                                                    handleEditLine(index)
+                                                }
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() =>
+                                                    handleRemoveLine(index)
+                                                }
+                                            >
+                                                <Trash className="h-4 w-4 text-red-500" />
+                                            </Button>
+                                        </div>
+                                    )}
+                                />
                             </div>
                         </div>
                     </div>
