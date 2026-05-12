@@ -156,27 +156,17 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
             setEditingIndex(null);
         };
 
-        const handleRemoveLine = (index: number) => {
-            remove(index);
-        };
+        const handleRemoveLine = (index: number) => remove(index);
 
-        const totalDebit = useMemo(() => {
-            return (
-                lines?.reduce(
-                    (sum, line) => sum + (Number(line.debit) || 0),
-                    0,
-                ) || 0
-            );
-        }, [lines]);
+        const totalDebit = useMemo(
+            () => lines?.reduce((sum, line) => sum + (Number(line.debit) || 0), 0) || 0,
+            [lines],
+        );
 
-        const totalCredit = useMemo(() => {
-            return (
-                lines?.reduce(
-                    (sum, line) => sum + (Number(line.credit) || 0),
-                    0,
-                ) || 0
-            );
-        }, [lines]);
+        const totalCredit = useMemo(
+            () => lines?.reduce((sum, line) => sum + (Number(line.credit) || 0), 0) || 0,
+            [lines],
+        );
 
         const isBalanced = totalDebit === totalCredit;
 
