@@ -53,15 +53,21 @@ export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
         cell: ({ row }) =>
             formatDateByRegionalSettings(row.getValue('period_end') as string),
     },
-    createRowCurrencyAmountColumn<BankReconciliation & { currency?: string | null }>({
+    createRowCurrencyAmountColumn<
+        BankReconciliation & { currency?: string | null }
+    >({
         accessorKey: 'statement_balance',
         label: 'Statement Balance',
     }),
-    createRowCurrencyAmountColumn<BankReconciliation & { currency?: string | null }>({
+    createRowCurrencyAmountColumn<
+        BankReconciliation & { currency?: string | null }
+    >({
         accessorKey: 'book_balance',
         label: 'Book Balance',
     }),
-    createRowCurrencyAmountColumn<BankReconciliation & { currency?: string | null }>({
+    createRowCurrencyAmountColumn<
+        BankReconciliation & { currency?: string | null }
+    >({
         accessorKey: 'difference',
         label: 'Difference',
     }),

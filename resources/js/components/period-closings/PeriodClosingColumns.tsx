@@ -70,10 +70,12 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
             );
         },
     },
-    createRowCurrencyAmountColumn<PeriodClosing & { currency?: string | null }>({
-        accessorKey: 'net_income',
-        label: 'Net Income',
-    }),
+    createRowCurrencyAmountColumn<PeriodClosing & { currency?: string | null }>(
+        {
+            accessorKey: 'net_income',
+            label: 'Net Income',
+        },
+    ),
     {
         accessorKey: 'closed_at',
         ...createSortingHeader('Closed At'),
