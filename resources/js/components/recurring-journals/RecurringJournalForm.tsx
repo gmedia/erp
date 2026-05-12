@@ -35,6 +35,8 @@ import {
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { RecurringJournalLineFormDialog } from './RecurringJournalLineFormDialog';
 
+const currencyOpts = { locale: 'id-ID', currency: 'IDR' } as const;
+
 const recurringJournalLineSchema = z.object({
     account_id: z.coerce.number().min(1, { message: 'Account is required.' }),
     account_name: z.string().optional(),
@@ -352,34 +354,20 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                                             </div>
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                            {formatCurrencyByRegionalSettings(
-                                                                Number(
-                                                                    lines?.[
-                                                                        index
-                                                                    ]?.debit ||
-                                                                        0,
-                                                                ),
-                                                                {
-                                                                    locale: 'id-ID',
-                                                                    currency:
-                                                                        'IDR',
-                                                                },
-                                                            )}
+                                                            {formatCurrencyByRegionalSettings(Number(
+                                                                lines?.[
+                                                                    index
+                                                                ]?.debit ||
+                                                                    0,
+                                                            ), currencyOpts)}
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                            {formatCurrencyByRegionalSettings(
-                                                                Number(
-                                                                    lines?.[
-                                                                        index
-                                                                    ]?.credit ||
-                                                                        0,
-                                                                ),
-                                                                {
-                                                                    locale: 'id-ID',
-                                                                    currency:
-                                                                        'IDR',
-                                                                },
-                                                            )}
+                                                            {formatCurrencyByRegionalSettings(Number(
+                                                                lines?.[
+                                                                    index
+                                                                ]?.credit ||
+                                                                    0,
+                                                            ), currencyOpts)}
                                                         </TableCell>
                                                         <TableCell>
                                                             {lines?.[index]
@@ -423,22 +411,10 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                                     Total
                                                 </TableCell>
                                                 <TableCell className="text-right font-semibold">
-                                                    {formatCurrencyByRegionalSettings(
-                                                        totalDebit,
-                                                        {
-                                                            locale: 'id-ID',
-                                                            currency: 'IDR',
-                                                        },
-                                                    )}
+                                                    {formatCurrencyByRegionalSettings(totalDebit, currencyOpts)}
                                                 </TableCell>
                                                 <TableCell className="text-right font-semibold">
-                                                    {formatCurrencyByRegionalSettings(
-                                                        totalCredit,
-                                                        {
-                                                            locale: 'id-ID',
-                                                            currency: 'IDR',
-                                                        },
-                                                    )}
+                                                    {formatCurrencyByRegionalSettings(totalCredit, currencyOpts)}
                                                 </TableCell>
                                                 <TableCell colSpan={2} />
                                             </TableRow>
