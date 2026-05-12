@@ -51,7 +51,9 @@ export const recurringJournalColumns: ColumnDef<RecurringJournal>[] = [
                 row.getValue('next_run_date') as string,
             ),
     },
-    createRowCurrencyAmountColumn<RecurringJournal & { currency?: string | null }>({
+    createRowCurrencyAmountColumn<
+        RecurringJournal & { currency?: string | null }
+    >({
         accessorKey: 'total_amount',
         label: 'Total Amount',
     }),
