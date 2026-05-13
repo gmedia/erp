@@ -286,8 +286,7 @@ export const ReportConfigurationForm = memo<ReportConfigurationFormProps>(
                                                             {...form.register(
                                                                 `sections.${index}.sort_order`,
                                                                 {
-                                                                    valueAsNumber:
-                                                                        true,
+                                                                    valueAsNumber: true,
                                                                 },
                                                             )}
                                                         />
