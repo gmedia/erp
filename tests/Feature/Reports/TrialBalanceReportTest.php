@@ -1,39 +1,53 @@
 <?php
 
-namespace Tests\Feature\Reports;
-
+use App\Models\Account;
+use App\Models\AccountBalance;
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
-use function Pest\Laravel\seed;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
 
-uses(RefreshDatabase::class)->group('reports');
+uses(RefreshDatabase::class)->group('trial-balance-report');
 
 beforeEach(function () {
-    seed();
-
-    $this->fiscalYear = FiscalYear::where('status', 'open')->firstOrFail();
     $this->user = createTestUserWithPermissions(['trial_balance_report']);
+    Sanctum::actingAs($this->user, ['*']);
 });
 
-test('trial balance seimbang dan sesuai jurnal posted pada seed', function () {
-    Sanctum::actingAs($this->user, ['*']);
-    $response = $this->getJson('/api/reports/trial-balance?fiscal_year_id=' . $this->fiscalYear->id)
-        ->assertStatus(200)
-        ->assertJsonPath('selectedYearId', $this->fiscalYear->id);
+test('it can get trial balance report', function () {
+    $fiscalYear = FiscalYear::factory()->create(['status' => 'open']);
+    $account = Account::factory()->create(['code' => '1010', 'name' => 'Cash', 'type' => 'asset']);
+    AccountBalance::factory()->create(['account_id' => $account->id, 'fiscal_year_id' => $fiscalYear->id, 'period_month' => 1, 'period_year' => 2026, 'closing_balance' => 1000]);
 
-    $report = $response->json('report');
-    $rowsByCode = collect($report)->keyBy('code');
+    getJson("/api/reports/trial-balance-detailed?fiscal_year_id={$fiscalYear->id}&period_month=1&period_year=2026")
+        ->assertOk()
+        ->assertJsonPath('data.0.account_name', 'Cash')
+        ->assertJsonPath('summary.total_debit', 1000);
+});
 
-    expect((float) $rowsByCode->get('11110')['debit'])->toBe(5000000.0);
-    expect((float) $rowsByCode->get('11300')['debit'])->toBe(3000000.0);
-    expect((float) $rowsByCode->get('41000')['credit'])->toBe(5000000.0);
-    expect((float) $rowsByCode->get('21100')['credit'])->toBe(3000000.0);
+test('it filters by fiscal year and period', function () {
+    $fiscalYear = FiscalYear::factory()->create();
+    $otherFiscalYear = FiscalYear::factory()->create();
+    $account = Account::factory()->create(['name' => 'Filtered Cash']);
+    AccountBalance::factory()->create(['account_id' => $account->id, 'fiscal_year_id' => $fiscalYear->id, 'period_month' => 2, 'period_year' => 2026, 'closing_balance' => 1500]);
+    AccountBalance::factory()->create(['fiscal_year_id' => $otherFiscalYear->id, 'period_month' => 1, 'period_year' => 2026, 'closing_balance' => 2500]);
 
-    $totalDebit = (float) collect($report)->sum(fn (array $row) => (float) $row['debit']);
-    $totalCredit = (float) collect($report)->sum(fn (array $row) => (float) $row['credit']);
+    getJson("/api/reports/trial-balance-detailed?fiscal_year_id={$fiscalYear->id}&period_month=2&period_year=2026")
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.account_name', 'Filtered Cash');
+});
 
-    expect($totalDebit)->toBe(8000000.0);
-    expect($totalCredit)->toBe(8000000.0);
+test('it can export trial balance report', function () {
+    $fiscalYear = FiscalYear::factory()->create();
+
+    $response = postJson('/api/reports/trial-balance-detailed/export', [
+        'fiscal_year_id' => $fiscalYear->id,
+        'period_month' => 1,
+        'period_year' => 2026,
+    ])->assertOk()->assertJsonStructure(['url', 'filename']);
+
+    expect($response->json('filename'))->toEndWith('.xlsx');
 });

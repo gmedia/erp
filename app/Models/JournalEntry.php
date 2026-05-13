@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * @property int $id
@@ -15,6 +16,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $reference
  * @property string $description
  * @property string $status
+ * @property string $journal_type
+ * @property string|null $source_type
+ * @property int|null $source_id
  * @property int|null $created_by
  * @property int|null $posted_by
  * @property \Illuminate\Support\Carbon|null $posted_at
@@ -66,6 +70,9 @@ class JournalEntry extends Model
         'reference',
         'description',
         'status',
+        'journal_type',
+        'source_type',
+        'source_id',
         'created_by',
         'posted_by',
         'posted_at',
@@ -97,6 +104,11 @@ class JournalEntry extends Model
     public function postedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'posted_by');
+    }
+
+    public function source(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     /**
