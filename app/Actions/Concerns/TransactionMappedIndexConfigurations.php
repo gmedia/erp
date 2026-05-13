@@ -342,7 +342,7 @@ final class TransactionMappedIndexConfigurations
                 'requester' => 'requested_by',
             ],
         ],
-         'supplier_bills' => [
+        'supplier_bills' => [
             'model_class' => SupplierBill::class,
             'with' => [
                 'supplier',
