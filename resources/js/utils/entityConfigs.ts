@@ -1243,3 +1243,30 @@ export const periodClosingConfig = createComplexEntityConfig<PeriodClosing>({
     getDeleteMessage: () =>
         'This action cannot be undone. This will permanently delete this period closing.',
 });
+
+import { reportConfigurationColumns } from '@/components/report-configurations/ReportConfigurationColumns';
+import { createReportConfigurationFilterFields } from '@/components/report-configurations/ReportConfigurationFilters';
+import { ReportConfigurationForm } from '@/components/report-configurations/ReportConfigurationForm';
+import { ReportConfigurationViewModal } from '@/components/report-configurations/ReportConfigurationViewModal';
+import { type ReportConfiguration } from '@/types/report-configuration';
+
+export const reportConfigurationConfig =
+    createComplexEntityConfig<ReportConfiguration>({
+        entityName: 'Report Configuration',
+        entityNamePlural: 'Report Configurations',
+        apiEndpoint: '/api/report-configurations',
+        exportEndpoint: '/api/report-configurations/export',
+        queryKey: ['report-configurations'],
+        breadcrumbs: [
+            { title: 'Report Configurations', href: '/report-configurations' },
+        ],
+        initialFilters: { search: '', report_type: '', is_active: '' },
+        columns: reportConfigurationColumns,
+        filterFields: createReportConfigurationFilterFields(),
+        formComponent: ReportConfigurationForm,
+        formType: 'complex',
+        entityNameForSearch: 'report configuration',
+        viewModalComponent: ReportConfigurationViewModal,
+        getDeleteMessage: (item: { name?: string }) =>
+            `This action cannot be undone. This will permanently delete report configuration ${item.name}.`,
+    });

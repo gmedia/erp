@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/recurring-journals.php';
     require __DIR__ . '/api/purchase-orders.php';
     require __DIR__ . '/api/purchase-requests.php';
+    require __DIR__ . '/api/report-configurations.php';
     require __DIR__ . '/api/reports.php';
     require __DIR__ . '/api/stock-adjustments.php';
     require __DIR__ . '/api/stock-monitor.php';

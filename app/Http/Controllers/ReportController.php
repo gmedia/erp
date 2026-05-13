@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\ReportConfigurations\GetReportConfigurationByTypeAction;
 use App\Http\Controllers\Concerns\InteractsWithFinancialReportRequest;
+use App\Models\ReportConfiguration;
 use App\Services\FinancialReportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,7 +14,8 @@ class ReportController extends Controller
     use InteractsWithFinancialReportRequest;
 
     public function __construct(
-        protected FinancialReportService $reportService
+        protected FinancialReportService $reportService,
+        protected GetReportConfigurationByTypeAction $configurationResolver,
     ) {}
 
     public function trialBalance(Request $request): JsonResponse
@@ -28,6 +31,7 @@ class ReportController extends Controller
             'fiscalYears' => $fiscalYears,
             'selectedYearId' => (int) $selectedYearId,
             'report' => $report,
+            'configuration' => $this->configurationResolver->execute(ReportConfiguration::TYPE_TRIAL_BALANCE),
         ]);
     }
 
@@ -52,6 +56,7 @@ class ReportController extends Controller
             'selectedYearId' => (int) $selectedYearId,
             'comparisonYearId' => $comparisonYearId ? (int) $comparisonYearId : null,
             'report' => $report,
+            'configuration' => $this->configurationResolver->execute(ReportConfiguration::TYPE_BALANCE_SHEET),
         ]);
     }
 
@@ -76,6 +81,7 @@ class ReportController extends Controller
             'selectedYearId' => (int) $selectedYearId,
             'comparisonYearId' => $comparisonYearId ? (int) $comparisonYearId : null,
             'report' => $report,
+            'configuration' => $this->configurationResolver->execute(ReportConfiguration::TYPE_INCOME_STATEMENT),
         ]);
     }
 
@@ -92,6 +98,7 @@ class ReportController extends Controller
             'fiscalYears' => $fiscalYears,
             'selectedYearId' => (int) $selectedYearId,
             'report' => $report,
+            'configuration' => $this->configurationResolver->execute(ReportConfiguration::TYPE_CASH_FLOW),
         ]);
     }
 

@@ -1,6 +1,6 @@
 # Implementation Status — Database Modules
 
-> **Last updated:** 2026-05-02
+> **Last updated:** 2026-05-13
 >
 > **Purpose:** Referensi cepat untuk AI agent dan developer tentang status implementasi setiap modul database. Dokumen ini adalah satu-satunya sumber kebenaran untuk status implementasi — jangan duplikasi informasi ini di file desain individual.
 
@@ -30,8 +30,8 @@
 | 14 | Inventory (Warehouse/Transfer/Opname) | `14_inventory_design.md` | ✅ Implemented | |
 | 15 | Accounts Payable | `15_accounts_payable_design.md` | ✅ Implemented | PR #10 |
 | 16 | Accounts Receivable | `16_accounts_receivable_design.md` | ✅ Implemented | PR #11 |
-| 17 | General Ledger (Extended) | `17_general_ledger_design.md` | ✅ Implemented | PR pending |
-| 18 | Financial Reports | `18_financial_reports_design.md` | 📐 Designed Only | |
+| 17 | General Ledger (Extended) | `17_general_ledger_design.md` | ✅ Implemented | PR #12 |
+| 18 | Financial Reports | `18_financial_reports_design.md` | 🚧 In Progress | `feature/financial-reports` |
 
 ---
 
@@ -239,22 +239,22 @@
 
 ---
 
-### 📐 Financial Reports
+### 🚧 Financial Reports
 
 **Design doc:** `18_financial_reports_design.md`
 
 | Layer | Status |
 |-------|--------|
-| Migration | ❌ Not created |
-| Model | ❌ Not created |
-| Controller | 🔨 Partial (`ReportController` exists but scope unclear) |
-| Frontend | 🔨 Partial (`pages/reports/` exists) |
-| Factory | ❌ Not created |
-| Tests | ❌ Not created |
+| Migration | 🚧 In Progress (branch `feature/financial-reports`) |
+| Model | 🚧 In Progress |
+| Controller | 🚧 In Progress |
+| Frontend | 🚧 In Progress |
+| Factory | 🚧 In Progress |
+| Tests | 🚧 In Progress |
 
 **Tables to create:** `report_configurations`, `report_sections`
 
-**Dependencies:** Requires GL Extended (📐), AP (✅), AR (✅)
+**Dependencies:** GL Extended (✅), AP (✅), AR (✅) — all prerequisites merged (PR #10, #11, #12).
 
 ---
 

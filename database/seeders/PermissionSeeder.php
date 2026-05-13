@@ -341,6 +341,27 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'report_configuration',
+                'display_name' => 'Report Configuration',
+                'child' => [
+                    [
+                        'name' => 'report_configuration.create',
+                        'display_name' => 'Create Report Configuration',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'report_configuration.edit',
+                        'display_name' => 'Edit Report Configuration',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'report_configuration.delete',
+                        'display_name' => 'Delete Report Configuration',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'asset',
                 'display_name' => 'Asset',
                 'child' => [
