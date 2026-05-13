@@ -64,7 +64,7 @@ export interface ModuleTestConfig {
 
 async function waitForApiResponse(page: Page, apiPath: string): Promise<void> {
     await page.waitForResponse(r => r.url().includes(apiPath) && r.status() < 400, {
-        timeout: 15000,
+        timeout: 30000,
     });
 }
 

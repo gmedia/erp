@@ -23,6 +23,9 @@ class PipelineSampleDataSeeder extends Seeder
 
         // ── Customer Invoice Lifecycle Pipeline ───────────────────────
         $this->seedCustomerInvoiceLifecyclePipeline($adminUserId);
+
+        // ── Asset Lifecycle Pipeline ─────────────────────────────────
+        $this->seedAssetLifecycle($adminUserId);
     }
 
     /**
@@ -247,6 +250,69 @@ class PipelineSampleDataSeeder extends Seeder
                     ])
                 );
             }
+        }
+    }
+
+    private function seedAssetLifecycle(?int $adminUserId): void
+    {
+        $pipeline = Pipeline::firstOrCreate(
+            ['code' => 'asset_lifecycle'],
+            [
+                'name' => 'Asset Lifecycle',
+                'code' => 'asset_lifecycle',
+                'entity_type' => 'App\Models\Asset',
+                'description' => 'Mengelola siklus hidup aset — dari draft, aktif, maintenance, hingga disposed/lost/cancelled.',
+                'version' => 1,
+                'is_active' => true,
+                'conditions' => null,
+                'created_by' => $adminUserId,
+            ]
+        );
+
+        $statesData = [
+            ['code' => 'draft', 'name' => 'Draft', 'type' => 'initial', 'color' => '#6B7280', 'icon' => 'FileEdit', 'description' => 'Aset baru didaftarkan, belum aktif.', 'sort_order' => 0],
+            ['code' => 'active', 'name' => 'Active', 'type' => 'intermediate', 'color' => '#10B981', 'icon' => 'CircleCheck', 'description' => 'Aset aktif digunakan.', 'sort_order' => 10],
+            ['code' => 'maintenance', 'name' => 'In Maintenance', 'type' => 'intermediate', 'color' => '#F59E0B', 'icon' => 'Wrench', 'description' => 'Aset sedang dalam perawatan.', 'sort_order' => 20],
+            ['code' => 'disposed', 'name' => 'Disposed', 'type' => 'final', 'color' => '#EF4444', 'icon' => 'Trash2', 'description' => 'Aset dihapusbukukan.', 'sort_order' => 30],
+            ['code' => 'lost', 'name' => 'Lost', 'type' => 'final', 'color' => '#DC2626', 'icon' => 'AlertTriangle', 'description' => 'Aset hilang.', 'sort_order' => 40],
+            ['code' => 'cancelled', 'name' => 'Cancelled', 'type' => 'final', 'color' => '#9CA3AF', 'icon' => 'Ban', 'description' => 'Pendaftaran aset dibatalkan.', 'sort_order' => 50],
+        ];
+
+        $states = [];
+        foreach ($statesData as $stateData) {
+            $states[$stateData['code']] = PipelineState::firstOrCreate(
+                ['pipeline_id' => $pipeline->id, 'code' => $stateData['code']],
+                array_merge($stateData, ['pipeline_id' => $pipeline->id])
+            );
+        }
+
+        $transitionsData = [
+            ['from' => 'draft', 'to' => 'active', 'name' => 'Activate', 'code' => 'activate', 'requires_confirmation' => true, 'requires_comment' => false],
+            ['from' => 'draft', 'to' => 'cancelled', 'name' => 'Cancel', 'code' => 'cancel', 'requires_confirmation' => true, 'requires_comment' => false],
+            ['from' => 'active', 'to' => 'maintenance', 'name' => 'Send to Maintenance', 'code' => 'send_to_maintenance', 'requires_confirmation' => false, 'requires_comment' => true],
+            ['from' => 'active', 'to' => 'disposed', 'name' => 'Dispose', 'code' => 'dispose', 'requires_confirmation' => true, 'requires_comment' => true],
+            ['from' => 'active', 'to' => 'lost', 'name' => 'Mark as Lost', 'code' => 'mark_as_lost', 'requires_confirmation' => true, 'requires_comment' => true],
+            ['from' => 'maintenance', 'to' => 'active', 'name' => 'Return from Maintenance', 'code' => 'return_from_maintenance', 'requires_confirmation' => false, 'requires_comment' => false],
+        ];
+
+        foreach ($transitionsData as $tData) {
+            PipelineTransition::firstOrCreate(
+                [
+                    'pipeline_id' => $pipeline->id,
+                    'from_state_id' => $states[$tData['from']]->id,
+                    'to_state_id' => $states[$tData['to']]->id,
+                ],
+                [
+                    'pipeline_id' => $pipeline->id,
+                    'name' => $tData['name'],
+                    'code' => $tData['code'],
+                    'from_state_id' => $states[$tData['from']]->id,
+                    'to_state_id' => $states[$tData['to']]->id,
+                    'requires_confirmation' => $tData['requires_confirmation'],
+                    'requires_comment' => $tData['requires_comment'],
+                    'is_active' => true,
+                ]
+            );
         }
     }
 }

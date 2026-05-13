@@ -90,19 +90,19 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
     await goToAssetProfile(page, assetName);
 
-    // Click Activate
     const activateBtn = page.getByRole('button', { name: 'Activate' });
     await expect(activateBtn).toBeVisible();
-    await Promise.all([
-      page.waitForResponse(
-        r => r.url().includes('/api/entity-states/') && r.status() < 400
-      ),
-      activateBtn.click(),
-    ]);
+    await activateBtn.click();
 
-    // After activation with approval, the state should change to Active
-    // (pipeline moves to active, but approval is pending)
-    // Verify success message
+    const confirmDialog = page.getByRole('alertdialog');
+    await expect(confirmDialog).toBeVisible({ timeout: 5000 });
+
+    const transitionResponse = page.waitForResponse(
+      r => r.url().includes('/api/entity-states/') && r.status() < 400
+    );
+    await confirmDialog.getByRole('button', { name: /Confirm/i }).click();
+    await transitionResponse;
+
     await expect(
       page.getByText(/transition executed|success/i).first()
     ).toBeVisible({ timeout: 10000 });
@@ -117,21 +117,22 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
     await goToAssetProfile(page, assetName);
 
-    // Activate the asset
     const activateBtn = page.getByRole('button', { name: 'Activate' });
-    await Promise.all([
-      page.waitForResponse(
-        r => r.url().includes('/api/entity-states/') && r.status() < 400
-      ),
-      activateBtn.click(),
-    ]);
+    await activateBtn.click();
 
-    // Wait for success
+    const confirmDialog = page.getByRole('alertdialog');
+    await expect(confirmDialog).toBeVisible({ timeout: 5000 });
+
+    const transitionResponse = page.waitForResponse(
+      r => r.url().includes('/api/entity-states/') && r.status() < 400
+    );
+    await confirmDialog.getByRole('button', { name: /Confirm/i }).click();
+    await transitionResponse;
+
     await expect(
       page.getByText(/transition executed|success/i).first()
     ).toBeVisible({ timeout: 10000 });
 
-    // Navigate to Approvals tab
     const approvalsTab = page.getByRole('tab', { name: /Approvals/i });
     await Promise.all([
       page.waitForResponse(
@@ -140,11 +141,9 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
       approvalsTab.click(),
     ]);
 
-    // Verify the tab panel is visible and shows approval data
     const tabContent = page.getByRole('tabpanel', { name: /Approvals/i });
     await expect(tabContent).toBeVisible();
 
-    // Should show pending or submitted status
     await expect(
       tabContent.getByText(/pending|submitted|approval/i).first()
     ).toBeVisible();
@@ -152,18 +151,22 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
   // ── Step 5: HR Manager approves (Step 1) ─────────────────────────
   test('Step 5: HR Manager can approve step 1 via My Approvals', async ({ page }) => {
-    // First, create and activate asset as admin
     await login(page, 'admin@dokfin.id', undefined, { requireDashboard: false });
     assetName = await createHighValueAsset(page);
     await goToAssetProfile(page, assetName);
 
     const activateBtn = page.getByRole('button', { name: 'Activate' });
-    await Promise.all([
-      page.waitForResponse(
-        r => r.url().includes('/api/entity-states/') && r.status() < 400
-      ),
-      activateBtn.click(),
-    ]);
+    await activateBtn.click();
+
+    const confirmDialog = page.getByRole('alertdialog');
+    await expect(confirmDialog).toBeVisible({ timeout: 5000 });
+
+    const transitionResponse = page.waitForResponse(
+      r => r.url().includes('/api/entity-states/') && r.status() < 400
+    );
+    await confirmDialog.getByRole('button', { name: /Confirm/i }).click();
+    await transitionResponse;
+
     await expect(
       page.getByText(/transition executed|success/i).first()
     ).toBeVisible({ timeout: 10000 });
@@ -206,18 +209,22 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
   // ── Step 6: Finance Director approves (Step 2) ───────────────────
   test('Step 6: Finance Director can approve step 2 via My Approvals', async ({ page }) => {
-    // First, create and activate asset as admin
     await login(page, 'admin@dokfin.id', undefined, { requireDashboard: false });
     assetName = await createHighValueAsset(page);
     await goToAssetProfile(page, assetName);
 
     const activateBtn = page.getByRole('button', { name: 'Activate' });
-    await Promise.all([
-      page.waitForResponse(
-        r => r.url().includes('/api/entity-states/') && r.status() < 400
-      ),
-      activateBtn.click(),
-    ]);
+    await activateBtn.click();
+
+    const confirmDialog = page.getByRole('alertdialog');
+    await expect(confirmDialog).toBeVisible({ timeout: 5000 });
+
+    const transitionResponse = page.waitForResponse(
+      r => r.url().includes('/api/entity-states/') && r.status() < 400
+    );
+    await confirmDialog.getByRole('button', { name: /Confirm/i }).click();
+    await transitionResponse;
+
     await expect(
       page.getByText(/transition executed|success/i).first()
     ).toBeVisible({ timeout: 10000 });

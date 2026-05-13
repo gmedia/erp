@@ -328,7 +328,7 @@ final class TransactionMappedIndexConfigurations
                 'pr_number',
                 'branch_id',
                 'department_id',
-                'requester_id',
+                'requested_by',
                 'priority',
                 'status',
                 'request_date',
@@ -339,10 +339,10 @@ final class TransactionMappedIndexConfigurations
             'sort_map' => [
                 'branch' => 'branch_id',
                 'department' => 'department_id',
-                'requester' => 'requester_id',
+                'requester' => 'requested_by',
             ],
         ],
-        'supplier_bills' => [
+         'supplier_bills' => [
             'model_class' => SupplierBill::class,
             'with' => [
                 'supplier',
@@ -352,7 +352,6 @@ final class TransactionMappedIndexConfigurations
                 'confirmer',
                 'items.product',
                 'items.account',
-                'items.unit',
             ],
             'search_fields' => [
                 'bill_number',
