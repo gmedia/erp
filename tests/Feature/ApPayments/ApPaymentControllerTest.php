@@ -3,6 +3,7 @@
 use App\Models\Account;
 use App\Models\ApPayment;
 use App\Models\Branch;
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\Supplier;
 use App\Models\SupplierBill;
@@ -137,7 +138,34 @@ test('show returns ap payment detail', function () {
 });
 
 test('update modifies ap payment', function () {
-    $apPayment = ApPayment::factory()->create();
+    FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '21100',
+        'name' => 'Accounts Payable',
+        'type' => 'liability',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
+    $bankAccount = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11110',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+
+    $apPayment = ApPayment::factory()->create([
+        'payment_date' => '2026-03-15',
+        'bank_account_id' => $bankAccount->id,
+        'total_amount' => 500000,
+    ]);
 
     $payload = [
         'status' => 'confirmed',

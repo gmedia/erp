@@ -1,6 +1,6 @@
 # Implementation Status — Database Modules
 
-> **Last updated:** 2026-05-13
+> **Last updated:** 2026-05-15
 >
 > **Purpose:** Referensi cepat untuk AI agent dan developer tentang status implementasi setiap modul database. Dokumen ini adalah satu-satunya sumber kebenaran untuk status implementasi — jangan duplikasi informasi ini di file desain individual.
 
@@ -31,7 +31,7 @@
 | 15 | Accounts Payable | `15_accounts_payable_design.md` | ✅ Implemented | PR #10 |
 | 16 | Accounts Receivable | `16_accounts_receivable_design.md` | ✅ Implemented | PR #11 |
 | 17 | General Ledger (Extended) | `17_general_ledger_design.md` | ✅ Implemented | PR #12 |
-| 18 | Financial Reports | `18_financial_reports_design.md` | 🚧 In Progress | `feature/financial-reports` |
+| 18 | Financial Reports | `18_financial_reports_design.md` | ✅ Implemented | PR #13 |
 
 ---
 
@@ -239,22 +239,24 @@
 
 ---
 
-### 🚧 Financial Reports
+### ✅ Financial Reports
 
 **Design doc:** `18_financial_reports_design.md`
 
-| Layer | Status |
-|-------|--------|
-| Migration | 🚧 In Progress (branch `feature/financial-reports`) |
-| Model | 🚧 In Progress |
-| Controller | 🚧 In Progress |
-| Frontend | 🚧 In Progress |
-| Factory | 🚧 In Progress |
-| Tests | 🚧 In Progress |
+| Layer | Status | Files |
+|-------|--------|-------|
+| Migration | ✅ | `2026_05_13_000100_create_report_configurations_table.php`, `2026_05_13_000200_create_report_sections_table.php` |
+| Model | ✅ | `ReportConfiguration`, `ReportSection` |
+| Controller | ✅ | `ReportConfigurationController`, `ReportController` (extended with `configuration` payload) |
+| Frontend | ✅ | `pages/report-configurations/`, `components/report-configurations/` (Columns, Filters, Form with `useFieldArray`, ViewModal) |
+| Factory | ✅ | `ReportConfigurationFactory`, `ReportSectionFactory` |
+| Tests | ✅ | 36 Pest financial-reports, 12 Pest reports, 7 E2E `report-configurations` |
+| Seeder | ✅ | `ReportConfigurationSeeder` (4 default configs: balance_sheet 15, income_statement 16, cash_flow 13, trial_balance 2 sections) |
 
-**Tables to create:** `report_configurations`, `report_sections`
+**Dependencies:** GL Extended (✅), AP (✅), AR (✅) — all prerequisites merged (PR #10, #11, #12, #13).
 
-**Dependencies:** GL Extended (✅), AP (✅), AR (✅) — all prerequisites merged (PR #10, #11, #12).
+**Known gaps vs design:**
+- Layout binding to actual GL/AP/AR balances dilakukan via existing `ReportController` actions; konfigurasi saat ini fokus pada struktur sections (ordering, sign_convention, formula). Render engine yang membaca formula expression untuk komputasi advanced belum diimplementasi (current behavior: section metadata + balance lookup by account code).
 
 ---
 
@@ -315,20 +317,13 @@ Dependencies: COA (✅), AP (✅ Fase 1A), AR (✅ Fase 1B)
 Design doc: `17_general_ledger_design.md`
 Note: Sebagian fitur GL dasar (journal entries, posting) sudah ada di COA module. Fase ini menambahkan fitur lanjutan.
 
-### Fase 3 — Financial Reports (18)
+### Fase 3 — Financial Reports (18) — ✅ COMPLETE
 
-Harus menunggu GL Extended selesai karena laporan keuangan membutuhkan data dari semua modul akuntansi.
+Implemented in PR #13 (`feature/financial-reports`). 42 files / +2453 / −42, 36 Pest financial-reports tests, 12 Pest reports tests, 7 E2E `report-configurations` tests.
 
-| Step | Scope | Skill | Estimasi |
-|------|-------|-------|----------|
-| 1 | Migration: `report_configurations`, `report_sections` | `database-migration` | 15m |
-| 2 | Models + Backend | `feature-non-crud` | 2h |
-| 3 | Frontend: Report pages (balance sheet, income statement, cash flow, dll) | `feature-non-crud` | 4h |
-| 4 | Tests | `testing-strategy` | 2h |
-
-Dependencies: GL Extended (Fase 2), AP (Fase 1A), AR (Fase 1B)
+Dependencies: GL Extended (✅ Fase 2), AP (✅ Fase 1A), AR (✅ Fase 1B)
 Design doc: `18_financial_reports_design.md`
-Note: Partial implementation sudah ada (`ReportController`, `pages/reports/`). Fase ini memperluas dengan konfigurasi report dan section yang dinamis.
+Note: Tabel `report_configurations` dan `report_sections` dengan hierarchical `parent_id`, enum `section_type` (header/detail/subtotal/total/separator), dan enum `sign_convention` (normal/reversed). `ReportController` diperluas dengan key `configuration` (additive, non-breaking).
 
 ### Fase 4 — Integration & Remaining Gaps
 
@@ -378,6 +373,8 @@ Task-task ini bisa dikerjakan kapan saja, tidak harus menunggu Fase 1-3.
 
 | Date | Milestone |
 |------|-----------|
+| 2026-05-15 | Financial Reports module complete (PR #13) |
+| 2026-05-13 | General Ledger Extended module complete (PR #12) |
 | 2026-05-11 | Accounts Receivable module complete (PR #11) |
 | 2026-05-10 | Accounts Payable module complete (PR #10) |
 | 2026-05-02 | Products V1→V2 migration complete (Fase 1-8) |

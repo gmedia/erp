@@ -1,6 +1,6 @@
-# AI Handoff: Financial Reports (Modul 18) — Config-Driven Refactor
+# AI Handoff: AP Journal Auto-Posting (Pending Decision #2 part 1)
 
-Last updated: 2026-05-13 UTC
+Last updated: 2026-05-15 UTC
 
 ## Document Roles
 
@@ -10,73 +10,66 @@ Last updated: 2026-05-13 UTC
 
 ## Current Objective
 
-- **Financial Reports (Modul 18)** — Config-driven report system with Report Configuration CRUD. Local implementation complete. Ready to push branch + open PR.
+- Ship AP journal auto-posting (Modul 15 §4 / Modul 17 §6 integration). Branch ready; commit + push + PR pending.
 
 ## Current Milestone
 
-- PR #12 (GL Extended) merged to main as `f3252285`.
-- Branch `feature/financial-reports` — all waves complete locally:
-  - ✅ Wave 1: Migrations (`report_configurations`, `report_sections`) + Models + 16 unit tests
-  - ✅ Wave 2: `ReportConfigurationSeeder` seeds 4 defaults (balance_sheet 15 sections, income_statement 16, cash_flow 13, trial_balance 2)
-  - ✅ Wave 3: Report Configuration CRUD backend (Controller, Action, FilterService, Requests, Resource, Export) + 14 feature tests
-  - ✅ Wave 4: `ReportController` extended with `configuration` payload (via `GetReportConfigurationByTypeAction`) — additive, non-breaking + 6 new tests
-  - ✅ Wave 5: Frontend CRUD (entity config, Columns, Filters, Form with `useFieldArray` for sections, ViewModal, page) + Menu + Permission seeder entries
-  - ✅ Wave 6: E2E Playwright (7 specs passed) + Quality gate (PHPStan 0 errors, TS clean, ESLint clean)
+- ✅ **Modul 18 (Financial Reports)** — merged via PR #13 as `82b7989e`.
+- 🚧 **AP journal auto-posting** — branch `feature/ap-journal-auto-posting`. All code + tests + style verifications green locally. Ready to commit + push + open PR.
 
 ## Current State
 
-- Branch: `feature/financial-reports`
-- Commits: pending (not yet committed)
-- HEAD parent: `f3252285` (merged main)
-- PHPStan: 0 errors (full project 1023 files)
-- TypeScript: clean (`npm run types`)
-- ESLint: clean (`npm run lint --fix`)
-- Pest `--group=financial-reports`: 36 passed (103 assertions)
-- Pest `--group=reports`: 12 passed (79 assertions)
-- E2E `tests/e2e/report-configurations/`: 7 passed (33.7s)
+- Branch: `feature/ap-journal-auto-posting`
+- Parent: `82b7989e` (main)
+- Commits: pending
+- PHPStan: 0 errors (full project)
+- Pest groups: ap-journal-posting (13/13), supplier-bills (8/8), ap-payments (12/12), journal-entries (29/29), asset-depreciation-runs (12/12), goods-receipts (22/22), purchase-orders (17/17), ar-receipts (8/8), customer-invoices (8/8), recurring-journals (16/16), reports (12/12), accounts (34/34) — all green.
+- Duster: applied (CS Fixer + Pint pass).
 
 ## Active Constraints
 
 - Use Sail for every runtime command.
+- Auto-posting is additive + non-breaking; existing tests that triggered `status='confirmed'` were updated to seed the COA control account (`code=21100`).
 
 ## Latest Session Delta
 
-- Merged PR #12 (GL Extended) — no code changes, just CI retrigger after autofix commit (`8b608724`).
-- Implemented Modul 18 config-driven refactor (full scope per user choice):
-  - Config tables `report_configurations`, `report_sections` with hierarchical `parent_id`, `section_type` enum (header/detail/subtotal/total/separator), `sign_convention` enum (normal/reversed), optional `formula`.
-  - Seeder preloads design-doc defaults for 4 built-in reports.
-  - Admin UI at `/report-configurations` with nested section editor (`useFieldArray`).
-  - `GET /api/reports/{balance-sheet,income-statement,cash-flow,trial-balance}` responses now include `configuration: { id, code, name, report_type, sections: [...] }` key. Existing `report` payload unchanged → frontend pages keep working.
-  - Menu seeder adds "Report Configuration" entry under Accounting. Permission seeder adds `report_configuration` + CRUD children.
+- Added 3 new actions in `app/Actions/AccountingPosting/`:
+  - `ResolveControlAccountAction` — looks up an account by code in the active CoaVersion.
+  - `PostSupplierBillJournalAction` — on bill confirm: Debit per-item `account_id` (grouped by account), Credit AP control (`code=21100`). Idempotent via `journal_entry_id` short-circuit.
+  - `PostApPaymentJournalAction` — on payment confirm: Debit AP control, Credit `bank_account_id`. Idempotent.
+- Extended `CreateJournalEntryAction::execute()` (additive): accepts optional `status` (`draft`|`posted`), `journal_type`, `source_type`, `source_id`. When `status='posted'`, balance is verified and `posted_by/posted_at` are stamped. Existing callers (depreciation, JournalEntryController) unchanged.
+- Wired hooks in `SupplierBillController::update()` and `ApPaymentController::update()` — only fires when status transitions from non-confirmed to `confirmed` (uses `confirmed_at === null` guard).
+- Pest coverage:
+  - Action-level: balance, idempotency, no-op when not confirmed, validation errors (no items, no active COA, non-positive payment).
+  - Controller-level: PUT endpoint posts journal on confirm; second PUT does NOT double-post.
+- Updated existing controller tests `update modifies supplier bill and items` + `update modifies ap payment` to seed FiscalYear + active CoaVersion + AP control account + bank account before triggering confirm.
 
 ## Validated Commands and Outcomes
 
-- `./vendor/bin/sail bin phpstan analyze` — 0 errors
-- `./vendor/bin/sail npm run types` — clean
-- `./vendor/bin/sail npm run lint` — clean
-- `./vendor/bin/sail test --group=financial-reports` — 36 passed (103 assertions)
-- `./vendor/bin/sail test --group=reports` — 12 passed (79 assertions)
-- `./vendor/bin/sail npm run test:e2e -- tests/e2e/report-configurations/` — 7 passed
-- `./vendor/bin/sail artisan migrate:fresh --seed` — all seeders green
+- `./vendor/bin/sail bin phpstan analyze` — 0 errors.
+- `./vendor/bin/sail test --group=ap-journal-posting` — 13 passed (47 assertions).
+- `./vendor/bin/sail test --group=supplier-bills` — 8 passed (42 assertions).
+- `./vendor/bin/sail test --group=ap-payments` — 12 passed (58 assertions).
+- `./vendor/bin/sail test --group=journal-entries` — 29 passed (194 assertions).
+- `./vendor/bin/sail test --group=asset-depreciation-runs` — 12 passed (no regression on the other CreateJournalEntryAction caller).
+- `./vendor/bin/sail bin duster fix` — clean.
 
 ## Open Risks / Blockers
 
-- None. Ready to commit + push + open PR.
-- Note: `sail bin duster fix` was invoked once but exceeded the 5m bash timeout. Not a blocker — PHPStan/TS/ESLint/Pest all pass, and CI duster step will auto-fix on push if anything slipped.
+- None. Test DB is clean, all groups green, PHPStan clean.
 
 ## Recommended Next Steps
 
-1. Stage and commit all 29 changed files in one atomic commit: `feat: implement Financial Reports module (Modul 18)`.
-2. Push branch `feature/financial-reports` to origin.
-3. Open PR against `main` titled `feat: implement Financial Reports module (Modul 18)` referencing `docs/database/18_financial_reports_design.md`.
-4. Wait for CI. After autofix (if any), retrigger via empty commit per existing convention.
-5. On green CI → merge.
+1. Stage + commit all changes in one atomic commit: `feat: auto-post AP journal entries on bill/payment confirm (Pending Decision #2 partial)`.
+2. Push branch `feature/ap-journal-auto-posting`. Open PR against `main`.
+3. Monitor CI (expect autofix retrigger pattern as usual). Merge when green.
+4. Start AR journal auto-posting branch (`feature/ar-journal-auto-posting`) using the same pattern: PostCustomerInvoiceJournalAction (Debit AR, Credit Revenue) + PostArReceiptJournalAction (Debit Bank, Credit AR).
 
 ## Continuation Prompt
 
 ```
-Read task.md. Modul 18 (Financial Reports) implementation complete on branch feature/financial-reports.
-Commit all changes with message "feat: implement Financial Reports module (Modul 18)",
-push to origin, open PR against main. Monitor CI (expect autofix retrigger pattern),
-then merge when green.
+Read task.md. Branch feature/ap-journal-auto-posting on parent 82b7989e (main).
+AP auto-posting (SupplierBill + ApPayment) implemented + tested. Commit "feat: auto-post AP
+journal entries on bill/payment confirm", push, open PR, monitor CI, merge.
+After merge, start feature/ar-journal-auto-posting using the same pattern.
 ```

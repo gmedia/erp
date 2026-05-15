@@ -5,19 +5,45 @@ namespace App\Actions\JournalEntries;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class CreateJournalEntryAction
 {
+    /**
+     * Create a journal entry with its lines.
+     *
+     * Optional keys (all backward compatible):
+     * - status: 'draft'|'posted' (default 'draft'). When 'posted', posted_by/posted_at are
+     *   filled and the entry is balance-verified before saving.
+     * - journal_type: e.g. 'general', 'adjusting', 'closing', 'recurring', 'system'.
+     * - source_type, source_id: morph reference to the originating document.
+     */
     public function execute(array $data): JournalEntry
     {
         $attempts = 0;
         $maxAttempts = 3;
 
+        $status = $data['status'] ?? 'draft';
+
+        if ($status === 'posted') {
+            $totalDebit = 0.0;
+            $totalCredit = 0.0;
+            foreach ($data['lines'] as $line) {
+                $totalDebit += (float) ($line['debit'] ?? 0);
+                $totalCredit += (float) ($line['credit'] ?? 0);
+            }
+            if (bccomp((string) $totalDebit, (string) $totalCredit, 2) !== 0) {
+                throw ValidationException::withMessages([
+                    'lines' => 'Journal entry is not balanced (debit must equal credit).',
+                ]);
+            }
+        }
+
         while ($attempts < $maxAttempts) {
             try {
-                return DB::transaction(function () use ($data) {
+                return DB::transaction(function () use ($data, $status) {
                     $entryDate = $data['entry_date'];
 
                     $fiscalYear = FiscalYear::where('start_date', '<=', $entryDate)
@@ -55,15 +81,27 @@ class CreateJournalEntryAction
 
                     $entryNumber = 'JV-' . $fiscalYear->name . '-' . str_pad((string) $count, 5, '0', STR_PAD_LEFT);
 
-                    $journalEntry = JournalEntry::create([
+                    $userId = Auth::id();
+
+                    $attributes = [
                         'fiscal_year_id' => $fiscalYear->id,
                         'entry_number' => $entryNumber,
                         'entry_date' => $data['entry_date'],
                         'reference' => $data['reference'] ?? null,
                         'description' => $data['description'],
-                        'status' => 'draft', // Default to draft
-                        'created_by' => auth()->id(),
-                    ]);
+                        'status' => $status,
+                        'journal_type' => $data['journal_type'] ?? 'general',
+                        'source_type' => $data['source_type'] ?? null,
+                        'source_id' => $data['source_id'] ?? null,
+                        'created_by' => $userId,
+                    ];
+
+                    if ($status === 'posted') {
+                        $attributes['posted_by'] = $userId;
+                        $attributes['posted_at'] = now();
+                    }
+
+                    $journalEntry = JournalEntry::create($attributes);
 
                     foreach ($data['lines'] as $lineData) {
                         $journalEntry->lines()->create([
