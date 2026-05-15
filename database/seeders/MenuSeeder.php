@@ -99,6 +99,19 @@ class MenuSeeder extends Seeder
                         'url' => 'posting-journals',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'report_configuration',
+                        'display_name' => 'Report Configuration',
+                        'permissions' => [
+                            'report_configuration',
+                            'report_configuration.create',
+                            'report_configuration.edit',
+                            'report_configuration.delete',
+                        ],
+                        'icon' => 'Settings',
+                        'url' => 'report-configurations',
+                        'child' => [],
+                    ],
                 ],
             ],
             [

@@ -1,4 +1,4 @@
-# AI Handoff: GL Extended — E2E Tests & Bug Fixes
+# AI Handoff: Financial Reports (Modul 18) — Config-Driven Refactor
 
 Last updated: 2026-05-13 UTC
 
@@ -10,23 +10,30 @@ Last updated: 2026-05-13 UTC
 
 ## Current Objective
 
-- **GL Extended (Modul 17)** — PR #12 open. All CI checks passed. Ready to merge.
+- **Financial Reports (Modul 18)** — Config-driven report system with Report Configuration CRUD. Local implementation complete. Ready to push branch + open PR.
 
 ## Current Milestone
 
-- **GL Extended**: ✅ Implementation complete. Sonar passed. E2E tests added. Bug fixes applied.
-- Full E2E suite: **466 passed, 0 failed** (42.0m)
-- PR #12 CI: Quality checks ✅, Test suite ✅, SonarCloud ✅
+- PR #12 (GL Extended) merged to main as `f3252285`.
+- Branch `feature/financial-reports` — all waves complete locally:
+  - ✅ Wave 1: Migrations (`report_configurations`, `report_sections`) + Models + 16 unit tests
+  - ✅ Wave 2: `ReportConfigurationSeeder` seeds 4 defaults (balance_sheet 15 sections, income_statement 16, cash_flow 13, trial_balance 2)
+  - ✅ Wave 3: Report Configuration CRUD backend (Controller, Action, FilterService, Requests, Resource, Export) + 14 feature tests
+  - ✅ Wave 4: `ReportController` extended with `configuration` payload (via `GetReportConfigurationByTypeAction`) — additive, non-breaking + 6 new tests
+  - ✅ Wave 5: Frontend CRUD (entity config, Columns, Filters, Form with `useFieldArray` for sections, ViewModal, page) + Menu + Permission seeder entries
+  - ✅ Wave 6: E2E Playwright (7 specs passed) + Quality gate (PHPStan 0 errors, TS clean, ESLint clean)
 
 ## Current State
 
-- Branch: `feature/general-ledger-extended`
-- PR: #12 (https://github.com/gmedia/erp/pull/12)
-- CI: All checks PASS, mergeable
-- PHPStan: 0 errors (3 pre-existing in PipelineSampleDataSeeder — nullsafe + offset)
-- TypeScript: clean
-- Pest: 54 tests, 155 assertions, all passing
-- E2E: 466 passed, 0 failed
+- Branch: `feature/financial-reports`
+- Commits: pending (not yet committed)
+- HEAD parent: `f3252285` (merged main)
+- PHPStan: 0 errors (full project 1023 files)
+- TypeScript: clean (`npm run types`)
+- ESLint: clean (`npm run lint --fix`)
+- Pest `--group=financial-reports`: 36 passed (103 assertions)
+- Pest `--group=reports`: 12 passed (79 assertions)
+- E2E `tests/e2e/report-configurations/`: 7 passed (33.7s)
 
 ## Active Constraints
 
@@ -34,37 +41,42 @@ Last updated: 2026-05-13 UTC
 
 ## Latest Session Delta
 
-- Added E2E tests for 5 GL Extended modules:
-  - `tests/e2e/recurring-journals/` (8 tests)
-  - `tests/e2e/bank-reconciliations/` (7 tests)
-  - `tests/e2e/period-closings/` (7 tests)
-  - `tests/e2e/general-ledger-report/` (1 test)
-  - `tests/e2e/trial-balance-report/` (1 test)
-- Fixed 27 pre-existing E2E failures:
-  - Supplier Bills 500: removed invalid `items.unit` eager load from `TransactionMappedIndexConfigurations.php`
-  - Entity State/Pipeline 17 failures: added `seedAssetLifecycle()` to `PipelineSampleDataSeeder.php`
-  - High-value asset registration 5 failures: fixed tests to handle confirmation dialog before API call
-  - Purchase Request sort 500: fixed `requester → requested_by` sort mapping
-- Increased shared test factory `waitForApiResponse` timeout from 15s to 30s
+- Merged PR #12 (GL Extended) — no code changes, just CI retrigger after autofix commit (`8b608724`).
+- Implemented Modul 18 config-driven refactor (full scope per user choice):
+  - Config tables `report_configurations`, `report_sections` with hierarchical `parent_id`, `section_type` enum (header/detail/subtotal/total/separator), `sign_convention` enum (normal/reversed), optional `formula`.
+  - Seeder preloads design-doc defaults for 4 built-in reports.
+  - Admin UI at `/report-configurations` with nested section editor (`useFieldArray`).
+  - `GET /api/reports/{balance-sheet,income-statement,cash-flow,trial-balance}` responses now include `configuration: { id, code, name, report_type, sections: [...] }` key. Existing `report` payload unchanged → frontend pages keep working.
+  - Menu seeder adds "Report Configuration" entry under Accounting. Permission seeder adds `report_configuration` + CRUD children.
 
 ## Validated Commands and Outcomes
 
-- `./vendor/bin/sail npm run test:e2e` — 466 passed, 0 failed (42.0m)
 - `./vendor/bin/sail bin phpstan analyze` — 0 errors
 - `./vendor/bin/sail npm run types` — clean
+- `./vendor/bin/sail npm run lint` — clean
+- `./vendor/bin/sail test --group=financial-reports` — 36 passed (103 assertions)
+- `./vendor/bin/sail test --group=reports` — 12 passed (79 assertions)
+- `./vendor/bin/sail npm run test:e2e -- tests/e2e/report-configurations/` — 7 passed
+- `./vendor/bin/sail artisan migrate:fresh --seed` — all seeders green
 
 ## Open Risks / Blockers
 
-- None. PR #12 ready to merge.
+- None. Ready to commit + push + open PR.
+- Note: `sail bin duster fix` was invoked once but exceeded the 5m bash timeout. Not a blocker — PHPStan/TS/ESLint/Pest all pass, and CI duster step will auto-fix on push if anything slipped.
 
 ## Recommended Next Steps
 
-1. Merge PR #12 to main.
-2. After merge → update `docs/database/IMPLEMENTATION_STATUS.md`, start Financial Reports (Modul 18) per `docs/database/18_financial_reports_design.md`.
+1. Stage and commit all 29 changed files in one atomic commit: `feat: implement Financial Reports module (Modul 18)`.
+2. Push branch `feature/financial-reports` to origin.
+3. Open PR against `main` titled `feat: implement Financial Reports module (Modul 18)` referencing `docs/database/18_financial_reports_design.md`.
+4. Wait for CI. After autofix (if any), retrigger via empty commit per existing convention.
+5. On green CI → merge.
 
 ## Continuation Prompt
 
 ```
-Read task.md. PR #12 (GL Extended) has all CI checks passing and full E2E suite green (466/466).
-Merge PR #12, then start Financial Reports (Modul 18) per docs/database/18_financial_reports_design.md.
+Read task.md. Modul 18 (Financial Reports) implementation complete on branch feature/financial-reports.
+Commit all changes with message "feat: implement Financial Reports module (Modul 18)",
+push to origin, open PR against main. Monitor CI (expect autofix retrigger pattern),
+then merge when green.
 ```

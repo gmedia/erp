@@ -86,6 +86,9 @@ const BankReconciliations = lazy(
 );
 const PeriodClosings = lazy(() => import('./pages/period-closings/index'));
 const PostingJournals = lazy(() => import('./pages/posting-journals/index'));
+const ReportConfigurations = lazy(
+    () => import('./pages/report-configurations/index'),
+);
 
 // AR Module (Accounts Receivable)
 const CustomerInvoices = lazy(() => import('./pages/customer-invoices/index'));
@@ -554,6 +557,14 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <PeriodClosings />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/report-configurations"
+                    element={
+                        <P>
+                            <ReportConfigurations />
                         </P>
                     }
                 />
