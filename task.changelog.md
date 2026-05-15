@@ -58,6 +58,14 @@ Catatan penamaan: heading modul memakai pola `Nama Modul di Kode (Label Bisnis)`
 - [x] `JournalEntry.source_type/source_id` di-set ke dokumen sumber (`App\Models\SupplierBill` / `App\Models\ApPayment`) untuk audit trail.
 - [x] Cakupan tes: 13 Pest ap-journal-posting (action-level + controller PUT integration), regresi clean pada supplier-bills, ap-payments, journal-entries, dan asset-depreciation-runs.
 
+### Modul Accounts Receivable (Piutang Usaha)
+
+- [x] Auto-posting jurnal saat Customer Invoice transisi ke `sent`: Debit Accounts Receivable (`code=11200`), Credit akun revenue per-item (grouped by `account_id`).
+- [x] Auto-posting jurnal saat AR Receipt di-confirm: Debit `bank_account_id`, Credit Accounts Receivable.
+- [x] Idempoten — re-save setelah `sent`/`confirmed` tidak menduplikasi jurnal.
+- [x] `JournalEntry.source_type/source_id` di-set ke dokumen sumber (`App\Models\CustomerInvoice` / `App\Models\ArReceipt`) untuk audit trail.
+- [x] Cakupan tes: 13 Pest ar-journal-posting (action-level + controller PUT integration), regresi clean pada customer-invoices, ar-receipts, credit-notes, dan ap-journal-posting.
+
 ## Dokumen Terkait
 
 - Status handoff aktif: `task.md`

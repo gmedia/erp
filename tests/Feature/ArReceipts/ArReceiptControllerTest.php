@@ -3,6 +3,7 @@
 use App\Models\Account;
 use App\Models\ArReceipt;
 use App\Models\Branch;
+use App\Models\CoaVersion;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
@@ -139,16 +140,39 @@ test('show returns ar receipt detail', function () {
 });
 
 test('update modifies ar receipt and allocations', function () {
+    FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11200',
+        'name' => 'Accounts Receivable',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+    $bankAccount = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11110',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+
     $customer = Customer::factory()->create();
-    $fiscalYear = FiscalYear::factory()->create();
     $invoice = CustomerInvoice::factory()->create([
         'customer_id' => $customer->id,
-        'fiscal_year_id' => $fiscalYear->id,
         'status' => 'sent',
     ]);
     $receipt = ArReceipt::factory()->create([
         'customer_id' => $customer->id,
-        'fiscal_year_id' => $fiscalYear->id,
+        'receipt_date' => '2026-03-06',
+        'bank_account_id' => $bankAccount->id,
+        'total_amount' => 75000,
         'status' => 'draft',
     ]);
 

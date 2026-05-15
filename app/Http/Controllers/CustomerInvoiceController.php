@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AccountingPosting\PostCustomerInvoiceJournalAction;
 use App\Actions\CustomerInvoices\ExportCustomerInvoicesAction;
 use App\Actions\CustomerInvoices\IndexCustomerInvoicesAction;
 use App\Actions\CustomerInvoices\SyncCustomerInvoiceItemsAction;
@@ -63,13 +64,16 @@ class CustomerInvoiceController extends Controller
     public function update(
         UpdateCustomerInvoiceRequest $request,
         CustomerInvoice $customerInvoice,
-        SyncCustomerInvoiceItemsAction $syncItems
+        SyncCustomerInvoiceItemsAction $syncItems,
+        PostCustomerInvoiceJournalAction $postJournal
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
-        if (($validated['status'] ?? null) === 'sent' && $customerInvoice->sent_at === null) {
+        $isNewlySent = ($validated['status'] ?? null) === 'sent' && $customerInvoice->sent_at === null;
+
+        if ($isNewlySent) {
             $validated['sent_by'] = Auth::id();
             $validated['sent_at'] = now()->toIso8601String();
         }
@@ -85,6 +89,10 @@ class CustomerInvoiceController extends Controller
                 $syncItems->execute($customerInvoice, $items);
             },
         );
+
+        if ($isNewlySent) {
+            $postJournal->execute($customerInvoice->refresh());
+        }
 
         return (new CustomerInvoiceResource($this->loadResourceRelations($customerInvoice)))->response();
     }

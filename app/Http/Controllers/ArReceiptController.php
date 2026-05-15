@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AccountingPosting\PostArReceiptJournalAction;
 use App\Actions\ArReceipts\ExportArReceiptsAction;
 use App\Actions\ArReceipts\IndexArReceiptsAction;
 use App\Actions\ArReceipts\SyncArReceiptAllocationsAction;
@@ -65,13 +66,16 @@ class ArReceiptController extends Controller
     public function update(
         UpdateArReceiptRequest $request,
         ArReceipt $arReceipt,
-        SyncArReceiptAllocationsAction $syncAllocations
+        SyncArReceiptAllocationsAction $syncAllocations,
+        PostArReceiptJournalAction $postJournal
     ): JsonResponse {
         $validated = $request->validated();
         $allocations = $validated['allocations'] ?? null;
         unset($validated['allocations']);
 
-        if (($validated['status'] ?? null) === 'confirmed' && $arReceipt->confirmed_at === null) {
+        $isNewlyConfirmed = ($validated['status'] ?? null) === 'confirmed' && $arReceipt->confirmed_at === null;
+
+        if ($isNewlyConfirmed) {
             $validated['confirmed_by'] = Auth::id();
             $validated['confirmed_at'] = now()->toIso8601String();
         }
@@ -87,6 +91,10 @@ class ArReceiptController extends Controller
                 $syncAllocations->execute($arReceipt, $allocations);
             },
         );
+
+        if ($isNewlyConfirmed) {
+            $postJournal->execute($arReceipt->refresh());
+        }
 
         return (new ArReceiptResource($this->loadResourceRelations($arReceipt)))->response();
     }

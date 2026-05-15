@@ -2,6 +2,7 @@
 
 use App\Models\Account;
 use App\Models\Branch;
+use App\Models\CoaVersion;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
@@ -148,11 +149,34 @@ test('show returns customer invoice detail', function () {
 });
 
 test('update modifies customer invoice and sets sent_by when status changes to sent', function () {
-    [$customer, $branch, $fiscalYear, $product, $unit, $account] = createCustomerInvoiceWithItem();
+    FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11200',
+        'name' => 'Accounts Receivable',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+
+    [$customer, $branch, , $product, $unit] = createCustomerInvoiceWithItem();
+    $revenueAccount = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '41000',
+        'type' => 'revenue',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
     $invoice = CustomerInvoice::factory()->create([
         'customer_id' => $customer->id,
         'branch_id' => $branch->id,
-        'fiscal_year_id' => $fiscalYear->id,
+        'invoice_date' => '2026-03-01',
         'status' => 'draft',
         'sent_by' => null,
         'sent_at' => null,
@@ -164,7 +188,7 @@ test('update modifies customer invoice and sets sent_by when status changes to s
             [
                 'product_id' => $product->id,
                 'unit_id' => $unit->id,
-                'account_id' => $account->id,
+                'account_id' => $revenueAccount->id,
                 'description' => 'Updated item',
                 'quantity' => 7,
                 'unit_price' => 10000,
