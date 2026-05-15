@@ -1,4 +1,4 @@
-# AI Handoff: AR Journal Auto-Posting (Pending Decision #2 part 2)
+# AI Handoff: Idle — Pending Decision #2 Closed
 
 Last updated: 2026-05-15 UTC
 
@@ -10,49 +10,40 @@ Last updated: 2026-05-15 UTC
 
 ## Current Objective
 
-- Ship AR journal auto-posting (mirror of AP). Branch ready; commit + push + PR pending.
+- None active. Awaiting next directive.
 
 ## Current Milestone
 
 - ✅ **PR #13 — Modul 18 (Financial Reports)** — merged as `82b7989e`.
 - ✅ **PR #14 — AP journal auto-posting** — merged as `52d1eb9f`.
-- 🚧 **AR journal auto-posting** — branch `feature/ar-journal-auto-posting`. All code + tests + style verifications green locally. Ready to commit + push + open PR.
+- ✅ **PR #15 — AR journal auto-posting** — merged as `25fb811f`. **Pending Decision #2 fully closed for AP + AR.**
 
 ## Current State
 
-- Branch: `feature/ar-journal-auto-posting`
-- Parent: `c0798b9b` (main, post-checkpoint)
-- Commits: pending
-- PHPStan: 0 errors (full project)
-- Pest groups: ar-journal-posting (13/13), customer-invoices (8/8), ar-receipts (8/8), credit-notes (8/8), ap-journal-posting (13/13), supplier-bills (8/8), ap-payments (12/12), journal-entries (29/29), asset-depreciation-runs (12/12) — all green.
-- Duster: applied (CS Fixer + Pint pass).
+- Branch: `main`
+- HEAD: `25fb811f` (PR #15 merge commit)
+- Working tree: clean
+- All quality gates green at merge: PHPStan 0 errors, Pest 9 affected groups all green, SonarCloud SUCCESS.
 
 ## Active Constraints
 
 - Use Sail for every runtime command.
-- AR control account is resolved by code lookup (`code=11200`) in active `CoaVersion`. AP control account remains at `code=21100`.
+- Control accounts resolved by code lookup in active `CoaVersion`: AP=`21100`, AR=`11200`. If a project ships without these codes seeded, the actions throw friendly `ValidationException` until COA is fixed.
 
-## Latest Session Delta
+## Latest Session Delta (today)
 
-- Added 2 new actions in `app/Actions/AccountingPosting/`:
-  - `PostCustomerInvoiceJournalAction` — on invoice transition to `sent`: Debit AR control (`code=11200`), Credit per-item revenue `account_id` (grouped). Idempotent via `journal_entry_id` short-circuit.
-  - `PostArReceiptJournalAction` — on receipt confirm: Debit `bank_account_id`, Credit AR control. Idempotent.
-- Wired hooks in `CustomerInvoiceController::update()` (transition guard via `sent_at === null`) and `ArReceiptController::update()` (transition guard via `confirmed_at === null`).
-- Pest coverage:
-  - Action-level: balance, idempotency, no-op when not in target status, validation errors (no items, no active COA, non-positive receipt).
-  - Controller-level: PUT endpoint posts journal on transition; second PUT does NOT double-post.
-- Updated existing controller tests `update modifies customer invoice and sets sent_by` + `update modifies ar receipt and allocations` to seed FiscalYear + active CoaVersion + AR control account.
+- Three PRs landed in sequence on `main`:
+  - PR #13 (Modul 18) → merged 14:00 UTC.
+  - PR #14 (AP auto-posting) → merged 14:15 UTC.
+  - PR #15 (AR auto-posting) → merged 14:47 UTC.
+- AR-side delta in PR #15: 9 files / +726 / −42, including 2 new actions (`PostCustomerInvoiceJournalAction`, `PostArReceiptJournalAction`), controller hooks for invoice → sent and receipt → confirmed transitions, 13 new Pest tests, and minimal seed adjustments to existing CustomerInvoice + ArReceipt controller tests.
+- Net effect: every confirmed bill, payment, invoice, and receipt now produces an immutable, balanced, posted JournalEntry with full audit trail (`source_type`/`source_id`).
 
 ## Validated Commands and Outcomes
 
-- `./vendor/bin/sail bin phpstan analyze` — 0 errors.
-- `./vendor/bin/sail test --group=ar-journal-posting` — 13 passed (47 assertions).
-- `./vendor/bin/sail test --group=customer-invoices` — 8 passed (41 assertions).
-- `./vendor/bin/sail test --group=ar-receipts` — 8 passed (40 assertions).
-- `./vendor/bin/sail test --group=credit-notes` — 8 passed (41 assertions).
-- `./vendor/bin/sail test --group=ap-journal-posting` — 13 passed (47 assertions, no regression).
-- `./vendor/bin/sail test --group=asset-depreciation-runs` — 12 passed (other CreateJournalEntryAction caller).
-- `./vendor/bin/sail bin duster fix` — clean.
+- `gh pr view 15` → state `MERGED`, mergeCommit `25fb811f9c265a46e9f856269c1dcdc602b5c93b`, mergedAt `2026-05-15T14:47:03Z`.
+- `git rev-parse HEAD` → `25fb811f9c265a46e9f856269c1dcdc602b5c93b`.
+- `git status --short` → clean.
 
 ## Open Risks / Blockers
 
@@ -60,20 +51,22 @@ Last updated: 2026-05-15 UTC
 
 ## Recommended Next Steps
 
-1. Stage + commit all changes in one atomic commit: `feat: auto-post AR journal entries on invoice sent / receipt confirm (Pending Decision #2 partial)`.
-2. Push branch `feature/ar-journal-auto-posting`. Open PR against `main`.
-3. Monitor CI. Merge when green.
-4. Pending Decision #2 will then be fully closed for AP + AR. Remaining accounting integrations:
-   - `journal_entry_id` di GR/SR (Modul 13 §6) — minimal hook on goods receipt confirm.
-   - `journal_entry_id` di stock adjustments (Modul 14 §7).
-   - Pending Decision #1: `product_stocks.branch_id → warehouse_id` migration.
-   - Modul 18 formula expression evaluator.
+1. Wait for user go-ahead before starting next phase.
+2. Highest-value remaining work (in `IMPLEMENTATION_STATUS.md`):
+   - **Pending Decision #3** — `journal_entry_id` on stock adjustments (Modul 14 §7). Auto-post when a stock adjustment confirms.
+   - **Pending Decision #2 remainder** — `journal_entry_id` on Goods Receipt + Supplier Return (Modul 13 §6). Auto-post when GR confirms (inventory acquisition: Debit Inventory, Credit GR Suspense / Accrued AP).
+   - **Modul 18 formula expression evaluator** — make the `formula` column on `report_sections` actually compute (currently stored as metadata only).
+   - **Pending Decision #1** — `product_stocks.branch_id → warehouse_id` migration (Modul 14 §8).
+   - Subscription frontend CRUD (Modul 00).
+   - Recurring journal scheduler (cron-driven auto-execution).
+   - Bank reconciliation CSV/Excel import.
 
 ## Continuation Prompt
 
 ```
-Read task.md. Branch feature/ar-journal-auto-posting on parent c0798b9b (main).
-AR auto-posting (CustomerInvoice + ArReceipt) implemented + tested. Commit
-"feat: auto-post AR journal entries on invoice sent / receipt confirm",
-push, open PR, monitor CI, merge.
+Read task.md. Repository on main at 25fb811f, working tree clean.
+PRs #13, #14, #15 shipped today. Pending Decision #2 closed for AP + AR.
+Awaiting user go-ahead for the next phase. Highest leverage candidates:
+GR/SR + StockAdjustment auto-posting (closes Pending Decision #3 and the
+remainder of #2), or the Modul 18 formula evaluator.
 ```
