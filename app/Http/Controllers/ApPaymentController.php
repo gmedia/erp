@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AccountingPosting\PostApPaymentJournalAction;
 use App\Actions\ApPayments\ExportApPaymentsAction;
 use App\Actions\ApPayments\IndexApPaymentsAction;
 use App\Actions\ApPayments\SyncApPaymentAllocationsAction;
@@ -64,13 +65,16 @@ class ApPaymentController extends Controller
     public function update(
         UpdateApPaymentRequest $request,
         ApPayment $apPayment,
-        SyncApPaymentAllocationsAction $syncAllocations
+        SyncApPaymentAllocationsAction $syncAllocations,
+        PostApPaymentJournalAction $postJournal
     ): JsonResponse {
         $validated = $request->validated();
         $allocations = $validated['allocations'] ?? null;
         unset($validated['allocations']);
 
-        if (($validated['status'] ?? null) === 'confirmed' && $apPayment->confirmed_at === null) {
+        $isNewlyConfirmed = ($validated['status'] ?? null) === 'confirmed' && $apPayment->confirmed_at === null;
+
+        if ($isNewlyConfirmed) {
             $validated['confirmed_by'] = Auth::id();
             $validated['confirmed_at'] = now()->toIso8601String();
         }
@@ -89,6 +93,10 @@ class ApPaymentController extends Controller
                 $syncAllocations->execute($apPayment, $allocations);
             },
         );
+
+        if ($isNewlyConfirmed) {
+            $postJournal->execute($apPayment->refresh());
+        }
 
         return (new ApPaymentResource($this->loadResourceRelations($apPayment)))->response();
     }

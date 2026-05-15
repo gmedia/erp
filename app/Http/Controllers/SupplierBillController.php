@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AccountingPosting\PostSupplierBillJournalAction;
 use App\Actions\SupplierBills\ExportSupplierBillsAction;
 use App\Actions\SupplierBills\IndexSupplierBillsAction;
 use App\Actions\SupplierBills\SyncSupplierBillItemsAction;
@@ -61,13 +62,16 @@ class SupplierBillController extends Controller
     public function update(
         UpdateSupplierBillRequest $request,
         SupplierBill $supplierBill,
-        SyncSupplierBillItemsAction $syncItems
+        SyncSupplierBillItemsAction $syncItems,
+        PostSupplierBillJournalAction $postJournal
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
-        if (($validated['status'] ?? null) === 'confirmed' && $supplierBill->confirmed_at === null) {
+        $isNewlyConfirmed = ($validated['status'] ?? null) === 'confirmed' && $supplierBill->confirmed_at === null;
+
+        if ($isNewlyConfirmed) {
             $validated['confirmed_by'] = Auth::id();
             $validated['confirmed_at'] = now()->toIso8601String();
         }
@@ -81,6 +85,10 @@ class SupplierBillController extends Controller
                 $syncItems->execute($supplierBill, $items);
             },
         );
+
+        if ($isNewlyConfirmed) {
+            $postJournal->execute($supplierBill->refresh());
+        }
 
         return (new SupplierBillResource($this->loadResourceRelations($supplierBill)))->response();
     }

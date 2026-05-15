@@ -2,6 +2,7 @@
 
 use App\Models\Account;
 use App\Models\Branch;
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\Product;
 use App\Models\Supplier;
@@ -146,9 +147,33 @@ test('show returns supplier bill detail', function () {
 });
 
 test('update modifies supplier bill and items', function () {
-    $supplierBill = SupplierBill::factory()->create();
+    FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '21100',
+        'name' => 'Accounts Payable',
+        'type' => 'liability',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
+
+    $supplierBill = SupplierBill::factory()->create([
+        'bill_date' => '2026-03-01',
+    ]);
     $product = Product::factory()->create();
-    $account = Account::factory()->create();
+    $account = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '52000',
+        'type' => 'expense',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
 
     $payload = [
         'status' => 'confirmed',
