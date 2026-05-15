@@ -1,4 +1,4 @@
-# AI Handoff: AP Journal Auto-Posting (Pending Decision #2 part 1)
+# AI Handoff: Idle — AR Journal Auto-Posting Queued
 
 Last updated: 2026-05-15 UTC
 
@@ -10,66 +10,64 @@ Last updated: 2026-05-15 UTC
 
 ## Current Objective
 
-- Ship AP journal auto-posting (Modul 15 §4 / Modul 17 §6 integration). Branch ready; commit + push + PR pending.
+- None active. Next planned phase: AR journal auto-posting (mirror of AP, on `feature/ar-journal-auto-posting`). Awaiting user go-ahead before starting.
 
 ## Current Milestone
 
-- ✅ **Modul 18 (Financial Reports)** — merged via PR #13 as `82b7989e`.
-- 🚧 **AP journal auto-posting** — branch `feature/ap-journal-auto-posting`. All code + tests + style verifications green locally. Ready to commit + push + open PR.
+- ✅ **PR #13 — Modul 18 (Financial Reports)** — merged as `82b7989e`.
+- ✅ **PR #14 — AP journal auto-posting** — merged as `52d1eb9f`. Pending Decision #2 (AP side) closed. Bills + payments now auto-create posted JournalEntries on confirm with `journal_type='system'` + source morph references; idempotent across re-saves.
 
 ## Current State
 
-- Branch: `feature/ap-journal-auto-posting`
-- Parent: `82b7989e` (main)
-- Commits: pending
-- PHPStan: 0 errors (full project)
-- Pest groups: ap-journal-posting (13/13), supplier-bills (8/8), ap-payments (12/12), journal-entries (29/29), asset-depreciation-runs (12/12), goods-receipts (22/22), purchase-orders (17/17), ar-receipts (8/8), customer-invoices (8/8), recurring-journals (16/16), reports (12/12), accounts (34/34) — all green.
-- Duster: applied (CS Fixer + Pint pass).
+- Branch: `main`
+- HEAD: `52d1eb9f` (PR #14 merge commit)
+- Working tree: clean
+- All quality gates green at merge: PHPStan 0 errors, Pest 12 affected groups all green, SonarCloud SUCCESS.
 
 ## Active Constraints
 
 - Use Sail for every runtime command.
-- Auto-posting is additive + non-breaking; existing tests that triggered `status='confirmed'` were updated to seed the COA control account (`code=21100`).
+- AP control account is currently resolved by code lookup (`code=21100`) in the active `CoaVersion`. If a project ships without that exact code seeded, the action throws a friendly `ValidationException` until the COA is fixed.
 
 ## Latest Session Delta
 
-- Added 3 new actions in `app/Actions/AccountingPosting/`:
-  - `ResolveControlAccountAction` — looks up an account by code in the active CoaVersion.
-  - `PostSupplierBillJournalAction` — on bill confirm: Debit per-item `account_id` (grouped by account), Credit AP control (`code=21100`). Idempotent via `journal_entry_id` short-circuit.
-  - `PostApPaymentJournalAction` — on payment confirm: Debit AP control, Credit `bank_account_id`. Idempotent.
-- Extended `CreateJournalEntryAction::execute()` (additive): accepts optional `status` (`draft`|`posted`), `journal_type`, `source_type`, `source_id`. When `status='posted'`, balance is verified and `posted_by/posted_at` are stamped. Existing callers (depreciation, JournalEntryController) unchanged.
-- Wired hooks in `SupplierBillController::update()` and `ApPaymentController::update()` — only fires when status transitions from non-confirmed to `confirmed` (uses `confirmed_at === null` guard).
-- Pest coverage:
-  - Action-level: balance, idempotency, no-op when not confirmed, validation errors (no items, no active COA, non-positive payment).
-  - Controller-level: PUT endpoint posts journal on confirm; second PUT does NOT double-post.
-- Updated existing controller tests `update modifies supplier bill and items` + `update modifies ap payment` to seed FiscalYear + active CoaVersion + AP control account + bank account before triggering confirm.
+- PR #14 went green on first push: Quality checks, Test suite, SonarCloud, SonarCloud Code Analysis — all SUCCESS. Merged via `gh pr merge 14 --merge --delete-branch` (no autofix retrigger needed this time).
+- 12 files / +826 / −82 landed: 3 new actions (AccountingPosting/), extended `CreateJournalEntryAction`, controller hooks for SupplierBill + ApPayment update, 13 new Pest tests in `tests/Feature/AccountingPosting/`, plus minimal seed adjustments in two existing controller tests.
+- Local `feature/ap-journal-auto-posting` branch removed by gh; back on `main`.
 
 ## Validated Commands and Outcomes
 
-- `./vendor/bin/sail bin phpstan analyze` — 0 errors.
-- `./vendor/bin/sail test --group=ap-journal-posting` — 13 passed (47 assertions).
-- `./vendor/bin/sail test --group=supplier-bills` — 8 passed (42 assertions).
-- `./vendor/bin/sail test --group=ap-payments` — 12 passed (58 assertions).
-- `./vendor/bin/sail test --group=journal-entries` — 29 passed (194 assertions).
-- `./vendor/bin/sail test --group=asset-depreciation-runs` — 12 passed (no regression on the other CreateJournalEntryAction caller).
-- `./vendor/bin/sail bin duster fix` — clean.
+- `gh pr view 14` → state `MERGED`, mergeCommit `52d1eb9f3fb54f60140e83197d482d892f192643`, mergedAt `2026-05-15T14:15:21Z`.
+- `git rev-parse HEAD` → `52d1eb9f3fb54f60140e83197d482d892f192643`.
+- `git status --short` → clean.
 
 ## Open Risks / Blockers
 
-- None. Test DB is clean, all groups green, PHPStan clean.
+- None.
 
 ## Recommended Next Steps
 
-1. Stage + commit all changes in one atomic commit: `feat: auto-post AP journal entries on bill/payment confirm (Pending Decision #2 partial)`.
-2. Push branch `feature/ap-journal-auto-posting`. Open PR against `main`.
-3. Monitor CI (expect autofix retrigger pattern as usual). Merge when green.
-4. Start AR journal auto-posting branch (`feature/ar-journal-auto-posting`) using the same pattern: PostCustomerInvoiceJournalAction (Debit AR, Credit Revenue) + PostArReceiptJournalAction (Debit Bank, Credit AR).
+1. Wait for user go-ahead before starting AR work (mirror of AP).
+2. When approved, create `feature/ar-journal-auto-posting`. Mirror plan:
+   - `PostCustomerInvoiceJournalAction` — on invoice confirm: Debit AR control (`code=11200`), Credit per-item revenue/expense `account_id`.
+   - `PostArReceiptJournalAction` — on receipt confirm: Debit `bank_account_id`, Credit AR control.
+   - Hooks in `CustomerInvoiceController::update()` + `ArReceiptController::update()` (transition guard via `confirmed_at === null`).
+   - Pest group `ar-journal-posting` covering balance, idempotency, no-op, validation errors, and controller PUT integration.
+3. Other Tier 1/2/3 follow-ups (in `IMPLEMENTATION_STATUS.md`):
+   - `journal_entry_id` on GR/SR + stock adjustments (Pending Decisions #2 remainder + #3).
+   - Modul 18 formula expression evaluator.
+   - `product_stocks.branch_id → warehouse_id` migration (Pending Decision #1).
+   - Subscription frontend CRUD.
+   - Recurring journal scheduler.
+   - Bank reconciliation CSV/Excel import.
 
 ## Continuation Prompt
 
 ```
-Read task.md. Branch feature/ap-journal-auto-posting on parent 82b7989e (main).
-AP auto-posting (SupplierBill + ApPayment) implemented + tested. Commit "feat: auto-post AP
-journal entries on bill/payment confirm", push, open PR, monitor CI, merge.
-After merge, start feature/ar-journal-auto-posting using the same pattern.
+Read task.md. Repository on main at 52d1eb9f, working tree clean.
+Modul 18 (PR #13) and AP journal auto-posting (PR #14) shipped. The mirror
+work for AR (CustomerInvoice/ArReceipt) is queued. When approved, create
+feature/ar-journal-auto-posting and follow the same pattern: control account
+lookup (code=11200 for AR), idempotent posting actions, controller hooks on
+the draft→confirmed transition, Pest group ar-journal-posting.
 ```
