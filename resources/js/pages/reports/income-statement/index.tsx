@@ -1,3 +1,4 @@
+import { ComputedSectionsCard } from '@/components/reports/financial/ComputedSectionsCard';
 import {
     FinancialReportHeaderMeta,
     FinancialReportPageShell,
@@ -13,7 +14,6 @@ import {
     FinancialStatusBadge,
     FinancialSummaryCard,
 } from '@/components/reports/financial/FinancialSummaryCard';
-import { ComputedSectionsCard } from '@/components/reports/financial/ComputedSectionsCard';
 import { Separator } from '@/components/ui/separator';
 import { cn, formatCurrency } from '@/lib/utils';
 

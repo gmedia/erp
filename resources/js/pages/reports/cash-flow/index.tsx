@@ -1,3 +1,4 @@
+import { ComputedSectionsCard } from '@/components/reports/financial/ComputedSectionsCard';
 import {
     FinancialReportHeaderMeta,
     type FinancialReportFiscalYear,
@@ -8,7 +9,6 @@ import {
     useSingleYearFinancialReportPage,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
-import { ComputedSectionsCard } from '@/components/reports/financial/ComputedSectionsCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
 
