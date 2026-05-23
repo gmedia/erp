@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AccountingPosting\PostStockAdjustmentJournalAction;
 use App\Actions\StockAdjustments\ExportStockAdjustmentsAction;
 use App\Actions\StockAdjustments\IndexStockAdjustmentsAction;
 use App\Actions\StockAdjustments\SyncStockAdjustmentItemsAction;
@@ -16,6 +17,8 @@ use App\Http\Resources\StockAdjustments\StockAdjustmentResource;
 use App\Models\StockAdjustment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class StockAdjustmentController extends Controller
 {
@@ -74,12 +77,15 @@ class StockAdjustmentController extends Controller
         UpdateStockAdjustmentRequest $request,
         StockAdjustment $stockAdjustment,
         SyncStockAdjustmentItemsAction $syncItems,
+        PostStockAdjustmentJournalAction $postJournal,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
-        if (($validated['status'] ?? null) === 'approved' && $stockAdjustment->approved_at === null) {
+        $isNewlyApproved = ($validated['status'] ?? null) === 'approved' && $stockAdjustment->approved_at === null;
+
+        if ($isNewlyApproved) {
             $validated['approved_by'] = Auth::id();
             $validated['approved_at'] = now()->toIso8601String();
         }
@@ -94,7 +100,18 @@ class StockAdjustmentController extends Controller
             },
         );
 
-        $stockAdjustment->load(['warehouse', 'inventoryStocktake', 'items.product', 'items.unit']);
+        if ($isNewlyApproved) {
+            try {
+                $postJournal->execute($stockAdjustment->refresh());
+            } catch (ValidationException $e) {
+                Log::warning('Stock adjustment journal posting skipped', [
+                    'stock_adjustment_id' => $stockAdjustment->id,
+                    'reason' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        $stockAdjustment->load(['warehouse', 'inventoryStocktake', 'journalEntry', 'items.product', 'items.unit']);
 
         return (new StockAdjustmentResource($stockAdjustment))->response();
     }
