@@ -1,13 +1,52 @@
 <?php
 
 use App\Actions\Approvals\RepairMissingApprovalStepsAction;
+use App\Actions\RecurringJournals\ExecuteRecurringJournalAction;
+use App\Models\RecurringJournal;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schedule;
 use Symfony\Component\Console\Command\Command;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+Artisan::command('recurring-journals:execute', function () {
+    $dueJournals = RecurringJournal::due()->get();
+
+    if ($dueJournals->isEmpty()) {
+        $this->info('No recurring journals due for execution.');
+
+        return Command::SUCCESS;
+    }
+
+    $action = app(ExecuteRecurringJournalAction::class);
+    $executed = 0;
+    $failed = 0;
+
+    foreach ($dueJournals as $journal) {
+        try {
+            $action->execute($journal);
+            $executed++;
+            $this->line("  ✓ Executed: {$journal->name} (#{$journal->id})");
+        } catch (\Exception $e) {
+            $failed++;
+            $this->error("  ✗ Failed: {$journal->name} (#{$journal->id}) — {$e->getMessage()}");
+            Log::error('Recurring journal execution failed', [
+                'recurring_journal_id' => $journal->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    $this->info("Done. Executed: {$executed}, Failed: {$failed}");
+
+    return $failed > 0 ? Command::FAILURE : Command::SUCCESS;
+})->purpose('Execute all due recurring journals');
+
+Schedule::command('recurring-journals:execute')->daily();
 
 Artisan::command('approvals:repair-missing-steps {--dry-run : Audit only without writing data}', function () {
     $report = app(RepairMissingApprovalStepsAction::class)->execute(
