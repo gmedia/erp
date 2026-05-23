@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\ReportConfigurations\GetReportConfigurationByTypeAction;
+use App\Actions\Reports\EvaluateReportSectionsAction;
 use App\Http\Controllers\Concerns\InteractsWithFinancialReportRequest;
 use App\Models\ReportConfiguration;
 use App\Services\FinancialReportService;
@@ -16,6 +17,7 @@ class ReportController extends Controller
     public function __construct(
         protected FinancialReportService $reportService,
         protected GetReportConfigurationByTypeAction $configurationResolver,
+        protected EvaluateReportSectionsAction $evaluateSections,
     ) {}
 
     public function trialBalance(Request $request): JsonResponse
@@ -44,11 +46,16 @@ class ReportController extends Controller
         ] = $this->resolveFiscalYearContext($request, withComparison: true);
 
         $report = [];
+        $computedSections = [];
         if ($selectedYearId) {
             $report = $this->reportService->getBalanceSheet(
                 $selectedYearId,
                 $comparisonYearId,
             );
+            $config = $this->configurationResolver->execute(ReportConfiguration::TYPE_BALANCE_SHEET);
+            if ($config) {
+                $computedSections = $this->evaluateSections->execute($config['sections'], $report['totals'] ?? []);
+            }
         }
 
         return response()->json([
@@ -57,6 +64,7 @@ class ReportController extends Controller
             'comparisonYearId' => $comparisonYearId ? (int) $comparisonYearId : null,
             'report' => $report,
             'configuration' => $this->configurationResolver->execute(ReportConfiguration::TYPE_BALANCE_SHEET),
+            'computed_sections' => $computedSections,
         ]);
     }
 
@@ -69,11 +77,16 @@ class ReportController extends Controller
         ] = $this->resolveFiscalYearContext($request, withComparison: true);
 
         $report = [];
+        $computedSections = [];
         if ($selectedYearId) {
             $report = $this->reportService->getIncomeStatement(
                 $selectedYearId,
                 $comparisonYearId,
             );
+            $config = $this->configurationResolver->execute(ReportConfiguration::TYPE_INCOME_STATEMENT);
+            if ($config) {
+                $computedSections = $this->evaluateSections->execute($config['sections'], $report['totals'] ?? []);
+            }
         }
 
         return response()->json([
@@ -82,6 +95,7 @@ class ReportController extends Controller
             'comparisonYearId' => $comparisonYearId ? (int) $comparisonYearId : null,
             'report' => $report,
             'configuration' => $this->configurationResolver->execute(ReportConfiguration::TYPE_INCOME_STATEMENT),
+            'computed_sections' => $computedSections,
         ]);
     }
 
@@ -90,8 +104,13 @@ class ReportController extends Controller
         ['fiscalYears' => $fiscalYears, 'selectedYearId' => $selectedYearId] = $this->resolveFiscalYearContext($request);
 
         $report = [];
+        $computedSections = [];
         if ($selectedYearId) {
             $report = $this->reportService->getCashFlow($selectedYearId);
+            $config = $this->configurationResolver->execute(ReportConfiguration::TYPE_CASH_FLOW);
+            if ($config) {
+                $computedSections = $this->evaluateSections->execute($config['sections'], $report['totals'] ?? []);
+            }
         }
 
         return response()->json([
@@ -99,6 +118,7 @@ class ReportController extends Controller
             'selectedYearId' => (int) $selectedYearId,
             'report' => $report,
             'configuration' => $this->configurationResolver->execute(ReportConfiguration::TYPE_CASH_FLOW),
+            'computed_sections' => $computedSections,
         ]);
     }
 
