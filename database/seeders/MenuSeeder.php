@@ -1087,9 +1087,13 @@ class MenuSeeder extends Seeder
                 'parent_id' => $parent?->id,
             ]);
 
-            foreach ($item['permissions'] as $permission) {
-                $newParent->permissions()->attach(Permission::where('name', $permission)->first());
-            }
+            $permissionIds = collect($item['permissions'])
+                ->map(fn (string $name) => Permission::where('name', $name)->first()?->id)
+                ->filter()
+                ->values()
+                ->all();
+
+            $newParent->permissions()->sync($permissionIds);
 
             $this->createMenus($item['child'], $newParent);
         }
