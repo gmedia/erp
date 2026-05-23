@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\FiscalYear;
-use App\Models\RecurringJournal;
-use App\Models\RecurringJournalLine;
 use App\Models\Account;
 use App\Models\CoaVersion;
+use App\Models\FiscalYear;
 use App\Models\JournalEntry;
+use App\Models\RecurringJournal;
+use App\Models\RecurringJournalLine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\artisan;
