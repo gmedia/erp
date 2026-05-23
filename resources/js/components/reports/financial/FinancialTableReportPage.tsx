@@ -24,6 +24,7 @@ import type { ReactNode } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 
+import type { ComputedSection } from './ComputedSectionsCard';
 import type { FinancialReportFiscalYear } from './FinancialReportPageShell';
 
 type BreadcrumbItem = {
@@ -44,6 +45,7 @@ type SingleYearFinancialReportResponse<TReport> = {
     fiscalYears: FinancialReportFiscalYear[];
     selectedYearId: number;
     report: TReport;
+    computed_sections: ComputedSection[];
 };
 
 type SingleYearFinancialReportPageOptions<TReport> = {
@@ -151,6 +153,7 @@ export function useSingleYearFinancialReportPage<TReport>({
         : [];
     const selectedYearId = data?.selectedYearId || 0;
     const report = data?.report || emptyReport;
+    const computedSections = data?.computed_sections || [];
     const selectedFiscalYear = resolveSelectedFiscalYear(
         fiscalYears,
         selectedYearId,
@@ -160,6 +163,7 @@ export function useSingleYearFinancialReportPage<TReport>({
         fiscalYears,
         selectedYearId,
         report,
+        computedSections,
         selectedFiscalYear,
         handleYearChange,
         isLoading,

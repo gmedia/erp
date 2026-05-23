@@ -8,6 +8,7 @@ import {
     useSingleYearFinancialReportPage,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
+import { ComputedSectionsCard } from '@/components/reports/financial/ComputedSectionsCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
 
@@ -36,6 +37,7 @@ export default function CashFlow() {
         fiscalYears,
         selectedYearId,
         report,
+        computedSections,
         selectedFiscalYear,
         handleYearChange,
         isLoading,
@@ -114,6 +116,11 @@ export default function CashFlow() {
                 ]}
                 emptyMessage="No data available for the selected fiscal year."
                 scrollAreaClassName="max-h-[calc(100vh-22rem)]"
+            />
+
+            <ComputedSectionsCard
+                sections={computedSections}
+                title="Cash Flow Summary"
             />
         </SingleYearFinancialReportPageShell>
     );

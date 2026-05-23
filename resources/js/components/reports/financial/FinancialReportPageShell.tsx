@@ -26,11 +26,14 @@ export type FinancialReportFiscalYear = {
     status: string;
 };
 
+import type { ComputedSection } from './ComputedSectionsCard';
+
 type ComparisonReportResponse<TReport> = {
     fiscalYears: FinancialReportFiscalYear[];
     selectedYearId: number;
     comparisonYearId?: number;
     report: TReport;
+    computed_sections: ComputedSection[];
 };
 
 type ComparisonFinancialReportPageOptions<TReport> = {
@@ -158,6 +161,7 @@ export function useComparisonFinancialReportPage<TReport>({
     const selectedYearId = data?.selectedYearId || 0;
     const comparisonYearId = data?.comparisonYearId;
     const report = data?.report || emptyReport;
+    const computedSections = data?.computed_sections || [];
     const { selectedFiscalYear, selectedComparisonFiscalYear } =
         resolveComparisonFiscalYears(
             fiscalYears,
@@ -170,6 +174,7 @@ export function useComparisonFinancialReportPage<TReport>({
         selectedYearId,
         comparisonYearId,
         report,
+        computedSections,
         selectedFiscalYear,
         selectedComparisonFiscalYear,
         handleYearChange,

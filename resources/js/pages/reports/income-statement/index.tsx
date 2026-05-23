@@ -13,6 +13,7 @@ import {
     FinancialStatusBadge,
     FinancialSummaryCard,
 } from '@/components/reports/financial/FinancialSummaryCard';
+import { ComputedSectionsCard } from '@/components/reports/financial/ComputedSectionsCard';
 import { Separator } from '@/components/ui/separator';
 import { cn, formatCurrency } from '@/lib/utils';
 
@@ -52,6 +53,7 @@ export default function IncomeStatement() {
         selectedYearId,
         comparisonYearId,
         report,
+        computedSections,
         selectedFiscalYear,
         selectedComparisonFiscalYear,
         handleYearChange,
@@ -195,6 +197,11 @@ export default function IncomeStatement() {
                         )}
                     </div>
                 </FinancialSummaryCard>
+
+                <ComputedSectionsCard
+                    sections={computedSections}
+                    title="Income Summary"
+                />
             </div>
         </FinancialReportPageShell>
     );

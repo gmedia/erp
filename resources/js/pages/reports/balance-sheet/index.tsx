@@ -14,6 +14,7 @@ import {
     FinancialStatusBadge,
     FinancialSummaryCard,
 } from '@/components/reports/financial/FinancialSummaryCard';
+import { ComputedSectionsCard } from '@/components/reports/financial/ComputedSectionsCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { formatCurrency } from '@/lib/utils';
@@ -59,6 +60,7 @@ export default function BalanceSheet() {
         selectedYearId,
         comparisonYearId,
         report,
+        computedSections,
         selectedFiscalYear,
         selectedComparisonFiscalYear,
         handleYearChange,
@@ -168,6 +170,11 @@ export default function BalanceSheet() {
                         </Alert>
                     )}
                 </FinancialSummaryCard>
+
+                <ComputedSectionsCard
+                    sections={computedSections}
+                    title="Financial Position Summary"
+                />
             </div>
         </FinancialReportPageShell>
     );
