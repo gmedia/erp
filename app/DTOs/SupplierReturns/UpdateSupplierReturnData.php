@@ -14,6 +14,8 @@ readonly class UpdateSupplierReturnData
         public ?string $reason = null,
         public ?string $status = null,
         public ?string $notes = null,
+        public ?int $confirmed_by = null,
+        public ?string $confirmed_at = null,
     ) {}
 
     public static function fromArray(array $data): self
@@ -28,6 +30,8 @@ readonly class UpdateSupplierReturnData
             reason: $data['reason'] ?? null,
             status: $data['status'] ?? null,
             notes: $data['notes'] ?? null,
+            confirmed_by: $data['confirmed_by'] ?? null,
+            confirmed_at: $data['confirmed_at'] ?? null,
         );
     }
 
@@ -61,6 +65,12 @@ readonly class UpdateSupplierReturnData
         }
         if ($this->notes !== null) {
             $payload['notes'] = $this->notes;
+        }
+        if ($this->confirmed_by !== null) {
+            $payload['confirmed_by'] = $this->confirmed_by;
+        }
+        if ($this->confirmed_at !== null) {
+            $payload['confirmed_at'] = $this->confirmed_at;
         }
 
         return $payload;

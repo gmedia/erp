@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AccountingPosting\PostSupplierReturnJournalAction;
 use App\Actions\SupplierReturns\ExportSupplierReturnsAction;
 use App\Actions\SupplierReturns\IndexSupplierReturnsAction;
 use App\Actions\SupplierReturns\SyncSupplierReturnItemsAction;
@@ -16,6 +17,8 @@ use App\Http\Resources\SupplierReturns\SupplierReturnResource;
 use App\Models\SupplierReturn;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class SupplierReturnController extends Controller
 {
@@ -79,11 +82,19 @@ class SupplierReturnController extends Controller
     public function update(
         UpdateSupplierReturnRequest $request,
         SupplierReturn $supplierReturn,
-        SyncSupplierReturnItemsAction $syncItems
+        SyncSupplierReturnItemsAction $syncItems,
+        PostSupplierReturnJournalAction $postJournal,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
+
+        $isNewlyConfirmed = ($validated['status'] ?? null) === 'confirmed' && $supplierReturn->confirmed_at === null;
+
+        if ($isNewlyConfirmed) {
+            $validated['confirmed_by'] = Auth::id();
+            $validated['confirmed_at'] = now()->toIso8601String();
+        }
 
         $this->updateWithSyncedItems(
             model: $supplierReturn,
@@ -94,6 +105,17 @@ class SupplierReturnController extends Controller
                 $syncItems->execute($supplierReturn, $items);
             },
         );
+
+        if ($isNewlyConfirmed) {
+            try {
+                $postJournal->execute($supplierReturn->refresh());
+            } catch (ValidationException $e) {
+                Log::warning('Supplier return journal posting skipped', [
+                    'supplier_return_id' => $supplierReturn->id,
+                    'reason' => $e->getMessage(),
+                ]);
+            }
+        }
 
         $supplierReturn->load([
             'purchaseOrder',

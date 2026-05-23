@@ -28,6 +28,9 @@ class SupplierReturn extends Model
         'reason',
         'status',
         'notes',
+        'journal_entry_id',
+        'confirmed_by',
+        'confirmed_at',
         'created_by',
     ];
 
@@ -36,6 +39,7 @@ class SupplierReturn extends Model
      */
     protected $casts = [
         'return_date' => 'date',
+        'confirmed_at' => 'datetime',
     ];
 
     public function purchaseOrder(): BelongsTo
@@ -56,6 +60,16 @@ class SupplierReturn extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function confirmer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'confirmed_by');
+    }
+
+    public function journalEntry(): BelongsTo
+    {
+        return $this->belongsTo(JournalEntry::class);
     }
 
     public function items(): HasMany

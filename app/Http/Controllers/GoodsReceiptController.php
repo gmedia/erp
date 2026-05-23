@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
 use App\Actions\GoodsReceipts\ExportGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\IndexGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\SyncGoodsReceiptItemsAction;
@@ -17,6 +18,8 @@ use App\Http\Resources\GoodsReceipts\GoodsReceiptResource;
 use App\Models\GoodsReceipt;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class GoodsReceiptController extends Controller
 {
@@ -66,13 +69,16 @@ class GoodsReceiptController extends Controller
     public function update(
         UpdateGoodsReceiptRequest $request,
         GoodsReceipt $goodsReceipt,
-        SyncGoodsReceiptItemsAction $syncItems
+        SyncGoodsReceiptItemsAction $syncItems,
+        PostGoodsReceiptJournalAction $postJournal,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
-        if (($validated['status'] ?? null) === 'confirmed' && $goodsReceipt->confirmed_at === null) {
+        $isNewlyConfirmed = ($validated['status'] ?? null) === 'confirmed' && $goodsReceipt->confirmed_at === null;
+
+        if ($isNewlyConfirmed) {
             $validated['confirmed_by'] = Auth::id();
             $validated['confirmed_at'] = now()->toIso8601String();
         }
@@ -86,6 +92,17 @@ class GoodsReceiptController extends Controller
                 $syncItems->execute($goodsReceipt, $items);
             },
         );
+
+        if ($isNewlyConfirmed) {
+            try {
+                $postJournal->execute($goodsReceipt->refresh());
+            } catch (ValidationException $e) {
+                Log::warning('Goods receipt journal posting skipped', [
+                    'goods_receipt_id' => $goodsReceipt->id,
+                    'reason' => $e->getMessage(),
+                ]);
+            }
+        }
 
         return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response();
     }
