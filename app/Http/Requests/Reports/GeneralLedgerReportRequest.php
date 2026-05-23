@@ -14,10 +14,13 @@ class GeneralLedgerReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'account_id' => ['required', 'integer', 'exists:accounts,id'],
-            'fiscal_year_id' => ['required', 'integer', 'exists:fiscal_years,id'],
-            'start_date' => ['required', 'date'],
-            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+            'search' => ['nullable', 'string', 'max:255'],
+            'account_id' => ['nullable', 'integer', 'exists:accounts,id'],
+            'fiscal_year_id' => ['nullable', 'integer', 'exists:fiscal_years,id'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'journal_type' => ['nullable', 'string', 'max:20'],
+            'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
         ];
     }

@@ -18,15 +18,14 @@ function getStatusVariant(status: BankReconciliation['status']) {
 export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
     createSelectColumn<BankReconciliation>(),
     {
-        accessorKey: 'account_name',
+        accessorKey: 'account_id',
         ...createSortingHeader('Account'),
         cell: ({ row }) => {
-            const code = row.original.account_code;
-            const name = row.getValue('account_name') as string;
+            const account = row.original.account;
             return (
                 <div>
-                    <div>{code}</div>
-                    <div className="text-sm text-gray-500">{name}</div>
+                    <div>{account?.code}</div>
+                    <div className="text-sm text-gray-500">{account?.name}</div>
                 </div>
             );
         },

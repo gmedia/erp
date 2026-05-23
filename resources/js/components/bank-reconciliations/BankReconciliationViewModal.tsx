@@ -77,7 +77,7 @@ export const BankReconciliationViewModal =
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <ViewField
                                     label="Account"
-                                    value={`${item.account_code} - ${item.account_name}`}
+                                    value={`${item.account?.code} - ${item.account?.name}`}
                                 />
                                 <ViewField
                                     label="Fiscal Year"

@@ -18,7 +18,7 @@ class IndexRecurringJournalRequest extends BaseListingRequest
                 'next_run_from' => ['nullable', 'date'],
                 'next_run_to' => ['nullable', 'date', 'after_or_equal:next_run_from'],
             ],
-            $this->listingSortRules('name,frequency,next_run_date,last_run_date,total_amount,is_active,created_at'),
+            $this->listingSortRules('name,frequency,next_run_date,last_run_date,total_amount,is_active,auto_post,created_at'),
             $this->paginationRules(),
         );
     }

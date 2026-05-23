@@ -13,8 +13,11 @@ export interface BankReconciliationItem {
 export interface BankReconciliation {
     id: number;
     account_id: number;
-    account_name?: string;
-    account_code?: string;
+    account?: {
+        id: number;
+        code: string;
+        name: string;
+    };
     fiscal_year_id: number;
     fiscal_year?: {
         id: number;
@@ -24,14 +27,16 @@ export interface BankReconciliation {
     period_end: string;
     statement_balance: number;
     book_balance: number;
+    reconciled_balance: number;
     difference: number;
     status: 'in_progress' | 'completed';
+    notes?: string | null;
     items: BankReconciliationItem[];
-    completed_at?: string;
+    completed_at?: string | null;
     completed_by?: {
         id: number;
         name: string;
-    };
+    } | null;
     created_by: {
         id: number;
         name: string;

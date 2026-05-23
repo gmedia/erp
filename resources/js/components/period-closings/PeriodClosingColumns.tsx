@@ -22,7 +22,7 @@ function getClosingTypeLabel(type: PeriodClosing['closing_type']) {
 export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
     createSelectColumn<PeriodClosing>(),
     {
-        accessorKey: 'fiscal_year',
+        accessorKey: 'fiscal_year_id',
         ...createSortingHeader('Fiscal Year'),
         cell: ({ row }) => row.original.fiscal_year?.name || '-',
     },

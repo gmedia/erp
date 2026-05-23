@@ -75,8 +75,8 @@ export const BankReconciliationForm = memo<BankReconciliationFormProps>(
             entity,
         });
 
-        const accountCode = entity?.account_code;
-        const accountName = entity?.account_name;
+        const accountCode = entity?.account?.code;
+        const accountName = entity?.account?.name;
         const fiscalYearName = entity?.fiscal_year?.name;
 
         return (

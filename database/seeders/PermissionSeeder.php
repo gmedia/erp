@@ -341,6 +341,64 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'recurring_journal',
+                'display_name' => 'Recurring Journal',
+                'child' => [
+                    [
+                        'name' => 'recurring_journal.create',
+                        'display_name' => 'Create Recurring Journal',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'recurring_journal.edit',
+                        'display_name' => 'Edit Recurring Journal',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'recurring_journal.delete',
+                        'display_name' => 'Delete Recurring Journal',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'bank_reconciliation',
+                'display_name' => 'Bank Reconciliation',
+                'child' => [
+                    [
+                        'name' => 'bank_reconciliation.create',
+                        'display_name' => 'Create Bank Reconciliation',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'bank_reconciliation.edit',
+                        'display_name' => 'Edit Bank Reconciliation',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'bank_reconciliation.delete',
+                        'display_name' => 'Delete Bank Reconciliation',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'period_closing',
+                'display_name' => 'Period Closing',
+                'child' => [
+                    [
+                        'name' => 'period_closing.create',
+                        'display_name' => 'Create Period Closing',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'general_ledger_report',
+                'display_name' => 'General Ledger Report',
+                'child' => [],
+            ],
+            [
                 'name' => 'report_configuration',
                 'display_name' => 'Report Configuration',
                 'child' => [

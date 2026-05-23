@@ -3,21 +3,41 @@
 namespace App\Actions\Reports;
 
 use App\Models\JournalEntryLine;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class GetGeneralLedgerReportAction
 {
     public function execute(array $filters): Collection
     {
+        if (empty($filters['account_id'])) {
+            return collect();
+        }
+
         $running = 0.0;
 
         return JournalEntryLine::query()
             ->with(['account', 'journalEntry'])
             ->where('account_id', $filters['account_id'])
-            ->whereHas('journalEntry', fn ($query) => $query
-                ->where('fiscal_year_id', $filters['fiscal_year_id'])
-                ->where('status', 'posted')
-                ->whereBetween('entry_date', [$filters['start_date'], $filters['end_date']]))
+            ->whereHas('journalEntry', function (Builder $query) use ($filters): void {
+                $query->where('status', 'posted');
+
+                if (! empty($filters['fiscal_year_id'])) {
+                    $query->where('fiscal_year_id', $filters['fiscal_year_id']);
+                }
+
+                if (! empty($filters['start_date']) && ! empty($filters['end_date'])) {
+                    $query->whereBetween('entry_date', [$filters['start_date'], $filters['end_date']]);
+                } elseif (! empty($filters['start_date'])) {
+                    $query->where('entry_date', '>=', $filters['start_date']);
+                } elseif (! empty($filters['end_date'])) {
+                    $query->where('entry_date', '<=', $filters['end_date']);
+                }
+
+                if (! empty($filters['journal_type'])) {
+                    $query->where('journal_type', $filters['journal_type']);
+                }
+            })
             ->join('journal_entries', 'journal_entry_lines.journal_entry_id', '=', 'journal_entries.id')
             ->orderBy('journal_entries.entry_date')
             ->orderBy('journal_entry_lines.id')

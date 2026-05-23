@@ -72,6 +72,9 @@ class MenuSeeder extends Seeder
                 'permissions' => [
                     'journal_entry',
                     'posting_journal',
+                    'recurring_journal',
+                    'bank_reconciliation',
+                    'period_closing',
                 ],
                 'icon' => 'Calculator',
                 'url' => null,
@@ -97,6 +100,43 @@ class MenuSeeder extends Seeder
                         ],
                         'icon' => 'CheckSquare',
                         'url' => 'posting-journals',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'recurring_journal',
+                        'display_name' => 'Recurring Journals',
+                        'permissions' => [
+                            'recurring_journal',
+                            'recurring_journal.create',
+                            'recurring_journal.edit',
+                            'recurring_journal.delete',
+                        ],
+                        'icon' => 'RotateCcw',
+                        'url' => 'recurring-journals',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'bank_reconciliation',
+                        'display_name' => 'Bank Reconciliations',
+                        'permissions' => [
+                            'bank_reconciliation',
+                            'bank_reconciliation.create',
+                            'bank_reconciliation.edit',
+                            'bank_reconciliation.delete',
+                        ],
+                        'icon' => 'Banknote',
+                        'url' => 'bank-reconciliations',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'period_closing',
+                        'display_name' => 'Period Closings',
+                        'permissions' => [
+                            'period_closing',
+                            'period_closing.create',
+                        ],
+                        'icon' => 'Lock',
+                        'url' => 'period-closings',
                         'child' => [],
                     ],
                     [
@@ -482,6 +522,7 @@ class MenuSeeder extends Seeder
                     'income_statement_report',
                     'cash_flow_report',
                     'comparative_report',
+                    'general_ledger_report',
                     'inventory_valuation_report',
                     'stock_movement_report',
                     'inventory_stocktake_variance_report',
@@ -539,6 +580,16 @@ class MenuSeeder extends Seeder
                         ],
                         'icon' => 'Scale',
                         'url' => 'reports/trial-balance',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'general_ledger_report',
+                        'display_name' => 'General Ledger Report',
+                        'permissions' => [
+                            'general_ledger_report',
+                        ],
+                        'icon' => 'BookOpen',
+                        'url' => 'reports/general-ledger',
                         'child' => [],
                     ],
                     [

@@ -24,8 +24,8 @@ export default function GeneralLedgerReportPage() {
             initialFilters={createEmptyReportFilters([
                 'account_id',
                 'fiscal_year_id',
-                'date_from',
-                'date_to',
+                'start_date',
+                'end_date',
                 'journal_type',
             ] as const)}
             endpoint="/api/reports/general-ledger"
