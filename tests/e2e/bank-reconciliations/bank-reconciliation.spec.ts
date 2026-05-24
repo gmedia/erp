@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { login } from '../helpers';
-import { createBankReconciliation } from './helpers';
+import { createBankReconciliation, getReconcilableRow } from './helpers';
 
 test.describe('Bank Reconciliation E2E Tests', () => {
     test.beforeEach(async ({ page }) => {
@@ -30,7 +30,7 @@ test.describe('Bank Reconciliation E2E Tests', () => {
     });
 
     test('can open actions menu for Bank Reconciliation', async ({ page }) => {
-        const row = page.locator('tbody tr').first();
+        const row = getReconcilableRow(page);
         await expect(row).toBeVisible();
         await row.getByRole('button').last().click();
 
@@ -50,7 +50,7 @@ test.describe('Bank Reconciliation E2E Tests', () => {
         await expect(headerCheckboxes).toHaveCount(1);
         await expect(headerCheckboxes.first()).toBeVisible();
 
-        const row = page.locator('tbody tr').first();
+        const row = getReconcilableRow(page);
         await expect(row).toBeVisible();
         const bodyCheckbox = row.locator('[data-testid="select-row"]').first();
         await expect(bodyCheckbox).toBeVisible();
@@ -100,7 +100,7 @@ test.describe('Bank Reconciliation Workflow', () => {
         test.setTimeout(60000);
 
         // Ensure we have at least one row
-        const row = page.locator('tbody tr').first();
+        const row = getReconcilableRow(page);
         const hasRow = await row.isVisible().catch(() => false);
         if (!hasRow) {
             await createBankReconciliation(page);
@@ -111,7 +111,7 @@ test.describe('Bank Reconciliation Workflow', () => {
         }
 
         // Open actions menu → View
-        const targetRow = page.locator('tbody tr').first();
+        const targetRow = getReconcilableRow(page);
         await expect(targetRow).toBeVisible();
         await targetRow.getByRole('button').last().click();
         await page.getByRole('menuitem', { name: /View/i }).click();
@@ -128,7 +128,7 @@ test.describe('Bank Reconciliation Workflow', () => {
     test('can open Import Statement dialog from View modal', async ({ page }) => {
         test.setTimeout(60000);
 
-        const row = page.locator('tbody tr').first();
+        const row = getReconcilableRow(page);
         const hasRow = await row.isVisible().catch(() => false);
         if (!hasRow) {
             await createBankReconciliation(page);
@@ -139,7 +139,7 @@ test.describe('Bank Reconciliation Workflow', () => {
         }
 
         // Open View modal
-        const targetRow = page.locator('tbody tr').first();
+        const targetRow = getReconcilableRow(page);
         await expect(targetRow).toBeVisible();
         await targetRow.getByRole('button').last().click();
         await page.getByRole('menuitem', { name: /View/i }).click();
@@ -157,7 +157,9 @@ test.describe('Bank Reconciliation Workflow', () => {
         await expect(importDialog).toBeVisible({ timeout: 10000 });
 
         // Assert file upload label visible
-        const fileLabel = importDialog.getByText(/Bank Statement File/i);
+        const fileLabel = importDialog.getByText('Bank Statement File', {
+            exact: true,
+        });
         await expect(fileLabel).toBeVisible();
 
         // Assert Next button visible
@@ -168,7 +170,7 @@ test.describe('Bank Reconciliation Workflow', () => {
     test('can open Reconciliation Workspace from View modal', async ({ page }) => {
         test.setTimeout(60000);
 
-        const row = page.locator('tbody tr').first();
+        const row = getReconcilableRow(page);
         const hasRow = await row.isVisible().catch(() => false);
         if (!hasRow) {
             await createBankReconciliation(page);
@@ -179,7 +181,7 @@ test.describe('Bank Reconciliation Workflow', () => {
         }
 
         // Open View modal
-        const targetRow = page.locator('tbody tr').first();
+        const targetRow = getReconcilableRow(page);
         await expect(targetRow).toBeVisible();
         await targetRow.getByRole('button').last().click();
         await page.getByRole('menuitem', { name: /View/i }).click();
@@ -212,7 +214,7 @@ test.describe('Bank Reconciliation Workflow', () => {
     test('Reconciliation Workspace shows bank items table', async ({ page }) => {
         test.setTimeout(60000);
 
-        const row = page.locator('tbody tr').first();
+        const row = getReconcilableRow(page);
         const hasRow = await row.isVisible().catch(() => false);
         if (!hasRow) {
             await createBankReconciliation(page);
@@ -223,7 +225,7 @@ test.describe('Bank Reconciliation Workflow', () => {
         }
 
         // Open View → Reconcile
-        const targetRow = page.locator('tbody tr').first();
+        const targetRow = getReconcilableRow(page);
         await expect(targetRow).toBeVisible();
         await targetRow.getByRole('button').last().click();
         await page.getByRole('menuitem', { name: /View/i }).click();
@@ -250,7 +252,7 @@ test.describe('Bank Reconciliation Workflow', () => {
     test('can trigger Auto Match from workspace', async ({ page }) => {
         test.setTimeout(60000);
 
-        const row = page.locator('tbody tr').first();
+        const row = getReconcilableRow(page);
         const hasRow = await row.isVisible().catch(() => false);
         if (!hasRow) {
             await createBankReconciliation(page);
@@ -261,7 +263,7 @@ test.describe('Bank Reconciliation Workflow', () => {
         }
 
         // Open View → Reconcile
-        const targetRow = page.locator('tbody tr').first();
+        const targetRow = getReconcilableRow(page);
         await expect(targetRow).toBeVisible();
         await targetRow.getByRole('button').last().click();
         await page.getByRole('menuitem', { name: /View/i }).click();

@@ -1,5 +1,12 @@
-import { Page, expect } from '@playwright/test';
+import { Locator, Page, expect } from '@playwright/test';
 import { searchAndWaitForApi } from '../helpers';
+
+export function getReconcilableRow(page: Page): Locator {
+    return page
+        .locator('tbody tr')
+        .filter({ hasNotText: /completed/i })
+        .first();
+}
 
 async function selectAsyncOption(
     page: Page,
