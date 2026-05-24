@@ -128,6 +128,7 @@ class BankReconciliationController extends Controller
             $request->file('file'),
             $request->validated('mapping')
         );
+        $bankReconciliation->recalculateBalances();
 
         return response()->json($summary);
     }
@@ -135,6 +136,7 @@ class BankReconciliationController extends Controller
     public function autoMatch(BankReconciliation $bankReconciliation, AutoMatchBankReconciliationAction $action): JsonResponse
     {
         $summary = $action->execute($bankReconciliation);
+        $bankReconciliation->recalculateBalances();
 
         return response()->json($summary);
     }
@@ -148,6 +150,7 @@ class BankReconciliationController extends Controller
         /** @var BankReconciliationItem $bankItem */
         $bankItem = $bankReconciliation->items()->findOrFail($item);
         $result = (new MatchBankReconciliationItemAction)->execute($bankItem, $validated['journal_entry_line_id']);
+        $bankReconciliation->recalculateBalances();
 
         return response()->json(['data' => $result]);
     }
@@ -157,6 +160,7 @@ class BankReconciliationController extends Controller
         /** @var BankReconciliationItem $bankItem */
         $bankItem = $bankReconciliation->items()->findOrFail($item);
         $result = (new UnmatchBankReconciliationItemAction)->execute($bankItem);
+        $bankReconciliation->recalculateBalances();
 
         return response()->json(['data' => $result]);
     }

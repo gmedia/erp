@@ -138,4 +138,23 @@ class BankReconciliation extends Model
     {
         return bccomp((string) $this->difference, '0', 2) === 0;
     }
+
+    /**
+     * Recalculate reconciled_balance and difference based on current reconciled items.
+     */
+    public function recalculateBalances(): void
+    {
+        $reconciledTotal = $this->items()
+            ->where('is_reconciled', true)
+            ->selectRaw('COALESCE(SUM(credit), 0) - COALESCE(SUM(debit), 0) as net')
+            ->value('net') ?? 0;
+
+        $reconciledBalance = round((float) $this->book_balance + (float) $reconciledTotal, 2);
+        $difference = round((float) $this->statement_balance - $reconciledBalance, 2);
+
+        $this->update([
+            'reconciled_balance' => $reconciledBalance,
+            'difference' => $difference,
+        ]);
+    }
 }
