@@ -7,7 +7,6 @@ use App\Models\InventoryStocktake;
 use App\Models\InventoryStocktakeItem;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Models\ProductStock;
 use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentItem;
 use App\Models\Unit;
@@ -141,19 +140,6 @@ class StockAdjustmentSampleDataSeeder extends Seeder
             return $products->take(3);
         }
 
-        $productIdsWithStock = ProductStock::query()
-            ->where('branch_id', $branchId)
-            ->orderBy('product_id')
-            ->limit(3)
-            ->pluck('product_id');
-
-        if ($productIdsWithStock->count() >= 3) {
-            return Product::query()
-                ->whereIn('id', $productIdsWithStock)
-                ->orderBy('id')
-                ->get();
-        }
-
         $products = Product::query()->orderBy('id')->take(3)->get();
         if ($products->count() >= 3) {
             return $products;
@@ -204,16 +190,6 @@ class StockAdjustmentSampleDataSeeder extends Seeder
                     'status' => 'active',
                 ]
             );
-
-            ProductStock::updateOrCreate(
-                ['product_id' => $product->id, 'branch_id' => $branchId],
-                [
-                    'quantity_on_hand' => 100,
-                    'quantity_reserved' => 0,
-                    'minimum_quantity' => 10,
-                    'average_cost' => $sample['cost'],
-                ]
-            );
         }
 
         return Product::query()
@@ -234,10 +210,7 @@ class StockAdjustmentSampleDataSeeder extends Seeder
                 break;
             }
 
-            $quantityBefore = (float) (ProductStock::query()
-                ->where('branch_id', $branchId)
-                ->where('product_id', $product->id)
-                ->value('quantity_on_hand') ?? 0);
+            $quantityBefore = 100.0;
 
             $quantityAdjusted = $adjustment;
             $quantityAfter = $quantityBefore + $quantityAdjusted;
@@ -274,10 +247,7 @@ class StockAdjustmentSampleDataSeeder extends Seeder
                 continue;
             }
 
-            $quantityBefore = (float) (ProductStock::query()
-                ->where('branch_id', $branchId)
-                ->where('product_id', $product->id)
-                ->value('quantity_on_hand') ?? $stItem->system_quantity);
+            $quantityBefore = (float) ($stItem->system_quantity ?? 100);
 
             $quantityAdjusted = (float) ($stItem->variance ?? 0);
             $quantityAfter = $quantityBefore + $quantityAdjusted;

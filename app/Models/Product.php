@@ -36,8 +36,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $production_orders_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductDependency> $relatedTo
  * @property-read int|null $related_to_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductStock> $stocks
- * @property-read int|null $stocks_count
+
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SubscriptionPlan> $subscriptionPlans
  * @property-read int|null $subscription_plans_count
  * @property-read \App\Models\Unit $unit
@@ -94,11 +93,6 @@ class Product extends Model
     public function prices(): HasMany
     {
         return $this->hasMany(ProductPrice::class);
-    }
-
-    public function stocks(): HasMany
-    {
-        return $this->hasMany(ProductStock::class);
     }
 
     public function billOfMaterials(): HasMany

@@ -9,9 +9,9 @@ use App\Models\CustomerSubscription;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductDependency;
+use App\Models\ProductDependency;
 use App\Models\ProductionOrder;
 use App\Models\ProductionOrderItem;
-use App\Models\ProductStock;
 use App\Models\SubscriptionBillingRecord;
 use App\Models\SubscriptionPlan;
 use App\Models\Unit;
@@ -230,30 +230,6 @@ class ProductSampleDataSeeder extends Seeder
             'related_product_id' => $deskChair->id,
             'type' => 'recommended',
             'notes' => 'Complete your office setup with a matching chair',
-        ]);
-
-        ProductStock::create([
-            'product_id' => $woodPanel->id,
-            'branch_id' => $branchId,
-            'quantity_on_hand' => 50,
-            'quantity_reserved' => 10,
-            'average_cost' => 250000,
-        ]);
-
-        ProductStock::create([
-            'product_id' => $tableLegs->id,
-            'branch_id' => $branchId,
-            'quantity_on_hand' => 30,
-            'quantity_reserved' => 5,
-            'average_cost' => 180000,
-        ]);
-
-        ProductStock::create([
-            'product_id' => $officeDesk->id,
-            'branch_id' => $branchId,
-            'quantity_on_hand' => 8,
-            'quantity_reserved' => 2,
-            'average_cost' => 850000,
         ]);
 
         $this->command->info('Sample product data created successfully!');

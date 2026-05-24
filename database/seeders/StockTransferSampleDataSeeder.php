@@ -6,7 +6,6 @@ use App\Models\Branch;
 use App\Models\Employee;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Models\ProductStock;
 use App\Models\StockTransfer;
 use App\Models\StockTransferItem;
 use App\Models\Unit;
@@ -221,16 +220,6 @@ class StockTransferSampleDataSeeder extends Seeder
                     'is_sellable' => true,
                     'is_taxable' => false,
                     'status' => 'active',
-                ]
-            );
-
-            ProductStock::updateOrCreate(
-                ['product_id' => $product->id, 'branch_id' => $branchId],
-                [
-                    'quantity_on_hand' => 100,
-                    'quantity_reserved' => 0,
-                    'minimum_quantity' => 10,
-                    'average_cost' => $sample['cost'],
                 ]
             );
         }

@@ -5,7 +5,6 @@ use App\Models\Branch;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductPrice;
-use App\Models\ProductStock;
 use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -49,13 +48,6 @@ test('product has prices relationship', function () {
     ProductPrice::factory()->count(3)->create(['product_id' => $product->id]);
 
     expect($product->prices)->toHaveCount(3);
-});
-
-test('product has stocks relationship', function () {
-    $product = Product::factory()->create();
-    ProductStock::factory()->count(2)->create(['product_id' => $product->id]);
-
-    expect($product->stocks)->toHaveCount(2);
 });
 
 test('product has bill of materials relationship', function () {
