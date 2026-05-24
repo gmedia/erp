@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $generated_entries_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\RecurringJournalLine> $lines
  * @property-read int|null $lines_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal due()
  * @method static \Database\Factories\RecurringJournalFactory factory($count = null, $state = [])
@@ -48,6 +49,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereNextRunDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereTotalAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class RecurringJournal extends Model

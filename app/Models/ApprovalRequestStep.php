@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\User|null $delegator
  * @property-read \App\Models\ApprovalFlowStep $flowStep
  * @property-read \App\Models\ApprovalRequest $request
+ *
  * @method static Builder<static>|ApprovalRequestStep assignedToUser(int $userId)
  * @method static Builder<static>|ApprovalRequestStep currentRequestStep()
  * @method static \Database\Factories\ApprovalRequestStepFactory factory($count = null, $state = [])
@@ -46,6 +47,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static Builder<static>|ApprovalRequestStep whereStatus($value)
  * @method static Builder<static>|ApprovalRequestStep whereStepOrder($value)
  * @method static Builder<static>|ApprovalRequestStep whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ApprovalRequestStep extends Model

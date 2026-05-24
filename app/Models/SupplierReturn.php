@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \App\Models\PurchaseOrder $purchaseOrder
  * @property-read \App\Models\Supplier $supplier
  * @property-read \App\Models\Warehouse $warehouse
+ *
  * @method static \Database\Factories\SupplierReturnFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn newQuery()
@@ -54,6 +55,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereSupplierId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereWarehouseId($value)
+ *
  * @mixin \Eloquent
  */
 class SupplierReturn extends Model

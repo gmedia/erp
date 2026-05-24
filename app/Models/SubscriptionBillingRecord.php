@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\CustomerSubscription $customerSubscription
+ *
  * @method static \Database\Factories\SubscriptionBillingRecordFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord newQuery()
@@ -39,6 +40,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereTaxAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereTotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class SubscriptionBillingRecord extends Model

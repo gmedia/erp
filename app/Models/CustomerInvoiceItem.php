@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\CustomerInvoice $customerInvoice
  * @property-read \App\Models\Product|null $product
  * @property-read \App\Models\Unit|null $unit
+ *
  * @method static \Database\Factories\CustomerInvoiceItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem newQuery()
@@ -44,6 +45,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereUnitId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class CustomerInvoiceItem extends Model

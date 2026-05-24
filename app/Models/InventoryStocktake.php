@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $items_count
  * @property-read \App\Models\ProductCategory|null $productCategory
  * @property-read \App\Models\Warehouse $warehouse
+ *
  * @method static \Database\Factories\InventoryStocktakeFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InventoryStocktake newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InventoryStocktake newQuery()
@@ -42,6 +43,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InventoryStocktake whereStocktakeNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InventoryStocktake whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InventoryStocktake whereWarehouseId($value)
+ *
  * @mixin \Eloquent
  */
 class InventoryStocktake extends Model

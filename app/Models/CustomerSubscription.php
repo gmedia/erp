@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $billing_records_count
  * @property-read \App\Models\Customer $customer
  * @property-read \App\Models\SubscriptionPlan $subscriptionPlan
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription cancelled()
  * @method static \Database\Factories\CustomerSubscriptionFactory factory($count = null, $state = [])
@@ -40,6 +41,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereSubscriptionPlanId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class CustomerSubscription extends Model

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Account $account
  * @property-read \App\Models\RecurringJournal $recurringJournal
+ *
  * @method static \Database\Factories\RecurringJournalLineFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournalLine newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournalLine newQuery()
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournalLine whereMemo($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournalLine whereRecurringJournalId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournalLine whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class RecurringJournalLine extends Model

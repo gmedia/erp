@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $branch_id
  * @property string|null $code
  * @property-read \App\Models\Branch|null $branch
+ *
  * @method static \Database\Factories\WarehouseFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Warehouse newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Warehouse newQuery()
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Warehouse whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Warehouse whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Warehouse whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Warehouse extends Model

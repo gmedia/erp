@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Pipeline $pipeline
+ *
  * @method static \Database\Factories\PipelineStateFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineState newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineState newQuery()
@@ -36,6 +37,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineState whereSortOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineState whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineState whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PipelineState extends Model

@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \App\Models\User|null $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApprovalFlowStep> $steps
  * @property-read int|null $steps_count
+ *
  * @method static \Database\Factories\ApprovalFlowFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalFlow newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalFlow newQuery()
@@ -35,6 +36,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalFlow whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalFlow whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalFlow whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ApprovalFlow extends Model

@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read Menu|null $parent
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
  * @property-read int|null $permissions_count
+ *
  * @method static \Database\Factories\MenuFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu newQuery()
@@ -34,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu whereParentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Menu whereUrl($value)
+ *
  * @mixin \Eloquent
  */
 class Menu extends Model

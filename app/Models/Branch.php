@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Database\Factories\BranchFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branch newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branch newQuery()
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branch whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branch whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branch whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Branch extends Model

@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \App\Models\User|null $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReportSection> $sections
  * @property-read int|null $sections_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration active()
  * @method static \Database\Factories\ReportConfigurationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration newModelQuery()
@@ -37,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration whereReportType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ReportConfiguration extends Model

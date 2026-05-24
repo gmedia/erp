@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\Product $relatedProduct
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency addOns()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency alternatives()
  * @method static \Database\Factories\ProductDependencyFactory factory($count = null, $state = [])
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereRelatedProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ProductDependency extends Model

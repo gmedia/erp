@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PurchaseRequestItem> $items
  * @property-read int|null $items_count
  * @property-read \App\Models\Employee|null $requester
+ *
  * @method static \Database\Factories\PurchaseRequestFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseRequest newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseRequest newQuery()
@@ -53,6 +54,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseRequest whereRequiredDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseRequest whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseRequest whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PurchaseRequest extends Model

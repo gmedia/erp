@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $items_count
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\Unit $unit
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder completed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder draft()
  * @method static \Database\Factories\ProductionOrderFactory factory($count = null, $state = [])
@@ -53,6 +54,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereTotalCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereUnitId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ProductionOrder extends Model

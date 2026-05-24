@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\CustomerCategory|null $customerCategory
  * @property-read \App\Models\Product $product
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice effective()
  * @method static \Database\Factories\ProductPriceFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice newModelQuery()
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ProductPrice extends Model

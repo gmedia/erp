@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\GoodsReceiptItem|null $goodsReceiptItem
  * @property-read \App\Models\Product|null $product
  * @property-read \App\Models\SupplierBill $supplierBill
+ *
  * @method static \Database\Factories\SupplierBillItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem newQuery()
@@ -44,6 +45,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereTaxPercent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class SupplierBillItem extends Model

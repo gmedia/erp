@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,8 +21,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string|null $user_agent
  * @property \Illuminate\Support\Carbon $created_at
  * @property-read \App\Models\User|null $actor
- * @property-read Model|\Eloquent $approvable
+ * @property-read Model|Eloquent $approvable
  * @property-read \App\Models\ApprovalRequest|null $request
+ *
  * @method static \Database\Factories\ApprovalAuditLogFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalAuditLog newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalAuditLog newQuery()
@@ -37,6 +39,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalAuditLog whereMetadata($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalAuditLog whereStepOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalAuditLog whereUserAgent($value)
+ *
  * @mixin \Eloquent
  */
 class ApprovalAuditLog extends Model

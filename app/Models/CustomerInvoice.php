@@ -49,6 +49,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ArReceipt> $receipts
  * @property-read int|null $receipts_count
  * @property-read \App\Models\User|null $sender
+ *
  * @method static \Database\Factories\CustomerInvoiceFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice newQuery()
@@ -77,6 +78,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereSubtotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereTaxAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class CustomerInvoice extends Model

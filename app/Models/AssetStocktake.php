@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \App\Models\User|null $createdBy
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AssetStocktakeItem> $items
  * @property-read int|null $items_count
+ *
  * @method static \Database\Factories\AssetStocktakeFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktake newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktake newQuery()
@@ -37,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktake whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktake whereUlid($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktake whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class AssetStocktake extends Model

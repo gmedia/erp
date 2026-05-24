@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\PurchaseOrderItem $purchaseOrderItem
  * @property-read \App\Models\Unit $unit
+ *
  * @method static \Database\Factories\GoodsReceiptItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsReceiptItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsReceiptItem newQuery()
@@ -39,6 +40,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsReceiptItem whereUnitId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsReceiptItem whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsReceiptItem whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class GoodsReceiptItem extends Model

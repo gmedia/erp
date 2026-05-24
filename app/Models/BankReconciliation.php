@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \App\Models\FiscalYear $fiscalYear
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BankReconciliationItem> $items
  * @property-read int|null $items_count
+ *
  * @method static \Database\Factories\BankReconciliationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation newQuery()
@@ -52,6 +53,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereStatementBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class BankReconciliation extends Model

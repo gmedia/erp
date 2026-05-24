@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\PurchaseOrder $purchaseOrder
  * @property-read \App\Models\PurchaseRequestItem|null $purchaseRequestItem
  * @property-read \App\Models\Unit $unit
+ *
  * @method static \Database\Factories\PurchaseOrderItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrderItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrderItem newQuery()
@@ -43,6 +44,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrderItem whereUnitId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrderItem whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrderItem whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PurchaseOrderItem extends Model

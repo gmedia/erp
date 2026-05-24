@@ -52,6 +52,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property-read int|null $payments_count
  * @property-read \App\Models\PurchaseOrder|null $purchaseOrder
  * @property-read \App\Models\Supplier $supplier
+ *
  * @method static \Database\Factories\SupplierBillFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill newQuery()
@@ -83,6 +84,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereSupplierInvoiceNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereTaxAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class SupplierBill extends Model

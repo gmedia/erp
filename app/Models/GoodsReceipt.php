@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \App\Models\PurchaseOrder $purchaseOrder
  * @property-read \App\Models\Employee|null $receiver
  * @property-read \App\Models\Warehouse $warehouse
+ *
  * @method static \Database\Factories\GoodsReceiptFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsReceipt newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsReceipt newQuery()
@@ -50,6 +51,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsReceipt whereSupplierDeliveryNote($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsReceipt whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsReceipt whereWarehouseId($value)
+ *
  * @mixin \Eloquent
  */
 class GoodsReceipt extends Model

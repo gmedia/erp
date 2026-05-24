@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $delegate
  * @property-read \App\Models\User $delegator
+ *
  * @method static \Database\Factories\ApprovalDelegationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalDelegation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalDelegation newQuery()
@@ -33,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalDelegation whereReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalDelegation whereStartDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalDelegation whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ApprovalDelegation extends Model

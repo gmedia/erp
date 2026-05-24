@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Database\Factories\CustomerCategoryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerCategory newQuery()
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerCategory whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerCategory whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerCategory whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class CustomerCategory extends Model

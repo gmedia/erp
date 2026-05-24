@@ -36,6 +36,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $items_count
  * @property-read \App\Models\Supplier $supplier
  * @property-read \App\Models\Warehouse $warehouse
+ *
  * @method static \Database\Factories\PurchaseOrderFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder newQuery()
@@ -60,6 +61,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereTaxAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereWarehouseId($value)
+ *
  * @mixin \Eloquent
  */
 class PurchaseOrder extends Model

@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read int|null $coa_versions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JournalEntry> $journalEntries
  * @property-read int|null $journal_entries_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FiscalYear current()
  * @method static \Database\Factories\FiscalYearFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FiscalYear newModelQuery()
@@ -33,6 +34,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FiscalYear whereStartDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FiscalYear whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FiscalYear whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class FiscalYear extends Model

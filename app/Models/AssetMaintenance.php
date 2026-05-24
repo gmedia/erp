@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\Asset $asset
  * @property-read \App\Models\User|null $createdBy
  * @property-read \App\Models\Supplier|null $supplier
+ *
  * @method static \Database\Factories\AssetMaintenanceFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetMaintenance newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetMaintenance newQuery()
@@ -40,6 +41,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetMaintenance whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetMaintenance whereSupplierId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetMaintenance whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class AssetMaintenance extends Model

@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Account $sourceAccount
  * @property-read \App\Models\Account $targetAccount
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountMapping newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountMapping newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountMapping query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountMapping whereTargetAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountMapping whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountMapping whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class AccountMapping extends Model

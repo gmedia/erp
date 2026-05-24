@@ -41,6 +41,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \App\Models\Unit $unit
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BillOfMaterial> $usedInBillOfMaterials
  * @property-read int|null $used_in_bill_of_materials_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product active()
  * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newModelQuery()
@@ -62,6 +63,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereUnitId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Product extends Model

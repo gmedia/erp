@@ -43,6 +43,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CustomerInvoice> $invoices
  * @property-read int|null $invoices_count
  * @property-read \App\Models\JournalEntry|null $journalEntry
+ *
  * @method static \Database\Factories\ArReceiptFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt newQuery()
@@ -68,6 +69,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereTotalAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereTotalUnallocated($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ArReceipt extends Model

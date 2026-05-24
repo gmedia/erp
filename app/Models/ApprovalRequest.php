@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,11 +21,12 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property \Illuminate\Support\Carbon|null $completed_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read Model|\Eloquent $approvable
+ * @property-read Model|Eloquent $approvable
  * @property-read \App\Models\ApprovalFlow $flow
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApprovalRequestStep> $steps
  * @property-read int|null $steps_count
  * @property-read \App\Models\User $submitter
+ *
  * @method static \Database\Factories\ApprovalRequestFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalRequest newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalRequest newQuery()
@@ -40,6 +42,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalRequest whereSubmittedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalRequest whereSubmittedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalRequest whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ApprovalRequest extends Model

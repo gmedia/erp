@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\StockTransfer $stockTransfer
  * @property-read \App\Models\Unit $unit
+ *
  * @method static \Database\Factories\StockTransferItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransferItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransferItem newQuery()
@@ -34,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransferItem whereUnitCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransferItem whereUnitId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransferItem whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class StockTransferItem extends Model

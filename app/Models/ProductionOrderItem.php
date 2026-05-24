@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\ProductionOrder $productionOrder
  * @property-read \App\Models\Unit $unit
+ *
  * @method static \Database\Factories\ProductionOrderItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem newQuery()
@@ -36,6 +37,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereUnitCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereUnitId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ProductionOrderItem extends Model

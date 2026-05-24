@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\PipelineTransition $transition
+ *
  * @method static \Database\Factories\PipelineTransitionActionFactory factory($count = null, $state = [])
  * @method static Builder<static>|PipelineTransitionAction newModelQuery()
  * @method static Builder<static>|PipelineTransitionAction newQuery()
@@ -32,6 +33,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder<static>|PipelineTransitionAction whereOnFailure($value)
  * @method static Builder<static>|PipelineTransitionAction wherePipelineTransitionId($value)
  * @method static Builder<static>|PipelineTransitionAction whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PipelineTransitionAction extends Model

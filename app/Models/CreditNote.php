@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CreditNoteItem> $items
  * @property-read int|null $items_count
  * @property-read \App\Models\JournalEntry|null $journalEntry
+ *
  * @method static \Database\Factories\CreditNoteFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote newQuery()
@@ -61,6 +62,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereSubtotal($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereTaxAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class CreditNote extends Model

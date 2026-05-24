@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Department|null $toDepartment
  * @property-read \App\Models\Employee|null $toEmployee
  * @property-read \App\Models\AssetLocation|null $toLocation
+ *
  * @method static \Database\Factories\AssetMovementFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetMovement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetMovement newQuery()
@@ -56,6 +57,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetMovement whereToEmployeeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetMovement whereToLocationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetMovement whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class AssetMovement extends Model

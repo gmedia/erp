@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $children_count
  * @property-read ReportSection|null $parent
  * @property-read \App\Models\ReportConfiguration $reportConfiguration
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection active()
  * @method static \Database\Factories\ReportSectionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection newModelQuery()
@@ -45,6 +46,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereSignConvention($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereSortOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ReportSection extends Model

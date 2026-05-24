@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Account $account
  * @property-read \App\Models\FiscalYear $fiscalYear
+ *
  * @method static \Database\Factories\AccountBalanceFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance newQuery()
@@ -39,6 +40,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance wherePeriodMonth($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance wherePeriodYear($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class AccountBalance extends Model

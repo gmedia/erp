@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\FiscalYear $fiscalYear
  * @property-read \App\Models\User|null $reopenedBy
  * @property-read \App\Models\Account|null $retainedEarningsAccount
+ *
  * @method static \Database\Factories\PeriodClosingFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing newQuery()
@@ -51,6 +52,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereRetainedEarningsAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PeriodClosing extends Model

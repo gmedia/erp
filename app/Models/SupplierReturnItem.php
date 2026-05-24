@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\SupplierReturn $supplierReturn
  * @property-read \App\Models\Unit|null $unit
+ *
  * @method static \Database\Factories\SupplierReturnItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem newQuery()
@@ -35,6 +36,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem whereUnitId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class SupplierReturnItem extends Model

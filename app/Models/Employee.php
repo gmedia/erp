@@ -38,7 +38,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 /**
  * Class Employee
- * 
+ *
  * Represents an employee in the system.
  *
  * @property int $id
@@ -62,6 +62,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read int|null $permissions_count
  * @property-read \App\Models\Position|null $position
  * @property-read \App\Models\User|null $user
+ *
  * @method static \Database\Factories\EmployeeFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newQuery()
@@ -81,6 +82,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereTerminationDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class Employee extends Model

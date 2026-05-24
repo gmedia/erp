@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\InventoryStocktake $inventoryStocktake
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\Unit $unit
+ *
  * @method static \Database\Factories\InventoryStocktakeItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InventoryStocktakeItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InventoryStocktakeItem newQuery()
@@ -41,6 +42,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InventoryStocktakeItem whereUnitId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InventoryStocktakeItem whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InventoryStocktakeItem whereVariance($value)
+ *
  * @mixin \Eloquent
  */
 class InventoryStocktakeItem extends Model

@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Product $finishedProduct
  * @property-read \App\Models\Product $rawMaterial
  * @property-read \App\Models\Unit $unit
+ *
  * @method static \Database\Factories\BillOfMaterialFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial newQuery()
@@ -32,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial whereUnitId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial whereWastePercentage($value)
+ *
  * @mixin \Eloquent
  */
 class BillOfMaterial extends Model

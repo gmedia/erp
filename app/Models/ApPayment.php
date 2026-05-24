@@ -47,6 +47,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property-read \App\Models\FiscalYear $fiscalYear
  * @property-read \App\Models\JournalEntry|null $journalEntry
  * @property-read \App\Models\Supplier $supplier
+ *
  * @method static \Database\Factories\ApPaymentFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment newQuery()
@@ -74,6 +75,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereTotalAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereTotalUnallocated($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ApPayment extends Model

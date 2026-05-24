@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\ApPayment $payment
  * @property-read \App\Models\SupplierBill $supplierBill
+ *
  * @method static \Database\Factories\ApPaymentAllocationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation newQuery()
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation whereSupplierBillId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ApPaymentAllocation extends Model

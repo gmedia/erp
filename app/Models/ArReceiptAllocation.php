@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\CustomerInvoice $customerInvoice
  * @property-read \App\Models\ArReceipt $receipt
+ *
  * @method static \Database\Factories\ArReceiptAllocationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation newQuery()
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class ArReceiptAllocation extends Model

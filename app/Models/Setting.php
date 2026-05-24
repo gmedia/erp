@@ -14,6 +14,7 @@ use InvalidArgumentException;
  * @property string $type
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Database\Factories\SettingFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting newQuery()
@@ -25,6 +26,7 @@ use InvalidArgumentException;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereValue($value)
+ *
  * @mixin \Eloquent
  */
 class Setting extends Model

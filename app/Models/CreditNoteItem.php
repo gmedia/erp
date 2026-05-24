@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Account $account
  * @property-read \App\Models\CreditNote $creditNote
  * @property-read \App\Models\Product|null $product
+ *
  * @method static \Database\Factories\CreditNoteItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem newQuery()
@@ -39,6 +40,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereTaxPercent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class CreditNoteItem extends Model

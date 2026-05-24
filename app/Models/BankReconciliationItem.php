@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\BankReconciliation $bankReconciliation
  * @property-read \App\Models\JournalEntryLine|null $journalEntryLine
+ *
  * @method static \Database\Factories\BankReconciliationItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem newQuery()
@@ -39,6 +40,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereTransactionDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class BankReconciliationItem extends Model

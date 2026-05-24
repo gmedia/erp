@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\PurchaseRequest $purchaseRequest
  * @property-read \App\Models\Unit $unit
+ *
  * @method static \Database\Factories\PurchaseRequestItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseRequestItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseRequestItem newQuery()
@@ -36,6 +37,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseRequestItem whereQuantityOrdered($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseRequestItem whereUnitId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseRequestItem whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PurchaseRequestItem extends Model

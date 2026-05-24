@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,7 +32,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JournalEntryLine> $lines
  * @property-read int|null $lines_count
  * @property-read \App\Models\User|null $postedBy
- * @property-read Model|\Eloquent|null $source
+ * @property-read Model|Eloquent|null $source
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry draft()
  * @method static \Database\Factories\JournalEntryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry newModelQuery()
@@ -53,6 +55,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereSourceType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class JournalEntry extends Model
