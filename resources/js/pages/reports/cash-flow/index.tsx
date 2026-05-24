@@ -9,8 +9,11 @@ import {
     useSingleYearFinancialReportPage,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useExport } from '@/hooks/useExport';
 import { formatCurrency } from '@/lib/utils';
+import { Download, Loader2 } from 'lucide-react';
 
 interface CashFlowItem extends FinancialTableRow {
     id: number;
@@ -48,6 +51,10 @@ export default function CashFlow() {
         emptyReport: emptyCashFlowReport,
     });
 
+    const { exporting, exportData } = useExport({
+        endpoint: '/api/reports/cash-flow/export',
+    });
+
     const totalInflow = report.reduce(
         (sum, item) => sum + (item.inflow || 0),
         0,
@@ -69,6 +76,25 @@ export default function CashFlow() {
             hasError={!!error}
             headerMeta={
                 <FinancialReportHeaderMeta fiscalYear={selectedFiscalYear} />
+            }
+            headerActions={
+                <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!selectedYearId || exporting}
+                    onClick={() =>
+                        exportData({
+                            fiscal_year_id: String(selectedYearId),
+                        })
+                    }
+                >
+                    {exporting ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                        <Download className="mr-2 h-4 w-4" />
+                    )}
+                    {exporting ? 'Exporting...' : 'Export'}
+                </Button>
             }
             preContent={
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

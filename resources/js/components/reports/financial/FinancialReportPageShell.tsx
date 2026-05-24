@@ -51,6 +51,7 @@ type FinancialReportPageShellProps = {
     onYearChange: (value: string) => void;
     onComparisonChange: (value: string) => void;
     headerMeta?: ReactNode;
+    headerActions?: ReactNode;
     isLoading?: boolean;
     hasError?: boolean;
     children?: ReactNode;
@@ -229,6 +230,7 @@ export function FinancialReportPageShell({
     onYearChange,
     onComparisonChange,
     headerMeta,
+    headerActions,
     isLoading = false,
     hasError = false,
     children,
@@ -258,7 +260,7 @@ export function FinancialReportPageShell({
                             </h1>
                             {headerMeta}
                         </div>
-                        <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                             <div className="w-full sm:w-[220px]">
                                 <Select
                                     value={String(selectedYearId)}
@@ -314,6 +316,7 @@ export function FinancialReportPageShell({
                                     </SelectContent>
                                 </Select>
                             </div>
+                            {headerActions}
                         </div>
                     </div>
 

@@ -10,7 +10,10 @@ import {
     useSingleYearFinancialReportPage,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
+import { Button } from '@/components/ui/button';
+import { useExport } from '@/hooks/useExport';
 import { formatCurrency } from '@/lib/utils';
+import { Download, Loader2 } from 'lucide-react';
 
 interface AccountItem extends FinancialTableRow {
     id: number;
@@ -48,6 +51,10 @@ export default function TrialBalance() {
         emptyReport: emptyTrialBalanceReport,
     });
 
+    const { exporting, exportData } = useExport({
+        endpoint: '/api/reports/trial-balance/export',
+    });
+
     const totalDebit = report.reduce((sum, item) => sum + (item.debit || 0), 0);
     const totalCredit = report.reduce(
         (sum, item) => sum + (item.credit || 0),
@@ -75,6 +82,25 @@ export default function TrialBalance() {
                         />
                     )}
                 </FinancialReportHeaderMeta>
+            }
+            headerActions={
+                <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!selectedYearId || exporting}
+                    onClick={() =>
+                        exportData({
+                            fiscal_year_id: String(selectedYearId),
+                        })
+                    }
+                >
+                    {exporting ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                        <Download className="mr-2 h-4 w-4" />
+                    )}
+                    {exporting ? 'Exporting...' : 'Export'}
+                </Button>
             }
         >
             <FinancialTableCard

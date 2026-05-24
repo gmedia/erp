@@ -14,8 +14,11 @@ import {
     FinancialStatusBadge,
     FinancialSummaryCard,
 } from '@/components/reports/financial/FinancialSummaryCard';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useExport } from '@/hooks/useExport';
 import { cn, formatCurrency } from '@/lib/utils';
+import { Download, Loader2 } from 'lucide-react';
 
 interface IncomeStatementResponse {
     fiscalYears: FinancialReportFiscalYear[];
@@ -66,6 +69,10 @@ export default function IncomeStatement() {
         emptyReport: emptyIncomeStatementReport,
     });
 
+    const { exporting, exportData } = useExport({
+        endpoint: '/api/reports/income-statement/export',
+    });
+
     const totalRevenue = report.totals?.revenue || 0;
     const totalExpense = report.totals?.expense || 0;
     const netIncome = report.totals?.net_income || 0;
@@ -99,6 +106,28 @@ export default function IncomeStatement() {
                         negativeLabel="Loss"
                     />
                 </FinancialReportHeaderMeta>
+            }
+            headerActions={
+                <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!selectedYearId || exporting}
+                    onClick={() =>
+                        exportData({
+                            fiscal_year_id: String(selectedYearId),
+                            ...(comparisonYearId && {
+                                comparison_year_id: String(comparisonYearId),
+                            }),
+                        })
+                    }
+                >
+                    {exporting ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                        <Download className="mr-2 h-4 w-4" />
+                    )}
+                    {exporting ? 'Exporting...' : 'Export'}
+                </Button>
             }
         >
             <div className="grid gap-6">

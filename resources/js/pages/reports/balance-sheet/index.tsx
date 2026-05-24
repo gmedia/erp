@@ -16,9 +16,11 @@ import {
     FinancialSummaryCard,
 } from '@/components/reports/financial/FinancialSummaryCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useExport } from '@/hooks/useExport';
 import { formatCurrency } from '@/lib/utils';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Download, Loader2 } from 'lucide-react';
 
 interface BalanceSheetResponse {
     fiscalYears: FinancialReportFiscalYear[];
@@ -73,6 +75,10 @@ export default function BalanceSheet() {
         emptyReport: emptyBalanceSheetReport,
     });
 
+    const { exporting, exportData } = useExport({
+        endpoint: '/api/reports/balance-sheet/export',
+    });
+
     const totalAssets = report.totals?.assets || 0;
     const totalLiabilitiesAndEquity =
         (report.totals?.liabilities || 0) + (report.totals?.equity || 0);
@@ -104,6 +110,28 @@ export default function BalanceSheet() {
                         negativeLabel={`Unbalanced • ${formatCurrency(difference)}`}
                     />
                 </FinancialReportHeaderMeta>
+            }
+            headerActions={
+                <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!selectedYearId || exporting}
+                    onClick={() =>
+                        exportData({
+                            fiscal_year_id: String(selectedYearId),
+                            ...(comparisonYearId && {
+                                comparison_year_id: String(comparisonYearId),
+                            }),
+                        })
+                    }
+                >
+                    {exporting ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                        <Download className="mr-2 h-4 w-4" />
+                    )}
+                    {exporting ? 'Exporting...' : 'Export'}
+                </Button>
             }
         >
             <div className="grid gap-6">
