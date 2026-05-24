@@ -1,5 +1,7 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 
+import { BankReconciliationWorkspace } from '@/components/bank-reconciliations/BankReconciliationWorkspace';
+import { ImportBankStatementDialog } from '@/components/bank-reconciliations/ImportBankStatementDialog';
 import { ViewField } from '@/components/common/ViewField';
 import {
     ViewModalItemsTable,
@@ -7,12 +9,14 @@ import {
 } from '@/components/common/ViewModalItemsTable';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     BankReconciliation,
     type BankReconciliationItem,
 } from '@/types/bank-reconciliation';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
+import { GitMerge } from 'lucide-react';
 
 interface BankReconciliationViewModalProps {
     item: BankReconciliation | null;
@@ -62,9 +66,19 @@ const itemColumns: ViewModalItemsTableColumn<BankReconciliationItem>[] = [
 export const BankReconciliationViewModal =
     memo<BankReconciliationViewModalProps>(
         function BankReconciliationViewModal({ item, open, onClose }) {
+            const [workspaceOpen, setWorkspaceOpen] = useState(false);
+
             if (!item) return null;
 
             return (
+                <>
+                    {workspaceOpen && (
+                        <BankReconciliationWorkspace
+                            bankReconciliation={item}
+                            open={workspaceOpen}
+                            onClose={() => setWorkspaceOpen(false)}
+                        />
+                    )}
                 <ViewModalShell
                     open={open}
                     onClose={onClose}
@@ -74,6 +88,25 @@ export const BankReconciliationViewModal =
                 >
                     <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
                         <div className="space-y-6 py-2">
+                            {item.status !== 'completed' && (
+                                <div className="flex justify-end gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setWorkspaceOpen(true)}
+                                    >
+                                        <GitMerge className="mr-2 size-4" />
+                                        Reconcile
+                                    </Button>
+                                    <ImportBankStatementDialog
+                                        bankReconciliationId={item.id}
+                                        onSuccess={() => {
+                                            onClose();
+                                        }}
+                                    />
+                                </div>
+                            )}
+
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <ViewField
                                     label="Account"
@@ -160,6 +193,7 @@ export const BankReconciliationViewModal =
                         </div>
                     </div>
                 </ViewModalShell>
+                </>
             );
         },
     );

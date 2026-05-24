@@ -2,11 +2,18 @@
 
 namespace App\Actions\BankReconciliations;
 
+use App\Actions\AccountingPosting\PostBankReconciliationJournalAction;
 use App\Models\BankReconciliation;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class CompleteBankReconciliationAction
 {
+    public function __construct(
+        private PostBankReconciliationJournalAction $postJournal,
+    ) {}
+
     public function execute(BankReconciliation $bankReconciliation): BankReconciliation
     {
         if (bccomp((string) $bankReconciliation->difference, '0', 2) !== 0) {
@@ -18,6 +25,15 @@ class CompleteBankReconciliationAction
             'completed_by' => auth()->id(),
             'completed_at' => now(),
         ]);
+
+        try {
+            $this->postJournal->execute($bankReconciliation->refresh());
+        } catch (Throwable $e) {
+            Log::warning('Bank reconciliation journal posting failed', [
+                'bank_reconciliation_id' => $bankReconciliation->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return $bankReconciliation->refresh()->load(['account', 'fiscalYear', 'items', 'completedBy', 'creator']);
     }

@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property numeric $difference
  * @property string $status
  * @property string|null $notes
+ * @property int|null $journal_entry_id
  * @property int|null $completed_by
  * @property \Illuminate\Support\Carbon|null $completed_at
  * @property int|null $created_by
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \App\Models\FiscalYear $fiscalYear
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BankReconciliationItem> $items
  * @property-read int|null $items_count
+ * @property-read \App\Models\JournalEntry|null $journalEntry
  *
  * @method static \Database\Factories\BankReconciliationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation newModelQuery()
@@ -45,6 +47,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereDifference($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereFiscalYearId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereJournalEntryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation wherePeriodEnd($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation wherePeriodStart($value)
@@ -81,6 +84,7 @@ class BankReconciliation extends Model
         'completed_by',
         'completed_at',
         'created_by',
+        'journal_entry_id',
     ];
 
     /**
@@ -115,6 +119,11 @@ class BankReconciliation extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function journalEntry(): BelongsTo
+    {
+        return $this->belongsTo(JournalEntry::class);
     }
 
     public function items(): HasMany

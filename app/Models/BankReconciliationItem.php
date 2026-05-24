@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $bank_reconciliation_id
  * @property int|null $journal_entry_line_id
+ * @property int|null $account_id
  * @property \Illuminate\Support\Carbon $transaction_date
  * @property string $description
  * @property numeric $debit
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Account|null $account
  * @property-read \App\Models\BankReconciliation $bankReconciliation
  * @property-read \App\Models\JournalEntryLine|null $journalEntryLine
  *
@@ -27,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereAccountId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereBankReconciliationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereCredit($value)
@@ -64,6 +67,7 @@ class BankReconciliationItem extends Model
         'is_reconciled',
         'reference',
         'notes',
+        'account_id',
     ];
 
     /**
@@ -84,5 +88,10 @@ class BankReconciliationItem extends Model
     public function journalEntryLine(): BelongsTo
     {
         return $this->belongsTo(JournalEntryLine::class);
+    }
+
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(Account::class);
     }
 }

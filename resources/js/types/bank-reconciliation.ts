@@ -8,6 +8,28 @@ export interface BankReconciliationItem {
     credit: number;
     type: string;
     is_reconciled: boolean;
+    reference?: string | null;
+    account_id?: number | null;
+    account?: {
+        id: number;
+        code: string;
+        name: string;
+    } | null;
+}
+
+export interface UnmatchedJournalLine {
+    id: number;
+    account_id: number;
+    debit: number;
+    credit: number;
+    memo: string | null;
+    journal_entry: {
+        id: number;
+        entry_date: string;
+        reference: string | null;
+        description: string;
+        entry_number: string;
+    };
 }
 
 export interface BankReconciliation {
