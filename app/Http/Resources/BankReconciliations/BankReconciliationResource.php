@@ -35,6 +35,13 @@ class BankReconciliationResource extends JsonResource
                 'is_reconciled' => (bool) $item->is_reconciled,
                 'reference' => $item->reference,
                 'notes' => $item->notes,
+                'account_id' => $item->account_id,
+                'account' => $item->account_id ? [
+                    'id' => $item->account->id,
+                    'code' => $item->account->code,
+                    'name' => $item->account->name,
+                ] : null,
+                'journal_entry_number' => $item->journalEntryLine?->journalEntry?->entry_number,
             ])->values()->all()),
             'completed_by' => $this->whenLoaded('completedBy', fn () => ['id' => $this->resource->completed_by, 'name' => $this->resource->completedBy?->name]),
             'completed_at' => $this->resource->completed_at?->toIso8601String(),
