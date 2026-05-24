@@ -194,6 +194,9 @@ const ReportArOutstanding = lazy(
 const ReportCustomerStatement = lazy(
     () => import('./pages/reports/customer-statement-report/index'),
 );
+const TrialBalanceDetailed = lazy(
+    () => import('./pages/reports/trial-balance-detailed/index'),
+);
 const UserGuide = lazy(() => import('./pages/user-guide/index'));
 
 // Helper to wrap protected routes
@@ -959,6 +962,14 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <ReportCustomerStatement />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/reports/trial-balance-detailed"
+                    element={
+                        <P>
+                            <TrialBalanceDetailed />
                         </P>
                     }
                 />
