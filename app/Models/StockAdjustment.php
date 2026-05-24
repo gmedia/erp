@@ -29,7 +29,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $items_count
  * @property-read \App\Models\JournalEntry|null $journalEntry
  * @property-read \App\Models\Warehouse $warehouse
- *
  * @method static \Database\Factories\StockAdjustmentFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockAdjustment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockAdjustment newQuery()
@@ -48,7 +47,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockAdjustment whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockAdjustment whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockAdjustment whereWarehouseId($value)
- *
  * @mixin \Eloquent
  */
 class StockAdjustment extends Model

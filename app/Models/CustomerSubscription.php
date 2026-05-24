@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $billing_records_count
  * @property-read \App\Models\Customer $customer
  * @property-read \App\Models\SubscriptionPlan $subscriptionPlan
- *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription cancelled()
  * @method static \Database\Factories\CustomerSubscriptionFactory factory($count = null, $state = [])
@@ -31,7 +30,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription pastDue()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription trial()
- *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereCustomerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereEndDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereNextBillingDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereStartDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereSubscriptionPlanId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class CustomerSubscription extends Model

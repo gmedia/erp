@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Account> $accounts
  * @property-read int|null $accounts_count
  * @property-read \App\Models\FiscalYear|null $fiscalYear
- *
  * @method static \Database\Factories\CoaVersionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CoaVersion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CoaVersion newQuery()
@@ -28,7 +27,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CoaVersion whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CoaVersion whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CoaVersion whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class CoaVersion extends Model

@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $assets_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AssetModel> $models
  * @property-read int|null $models_count
- *
  * @method static \Database\Factories\AssetCategoryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetCategory newQuery()
@@ -28,7 +27,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetCategory whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetCategory whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetCategory whereUsefulLifeMonthsDefault($value)
- *
  * @mixin \Eloquent
  */
 class AssetCategory extends Model

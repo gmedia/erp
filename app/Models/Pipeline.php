@@ -26,7 +26,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $states_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PipelineTransition> $transitions
  * @property-read int|null $transitions_count
- *
  * @method static \Database\Factories\PipelineFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Pipeline newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Pipeline newQuery()
@@ -42,7 +41,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Pipeline whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Pipeline whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Pipeline whereVersion($value)
- *
  * @mixin \Eloquent
  */
 class Pipeline extends Model

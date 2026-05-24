@@ -21,13 +21,12 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string|null $ip_address
  * @property string|null $user_agent
  * @property \Illuminate\Support\Carbon $created_at
- * @property-read Model $entity
+ * @property-read Model|\Eloquent $entity
  * @property-read \App\Models\PipelineState|null $fromState
  * @property-read \App\Models\User|null $performedBy
  * @property-read \App\Models\PipelineEntityState $pipelineEntityState
  * @property-read \App\Models\PipelineState $toState
  * @property-read \App\Models\PipelineTransition|null $transition
- *
  * @method static \Database\Factories\PipelineStateLogFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineStateLog newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineStateLog newQuery()
@@ -45,7 +44,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineStateLog whereToStateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineStateLog whereTransitionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineStateLog whereUserAgent($value)
- *
  * @mixin \Eloquent
  */
 class PipelineStateLog extends Model

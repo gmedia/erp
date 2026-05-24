@@ -32,18 +32,42 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property \Illuminate\Support\Carbon|null $confirmed_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Customer $customer
- * @property-read \App\Models\Branch $branch
- * @property-read \App\Models\FiscalYear $fiscalYear
- * @property-read \App\Models\Account $bankAccount
- * @property-read \App\Models\JournalEntry|null $journalEntry
- * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\User|null $confirmer
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ArReceiptAllocation> $allocations
  * @property-read int|null $allocations_count
+ * @property-read \App\Models\Account $bankAccount
+ * @property-read \App\Models\Branch $branch
+ * @property-read \App\Models\User|null $confirmer
+ * @property-read \App\Models\User|null $creator
+ * @property-read \App\Models\Customer $customer
+ * @property-read \App\Models\FiscalYear $fiscalYear
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CustomerInvoice> $invoices
  * @property-read int|null $invoices_count
- *
+ * @property-read \App\Models\JournalEntry|null $journalEntry
+ * @method static \Database\Factories\ArReceiptFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereBankAccountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereConfirmedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereConfirmedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereCurrency($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereCustomerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereFiscalYearId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereJournalEntryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt wherePaymentMethod($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereReceiptDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereReceiptNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereReference($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereTotalAllocated($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereTotalAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereTotalUnallocated($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class ArReceipt extends Model

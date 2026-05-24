@@ -35,21 +35,48 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property \Illuminate\Support\Carbon|null $sent_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Customer $customer
  * @property-read \App\Models\Branch $branch
- * @property-read \App\Models\FiscalYear $fiscalYear
- * @property-read \App\Models\JournalEntry|null $journalEntry
  * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\User|null $sender
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CustomerInvoiceItem> $items
- * @property-read int|null $items_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ArReceiptAllocation> $receiptAllocations
- * @property-read int|null $receipt_allocations_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CreditNote> $creditNotes
  * @property-read int|null $credit_notes_count
+ * @property-read \App\Models\Customer $customer
+ * @property-read \App\Models\FiscalYear $fiscalYear
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CustomerInvoiceItem> $items
+ * @property-read int|null $items_count
+ * @property-read \App\Models\JournalEntry|null $journalEntry
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ArReceiptAllocation> $receiptAllocations
+ * @property-read int|null $receipt_allocations_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ArReceipt> $receipts
  * @property-read int|null $receipts_count
- *
+ * @property-read \App\Models\User|null $sender
+ * @method static \Database\Factories\CustomerInvoiceFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereAmountDue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereAmountReceived($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereCreditNoteAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereCurrency($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereCustomerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereDiscountAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereDueDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereFiscalYearId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereGrandTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereInvoiceDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereInvoiceNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereJournalEntryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice wherePaymentTerms($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereSentAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereSentBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereSubtotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereTaxAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class CustomerInvoice extends Model

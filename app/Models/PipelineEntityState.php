@@ -20,12 +20,11 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\PipelineState $currentState
- * @property-read Model $entity
+ * @property-read Model|\Eloquent $entity
  * @property-read \App\Models\User|null $lastTransitionedBy
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PipelineStateLog> $logs
  * @property-read int|null $logs_count
  * @property-read \App\Models\Pipeline $pipeline
- *
  * @method static \Database\Factories\PipelineEntityStateFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineEntityState newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineEntityState newQuery()
@@ -40,7 +39,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineEntityState whereMetadata($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineEntityState wherePipelineId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineEntityState whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class PipelineEntityState extends Model

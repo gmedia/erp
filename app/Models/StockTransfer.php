@@ -35,7 +35,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \App\Models\Employee|null $requestedBy
  * @property-read \App\Models\User|null $shippedBy
  * @property-read \App\Models\Warehouse $toWarehouse
- *
  * @method static \Database\Factories\StockTransferFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer newQuery()
@@ -58,7 +57,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereTransferDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereTransferNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class StockTransfer extends Model

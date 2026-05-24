@@ -22,11 +22,28 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Account $account
  * @property-read \App\Models\CustomerInvoice $customerInvoice
  * @property-read \App\Models\Product|null $product
- * @property-read \App\Models\Account $account
  * @property-read \App\Models\Unit|null $unit
- *
+ * @method static \Database\Factories\CustomerInvoiceItemFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereAccountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereCustomerInvoiceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereDiscountPercent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereLineTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereTaxPercent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereUnitId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereUnitPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoiceItem whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class CustomerInvoiceItem extends Model

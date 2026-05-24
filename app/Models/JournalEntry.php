@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JournalEntryLine> $lines
  * @property-read int|null $lines_count
  * @property-read \App\Models\User|null $postedBy
- *
+ * @property-read Model|\Eloquent|null $source
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry draft()
  * @method static \Database\Factories\JournalEntryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry newModelQuery()
@@ -45,12 +45,14 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereEntryNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereFiscalYearId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereJournalType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry wherePostedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry wherePostedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereReference($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereSourceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereSourceType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class JournalEntry extends Model

@@ -21,7 +21,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, AssetLocation> $children
  * @property-read int|null $children_count
  * @property-read AssetLocation|null $parent
- *
  * @method static \Database\Factories\AssetLocationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetLocation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetLocation newQuery()
@@ -33,7 +32,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetLocation whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetLocation whereParentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetLocation whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class AssetLocation extends Model

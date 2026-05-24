@@ -27,7 +27,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Branch|null $foundBranch
  * @property-read \App\Models\AssetLocation|null $foundLocation
  * @property-read \App\Models\AssetStocktake $stocktake
- *
  * @method static \Database\Factories\AssetStocktakeItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem newQuery()
@@ -45,7 +44,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereResult($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class AssetStocktakeItem extends Model

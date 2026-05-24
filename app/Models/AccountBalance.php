@@ -22,9 +22,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Account $account
  * @property-read \App\Models\FiscalYear $fiscalYear
- *
  * @method static \Database\Factories\AccountBalanceFactory factory($count = null, $state = [])
- *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance whereAccountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance whereClosingBalance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance whereCreditTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance whereDebitTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance whereFiscalYearId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance whereLastRecalculatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance whereMovement($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance whereOpeningBalance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance wherePeriodMonth($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance wherePeriodYear($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class AccountBalance extends Model

@@ -32,7 +32,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JournalEntryLine> $journalLines
  * @property-read int|null $journal_lines_count
  * @property-read Account|null $parent
- *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Account active()
  * @method static \Database\Factories\AccountFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Account newModelQuery()
@@ -53,7 +52,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereSubType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Account whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class Account extends Model

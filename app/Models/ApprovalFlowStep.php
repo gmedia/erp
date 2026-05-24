@@ -25,7 +25,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\User|null $escalationUser
  * @property-read \App\Models\ApprovalFlow $flow
  * @property-read \App\Models\User|null $user
- *
  * @method static \Database\Factories\ApprovalFlowStepFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalFlowStep newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalFlowStep newQuery()
@@ -45,7 +44,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalFlowStep whereRequiredAction($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalFlowStep whereStepOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalFlowStep whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class ApprovalFlowStep extends Model

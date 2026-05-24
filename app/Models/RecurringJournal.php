@@ -22,17 +22,32 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $created_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\FiscalYear|null $fiscalYear
  * @property-read \App\Models\User|null $creator
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\RecurringJournalLine> $lines
- * @property-read int|null $lines_count
+ * @property-read \App\Models\FiscalYear|null $fiscalYear
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JournalEntry> $generatedEntries
  * @property-read int|null $generated_entries_count
- *
- * @method static \Database\Factories\RecurringJournalFactory factory($count = null, $state = [])
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\RecurringJournalLine> $lines
+ * @property-read int|null $lines_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal due()
- *
+ * @method static \Database\Factories\RecurringJournalFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereAutoPost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereEndDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereFiscalYearId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereFrequency($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereLastRunDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereNextRunDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereTotalAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class RecurringJournal extends Model

@@ -22,9 +22,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\BankReconciliation $bankReconciliation
  * @property-read \App\Models\JournalEntryLine|null $journalEntryLine
- *
  * @method static \Database\Factories\BankReconciliationItemFactory factory($count = null, $state = [])
- *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereBankReconciliationId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereCredit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereDebit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereIsReconciled($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereJournalEntryLineId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereReference($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereTransactionDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class BankReconciliationItem extends Model

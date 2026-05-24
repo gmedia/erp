@@ -13,20 +13,29 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $quantity_planned
  * @property int $unit_id
  * @property numeric $quantity_used
- * @property numeric $unit_cost
- * @property numeric $cost
+ * @property numeric $unit_cost Cost per unit at time of production
+ * @property numeric $cost quantity_used * unit_cost
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\ProductionOrder $productionOrder
  * @property-read \App\Models\Unit $unit
- *
  * @method static \Database\Factories\ProductionOrderItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem query()
- *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereCost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereProductionOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereQuantityPlanned($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereQuantityUsed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereUnitCost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereUnitId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class ProductionOrderItem extends Model

@@ -29,16 +29,38 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Illuminate\Support\Carbon|null $confirmed_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Branch $branch
+ * @property-read \App\Models\User|null $confirmer
+ * @property-read \App\Models\User|null $creator
  * @property-read \App\Models\Customer $customer
  * @property-read \App\Models\CustomerInvoice|null $customerInvoice
- * @property-read \App\Models\Branch $branch
  * @property-read \App\Models\FiscalYear $fiscalYear
- * @property-read \App\Models\JournalEntry|null $journalEntry
- * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\User|null $confirmer
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CreditNoteItem> $items
  * @property-read int|null $items_count
- *
+ * @property-read \App\Models\JournalEntry|null $journalEntry
+ * @method static \Database\Factories\CreditNoteFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereConfirmedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereConfirmedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereCreditNoteDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereCreditNoteNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereCustomerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereCustomerInvoiceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereFiscalYearId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereGrandTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereJournalEntryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereReason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereSubtotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereTaxAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class CreditNote extends Model

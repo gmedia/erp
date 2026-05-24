@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $finished_product_id
  * @property int $raw_material_id
- * @property numeric $quantity
+ * @property numeric $quantity Quantity of raw material needed per 1 unit of finished product
  * @property numeric $waste_percentage
  * @property int $unit_id
  * @property string|null $notes
@@ -19,12 +19,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Product $finishedProduct
  * @property-read \App\Models\Product $rawMaterial
  * @property-read \App\Models\Unit $unit
- *
  * @method static \Database\Factories\BillOfMaterialFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial query()
- *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial whereFinishedProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial whereQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial whereRawMaterialId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial whereUnitId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial whereWastePercentage($value)
  * @mixin \Eloquent
  */
 class BillOfMaterial extends Model

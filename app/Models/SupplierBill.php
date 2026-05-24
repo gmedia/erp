@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @property int $id
- * @property string $bill_number
+ * @property string|null $bill_number
  * @property int $supplier_id
  * @property int $branch_id
  * @property int $fiscal_year_id
@@ -38,19 +38,51 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property \Illuminate\Support\Carbon|null $confirmed_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Branch $branch
+ * @property-read \App\Models\User|null $confirmer
+ * @property-read \App\Models\User|null $creator
+ * @property-read \App\Models\FiscalYear $fiscalYear
+ * @property-read \App\Models\GoodsReceipt|null $goodsReceipt
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierBillItem> $items
  * @property-read int|null $items_count
+ * @property-read \App\Models\JournalEntry|null $journalEntry
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApPaymentAllocation> $paymentAllocations
  * @property-read int|null $payment_allocations_count
- * @property-read \App\Models\Supplier $supplier
- * @property-read \App\Models\Branch $branch
- * @property-read \App\Models\FiscalYear $fiscalYear
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApPayment> $payments
+ * @property-read int|null $payments_count
  * @property-read \App\Models\PurchaseOrder|null $purchaseOrder
- * @property-read \App\Models\GoodsReceipt|null $goodsReceipt
- * @property-read \App\Models\JournalEntry|null $journalEntry
- * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\User|null $confirmer
- *
+ * @property-read \App\Models\Supplier $supplier
+ * @method static \Database\Factories\SupplierBillFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereAmountDue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereAmountPaid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereBillDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereBillNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereConfirmedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereConfirmedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereCurrency($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereDiscountAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereDueDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereFiscalYearId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereGoodsReceiptId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereGrandTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereJournalEntryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill wherePaymentTerms($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill wherePurchaseOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereSubtotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereSupplierId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereSupplierInvoiceDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereSupplierInvoiceNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereTaxAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class SupplierBill extends Model

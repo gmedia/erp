@@ -20,10 +20,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Account $account
  * @property-read \App\Models\CreditNote $creditNote
  * @property-read \App\Models\Product|null $product
- * @property-read \App\Models\Account $account
- *
+ * @method static \Database\Factories\CreditNoteItemFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereAccountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereCreditNoteId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereLineTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereTaxPercent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereUnitPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class CreditNoteItem extends Model

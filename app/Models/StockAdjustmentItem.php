@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\StockAdjustment $stockAdjustment
  * @property-read \App\Models\Unit $unit
- *
  * @method static \Database\Factories\StockAdjustmentItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockAdjustmentItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockAdjustmentItem newQuery()
@@ -39,7 +38,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockAdjustmentItem whereUnitCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockAdjustmentItem whereUnitId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockAdjustmentItem whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class StockAdjustmentItem extends Model

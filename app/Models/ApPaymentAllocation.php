@@ -18,7 +18,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\ApPayment $payment
  * @property-read \App\Models\SupplierBill $supplierBill
- *
+ * @method static \Database\Factories\ApPaymentAllocationFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation whereAllocatedAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation whereApPaymentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation whereDiscountTaken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation whereSupplierBillId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class ApPaymentAllocation extends Model

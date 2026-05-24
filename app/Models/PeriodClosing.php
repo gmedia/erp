@@ -24,15 +24,33 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $created_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\FiscalYear $fiscalYear
- * @property-read \App\Models\JournalEntry|null $closingJournalEntry
- * @property-read \App\Models\Account|null $retainedEarningsAccount
  * @property-read \App\Models\User|null $closedBy
- * @property-read \App\Models\User|null $reopenedBy
+ * @property-read \App\Models\JournalEntry|null $closingJournalEntry
  * @property-read \App\Models\User|null $creator
- *
+ * @property-read \App\Models\FiscalYear $fiscalYear
+ * @property-read \App\Models\User|null $reopenedBy
+ * @property-read \App\Models\Account|null $retainedEarningsAccount
  * @method static \Database\Factories\PeriodClosingFactory factory($count = null, $state = [])
- *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereClosedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereClosedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereClosingJournalEntryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereClosingType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereFiscalYearId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereNetIncome($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing wherePeriodMonth($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing wherePeriodYear($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereReopenedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereReopenedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereRetainedEarningsAccountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class PeriodClosing extends Model

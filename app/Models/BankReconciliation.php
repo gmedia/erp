@@ -26,14 +26,32 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Account $account
- * @property-read \App\Models\FiscalYear $fiscalYear
  * @property-read \App\Models\User|null $completedBy
  * @property-read \App\Models\User|null $creator
+ * @property-read \App\Models\FiscalYear $fiscalYear
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BankReconciliationItem> $items
  * @property-read int|null $items_count
- *
  * @method static \Database\Factories\BankReconciliationFactory factory($count = null, $state = [])
- *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereAccountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereBookBalance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereCompletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereCompletedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereDifference($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereFiscalYearId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation wherePeriodEnd($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation wherePeriodStart($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereReconciledBalance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereReconciliationDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereStatementBalance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class BankReconciliation extends Model

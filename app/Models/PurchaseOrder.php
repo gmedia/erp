@@ -11,12 +11,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
- * @property string $po_number
+ * @property string|null $po_number
  * @property int $supplier_id
  * @property int $warehouse_id
  * @property \Illuminate\Support\Carbon $order_date
  * @property \Illuminate\Support\Carbon|null $expected_delivery_date
- * @property string $payment_terms
+ * @property string|null $payment_terms
  * @property string $currency
  * @property numeric $subtotal
  * @property numeric $tax_amount
@@ -30,13 +30,36 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $created_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $approver
+ * @property-read \App\Models\User|null $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PurchaseOrderItem> $items
  * @property-read int|null $items_count
  * @property-read \App\Models\Supplier $supplier
  * @property-read \App\Models\Warehouse $warehouse
- * @property-read \App\Models\User|null $approver
- * @property-read \App\Models\User|null $creator
- *
+ * @method static \Database\Factories\PurchaseOrderFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereApprovedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereApprovedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereCurrency($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereDiscountAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereExpectedDeliveryDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereGrandTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereOrderDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder wherePaymentTerms($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder wherePoNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereShippingAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereSubtotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereSupplierId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereTaxAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrder whereWarehouseId($value)
  * @mixin \Eloquent
  */
 class PurchaseOrder extends Model

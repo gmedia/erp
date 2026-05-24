@@ -29,7 +29,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\User|null $createdBy
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\Warehouse $warehouse
- *
  * @method static \Database\Factories\StockMovementFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement newQuery()
@@ -51,7 +50,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereUnitCost($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement whereWarehouseId($value)
- *
  * @mixin \Eloquent
  */
 class StockMovement extends Model

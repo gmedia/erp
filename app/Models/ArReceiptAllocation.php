@@ -16,9 +16,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\ArReceipt $receipt
  * @property-read \App\Models\CustomerInvoice $customerInvoice
- *
+ * @property-read \App\Models\ArReceipt $receipt
+ * @method static \Database\Factories\ArReceiptAllocationFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation whereAllocatedAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation whereArReceiptId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation whereCustomerInvoiceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation whereDiscountGiven($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceiptAllocation whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class ArReceiptAllocation extends Model

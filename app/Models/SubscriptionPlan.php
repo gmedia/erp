@@ -21,13 +21,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CustomerSubscription> $customerSubscriptions
  * @property-read int|null $customer_subscriptions_count
  * @property-read \App\Models\Product $product
- *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan active()
  * @method static \Database\Factories\SubscriptionPlanFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan query()
- *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereBillingInterval($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereSetupFee($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereTrialPeriodDays($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionPlan whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class SubscriptionPlan extends Model

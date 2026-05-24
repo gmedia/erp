@@ -11,12 +11,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $product_id
  * @property int $related_product_id
  * @property string $type
- * @property string|null $notes
+ * @property string|null $notes Explanation of the dependency
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Product $product
  * @property-read \App\Models\Product $relatedProduct
- *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency addOns()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency alternatives()
  * @method static \Database\Factories\ProductDependencyFactory factory($count = null, $state = [])
@@ -25,7 +24,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency prerequisites()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency recommended()
- *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereRelatedProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class ProductDependency extends Model

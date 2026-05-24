@@ -25,7 +25,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AssetDepreciationLine> $lines
  * @property-read int|null $lines_count
  * @property-read \App\Models\User|null $postedBy
- *
  * @method static \Database\Factories\AssetDepreciationRunFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationRun newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationRun newQuery()
@@ -41,7 +40,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationRun wherePostedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationRun whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationRun whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class AssetDepreciationRun extends Model

@@ -45,8 +45,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Account|null $accumulatedDepreciationAccount
- * @property-read \Illuminate\Database\Eloquent\Collection<int,
- *     \App\Models\PipelineEntityState> $allPipelineEntityStates
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PipelineEntityState> $allPipelineEntityStates
  * @property-read int|null $all_pipeline_entity_states_count
  * @property-read \App\Models\Branch $branch
  * @property-read \App\Models\AssetCategory $category
@@ -67,7 +66,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AssetStocktakeItem> $stocktakeItems
  * @property-read int|null $stocktake_items_count
  * @property-read \App\Models\Supplier|null $supplier
- *
  * @method static \Database\Factories\AssetFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Asset newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Asset newQuery()
@@ -106,7 +104,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Asset whereWarrantyEndDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Asset withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Asset withoutTrashed()
- *
  * @mixin \Eloquent
  */
 class Asset extends Model

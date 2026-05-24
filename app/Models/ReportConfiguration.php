@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property string|null $description
  * @property string $report_type
- * @property array<string, mixed>|null $layout_config
+ * @property array<array-key, mixed>|null $layout_config
  * @property bool $is_active
  * @property int|null $created_by
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -21,11 +21,22 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \App\Models\User|null $creator
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReportSection> $sections
  * @property-read int|null $sections_count
- *
- * @method static \Database\Factories\ReportConfigurationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration active()
+ * @method static \Database\Factories\ReportConfigurationFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration ofType(string $type)
- *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration whereLayoutConfig($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration whereReportType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class ReportConfiguration extends Model

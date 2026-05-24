@@ -20,7 +20,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read float $net_amount
  * @property-read string $type
  * @property-read \App\Models\JournalEntry $journalEntry
- *
  * @method static \Database\Factories\JournalEntryLineFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntryLine newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntryLine newQuery()
@@ -33,7 +32,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntryLine whereJournalEntryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntryLine whereMemo($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntryLine whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class JournalEntryLine extends Model

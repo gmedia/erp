@@ -22,11 +22,28 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\SupplierBill $supplierBill
- * @property-read \App\Models\Product|null $product
  * @property-read \App\Models\Account $account
  * @property-read \App\Models\GoodsReceiptItem|null $goodsReceiptItem
- *
+ * @property-read \App\Models\Product|null $product
+ * @property-read \App\Models\SupplierBill $supplierBill
+ * @method static \Database\Factories\SupplierBillItemFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereAccountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereDiscountPercent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereGoodsReceiptItemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereLineTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereQuantity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereSupplierBillId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereTaxPercent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereUnitPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class SupplierBillItem extends Model

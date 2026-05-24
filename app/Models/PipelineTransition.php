@@ -29,7 +29,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \App\Models\PipelineState $fromState
  * @property-read \App\Models\Pipeline $pipeline
  * @property-read \App\Models\PipelineState $toState
- *
  * @method static \Database\Factories\PipelineTransitionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransition newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransition newQuery()
@@ -50,7 +49,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransition whereSortOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransition whereToStateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineTransition whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class PipelineTransition extends Model

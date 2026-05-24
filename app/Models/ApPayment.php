@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @property int $id
- * @property string $payment_number
+ * @property string|null $payment_number
  * @property int $supplier_id
  * @property int $branch_id
  * @property int $fiscal_year_id
@@ -37,15 +37,43 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApPaymentAllocation> $allocations
  * @property-read int|null $allocations_count
- * @property-read \App\Models\Supplier $supplier
- * @property-read \App\Models\Branch $branch
- * @property-read \App\Models\FiscalYear $fiscalYear
- * @property-read \App\Models\Account $bankAccount
- * @property-read \App\Models\JournalEntry|null $journalEntry
  * @property-read \App\Models\User|null $approver
- * @property-read \App\Models\User|null $creator
+ * @property-read \App\Models\Account $bankAccount
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierBill> $bills
+ * @property-read int|null $bills_count
+ * @property-read \App\Models\Branch $branch
  * @property-read \App\Models\User|null $confirmer
- *
+ * @property-read \App\Models\User|null $creator
+ * @property-read \App\Models\FiscalYear $fiscalYear
+ * @property-read \App\Models\JournalEntry|null $journalEntry
+ * @property-read \App\Models\Supplier $supplier
+ * @method static \Database\Factories\ApPaymentFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereApprovedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereApprovedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereBankAccountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereConfirmedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereConfirmedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereCurrency($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereFiscalYearId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereJournalEntryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment wherePaymentDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment wherePaymentMethod($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment wherePaymentNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereReference($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereSupplierId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereTotalAllocated($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereTotalAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereTotalUnallocated($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPayment whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class ApPayment extends Model

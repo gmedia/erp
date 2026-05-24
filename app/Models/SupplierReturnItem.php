@@ -6,6 +6,37 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $supplier_return_id
+ * @property int $goods_receipt_item_id
+ * @property int $product_id
+ * @property int|null $unit_id
+ * @property numeric $quantity_returned
+ * @property numeric $unit_price
+ * @property string|null $notes
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\GoodsReceiptItem $goodsReceiptItem
+ * @property-read \App\Models\Product $product
+ * @property-read \App\Models\SupplierReturn $supplierReturn
+ * @property-read \App\Models\Unit|null $unit
+ * @method static \Database\Factories\SupplierReturnItemFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem whereGoodsReceiptItemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem whereQuantityReturned($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem whereSupplierReturnId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem whereUnitId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem whereUnitPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class SupplierReturnItem extends Model
 {
     /** @use HasFactory<\Database\Factories\SupplierReturnItemFactory> */

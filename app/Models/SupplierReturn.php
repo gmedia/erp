@@ -8,6 +8,54 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string|null $return_number
+ * @property int $purchase_order_id
+ * @property int|null $goods_receipt_id
+ * @property int $supplier_id
+ * @property int $warehouse_id
+ * @property \Illuminate\Support\Carbon $return_date
+ * @property string $reason
+ * @property string $status
+ * @property string|null $notes
+ * @property int|null $confirmed_by
+ * @property \Illuminate\Support\Carbon|null $confirmed_at
+ * @property int|null $journal_entry_id
+ * @property int|null $created_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $confirmer
+ * @property-read \App\Models\User|null $creator
+ * @property-read \App\Models\GoodsReceipt|null $goodsReceipt
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierReturnItem> $items
+ * @property-read int|null $items_count
+ * @property-read \App\Models\JournalEntry|null $journalEntry
+ * @property-read \App\Models\PurchaseOrder $purchaseOrder
+ * @property-read \App\Models\Supplier $supplier
+ * @property-read \App\Models\Warehouse $warehouse
+ * @method static \Database\Factories\SupplierReturnFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereConfirmedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereConfirmedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereGoodsReceiptId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereJournalEntryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn wherePurchaseOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereReason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereReturnDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereReturnNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereSupplierId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn whereWarehouseId($value)
+ * @mixin \Eloquent
+ */
 class SupplierReturn extends Model
 {
     /** @use HasFactory<\Database\Factories\SupplierReturnFactory> */

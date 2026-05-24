@@ -22,14 +22,29 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\ReportConfiguration $reportConfiguration
- * @property-read \App\Models\ReportSection|null $parent
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReportSection> $children
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ReportSection> $children
  * @property-read int|null $children_count
- *
- * @method static \Database\Factories\ReportSectionFactory factory($count = null, $state = [])
+ * @property-read ReportSection|null $parent
+ * @property-read \App\Models\ReportConfiguration $reportConfiguration
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection active()
- *
+ * @method static \Database\Factories\ReportSectionFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereAccountSubTypeFilter($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereAccountTypeFilter($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereFormula($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereParentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereReportConfigurationId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereSectionType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereSignConvention($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereSortOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportSection whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class ReportSection extends Model

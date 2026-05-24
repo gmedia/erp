@@ -19,7 +19,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Asset $asset
  * @property-read \App\Models\AssetDepreciationRun $run
- *
  * @method static \Database\Factories\AssetDepreciationLineFactory factory($count = null, $state = [])
  * @method static Builder<static>|AssetDepreciationLine newModelQuery()
  * @method static Builder<static>|AssetDepreciationLine newQuery()
@@ -33,7 +32,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static Builder<static>|AssetDepreciationLine whereCreatedAt($value)
  * @method static Builder<static>|AssetDepreciationLine whereId($value)
  * @method static Builder<static>|AssetDepreciationLine whereUpdatedAt($value)
- *
  * @mixin \Eloquent
  */
 class AssetDepreciationLine extends Model

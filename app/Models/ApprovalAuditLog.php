@@ -19,10 +19,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string|null $ip_address
  * @property string|null $user_agent
  * @property \Illuminate\Support\Carbon $created_at
- * @property-read User|null $actor
- * @property-read Model $approvable
- * @property-read ApprovalRequest|null $request
- *
+ * @property-read \App\Models\User|null $actor
+ * @property-read Model|\Eloquent $approvable
+ * @property-read \App\Models\ApprovalRequest|null $request
  * @method static \Database\Factories\ApprovalAuditLogFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalAuditLog newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalAuditLog newQuery()
@@ -38,7 +37,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalAuditLog whereMetadata($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalAuditLog whereStepOrder($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalAuditLog whereUserAgent($value)
- *
  * @mixin \Eloquent
  */
 class ApprovalAuditLog extends Model

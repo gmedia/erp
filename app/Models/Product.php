@@ -10,16 +10,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
- * @property string $code
+ * @property string $code Product/Service code (SKU)
  * @property string $name
  * @property string|null $description
  * @property string $type
  * @property int $product_category_id
  * @property int $unit_id
  * @property int|null $branch_id
- * @property numeric $cost
- * @property numeric $selling_price
- * @property string $billing_model
+ * @property numeric $cost Production/purchase cost per unit
+ * @property numeric $selling_price Default selling price
+ * @property string $billing_model How this product is billed
  * @property string $status
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -36,20 +36,32 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read int|null $production_orders_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductDependency> $relatedTo
  * @property-read int|null $related_to_count
-
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SubscriptionPlan> $subscriptionPlans
  * @property-read int|null $subscription_plans_count
  * @property-read \App\Models\Unit $unit
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BillOfMaterial> $usedInBillOfMaterials
  * @property-read int|null $used_in_bill_of_materials_count
- *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product active()
  * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product ofType(string $type)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product query()
- *
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereBillingModel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCost($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereProductCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSellingPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereUnitId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class Product extends Model
