@@ -1,6 +1,6 @@
-# AI Handoff: Bank Reconciliation Feature + Trial Balance Detailed Complete
+# AI Handoff: Financial Reports Export Family Complete
 
-Last updated: 2026-05-24 09:33 UTC
+Last updated: 2026-05-24 10:03 UTC
 
 ## Document Roles
 
@@ -11,139 +11,129 @@ Last updated: 2026-05-24 09:33 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `89ed0bf5`
+- HEAD: `ebaeaf10`
 - Working tree: clean
-- Remote: 4 commits ahead (not yet pushed this shift)
-- Bank reconciliation E2E: **13/13 passing** via Sail runner
+- Remote: 2 commits ahead (need push)
+- All financial reports now have Excel export
 
 ## Current Objective
 
-Sessions 2026-05-24 morning + afternoon complete. All shipped:
+Sessions 2026-05-24 (3 shifts) all complete:
 
-- ✅ Bank Reconciliation feature end-to-end (import, match, journal posting, balance recalc, Complete in workspace)
-- ✅ Trial Balance Detailed frontend wired
-- ✅ Comparative Report frontend verified (already complete)
-- ✅ E2E global-setup Sail-aware (unblocks runs from PHP-less hosts)
+- ✅ Bank Reconciliation feature end-to-end
+- ✅ Trial Balance Detailed
+- ✅ Comparative Report frontend (already complete)
+- ✅ E2E global-setup Sail-aware
 - ✅ Bank Reconciliation E2E: 13/13 passing
+- ✅ Financial reports export family — all 5 reports
 
-## Session Summary (2026-05-24 afternoon)
+## Session Summary (2026-05-24 evening)
 
-4 commits shipped after the previous handoff (`1e8747f1`):
+2 commits shipped after the previous handoff (`6e47d10c`):
 
 | Commit | Description |
 |--------|-------------|
-| `ae318366` | feat(e2e): make global-setup Sail-aware with PHP fallback |
-| `4da050bd` | fix(seeder): remove duplicate ProductDependency import |
-| `9d52ebc3` | fix(bank-reconciliation): handle missing items in workspace |
-| `89ed0bf5` | test(bank-reconciliation): pick reconcilable rows and fix strict-mode locator |
+| `e056a86f` | feat(reports): Excel export endpoints for 5 financial reports |
+| `ebaeaf10` | feat(reports): wire Excel export buttons on 5 financial report pages |
 
-### #1 Sail-aware global-setup (`ae318366`)
+### Backend (commit `e056a86f`)
 
-`tests/e2e/global-setup.ts` previously called `phpBinary` directly, breaking on Sail-only hosts.
+5 reports gained POST `/reports/{report}/export`:
+- `trial-balance` (single year)
+- `balance-sheet` (with optional comparison_year)
+- `income-statement` (with optional comparison_year)
+- `cash-flow` (single year)
+- `comparative` (with optional comparison_year)
 
-- New tiered runner resolution: local PHP → Sail (`./vendor/bin/sail artisan`) → throw informative error
-- New env override: `PLAYWRIGHT_USE_SAIL=1` to force Sail even when local PHP exists
-- Logs the chosen runner at start of every run
+Per-report files (15 new):
+- `app/Http/Requests/Reports/{Name}Request.php` — fiscal_year + optional comparison validation
+- `app/Actions/Reports/Export{Name}Action.php` — uses `ExportsReportToExcel` trait
+- `app/Exports/{Name}Export.php` — `FromCollection|ShouldAutoSize|WithHeadings`
 
-Verified across 4 scenarios (default, force-sail, no-php-with-sail, no-php-no-sail).
+Tree reports (Balance Sheet, Income Statement, Comparative) use a private `flattenTree($nodes, $section, $depth)` helper that recurses `children` and indents names by depth, then appends section + grand totals from `report['totals']`.
 
-### #2 Bank Reconciliation E2E green-light
+Note: TrialBalance request was named `TrialBalanceFinancialReportRequest` to avoid collision with the existing `TrialBalanceReportRequest` used by `trial-balance-detailed`.
 
-Three independent bugs surfaced while running the suite:
+Routes added in `routes/api/reports.php` paired with existing GET routes, gated by the same `permission:{report}_report` middleware.
 
-1. **Stale Vite build** — `public/build` was 11 days old, missing the bank-reconciliation feature entirely. Rebuild with `sail npm run build` resolved 1/5 failing tests immediately.
+Smoke-tested all 5 endpoints — 200 OK + valid file URLs.
 
-2. **Workspace crash on `items.length`** (`9d52ebc3`)
-   - `BankReconciliationWorkspace` initialized state from `bankReconciliation.items`
-   - List endpoint omits the `items` relation (only `show` loads it)
-   - `items.length` then threw `Cannot read properties of undefined (reading 'length')`
-   - Fix: default to `[]` and fetch full detail (`GET /api/bank-reconciliations/{id}`) when the workspace opens
+### Frontend (commit `ebaeaf10`)
 
-3. **Test row selection bug** (`89ed0bf5`)
-   - Workflow tests grabbed `tbody tr.first()` which always hit the seeded Completed row
-   - Completed reconciliations intentionally hide Reconcile/Import buttons (verified by another passing test)
-   - Added `getReconcilableRow` helper filtering out completed rows
-   - Also fixed a strict-mode violation: `getByText(/Bank Statement File/i)` matched both label and dialog description; switched to `exact: true`
+Two financial-report shells gained an optional `headerActions` prop:
+- `resources/js/components/reports/financial/FinancialReportPageShell.tsx` (comparison)
+- `resources/js/components/reports/financial/FinancialTableReportPage.tsx` (single year)
 
-4. **Seeder duplicate import** (`4da050bd`)
-   - `database/seeders/ProductSampleDataSeeder.php` had `use App\Models\ProductDependency` twice
-   - Caused PHP fatal during `db:seed`, blocking every E2E run
-   - One-line removal
+Each of the 5 page files now passes an Export Button (Download icon, outline + sm) via `headerActions`, using the shared `useExport` hook. Button disabled when `!selectedYearId || isExporting`.
 
-### Oracle consultation
-
-When Workspace's invisibility was unexplained, an Oracle consult correctly diagnosed stale Vite build as the top theory based on the symptom pattern (relation fields missing, scalar fields fine, action buttons missing despite correct status). Saved 30+ minutes of guessing.
+`tsc --noEmit` clean. `npm run build` clean.
 
 ## Validated
 
-- TypeScript: `tsc --noEmit` clean
+- PHPStan: 0 errors on all new files + ReportController
 - Duster: pass on all changed PHP files
-- Bank Reconciliation E2E: **13/13 passing** (EXIT=0, ~95s runtime via Sail)
-  - List view, search, filter, sort, export, checkbox, actions menu
-  - View modal, Import Statement dialog, Reconciliation Workspace
-  - Auto Match toast, items table headers, Completed row hides actions
+- TypeScript: `tsc --noEmit` clean
+- Vite build: clean
+- HTTP smoke: all 5 endpoints return 200 + valid xlsx URL
 
 ## Known Issues / Limitations
 
-1. **Financial reports lack export endpoints** (unchanged from previous handoff)
-   - 5 reports: trial-balance, balance-sheet, income-statement, cash-flow, comparative
-   - Other reports (inventory-valuation, stock-movement, etc.) all have export
-   - Consistent gap, not a regression
-   - Fix: add `POST {report}/export` route + ExportAction + Excel class per report
-
-2. **Vite build hygiene**
+1. **Vite build hygiene** (unchanged)
    - `public/build` can drift from source if `npm run build` isn't run after frontend changes
    - Global-setup deletes `public/hot`, forcing built assets — so stale build silently breaks E2E
    - Consider adding a build step to `global-setup.ts` or CI pipeline
 
+2. **No E2E coverage for the new export buttons**
+   - Manual smoke tested via curl + tinker. Browser-level click → download flow not yet covered.
+
 ## Recommended Next Steps
 
-1. **Push the 4 new commits** when ready (no destructive remote ops)
+1. **Push the 2 new commits + 5 from earlier today**
    ```
    git push origin main
    ```
+   Total 7 commits unpushed since this morning's handoff (`c7c4f966`).
 
-2. **E2E tests for financial reports** (~2-3 hr)
-   - 6 reports without Playwright coverage: Balance Sheet, Income Statement, Cash Flow, Trial Balance, Trial Balance Detailed, Comparative
-   - Pattern: existing `tests/e2e/inventory-valuation-report/` or `tests/e2e/stock-movement-report/`
-   - Standard 9 test cases (search, filter, sort, export, etc.)
-   - **Blocker**: financial reports don't have export endpoints yet (skip Export test or do #3 first)
+2. **E2E tests for financial reports** (~2-3 hr) — now unblocked
+   - 6 reports without Playwright coverage: Trial Balance, Trial Balance Detailed, Balance Sheet, Income Statement, Cash Flow, Comparative
+   - Pattern reference: `tests/e2e/inventory-valuation-report/` — but note these reports use FinancialReportPageShell, not ReportDataTablePage. Locator strategy will differ slightly.
+   - Standard 9 test cases per report (search may not apply — there's no search box; sort may not apply — these are tree displays, not sortable tables).
+   - Recommend: subset of test cases per report (visit, change fiscal year, change comparison year, click Export button)
 
-3. **Financial reports export family** (~4+ hr)
-   - Add export endpoint for trial-balance, balance-sheet, income-statement, cash-flow, comparative
-   - Backend: route + Action + Excel class per report
-   - Frontend: wire export button in each report page
-   - Reference pattern: `app/Actions/Reports/ExportTrialBalanceReportAction.php` + `app/Exports/TrialBalanceReportExport.php`
-   - Good fit for parallel sub-agent delegation (5 reports, identical pattern)
-
-4. **Vite build automation** (~30 min, optional)
+3. **Vite build automation** (~30 min, optional)
    - Add `sail npm run build` to global-setup or document in handoff
-   - Prevents the stale-build trap from happening again
+   - Prevents stale-build from masking frontend bugs
+
+4. **Pest tests for export endpoints** (~1-2 hr)
+   - Each new ExportAction + Excel class deserves a feature test asserting 200 + filename + content
+   - Pattern: `tests/Feature/Reports/InventoryValuationReportTest.php` etc.
+   - Quick to delegate in parallel.
 
 ## Continuation Prompt
 
 ```
-Read task.md. Repo on main at 89ed0bf5, clean. 4 unpushed commits.
+Read task.md. Repo on main at ebaeaf10, clean. 7 unpushed commits.
 
-Last session (2026-05-24 afternoon) shipped:
-- Sail-aware E2E global-setup (PLAYWRIGHT_USE_SAIL=1 to force Sail)
-- Bank Reconciliation E2E now 13/13 passing
-  - Fixed 3 bugs: stale Vite build, Workspace crash on missing items, seeder duplicate import
-  - Test improvements: getReconcilableRow helper, strict-mode locator fix
-- Oracle consult correctly diagnosed stale build as top theory
+Last session (2026-05-24 evening) shipped:
+- 5 new Excel export endpoints for financial reports (trial-balance,
+  balance-sheet, income-statement, cash-flow, comparative)
+- 15 new backend files (FormRequest + Action + Excel per report)
+- 2 financial report shells gained headerActions prop
+- 5 frontend pages got Export buttons via useExport hook
 
-Run E2E with: PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_USE_SAIL=1 npx playwright test tests/e2e/bank-reconciliations/
+All smoke-tested 200 OK. PHPStan/Duster/Types clean.
 
-Next priorities:
-1. Push the 4 commits (when ready)
-2. Financial reports export family (~4hr) — 5 reports parallel delegate-able
-3. E2E tests for 6 financial reports (~2-3hr) — needs #2 first for Export coverage
+Next priority options:
+1. Push the 7 commits (when ready)
+2. E2E tests for 6 financial reports (~2-3 hr) — now unblocked since
+   all have export endpoints
+3. Pest tests for the 5 new export endpoints (~1-2 hr) — parallel-delegatable
+4. Vite build automation hygiene (~30 min)
 
-Recommend #2 first (delegate 5 reports in parallel to deep agents),
-then #3 to lock in coverage.
+Recommend #1 first to push, then #3 (Pest tests via 5 parallel sub-agents)
+since #2 needs more design work for tree-vs-table test patterns.
 
-Reminder: run `sail npm run build` after frontend changes — global-setup
-forces built assets and stale builds silently break E2E.
+Reminder: run `sail npm run build` after frontend changes.
 ```
 
 Read task.md. Repo on main at c7c4f966, clean and pushed.
