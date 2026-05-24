@@ -22,13 +22,23 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('reports')->group(function () {
     Route::get('trial-balance', [ReportController::class, 'trialBalance'])
         ->middleware('permission:trial_balance_report');
+    Route::post('trial-balance/export', [ReportController::class, 'exportTrialBalance'])
+        ->middleware('permission:trial_balance_report');
     Route::get('balance-sheet', [ReportController::class, 'balanceSheet'])
+        ->middleware('permission:balance_sheet_report');
+    Route::post('balance-sheet/export', [ReportController::class, 'exportBalanceSheet'])
         ->middleware('permission:balance_sheet_report');
     Route::get('income-statement', [ReportController::class, 'incomeStatement'])
         ->middleware('permission:income_statement_report');
+    Route::post('income-statement/export', [ReportController::class, 'exportIncomeStatement'])
+        ->middleware('permission:income_statement_report');
     Route::get('cash-flow', [ReportController::class, 'cashFlow'])
         ->middleware('permission:cash_flow_report');
+    Route::post('cash-flow/export', [ReportController::class, 'exportCashFlow'])
+        ->middleware('permission:cash_flow_report');
     Route::get('comparative', [ReportController::class, 'comparative'])
+        ->middleware('permission:comparative_report');
+    Route::post('comparative/export', [ReportController::class, 'exportComparative'])
         ->middleware('permission:comparative_report');
     Route::get('assets/register', [AssetReportController::class, 'register'])
         ->middleware('permission:asset');

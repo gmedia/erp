@@ -4,7 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Actions\ReportConfigurations\GetReportConfigurationByTypeAction;
 use App\Actions\Reports\EvaluateReportSectionsAction;
+use App\Actions\Reports\ExportBalanceSheetReportAction;
+use App\Actions\Reports\ExportCashFlowReportAction;
+use App\Actions\Reports\ExportComparativeReportAction;
+use App\Actions\Reports\ExportIncomeStatementReportAction;
+use App\Actions\Reports\ExportTrialBalanceFinancialReportAction;
 use App\Http\Controllers\Concerns\InteractsWithFinancialReportRequest;
+use App\Http\Requests\Reports\BalanceSheetReportRequest;
+use App\Http\Requests\Reports\CashFlowReportRequest;
+use App\Http\Requests\Reports\ComparativeReportRequest;
+use App\Http\Requests\Reports\IncomeStatementReportRequest;
+use App\Http\Requests\Reports\TrialBalanceFinancialReportRequest;
 use App\Models\ReportConfiguration;
 use App\Services\FinancialReportService;
 use Illuminate\Http\JsonResponse;
@@ -154,5 +164,30 @@ class ReportController extends Controller
             'comparisonYearId' => $comparisonYearId,
             'report' => $report,
         ]);
+    }
+
+    public function exportTrialBalance(TrialBalanceFinancialReportRequest $request, ExportTrialBalanceFinancialReportAction $action): JsonResponse
+    {
+        return $action->execute($request->validated());
+    }
+
+    public function exportBalanceSheet(BalanceSheetReportRequest $request, ExportBalanceSheetReportAction $action): JsonResponse
+    {
+        return $action->execute($request->validated());
+    }
+
+    public function exportIncomeStatement(IncomeStatementReportRequest $request, ExportIncomeStatementReportAction $action): JsonResponse
+    {
+        return $action->execute($request->validated());
+    }
+
+    public function exportCashFlow(CashFlowReportRequest $request, ExportCashFlowReportAction $action): JsonResponse
+    {
+        return $action->execute($request->validated());
+    }
+
+    public function exportComparative(ComparativeReportRequest $request, ExportComparativeReportAction $action): JsonResponse
+    {
+        return $action->execute($request->validated());
     }
 }
