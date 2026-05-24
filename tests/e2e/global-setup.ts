@@ -1,16 +1,23 @@
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 
 const AUTH_STATE_PATH = 'e2e/.auth/admin.json';
 const DEFAULT_BASE_URL = 'http://localhost:80';
 const VITE_HOT_FILE_PATH = 'public/hot';
+const SAIL_BINARY_PATH = 'vendor/bin/sail';
 
 type LoginResponse = {
     token?: string;
 };
 
-function resolvePhpBinary(): string {
+type ArtisanRunner = {
+    command: string;
+    baseArgs: string[];
+    label: string;
+};
+
+function tryLocalPhpBinary(): string | null {
     const candidates = [
         process.env.PLAYWRIGHT_PHP_BINARY,
         process.env.PHP_BINARY,
@@ -31,7 +38,35 @@ function resolvePhpBinary(): string {
         }
     }
 
-    throw new Error('Unable to resolve PHP binary. Set PLAYWRIGHT_PHP_BINARY or PHP_BINARY.');
+    return null;
+}
+
+function resolveArtisanRunner(): ArtisanRunner {
+    const forceSail = process.env.PLAYWRIGHT_USE_SAIL === '1';
+
+    if (! forceSail) {
+        const phpBinary = tryLocalPhpBinary();
+        if (phpBinary) {
+            return {
+                command: phpBinary,
+                baseArgs: ['artisan'],
+                label: `local PHP (${phpBinary})`,
+            };
+        }
+    }
+
+    if (existsSync(SAIL_BINARY_PATH)) {
+        return {
+            command: SAIL_BINARY_PATH.startsWith('/') ? SAIL_BINARY_PATH : `./${SAIL_BINARY_PATH}`,
+            baseArgs: ['artisan'],
+            label: 'Sail (./vendor/bin/sail)',
+        };
+    }
+
+    throw new Error(
+        'Unable to resolve artisan runner. Install PHP locally, set PLAYWRIGHT_PHP_BINARY/PHP_BINARY, '
+            + 'or ensure vendor/bin/sail exists (run `composer install`).',
+    );
 }
 
 function disableViteHotFile(): void {
@@ -100,17 +135,19 @@ async function createAdminAuthState(baseUrl: string, authStatePath: string): Pro
 }
 
 export default async function globalSetup() {
-    const phpBinary = resolvePhpBinary();
+    const runner = resolveArtisanRunner();
     const baseUrl = process.env.PLAYWRIGHT_BASE_URL || DEFAULT_BASE_URL;
     const shouldPreloadAuthState = process.env.PLAYWRIGHT_PRELOAD_AUTH !== '0';
     const authStatePath = process.env.PLAYWRIGHT_STORAGE_STATE || AUTH_STATE_PATH;
 
+    console.log(`[e2e:global-setup] Using artisan runner: ${runner.label}`);
+
     disableViteHotFile();
 
-    execFileSync(phpBinary, ['artisan', 'migrate:fresh', '--force'], {
+    execFileSync(runner.command, [...runner.baseArgs, 'migrate:fresh', '--force'], {
         stdio: 'inherit',
     });
-    execFileSync(phpBinary, ['artisan', 'db:seed', '--force'], {
+    execFileSync(runner.command, [...runner.baseArgs, 'db:seed', '--force'], {
         stdio: 'inherit',
     });
 
