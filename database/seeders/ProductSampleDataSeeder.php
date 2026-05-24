@@ -9,7 +9,6 @@ use App\Models\CustomerSubscription;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductDependency;
-use App\Models\ProductDependency;
 use App\Models\ProductionOrder;
 use App\Models\ProductionOrderItem;
 use App\Models\SubscriptionBillingRecord;
