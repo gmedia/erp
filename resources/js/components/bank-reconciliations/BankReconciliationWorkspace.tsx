@@ -85,7 +85,7 @@ export const BankReconciliationWorkspace =
             const queryClient = useQueryClient();
 
             const [items, setItems] = useState<BankReconciliationItem[]>(
-                bankReconciliation.items,
+                bankReconciliation.items ?? [],
             );
 
             const [matchingItemId, setMatchingItemId] = useState<number | null>(
@@ -125,8 +125,34 @@ export const BankReconciliationWorkspace =
             const [accountLoading, setAccountLoading] = useState(false);
 
             useEffect(() => {
-                setItems(bankReconciliation.items);
+                setItems(bankReconciliation.items ?? []);
             }, [bankReconciliation.items]);
+
+            useEffect(() => {
+                if (!open) return;
+
+                let cancelled = false;
+                axios
+                    .get<{ data: BankReconciliation }>(
+                        `/api/bank-reconciliations/${bankReconciliation.id}`,
+                    )
+                    .then((res) => {
+                        if (cancelled) return;
+                        setItems(res.data.data.items ?? []);
+                        setCurrentDifference(res.data.data.difference);
+                        setCurrentReconciledBalance(
+                            res.data.data.reconciled_balance,
+                        );
+                    })
+                    .catch(() => {
+                        if (!cancelled)
+                            toast.error('Failed to load reconciliation items.');
+                    });
+
+                return () => {
+                    cancelled = true;
+                };
+            }, [open, bankReconciliation.id]);
 
             useEffect(() => {
                 if (!matchDialogOpen) return;
