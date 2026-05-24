@@ -102,6 +102,13 @@ export const BankReconciliationWorkspace =
                 null,
             );
             const [autoMatchLoading, setAutoMatchLoading] = useState(false);
+            const [completeLoading, setCompleteLoading] = useState(false);
+
+            const [currentDifference, setCurrentDifference] = useState<number>(
+                bankReconciliation.difference,
+            );
+            const [currentReconciledBalance, setCurrentReconciledBalance] =
+                useState<number>(bankReconciliation.reconciled_balance);
 
             const [assigningItemId, setAssigningItemId] = useState<
                 number | null
@@ -194,6 +201,10 @@ export const BankReconciliationWorkspace =
                         `/api/bank-reconciliations/${bankReconciliation.id}`,
                     );
                     setItems(fresh.data.data.items);
+                    setCurrentDifference(fresh.data.data.difference);
+                    setCurrentReconciledBalance(
+                        fresh.data.data.reconciled_balance,
+                    );
                 } catch {
                     toast.error('Auto match failed. Please try again.');
                 } finally {
@@ -245,6 +256,13 @@ export const BankReconciliationWorkspace =
                     );
                     closeAssignDialog();
                     await invalidate();
+                    const freshAssign = await axios.get<{
+                        data: BankReconciliation;
+                    }>(`/api/bank-reconciliations/${bankReconciliation.id}`);
+                    setCurrentDifference(freshAssign.data.data.difference);
+                    setCurrentReconciledBalance(
+                        freshAssign.data.data.reconciled_balance,
+                    );
                 } catch (err: unknown) {
                     const msg =
                         rawAxios.isAxiosError(err) &&
@@ -275,6 +293,13 @@ export const BankReconciliationWorkspace =
                     toast.success('Item matched successfully.');
                     closeMatchDialog();
                     await invalidate();
+                    const freshMatch = await axios.get<{
+                        data: BankReconciliation;
+                    }>(`/api/bank-reconciliations/${bankReconciliation.id}`);
+                    setCurrentDifference(freshMatch.data.data.difference);
+                    setCurrentReconciledBalance(
+                        freshMatch.data.data.reconciled_balance,
+                    );
                 } catch (err: unknown) {
                     const msg =
                         rawAxios.isAxiosError(err) &&
@@ -302,6 +327,13 @@ export const BankReconciliationWorkspace =
                     );
                     toast.success('Item unmatched.');
                     await invalidate();
+                    const freshUnmatch = await axios.get<{
+                        data: BankReconciliation;
+                    }>(`/api/bank-reconciliations/${bankReconciliation.id}`);
+                    setCurrentDifference(freshUnmatch.data.data.difference);
+                    setCurrentReconciledBalance(
+                        freshUnmatch.data.data.reconciled_balance,
+                    );
                 } catch (err: unknown) {
                     const msg =
                         rawAxios.isAxiosError(err) &&
@@ -311,6 +343,30 @@ export const BankReconciliationWorkspace =
                     toast.error(msg);
                 } finally {
                     setLoadingItemId(null);
+                }
+            };
+
+            const handleComplete = async () => {
+                setCompleteLoading(true);
+                try {
+                    await axios.post<{ data: BankReconciliation }>(
+                        `/api/bank-reconciliations/${bankReconciliation.id}/complete`,
+                    );
+                    toast.success('Reconciliation Completed', {
+                        description:
+                            'Bank reconciliation has been completed and journal entries posted.',
+                    });
+                    await invalidate();
+                    onClose();
+                } catch (err: unknown) {
+                    const msg =
+                        rawAxios.isAxiosError(err) &&
+                        err.response?.data?.message
+                            ? (err.response.data.message as string)
+                            : 'Failed to complete reconciliation.';
+                    toast.error('Complete Failed', { description: msg });
+                } finally {
+                    setCompleteLoading(false);
                 }
             };
 
@@ -360,6 +416,41 @@ export const BankReconciliationWorkspace =
                                             )}
                                             Auto Match
                                         </Button>
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <span>
+                                                        <Button
+                                                            variant="default"
+                                                            size="sm"
+                                                            onClick={
+                                                                handleComplete
+                                                            }
+                                                            disabled={
+                                                                completeLoading ||
+                                                                Math.abs(
+                                                                    currentDifference,
+                                                                ) > 0.01
+                                                            }
+                                                        >
+                                                            {completeLoading ? (
+                                                                <Loader2 className="mr-2 size-4 animate-spin" />
+                                                            ) : (
+                                                                <CheckCircle2 className="mr-2 size-4" />
+                                                            )}
+                                                            Complete
+                                                        </Button>
+                                                    </span>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    {Math.abs(
+                                                        currentDifference,
+                                                    ) > 0.01
+                                                        ? 'Difference must be zero to complete'
+                                                        : 'Complete reconciliation'}
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -428,14 +519,14 @@ export const BankReconciliationWorkspace =
                                         </span>
                                         <span
                                             className={
-                                                bankReconciliation.difference ===
-                                                0
+                                                Math.abs(currentDifference) <=
+                                                0.01
                                                     ? 'font-medium text-green-700'
                                                     : 'font-medium text-red-700'
                                             }
                                         >
                                             {formatCurrencyByRegionalSettings(
-                                                bankReconciliation.difference,
+                                                currentDifference,
                                                 currencyOpts,
                                             )}
                                         </span>

@@ -1,6 +1,6 @@
-# AI Handoff: Idle — Pending Decision #2 Closed
+# AI Handoff: Bank Reconciliation + Trial Balance Detailed
 
-Last updated: 2026-05-15 UTC
+Last updated: 2026-05-24 UTC
 
 ## Document Roles
 
@@ -10,63 +10,50 @@ Last updated: 2026-05-15 UTC
 
 ## Current Objective
 
-- None active. Awaiting next directive.
-
-## Current Milestone
-
-- ✅ **PR #13 — Modul 18 (Financial Reports)** — merged as `82b7989e`.
-- ✅ **PR #14 — AP journal auto-posting** — merged as `52d1eb9f`.
-- ✅ **PR #15 — AR journal auto-posting** — merged as `25fb811f`. **Pending Decision #2 fully closed for AP + AR.**
+- ✅ Bank Reconciliation feature complete (import, match, journal posting, balance recalc)
+- ✅ Trial Balance Detailed frontend wired
+- ✅ Comparative Report frontend confirmed already complete (no work needed)
 
 ## Current State
 
 - Branch: `main`
-- HEAD: `25fb811f` (PR #15 merge commit)
-- Working tree: clean
-- All quality gates green at merge: PHPStan 0 errors, Pest 9 affected groups all green, SonarCloud SUCCESS.
+- HEAD: `1cbde836`
+- Working tree: clean (only `task.md` uncommitted)
+- Remote: pushed and up-to-date
+- Migration `add_journal_columns_to_bank_reconciliations` ran on dev DB
 
-## Active Constraints
+## Session Summary (2026-05-24)
 
-- Use Sail for every runtime command.
-- Control accounts resolved by code lookup in active `CoaVersion`: AP=`21100`, AR=`11200`. If a project ships without these codes seeded, the actions throw friendly `ValidationException` until COA is fixed.
+5 commits this session:
 
-## Latest Session Delta (today)
+| Commit | Description |
+|--------|-------------|
+| `ae796431` | feat: bank reconciliation full feature (import, match, journal posting) |
+| `57bf3acc` | fix: include account + JE data in items API response |
+| `fcc16ec2` | feat: auto-recalculate balances after match/unmatch/import |
+| `1cbde836` | feat: Trial Balance Detailed report frontend page |
+| (Plus rebased: ide-helper regen, import ordering — already on remote) |
 
-- Three PRs landed in sequence on `main`:
-  - PR #13 (Modul 18) → merged 14:00 UTC.
-  - PR #14 (AP auto-posting) → merged 14:15 UTC.
-  - PR #15 (AR auto-posting) → merged 14:47 UTC.
-- AR-side delta in PR #15: 9 files / +726 / −42, including 2 new actions (`PostCustomerInvoiceJournalAction`, `PostArReceiptJournalAction`), controller hooks for invoice → sent and receipt → confirmed transitions, 13 new Pest tests, and minimal seed adjustments to existing CustomerInvoice + ArReceipt controller tests.
-- Net effect: every confirmed bill, payment, invoice, and receipt now produces an immutable, balanced, posted JournalEntry with full audit trail (`source_type`/`source_id`).
-
-## Validated Commands and Outcomes
-
-- `gh pr view 15` → state `MERGED`, mergeCommit `25fb811f9c265a46e9f856269c1dcdc602b5c93b`, mergedAt `2026-05-15T14:47:03Z`.
-- `git rev-parse HEAD` → `25fb811f9c265a46e9f856269c1dcdc602b5c93b`.
-- `git status --short` → clean.
-
-## Open Risks / Blockers
-
-- None.
+### Validated:
+- PHPStan: 0 errors on all changed files
+- TypeScript: `tsc --noEmit` clean
+- Pest: 32 tests passing (109 assertions) in `bank-reconciliations` group
+- 6 E2E workflow tests added (need real server to verify)
 
 ## Recommended Next Steps
 
-1. Wait for user go-ahead before starting next phase.
-2. Highest-value remaining work (in `IMPLEMENTATION_STATUS.md`):
-   - **Pending Decision #3** — `journal_entry_id` on stock adjustments (Modul 14 §7). Auto-post when a stock adjustment confirms.
-   - **Pending Decision #2 remainder** — `journal_entry_id` on Goods Receipt + Supplier Return (Modul 13 §6). Auto-post when GR confirms (inventory acquisition: Debit Inventory, Credit GR Suspense / Accrued AP).
-   - **Modul 18 formula expression evaluator** — make the `formula` column on `report_sections` actually compute (currently stored as metadata only).
-   - **Pending Decision #1** — `product_stocks.branch_id → warehouse_id` migration (Modul 14 §8).
-   - Subscription frontend CRUD (Modul 00).
-   - Recurring journal scheduler (cron-driven auto-execution).
-   - Bank reconciliation CSV/Excel import.
+1. **Bank Reconciliation polish** — Add "Complete" button to Workspace (currently users must close + open via row actions)
+2. **E2E tests for financial reports** — Balance Sheet, Income Statement, Cash Flow, Trial Balance, Trial Balance Detailed, Comparative — none have Playwright coverage
+3. **Run bank reconciliation E2E** — verify the 6 new tests pass against running dev server
+4. **Financial reports export family** (bigger scope) — All 5 financial reports (trial-balance, balance-sheet, income-statement, cash-flow, comparative) lack export endpoints. Consistent gap, would need new exports + actions per report.
 
 ## Continuation Prompt
 
 ```
-Read task.md. Repository on main at 25fb811f, working tree clean.
-PRs #13, #14, #15 shipped today. Pending Decision #2 closed for AP + AR.
-Awaiting user go-ahead for the next phase. Highest leverage candidates:
-GR/SR + StockAdjustment auto-posting (closes Pending Decision #3 and the
-remainder of #2), or the Modul 18 formula evaluator.
+Read task.md. 4 commits shipped 2026-05-24: bank reconciliation full feature, account/JE in items response, auto-recalc balances, Trial Balance Detailed frontend.
+Repo on main at 1cbde836, pushed, clean.
+Bank Reconciliation: import (CSV/Excel + column mapping), 3-priority auto-match, manual match/unmatch, account assignment, journal posting on complete, workspace UI, 32 Pest tests passing.
+Trial Balance Detailed: ReportDataTablePage pattern, /reports/trial-balance-detailed wired.
+Comparative Report: already complete (verified, no work needed).
+Next: bank reconciliation polish (Complete button in workspace), or E2E tests for financial reports, or run existing bank-reconciliation E2E tests.
 ```
