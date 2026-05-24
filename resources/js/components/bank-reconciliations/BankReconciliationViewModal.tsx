@@ -79,120 +79,123 @@ export const BankReconciliationViewModal =
                             onClose={() => setWorkspaceOpen(false)}
                         />
                     )}
-                <ViewModalShell
-                    open={open}
-                    onClose={onClose}
-                    title="Bank Reconciliation Details"
-                    description="View complete details of this bank reconciliation"
-                    contentClassName="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden sm:max-w-7xl"
-                >
-                    <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
-                        <div className="space-y-6 py-2">
-                            {item.status !== 'completed' && (
-                                <div className="flex justify-end gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setWorkspaceOpen(true)}
-                                    >
-                                        <GitMerge className="mr-2 size-4" />
-                                        Reconcile
-                                    </Button>
-                                    <ImportBankStatementDialog
-                                        bankReconciliationId={item.id}
-                                        onSuccess={() => {
-                                            onClose();
-                                        }}
-                                    />
-                                </div>
-                            )}
-
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <ViewField
-                                    label="Account"
-                                    value={`${item.account?.code} - ${item.account?.name}`}
-                                />
-                                <ViewField
-                                    label="Fiscal Year"
-                                    value={item.fiscal_year?.name || '-'}
-                                />
-                                <ViewField
-                                    label="Period Start"
-                                    value={formatDateByRegionalSettings(
-                                        item.period_start,
-                                    )}
-                                />
-                                <ViewField
-                                    label="Period End"
-                                    value={formatDateByRegionalSettings(
-                                        item.period_end,
-                                    )}
-                                />
-                                <ViewField
-                                    label="Statement Balance"
-                                    value={formatCurrencyByRegionalSettings(
-                                        item.statement_balance,
-                                        currencyOpts,
-                                    )}
-                                />
-                                <ViewField
-                                    label="Book Balance"
-                                    value={formatCurrencyByRegionalSettings(
-                                        item.book_balance,
-                                        currencyOpts,
-                                    )}
-                                />
-                                <ViewField
-                                    label="Difference"
-                                    value={formatCurrencyByRegionalSettings(
-                                        item.difference,
-                                        currencyOpts,
-                                    )}
-                                />
-                                <ViewField
-                                    label="Status"
-                                    value={
-                                        <Badge
-                                            variant={
-                                                item.status === 'completed'
-                                                    ? 'default'
-                                                    : 'secondary'
+                    <ViewModalShell
+                        open={open}
+                        onClose={onClose}
+                        title="Bank Reconciliation Details"
+                        description="View complete details of this bank reconciliation"
+                        contentClassName="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden sm:max-w-7xl"
+                    >
+                        <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
+                            <div className="space-y-6 py-2">
+                                {item.status !== 'completed' && (
+                                    <div className="flex justify-end gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                                setWorkspaceOpen(true)
                                             }
                                         >
-                                            {item.status === 'in_progress'
-                                                ? 'In Progress'
-                                                : 'Completed'}
-                                        </Badge>
-                                    }
-                                />
-                                {item.completed_at && (
-                                    <>
-                                        <ViewField
-                                            label="Completed At"
-                                            value={formatDateByRegionalSettings(
-                                                item.completed_at,
-                                            )}
+                                            <GitMerge className="mr-2 size-4" />
+                                            Reconcile
+                                        </Button>
+                                        <ImportBankStatementDialog
+                                            bankReconciliationId={item.id}
+                                            onSuccess={() => {
+                                                onClose();
+                                            }}
                                         />
-                                        <ViewField
-                                            label="Completed By"
-                                            value={
-                                                item.completed_by?.name || '-'
-                                            }
-                                        />
-                                    </>
+                                    </div>
                                 )}
-                            </div>
 
-                            <ViewModalItemsTable
-                                items={item.items}
-                                columns={itemColumns}
-                                minWidthClassName="min-w-[600px]"
-                                title="Reconciliation Items"
-                                getRowKey={(row) => row.id ?? 0}
-                            />
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <ViewField
+                                        label="Account"
+                                        value={`${item.account?.code} - ${item.account?.name}`}
+                                    />
+                                    <ViewField
+                                        label="Fiscal Year"
+                                        value={item.fiscal_year?.name || '-'}
+                                    />
+                                    <ViewField
+                                        label="Period Start"
+                                        value={formatDateByRegionalSettings(
+                                            item.period_start,
+                                        )}
+                                    />
+                                    <ViewField
+                                        label="Period End"
+                                        value={formatDateByRegionalSettings(
+                                            item.period_end,
+                                        )}
+                                    />
+                                    <ViewField
+                                        label="Statement Balance"
+                                        value={formatCurrencyByRegionalSettings(
+                                            item.statement_balance,
+                                            currencyOpts,
+                                        )}
+                                    />
+                                    <ViewField
+                                        label="Book Balance"
+                                        value={formatCurrencyByRegionalSettings(
+                                            item.book_balance,
+                                            currencyOpts,
+                                        )}
+                                    />
+                                    <ViewField
+                                        label="Difference"
+                                        value={formatCurrencyByRegionalSettings(
+                                            item.difference,
+                                            currencyOpts,
+                                        )}
+                                    />
+                                    <ViewField
+                                        label="Status"
+                                        value={
+                                            <Badge
+                                                variant={
+                                                    item.status === 'completed'
+                                                        ? 'default'
+                                                        : 'secondary'
+                                                }
+                                            >
+                                                {item.status === 'in_progress'
+                                                    ? 'In Progress'
+                                                    : 'Completed'}
+                                            </Badge>
+                                        }
+                                    />
+                                    {item.completed_at && (
+                                        <>
+                                            <ViewField
+                                                label="Completed At"
+                                                value={formatDateByRegionalSettings(
+                                                    item.completed_at,
+                                                )}
+                                            />
+                                            <ViewField
+                                                label="Completed By"
+                                                value={
+                                                    item.completed_by?.name ||
+                                                    '-'
+                                                }
+                                            />
+                                        </>
+                                    )}
+                                </div>
+
+                                <ViewModalItemsTable
+                                    items={item.items}
+                                    columns={itemColumns}
+                                    minWidthClassName="min-w-[600px]"
+                                    title="Reconciliation Items"
+                                    getRowKey={(row) => row.id ?? 0}
+                                />
+                            </div>
                         </div>
-                    </div>
-                </ViewModalShell>
+                    </ViewModalShell>
                 </>
             );
         },
