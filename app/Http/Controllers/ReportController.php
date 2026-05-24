@@ -25,8 +25,13 @@ class ReportController extends Controller
         ['fiscalYears' => $fiscalYears, 'selectedYearId' => $selectedYearId] = $this->resolveFiscalYearContext($request);
 
         $report = [];
+        $computedSections = [];
         if ($selectedYearId) {
             $report = $this->reportService->getTrialBalance($selectedYearId);
+            $config = $this->configurationResolver->execute(ReportConfiguration::TYPE_TRIAL_BALANCE);
+            if ($config) {
+                $computedSections = $this->evaluateSections->execute($config['sections'], $report['totals'] ?? []);
+            }
         }
 
         return response()->json([
@@ -34,6 +39,7 @@ class ReportController extends Controller
             'selectedYearId' => (int) $selectedYearId,
             'report' => $report,
             'configuration' => $this->configurationResolver->execute(ReportConfiguration::TYPE_TRIAL_BALANCE),
+            'computed_sections' => $computedSections,
         ]);
     }
 

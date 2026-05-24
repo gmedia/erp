@@ -9,6 +9,7 @@ import {
     useSingleYearFinancialReportPage,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
+import { ComputedSectionsCard } from '@/components/reports/financial/ComputedSectionsCard';
 import { formatCurrency } from '@/lib/utils';
 
 interface AccountItem extends FinancialTableRow {
@@ -36,6 +37,7 @@ export default function TrialBalance() {
         fiscalYears,
         selectedYearId,
         report,
+        computedSections,
         selectedFiscalYear,
         handleYearChange,
         isLoading,
@@ -101,6 +103,11 @@ export default function TrialBalance() {
                     </div>
                 )}
             </FinancialTableCard>
+
+            <ComputedSectionsCard
+                sections={computedSections}
+                title="Trial Balance Summary"
+            />
         </SingleYearFinancialReportPageShell>
     );
 }
