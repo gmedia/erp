@@ -1,17 +1,21 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 
 const AUTH_STATE_PATH = 'e2e/.auth/admin.json';
 const DEFAULT_BASE_URL = 'http://localhost:80';
 const VITE_HOT_FILE_PATH = 'public/hot';
 const SAIL_BINARY_PATH = 'vendor/bin/sail';
+const BUILD_MANIFEST_PATH = 'public/build/manifest.json';
+const BUILD_SOURCE_DIRS = ['resources'];
+const BUILD_SOURCE_FILES = ['package.json', 'package-lock.json', 'vite.config.ts', 'tsconfig.json'];
+const BUILD_IGNORE_DIRS = new Set(['node_modules', '.git', 'vendor', 'storage', 'public']);
 
 type LoginResponse = {
     token?: string;
 };
 
-type ArtisanRunner = {
+type CommandRunner = {
     command: string;
     baseArgs: string[];
     label: string;
@@ -41,7 +45,146 @@ function tryLocalPhpBinary(): string | null {
     return null;
 }
 
-function resolveArtisanRunner(): ArtisanRunner {
+function tryLocalNpmBinary(): string | null {
+    const candidates = [
+        process.env.PLAYWRIGHT_NPM_BINARY,
+        'npm',
+        '/usr/bin/npm',
+        '/usr/local/bin/npm',
+    ].filter((candidate): candidate is string => Boolean(candidate && candidate.trim()));
+
+    for (const candidate of candidates) {
+        try {
+            execFileSync(candidate, ['--version'], {
+                stdio: 'ignore',
+            });
+
+            return candidate;
+        } catch {
+            // Try the next candidate.
+        }
+    }
+
+    return null;
+}
+
+function resolveNpmRunner(): CommandRunner | null {
+    const forceSail = process.env.PLAYWRIGHT_USE_SAIL === '1';
+
+    if (! forceSail) {
+        const npmBinary = tryLocalNpmBinary();
+        if (npmBinary) {
+            return {
+                command: npmBinary,
+                baseArgs: [],
+                label: `local npm (${npmBinary})`,
+            };
+        }
+    }
+
+    if (existsSync(SAIL_BINARY_PATH)) {
+        return {
+            command: SAIL_BINARY_PATH.startsWith('/') ? SAIL_BINARY_PATH : `./${SAIL_BINARY_PATH}`,
+            baseArgs: ['npm'],
+            label: 'Sail (./vendor/bin/sail npm)',
+        };
+    }
+
+    return null;
+}
+
+function findNewestMtime(path: string): number {
+    let stat;
+    try {
+        stat = statSync(path);
+    } catch {
+        return 0;
+    }
+
+    if (stat.isFile()) {
+        return stat.mtimeMs;
+    }
+
+    if (! stat.isDirectory()) {
+        return 0;
+    }
+
+    let newest = stat.mtimeMs;
+    let entries;
+    try {
+        entries = readdirSync(path, { withFileTypes: true });
+    } catch {
+        return newest;
+    }
+
+    for (const entry of entries) {
+        if (entry.isDirectory() && BUILD_IGNORE_DIRS.has(entry.name)) {
+            continue;
+        }
+
+        const childMtime = findNewestMtime(join(path, entry.name));
+        if (childMtime > newest) {
+            newest = childMtime;
+        }
+    }
+
+    return newest;
+}
+
+function isBuildStale(): boolean {
+    if (! existsSync(BUILD_MANIFEST_PATH)) {
+        return true;
+    }
+
+    const manifestMtime = statSync(BUILD_MANIFEST_PATH).mtimeMs;
+    let newestSourceMtime = 0;
+
+    for (const dir of BUILD_SOURCE_DIRS) {
+        const mtime = findNewestMtime(dir);
+        if (mtime > newestSourceMtime) {
+            newestSourceMtime = mtime;
+        }
+    }
+
+    for (const file of BUILD_SOURCE_FILES) {
+        const mtime = findNewestMtime(file);
+        if (mtime > newestSourceMtime) {
+            newestSourceMtime = mtime;
+        }
+    }
+
+    return newestSourceMtime > manifestMtime;
+}
+
+function ensureFreshBuild(): void {
+    if (process.env.PLAYWRIGHT_SKIP_BUILD === '1') {
+        console.log('[e2e:global-setup] PLAYWRIGHT_SKIP_BUILD=1 set, skipping build hygiene check');
+        return;
+    }
+
+    const force = process.env.PLAYWRIGHT_FORCE_BUILD === '1';
+    if (! force && ! isBuildStale()) {
+        return;
+    }
+
+    const npm = resolveNpmRunner();
+    if (! npm) {
+        console.warn(
+            '[e2e:global-setup] Build appears stale but no npm runner is available. '
+                + 'Run `sail npm run build` manually or set PLAYWRIGHT_SKIP_BUILD=1 to silence.',
+        );
+        return;
+    }
+
+    const reason = force ? 'PLAYWRIGHT_FORCE_BUILD=1' : 'source files newer than build manifest';
+    console.log(`[e2e:global-setup] Rebuilding Vite assets (${reason}) via ${npm.label}`);
+
+    execFileSync(npm.command, [...npm.baseArgs, 'run', 'build'], {
+        stdio: 'inherit',
+    });
+}
+
+function resolveArtisanRunner(): CommandRunner {
     const forceSail = process.env.PLAYWRIGHT_USE_SAIL === '1';
 
     if (! forceSail) {
@@ -143,6 +286,7 @@ export default async function globalSetup() {
     console.log(`[e2e:global-setup] Using artisan runner: ${runner.label}`);
 
     disableViteHotFile();
+    ensureFreshBuild();
 
     execFileSync(runner.command, [...runner.baseArgs, 'migrate:fresh', '--force'], {
         stdio: 'inherit',
