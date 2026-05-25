@@ -10,8 +10,21 @@ parameters:
     # Level 10 is the highest level
     level: 5
 
-#    ignoreErrors:
-#        - '#PHPDoc tag @var#'
-#
+    # ide-helper:models writes "Model|Eloquent" PHPDocs for morphTo
+    # relations. Pint's global_namespace_import strips any leading
+    # backslash, leaving an unqualified "Eloquent" that PHPStan would
+    # otherwise resolve as App\Models\Eloquent. Surface this as a
+    # report-tolerant ignore so future ide-helper regenerations don't
+    # break the CI gate, while keeping unmatched errors silent so the
+    # rule self-cleans once ide-helper aliases settle.
+    reportUnmatchedIgnoredErrors: false
+
+    ignoreErrors:
+        -
+            message: '#unknown class App\\Models\\Eloquent#'
+            paths:
+                - app/Models/*.php
+                - app/Actions/*
+
 #    excludePaths:
 #        - ./*/*/FileToBeExcluded.php
