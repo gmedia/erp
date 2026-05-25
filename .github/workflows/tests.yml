@@ -232,9 +232,159 @@ jobs:
             ./vendor/bin/sail down -v
           fi
 
+  e2e:
+    name: Playwright E2E via Sail
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: quality
+    if: ${{ needs.quality.outputs.autofix_applied != 'true' }}
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: read
+    env:
+      PLAYWRIGHT_USE_SAIL: '1'
+      PLAYWRIGHT_BASE_URL: http://localhost:82
+
+    steps:
+      - name: Checkout source branch
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          repository: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@d59004228537ca90c8dca680592a08a675bf52b6 # v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          sed -i "s/^WWWUSER=.*/WWWUSER=$(id -u)/" .env
+          sed -i "s/^WWWGROUP=.*/WWWGROUP=$(id -g)/" .env
+          mkdir -p storage/tmp
+          chmod -R u+rwX,g+rwX,o-rwx storage/tmp
+
+      - name: Bootstrap Sail dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull CI Sail image
+        shell: bash
+        timeout-minutes: 5
+        run: |
+          branch_tag="${GITHUB_BASE_REF:-${GITHUB_REF_NAME}}"
+          branch_tag=$(echo "$branch_tag" | tr -cd '[:alnum:]._-')
+
+          candidates=(
+            "$CI_SAIL_IMAGE"
+            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:${branch_tag}"
+            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:latest"
+          )
+
+          for image in "${candidates[@]}"; do
+            for attempt in 1 2 3; do
+              if timeout 60s docker pull "$image"; then
+                docker tag "$image" sail-8.4/app
+                exit 0
+              fi
+
+              if [ "$attempt" -lt 3 ]; then
+                echo "CI Sail image $image not available. Retry ${attempt}/3 in 10s..."
+                sleep 10
+              fi
+            done
+          done
+
+          echo "::error::Unable to pull any CI Sail image candidate after retries."
+          exit 1
+
+      - name: Start Sail
+        run: ./vendor/bin/sail up -d --wait
+
+      - name: Cache npm dependencies
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - name: Install npm dependencies in Sail
+        run: ./vendor/bin/sail npm ci
+
+      - name: Install npm dependencies on runner
+        run: npm ci --prefer-offline --no-audit --fund=false
+
+      - name: Generate application key
+        run: ./vendor/bin/sail artisan key:generate
+
+      - name: Configure MinIO bucket
+        run: |
+          ./vendor/bin/sail exec -T minio mc alias set myminio http://localhost:9000 sail password
+          ./vendor/bin/sail exec -T minio mc mb myminio/local || true
+          ./vendor/bin/sail exec -T minio mc anonymous set download myminio/local || true
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-playwright-
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright E2E
+        run: npx playwright test --reporter=line
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        continue-on-error: true
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload Laravel logs on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        continue-on-error: true
+        with:
+          name: e2e-laravel-logs-${{ github.run_id }}
+          path: storage/logs
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Stop Sail
+        if: always()
+        run: |
+          if [ -x ./vendor/bin/sail ]; then
+            ./vendor/bin/sail down -v
+          fi
+
   ci:
     name: Test suite via Sail
-    needs: quality
+    needs: [quality, e2e]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -246,4 +396,5 @@ jobs:
             exit 1
           fi
 
+          echo "quality=${{ needs.quality.result }} e2e=${{ needs.e2e.result }}"
           [ "${{ needs.quality.result }}" = "success" ]
