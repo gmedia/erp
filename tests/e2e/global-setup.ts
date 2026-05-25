@@ -295,6 +295,19 @@ export default async function globalSetup() {
         stdio: 'inherit',
     });
 
+    // Ensure the public storage symlink exists so /storage/exports/*.xlsx
+    // download URLs returned by Storage::disk('public')->url(...) resolve to
+    // real files instead of HTML 404 pages. Without this, ExcelJS fails with
+    // "Can't find end of central directory : is this a zip file?".
+    try {
+        execFileSync(runner.command, [...runner.baseArgs, 'storage:link', '--force'], {
+            stdio: 'inherit',
+        });
+    } catch {
+        // storage:link is idempotent; ignore "already exists" failures from
+        // older Laravel versions that don't accept --force.
+    }
+
     if (shouldPreloadAuthState) {
         await createAdminAuthState(baseUrl, authStatePath);
     }

@@ -1,6 +1,6 @@
-# AI Handoff: CI E2E Subset GREEN on CI (1st green run)
+# AI Handoff: CI E2E — storage:link fix unblocks 41 export specs
 
-Last updated: 2026-05-25 06:39 UTC
+Last updated: 2026-05-25 07:30 UTC
 
 ## Document Roles
 
@@ -11,15 +11,53 @@ Last updated: 2026-05-25 06:39 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `865130d9 ci(e2e): narrow Playwright run to known-green subset`
-- Working tree: clean (only this `task.md` post-CI status update pending)
-- Remote: pushed
-- CI run `26386502708`: overall `success`
-  - Quality checks via Sail: `success`
-  - Playwright E2E via Sail: `success` (narrowed subset, FIRST green E2E run)
-  - Test suite via Sail: `success`
-- E2E job is still non-blocking (`continue-on-error: true`); needs a few
-  more green runs before promoting to required.
+- HEAD: about to be `<new sha> ci(e2e): run storage:link in global-setup`
+  on top of `865130d9 ci(e2e): narrow Playwright run to known-green subset`
+- Working tree: 1 modified file → `tests/e2e/global-setup.ts`
+- Remote: pushed up to `865130d9` (1st green E2E run `26386502708`)
+- Quality + Test suite + narrowed E2E: green on CI run `26386502708`
+- E2E job remains non-blocking (`continue-on-error: true`)
+
+## Root Cause Identified (41 CRUD export failures)
+
+CI runner has a fresh clone with no `public/storage` symlink. Backend
+exports write to `storage/app/public/exports/*.xlsx` and return
+`Storage::disk('public')->url(...)` → `/storage/exports/...`. Without
+the symlink that URL serves an HTML 404 page, the browser saves the
+HTML as the "downloaded" `.xlsx`, and ExcelJS chokes:
+
+```
+Error: Can't find end of central directory : is this a zip file ?
+  at workbook.xlsx.readFile(filePath)   // shared-test-factories.ts:208
+```
+
+All 41 unique failures from CI run `26384727117` match this signature
+across simple + complex CRUD modules (departments, fiscal-years,
+goods-receipts, journal-entries, etc.) plus a couple of report exports.
+
+Local devs never see this because `project_setup.sh` runs
+`./vendor/bin/sail artisan storage:link` once on host. CI has never
+run that step.
+
+### Fix (about to commit)
+
+`tests/e2e/global-setup.ts` runs `artisan storage:link --force` after
+`migrate:fresh + db:seed`. The Sail-aware artisan runner already exists,
+so this works on both local and CI.
+
+### Local verification (Sail, symlink removed before each run)
+
+```
+rm -f public/storage
+npx playwright test tests/e2e/fiscal-years/ -g "can export Fiscal Years"
+  → INFO  The [public/storage] link has been connected
+  → ✓  can export Fiscal Years (5.6s) | 1 passed (25.0s)
+
+rm -f public/storage
+npx playwright test tests/e2e/branches/ -g "can export Branches"
+  → INFO  The [public/storage] link has been connected
+  → ✓  can export Branches (3.3s) | 1 passed (22.2s)
+```
 
 ## Current Objective
 
@@ -94,52 +132,56 @@ commit and is about to ship a second:
 
 ## Recommended Next Steps
 
-1. **Ship the subset narrowing** (this session)
-   - `git add .github/workflows/tests.yml task.md`
-   - `git commit -m "ci(e2e): narrow Playwright run to known-green subset"`
+1. **Ship storage:link fix** (this session)
+   - `git add tests/e2e/global-setup.ts task.md`
+   - `git commit -m "ci(e2e): run storage:link in global-setup to unblock CRUD export specs"`
    - `git push origin main`
 
 2. **Monitor next CI run**
-   - Confirm `Quality checks via Sail` success.
-   - Confirm `Playwright E2E via Sail` success on the narrowed subset.
-   - Confirm `Test suite via Sail` success and overall run success.
+   - Confirm narrowed subset still green (proves no regression).
+   - Subset content unchanged — full validation of fix happens after subset expansion.
 
-3. **Promote E2E to required (after a few green runs)**
+3. **Expand CI E2E subset incrementally** (next session)
+   - Add 2-3 simple CRUD modules first (e.g. `departments`,
+     `branches`, `fiscal-years`) since their failures all match the
+     storage:link signature.
+   - Verify each wave green before adding more.
+   - Eventually re-enable full `tests/e2e/` once 0 known-failing specs remain.
+
+4. **Promote E2E to required (after 2-3 green runs)**
    - Drop `continue-on-error: true` from the e2e job.
    - Require `needs.e2e.result == success` in the reflect step.
-
-4. **Triage full-suite failures (later)**
-   - Investigate `Export failed: x` console errors in CRUD export specs.
-   - Re-add modules in waves once each wave is green.
 
 5. **Optional UX polish**
    - Auto-select first/open fiscal year in `ReportDataTablePage` (~1 hr).
 
 6. **Optional infrastructure**
-   - Parallel-safe `migrate:fresh`/DB sharding for E2E concurrency.
+   - Parallel-safe `migrate:fresh` / DB sharding for E2E concurrency.
 
 ## Continuation Prompt
 
 ```
 Read task.md. Repo on main. HEAD should be the new
-"ci(e2e): narrow Playwright run to known-green subset" commit
-(after this session pushes), or 25c307cc if not yet pushed.
+"ci(e2e): run storage:link in global-setup ..." commit (after this
+session pushes), or 865130d9 if not yet pushed.
 
 Status:
-- Quality + Test suite: PASSING on CI.
-- E2E: just narrowed to known-green subset
-  (bank-reconciliations + 6 financial reports).
-- E2E job is still non-blocking (continue-on-error: true)
-  pending CI verification of the subset.
+- Quality + Test suite + narrowed E2E: GREEN on CI run 26386502708.
+- Root cause for the previous 41 CRUD export failures identified
+  and fixed: missing public/storage symlink on CI runner.
+- E2E global-setup now runs `artisan storage:link --force` after
+  migrate:fresh + db:seed. Verified locally for fiscal-years and
+  branches with the symlink deleted before each run.
+- E2E job is still non-blocking (continue-on-error: true).
 
 Next priority:
-1. Watch the next CI run after the narrowing push and confirm
-   E2E subset is green.
-2. After a few green runs, drop continue-on-error from the e2e
-   job and require needs.e2e.result == success in the reflect step.
-3. Triage the pre-existing CRUD export failures
-   (Console Error text: "Export failed: x") and re-introduce
-   modules in waves.
-4. Optional: auto-select fiscal year in ReportDataTablePage.
-5. Optional: parallel-safe migrate:fresh / DB sharding.
+1. Watch the new CI run and confirm narrowed subset still green
+   (no regression from the storage:link change).
+2. Expand the E2E subset incrementally — start with 2-3 simple CRUD
+   modules whose only known failure was the storage:link issue.
+3. After 2-3 green runs, drop continue-on-error from the e2e job
+   and require needs.e2e.result == success in the reflect step.
+4. Eventually re-enable full tests/e2e/.
+5. Optional: auto-select fiscal year in ReportDataTablePage.
+6. Optional: parallel-safe migrate:fresh / DB sharding.
 ```
