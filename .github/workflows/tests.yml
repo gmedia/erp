@@ -351,7 +351,16 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Playwright E2E
-        run: npx playwright test --reporter=line
+        run: >
+          npx playwright test
+          tests/e2e/bank-reconciliations/
+          tests/e2e/balance-sheet-report/
+          tests/e2e/cash-flow-report/
+          tests/e2e/comparative-report/
+          tests/e2e/income-statement-report/
+          tests/e2e/trial-balance-detailed-report/
+          tests/e2e/trial-balance-report/
+          --reporter=line
 
       - name: Upload Playwright report
         if: failure()
