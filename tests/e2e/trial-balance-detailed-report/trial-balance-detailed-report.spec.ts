@@ -50,28 +50,46 @@ test.describe('Trial Balance Detailed Report', () => {
         await page.goto('/reports/trial-balance-detailed');
         await expect(page.locator('table').first()).toBeVisible({ timeout: 30000 });
 
-        const exportButton = page.getByRole('button', { name: /export/i });
-        await expect(exportButton).toBeVisible();
+        await page.getByRole('button', { name: /filters/i }).click();
+        const filtersDialog = page.getByRole('dialog');
+        await expect(filtersDialog).toBeVisible();
 
-        // The Export button stays disabled until the report returns data, but the page
-        // sends an empty `period_year` on first load (no UI field exists for it) so the
-        // backend never returns rows from the seeded AccountBalance. Bypass the UI
-        // disabled state by hitting the export endpoint directly with a valid filter set
-        // sourced from the default seed (FY 2025 has AccountBalance rows for Jan).
-        const token = await page.evaluate(() => localStorage.getItem('api_token'));
-        const response = await page.request.post(
-            '/api/reports/trial-balance-detailed/export',
-            {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                data: { fiscal_year_id: 1, period_month: 1, period_year: 2025 },
-            },
-        );
+        await filtersDialog
+            .locator('button')
+            .filter({ hasText: /Select fiscal year/i })
+            .first()
+            .click({ force: true });
 
-        expect(response.ok()).toBeTruthy();
+        const option = page
+            .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+            .first();
+        await expect(option).toBeVisible({ timeout: 10000 });
+        await option.click({ force: true });
+
+        await Promise.all([
+            page.waitForResponse(
+                (r) =>
+                    r.url().includes('/api/reports/trial-balance-detailed') &&
+                    !r.url().includes('/export') &&
+                    r.status() < 400,
+                { timeout: 30000 },
+            ),
+            filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
+        ]);
+
+        const exportButton = page.getByRole('button', { name: /^Export$/i });
+        await expect(exportButton).toBeEnabled({ timeout: 10000 });
+
+        const [response] = await Promise.all([
+            page.waitForResponse(
+                (r) =>
+                    r.url().includes('/api/reports/trial-balance-detailed/export') &&
+                    r.status() < 400,
+                { timeout: 30000 },
+            ),
+            exportButton.click(),
+        ]);
+
         const body = await response.json();
         expect(body).toHaveProperty('url');
         expect(body).toHaveProperty('filename');
