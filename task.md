@@ -1,6 +1,6 @@
-# AI Handoff: Financial Reports — All Coverage Layers Complete
+# AI Handoff: Trial Balance Detailed Default Load Fixed
 
-Last updated: 2026-05-25 03:02 UTC
+Last updated: 2026-05-25 03:29 UTC
 
 ## Document Roles
 
@@ -11,168 +11,129 @@ Last updated: 2026-05-25 03:02 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `ae5944a2`
+- HEAD: `cc990eef`
 - Working tree: clean
 - Remote: pushed and up-to-date
-- All financial reports have backend export, frontend buttons, Pest tests, AND Playwright E2E
+- Trial balance detailed default load now returns data; Export button works
+- Last UI bypass in E2E suite removed
 
 ## Current Objective
 
-All financial-report export work end-to-end shipped:
+Trial Balance Detailed default-load issue closed:
 
-- ✅ Backend export endpoints for 5 reports (commit `e056a86f`)
-- ✅ Frontend export buttons on 5 report pages (commit `ebaeaf10`)
-- ✅ Pest feature tests for 5 export endpoints (commit `c87add0a`)
-- ✅ Vite build hygiene auto-rebuild in global-setup (commit `1551a429`)
-- ✅ Playwright E2E for 6 financial reports (commit `ae5944a2`)
+- ✅ Backend `GetTrialBalanceReportAction` derives `period_year` from
+      `FiscalYear::start_date` when not provided
+- ✅ Empty-string `period_month` / `period_year` coerced to `null`
+- ✅ Conditional WHERE clauses (no filtering when null)
+- ✅ E2E test refactored to exercise real UI flow (Filters → Apply →
+      Export click)
+- ✅ Backward compat preserved (existing Pest cases still pass)
 
-## Session Summary (2026-05-25, 2 commits)
+## Session Summary (2026-05-25 03:29 UTC)
+
+2 commits shipped after the previous handoff (`091e4314`):
 
 | Commit | Description |
 |--------|-------------|
-| `1551a429` | feat(e2e): auto-rebuild Vite assets when stale in global-setup |
-| `ae5944a2` | test(reports): Playwright E2E coverage for 6 financial reports |
+| `3cc1ea86` | fix(reports): derive period_year from fiscal year in trial balance detailed |
+| `cc990eef` | test(reports): drop UI bypass in trial-balance-detailed export E2E |
 
-### #1 Build hygiene auto-rebuild (`1551a429`)
+### Backend fix (`3cc1ea86`)
 
-`tests/e2e/global-setup.ts` previously assumed `public/build` was current.
-After two sessions where stale builds silently broke E2E (cost ~1h debug
-total), added an mtime-based check.
+`GetTrialBalanceReportAction::execute`:
+- Coerces empty-string filters to `null` via private `intOrNull`
+- If `period_year` is null, derives it from
+  `FiscalYear::query()->whereKey($fiscalYearId)->value('start_date')?->year`
+- Applies `period_month` / `period_year` WHERE clauses only when each
+  is non-null (so callers can request "all periods for fiscal year")
 
-- Compares newest mtime in `resources/`, `package.json`, `package-lock.json`,
-  `vite.config.ts`, `tsconfig.json` vs `public/build/manifest.json`
-- If source newer → auto-runs `sail npm run build` (or local `npm run build`)
-- Local npm → Sail npm fallback (mirrors artisan runner resolution)
-- Env overrides: `PLAYWRIGHT_SKIP_BUILD=1`, `PLAYWRIGHT_FORCE_BUILD=1`
-- Verified across 4 paths: fresh skip, stale rebuild, skip env, sail-only
+Smoke-tested 4 scenarios via curl:
+- Only fiscal_year_id (year derived) → 12 rows (3 months × 4 accounts)
+- fiscal_year_id + period_month → 4 rows
+- Explicit period_year (backward compat) → 4 rows
+- Empty-string filters from frontend → 12 rows
 
-### #2 Playwright E2E for financial reports (`ae5944a2`)
+### E2E refactor (`cc990eef`)
 
-5 new spec files + 1 extended:
+Removed the `page.request.post()` workaround. The new flow:
+1. `goto('/reports/trial-balance-detailed')` and wait for the table
+2. Open Filters dialog → Select fiscal year combobox → pick first
+   option → Apply Filters
+3. Wait for the GET refetch
+4. Assert Export button is enabled
+5. Click Export, intercept `/api/.../export` response, assert filename
 
-| Spec file | Tests | Shell |
-|-----------|-------|-------|
-| `balance-sheet-report.spec.ts` | 4 | FinancialReportPageShell (comparison) |
-| `cash-flow-report.spec.ts` | 3 | SingleYearFinancialReportPageShell |
-| `comparative-report.spec.ts` | 4 | FinancialReportPageShell (comparison) |
-| `income-statement-report.spec.ts` | 4 | FinancialReportPageShell (comparison) |
-| `trial-balance-detailed-report.spec.ts` | 3 | ReportDataTablePage |
-| `trial-balance-report.spec.ts` (extended) | +1 (4 total) | SingleYearFinancialReportPageShell |
-
-20 new tests total (the 4-total trial-balance line counts the existing test
-plus 1 new export test). All pass in 71s via single global-setup run with
-Sail (`PLAYWRIGHT_USE_SAIL=1`). EXIT=0 verified.
-
-Each comparison-aware report covers: view + heading, fiscal year change
-+ refetch, comparison year change + refetch, Export click + filename
-regex match. Single-year shells skip the comparison test.
-
-### Notable trade-off in trial-balance-detailed export test
-
-The Export button is disabled until the report query returns rows, but
-the page sends an empty `period_year` on first load (no UI field exists
-for `period_year`, only `fiscal_year_id` and `period_month`). The
-backend `GetTrialBalanceReportAction` requires non-empty `period_year`
-to match seeded `AccountBalance` rows, so the button stays disabled
-indefinitely under default seed.
-
-The test bypasses the UI disabled-state by calling the export endpoint
-directly via `page.request.post()` with seed-anchored values
-(`fiscal_year_id: 1`, `period_month: 1`, `period_year: 2025`). An
-inline comment explains the rationale for future maintainers.
-
-This is technically a workaround. The proper fix is a separate
-investigation into either:
-1. Backend: make `period_year` derivable from `fiscal_year_id` so the
-   default load returns data
-2. Frontend: add a `period_year` filter field to the
-   `trial-balance-detailed` page
-
-### Notes from delegation
-
-- 5 deep sub-agents fired in parallel for E2E specs. Durations 21–47
-  minutes each — caused by concurrent global-setup `migrate:fresh`
-  collisions on shared MariaDB. Several agents bypassed global-setup
-  with temp configs to validate their specs.
-- All 5 specs subsequently passed in **a single sequential run** with
-  one global-setup (71s). Sub-agent self-validation noise didn't
-  invalidate output.
-- Lesson: don't fire >1 agent that triggers `migrate:fresh` in
-  parallel against a shared DB. Either run E2E specs sequentially via
-  one orchestrator, or shard MariaDB databases per agent.
+The test no longer hardcodes seed values like `fiscal_year_id: 1` or
+`period_year: 2025`.
 
 ## Validated
 
-- Pest: 30/30 financial report tests pass (153 assertions)
+- Pest: 30/30 financial report tests pass (153 assertions, ~69s)
+- Pest TrialBalance subset: 6/6 tests pass (24 assertions)
 - Playwright: 20/20 financial report E2E tests pass (~71s via Sail)
-- TypeScript: `tsc --noEmit` clean
-- Build hygiene: 4 scenarios verified end-to-end
+- Duster + PHPStan clean on changed files
+- Backward compat preserved (existing tests pass period_year
+  explicitly and still match)
 
 ## Known Issues / Limitations
 
-1. **trial-balance-detailed default load returns no data**
-   - Backend requires `period_year` but no UI filter field exists for it
-   - Export button stays disabled indefinitely under default seed
-   - E2E export test bypasses UI as workaround (with inline comment)
-   - Worth a proper fix: derive `period_year` from `fiscal_year_id`
-     server-side, or add UI field
-
-2. **`GlExtendedSampleDataSeeder` deadlock under parallel test runs**
+1. **`GlExtendedSampleDataSeeder` deadlock under parallel test runs**
    - Multiple sub-agents reported transient deadlocks during heavy
      concurrent test execution against this seeder
    - Sequential runs work fine with default MariaDB settings
    - Worth a hardening pass if parallel test infra is added later
 
-3. **E2E parallel delegation collides on shared MariaDB**
+2. **E2E parallel delegation collides on shared MariaDB**
    - Concurrent `migrate:fresh` from multiple test runs deadlocks
-   - Mitigation: run all E2E in a single sequential session (current
-     approach), or shard databases per worker
+   - Mitigation: run all E2E in a single sequential session, or shard
+     databases per worker
 
 ## Recommended Next Steps
 
-1. **Fix `trial-balance-detailed` default load** (~1 hr)
-   - Either derive `period_year` from `fiscal_year_id` in backend, or
-     add a `period_year` filter field to the frontend
-   - After fix, simplify the E2E export test to use UI click
-
-2. **Hardening pass on `GlExtendedSampleDataSeeder`** (~1-2 hr)
+1. **Hardening pass on `GlExtendedSampleDataSeeder`** (~1-2 hr)
    - Wrap potentially conflicting inserts in `firstOrCreate` /
      `upsert`
    - Reduces flake risk under parallel CI workloads
+   - Prerequisite for #2
 
-3. **CI pipeline integration** (~varies)
-   - Run Pest + Playwright via the new build-hygiene-aware
-     global-setup in CI
+2. **CI pipeline integration** (~varies)
+   - Run Pest + Playwright via the build-hygiene-aware global-setup
    - PLAYWRIGHT_USE_SAIL=1 for Sail-only runners
+   - Cache vendor + node_modules; upload Playwright report artifact
+
+3. **Auto-select first/open fiscal year in `ReportDataTablePage`**
+   (~1 hr, optional polish)
+   - Currently the trial-balance-detailed page renders empty until the
+     user opens Filters and picks a fiscal year
+   - The financial shells (FinancialReportPageShell) auto-resolve the
+     fiscal year via `resolveFiscalYearContext`; this datatable shell
+     does not have an equivalent
+   - UX nicety; not blocking any feature
 
 ## Continuation Prompt
 
 ```
-Read task.md. Repo on main at ae5944a2, clean and pushed.
+Read task.md. Repo on main at cc990eef, clean and pushed.
 
-Last 2 commits today (2026-05-25):
-- 1551a429: feat(e2e): auto-rebuild Vite assets when stale in
-  global-setup. mtime-based check rebuilds via local npm or Sail.
-  Env overrides PLAYWRIGHT_SKIP_BUILD=1 / PLAYWRIGHT_FORCE_BUILD=1.
-- ae5944a2: test(reports): 20 Playwright E2E tests across 6 financial
-  reports. All pass in 71s via single global-setup. trial-balance-detailed
-  export test bypasses UI (button disabled due to backend bug, see
-  task.md). Run with PLAYWRIGHT_USE_SAIL=1.
+Last micro-session (2026-05-25 03:29 UTC) shipped:
+- 3cc1ea86: fix(reports): GetTrialBalanceReportAction derives period_year
+  from FiscalYear::start_date when not provided. Empty-string filters
+  coerced to null. Default trial-balance-detailed load now returns data.
+- cc990eef: test(reports): trial-balance-detailed E2E export test now
+  uses real UI flow (Filters dialog → Apply → click Export) instead of
+  the previous page.request.post() workaround.
 
-Coverage now complete:
-- Backend export endpoints (5 reports)
-- Frontend export buttons (5 reports)
-- Pest tests (5 reports, 30/30 pass)
-- Playwright E2E (6 reports, 20/20 pass)
-- Build-hygiene auto-rebuild
+All coverage layers green:
+- Pest 30/30 financial reports (153 assertions)
+- Playwright 20/20 financial reports (71s via Sail)
+- TS / PHPStan / Duster clean
 
 Next priority options:
-1. Fix trial-balance-detailed default load — either derive period_year
-   from fiscal_year_id server-side, or add UI filter field for it
-2. Hardening pass on GlExtendedSampleDataSeeder for parallel-safety
-3. CI pipeline integration for the new test layers
+1. Hardening pass on GlExtendedSampleDataSeeder for parallel-safety
+2. CI pipeline integration for the new test layers
+3. Auto-select fiscal year in ReportDataTablePage shell (UX polish)
 
-Recommend #1 first — it removes the only UI bypass in the E2E suite.
+Recommend #1 first (prereq for #2), then #2.
 ```
 
 Read task.md. Repo on main at c7c4f966, clean and pushed.
