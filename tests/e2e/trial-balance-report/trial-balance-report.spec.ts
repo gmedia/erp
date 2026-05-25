@@ -36,4 +36,32 @@ test.describe('Trial Balance Report', () => {
             }
         }
     });
+
+    test('can export trial balance report', async ({ page }) => {
+        test.setTimeout(60000);
+
+        await page.goto('/reports/trial-balance');
+        await page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/trial-balance') &&
+                !r.url().includes('/export') &&
+                r.status() < 400,
+            { timeout: 30000 },
+        );
+
+        const [exportResponse] = await Promise.all([
+            page.waitForResponse(
+                (r) =>
+                    r.url().includes('/api/reports/trial-balance/export') &&
+                    r.status() < 400,
+                { timeout: 30000 },
+            ),
+            page.getByRole('button', { name: /export/i }).click(),
+        ]);
+
+        const body = await exportResponse.json();
+        expect(body).toHaveProperty('url');
+        expect(body).toHaveProperty('filename');
+        expect(body.filename).toMatch(/^trial_balance_financial_report_.*\.xlsx$/);
+    });
 });
