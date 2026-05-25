@@ -4,7 +4,10 @@ use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
+use Maatwebsite\Excel\Facades\Excel;
 
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -50,4 +53,45 @@ test('it can export trial balance report', function () {
     ])->assertOk()->assertJsonStructure(['url', 'filename']);
 
     expect($response->json('filename'))->toEndWith('.xlsx');
+});
+
+test('it can export trial balance financial report', function () {
+    Carbon::setTestNow(Carbon::parse('2026-03-04 10:00:00'));
+    Excel::fake();
+    Storage::fake('public');
+
+    $fiscalYear = FiscalYear::factory()->create(['status' => 'open']);
+
+    $response = postJson('/api/reports/trial-balance/export', [
+        'fiscal_year_id' => $fiscalYear->id,
+    ])->assertOk()->assertJsonStructure(['url', 'filename']);
+
+    $filename = $response->json('filename');
+    expect($filename)->toStartWith('trial_balance_financial_report_');
+    expect($filename)->toEndWith('.xlsx');
+
+    Excel::assertStored('exports/' . $filename, 'public');
+    Carbon::setTestNow();
+});
+
+test('it requires permission to export trial balance financial report', function () {
+    $userWithoutPermission = createTestUserWithPermissions([]);
+    Sanctum::actingAs($userWithoutPermission, ['*']);
+
+    $fiscalYear = FiscalYear::factory()->create(['status' => 'open']);
+
+    postJson('/api/reports/trial-balance/export', [
+        'fiscal_year_id' => $fiscalYear->id,
+    ])->assertStatus(403);
+});
+
+test('it validates fiscal_year_id when exporting trial balance financial report', function () {
+    postJson('/api/reports/trial-balance/export', [])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['fiscal_year_id']);
+
+    postJson('/api/reports/trial-balance/export', [
+        'fiscal_year_id' => 99999,
+    ])->assertStatus(422)
+        ->assertJsonValidationErrors(['fiscal_year_id']);
 });

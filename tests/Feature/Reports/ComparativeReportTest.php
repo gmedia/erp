@@ -8,8 +8,11 @@ use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
+use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class)->group('reports');
 
@@ -204,4 +207,68 @@ test('comparative uses archived previous year and mapping split allocated to LCA
         ->assertJsonPath('report.totals.assets', 0)
         ->assertJsonPath('report.totals.comparison_assets', 300)
         ->assertJsonPath('report.totals.change_assets', -300);
+});
+
+test('it can export comparative report', function () {
+    Carbon::setTestNow(Carbon::parse('2026-04-10 09:30:00'));
+    Excel::fake();
+    Storage::fake('public');
+
+    Sanctum::actingAs($this->user, ['*']);
+    $response = $this->postJson('/api/reports/comparative/export', [
+        'fiscal_year_id' => $this->fyCurr->id,
+    ])
+        ->assertOk()
+        ->assertJsonStructure(['url', 'filename']);
+
+    $filename = $response->json('filename');
+    expect($filename)->toStartWith('comparative_report_');
+    expect($filename)->toEndWith('.xlsx');
+
+    Excel::assertStored('exports/' . $filename, 'public');
+    Carbon::setTestNow();
+});
+
+test('it can export comparative report with comparison year', function () {
+    Carbon::setTestNow(Carbon::parse('2026-04-10 09:30:00'));
+    Excel::fake();
+    Storage::fake('public');
+
+    Sanctum::actingAs($this->user, ['*']);
+    $response = $this->postJson('/api/reports/comparative/export', [
+        'fiscal_year_id' => $this->fyCurr->id,
+        'comparison_year_id' => $this->fyPrev->id,
+    ])
+        ->assertOk()
+        ->assertJsonStructure(['url', 'filename']);
+
+    $filename = $response->json('filename');
+    expect($filename)->toStartWith('comparative_report_');
+    expect($filename)->toEndWith('.xlsx');
+
+    Excel::assertStored('exports/' . $filename, 'public');
+    Carbon::setTestNow();
+});
+
+test('it requires permission to export comparative report', function () {
+    $userNoPerms = createTestUserWithPermissions([]);
+
+    Sanctum::actingAs($userNoPerms, ['*']);
+    $this->postJson('/api/reports/comparative/export', [
+        'fiscal_year_id' => $this->fyCurr->id,
+    ])->assertForbidden();
+});
+
+test('it validates fiscal_year_id when exporting comparative', function () {
+    Sanctum::actingAs($this->user, ['*']);
+
+    $this->postJson('/api/reports/comparative/export', [])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['fiscal_year_id']);
+
+    $this->postJson('/api/reports/comparative/export', [
+        'fiscal_year_id' => 99999,
+    ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['fiscal_year_id']);
 });

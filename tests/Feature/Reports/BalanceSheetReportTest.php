@@ -4,7 +4,10 @@ namespace Tests\Feature\Reports;
 
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
+use Maatwebsite\Excel\Facades\Excel;
 
 use function Pest\Laravel\seed;
 
@@ -47,4 +50,75 @@ test('balance sheet returns an empty structured report when fiscal year has no c
         ->assertJsonPath('report.totals.assets', 0)
         ->assertJsonPath('report.totals.liabilities', 0)
         ->assertJsonPath('report.totals.equity', 0);
+});
+
+test('it can export balance sheet report', function () {
+    Carbon::setTestNow(Carbon::parse('2026-03-04 10:00:00'));
+    Excel::fake();
+    Storage::fake('public');
+
+    Sanctum::actingAs($this->user, ['*']);
+    $response = $this->postJson('/api/reports/balance-sheet/export', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+    ])
+        ->assertOk()
+        ->assertJsonStructure(['url', 'filename']);
+
+    $filename = $response->json('filename');
+    expect($filename)->toStartWith('balance_sheet_report_');
+    expect($filename)->toEndWith('.xlsx');
+
+    Excel::assertStored('exports/' . $filename, 'public');
+    Carbon::setTestNow();
+});
+
+test('it can export balance sheet report with comparison year', function () {
+    Carbon::setTestNow(Carbon::parse('2026-03-04 10:00:00'));
+    Excel::fake();
+    Storage::fake('public');
+
+    $comparisonYear = FiscalYear::create([
+        'name' => '2024',
+        'start_date' => '2024-01-01',
+        'end_date' => '2024-12-31',
+        'status' => 'closed',
+    ]);
+
+    Sanctum::actingAs($this->user, ['*']);
+    $response = $this->postJson('/api/reports/balance-sheet/export', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'comparison_year_id' => $comparisonYear->id,
+    ])
+        ->assertOk()
+        ->assertJsonStructure(['url', 'filename']);
+
+    $filename = $response->json('filename');
+    expect($filename)->toStartWith('balance_sheet_report_');
+    expect($filename)->toEndWith('.xlsx');
+
+    Excel::assertStored('exports/' . $filename, 'public');
+    Carbon::setTestNow();
+});
+
+test('it requires permission to export balance sheet report', function () {
+    $userWithoutPermission = createTestUserWithPermissions([]);
+
+    Sanctum::actingAs($userWithoutPermission, ['*']);
+    $this->postJson('/api/reports/balance-sheet/export', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+    ])->assertForbidden();
+});
+
+test('it validates fiscal_year_id when exporting balance sheet', function () {
+    Sanctum::actingAs($this->user, ['*']);
+
+    $this->postJson('/api/reports/balance-sheet/export', [])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['fiscal_year_id']);
+
+    $this->postJson('/api/reports/balance-sheet/export', [
+        'fiscal_year_id' => 99999,
+    ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['fiscal_year_id']);
 });
