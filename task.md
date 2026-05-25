@@ -1,6 +1,6 @@
-# AI Handoff: CI E2E — storage:link fix unblocks 41 export specs
+# AI Handoff: CI E2E — subset expanded with 3 simple-CRUD modules
 
-Last updated: 2026-05-25 07:30 UTC
+Last updated: 2026-05-25 07:53 UTC
 
 ## Document Roles
 
@@ -11,52 +11,51 @@ Last updated: 2026-05-25 07:30 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: about to be `<new sha> ci(e2e): run storage:link in global-setup`
-  on top of `865130d9 ci(e2e): narrow Playwright run to known-green subset`
-- Working tree: 1 modified file → `tests/e2e/global-setup.ts`
-- Remote: pushed up to `865130d9` (1st green E2E run `26386502708`)
-- Quality + Test suite + narrowed E2E: green on CI run `26386502708`
+- HEAD: about to be `<new sha> ci(e2e): expand subset with branches, departments, fiscal-years`
+  on top of `34fad961 ci(e2e): run storage:link in global-setup ...`
+- Working tree: 1 modified file → `.github/workflows/tests.yml`
+- Remote: pushed up to `34fad961`
+- 3 consecutive green CI runs already:
+  - `26386502708` (subset narrowing)
+  - `26387160311` (docs only)
+  - `26389011248` (storage:link fix)
 - E2E job remains non-blocking (`continue-on-error: true`)
 
-## Root Cause Identified (41 CRUD export failures)
+## Storage:link fix is live but not yet validated end-to-end on CI
 
-CI runner has a fresh clone with no `public/storage` symlink. Backend
-exports write to `storage/app/public/exports/*.xlsx` and return
-`Storage::disk('public')->url(...)` → `/storage/exports/...`. Without
-the symlink that URL serves an HTML 404 page, the browser saves the
-HTML as the "downloaded" `.xlsx`, and ExcelJS chokes:
+The 3 green runs above only ran the original 7-spec narrowed subset
+(bank-reconciliations + 6 financial reports). None of them exercised
+any of the 41 originally-failing CRUD export specs, so we still need
+one CI run that actually exports a CRUD module to confirm the
+storage:link fix works on the runner.
+
+This expansion does that.
+
+## Subset Expansion (about to commit)
+
+`.github/workflows/tests.yml` E2E command now includes 3 simple-CRUD
+modules whose only known failure was the storage:link symlink
+(verified locally with the symlink removed before each run):
 
 ```
-Error: Can't find end of central directory : is this a zip file ?
-  at workbook.xlsx.readFile(filePath)   // shared-test-factories.ts:208
+tests/e2e/bank-reconciliations/
+tests/e2e/balance-sheet-report/
+tests/e2e/branches/                   # NEW
+tests/e2e/cash-flow-report/
+tests/e2e/comparative-report/
+tests/e2e/departments/                # NEW
+tests/e2e/fiscal-years/               # NEW
+tests/e2e/income-statement-report/
+tests/e2e/trial-balance-detailed-report/
+tests/e2e/trial-balance-report/
 ```
 
-All 41 unique failures from CI run `26384727117` match this signature
-across simple + complex CRUD modules (departments, fiscal-years,
-goods-receipts, journal-entries, etc.) plus a couple of report exports.
-
-Local devs never see this because `project_setup.sh` runs
-`./vendor/bin/sail artisan storage:link` once on host. CI has never
-run that step.
-
-### Fix (about to commit)
-
-`tests/e2e/global-setup.ts` runs `artisan storage:link --force` after
-`migrate:fresh + db:seed`. The Sail-aware artisan runner already exists,
-so this works on both local and CI.
-
-### Local verification (Sail, symlink removed before each run)
+### Local verification (Sail, fresh symlink each run)
 
 ```
 rm -f public/storage
-npx playwright test tests/e2e/fiscal-years/ -g "can export Fiscal Years"
-  → INFO  The [public/storage] link has been connected
-  → ✓  can export Fiscal Years (5.6s) | 1 passed (25.0s)
-
-rm -f public/storage
-npx playwright test tests/e2e/branches/ -g "can export Branches"
-  → INFO  The [public/storage] link has been connected
-  → ✓  can export Branches (3.3s) | 1 passed (22.2s)
+npx playwright test tests/e2e/branches/ tests/e2e/departments/ tests/e2e/fiscal-years/
+  → 27 passed (2.3m)
 ```
 
 ## Current Objective
@@ -132,25 +131,25 @@ commit and is about to ship a second:
 
 ## Recommended Next Steps
 
-1. **Ship storage:link fix** (this session)
-   - `git add tests/e2e/global-setup.ts task.md`
-   - `git commit -m "ci(e2e): run storage:link in global-setup to unblock CRUD export specs"`
+1. **Ship the subset expansion** (this session)
+   - `git add .github/workflows/tests.yml task.md`
+   - `git commit -m "ci(e2e): expand subset with branches, departments, fiscal-years"`
    - `git push origin main`
 
 2. **Monitor next CI run**
-   - Confirm narrowed subset still green (proves no regression).
-   - Subset content unchanged — full validation of fix happens after subset expansion.
+   - Confirm 10-spec subset green on CI.
+   - Confirms storage:link fix works on the runner end-to-end.
 
-3. **Expand CI E2E subset incrementally** (next session)
-   - Add 2-3 simple CRUD modules first (e.g. `departments`,
-     `branches`, `fiscal-years`) since their failures all match the
-     storage:link signature.
-   - Verify each wave green before adding more.
-   - Eventually re-enable full `tests/e2e/` once 0 known-failing specs remain.
-
-4. **Promote E2E to required (after 2-3 green runs)**
+3. **Promote E2E to required (after this run is green)**
    - Drop `continue-on-error: true` from the e2e job.
    - Require `needs.e2e.result == success` in the reflect step.
+
+4. **Continue expanding subset in waves**
+   - Next wave: remaining simple CRUD (`positions`, `customer-categories`,
+     `supplier-categories`).
+   - Then complex CRUD waves (employees / customers / suppliers / products,
+     warehouses, asset-* family, etc.) — verify each module locally first.
+   - Eventually re-enable full `tests/e2e/` once 0 known-failing specs remain.
 
 5. **Optional UX polish**
    - Auto-select first/open fiscal year in `ReportDataTablePage` (~1 hr).
@@ -162,25 +161,28 @@ commit and is about to ship a second:
 
 ```
 Read task.md. Repo on main. HEAD should be the new
-"ci(e2e): run storage:link in global-setup ..." commit (after this
-session pushes), or 865130d9 if not yet pushed.
+"ci(e2e): expand subset with branches, departments, fiscal-years"
+commit (after this session pushes), or 34fad961 if not yet pushed.
 
 Status:
-- Quality + Test suite + narrowed E2E: GREEN on CI run 26386502708.
-- Root cause for the previous 41 CRUD export failures identified
-  and fixed: missing public/storage symlink on CI runner.
-- E2E global-setup now runs `artisan storage:link --force` after
-  migrate:fresh + db:seed. Verified locally for fiscal-years and
-  branches with the symlink deleted before each run.
+- 3 consecutive green CI runs (subset narrowing, docs, storage:link fix).
+- storage:link fix is live but not yet exercised end-to-end on CI
+  because none of the 7-spec narrowed subset hits the storage:link
+  code path.
+- About to expand the E2E subset to 10 specs by adding 3 simple CRUD
+  modules (branches, departments, fiscal-years), all storage:link-only
+  failures locally.
 - E2E job is still non-blocking (continue-on-error: true).
 
 Next priority:
-1. Watch the new CI run and confirm narrowed subset still green
-   (no regression from the storage:link change).
-2. Expand the E2E subset incrementally — start with 2-3 simple CRUD
-   modules whose only known failure was the storage:link issue.
-3. After 2-3 green runs, drop continue-on-error from the e2e job
-   and require needs.e2e.result == success in the reflect step.
+1. Watch the new CI run after the expansion push and confirm the
+   10-spec subset is green. This is the first CI run that actually
+   validates the storage:link fix end-to-end.
+2. After green, drop continue-on-error from the e2e job and require
+   needs.e2e.result == success in the reflect step.
+3. Continue expanding the subset in waves: simple CRUD (positions,
+   customer-categories, supplier-categories), then complex CRUD
+   modules. Verify each module locally before adding to CI.
 4. Eventually re-enable full tests/e2e/.
 5. Optional: auto-select fiscal year in ReportDataTablePage.
 6. Optional: parallel-safe migrate:fresh / DB sharding.

@@ -355,8 +355,11 @@ jobs:
           npx playwright test
           tests/e2e/bank-reconciliations/
           tests/e2e/balance-sheet-report/
+          tests/e2e/branches/
           tests/e2e/cash-flow-report/
           tests/e2e/comparative-report/
+          tests/e2e/departments/
+          tests/e2e/fiscal-years/
           tests/e2e/income-statement-report/
           tests/e2e/trial-balance-detailed-report/
           tests/e2e/trial-balance-report/
