@@ -1,6 +1,6 @@
-# AI Handoff: CI E2E Narrowed to Known-Green Subset
+# AI Handoff: CI E2E Subset GREEN on CI (1st green run)
 
-Last updated: 2026-05-25 06:18 UTC
+Last updated: 2026-05-25 06:39 UTC
 
 ## Document Roles
 
@@ -11,15 +11,15 @@ Last updated: 2026-05-25 06:18 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `25c307cc fix(static): silence App\\Models\\Eloquent class.notFound in PHPStan`
-- Working tree: 1 modified file → `.github/workflows/tests.yml` (E2E subset narrowing, about to commit)
-- Remote: pushed up to `25c307cc`
-- Quality job: PASSING on CI
-- Test suite job: PASSING on CI
-- E2E job: observed running on CI run `26384727117`; full suite produced
-  `41 failed` (mostly pre-existing CRUD export specs with
-  `Console Error text: "Export failed: x"`). Job is non-blocking
-  (`continue-on-error: true`), so the overall run still reports `success`.
+- HEAD: `865130d9 ci(e2e): narrow Playwright run to known-green subset`
+- Working tree: clean (only this `task.md` post-CI status update pending)
+- Remote: pushed
+- CI run `26386502708`: overall `success`
+  - Quality checks via Sail: `success`
+  - Playwright E2E via Sail: `success` (narrowed subset, FIRST green E2E run)
+  - Test suite via Sail: `success`
+- E2E job is still non-blocking (`continue-on-error: true`); needs a few
+  more green runs before promoting to required.
 
 ## Current Objective
 
@@ -28,8 +28,9 @@ opening the gate to the full suite.
 
 - ✅ E2E job runs on CI (no longer skipped by autofix guard).
 - ✅ Quality + Test suite jobs green on CI.
-- ⏳ Narrow E2E command to known-green subset (this session).
-- ⏳ Verify subset E2E green on CI for a few runs.
+- ✅ E2E command narrowed to known-green subset (this session).
+- ✅ Subset E2E green on CI run `26386502708` (1st green run).
+- ⏳ A few more green runs before flipping `continue-on-error`.
 - ⏳ Drop `continue-on-error: true` and require
   `needs.e2e.result == success` once stable.
 - ⏳ Triage and re-add the rest of `tests/e2e/**` in waves.
