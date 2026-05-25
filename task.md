@@ -1,6 +1,6 @@
-# AI Handoff: Trial Balance Detailed Default Load Fixed
+# AI Handoff: GlExtendedSampleDataSeeder Hardened (Idempotent + Atomic)
 
-Last updated: 2026-05-25 03:29 UTC
+Last updated: 2026-05-25 03:41 UTC
 
 ## Document Roles
 
@@ -11,129 +11,124 @@ Last updated: 2026-05-25 03:29 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `cc990eef`
+- HEAD: `aaa4c147`
 - Working tree: clean
 - Remote: pushed and up-to-date
-- Trial balance detailed default load now returns data; Export button works
-- Last UI bypass in E2E suite removed
+- Seeder is now idempotent and atomic (transaction-wrapped)
 
 ## Current Objective
 
-Trial Balance Detailed default-load issue closed:
+GlExtendedSampleDataSeeder hardening complete:
 
-- ✅ Backend `GetTrialBalanceReportAction` derives `period_year` from
-      `FiscalYear::start_date` when not provided
-- ✅ Empty-string `period_month` / `period_year` coerced to `null`
-- ✅ Conditional WHERE clauses (no filtering when null)
-- ✅ E2E test refactored to exercise real UI flow (Filters → Apply →
-      Export click)
-- ✅ Backward compat preserved (existing Pest cases still pass)
+- ✅ All inserts moved to `updateOrCreate` keyed by natural unique
+      constraints (matching migration indexes)
+- ✅ Child rows (recurring journal lines, bank reconciliation items)
+      delete-then-recreate for sync with parent payload across reruns
+- ✅ Whole seed wrapped in `DB::transaction` for atomic rollback +
+      bounded lock contention
+- ✅ Two-run idempotency verified (counts identical: 4/2/3/12)
+- ✅ Backward compat preserved for 30/30 Pest financial tests
+- ✅ Full E2E (financial reports + bank reconciliation) still EXIT=0
 
-## Session Summary (2026-05-25 03:29 UTC)
+## Session Summary (2026-05-25 03:41 UTC)
 
-2 commits shipped after the previous handoff (`091e4314`):
+1 commit shipped after the previous handoff (`38527d01`):
 
 | Commit | Description |
 |--------|-------------|
-| `3cc1ea86` | fix(reports): derive period_year from fiscal year in trial balance detailed |
-| `cc990eef` | test(reports): drop UI bypass in trial-balance-detailed export E2E |
+| `aaa4c147` | fix(seeder): make GlExtendedSampleDataSeeder idempotent and atomic |
 
-### Backend fix (`3cc1ea86`)
+### Why this matters
 
-`GetTrialBalanceReportAction::execute`:
-- Coerces empty-string filters to `null` via private `intOrNull`
-- If `period_year` is null, derives it from
-  `FiscalYear::query()->whereKey($fiscalYearId)->value('start_date')?->year`
-- Applies `period_month` / `period_year` WHERE clauses only when each
-  is non-null (so callers can request "all periods for fiscal year")
+During the parallel E2E delegation earlier today, multiple sub-agents
+hit transient deadlocks running this seeder concurrently. Inspection
+showed:
 
-Smoke-tested 4 scenarios via curl:
-- Only fiscal_year_id (year derived) → 12 rows (3 months × 4 accounts)
-- fiscal_year_id + period_month → 4 rows
-- Explicit period_year (backward compat) → 4 rows
-- Empty-string filters from frontend → 12 rows
+- The seeder used `factory()->create()` with no idempotency keys
+- A second run crashes on unique constraints in `period_closings`,
+  `account_balances`, and `bank_reconciliations`
+- No transaction boundary, so each insert held its own lock
+  separately, increasing the deadlock surface
 
-### E2E refactor (`cc990eef`)
+### Refactor details
 
-Removed the `page.request.post()` workaround. The new flow:
-1. `goto('/reports/trial-balance-detailed')` and wait for the table
-2. Open Filters dialog → Select fiscal year combobox → pick first
-   option → Apply Filters
-3. Wait for the GET refetch
-4. Assert Export button is enabled
-5. Click Export, intercept `/api/.../export` response, assert filename
+Per-section unique-key mapping (taken from migrations):
 
-The test no longer hardcodes seed values like `fiscal_year_id: 1` or
-`period_year: 2025`.
+| Table | Unique constraint |
+|-------|-------------------|
+| `recurring_journals` | `(name, fiscal_year_id)` (no DB constraint, but functional ID) |
+| `bank_reconciliations` | `(account_id, period_start, period_end)` |
+| `period_closings` | `(fiscal_year_id, period_month, period_year, closing_type)` |
+| `account_balances` | `(account_id, fiscal_year_id, period_month, period_year)` |
 
-## Validated
+Each section now uses `updateOrCreate` with the natural key as the
+match attributes and the rest as values. Whole `run()` body wrapped
+in `DB::transaction(function () use (...) { ... })`.
 
-- Pest: 30/30 financial report tests pass (153 assertions, ~69s)
-- Pest TrialBalance subset: 6/6 tests pass (24 assertions)
-- Playwright: 20/20 financial report E2E tests pass (~71s via Sail)
-- Duster + PHPStan clean on changed files
-- Backward compat preserved (existing tests pass period_year
-  explicitly and still match)
+### Validated
+
+- Pest: 30/30 financial reports (153 assertions, ~68s)
+- Playwright E2E: bank-reconciliation (13) + 6 financial reports (20)
+  full suite passes (EXIT=0)
+- Two consecutive `db:seed --class=GlExtendedSampleDataSeeder` runs
+  succeed with identical row counts
+- Duster + PHPStan clean
 
 ## Known Issues / Limitations
 
-1. **`GlExtendedSampleDataSeeder` deadlock under parallel test runs**
-   - Multiple sub-agents reported transient deadlocks during heavy
-     concurrent test execution against this seeder
-   - Sequential runs work fine with default MariaDB settings
-   - Worth a hardening pass if parallel test infra is added later
-
-2. **E2E parallel delegation collides on shared MariaDB**
+1. **E2E parallel delegation collides on shared MariaDB** (unchanged)
    - Concurrent `migrate:fresh` from multiple test runs deadlocks
-   - Mitigation: run all E2E in a single sequential session, or shard
-     databases per worker
+   - Mitigation still: run all E2E in a single sequential session, or
+     shard databases per worker
+   - The seeder hardening reduces the lock surface within a single
+     run but does NOT fix concurrent `migrate:fresh` collisions
 
 ## Recommended Next Steps
 
-1. **Hardening pass on `GlExtendedSampleDataSeeder`** (~1-2 hr)
-   - Wrap potentially conflicting inserts in `firstOrCreate` /
-     `upsert`
-   - Reduces flake risk under parallel CI workloads
-   - Prerequisite for #2
-
-2. **CI pipeline integration** (~varies)
-   - Run Pest + Playwright via the build-hygiene-aware global-setup
+1. **CI pipeline integration** (~varies)
+   - Run Pest + Playwright via build-hygiene-aware global-setup
    - PLAYWRIGHT_USE_SAIL=1 for Sail-only runners
    - Cache vendor + node_modules; upload Playwright report artifact
+   - Now safer to add since seeder is hardened
 
-3. **Auto-select first/open fiscal year in `ReportDataTablePage`**
+2. **Auto-select first/open fiscal year in `ReportDataTablePage`**
    (~1 hr, optional polish)
-   - Currently the trial-balance-detailed page renders empty until the
-     user opens Filters and picks a fiscal year
-   - The financial shells (FinancialReportPageShell) auto-resolve the
-     fiscal year via `resolveFiscalYearContext`; this datatable shell
-     does not have an equivalent
+   - Currently the trial-balance-detailed page renders empty until
+     the user opens Filters and picks a fiscal year
+   - The financial shells auto-resolve fiscal year via
+     `resolveFiscalYearContext`; this datatable shell does not
    - UX nicety; not blocking any feature
+
+3. **Investigate parallel-safe migrate:fresh** (optional)
+   - The current bottleneck for parallel E2E is the shared `testing`
+     DB. Consider sharding (one DB per worker via PHPUnit
+     parallel-process strategy or Pest's parallel mode)
+   - Lower priority; sequential runs work fine
 
 ## Continuation Prompt
 
 ```
-Read task.md. Repo on main at cc990eef, clean and pushed.
+Read task.md. Repo on main at aaa4c147, clean and pushed.
 
-Last micro-session (2026-05-25 03:29 UTC) shipped:
-- 3cc1ea86: fix(reports): GetTrialBalanceReportAction derives period_year
-  from FiscalYear::start_date when not provided. Empty-string filters
-  coerced to null. Default trial-balance-detailed load now returns data.
-- cc990eef: test(reports): trial-balance-detailed E2E export test now
-  uses real UI flow (Filters dialog → Apply → click Export) instead of
-  the previous page.request.post() workaround.
+Last micro-session (2026-05-25 03:41 UTC) shipped:
+- aaa4c147: fix(seeder): GlExtendedSampleDataSeeder is now idempotent
+  via updateOrCreate keyed by migration unique constraints, and atomic
+  via DB::transaction wrap. Two consecutive runs produce identical
+  row counts. Reduces deadlock surface during parallel test runs.
 
 All coverage layers green:
 - Pest 30/30 financial reports (153 assertions)
-- Playwright 20/20 financial reports (71s via Sail)
+- Playwright 20/20 financial reports + 13/13 bank reconciliation
 - TS / PHPStan / Duster clean
 
 Next priority options:
-1. Hardening pass on GlExtendedSampleDataSeeder for parallel-safety
-2. CI pipeline integration for the new test layers
-3. Auto-select fiscal year in ReportDataTablePage shell (UX polish)
+1. CI pipeline integration (Pest + Playwright via build-hygiene
+   global-setup, PLAYWRIGHT_USE_SAIL=1)
+2. Auto-select fiscal year in ReportDataTablePage (UX polish)
+3. Parallel-safe migrate:fresh investigation (lower priority)
 
-Recommend #1 first (prereq for #2), then #2.
+Recommend #1 next — the test/seeder ground is now stable enough to
+codify into CI without flake risk.
 ```
 
 Read task.md. Repo on main at c7c4f966, clean and pushed.
