@@ -61,7 +61,7 @@ class GoodsReceiptExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
             'ID' => fn (GoodsReceipt $gr): mixed => $gr->id,
             'GR Number' => fn (GoodsReceipt $gr): mixed => $gr->gr_number,
             'PO Number' => fn (GoodsReceipt $gr): mixed => $this->relatedAttribute($gr, 'purchaseOrder', 'po_number'),
-            'Supplier' => fn (GoodsReceipt $gr): mixed => $gr->purchaseOrder?->getRelationValue('supplier')?->name,
+            'Supplier' => fn (GoodsReceipt $gr): mixed => $gr->purchaseOrder->getRelationValue('supplier')?->name,
             'Warehouse' => fn (GoodsReceipt $gr): mixed => $this->relatedAttribute($gr, 'warehouse', 'name'),
             'Receipt Date' => fn (GoodsReceipt $gr): mixed => $this->formatDateValue($gr->receipt_date, 'Y-m-d'),
             'Supplier Delivery Note' => fn (GoodsReceipt $gr): mixed => $gr->supplier_delivery_note,

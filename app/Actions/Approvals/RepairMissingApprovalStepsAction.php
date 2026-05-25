@@ -41,15 +41,15 @@ class RepairMissingApprovalStepsAction
 
         foreach ($requests as $request) {
             $flow = $request->flow;
-            $flowSteps = $flow ? $flow->steps : collect();
+            $flowSteps = $flow->steps;
             $skipReason = $this->getSkipReason($request);
 
             if ($skipReason !== null) {
                 $report['skipped']++;
                 $report['items'][] = $this->buildReportItem(
                     $request,
-                    $flow?->id,
-                    $flow?->code,
+                    $flow->id,
+                    $flow->code,
                     $flowSteps->count(),
                     $skipReason,
                 );
@@ -79,8 +79,8 @@ class RepairMissingApprovalStepsAction
 
             $report['items'][] = $this->buildReportItem(
                 $request,
-                $flow?->id,
-                $flow?->code,
+                $flow->id,
+                $flow->code,
                 $flowSteps->count(),
                 $dryRun ? 'repairable' : 'repaired',
             );
@@ -101,10 +101,6 @@ class RepairMissingApprovalStepsAction
 
         $flow = $request->flow;
 
-        if (! $flow) {
-            return 'missing_approval_flow';
-        }
-
         if ($flow->steps->isEmpty()) {
             return 'approval_flow_has_no_steps';
         }
@@ -118,8 +114,8 @@ class RepairMissingApprovalStepsAction
 
     private function buildReportItem(
         ApprovalRequest $request,
-        ?int $flowId,
-        ?string $flowCode,
+        int $flowId,
+        string $flowCode,
         int $flowStepCount,
         string $outcome,
     ): array {
