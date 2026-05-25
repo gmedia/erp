@@ -1,6 +1,6 @@
-# AI Handoff: Financial Reports Export Family Complete
+# AI Handoff: Financial Reports Export Family + Pest Coverage
 
-Last updated: 2026-05-24 10:03 UTC
+Last updated: 2026-05-25 01:49 UTC
 
 ## Document Roles
 
@@ -11,129 +11,118 @@ Last updated: 2026-05-24 10:03 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `ebaeaf10`
+- HEAD: `c87add0a`
 - Working tree: clean
-- Remote: 2 commits ahead (need push)
-- All financial reports now have Excel export
+- Remote: pushed and up-to-date
+- All financial reports have Excel export endpoints + Pest coverage
 
 ## Current Objective
 
-Sessions 2026-05-24 (3 shifts) all complete:
+All financial-report export work shipped:
 
-- ✅ Bank Reconciliation feature end-to-end
-- ✅ Trial Balance Detailed
-- ✅ Comparative Report frontend (already complete)
-- ✅ E2E global-setup Sail-aware
-- ✅ Bank Reconciliation E2E: 13/13 passing
-- ✅ Financial reports export family — all 5 reports
+- ✅ Backend export endpoints for 5 reports (commit `e056a86f`)
+- ✅ Frontend export buttons on 5 report pages (commit `ebaeaf10`)
+- ✅ Pest feature tests for 5 export endpoints (commit `c87add0a`)
 
-## Session Summary (2026-05-24 evening)
+## Session Summary (2026-05-25 01:49 UTC)
 
-2 commits shipped after the previous handoff (`6e47d10c`):
+1 commit shipped after the previous handoff (`a477b653`):
 
 | Commit | Description |
 |--------|-------------|
-| `e056a86f` | feat(reports): Excel export endpoints for 5 financial reports |
-| `ebaeaf10` | feat(reports): wire Excel export buttons on 5 financial report pages |
+| `c87add0a` | test(reports): add Pest coverage for 5 financial report exports |
 
-### Backend (commit `e056a86f`)
+### Pest test coverage added
 
-5 reports gained POST `/reports/{report}/export`:
-- `trial-balance` (single year)
-- `balance-sheet` (with optional comparison_year)
-- `income-statement` (with optional comparison_year)
-- `cash-flow` (single year)
-- `comparative` (with optional comparison_year)
+Per the recommendation in the previous handoff, added feature tests
+for the 5 newly-shipped export endpoints. Delegation pattern: 5 deep
+sub-agents in parallel, one per report. Each agent appended tests
+to existing report test files (or created a new file for Cash Flow).
 
-Per-report files (15 new):
-- `app/Http/Requests/Reports/{Name}Request.php` — fiscal_year + optional comparison validation
-- `app/Actions/Reports/Export{Name}Action.php` — uses `ExportsReportToExcel` trait
-- `app/Exports/{Name}Export.php` — `FromCollection|ShouldAutoSize|WithHeadings`
+Test cases per report:
+- Happy path: `POST /reports/{slug}/export` with `fiscal_year_id` →
+  200 + JSON `{url, filename}` + correct filename prefix + `.xlsx`
+  suffix + `Excel::assertStored` on public disk
+- Comparison-aware reports (balance-sheet, income-statement,
+  comparative): additional test sending both fiscal + comparison year
+- Permission guard: user without `{report}_report` permission → 403
+- Validation: missing/invalid `fiscal_year_id` → 422
 
-Tree reports (Balance Sheet, Income Statement, Comparative) use a private `flattenTree($nodes, $section, $depth)` helper that recurses `children` and indents names by depth, then appends section + grand totals from `report['totals']`.
+Files touched:
+- `tests/Feature/Reports/BalanceSheetReportTest.php` — +4 tests
+- `tests/Feature/Reports/ComparativeReportTest.php` — +4 tests
+- `tests/Feature/Reports/IncomeStatementReportTest.php` — +4 tests
+- `tests/Feature/Reports/TrialBalanceReportTest.php` — +3 tests
+- `tests/Feature/Reports/CashFlowReportTest.php` — new file, 5 tests
 
-Note: TrialBalance request was named `TrialBalanceFinancialReportRequest` to avoid collision with the existing `TrialBalanceReportRequest` used by `trial-balance-detailed`.
+### Notes from delegation
 
-Routes added in `routes/api/reports.php` paired with existing GET routes, gated by the same `permission:{report}_report` middleware.
+Some agents temporarily mutated MariaDB runtime settings
+(`innodb_deadlock_detect=OFF`, `innodb_lock_wait_timeout=120`) and
+created a `database/schema/mariadb-schema.sql` artifact while debugging
+transient deadlocks during their test runs. After the work was done:
+- `database/schema/` artifact deleted (not committed)
+- MariaDB settings reset to defaults via `docker exec`
+- All 30 tests re-run with default settings: still 30/30 pass
 
-Smoke-tested all 5 endpoints — 200 OK + valid file URLs.
-
-### Frontend (commit `ebaeaf10`)
-
-Two financial-report shells gained an optional `headerActions` prop:
-- `resources/js/components/reports/financial/FinancialReportPageShell.tsx` (comparison)
-- `resources/js/components/reports/financial/FinancialTableReportPage.tsx` (single year)
-
-Each of the 5 page files now passes an Export Button (Download icon, outline + sm) via `headerActions`, using the shared `useExport` hook. Button disabled when `!selectedYearId || isExporting`.
-
-`tsc --noEmit` clean. `npm run build` clean.
+The settings mutations were not persisted across container restart
+anyway, so future fresh containers are unaffected.
 
 ## Validated
 
-- PHPStan: 0 errors on all new files + ReportController
-- Duster: pass on all changed PHP files
-- TypeScript: `tsc --noEmit` clean
-- Vite build: clean
-- HTTP smoke: all 5 endpoints return 200 + valid xlsx URL
+- Pest: **30/30 financial report tests pass** (153 assertions, ~67s)
+- Default MariaDB settings (no innodb tweaks needed)
+- Duster pass on all changed test files
 
 ## Known Issues / Limitations
 
 1. **Vite build hygiene** (unchanged)
-   - `public/build` can drift from source if `npm run build` isn't run after frontend changes
-   - Global-setup deletes `public/hot`, forcing built assets — so stale build silently breaks E2E
-   - Consider adding a build step to `global-setup.ts` or CI pipeline
+   - `public/build` can drift from source if `npm run build` isn't run
+   - Global-setup deletes `public/hot`, forcing built assets
 
-2. **No E2E coverage for the new export buttons**
-   - Manual smoke tested via curl + tinker. Browser-level click → download flow not yet covered.
+2. **No Playwright E2E coverage for the new export buttons**
+   - Backend covered via Pest. Browser click → download flow not yet
+     covered.
 
 ## Recommended Next Steps
 
-1. **Push the 2 new commits + 5 from earlier today**
-   ```
-   git push origin main
-   ```
-   Total 7 commits unpushed since this morning's handoff (`c7c4f966`).
+1. **E2E tests for financial reports** (~2-3 hr)
+   - 6 reports without Playwright coverage: Trial Balance, Trial
+     Balance Detailed, Balance Sheet, Income Statement, Cash Flow,
+     Comparative
+   - Tree reports use `FinancialReportPageShell` (not
+     `ReportDataTablePage`), so test patterns differ slightly from
+     existing report E2E
+   - Recommended subset per report: visit, change fiscal year,
+     change comparison year, click Export & verify download
 
-2. **E2E tests for financial reports** (~2-3 hr) — now unblocked
-   - 6 reports without Playwright coverage: Trial Balance, Trial Balance Detailed, Balance Sheet, Income Statement, Cash Flow, Comparative
-   - Pattern reference: `tests/e2e/inventory-valuation-report/` — but note these reports use FinancialReportPageShell, not ReportDataTablePage. Locator strategy will differ slightly.
-   - Standard 9 test cases per report (search may not apply — there's no search box; sort may not apply — these are tree displays, not sortable tables).
-   - Recommend: subset of test cases per report (visit, change fiscal year, change comparison year, click Export button)
+2. **Vite build automation hygiene** (~30 min, optional)
+   - Add `sail npm run build` to `global-setup.ts` or document
+     prominently in handoff prompts
 
-3. **Vite build automation** (~30 min, optional)
-   - Add `sail npm run build` to global-setup or document in handoff
-   - Prevents stale-build from masking frontend bugs
-
-4. **Pest tests for export endpoints** (~1-2 hr)
-   - Each new ExportAction + Excel class deserves a feature test asserting 200 + filename + content
-   - Pattern: `tests/Feature/Reports/InventoryValuationReportTest.php` etc.
-   - Quick to delegate in parallel.
+3. **Investigate `GlExtendedSampleDataSeeder` deadlock susceptibility**
+   - Multiple agents reported transient deadlocks during heavy parallel
+     test runs against this seeder. Worth a hardening pass.
+   - Default MariaDB settings work fine for sequential test runs;
+     parallel runs occasionally hit it.
 
 ## Continuation Prompt
 
 ```
-Read task.md. Repo on main at ebaeaf10, clean. 7 unpushed commits.
+Read task.md. Repo on main at c87add0a, clean and pushed.
 
-Last session (2026-05-24 evening) shipped:
-- 5 new Excel export endpoints for financial reports (trial-balance,
-  balance-sheet, income-statement, cash-flow, comparative)
-- 15 new backend files (FormRequest + Action + Excel per report)
-- 2 financial report shells gained headerActions prop
-- 5 frontend pages got Export buttons via useExport hook
-
-All smoke-tested 200 OK. PHPStan/Duster/Types clean.
+Last micro-session (2026-05-25 01:49 UTC) shipped:
+- Pest tests for 5 financial report export endpoints
+- 30/30 reports tests pass with default MariaDB settings
+- 5 deep sub-agents delegated in parallel (one per report)
 
 Next priority options:
-1. Push the 7 commits (when ready)
-2. E2E tests for 6 financial reports (~2-3 hr) — now unblocked since
-   all have export endpoints
-3. Pest tests for the 5 new export endpoints (~1-2 hr) — parallel-delegatable
-4. Vite build automation hygiene (~30 min)
+1. E2E tests for 6 financial reports (~2-3 hr) — last coverage gap
+2. Vite build automation hygiene (~30 min)
+3. Investigate GlExtendedSampleDataSeeder deadlock under parallel runs
 
-Recommend #1 first to push, then #3 (Pest tests via 5 parallel sub-agents)
-since #2 needs more design work for tree-vs-table test patterns.
-
-Reminder: run `sail npm run build` after frontend changes.
+Recommend #1 to close the coverage loop on the export family work,
+then #2 to prevent the recurring stale-build trap.
 ```
 
 Read task.md. Repo on main at c7c4f966, clean and pushed.
