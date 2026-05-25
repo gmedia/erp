@@ -107,8 +107,9 @@ export const BankReconciliationWorkspace =
             const [currentDifference, setCurrentDifference] = useState<number>(
                 bankReconciliation.difference,
             );
-            const [currentReconciledBalance, setCurrentReconciledBalance] =
-                useState<number>(bankReconciliation.reconciled_balance);
+            const [, setCurrentReconciledBalance] = useState<number>(
+                bankReconciliation.reconciled_balance,
+            );
 
             const [assigningItemId, setAssigningItemId] = useState<
                 number | null
