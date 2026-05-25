@@ -238,7 +238,6 @@ jobs:
     timeout-minutes: 60
     needs: quality
     if: ${{ needs.quality.outputs.autofix_applied != 'true' }}
-    continue-on-error: true
     permissions:
       contents: read
       packages: read
@@ -358,8 +357,11 @@ jobs:
           tests/e2e/branches/
           tests/e2e/cash-flow-report/
           tests/e2e/comparative-report/
+          tests/e2e/customer-categories/
           tests/e2e/departments/
           tests/e2e/income-statement-report/
+          tests/e2e/positions/
+          tests/e2e/supplier-categories/
           tests/e2e/trial-balance-detailed-report/
           tests/e2e/trial-balance-report/
           --reporter=line
@@ -409,3 +411,4 @@ jobs:
 
           echo "quality=${{ needs.quality.result }} e2e=${{ needs.e2e.result }}"
           [ "${{ needs.quality.result }}" = "success" ]
+          [ "${{ needs.e2e.result }}" = "success" ]
