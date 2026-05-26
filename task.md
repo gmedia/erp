@@ -1,6 +1,6 @@
-# AI Handoff: CI E2E Required Gate Expanded to 55 Modules
+# AI Handoff: CI E2E Required Gate Expanded to 76 Modules
 
-Last updated: 2026-05-26 13:40 UTC
+Last updated: 2026-05-26 16:30 UTC
 
 ## Document Roles
 
@@ -11,22 +11,28 @@ Last updated: 2026-05-26 13:40 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `fc55e70e ci: nudge after Actions degraded recovery (2nd retry)`
+- HEAD: `186f1652 fix(e2e): pin Export button locator with exact:true to avoid account name collision`
 - Working tree: clean (this update staged for commit).
 - Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
-- Latest CI run: `26449377161` → overall `success`
+- Latest CI run: `26458724971` → overall `success`
   - `Quality checks via Sail`: `success`
-  - `Playwright E2E via Sail`: `success`
+  - `Playwright E2E via Sail`: `success` (~481 tests)
   - `Test suite via Sail`: `success`
-- Current CI E2E subset: **55 modules** (wave 7 added 7 non-CRUD workflow modules).
+- Current CI E2E subset: **76 modules** (wave 8 added 21 modules).
 
-### Notes on Recovery
+### Wave 8 Failure & Fix
 
-- GitHub Actions had a `major_outage` from 10:57 UTC (incident `gnftqj9htp0g`).
-- Pushes at 11:55 UTC (`f721361f`), 12:01 UTC (`28212829`), and 12:10 UTC (`179b12de`) did not trigger any CI run.
-- A 4th nudge empty commit at 12:58 UTC (`fc55e70e`) finally triggered run `26449377161` after Actions moved from `major_outage` to `degraded_performance`.
-- Workflow content is unchanged across the wave 7 commits; the green run validates the 55-module subset present at HEAD.
+- First wave-8 push (`3059cc5e`) failed CI run `26455179022` with **480 passed, 1 failed**:
+  - `tests/e2e/comparative-report/comparative-report.spec.ts:84:5 › can export comparative report`
+  - Strict-mode violation: `getByRole('button', { name: 'Export' })` resolved to 2 elements.
+  - Cause: `accounts/add-account.spec.ts` seeds an account named `Export Test Account` (CODE66342). The account row in `/accounts` exposes a button accessible name `CODE66342 Export Test Account`, which Playwright treats as a substring match for `Export`.
+- Fix (`186f1652`): pinned the Export button locator with `{ exact: true }` in three vulnerable specs:
+  - `tests/e2e/comparative-report/comparative-report.spec.ts` (the failing one)
+  - `tests/e2e/cash-flow-report/cash-flow-report.spec.ts` (same shape, pre-emptive)
+  - `tests/e2e/asset-stocktake-variances/index.spec.ts` (same shape, pre-emptive)
+- Local verification (Sail): 13 passed (1.2m) on accounts + the 3 reports.
+- CI run `26458724971`: all 3 jobs green.
 
 ## Current Objective
 
@@ -68,30 +74,43 @@ Current subset in `.github/workflows/tests.yml`:
 
 ```text
 tests/e2e/account-mappings/
+tests/e2e/accounts/
 tests/e2e/admin-settings/
+tests/e2e/ap-payments/
 tests/e2e/approval-audit-trail/
 tests/e2e/approval-delegations/
 tests/e2e/approval-flows/
 tests/e2e/approval-history/
 tests/e2e/approval-monitoring/
+tests/e2e/ar-receipts/
 tests/e2e/asset-categories/
 tests/e2e/asset-dashboard/
+tests/e2e/asset-depreciation-runs/
 tests/e2e/asset-locations/
 tests/e2e/asset-maintenances/
 tests/e2e/asset-models/
 tests/e2e/asset-movements/
+tests/e2e/asset-reports/
+tests/e2e/asset-stocktake-variances/
 tests/e2e/asset-stocktakes/
 tests/e2e/assets/
 tests/e2e/balance-sheet-report/
 tests/e2e/bank-reconciliations/
+tests/e2e/book-value-depreciation-reports/
 tests/e2e/branches/
 tests/e2e/cash-flow-report/
 tests/e2e/coa-versions/
 tests/e2e/comparative-report/
+tests/e2e/credit-notes/
 tests/e2e/customer-categories/
+tests/e2e/customer-invoices/
 tests/e2e/customers/
+tests/e2e/dashboards/
 tests/e2e/departments/
 tests/e2e/employees/
+tests/e2e/entity-state-actions/
+tests/e2e/entity-state-timeline/
+tests/e2e/general-ledger-report/
 tests/e2e/goods-receipt-report/
 tests/e2e/goods-receipts/
 tests/e2e/income-statement-report/
@@ -99,28 +118,36 @@ tests/e2e/inventory-stocktake-variance-report/
 tests/e2e/inventory-stocktakes/
 tests/e2e/inventory-valuation-report/
 tests/e2e/journal-entries/
+tests/e2e/maintenance-cost-reports/
 tests/e2e/my-approvals/
+tests/e2e/period-closings/
+tests/e2e/permissions/
 tests/e2e/pipeline-audit-trail/
 tests/e2e/pipelines/
 tests/e2e/positions/
+tests/e2e/posting-journals/
 tests/e2e/product-categories/
 tests/e2e/products/
 tests/e2e/purchase-history-report/
 tests/e2e/purchase-order-status-report/
 tests/e2e/purchase-orders/
 tests/e2e/purchase-requests/
+tests/e2e/recurring-journals/
+tests/e2e/report-configurations/
 tests/e2e/stock-adjustment-report/
 tests/e2e/stock-adjustments/
 tests/e2e/stock-monitor/
 tests/e2e/stock-movement-report/
 tests/e2e/stock-movements/
 tests/e2e/stock-transfers/
+tests/e2e/supplier-bills/
 tests/e2e/supplier-categories/
 tests/e2e/supplier-returns/
 tests/e2e/suppliers/
 tests/e2e/trial-balance-detailed-report/
 tests/e2e/trial-balance-report/
 tests/e2e/units/
+tests/e2e/users/
 tests/e2e/warehouses/
 ```
 
@@ -140,6 +167,37 @@ Wave history:
 | `28212829` | First retrigger empty commit (didn't fire CI; Actions outage) |
 | `179b12de` | docs(task): handoff update for wave 7 + outage |
 | `fc55e70e` | 2nd retrigger empty commit; finally triggered CI run `26449377161` (green) |
+| `3059cc5e` | Add 21 modules in 3 batches (wave 8: 8a master data, 8b AR/AP, 8c journals/reports); CI run `26455179022` failed on comparative-report Export collision |
+| `186f1652` | Pin Export button locator with `exact:true` in 3 specs; CI run `26458724971` green |
+
+Local verification before `3059cc5e` (wave 8 in 3 batches):
+
+```bash
+# Batch 8a: master data ringan
+PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
+  npx playwright test \
+  tests/e2e/users/ tests/e2e/permissions/ tests/e2e/dashboards/ \
+  tests/e2e/accounts/ tests/e2e/report-configurations/ --reporter=list
+# → 18 passed (2.1m)
+
+# Batch 8b: AR/AP transactions
+PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
+  npx playwright test \
+  tests/e2e/customer-invoices/ tests/e2e/supplier-bills/ \
+  tests/e2e/ar-receipts/ tests/e2e/ap-payments/ tests/e2e/credit-notes/ --reporter=list
+# → 45 passed (3.8m)
+
+# Batch 8c: journals & report sub-modules (pipeline-dashboard skipped: directory does not exist)
+PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
+  npx playwright test \
+  tests/e2e/posting-journals/ tests/e2e/recurring-journals/ \
+  tests/e2e/period-closings/ tests/e2e/general-ledger-report/ \
+  tests/e2e/maintenance-cost-reports/ tests/e2e/book-value-depreciation-reports/ \
+  tests/e2e/asset-stocktake-variances/ tests/e2e/asset-depreciation-runs/ \
+  tests/e2e/asset-reports/ tests/e2e/entity-state-actions/ \
+  tests/e2e/entity-state-timeline/ --reporter=list
+# → 39 passed (2.4m)
+```
 
 Local verification before `f721361f` (non-CRUD workflow wave 7):
 
@@ -242,31 +300,9 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 \
 
 ## Recommended Next Steps
 
-1. **Wave 8: Remaining smaller modules**
-   - Candidates (mix of CRUD/non-CRUD/reports):
-     - `tests/e2e/accounts/`
-     - `tests/e2e/posting-journals/`
-     - `tests/e2e/recurring-journals/`
-     - `tests/e2e/period-closings/`
-     - `tests/e2e/customer-invoices/`
-     - `tests/e2e/supplier-bills/`
-     - `tests/e2e/ar-receipts/`
-     - `tests/e2e/ap-payments/`
-     - `tests/e2e/credit-notes/`
-     - `tests/e2e/general-ledger-report/`
-     - `tests/e2e/maintenance-cost-reports/`
-     - `tests/e2e/book-value-depreciation-reports/`
-     - `tests/e2e/asset-stocktake-variances/`
-     - `tests/e2e/asset-depreciation-runs/`
-     - `tests/e2e/asset-reports/`
-     - `tests/e2e/pipeline-dashboard/`
-     - `tests/e2e/entity-state-actions/`
-     - `tests/e2e/entity-state-timeline/`
-     - `tests/e2e/users/`
-     - `tests/e2e/permissions/`
-     - `tests/e2e/dashboards/`
-     - `tests/e2e/report-configurations/`
-   - Run locally first via Sail in smaller batches; consolidate green ones into the workflow.
+1. **Verify pipeline-dashboard module** — registered in docs but `tests/e2e/pipeline-dashboard/` directory does not exist. Either:
+   - Decide it's intentional (dashboard component without dedicated E2E) and remove from docs registry, OR
+   - Author the spec file under that path and add it to the CI subset.
 
 2. **Separate task: harden report exports for fiscal-years re-inclusion**
    - Make empty-data fiscal years export a valid empty workbook, not a 500.
@@ -275,6 +311,23 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 \
      - trial-balance-detailed export action / route path (find exact file before editing)
      - possibly other financial report export actions.
    - Then re-add `tests/e2e/fiscal-years/` to subset.
+
+3. **Optional cleanup: scan for other unguarded `getByRole('button', { name: 'Export' })`**
+   - Pattern was vulnerable to accessible-name substring matching. Already fixed 3 known sites.
+   - Defensive review: consider grep over `tests/e2e/**` for similar accessible-name shortcuts (`name: 'Save'`, `name: 'Add'`, etc.) that could break under data churn.
+
+4. **Optional UX polish**
+   - Prefer/open fiscal year auto-selection in financial report pages.
+   - Reduces chance of selecting junk test fiscal years.
+
+5. **Decide: keep `fiscal-years/` and missing pipeline-dashboard out, or treat them as known-debt items in `task.changelog.md`.**
+
+Coverage now: **76 of 81** module directories under `tests/e2e/` are in the required CI subset. Remaining excluded:
+- `fiscal-years/` (blocked on report export hardening)
+- `approvaldelegationss/` (legacy typo dir; verify what's there before adding)
+- `misc/` (catch-all; not a real module)
+- `test-results/` (Playwright output, not a spec dir)
+- `pipeline-dashboard/` (does not exist; only referenced in docs)
 
 ## Useful Commands
 
@@ -308,24 +361,27 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `fc55e70e` or newer.
+Read task.md first. Repo should be on `main` at `186f1652` or newer.
 Working tree should be clean.
 
-CI E2E is required and green. Latest known green run: `26449377161`
-on HEAD fc55e70e with the 55-module subset.
+CI E2E is required and green. Latest known green run: `26458724971`
+on HEAD 186f1652 with the 76-module subset (~481 Playwright tests).
 
-Next recommended work: Wave 8 — remaining smaller modules (accounts,
-posting-journals, recurring-journals, period-closings, customer-invoices,
-supplier-bills, ar-receipts, ap-payments, credit-notes,
-general-ledger-report, maintenance-cost-reports, book-value-depreciation-reports,
-asset-stocktake-variances, asset-depreciation-runs, asset-reports,
-pipeline-dashboard, entity-state-actions, entity-state-timeline, users,
-permissions, dashboards, report-configurations).
+Coverage now: 76 of 81 directories under tests/e2e/ are in the required
+CI subset. Remaining excluded:
+- fiscal-years/        (blocked on report export hardening)
+- approvaldelegationss/  (legacy typo dir; verify before adding)
+- misc/                  (catch-all; not a real module)
+- test-results/          (Playwright output, not a spec dir)
+- pipeline-dashboard/    (directory does not exist; only referenced in docs)
 
-Run locally first via Sail in smaller batches before adding paths to
-.github/workflows/tests.yml.
-
-Keep `fiscal-years/` excluded until report export actions are hardened.
+Recommended next work:
+1. Decide handling of pipeline-dashboard (drop from docs or write spec).
+2. Harden report export actions so empty fiscal years return empty .xlsx
+   instead of 500, then re-add tests/e2e/fiscal-years/.
+3. Defensive grep over tests/e2e/** for unguarded accessible-name locators
+   (e.g. getByRole('button', { name: 'Save' })) that could break under
+   data churn.
 
 Note: GitHub Actions had a major outage 2026-05-26 10:57-12:58 UTC. If
 future pushes silently don't trigger CI, the workaround is an empty
