@@ -369,15 +369,24 @@ jobs:
           tests/e2e/customers/
           tests/e2e/departments/
           tests/e2e/employees/
+          tests/e2e/goods-receipt-report/
           tests/e2e/goods-receipts/
           tests/e2e/income-statement-report/
+          tests/e2e/inventory-stocktake-variance-report/
           tests/e2e/inventory-stocktakes/
+          tests/e2e/inventory-valuation-report/
           tests/e2e/positions/
           tests/e2e/product-categories/
           tests/e2e/products/
+          tests/e2e/purchase-history-report/
+          tests/e2e/purchase-order-status-report/
           tests/e2e/purchase-orders/
           tests/e2e/purchase-requests/
+          tests/e2e/stock-adjustment-report/
           tests/e2e/stock-adjustments/
+          tests/e2e/stock-monitor/
+          tests/e2e/stock-movement-report/
+          tests/e2e/stock-movements/
           tests/e2e/stock-transfers/
           tests/e2e/supplier-categories/
           tests/e2e/supplier-returns/
