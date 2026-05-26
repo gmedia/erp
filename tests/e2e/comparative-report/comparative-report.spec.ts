@@ -90,7 +90,7 @@ test.describe('Comparative Report', () => {
 
         const [download] = await Promise.all([
             page.waitForEvent('download', { timeout: 30000 }),
-            page.getByRole('button', { name: 'Export' }).click(),
+            page.getByRole('button', { name: 'Export', exact: true }).click(),
         ]);
 
         const filename = download.suggestedFilename();

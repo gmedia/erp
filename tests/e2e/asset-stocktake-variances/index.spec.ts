@@ -28,7 +28,7 @@ test.describe('Asset Stocktake Variance Report E2E', () => {
         await dialog.getByRole('button', { name: 'Apply Filters' }).click();
 
         // Should be able to export
-        const exportBtn = page.getByRole('button', { name: 'Export' });
+        const exportBtn = page.getByRole('button', { name: 'Export', exact: true });
         await expect(exportBtn).toBeVisible();
         
         // Set search text

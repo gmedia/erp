@@ -77,7 +77,7 @@ test.describe('Cash Flow Report', () => {
             timeout: 30000,
         });
 
-        await page.getByRole('button', { name: 'Export' }).click();
+        await page.getByRole('button', { name: 'Export', exact: true }).click();
 
         const download = await downloadPromise;
         expect(download.suggestedFilename()).toMatch(
