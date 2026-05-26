@@ -141,7 +141,7 @@ export function DataTableToolbar<T>({
                         variant="outline"
                         size="sm"
                         onClick={onExport}
-                        disabled={!hasData || exporting}
+                        disabled={exporting}
                         aria-label="Export"
                         data-testid="export-button"
                     >
