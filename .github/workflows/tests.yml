@@ -389,6 +389,7 @@ jobs:
           tests/e2e/employees/
           tests/e2e/entity-state-actions/
           tests/e2e/entity-state-timeline/
+          tests/e2e/fiscal-years/
           tests/e2e/general-ledger-report/
           tests/e2e/goods-receipt-report/
           tests/e2e/goods-receipts/
