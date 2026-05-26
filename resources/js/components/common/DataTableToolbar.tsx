@@ -44,7 +44,6 @@ interface DataTableToolbarProps<T> {
     // Export functionality
     onExport: () => void;
     exporting: boolean;
-    hasData: boolean;
 
     // Table instance for column visibility
     table: Table<T>;
@@ -72,7 +71,6 @@ export function DataTableToolbar<T>({
     extraActions,
     onExport,
     exporting,
-    hasData,
     table,
 }: Readonly<DataTableToolbarProps<T>>) {
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

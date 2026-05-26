@@ -382,7 +382,6 @@ export function DataTable<T>({
                 extraActions={extraToolbarActions}
                 onExport={handleExport}
                 exporting={exporting}
-                hasData={data.length > 0}
                 table={table}
             />
 
