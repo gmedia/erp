@@ -68,6 +68,6 @@ test.describe('Entity State Actions', () => {
 
     await expect(page.getByText('Transition executed successfully')).toBeVisible();
     await expect(page.getByText('Cancelled', { exact: true }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Activate' })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Activate', exact: true })).not.toBeVisible();
   });
 });

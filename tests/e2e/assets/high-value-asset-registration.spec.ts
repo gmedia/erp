@@ -78,7 +78,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
     await expect(page.getByText('Draft', { exact: true }).first()).toBeVisible();
 
     // Activate button should be visible (transition from Draft)
-    await expect(page.getByRole('button', { name: 'Activate' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Activate', exact: true })).toBeVisible();
   });
 
   // ── Step 3: Activate triggers approval ───────────────────────────
@@ -90,7 +90,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
     await goToAssetProfile(page, assetName);
 
-    const activateBtn = page.getByRole('button', { name: 'Activate' });
+    const activateBtn = page.getByRole('button', { name: 'Activate', exact: true });
     await expect(activateBtn).toBeVisible();
     await activateBtn.click();
 
@@ -117,7 +117,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
     await goToAssetProfile(page, assetName);
 
-    const activateBtn = page.getByRole('button', { name: 'Activate' });
+    const activateBtn = page.getByRole('button', { name: 'Activate', exact: true });
     await activateBtn.click();
 
     const confirmDialog = page.getByRole('alertdialog');
@@ -155,7 +155,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
     assetName = await createHighValueAsset(page);
     await goToAssetProfile(page, assetName);
 
-    const activateBtn = page.getByRole('button', { name: 'Activate' });
+    const activateBtn = page.getByRole('button', { name: 'Activate', exact: true });
     await activateBtn.click();
 
     const confirmDialog = page.getByRole('alertdialog');
@@ -213,7 +213,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
     assetName = await createHighValueAsset(page);
     await goToAssetProfile(page, assetName);
 
-    const activateBtn = page.getByRole('button', { name: 'Activate' });
+    const activateBtn = page.getByRole('button', { name: 'Activate', exact: true });
     await activateBtn.click();
 
     const confirmDialog = page.getByRole('alertdialog');
@@ -287,9 +287,9 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
     await expect(page.getByText('Active', { exact: true }).first()).toBeVisible();
 
     // Should show transitions available from Active state
-    await expect(page.getByRole('button', { name: 'Send to Maintenance' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Dispose' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Mark as Lost' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Send to Maintenance', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Dispose', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Mark as Lost', exact: true })).toBeVisible();
   });
 
   // ── Step 8: Verify Approval History shows trail ──────────────────

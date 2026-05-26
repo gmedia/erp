@@ -56,13 +56,13 @@ test.describe('Asset Pipeline Lifecycle — Per State', () => {
     await expect(page.getByText('Draft', { exact: true }).first()).toBeVisible();
 
     // Available transitions from Draft: Activate, Cancel
-    await expect(page.getByRole('button', { name: 'Activate' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Activate', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Cancel', exact: true })).toBeVisible();
 
     // Should NOT show transitions for other states
-    await expect(page.getByRole('button', { name: 'Send to Maintenance' })).not.toBeVisible();
-    await expect(page.getByRole('button', { name: 'Dispose' })).not.toBeVisible();
-    await expect(page.getByRole('button', { name: 'Mark as Lost' })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Send to Maintenance', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Dispose', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Mark as Lost', exact: true })).not.toBeVisible();
   });
 
   // ── ACTIVE STATE ─────────────────────────────────────────────────
@@ -74,13 +74,13 @@ test.describe('Asset Pipeline Lifecycle — Per State', () => {
     await expect(page.getByText('Active', { exact: true }).first()).toBeVisible();
 
     // Available transitions from Active: Send to Maintenance, Dispose, Mark as Lost
-    await expect(page.getByRole('button', { name: 'Send to Maintenance' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Dispose' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Mark as Lost' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Send to Maintenance', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Dispose', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Mark as Lost', exact: true })).toBeVisible();
 
     // Should NOT show transitions from other states
-    await expect(page.getByRole('button', { name: 'Activate' })).not.toBeVisible();
-    await expect(page.getByRole('button', { name: 'Cancel' })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Activate', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Cancel', exact: true })).not.toBeVisible();
   });
 
   // ── MAINTENANCE STATE ────────────────────────────────────────────
@@ -92,11 +92,11 @@ test.describe('Asset Pipeline Lifecycle — Per State', () => {
     await expect(page.getByText('In Maintenance', { exact: true }).first()).toBeVisible();
 
     // Available transition: Return from Maintenance
-    await expect(page.getByRole('button', { name: 'Return from Maintenance' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Return from Maintenance', exact: true })).toBeVisible();
 
     // Should NOT show other transitions
-    await expect(page.getByRole('button', { name: 'Activate' })).not.toBeVisible();
-    await expect(page.getByRole('button', { name: 'Dispose' })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Activate', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Dispose', exact: true })).not.toBeVisible();
   });
 
   // ── DISPOSED STATE (final) ───────────────────────────────────────
@@ -108,11 +108,11 @@ test.describe('Asset Pipeline Lifecycle — Per State', () => {
     await expect(page.getByText('Disposed', { exact: true }).first()).toBeVisible();
 
     // Final state — no transitions available
-    await expect(page.getByRole('button', { name: 'Activate' })).not.toBeVisible();
-    await expect(page.getByRole('button', { name: 'Send to Maintenance' })).not.toBeVisible();
-    await expect(page.getByRole('button', { name: 'Return from Maintenance' })).not.toBeVisible();
-    await expect(page.getByRole('button', { name: 'Dispose' })).not.toBeVisible();
-    await expect(page.getByRole('button', { name: 'Mark as Lost' })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Activate', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Send to Maintenance', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Return from Maintenance', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Dispose', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Mark as Lost', exact: true })).not.toBeVisible();
   });
 
   // ── LOST STATE (final) ───────────────────────────────────────────
@@ -124,9 +124,9 @@ test.describe('Asset Pipeline Lifecycle — Per State', () => {
     await expect(page.getByText('Lost', { exact: true }).first()).toBeVisible();
 
     // Final state — no transitions
-    await expect(page.getByRole('button', { name: 'Activate' })).not.toBeVisible();
-    await expect(page.getByRole('button', { name: 'Return from Maintenance' })).not.toBeVisible();
-    await expect(page.getByRole('button', { name: 'Mark as Lost' })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Activate', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Return from Maintenance', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Mark as Lost', exact: true })).not.toBeVisible();
   });
 
   // ── CANCELLED STATE (final) ──────────────────────────────────────
@@ -138,8 +138,8 @@ test.describe('Asset Pipeline Lifecycle — Per State', () => {
     await expect(page.getByText('Cancelled', { exact: true }).first()).toBeVisible();
 
     // Final state — no transitions
-    await expect(page.getByRole('button', { name: 'Activate' })).not.toBeVisible();
-    await expect(page.getByRole('button', { name: 'Cancel' })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Activate', exact: true })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Cancel', exact: true })).not.toBeVisible();
   });
 
   // ── TIMELINE ─────────────────────────────────────────────────────
