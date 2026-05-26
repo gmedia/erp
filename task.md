@@ -1,6 +1,6 @@
-# AI Handoff: CI E2E Required Gate Expanded to 76 Modules
+# AI Handoff: CI E2E Required Gate at 76 Modules + Defensive Locator Hardening
 
-Last updated: 2026-05-26 16:30 UTC
+Last updated: 2026-05-26 17:35 UTC
 
 ## Document Roles
 
@@ -11,15 +11,15 @@ Last updated: 2026-05-26 16:30 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `186f1652 fix(e2e): pin Export button locator with exact:true to avoid account name collision`
+- HEAD: `342f5303 docs: clean stale references to pipeline-dashboard E2E and approvaldelegationss typo`
 - Working tree: clean (this update staged for commit).
 - Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
-- Latest CI run: `26458724971` → overall `success`
+- Latest CI run: `26462285549` → overall `success`
   - `Quality checks via Sail`: `success`
   - `Playwright E2E via Sail`: `success` (~481 tests)
   - `Test suite via Sail`: `success`
-- Current CI E2E subset: **76 modules** (wave 8 added 21 modules).
+- Current CI E2E subset: **76 modules** (subset list unchanged from `186f1652`).
 
 ### Wave 8 Failure & Fix
 
@@ -169,6 +169,8 @@ Wave history:
 | `fc55e70e` | 2nd retrigger empty commit; finally triggered CI run `26449377161` (green) |
 | `3059cc5e` | Add 21 modules in 3 batches (wave 8: 8a master data, 8b AR/AP, 8c journals/reports); CI run `26455179022` failed on comparative-report Export collision |
 | `186f1652` | Pin Export button locator with `exact:true` in 3 specs; CI run `26458724971` green |
+| `13de4526` | Defensive sweep: pin 32 page-scoped Activate/Cancel/etc button locators with `exact:true` (assets/high-value-asset-registration, entity-state-actions/asset-pipeline-lifecycle, entity-state-actions/entity-state-actions) |
+| `342f5303` | Docs cleanup: clarify pipeline-dashboard has no dedicated E2E; remove stale `ApprovalDelegationss` note + delete empty stub dir; CI run `26462285549` green |
 
 Local verification before `3059cc5e` (wave 8 in 3 batches):
 
@@ -300,34 +302,35 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 \
 
 ## Recommended Next Steps
 
-1. **Verify pipeline-dashboard module** — registered in docs but `tests/e2e/pipeline-dashboard/` directory does not exist. Either:
-   - Decide it's intentional (dashboard component without dedicated E2E) and remove from docs registry, OR
-   - Author the spec file under that path and add it to the CI subset.
-
-2. **Separate task: harden report exports for fiscal-years re-inclusion**
+1. **Separate task: harden report exports for fiscal-years re-inclusion** (highest impact, only remaining blocker)
    - Make empty-data fiscal years export a valid empty workbook, not a 500.
    - Targets:
      - `app/Actions/Reports/ExportIncomeStatementReportAction.php`
      - trial-balance-detailed export action / route path (find exact file before editing)
      - possibly other financial report export actions.
-   - Then re-add `tests/e2e/fiscal-years/` to subset.
+   - Verify locally:
 
-3. **Optional cleanup: scan for other unguarded `getByRole('button', { name: 'Export' })`**
-   - Pattern was vulnerable to accessible-name substring matching. Already fixed 3 known sites.
-   - Defensive review: consider grep over `tests/e2e/**` for similar accessible-name shortcuts (`name: 'Save'`, `name: 'Add'`, etc.) that could break under data churn.
+   ```bash
+   PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
+     npx playwright test \
+     tests/e2e/fiscal-years/ tests/e2e/income-statement-report/ \
+     tests/e2e/trial-balance-detailed-report/ --reporter=list
+   ```
 
-4. **Optional UX polish**
+   - Then add `tests/e2e/fiscal-years/` to subset (77 modules).
+
+2. **Optional: write `tests/e2e/pipeline-dashboard/` smoke spec** to extend coverage. Dashboard already exists at `/pipeline-dashboard`; pattern can mirror `tests/e2e/asset-dashboard/asset-dashboard.spec.ts`.
+
+3. **Optional UX polish**
    - Prefer/open fiscal year auto-selection in financial report pages.
    - Reduces chance of selecting junk test fiscal years.
 
-5. **Decide: keep `fiscal-years/` and missing pipeline-dashboard out, or treat them as known-debt items in `task.changelog.md`.**
+Coverage now: **76 of 80** module directories under `tests/e2e/` are in the required CI subset (one stale dir `approvaldelegationss/` was empty and has been removed). Remaining excluded:
 
-Coverage now: **76 of 81** module directories under `tests/e2e/` are in the required CI subset. Remaining excluded:
 - `fiscal-years/` (blocked on report export hardening)
-- `approvaldelegationss/` (legacy typo dir; verify what's there before adding)
 - `misc/` (catch-all; not a real module)
 - `test-results/` (Playwright output, not a spec dir)
-- `pipeline-dashboard/` (does not exist; only referenced in docs)
+- (no `pipeline-dashboard/` directory exists)
 
 ## Useful Commands
 
@@ -361,27 +364,25 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `186f1652` or newer.
+Read task.md first. Repo should be on `main` at `342f5303` or newer.
 Working tree should be clean.
 
-CI E2E is required and green. Latest known green run: `26458724971`
-on HEAD 186f1652 with the 76-module subset (~481 Playwright tests).
+CI E2E is required and green. Latest known green run: `26462285549`
+on HEAD 342f5303 with the 76-module subset (~481 Playwright tests).
 
-Coverage now: 76 of 81 directories under tests/e2e/ are in the required
+Coverage now: 76 of 80 directories under tests/e2e/ are in the required
 CI subset. Remaining excluded:
 - fiscal-years/        (blocked on report export hardening)
-- approvaldelegationss/  (legacy typo dir; verify before adding)
-- misc/                  (catch-all; not a real module)
-- test-results/          (Playwright output, not a spec dir)
-- pipeline-dashboard/    (directory does not exist; only referenced in docs)
+- misc/                (catch-all; not a real module)
+- test-results/        (Playwright output, not a spec dir)
+(approvaldelegationss/ stale dir was removed; no class with that name exists.
+ pipeline-dashboard/ directory does not exist; coverage indirect only.)
 
 Recommended next work:
-1. Decide handling of pipeline-dashboard (drop from docs or write spec).
-2. Harden report export actions so empty fiscal years return empty .xlsx
+1. Harden report export actions so empty fiscal years return empty .xlsx
    instead of 500, then re-add tests/e2e/fiscal-years/.
-3. Defensive grep over tests/e2e/** for unguarded accessible-name locators
-   (e.g. getByRole('button', { name: 'Save' })) that could break under
-   data churn.
+2. Optional: write tests/e2e/pipeline-dashboard/ smoke spec mirroring
+   tests/e2e/asset-dashboard/.
 
 Note: GitHub Actions had a major outage 2026-05-26 10:57-12:58 UTC. If
 future pushes silently don't trigger CI, the workaround is an empty
