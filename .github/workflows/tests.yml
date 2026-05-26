@@ -403,6 +403,7 @@ jobs:
           tests/e2e/period-closings/
           tests/e2e/permissions/
           tests/e2e/pipeline-audit-trail/
+          tests/e2e/pipeline-dashboard/
           tests/e2e/pipelines/
           tests/e2e/positions/
           tests/e2e/posting-journals/
