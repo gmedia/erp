@@ -1,6 +1,6 @@
-# AI Handoff: CI E2E Required Gate Expanded to 43 Modules
+# AI Handoff: CI E2E Required Gate Expanded to 48 Modules
 
-Last updated: 2026-05-26 08:19 UTC
+Last updated: 2026-05-26 10:00 UTC
 
 ## Document Roles
 
@@ -11,15 +11,15 @@ Last updated: 2026-05-26 08:19 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `f7278be5 ci(e2e): expand subset with 9 stock/report modules (wave 5)`
+- HEAD: `0655495d ci(e2e): expand subset with 5 CRUD modules (wave 6)`
 - Working tree: clean (this update staged for commit).
 - Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
-- Latest CI run: `26439061397` → overall `success`
+- Latest CI run: `26443633141` → overall `success`
   - `Quality checks via Sail`: `success`
   - `Playwright E2E via Sail`: `success`
   - `Test suite via Sail`: `success`
-- Current CI E2E subset: **43 modules** (wave 5 added 9 stock/report modules).
+- Current CI E2E subset: **48 modules** (wave 6 added 5 complex CRUD modules).
 
 ## Current Objective
 
@@ -61,12 +61,15 @@ Current subset in `.github/workflows/tests.yml`:
 
 ```text
 tests/e2e/account-mappings/
+tests/e2e/approval-delegations/
+tests/e2e/approval-flows/
 tests/e2e/asset-categories/
 tests/e2e/asset-locations/
 tests/e2e/asset-maintenances/
 tests/e2e/asset-models/
 tests/e2e/asset-movements/
 tests/e2e/asset-stocktakes/
+tests/e2e/assets/
 tests/e2e/balance-sheet-report/
 tests/e2e/bank-reconciliations/
 tests/e2e/branches/
@@ -83,6 +86,8 @@ tests/e2e/income-statement-report/
 tests/e2e/inventory-stocktake-variance-report/
 tests/e2e/inventory-stocktakes/
 tests/e2e/inventory-valuation-report/
+tests/e2e/journal-entries/
+tests/e2e/pipelines/
 tests/e2e/positions/
 tests/e2e/product-categories/
 tests/e2e/products/
@@ -116,6 +121,18 @@ Wave history:
 | `04d47b33` | Add `employees`, `customers`, `suppliers`, `products`, `asset-movements`, `asset-maintenances`, `asset-stocktakes`, `coa-versions`, `account-mappings` |
 | `f2555ae9` | Add `goods-receipts`, `inventory-stocktakes`, `purchase-orders`, `purchase-requests`, `stock-adjustments`, `stock-transfers`, `supplier-returns` (transaction wave 4) |
 | `f7278be5` | Add `goods-receipt-report`, `inventory-stocktake-variance-report`, `inventory-valuation-report`, `purchase-history-report`, `purchase-order-status-report`, `stock-adjustment-report`, `stock-monitor`, `stock-movement-report`, `stock-movements` (stock/report wave 5) |
+| `0655495d` | Add `approval-delegations`, `approval-flows`, `assets`, `journal-entries`, `pipelines` (CRUD wave 6) |
+
+Local verification before `0655495d` (CRUD wave 6):
+
+```bash
+PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
+  npx playwright test \
+  tests/e2e/journal-entries/ tests/e2e/assets/ \
+  tests/e2e/approval-flows/ tests/e2e/approval-delegations/ \
+  tests/e2e/pipelines/ --reporter=list
+# → 58 passed (6.4m)
+```
 
 Local verification before `f7278be5` (stock/report wave 5):
 
@@ -195,24 +212,7 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 \
 
 ## Recommended Next Steps
 
-1. **Wave 6: Remaining CRUD modules**
-   - Candidate set (more complex, nested forms, pipeline state):
-     - `tests/e2e/journal-entries/`
-     - `tests/e2e/assets/`
-     - `tests/e2e/approval-flows/`
-     - `tests/e2e/approval-delegations/`
-     - `tests/e2e/pipelines/`
-   - Run locally first via Sail:
-
-   ```bash
-   PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
-     npx playwright test \
-     tests/e2e/journal-entries/ tests/e2e/assets/ \
-     tests/e2e/approval-flows/ tests/e2e/approval-delegations/ \
-     tests/e2e/pipelines/ --reporter=list
-   ```
-
-2. **Wave 7: Non-CRUD workflow/dashboard modules**
+1. **Wave 7: Non-CRUD workflow/dashboard modules**
    - Candidate set:
      - `tests/e2e/my-approvals/`
      - `tests/e2e/approval-monitoring/`
@@ -221,6 +221,41 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 \
      - `tests/e2e/asset-dashboard/`
      - `tests/e2e/admin-settings/`
      - `tests/e2e/approval-history/`
+   - Run locally first via Sail:
+
+   ```bash
+   PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
+     npx playwright test \
+     tests/e2e/my-approvals/ tests/e2e/approval-monitoring/ \
+     tests/e2e/approval-audit-trail/ tests/e2e/pipeline-audit-trail/ \
+     tests/e2e/asset-dashboard/ tests/e2e/admin-settings/ \
+     tests/e2e/approval-history/ --reporter=list
+   ```
+
+2. **Wave 8: Remaining smaller modules**
+   - Candidates (mix of CRUD/non-CRUD/reports):
+     - `tests/e2e/accounts/`
+     - `tests/e2e/posting-journals/`
+     - `tests/e2e/recurring-journals/`
+     - `tests/e2e/period-closings/`
+     - `tests/e2e/customer-invoices/`
+     - `tests/e2e/supplier-bills/`
+     - `tests/e2e/ar-receipts/`
+     - `tests/e2e/ap-payments/`
+     - `tests/e2e/credit-notes/`
+     - `tests/e2e/general-ledger-report/`
+     - `tests/e2e/maintenance-cost-reports/`
+     - `tests/e2e/book-value-depreciation-reports/`
+     - `tests/e2e/asset-stocktake-variances/`
+     - `tests/e2e/asset-depreciation-runs/`
+     - `tests/e2e/asset-reports/`
+     - `tests/e2e/pipeline-dashboard/`
+     - `tests/e2e/entity-state-actions/`
+     - `tests/e2e/entity-state-timeline/`
+     - `tests/e2e/users/`
+     - `tests/e2e/permissions/`
+     - `tests/e2e/dashboards/`
+     - `tests/e2e/report-configurations/`
 
 3. **Separate task: harden report exports for fiscal-years re-inclusion**
    - Make empty-data fiscal years export a valid empty workbook, not a 500.
@@ -262,15 +297,16 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `f7278be5` or newer.
+Read task.md first. Repo should be on `main` at `0655495d` or newer.
 Working tree should be clean.
 
-CI E2E is required and green. Latest known green run: `26439061397`
-on HEAD f7278be5 with the 43-module subset.
+CI E2E is required and green. Latest known green run: `26443633141`
+on HEAD 0655495d with the 48-module subset.
 
-Next recommended work: wave 6 — remaining CRUD modules (journal-entries,
-assets, approval-flows, approval-delegations, pipelines). Run locally
-first via Sail before adding paths to .github/workflows/tests.yml.
+Next recommended work: wave 7 — non-CRUD workflow/dashboard modules
+(my-approvals, approval-monitoring, approval-audit-trail,
+pipeline-audit-trail, asset-dashboard, admin-settings, approval-history).
+Run locally first via Sail before adding paths to .github/workflows/tests.yml.
 
 Keep `fiscal-years/` excluded until report export actions are hardened.
 ```
