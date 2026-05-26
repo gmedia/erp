@@ -1,6 +1,6 @@
 # AI Handoff: CI E2E Required Gate Expanded to 77 Modules — Fiscal Years Re-Included
 
-Last updated: 2026-05-26 19:25 UTC
+Last updated: 2026-05-26 20:50 UTC
 
 ## Document Roles
 
@@ -11,8 +11,8 @@ Last updated: 2026-05-26 19:25 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `a51d043f fix(reports): remove now-unused hasData prop from DataTableToolbar`
-- Working tree: clean (this update staged for commit).
+- HEAD: `6a443f51 docs(task): record green CI run 26467825310 + fiscal-years re-inclusion baseline`
+- Working tree: clean.
 - Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
 - Latest CI run: `26467825310` → overall `success`
@@ -20,6 +20,10 @@ Last updated: 2026-05-26 19:25 UTC
   - `Playwright E2E via Sail`: `success`
   - `Test suite via Sail`: `success`
 - Current CI E2E subset: **77 modules** (added `fiscal-years` after report-export hardening).
+- Coverage: 77 of 80 directories under `tests/e2e/` are in the required gate. Remaining 3 are not real modules:
+  - `misc/` (catch-all utilities)
+  - `test-results/` (Playwright output)
+  - `pipeline-dashboard/` (no directory exists; only referenced indirectly via pipeline-audit-trail / entity-state-* specs)
 
 ### Fiscal Years Re-Inclusion (this session)
 
@@ -49,9 +53,7 @@ Last updated: 2026-05-26 19:25 UTC
 
 ## Current Objective
 
-Keep expanding `tests/e2e/**` into the required CI subset in safe waves,
-while fixing known data-coupling/export hardening issues before adding
-risky modules.
+CI E2E expansion milestone is **complete**. All real module directories under `tests/e2e/` are in the required gate (77 of 80; the 3 excluded are not real modules). Future work shifts to product features, defensive locator audits beyond `getByRole('button', ...)`, or optional UX polish.
 
 ## What Changed Since Previous Handoff
 
@@ -320,13 +322,23 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 \
 
 ## Recommended Next Steps
 
-1. **Optional: write `tests/e2e/pipeline-dashboard/` smoke spec** to extend coverage. Dashboard exists at `/pipeline-dashboard`; mirror `tests/e2e/asset-dashboard/asset-dashboard.spec.ts` shape.
+The CI gate milestone is at diminishing returns. Recommended bias is to shift to product work; the items below are all optional housekeeping.
+
+1. **Optional: pipeline-dashboard smoke spec** (~30 min)
+   - Page exists at `/pipeline-dashboard`. Mirror `tests/e2e/asset-dashboard/asset-dashboard.spec.ts` shape (navigate, assert summary cards/charts visible).
+   - Add `tests/e2e/pipeline-dashboard/` to subset → 78 modules.
 
 2. **Optional UX polish**
-   - Prefer/open fiscal year auto-selection in financial report pages.
-   - Reduces the chance of selecting junk test fiscal years (the empty FY case is already safe; this is just nicer UX).
+   - Prefer/open fiscal year auto-selection in financial report pages so the default selection is the most recent FY with posted data, not the latest FY by `start_date`.
+   - The empty-FY case is already safe (header-only xlsx); this is purely UX.
 
-3. **Optional: update `task.changelog.md`** with the fiscal-years re-inclusion milestone if the changelog convention is to track such CI gating changes.
+3. **Optional: defensive audit beyond `getByRole('button', ...)`**
+   - Same accessible-name substring collision risk applies to:
+     - `getByRole('link', { name: '...' })` without `exact: true`
+     - `getByText('...')` without exact
+   - Cheap grep + selective `exact: true` pin where rows or seeded data could collide.
+
+4. **Optional: update `task.changelog.md`** with the fiscal-years re-inclusion milestone if changelog convention tracks CI gating changes.
 
 Coverage now: **77 of 80** module directories under `tests/e2e/` are in the required CI subset. Remaining excluded:
 
@@ -366,11 +378,13 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `a51d043f` or newer.
+Read task.md first. Repo should be on `main` at `6a443f51` or newer.
 Working tree should be clean.
 
 CI E2E is required and green. Latest known green run: `26467825310`
 on HEAD a51d043f with the 77-module subset (~485 Playwright tests).
+Newer commit 6a443f51 is the handoff doc update — workflow content is
+unchanged, so the CI baseline still applies.
 
 Coverage now: 77 of 80 directories under tests/e2e/ are in the required
 CI subset. Remaining excluded:
@@ -378,12 +392,20 @@ CI subset. Remaining excluded:
 - test-results/        (Playwright output, not a spec dir)
 - (no pipeline-dashboard/ directory exists)
 
-Recommended next work (all optional):
+The CI E2E expansion milestone is COMPLETE. All real module dirs are in
+the required gate. Future work bias: shift to product features. The
+items below are optional housekeeping only.
+
+Recommended next work (all optional, pick zero or one):
 1. Write tests/e2e/pipeline-dashboard/ smoke spec mirroring
-   tests/e2e/asset-dashboard/.
-2. UX polish: auto-select preferred fiscal year on financial report
-   pages.
-3. Update task.changelog.md with the fiscal-years re-inclusion milestone.
+   tests/e2e/asset-dashboard/. Subset 77 -> 78.
+2. UX polish: auto-select preferred fiscal year (most recent with posted
+   data) on financial report pages.
+3. Defensive audit beyond getByRole('button', ...): scan
+   getByRole('link', { name: ... }) and getByText(...) for substring
+   collision risk; selectively pin with exact:true.
+4. Update task.changelog.md with the fiscal-years re-inclusion
+   milestone if the changelog convention tracks CI gating changes.
 
 Note: GitHub Actions had a major outage 2026-05-26 10:57-12:58 UTC. If
 future pushes silently don't trigger CI, the workaround is an empty
