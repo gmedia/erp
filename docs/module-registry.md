@@ -442,7 +442,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   route: /pipeline-dashboard
   api: /api/pipeline-dashboard/data
   view_type: page
-  note: "Pipeline monitoring dashboard with summary cards, state distribution chart, and stale entity detection."
+  note: "Pipeline monitoring dashboard with summary cards, state distribution chart, and stale entity detection. No dedicated Playwright E2E spec yet (no tests/e2e/pipeline-dashboard/ directory) — covered indirectly via pipeline-audit-trail and entity-state-* specs."
 
 - slug: pipeline-audit-trail
   route: /pipeline-audit-trail

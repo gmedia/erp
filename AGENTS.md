@@ -121,4 +121,3 @@ sail artisan ide-helper:models -RW    # Model PHPDoc
 - **Zustand** used alongside React Query for client state.
 - **`task.md`** is the handoff document — read it first when continuing work.
 - **`.github/skills/`** has scaffolding templates for new modules.
-- Typo in codebase: `ApprovalDelegationss` (double 's') exists — legacy, don't rename without impact analysis.
