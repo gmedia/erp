@@ -353,12 +353,15 @@ jobs:
         run: >
           npx playwright test
           tests/e2e/account-mappings/
+          tests/e2e/approval-delegations/
+          tests/e2e/approval-flows/
           tests/e2e/asset-categories/
           tests/e2e/asset-locations/
           tests/e2e/asset-maintenances/
           tests/e2e/asset-models/
           tests/e2e/asset-movements/
           tests/e2e/asset-stocktakes/
+          tests/e2e/assets/
           tests/e2e/balance-sheet-report/
           tests/e2e/bank-reconciliations/
           tests/e2e/branches/
@@ -375,6 +378,8 @@ jobs:
           tests/e2e/inventory-stocktake-variance-report/
           tests/e2e/inventory-stocktakes/
           tests/e2e/inventory-valuation-report/
+          tests/e2e/journal-entries/
+          tests/e2e/pipelines/
           tests/e2e/positions/
           tests/e2e/product-categories/
           tests/e2e/products/
