@@ -1,6 +1,6 @@
-# AI Handoff: CI E2E Wave 7 Pushed, BLOCKED on GitHub Actions Outage
+# AI Handoff: CI E2E Required Gate Expanded to 55 Modules
 
-Last updated: 2026-05-26 12:10 UTC
+Last updated: 2026-05-26 13:40 UTC
 
 ## Document Roles
 
@@ -11,28 +11,22 @@ Last updated: 2026-05-26 12:10 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `28212829 ci: retrigger pipeline (wave 7 push didn't fire CI)`
+- HEAD: `fc55e70e ci: nudge after Actions degraded recovery (2nd retry)`
 - Working tree: clean (this update staged for commit).
 - Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
-- **Latest CI run: `26445640143` on prior HEAD `5a0f763d` → success** (48-module subset).
-- **CI for wave 7 (HEAD `f721361f` and retrigger `28212829`) NEVER fired** because of GitHub Actions outage.
-- Current CI E2E subset on `main`: **55 modules** (wave 7 added 7 non-CRUD workflow modules), but unverified on CI yet.
+- Latest CI run: `26449377161` → overall `success`
+  - `Quality checks via Sail`: `success`
+  - `Playwright E2E via Sail`: `success`
+  - `Test suite via Sail`: `success`
+- Current CI E2E subset: **55 modules** (wave 7 added 7 non-CRUD workflow modules).
 
-### Active Incident (BLOCKER)
+### Notes on Recovery
 
-- GitHub Actions: `major_outage` since 2026-05-26 10:57 UTC.
-- Incident: `gnftqj9htp0g` ("Incident with Actions and Pages").
-- Cause (per status page): "authentication issues leading to failure in starting Actions runs and downloading actions. At this time the majority of Actions runs is impacted."
-- Effect on this repo: pushes at `11:55 UTC` (f721361f) and `12:01 UTC` (28212829) did NOT trigger any workflow run.
-- Status page: <https://www.githubstatus.com/>
-
-### Next Action When Outage Clears
-
-1. `gh api "repos/gmedia/erp/actions/workflows/192281498/runs?per_page=3" --jq '.workflow_runs[] | {head_sha: .head_sha[0:8], status, conclusion, created_at}'`
-2. If still no run for `28212829` after Actions returns operational, push another empty commit:
-   - `git commit --allow-empty -m "ci: nudge after Actions outage" && git push origin main`
-3. Once CI run appears, monitor as usual; expected: 3 green jobs on 55-module subset.
+- GitHub Actions had a `major_outage` from 10:57 UTC (incident `gnftqj9htp0g`).
+- Pushes at 11:55 UTC (`f721361f`), 12:01 UTC (`28212829`), and 12:10 UTC (`179b12de`) did not trigger any CI run.
+- A 4th nudge empty commit at 12:58 UTC (`fc55e70e`) finally triggered run `26449377161` after Actions moved from `major_outage` to `degraded_performance`.
+- Workflow content is unchanged across the wave 7 commits; the green run validates the 55-module subset present at HEAD.
 
 ## Current Objective
 
@@ -142,8 +136,10 @@ Wave history:
 | `f2555ae9` | Add `goods-receipts`, `inventory-stocktakes`, `purchase-orders`, `purchase-requests`, `stock-adjustments`, `stock-transfers`, `supplier-returns` (transaction wave 4) |
 | `f7278be5` | Add `goods-receipt-report`, `inventory-stocktake-variance-report`, `inventory-valuation-report`, `purchase-history-report`, `purchase-order-status-report`, `stock-adjustment-report`, `stock-monitor`, `stock-movement-report`, `stock-movements` (stock/report wave 5) |
 | `0655495d` | Add `approval-delegations`, `approval-flows`, `assets`, `journal-entries`, `pipelines` (CRUD wave 6) |
-| `f721361f` | Add `admin-settings`, `approval-audit-trail`, `approval-history`, `approval-monitoring`, `asset-dashboard`, `my-approvals`, `pipeline-audit-trail` (non-CRUD workflow wave 7); CI did not fire due to GitHub Actions outage |
-| `28212829` | Empty commit attempt to retrigger CI; also did not fire because outage continued |
+| `f721361f` | Add `admin-settings`, `approval-audit-trail`, `approval-history`, `approval-monitoring`, `asset-dashboard`, `my-approvals`, `pipeline-audit-trail` (non-CRUD workflow wave 7) |
+| `28212829` | First retrigger empty commit (didn't fire CI; Actions outage) |
+| `179b12de` | docs(task): handoff update for wave 7 + outage |
+| `fc55e70e` | 2nd retrigger empty commit; finally triggered CI run `26449377161` (green) |
 
 Local verification before `f721361f` (non-CRUD workflow wave 7):
 
@@ -246,12 +242,7 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 \
 
 ## Recommended Next Steps
 
-1. **Wait for GitHub Actions to recover from incident `gnftqj9htp0g`**
-   - Check status: <https://www.githubstatus.com/api/v2/incidents/unresolved.json>
-   - When `Actions` returns `operational`, look for a CI run on HEAD `28212829`.
-   - If no run appears within ~10min after recovery, push another empty commit to nudge.
-
-2. **After CI for `28212829` completes green, continue with Wave 8: remaining smaller modules**
+1. **Wave 8: Remaining smaller modules**
    - Candidates (mix of CRUD/non-CRUD/reports):
      - `tests/e2e/accounts/`
      - `tests/e2e/posting-journals/`
@@ -275,8 +266,9 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 \
      - `tests/e2e/permissions/`
      - `tests/e2e/dashboards/`
      - `tests/e2e/report-configurations/`
+   - Run locally first via Sail in smaller batches; consolidate green ones into the workflow.
 
-3. **Separate task: harden report exports for fiscal-years re-inclusion**
+2. **Separate task: harden report exports for fiscal-years re-inclusion**
    - Make empty-data fiscal years export a valid empty workbook, not a 500.
    - Targets:
      - `app/Actions/Reports/ExportIncomeStatementReportAction.php`
@@ -316,19 +308,26 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `28212829` or newer.
+Read task.md first. Repo should be on `main` at `fc55e70e` or newer.
 Working tree should be clean.
 
-CI E2E was required and green at HEAD 5a0f763d (run 26445640143, 48 modules).
-Wave 7 push (f721361f) and retrigger empty commit (28212829) did NOT trigger
-CI because of GitHub Actions outage `gnftqj9htp0g` starting 2026-05-26 10:57 UTC.
+CI E2E is required and green. Latest known green run: `26449377161`
+on HEAD fc55e70e with the 55-module subset.
 
-Next recommended work:
-1. When Actions returns to operational, check for CI run on 28212829.
-2. If still no run, push another empty commit.
-3. Once green, continue Wave 8 (accounts, posting-journals, recurring-journals,
-   period-closings, customer-invoices, supplier-bills, ar-receipts, ap-payments,
-   credit-notes, ...).
+Next recommended work: Wave 8 — remaining smaller modules (accounts,
+posting-journals, recurring-journals, period-closings, customer-invoices,
+supplier-bills, ar-receipts, ap-payments, credit-notes,
+general-ledger-report, maintenance-cost-reports, book-value-depreciation-reports,
+asset-stocktake-variances, asset-depreciation-runs, asset-reports,
+pipeline-dashboard, entity-state-actions, entity-state-timeline, users,
+permissions, dashboards, report-configurations).
+
+Run locally first via Sail in smaller batches before adding paths to
+.github/workflows/tests.yml.
 
 Keep `fiscal-years/` excluded until report export actions are hardened.
+
+Note: GitHub Actions had a major outage 2026-05-26 10:57-12:58 UTC. If
+future pushes silently don't trigger CI, the workaround is an empty
+commit nudge.
 ```
