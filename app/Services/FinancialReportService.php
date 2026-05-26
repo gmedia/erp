@@ -235,6 +235,15 @@ class FinancialReportService
                 'assets' => 0,
                 'liabilities' => 0,
                 'equity' => 0,
+                'comparison_assets' => 0,
+                'comparison_liabilities' => 0,
+                'comparison_equity' => 0,
+                'change_assets' => 0,
+                'change_liabilities' => 0,
+                'change_equity' => 0,
+                'change_percentage_assets' => 0,
+                'change_percentage_liabilities' => 0,
+                'change_percentage_equity' => 0,
             ],
         ];
     }
@@ -248,6 +257,15 @@ class FinancialReportService
                 'revenue' => 0,
                 'expense' => 0,
                 'net_income' => 0,
+                'comparison_revenue' => 0,
+                'comparison_expense' => 0,
+                'comparison_net_income' => 0,
+                'change_revenue' => 0,
+                'change_expense' => 0,
+                'change_net_income' => 0,
+                'change_percentage_revenue' => 0,
+                'change_percentage_expense' => 0,
+                'change_percentage_net_income' => 0,
             ],
         ];
     }

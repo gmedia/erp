@@ -100,6 +100,33 @@ test('it can export income statement report with comparison year', function () {
     Carbon::setTestNow();
 });
 
+test('it can export income statement report for fiscal year without coa version (regression: empty totals shape)', function () {
+    $fiscalYearWithoutCoa = FiscalYear::create([
+        'name' => '2027-empty',
+        'start_date' => '2027-01-01',
+        'end_date' => '2027-12-31',
+        'status' => 'open',
+    ]);
+
+    Carbon::setTestNow(Carbon::parse('2026-03-04 10:00:00'));
+    Excel::fake();
+    Storage::fake('public');
+
+    Sanctum::actingAs($this->user, ['*']);
+    $response = $this->postJson('/api/reports/income-statement/export', [
+        'fiscal_year_id' => $fiscalYearWithoutCoa->id,
+    ])
+        ->assertOk()
+        ->assertJsonStructure(['url', 'filename']);
+
+    $filename = $response->json('filename');
+    expect($filename)->toStartWith('income_statement_report_');
+    expect($filename)->toEndWith('.xlsx');
+
+    Excel::assertStored('exports/' . $filename, 'public');
+    Carbon::setTestNow();
+});
+
 test('it requires permission to export income statement', function () {
     $userWithoutPermission = createTestUserWithPermissions([]);
 
