@@ -1,6 +1,6 @@
 # AI Handoff: CI E2E Required Gate Expanded to 34 Modules
 
-Last updated: 2026-05-26 06:25 UTC
+Last updated: 2026-05-26 07:02 UTC
 
 ## Document Roles
 
@@ -11,14 +11,15 @@ Last updated: 2026-05-26 06:25 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `f2555ae9 ci(e2e): expand subset with 7 transaction modules (wave 4)`
-- Working tree: dirty only with this `task.md` handoff update (will be committed next).
-- Remote: HEAD `f2555ae9` not yet pushed.
+- HEAD: `9ecd2385 docs(task): handoff — transaction wave 4 added to required CI subset`
+- Working tree: clean (this update is staged for commit).
+- Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
-- Latest known green CI run on prior HEAD: `26429183081` (covering 27-module subset).
-- Current CI E2E subset: **34 modules** (added 7 transaction modules in wave 4).
-  - Local verification of wave 4: 75 passed in 8.0m on Sail-backed run.
-  - CI run for `f2555ae9` not yet observed; first run after push will validate.
+- Latest CI run: `26436100671` → overall `success`
+  - `Quality checks via Sail`: `success`
+  - `Playwright E2E via Sail`: `success`
+  - `Test suite via Sail`: `success`
+- Current CI E2E subset: **34 modules** (transaction wave 4 added).
 
 ## Current Objective
 
@@ -243,16 +244,15 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `f2555ae9` or newer.
-Working tree should be clean (the f2555ae9 + this task.md handoff
-update are the most recent local commits).
+Read task.md first. Repo should be on `main` at `9ecd2385` or newer.
+Working tree should be clean.
 
-CI E2E is required. Next CI run after `git push` validates the new
-34-module subset. Latest known green run on prior HEAD: `26429183081`.
+CI E2E is required and green. Latest known green run: `26436100671`
+on HEAD 9ecd2385 with the 34-module subset.
 
-Next recommended work: push, watch CI, then expand into the read-only
-stock/report wave (stock-movements, stock-monitor, several *-report
-modules). Run locally first via Sail before adding paths to
+Next recommended work: expand into the read-only stock/report wave
+(stock-movements, stock-monitor, several *-report modules). Run
+locally first via Sail before adding paths to
 .github/workflows/tests.yml.
 
 Keep `fiscal-years/` excluded until report export actions are hardened.
