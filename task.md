@@ -1,6 +1,6 @@
-# AI Handoff: CI E2E Required Gate Expanded to 48 Modules
+# AI Handoff: CI E2E Wave 7 Pushed, BLOCKED on GitHub Actions Outage
 
-Last updated: 2026-05-26 10:00 UTC
+Last updated: 2026-05-26 12:10 UTC
 
 ## Document Roles
 
@@ -11,15 +11,28 @@ Last updated: 2026-05-26 10:00 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `0655495d ci(e2e): expand subset with 5 CRUD modules (wave 6)`
+- HEAD: `28212829 ci: retrigger pipeline (wave 7 push didn't fire CI)`
 - Working tree: clean (this update staged for commit).
 - Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
-- Latest CI run: `26443633141` → overall `success`
-  - `Quality checks via Sail`: `success`
-  - `Playwright E2E via Sail`: `success`
-  - `Test suite via Sail`: `success`
-- Current CI E2E subset: **48 modules** (wave 6 added 5 complex CRUD modules).
+- **Latest CI run: `26445640143` on prior HEAD `5a0f763d` → success** (48-module subset).
+- **CI for wave 7 (HEAD `f721361f` and retrigger `28212829`) NEVER fired** because of GitHub Actions outage.
+- Current CI E2E subset on `main`: **55 modules** (wave 7 added 7 non-CRUD workflow modules), but unverified on CI yet.
+
+### Active Incident (BLOCKER)
+
+- GitHub Actions: `major_outage` since 2026-05-26 10:57 UTC.
+- Incident: `gnftqj9htp0g` ("Incident with Actions and Pages").
+- Cause (per status page): "authentication issues leading to failure in starting Actions runs and downloading actions. At this time the majority of Actions runs is impacted."
+- Effect on this repo: pushes at `11:55 UTC` (f721361f) and `12:01 UTC` (28212829) did NOT trigger any workflow run.
+- Status page: <https://www.githubstatus.com/>
+
+### Next Action When Outage Clears
+
+1. `gh api "repos/gmedia/erp/actions/workflows/192281498/runs?per_page=3" --jq '.workflow_runs[] | {head_sha: .head_sha[0:8], status, conclusion, created_at}'`
+2. If still no run for `28212829` after Actions returns operational, push another empty commit:
+   - `git commit --allow-empty -m "ci: nudge after Actions outage" && git push origin main`
+3. Once CI run appears, monitor as usual; expected: 3 green jobs on 55-module subset.
 
 ## Current Objective
 
@@ -61,9 +74,14 @@ Current subset in `.github/workflows/tests.yml`:
 
 ```text
 tests/e2e/account-mappings/
+tests/e2e/admin-settings/
+tests/e2e/approval-audit-trail/
 tests/e2e/approval-delegations/
 tests/e2e/approval-flows/
+tests/e2e/approval-history/
+tests/e2e/approval-monitoring/
 tests/e2e/asset-categories/
+tests/e2e/asset-dashboard/
 tests/e2e/asset-locations/
 tests/e2e/asset-maintenances/
 tests/e2e/asset-models/
@@ -87,6 +105,8 @@ tests/e2e/inventory-stocktake-variance-report/
 tests/e2e/inventory-stocktakes/
 tests/e2e/inventory-valuation-report/
 tests/e2e/journal-entries/
+tests/e2e/my-approvals/
+tests/e2e/pipeline-audit-trail/
 tests/e2e/pipelines/
 tests/e2e/positions/
 tests/e2e/product-categories/
@@ -122,6 +142,20 @@ Wave history:
 | `f2555ae9` | Add `goods-receipts`, `inventory-stocktakes`, `purchase-orders`, `purchase-requests`, `stock-adjustments`, `stock-transfers`, `supplier-returns` (transaction wave 4) |
 | `f7278be5` | Add `goods-receipt-report`, `inventory-stocktake-variance-report`, `inventory-valuation-report`, `purchase-history-report`, `purchase-order-status-report`, `stock-adjustment-report`, `stock-monitor`, `stock-movement-report`, `stock-movements` (stock/report wave 5) |
 | `0655495d` | Add `approval-delegations`, `approval-flows`, `assets`, `journal-entries`, `pipelines` (CRUD wave 6) |
+| `f721361f` | Add `admin-settings`, `approval-audit-trail`, `approval-history`, `approval-monitoring`, `asset-dashboard`, `my-approvals`, `pipeline-audit-trail` (non-CRUD workflow wave 7); CI did not fire due to GitHub Actions outage |
+| `28212829` | Empty commit attempt to retrigger CI; also did not fire because outage continued |
+
+Local verification before `f721361f` (non-CRUD workflow wave 7):
+
+```bash
+PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
+  npx playwright test \
+  tests/e2e/my-approvals/ tests/e2e/approval-monitoring/ \
+  tests/e2e/approval-audit-trail/ tests/e2e/pipeline-audit-trail/ \
+  tests/e2e/asset-dashboard/ tests/e2e/admin-settings/ \
+  tests/e2e/approval-history/ --reporter=list
+# → 19 passed (1.4m)
+```
 
 Local verification before `0655495d` (CRUD wave 6):
 
@@ -212,27 +246,12 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 \
 
 ## Recommended Next Steps
 
-1. **Wave 7: Non-CRUD workflow/dashboard modules**
-   - Candidate set:
-     - `tests/e2e/my-approvals/`
-     - `tests/e2e/approval-monitoring/`
-     - `tests/e2e/approval-audit-trail/`
-     - `tests/e2e/pipeline-audit-trail/`
-     - `tests/e2e/asset-dashboard/`
-     - `tests/e2e/admin-settings/`
-     - `tests/e2e/approval-history/`
-   - Run locally first via Sail:
+1. **Wait for GitHub Actions to recover from incident `gnftqj9htp0g`**
+   - Check status: <https://www.githubstatus.com/api/v2/incidents/unresolved.json>
+   - When `Actions` returns `operational`, look for a CI run on HEAD `28212829`.
+   - If no run appears within ~10min after recovery, push another empty commit to nudge.
 
-   ```bash
-   PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
-     npx playwright test \
-     tests/e2e/my-approvals/ tests/e2e/approval-monitoring/ \
-     tests/e2e/approval-audit-trail/ tests/e2e/pipeline-audit-trail/ \
-     tests/e2e/asset-dashboard/ tests/e2e/admin-settings/ \
-     tests/e2e/approval-history/ --reporter=list
-   ```
-
-2. **Wave 8: Remaining smaller modules**
+2. **After CI for `28212829` completes green, continue with Wave 8: remaining smaller modules**
    - Candidates (mix of CRUD/non-CRUD/reports):
      - `tests/e2e/accounts/`
      - `tests/e2e/posting-journals/`
@@ -297,16 +316,19 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `0655495d` or newer.
+Read task.md first. Repo should be on `main` at `28212829` or newer.
 Working tree should be clean.
 
-CI E2E is required and green. Latest known green run: `26443633141`
-on HEAD 0655495d with the 48-module subset.
+CI E2E was required and green at HEAD 5a0f763d (run 26445640143, 48 modules).
+Wave 7 push (f721361f) and retrigger empty commit (28212829) did NOT trigger
+CI because of GitHub Actions outage `gnftqj9htp0g` starting 2026-05-26 10:57 UTC.
 
-Next recommended work: wave 7 — non-CRUD workflow/dashboard modules
-(my-approvals, approval-monitoring, approval-audit-trail,
-pipeline-audit-trail, asset-dashboard, admin-settings, approval-history).
-Run locally first via Sail before adding paths to .github/workflows/tests.yml.
+Next recommended work:
+1. When Actions returns to operational, check for CI run on 28212829.
+2. If still no run, push another empty commit.
+3. Once green, continue Wave 8 (accounts, posting-journals, recurring-journals,
+   period-closings, customer-invoices, supplier-bills, ar-receipts, ap-payments,
+   credit-notes, ...).
 
 Keep `fiscal-years/` excluded until report export actions are hardened.
 ```
