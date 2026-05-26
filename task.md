@@ -1,6 +1,6 @@
-# AI Handoff: CI E2E Required Gate at 76 Modules + Defensive Locator Hardening
+# AI Handoff: CI E2E Required Gate Expanded to 77 Modules — Fiscal Years Re-Included
 
-Last updated: 2026-05-26 17:35 UTC
+Last updated: 2026-05-26 19:25 UTC
 
 ## Document Roles
 
@@ -11,15 +11,28 @@ Last updated: 2026-05-26 17:35 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `342f5303 docs: clean stale references to pipeline-dashboard E2E and approvaldelegationss typo`
+- HEAD: `a51d043f fix(reports): remove now-unused hasData prop from DataTableToolbar`
 - Working tree: clean (this update staged for commit).
 - Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
-- Latest CI run: `26462285549` → overall `success`
+- Latest CI run: `26467825310` → overall `success`
   - `Quality checks via Sail`: `success`
-  - `Playwright E2E via Sail`: `success` (~481 tests)
+  - `Playwright E2E via Sail`: `success`
   - `Test suite via Sail`: `success`
-- Current CI E2E subset: **76 modules** (subset list unchanged from `186f1652`).
+- Current CI E2E subset: **77 modules** (added `fiscal-years` after report-export hardening).
+
+### Fiscal Years Re-Inclusion (this session)
+
+- Old blocker: when fiscal-years E2E created an extra FY without a CoA version, financial report exports (income-statement, trial-balance-detailed) returned 500 with `Undefined array key "comparison_revenue"`.
+- Root cause #1 (backend): `FinancialReportService::emptyIncomeStatementReport()` and `emptyBalanceSheetReport()` returned only base totals; consumers (xlsx exports) accessed `comparison_*` and `change_*` keys without `??`.
+- Root cause #2 (frontend): `DataTableToolbar` Export button was disabled on `!hasData`. With CoA-less FY default-selected by FE, no rows -> Export permanently disabled -> `tests/e2e/trial-balance-detailed-report` saw the disabled state and the test stayed in `toBeEnabled` waiting.
+- Fixes:
+  - `4e036b23 fix(reports): emit full totals shape from empty financial reports` — fills empty templates with all `comparison_*`/`change_*` keys at zero. Pest regression tests added in `IncomeStatementReportTest` + `BalanceSheetReportTest` (FY without CoA → 200, valid xlsx).
+  - `4f13056a fix(reports): allow exporting empty data tables once filters are applied` — drops `!hasData` from Export button disable condition; only `exporting` blocks reclicks. Backend already returns header-only xlsx for empty data.
+  - `a51d043f fix(reports): remove now-unused hasData prop from DataTableToolbar` — follow-up to satisfy ESLint after the prop was no longer used.
+- Local verification: 29 passed (2.0m) on fiscal-years/ + 6 financial reports.
+- Pest verification: 31 passed (74.8s) on `--group reports`.
+- CI verification: run `26467825310` green for HEAD `a51d043f` with the 77-module subset.
 
 ### Wave 8 Failure & Fix
 
@@ -110,6 +123,7 @@ tests/e2e/departments/
 tests/e2e/employees/
 tests/e2e/entity-state-actions/
 tests/e2e/entity-state-timeline/
+tests/e2e/fiscal-years/
 tests/e2e/general-ledger-report/
 tests/e2e/goods-receipt-report/
 tests/e2e/goods-receipts/
@@ -171,6 +185,10 @@ Wave history:
 | `186f1652` | Pin Export button locator with `exact:true` in 3 specs; CI run `26458724971` green |
 | `13de4526` | Defensive sweep: pin 32 page-scoped Activate/Cancel/etc button locators with `exact:true` (assets/high-value-asset-registration, entity-state-actions/asset-pipeline-lifecycle, entity-state-actions/entity-state-actions) |
 | `342f5303` | Docs cleanup: clarify pipeline-dashboard has no dedicated E2E; remove stale `ApprovalDelegationss` note + delete empty stub dir; CI run `26462285549` green |
+| `4e036b23` | Backend: emit full totals shape from empty financial reports (comparison_*, change_*) + Pest regression tests for empty-fiscal-year exports |
+| `4f13056a` | Frontend: allow exporting empty data tables once filters are applied (drop `!hasData` from Export disable condition) |
+| `75033217` | Re-add `fiscal-years/` to required CI subset (now 77 modules) |
+| `a51d043f` | Remove now-unused `hasData` prop from DataTableToolbar (lint fix); CI run `26467825310` green |
 
 Local verification before `3059cc5e` (wave 8 in 3 batches):
 
@@ -302,32 +320,16 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 \
 
 ## Recommended Next Steps
 
-1. **Separate task: harden report exports for fiscal-years re-inclusion** (highest impact, only remaining blocker)
-   - Make empty-data fiscal years export a valid empty workbook, not a 500.
-   - Targets:
-     - `app/Actions/Reports/ExportIncomeStatementReportAction.php`
-     - trial-balance-detailed export action / route path (find exact file before editing)
-     - possibly other financial report export actions.
-   - Verify locally:
+1. **Optional: write `tests/e2e/pipeline-dashboard/` smoke spec** to extend coverage. Dashboard exists at `/pipeline-dashboard`; mirror `tests/e2e/asset-dashboard/asset-dashboard.spec.ts` shape.
 
-   ```bash
-   PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
-     npx playwright test \
-     tests/e2e/fiscal-years/ tests/e2e/income-statement-report/ \
-     tests/e2e/trial-balance-detailed-report/ --reporter=list
-   ```
-
-   - Then add `tests/e2e/fiscal-years/` to subset (77 modules).
-
-2. **Optional: write `tests/e2e/pipeline-dashboard/` smoke spec** to extend coverage. Dashboard already exists at `/pipeline-dashboard`; pattern can mirror `tests/e2e/asset-dashboard/asset-dashboard.spec.ts`.
-
-3. **Optional UX polish**
+2. **Optional UX polish**
    - Prefer/open fiscal year auto-selection in financial report pages.
-   - Reduces chance of selecting junk test fiscal years.
+   - Reduces the chance of selecting junk test fiscal years (the empty FY case is already safe; this is just nicer UX).
 
-Coverage now: **76 of 80** module directories under `tests/e2e/` are in the required CI subset (one stale dir `approvaldelegationss/` was empty and has been removed). Remaining excluded:
+3. **Optional: update `task.changelog.md`** with the fiscal-years re-inclusion milestone if the changelog convention is to track such CI gating changes.
 
-- `fiscal-years/` (blocked on report export hardening)
+Coverage now: **77 of 80** module directories under `tests/e2e/` are in the required CI subset. Remaining excluded:
+
 - `misc/` (catch-all; not a real module)
 - `test-results/` (Playwright output, not a spec dir)
 - (no `pipeline-dashboard/` directory exists)
@@ -364,25 +366,24 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `342f5303` or newer.
+Read task.md first. Repo should be on `main` at `a51d043f` or newer.
 Working tree should be clean.
 
-CI E2E is required and green. Latest known green run: `26462285549`
-on HEAD 342f5303 with the 76-module subset (~481 Playwright tests).
+CI E2E is required and green. Latest known green run: `26467825310`
+on HEAD a51d043f with the 77-module subset (~485 Playwright tests).
 
-Coverage now: 76 of 80 directories under tests/e2e/ are in the required
+Coverage now: 77 of 80 directories under tests/e2e/ are in the required
 CI subset. Remaining excluded:
-- fiscal-years/        (blocked on report export hardening)
 - misc/                (catch-all; not a real module)
 - test-results/        (Playwright output, not a spec dir)
-(approvaldelegationss/ stale dir was removed; no class with that name exists.
- pipeline-dashboard/ directory does not exist; coverage indirect only.)
+- (no pipeline-dashboard/ directory exists)
 
-Recommended next work:
-1. Harden report export actions so empty fiscal years return empty .xlsx
-   instead of 500, then re-add tests/e2e/fiscal-years/.
-2. Optional: write tests/e2e/pipeline-dashboard/ smoke spec mirroring
+Recommended next work (all optional):
+1. Write tests/e2e/pipeline-dashboard/ smoke spec mirroring
    tests/e2e/asset-dashboard/.
+2. UX polish: auto-select preferred fiscal year on financial report
+   pages.
+3. Update task.changelog.md with the fiscal-years re-inclusion milestone.
 
 Note: GitHub Actions had a major outage 2026-05-26 10:57-12:58 UTC. If
 future pushes silently don't trigger CI, the workaround is an empty
