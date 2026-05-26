@@ -1,6 +1,6 @@
-# AI Handoff: CI E2E Required Gate Expanded to 27 Modules
+# AI Handoff: CI E2E Required Gate Expanded to 34 Modules
 
-Last updated: 2026-05-26 00:00 UTC
+Last updated: 2026-05-26 06:25 UTC
 
 ## Document Roles
 
@@ -11,15 +11,14 @@ Last updated: 2026-05-26 00:00 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `04d47b33 ci(e2e): expand subset to 27 modules (wave 2+3)`
-- Working tree: clean before this `task.md` update.
-- Remote: pushed.
-- CI E2E is now a **required gate** (no `continue-on-error`).
-- Latest CI run: `26429183081` → overall `success`
-  - `Quality checks via Sail`: `success`
-  - `Playwright E2E via Sail`: `success`
-  - `Test suite via Sail`: `success`
-- Current CI E2E subset: 27 modules, roughly 218 Playwright tests.
+- HEAD: `f2555ae9 ci(e2e): expand subset with 7 transaction modules (wave 4)`
+- Working tree: dirty only with this `task.md` handoff update (will be committed next).
+- Remote: HEAD `f2555ae9` not yet pushed.
+- CI E2E is **required gate** (no `continue-on-error`).
+- Latest known green CI run on prior HEAD: `26429183081` (covering 27-module subset).
+- Current CI E2E subset: **34 modules** (added 7 transaction modules in wave 4).
+  - Local verification of wave 4: 75 passed in 8.0m on Sail-backed run.
+  - CI run for `f2555ae9` not yet observed; first run after push will validate.
 
 ## Current Objective
 
@@ -77,11 +76,18 @@ tests/e2e/customer-categories/
 tests/e2e/customers/
 tests/e2e/departments/
 tests/e2e/employees/
+tests/e2e/goods-receipts/
 tests/e2e/income-statement-report/
+tests/e2e/inventory-stocktakes/
 tests/e2e/positions/
 tests/e2e/product-categories/
 tests/e2e/products/
+tests/e2e/purchase-orders/
+tests/e2e/purchase-requests/
+tests/e2e/stock-adjustments/
+tests/e2e/stock-transfers/
 tests/e2e/supplier-categories/
+tests/e2e/supplier-returns/
 tests/e2e/suppliers/
 tests/e2e/trial-balance-detailed-report/
 tests/e2e/trial-balance-report/
@@ -98,6 +104,19 @@ Wave history:
 | `f09c9002` | Required gate + add `positions`, `customer-categories`, `supplier-categories` |
 | `c036f09c` | Add `asset-categories`, `asset-locations`, `asset-models`, `product-categories`, `units`, `warehouses` |
 | `04d47b33` | Add `employees`, `customers`, `suppliers`, `products`, `asset-movements`, `asset-maintenances`, `asset-stocktakes`, `coa-versions`, `account-mappings` |
+| `f2555ae9` | Add `goods-receipts`, `inventory-stocktakes`, `purchase-orders`, `purchase-requests`, `stock-adjustments`, `stock-transfers`, `supplier-returns` (transaction wave 4) |
+
+Local verification before `f2555ae9` (transaction wave 4):
+
+```bash
+PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
+  npx playwright test \
+  tests/e2e/stock-transfers/ tests/e2e/inventory-stocktakes/ \
+  tests/e2e/stock-adjustments/ tests/e2e/purchase-requests/ \
+  tests/e2e/purchase-orders/ tests/e2e/goods-receipts/ \
+  tests/e2e/supplier-returns/ --reporter=list
+# → 75 passed (8.0m)
+```
 
 Local verification before `04d47b33`:
 
@@ -151,52 +170,46 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 \
 
 ## Recommended Next Steps
 
-1. **Expand transaction modules in a controlled wave**
-   - Candidate set:
-     - `tests/e2e/stock-transfers/`
-     - `tests/e2e/inventory-stocktakes/`
-     - `tests/e2e/stock-adjustments/`
-     - `tests/e2e/purchase-requests/`
-     - `tests/e2e/purchase-orders/`
-     - `tests/e2e/goods-receipts/`
-     - `tests/e2e/supplier-returns/`
+1. **Push `f2555ae9` and confirm CI green**
+   - `git push origin main`
+   - Monitor: `gh run list --branch main --limit 3`
+   - Expected: same 3 jobs all green; E2E will now run ~34 modules.
+
+2. **Next wave: stock/report read-only modules**
+   - Candidate set (no fiscal-year coupling, similar shape to current green subset):
+     - `tests/e2e/stock-movements/`
+     - `tests/e2e/stock-monitor/`
+     - `tests/e2e/stock-movement-report/`
+     - `tests/e2e/stock-adjustment-report/`
+     - `tests/e2e/inventory-valuation-report/`
+     - `tests/e2e/inventory-stocktake-variance-report/`
+     - `tests/e2e/goods-receipt-report/`
+     - `tests/e2e/purchase-order-status-report/`
+     - `tests/e2e/purchase-history-report/`
    - Run locally first via Sail:
 
    ```bash
-   PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 \
+   PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
      npx playwright test \
-     tests/e2e/stock-transfers/ \
-     tests/e2e/inventory-stocktakes/ \
-     tests/e2e/stock-adjustments/ \
-     tests/e2e/purchase-requests/ \
-     tests/e2e/purchase-orders/ \
-     tests/e2e/goods-receipts/ \
-     tests/e2e/supplier-returns/ \
-     --reporter=list
+     tests/e2e/stock-movements/ tests/e2e/stock-monitor/ \
+     tests/e2e/stock-movement-report/ tests/e2e/stock-adjustment-report/ \
+     tests/e2e/inventory-valuation-report/ \
+     tests/e2e/inventory-stocktake-variance-report/ \
+     tests/e2e/goods-receipt-report/ tests/e2e/purchase-order-status-report/ \
+     tests/e2e/purchase-history-report/ --reporter=list
    ```
 
-2. **If wave is green, add those paths to `.github/workflows/tests.yml`**
-   - Validate YAML:
-
-   ```bash
-   rtk python3 -c "import yaml; yaml.safe_load(open('.github/workflows/tests.yml')); print('YAML OK')"
-   ```
-
-   - Commit/push and monitor the new CI run.
-
-3. **If transaction wave fails, split smaller**
-   - Procurement first:
-     - `purchase-requests`, `purchase-orders`, `goods-receipts`, `supplier-returns`
-   - Inventory first:
-     - `stock-transfers`, `inventory-stocktakes`, `stock-adjustments`
-
-4. **Separate task: harden report exports**
+3. **Separate task: harden report exports for fiscal-years re-inclusion**
    - Make empty-data fiscal years export a valid empty workbook, not a 500.
-   - Then re-add `tests/e2e/fiscal-years/`.
+   - Targets:
+     - `app/Actions/Reports/ExportIncomeStatementReportAction.php`
+     - trial-balance-detailed export action / route path (find exact file before editing)
+     - possibly other financial report export actions.
+   - Then re-add `tests/e2e/fiscal-years/` to subset.
 
-5. **Optional UX polish**
+4. **Optional UX polish**
    - Prefer/open fiscal year auto-selection in financial report pages.
-   - This reduces chance of selecting junk test fiscal years.
+   - Reduces chance of selecting junk test fiscal years.
 
 ## Useful Commands
 
@@ -206,15 +219,19 @@ git status --short
 git log --oneline -12
 
 # Run current CI subset locally if needed (long)
-PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 npx playwright test \
+PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
+  npx playwright test \
   tests/e2e/account-mappings/ tests/e2e/asset-categories/ tests/e2e/asset-locations/ \
   tests/e2e/asset-maintenances/ tests/e2e/asset-models/ tests/e2e/asset-movements/ \
   tests/e2e/asset-stocktakes/ tests/e2e/balance-sheet-report/ tests/e2e/bank-reconciliations/ \
   tests/e2e/branches/ tests/e2e/cash-flow-report/ tests/e2e/coa-versions/ \
   tests/e2e/comparative-report/ tests/e2e/customer-categories/ tests/e2e/customers/ \
-  tests/e2e/departments/ tests/e2e/employees/ tests/e2e/income-statement-report/ \
+  tests/e2e/departments/ tests/e2e/employees/ tests/e2e/goods-receipts/ \
+  tests/e2e/income-statement-report/ tests/e2e/inventory-stocktakes/ \
   tests/e2e/positions/ tests/e2e/product-categories/ tests/e2e/products/ \
-  tests/e2e/supplier-categories/ tests/e2e/suppliers/ \
+  tests/e2e/purchase-orders/ tests/e2e/purchase-requests/ \
+  tests/e2e/stock-adjustments/ tests/e2e/stock-transfers/ \
+  tests/e2e/supplier-categories/ tests/e2e/supplier-returns/ tests/e2e/suppliers/ \
   tests/e2e/trial-balance-detailed-report/ tests/e2e/trial-balance-report/ \
   tests/e2e/units/ tests/e2e/warehouses/ --reporter=line
 
@@ -226,23 +243,17 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `04d47b33` or newer.
-Working tree should be clean except possibly this task.md handoff update.
+Read task.md first. Repo should be on `main` at `f2555ae9` or newer.
+Working tree should be clean (the f2555ae9 + this task.md handoff
+update are the most recent local commits).
 
-CI E2E is required and green. Latest known green run: `26429183081`.
-Current E2E subset has 27 modules (~218 tests) in `.github/workflows/tests.yml`.
+CI E2E is required. Next CI run after `git push` validates the new
+34-module subset. Latest known green run on prior HEAD: `26429183081`.
 
-Next recommended work: verify transaction modules locally, then add green
-ones to the required CI E2E subset:
-- stock-transfers
-- inventory-stocktakes
-- stock-adjustments
-- purchase-requests
-- purchase-orders
-- goods-receipts
-- supplier-returns
+Next recommended work: push, watch CI, then expand into the read-only
+stock/report wave (stock-movements, stock-monitor, several *-report
+modules). Run locally first via Sail before adding paths to
+.github/workflows/tests.yml.
 
 Keep `fiscal-years/` excluded until report export actions are hardened.
-Known fiscal-years issue: report export endpoints 500 when fiscal year has
-no data/config, causing income-statement/trial-balance-detailed failures.
 ```
