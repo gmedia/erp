@@ -32,6 +32,7 @@ export function createGeneralLedgerFilterFields(): FieldDescriptor[] {
                 <AsyncSelect
                     url="/api/fiscal-years"
                     placeholder="Select Fiscal Year"
+                    preferredMetaKey="preferred_fiscal_year_id"
                 />
             ),
         },

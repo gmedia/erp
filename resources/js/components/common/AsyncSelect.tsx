@@ -21,10 +21,12 @@ export interface AsyncSelectProps<T extends object = Record<string, unknown>> {
     url: string;
     placeholder?: string;
     className?: string;
-    labelFn?: (item: T) => string; // To extract label from item
-    valueFn?: (item: T) => string; // To extract value from item
-    initialLabel?: string; // Optional initial label to avoid extra fetch
-    label?: string; // For accessibility and E2E testing
+    labelFn?: (item: T) => string;
+    valueFn?: (item: T) => string;
+    initialLabel?: string;
+    label?: string;
+    /** Meta key to read from API response for auto-selecting a default value when no value is set. */
+    preferredMetaKey?: string;
 }
 
 export function AsyncSelect<T extends object = Record<string, unknown>>({
@@ -39,6 +41,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
         (item as unknown as { id: number | string }).id.toString(),
     initialLabel,
     label,
+    preferredMetaKey,
 }: Readonly<AsyncSelectProps<T>>) {
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState('');
@@ -48,6 +51,29 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
         initialLabel || '',
     );
     const [initialLoadDone, setInitialLoadDone] = React.useState(false);
+    const [preferredResolved, setPreferredResolved] = React.useState(false);
+
+    React.useEffect(() => {
+        if (!preferredMetaKey || preferredResolved || value) return;
+
+        const resolvePreferred = async () => {
+            try {
+                const response = await axios.get(url, {
+                    params: { per_page: 1 },
+                });
+                const preferredId = response.data?.meta?.[preferredMetaKey];
+                if (preferredId) {
+                    onValueChange?.(String(preferredId));
+                }
+            } catch {
+                // Silently fail — user can still pick manually
+            } finally {
+                setPreferredResolved(true);
+            }
+        };
+
+        resolvePreferred();
+    }, [preferredMetaKey, preferredResolved, value, url, onValueChange]);
 
     const debouncedSearch = useDebounce(search, 300);
 
