@@ -1,6 +1,6 @@
 # AI Handoff: Preferred Fiscal Year Auto-Select for Financial Reports
 
-Last updated: 2026-05-27 01:07 UTC
+Last updated: 2026-05-27 04:58 UTC
 
 ## Document Roles
 
@@ -11,11 +11,11 @@ Last updated: 2026-05-27 01:07 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `420b7c7b feat(reports): auto-select preferred fiscal year with posted entries`
+- HEAD: `fc3b1187 docs(task): record preferred-FY feature + updated handoff`
 - Working tree: clean.
 - Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
-- Latest verified-green CI run: `26480230470` (HEAD `4d9584f4`, 78-module subset).
+- Latest verified-green CI run: `26484564047` (HEAD `fc3b1187`, 78-module subset).
   - `Quality checks via Sail`: `success`
   - `Playwright E2E via Sail`: `success`
   - `Test suite via Sail`: `success`
@@ -43,7 +43,7 @@ Last updated: 2026-05-27 01:07 UTC
   - Duster: PASS
   - Playwright (income-statement + trial-balance + balance-sheet): 10 passed (43s)
 - Commit: `420b7c7b feat(reports): auto-select preferred fiscal year with posted entries`
-- CI verification: pending (run triggered by push).
+- CI verification: run `26484564047` green (HEAD `fc3b1187` which carries `420b7c7b`'s code change).
 - Note: Trial Balance Detailed and General Ledger use `ReportDataTablePage` with a filter field fetching `/api/fiscal-years` — they do NOT go through this trait. They have no server-side default selection; user must pick FY from filter. This is acceptable for now (data-table pattern doesn't have `selectedYearId` injection).
 
 ### Pipeline Dashboard Smoke Spec (this session)
@@ -150,15 +150,13 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `420b7c7b` or newer.
+Read task.md first. Repo should be on `main` at `fc3b1187` or newer.
 Working tree should be clean.
 
-CI E2E is required. Latest verified-green run: `26480230470` on HEAD
-4d9584f4 with the 78-module subset. Newer commit 420b7c7b adds the
-preferred-FY feature (backend only, no workflow change); CI run for
-this commit is pending/should be green by now.
+CI E2E is required and green. Latest green run: `26484564047` on HEAD
+fc3b1187 with the 78-module subset. All 3 jobs passed.
 
-Two features shipped this session:
+Two features shipped in the previous session:
 1. tests/e2e/pipeline-dashboard/ smoke spec (CI subset 77 -> 78).
 2. GetPreferredFiscalYearAction: financial reports now default to the
    latest FY with posted journal entries instead of just "first open FY".
