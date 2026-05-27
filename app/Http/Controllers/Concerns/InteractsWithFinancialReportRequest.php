@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Concerns;
 
+use App\Actions\FiscalYears\GetPreferredFiscalYearAction;
 use App\Models\FiscalYear;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -18,8 +19,8 @@ trait InteractsWithFinancialReportRequest
     ): array {
         /** @var Collection<int, FiscalYear> $fiscalYears */
         $fiscalYears = FiscalYear::orderBy('start_date', 'desc')->get();
-        $currentFiscalYear = $fiscalYears->firstWhere('status', 'open') ?? $fiscalYears->first();
-        $selectedYearId = $this->resolveSelectedYearId($request, $currentFiscalYear?->id);
+        $defaultFiscalYear = app(GetPreferredFiscalYearAction::class)->execute($fiscalYears);
+        $selectedYearId = $this->resolveSelectedYearId($request, $defaultFiscalYear?->id);
 
         if (! $withComparison) {
             return [
