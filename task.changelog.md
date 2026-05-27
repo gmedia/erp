@@ -1,6 +1,6 @@
 # Changelog Tugas
 
-Terakhir diperbarui: 2026-05-15
+Terakhir diperbarui: 2026-05-27
 
 File ini menyimpan catatan perubahan produk dan fitur.
 Baca `task.md` untuk status handoff aktif dan `task.handoff-archive.md` untuk riwayat checkpoint E2E lama.
@@ -49,6 +49,15 @@ Catatan penamaan: heading modul memakai pola `Nama Modul di Kode (Label Bisnis)`
 - [x] API `GET /api/reports/{balance-sheet,income-statement,cash-flow,trial-balance}` menambahkan key `configuration` (additive, non-breaking) tanpa mengubah struktur `report` lama.
 - [x] Menu seeder menambahkan entri "Report Configuration" di grup Accounting; Permission seeder menambahkan `report_configuration` + CRUD children.
 - [x] Cakupan tes: 36 Pest financial-reports, 12 Pest reports, 7 E2E Playwright report-configurations.
+- [x] Auto-select preferred fiscal year (FY dengan posted journal entries) untuk 5 laporan keuangan utama (Income Statement, Balance Sheet, Comparative, Cash Flow, Trial Balance) via `GetPreferredFiscalYearAction` + `InteractsWithFinancialReportRequest` trait. Zero frontend change.
+- [x] Extend preferred FY auto-select ke Trial Balance Detailed + General Ledger via `AsyncSelect.preferredMetaKey` prop + `FiscalYearCollection` meta response. Zero per-page edits.
+- [x] Fix empty financial report export (FY tanpa CoA → 500) dengan mengisi template `comparison_*`/`change_*` keys.
+- [x] Fix Export button disabled saat data kosong — hapus guard `!hasData` agar user tetap bisa export header-only xlsx.
+
+### Modul Pipeline Dashboard
+
+- [x] E2E smoke spec: `tests/e2e/pipeline-dashboard/pipeline-dashboard.spec.ts` — verifikasi heading, filter labels, card slots, chart/table titles.
+- [x] CI subset bump 77 → 78 modules.
 
 ### Modul Accounts Payable (Hutang Usaha)
 
