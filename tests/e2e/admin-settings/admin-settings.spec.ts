@@ -40,9 +40,9 @@ test.describe('Admin Settings', () => {
         await expect(page).toHaveTitle(/Admin Settings/);
 
         // Sidebar navigation should be visible
-        await expect(page.getByRole('link', { name: 'General' })).toBeVisible();
-        await expect(page.getByRole('link', { name: 'Regional' })).toBeVisible();
-        await expect(page.getByRole('link', { name: 'SMTP' })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'General', exact: true })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'Regional', exact: true })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'SMTP', exact: true })).toBeVisible();
 
         // General settings heading should show
         await expect(page.getByText('General Settings')).toBeVisible();
@@ -58,7 +58,7 @@ test.describe('Admin Settings', () => {
         await page.goto('/admin-settings');
 
         // Click Regional tab
-        await page.getByRole('link', { name: 'Regional' }).click();
+        await page.getByRole('link', { name: 'Regional', exact: true }).click();
         await expect(page).toHaveURL(/group=regional/);
 
         // Regional settings heading should show
@@ -223,7 +223,7 @@ test.describe('Admin Settings', () => {
         await page.goto('/admin-settings');
 
         // Click SMTP tab
-        await page.getByRole('link', { name: 'SMTP' }).click();
+        await page.getByRole('link', { name: 'SMTP', exact: true }).click();
         await expect(page).toHaveURL(/group=smtp/);
 
         // SMTP settings heading should show

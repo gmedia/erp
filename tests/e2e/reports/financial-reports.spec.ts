@@ -36,9 +36,9 @@ async function waitForBalanceSheetReady(page: Page) {
     await expect(
         page.getByRole('heading', { name: 'Balance Sheet', level: 1 }),
     ).toBeVisible({ timeout: 60000 });
-    await expect(page.getByText('Total Assets')).toBeVisible({ timeout: 60000 });
+    await expect(page.getByText('Total Assets', { exact: true })).toBeVisible({ timeout: 60000 });
     await expect(
-        page.getByText('Total Liabilities & Equity'),
+        page.getByText('Total Liabilities & Equity', { exact: true }),
     ).toBeVisible({ timeout: 60000 });
     await expect(page.getByRole('combobox').first()).toBeVisible({ timeout: 60000 });
     await expect(page.getByRole('combobox').nth(1)).toBeVisible({ timeout: 60000 });

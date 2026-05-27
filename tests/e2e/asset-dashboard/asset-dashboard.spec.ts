@@ -21,7 +21,7 @@ test.describe('Asset Dashboard', () => {
     // 1. Open Asset menu and click Asset Dashboard
     await page.getByRole('button', { name: 'Asset', exact: true }).first().click();
     const dataPromise = waitForAssetDashboardData(page);
-    await page.getByRole('link', { name: 'Asset Dashboard' }).click();
+    await page.getByRole('link', { name: 'Asset Dashboard', exact: true }).click();
 
     // 2. Wait for navigation
     await page.waitForURL('**/asset-dashboard', { timeout: 15000 });
