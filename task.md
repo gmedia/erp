@@ -1,6 +1,6 @@
 # AI Handoff: Preferred Fiscal Year Auto-Select for Financial Reports
 
-Last updated: 2026-05-27 04:58 UTC
+Last updated: 2026-05-27 08:02 UTC
 
 ## Document Roles
 
@@ -11,7 +11,7 @@ Last updated: 2026-05-27 04:58 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `fc3b1187 docs(task): record preferred-FY feature + updated handoff`
+- HEAD: `810a2d98 test(fiscal-years): add preferred_fiscal_year_id meta assertions to FiscalYearCollectionTest`
 - Working tree: clean.
 - Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
@@ -45,6 +45,31 @@ Last updated: 2026-05-27 04:58 UTC
 - Commit: `420b7c7b feat(reports): auto-select preferred fiscal year with posted entries`
 - CI verification: run `26484564047` green (HEAD `fc3b1187` which carries `420b7c7b`'s code change).
 - Note: Trial Balance Detailed and General Ledger use `ReportDataTablePage` with a filter field fetching `/api/fiscal-years` — they do NOT go through this trait. They have no server-side default selection; user must pick FY from filter. This is acceptable for now (data-table pattern doesn't have `selectedYearId` injection).
+
+### Preferred FY Extended to Trial Balance Detailed + General Ledger (this session)
+
+- Problem: Trial Balance Detailed and General Ledger reports had no auto-select for fiscal year — user had to manually pick from filter dropdown.
+- Solution: Two-part change:
+  1. **Backend**: `FiscalYearCollection` now includes `preferred_fiscal_year_id` in response meta (via `with()` method calling `GetPreferredFiscalYearAction`).
+  2. **Frontend**: `AsyncSelect` gained a `preferredMetaKey` prop — when set and no value is selected, it fetches the URL on mount, reads the meta key, and auto-selects.
+- Filter definitions for both reports pass `preferredMetaKey="preferred_fiscal_year_id"` — zero per-page edits to report pages themselves.
+- Files changed:
+  - MODIFIED: `app/Http/Resources/FiscalYears/FiscalYearCollection.php` (added `with()` method)
+  - MODIFIED: `resources/js/components/common/AsyncSelect.tsx` (added `preferredMetaKey` prop + auto-select effect)
+  - MODIFIED: `resources/js/components/reports/trial-balance-detailed/Filters.tsx` (use `preferredMetaKey`)
+  - MODIFIED: `resources/js/components/reports/general-ledger/Filters.tsx` (use `preferredMetaKey`)
+  - MODIFIED: `tests/Unit/Resources/FiscalYears/FiscalYearCollectionTest.php` (2 new test cases)
+- Verification:
+  - Unit: 3 passed (FiscalYearCollectionTest)
+  - Pest `--group fiscal-years --group reports`: 71 passed (83.6s)
+  - PHPStan: 0 errors
+  - TypeScript: 0 errors
+  - Duster: PASS
+  - Tinker: confirmed `preferred_fiscal_year_id` merges into pagination meta
+- Commits:
+  - `3aa557c2 feat(reports): extend preferred fiscal year auto-select to trial-balance-detailed and general-ledger`
+  - `810a2d98 test(fiscal-years): add preferred_fiscal_year_id meta assertions to FiscalYearCollectionTest`
+- CI verification: pending (pushed to main, awaiting CI run).
 
 ### Pipeline Dashboard Smoke Spec (this session)
 
@@ -95,28 +120,26 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BU
 
 ## Current Objective
 
-Two features shipped this session:
+Three features shipped this session:
 1. Pipeline-dashboard smoke spec (CI subset 77 → 78, verified green).
 2. Preferred fiscal year auto-select for 5 financial reports (zero frontend change).
+3. Extended preferred-FY to Trial Balance Detailed + General Ledger via `AsyncSelect.preferredMetaKey` prop (zero per-page edits).
 
-CI verification for commit `420b7c7b` is pending. Once green, both features are fully validated.
+CI verification for commits `3aa557c2` + `810a2d98` is pending.
 
 ## Recommended Next Steps
 
 Bias: shift to product features. Items below are optional.
 
-1. **Optional: extend preferred-FY to Trial Balance Detailed + General Ledger**
-   - These 2 reports use `ReportDataTablePage` filter pattern (no `selectedYearId` injection).
-   - Could add `preferred_fiscal_year_id` as meta in `/api/fiscal-years` response, then frontend filter field auto-selects it.
-   - Scope: ~1 hr. Backend: modify `FiscalYearCollection` to include meta. Frontend: modify 2 filter field configs to consume it.
+1. **Wait for CI green** on HEAD `810a2d98` — confirm no regressions.
 
-2. **Optional UX polish: show indicator when default FY was auto-selected**
-   - Small frontend badge/tooltip on the FY selector showing "Auto-selected: has posted entries".
-   - Pure cosmetic, low priority.
+2. **Optional: run E2E locally for trial-balance-detailed + general-ledger** to visually confirm auto-select behavior.
 
-3. **Optional: defensive locator audit** (same as before)
+3. **Optional: extend `preferredMetaKey` to other reports** that use fiscal year filters (if any exist beyond these 2).
 
-4. **Optional: update `task.changelog.md`** with both milestones.
+4. **Optional: defensive locator audit** (same as before).
+
+5. **New product feature** (user provides scope).
 
 ## Useful Commands
 
@@ -150,27 +173,30 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `fc3b1187` or newer.
+Read task.md first. Repo should be on `main` at `810a2d98` or newer.
 Working tree should be clean.
 
 CI E2E is required and green. Latest green run: `26484564047` on HEAD
 fc3b1187 with the 78-module subset. All 3 jobs passed.
+Newer commits (pending CI): 3aa557c2, 810a2d98.
 
-Two features shipped in the previous session:
+Three features shipped:
 1. tests/e2e/pipeline-dashboard/ smoke spec (CI subset 77 -> 78).
 2. GetPreferredFiscalYearAction: financial reports now default to the
    latest FY with posted journal entries instead of just "first open FY".
    Affects 5 reports via InteractsWithFinancialReportRequest trait.
    Zero frontend change.
+3. Extended preferred-FY to Trial Balance Detailed + General Ledger:
+   - Backend: FiscalYearCollection returns preferred_fiscal_year_id in meta.
+   - Frontend: AsyncSelect gained preferredMetaKey prop for auto-select.
+   - Zero per-page edits — only filter definitions changed.
 
 Coverage: 78 of 80 directories under tests/e2e/ in required gate.
 Remaining: misc/ (catch-all), test-results/ (Playwright output).
 
 Recommended next work (all optional, pick zero or one):
-1. Extend preferred-FY to Trial Balance Detailed + General Ledger
-   (add preferred_fiscal_year_id meta to /api/fiscal-years response +
-   frontend filter auto-select). ~1 hr.
-2. Defensive locator audit (getByRole('link'), getByText without exact).
-3. Update task.changelog.md with both milestones.
+1. Wait for CI green on 810a2d98, then record in task.md.
+2. Run E2E locally for trial-balance-detailed + general-ledger.
+3. Defensive locator audit (getByRole('link'), getByText without exact).
 4. New product feature (user provides scope).
 ```
