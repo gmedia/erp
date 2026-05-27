@@ -1,6 +1,6 @@
 # AI Handoff: Preferred Fiscal Year Auto-Select for Financial Reports
 
-Last updated: 2026-05-27 09:15 UTC
+Last updated: 2026-05-27 10:42 UTC
 
 ## Document Roles
 
@@ -11,7 +11,7 @@ Last updated: 2026-05-27 09:15 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `ea92e3f9 ci: trigger re-run after autofix`
+- HEAD: `60ee5925 test(e2e): add exact:true to vulnerable locators in asset-dashboard, admin-settings, financial-reports`
 - Working tree: clean.
 - Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
@@ -120,26 +120,24 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BU
 
 ## Current Objective
 
-Three features shipped this session:
+Four items shipped this session:
 1. Pipeline-dashboard smoke spec (CI subset 77 → 78, verified green).
 2. Preferred fiscal year auto-select for 5 financial reports (zero frontend change).
 3. Extended preferred-FY to Trial Balance Detailed + General Ledger via `AsyncSelect.preferredMetaKey` prop (zero per-page edits).
+4. Defensive locator audit: added `exact: true` to 8 vulnerable locators in 3 E2E specs.
 
 CI verification for commits `3aa557c2` + `810a2d98` is confirmed green (run `26500231032`).
+CI for locator audit commit `60ee5925` is pending (run `26504565338`).
 
 ## Recommended Next Steps
 
 Bias: shift to product features. Items below are optional.
 
-1. **Wait for CI green** on HEAD `810a2d98` — confirm no regressions.
+1. **Dead code cleanup** — run Depwire scan, remove unused symbols.
 
-2. **Optional: run E2E locally for trial-balance-detailed + general-ledger** to visually confirm auto-select behavior.
+2. **Sonar duplication refactor** — check current metrics, execute next wave.
 
-3. **Optional: extend `preferredMetaKey` to other reports** that use fiscal year filters (if any exist beyond these 2).
-
-4. **Optional: defensive locator audit** (same as before).
-
-5. **New product feature** (user provides scope).
+3. **New product feature** (user provides scope).
 
 ## Useful Commands
 
