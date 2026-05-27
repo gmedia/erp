@@ -1,8 +1,8 @@
+import { AsyncSelect } from '@/components/common/AsyncSelect';
 import {
     createSelectFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
-import { AsyncSelect } from '@/components/common/AsyncSelect';
 
 export function createTrialBalanceDetailedFilterFields(): FieldDescriptor[] {
     const months = [
