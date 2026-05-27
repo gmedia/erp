@@ -1,6 +1,6 @@
-# AI Handoff: CI E2E Required Gate Expanded to 78 Modules — Pipeline Dashboard Smoke Spec Added
+# AI Handoff: Preferred Fiscal Year Auto-Select for Financial Reports
 
-Last updated: 2026-05-27 00:44 UTC
+Last updated: 2026-05-27 01:07 UTC
 
 ## Document Roles
 
@@ -11,18 +11,40 @@ Last updated: 2026-05-27 00:44 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `4d9584f4 docs(task): record pipeline-dashboard smoke spec + CI subset bump to 78`
+- HEAD: `420b7c7b feat(reports): auto-select preferred fiscal year with posted entries`
 - Working tree: clean.
 - Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
-- Latest CI run: `26480230470` → overall `success` (HEAD `4d9584f4`, 78-module subset).
+- Latest verified-green CI run: `26480230470` (HEAD `4d9584f4`, 78-module subset).
   - `Quality checks via Sail`: `success`
   - `Playwright E2E via Sail`: `success`
   - `Test suite via Sail`: `success`
-- Current CI E2E subset: **78 modules** (added `pipeline-dashboard` in this session).
+- Current CI E2E subset: **78 modules**.
 - Coverage: 78 of 80 directories under `tests/e2e/` are in the required gate. Remaining 2 are not real modules:
   - `misc/` (catch-all utilities)
   - `test-results/` (Playwright output)
+
+### Preferred Fiscal Year Auto-Select (this session)
+
+- Problem: financial report pages defaulted to "first open FY" or "first FY by start_date desc", which could be an empty FY without posted journal entries. Users saw empty tables on first load.
+- Solution: `GetPreferredFiscalYearAction` resolves the default FY with priority:
+  1. Latest FY (by `start_date` desc) that has ≥1 posted `JournalEntry`
+  2. Fallback: first open FY
+  3. Fallback: first FY in collection
+- Wired into `InteractsWithFinancialReportRequest::resolveFiscalYearContext()` trait, which feeds `selectedYearId` to all 5 financial reports (income-statement, balance-sheet, comparative, cash-flow, trial-balance). **Zero frontend change** — frontend already consumes `data?.selectedYearId`.
+- Files changed:
+  - NEW: `app/Actions/FiscalYears/GetPreferredFiscalYearAction.php`
+  - MODIFIED: `app/Http/Controllers/Concerns/InteractsWithFinancialReportRequest.php` (1 line: replace old default logic with Action call)
+  - NEW: `tests/Unit/Actions/FiscalYears/GetPreferredFiscalYearActionTest.php` (6 test cases)
+- Verification:
+  - Unit: 6 passed (GetPreferredFiscalYearActionTest)
+  - Pest `--group reports`: 31 passed (76.6s)
+  - PHPStan: 0 errors
+  - Duster: PASS
+  - Playwright (income-statement + trial-balance + balance-sheet): 10 passed (43s)
+- Commit: `420b7c7b feat(reports): auto-select preferred fiscal year with posted entries`
+- CI verification: pending (run triggered by push).
+- Note: Trial Balance Detailed and General Ledger use `ReportDataTablePage` with a filter field fetching `/api/fiscal-years` — they do NOT go through this trait. They have no server-side default selection; user must pick FY from filter. This is acceptable for now (data-table pattern doesn't have `selectedYearId` injection).
 
 ### Pipeline Dashboard Smoke Spec (this session)
 
@@ -73,293 +95,28 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BU
 
 ## Current Objective
 
-CI E2E expansion milestone is **complete**. All real module directories under `tests/e2e/` are in the required gate (77 of 80; the 3 excluded are not real modules). Future work shifts to product features, defensive locator audits beyond `getByRole('button', ...)`, or optional UX polish.
+Two features shipped this session:
+1. Pipeline-dashboard smoke spec (CI subset 77 → 78, verified green).
+2. Preferred fiscal year auto-select for 5 financial reports (zero frontend change).
 
-## What Changed Since Previous Handoff
-
-### 1. Root cause for 41 CRUD export failures fixed
-
-- CI full E2E run `26384727117` had `41 failed` export specs.
-- Failure signature:
-  - `Console Error text: "Export failed: x"`
-  - `Error: Can't find end of central directory : is this a zip file ?`
-  - failure location: `tests/e2e/shared-test-factories.ts:208`
-- Root cause: fresh CI runner did not have `public/storage` symlink.
-  - Backend stores exports in `storage/app/public/exports/*.xlsx`.
-  - Backend returns `Storage::disk('public')->url(...)` → `/storage/exports/...`.
-  - Without symlink, browser downloads HTML 404 as `.xlsx`; ExcelJS fails.
-- Fix committed:
-  - `34fad961 ci(e2e): run storage:link in global-setup to unblock CRUD export specs`
-  - `tests/e2e/global-setup.ts` now runs `artisan storage:link --force` after `migrate:fresh` + `db:seed`.
-- Validated on CI through CRUD export specs (`branches`, `departments`, later many more).
-
-### 2. E2E promoted to required
-
-- Commit: `f09c9002 ci(e2e): promote E2E to required + expand with 3 more simple-CRUD modules`
-- Changes:
-  - Removed `continue-on-error: true` from the e2e job in `.github/workflows/tests.yml`.
-  - Reflect step now checks both:
-    - `needs.quality.result == success`
-    - `needs.e2e.result == success`
-- CI run `26392779224`: all green with E2E required.
-
-### 3. CI E2E subset expanded in waves
-
-Current subset in `.github/workflows/tests.yml`:
-
-```text
-tests/e2e/account-mappings/
-tests/e2e/accounts/
-tests/e2e/admin-settings/
-tests/e2e/ap-payments/
-tests/e2e/approval-audit-trail/
-tests/e2e/approval-delegations/
-tests/e2e/approval-flows/
-tests/e2e/approval-history/
-tests/e2e/approval-monitoring/
-tests/e2e/ar-receipts/
-tests/e2e/asset-categories/
-tests/e2e/asset-dashboard/
-tests/e2e/asset-depreciation-runs/
-tests/e2e/asset-locations/
-tests/e2e/asset-maintenances/
-tests/e2e/asset-models/
-tests/e2e/asset-movements/
-tests/e2e/asset-reports/
-tests/e2e/asset-stocktake-variances/
-tests/e2e/asset-stocktakes/
-tests/e2e/assets/
-tests/e2e/balance-sheet-report/
-tests/e2e/bank-reconciliations/
-tests/e2e/book-value-depreciation-reports/
-tests/e2e/branches/
-tests/e2e/cash-flow-report/
-tests/e2e/coa-versions/
-tests/e2e/comparative-report/
-tests/e2e/credit-notes/
-tests/e2e/customer-categories/
-tests/e2e/customer-invoices/
-tests/e2e/customers/
-tests/e2e/dashboards/
-tests/e2e/departments/
-tests/e2e/employees/
-tests/e2e/entity-state-actions/
-tests/e2e/entity-state-timeline/
-tests/e2e/fiscal-years/
-tests/e2e/general-ledger-report/
-tests/e2e/goods-receipt-report/
-tests/e2e/goods-receipts/
-tests/e2e/income-statement-report/
-tests/e2e/inventory-stocktake-variance-report/
-tests/e2e/inventory-stocktakes/
-tests/e2e/inventory-valuation-report/
-tests/e2e/journal-entries/
-tests/e2e/maintenance-cost-reports/
-tests/e2e/my-approvals/
-tests/e2e/period-closings/
-tests/e2e/permissions/
-tests/e2e/pipeline-audit-trail/
-tests/e2e/pipelines/
-tests/e2e/positions/
-tests/e2e/posting-journals/
-tests/e2e/product-categories/
-tests/e2e/products/
-tests/e2e/purchase-history-report/
-tests/e2e/purchase-order-status-report/
-tests/e2e/purchase-orders/
-tests/e2e/purchase-requests/
-tests/e2e/recurring-journals/
-tests/e2e/report-configurations/
-tests/e2e/stock-adjustment-report/
-tests/e2e/stock-adjustments/
-tests/e2e/stock-monitor/
-tests/e2e/stock-movement-report/
-tests/e2e/stock-movements/
-tests/e2e/stock-transfers/
-tests/e2e/supplier-bills/
-tests/e2e/supplier-categories/
-tests/e2e/supplier-returns/
-tests/e2e/suppliers/
-tests/e2e/trial-balance-detailed-report/
-tests/e2e/trial-balance-report/
-tests/e2e/units/
-tests/e2e/users/
-tests/e2e/warehouses/
-```
-
-Wave history:
-
-| Commit | Result |
-|--------|--------|
-| `865130d9` | Narrowed to known-green subset: bank-reconciliations + 6 financial reports |
-| `ecfc83e3` | Corrected subset to include `branches`, `departments`; exclude `fiscal-years` |
-| `f09c9002` | Required gate + add `positions`, `customer-categories`, `supplier-categories` |
-| `c036f09c` | Add `asset-categories`, `asset-locations`, `asset-models`, `product-categories`, `units`, `warehouses` |
-| `04d47b33` | Add `employees`, `customers`, `suppliers`, `products`, `asset-movements`, `asset-maintenances`, `asset-stocktakes`, `coa-versions`, `account-mappings` |
-| `f2555ae9` | Add `goods-receipts`, `inventory-stocktakes`, `purchase-orders`, `purchase-requests`, `stock-adjustments`, `stock-transfers`, `supplier-returns` (transaction wave 4) |
-| `f7278be5` | Add `goods-receipt-report`, `inventory-stocktake-variance-report`, `inventory-valuation-report`, `purchase-history-report`, `purchase-order-status-report`, `stock-adjustment-report`, `stock-monitor`, `stock-movement-report`, `stock-movements` (stock/report wave 5) |
-| `0655495d` | Add `approval-delegations`, `approval-flows`, `assets`, `journal-entries`, `pipelines` (CRUD wave 6) |
-| `f721361f` | Add `admin-settings`, `approval-audit-trail`, `approval-history`, `approval-monitoring`, `asset-dashboard`, `my-approvals`, `pipeline-audit-trail` (non-CRUD workflow wave 7) |
-| `28212829` | First retrigger empty commit (didn't fire CI; Actions outage) |
-| `179b12de` | docs(task): handoff update for wave 7 + outage |
-| `fc55e70e` | 2nd retrigger empty commit; finally triggered CI run `26449377161` (green) |
-| `3059cc5e` | Add 21 modules in 3 batches (wave 8: 8a master data, 8b AR/AP, 8c journals/reports); CI run `26455179022` failed on comparative-report Export collision |
-| `186f1652` | Pin Export button locator with `exact:true` in 3 specs; CI run `26458724971` green |
-| `13de4526` | Defensive sweep: pin 32 page-scoped Activate/Cancel/etc button locators with `exact:true` (assets/high-value-asset-registration, entity-state-actions/asset-pipeline-lifecycle, entity-state-actions/entity-state-actions) |
-| `342f5303` | Docs cleanup: clarify pipeline-dashboard has no dedicated E2E; remove stale `ApprovalDelegationss` note + delete empty stub dir; CI run `26462285549` green |
-| `4e036b23` | Backend: emit full totals shape from empty financial reports (comparison_*, change_*) + Pest regression tests for empty-fiscal-year exports |
-| `4f13056a` | Frontend: allow exporting empty data tables once filters are applied (drop `!hasData` from Export disable condition) |
-| `75033217` | Re-add `fiscal-years/` to required CI subset (now 77 modules) |
-| `a51d043f` | Remove now-unused `hasData` prop from DataTableToolbar (lint fix); CI run `26467825310` green |
-
-Local verification before `3059cc5e` (wave 8 in 3 batches):
-
-```bash
-# Batch 8a: master data ringan
-PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
-  npx playwright test \
-  tests/e2e/users/ tests/e2e/permissions/ tests/e2e/dashboards/ \
-  tests/e2e/accounts/ tests/e2e/report-configurations/ --reporter=list
-# → 18 passed (2.1m)
-
-# Batch 8b: AR/AP transactions
-PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
-  npx playwright test \
-  tests/e2e/customer-invoices/ tests/e2e/supplier-bills/ \
-  tests/e2e/ar-receipts/ tests/e2e/ap-payments/ tests/e2e/credit-notes/ --reporter=list
-# → 45 passed (3.8m)
-
-# Batch 8c: journals & report sub-modules (pipeline-dashboard skipped: directory does not exist)
-PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
-  npx playwright test \
-  tests/e2e/posting-journals/ tests/e2e/recurring-journals/ \
-  tests/e2e/period-closings/ tests/e2e/general-ledger-report/ \
-  tests/e2e/maintenance-cost-reports/ tests/e2e/book-value-depreciation-reports/ \
-  tests/e2e/asset-stocktake-variances/ tests/e2e/asset-depreciation-runs/ \
-  tests/e2e/asset-reports/ tests/e2e/entity-state-actions/ \
-  tests/e2e/entity-state-timeline/ --reporter=list
-# → 39 passed (2.4m)
-```
-
-Local verification before `f721361f` (non-CRUD workflow wave 7):
-
-```bash
-PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
-  npx playwright test \
-  tests/e2e/my-approvals/ tests/e2e/approval-monitoring/ \
-  tests/e2e/approval-audit-trail/ tests/e2e/pipeline-audit-trail/ \
-  tests/e2e/asset-dashboard/ tests/e2e/admin-settings/ \
-  tests/e2e/approval-history/ --reporter=list
-# → 19 passed (1.4m)
-```
-
-Local verification before `0655495d` (CRUD wave 6):
-
-```bash
-PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
-  npx playwright test \
-  tests/e2e/journal-entries/ tests/e2e/assets/ \
-  tests/e2e/approval-flows/ tests/e2e/approval-delegations/ \
-  tests/e2e/pipelines/ --reporter=list
-# → 58 passed (6.4m)
-```
-
-Local verification before `f7278be5` (stock/report wave 5):
-
-```bash
-PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
-  npx playwright test \
-  tests/e2e/stock-movements/ tests/e2e/stock-monitor/ \
-  tests/e2e/stock-movement-report/ tests/e2e/stock-adjustment-report/ \
-  tests/e2e/inventory-valuation-report/ \
-  tests/e2e/inventory-stocktake-variance-report/ \
-  tests/e2e/goods-receipt-report/ tests/e2e/purchase-order-status-report/ \
-  tests/e2e/purchase-history-report/ --reporter=list
-# → 9 passed (50.3s)
-```
-
-Local verification before `f2555ae9` (transaction wave 4):
-
-```bash
-PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
-  npx playwright test \
-  tests/e2e/stock-transfers/ tests/e2e/inventory-stocktakes/ \
-  tests/e2e/stock-adjustments/ tests/e2e/purchase-requests/ \
-  tests/e2e/purchase-orders/ tests/e2e/goods-receipts/ \
-  tests/e2e/supplier-returns/ --reporter=list
-# → 75 passed (8.0m)
-```
-
-Local verification before `04d47b33`:
-
-```bash
-# Wave 2
-npx playwright test tests/e2e/employees/ tests/e2e/customers/ tests/e2e/suppliers/ tests/e2e/products/ --reporter=list
-# → 40 passed (5.6m)
-
-# Wave 3
-npx playwright test tests/e2e/asset-movements/ tests/e2e/asset-maintenances/ tests/e2e/asset-stocktakes/ tests/e2e/coa-versions/ tests/e2e/account-mappings/ --reporter=list
-# → 46 passed (5.9m)
-```
-
-## Known Issues / Blockers
-
-### fiscal-years is excluded
-
-- Commit `4080dec7` tried adding `fiscal-years/`.
-- CI run `26389923397` showed failures after `fiscal-years/` ran:
-  - `income-statement-report can export income statement report`
-    - `/api/reports/income-statement/export` returned `500`
-    - browser log: `Console Error text: "Export failed: x"`
-  - `trial-balance-detailed-report can export trial balance detailed report`
-    - export button stayed disabled / no data loaded, depending on attempt.
-- Reproduced locally by running:
-
-```bash
-PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 \
-  npx playwright test tests/e2e/fiscal-years/ tests/e2e/income-statement-report/ --reporter=list
-# → income-statement export timeout / backend 500
-```
-
-- Investigation findings:
-  - `fiscal-years/` creates extra test years like `FY 1779...`.
-  - Report pages can auto-select or operate against a fiscal year with no report data.
-  - Report export actions can 500 instead of returning an empty `.xlsx` for an empty fiscal year.
-- Current decision: keep `fiscal-years/` excluded until report export actions are hardened.
-
-### Backend report export hardening needed
-
-- Report export endpoints should return valid empty `.xlsx` instead of 500 when fiscal year has no data/config.
-- Likely targets:
-  - `app/Actions/Reports/ExportIncomeStatementReportAction.php`
-  - trial-balance-detailed export action / route path (find exact file before editing)
-  - possibly other financial report export actions.
-
-### Full E2E suite still not enabled
-
-- Remaining modules include transaction/procurement/inventory modules and various reports.
-- Need local verification per wave before adding to required CI subset.
+CI verification for commit `420b7c7b` is pending. Once green, both features are fully validated.
 
 ## Recommended Next Steps
 
-The CI gate milestone is at diminishing returns. Recommended bias is to shift to product work; the items below are all optional housekeeping.
+Bias: shift to product features. Items below are optional.
 
-1. **Optional UX polish**
-   - Prefer/open fiscal year auto-selection in financial report pages so the default selection is the most recent FY with posted data, not the latest FY by `start_date`.
-   - The empty-FY case is already safe (header-only xlsx); this is purely UX.
+1. **Optional: extend preferred-FY to Trial Balance Detailed + General Ledger**
+   - These 2 reports use `ReportDataTablePage` filter pattern (no `selectedYearId` injection).
+   - Could add `preferred_fiscal_year_id` as meta in `/api/fiscal-years` response, then frontend filter field auto-selects it.
+   - Scope: ~1 hr. Backend: modify `FiscalYearCollection` to include meta. Frontend: modify 2 filter field configs to consume it.
 
-2. **Optional: defensive audit beyond `getByRole('button', ...)`**
-   - Same accessible-name substring collision risk applies to:
-     - `getByRole('link', { name: '...' })` without `exact: true`
-     - `getByText('...')` without exact
-   - Cheap grep + selective `exact: true` pin where rows or seeded data could collide.
+2. **Optional UX polish: show indicator when default FY was auto-selected**
+   - Small frontend badge/tooltip on the FY selector showing "Auto-selected: has posted entries".
+   - Pure cosmetic, low priority.
 
-3. **Optional: update `task.changelog.md`** with the fiscal-years re-inclusion + pipeline-dashboard milestones if changelog convention tracks CI gating changes.
+3. **Optional: defensive locator audit** (same as before)
 
-Coverage now: **78 of 80** module directories under `tests/e2e/` are in the required CI subset. Remaining excluded:
-
-- `misc/` (catch-all; not a real module)
-- `test-results/` (Playwright output, not a spec dir)
+4. **Optional: update `task.changelog.md`** with both milestones.
 
 ## Useful Commands
 
@@ -393,32 +150,29 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `4d9584f4` or newer.
+Read task.md first. Repo should be on `main` at `420b7c7b` or newer.
 Working tree should be clean.
 
-CI E2E is required and green. Latest known-green run: `26480230470`
-on HEAD 4d9584f4 with the 78-module subset.
+CI E2E is required. Latest verified-green run: `26480230470` on HEAD
+4d9584f4 with the 78-module subset. Newer commit 420b7c7b adds the
+preferred-FY feature (backend only, no workflow change); CI run for
+this commit is pending/should be green by now.
 
-Coverage now: 78 of 80 directories under tests/e2e/ are in the required
-CI subset. Remaining excluded:
-- misc/                (catch-all; not a real module)
-- test-results/        (Playwright output, not a spec dir)
+Two features shipped this session:
+1. tests/e2e/pipeline-dashboard/ smoke spec (CI subset 77 -> 78).
+2. GetPreferredFiscalYearAction: financial reports now default to the
+   latest FY with posted journal entries instead of just "first open FY".
+   Affects 5 reports via InteractsWithFinancialReportRequest trait.
+   Zero frontend change.
 
-The CI E2E expansion milestone is COMPLETE. All real module dirs are in
-the required gate. Future work bias: shift to product features. The
-items below are optional housekeeping only.
+Coverage: 78 of 80 directories under tests/e2e/ in required gate.
+Remaining: misc/ (catch-all), test-results/ (Playwright output).
 
 Recommended next work (all optional, pick zero or one):
-1. UX polish: auto-select preferred fiscal year (most recent with posted
-   data) on financial report pages.
-2. Defensive audit beyond getByRole('button', ...): scan
-   getByRole('link', { name: ... }) and getByText(...) for substring
-   collision risk; selectively pin with exact:true.
-3. Update task.changelog.md with the fiscal-years re-inclusion +
-   pipeline-dashboard milestones if the changelog convention tracks CI
-   gating changes.
-
-Note: GitHub Actions had a major outage 2026-05-26 10:57-12:58 UTC. If
-future pushes silently don't trigger CI, the workaround is an empty
-commit nudge.
+1. Extend preferred-FY to Trial Balance Detailed + General Ledger
+   (add preferred_fiscal_year_id meta to /api/fiscal-years response +
+   frontend filter auto-select). ~1 hr.
+2. Defensive locator audit (getByRole('link'), getByText without exact).
+3. Update task.changelog.md with both milestones.
+4. New product feature (user provides scope).
 ```
