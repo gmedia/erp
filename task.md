@@ -1,6 +1,6 @@
 # AI Handoff: CI E2E Required Gate Expanded to 78 Modules — Pipeline Dashboard Smoke Spec Added
 
-Last updated: 2026-05-26 21:20 UTC
+Last updated: 2026-05-27 00:44 UTC
 
 ## Document Roles
 
@@ -11,11 +11,11 @@ Last updated: 2026-05-26 21:20 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `ca1ae199 test(e2e): add pipeline-dashboard smoke spec + include in required CI subset`
+- HEAD: `4d9584f4 docs(task): record pipeline-dashboard smoke spec + CI subset bump to 78`
 - Working tree: clean.
-- Remote: not yet pushed for this commit.
+- Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
-- Latest known-green CI run: `26467825310` → overall `success` (HEAD `a51d043f`, 77-module subset).
+- Latest CI run: `26480230470` → overall `success` (HEAD `4d9584f4`, 78-module subset).
   - `Quality checks via Sail`: `success`
   - `Playwright E2E via Sail`: `success`
   - `Test suite via Sail`: `success`
@@ -43,7 +43,7 @@ PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BU
 
 - TypeScript verification: `npm run types` → no errors.
 - Commit: `ca1ae199 test(e2e): add pipeline-dashboard smoke spec + include in required CI subset`.
-- CI verification: pending after push (no Actions run yet for this commit).
+- CI verification: run `26480230470` green for HEAD `4d9584f4` (which carries `ca1ae199`'s workflow change) with the 78-module subset.
 
 ### Fiscal Years Re-Inclusion (previous session)
 
@@ -393,13 +393,11 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `ca1ae199` or newer.
+Read task.md first. Repo should be on `main` at `4d9584f4` or newer.
 Working tree should be clean.
 
-CI E2E is required. Latest known-green run: `26467825310` on HEAD
-a51d043f with the 77-module subset (~485 Playwright tests). Newer
-commit ca1ae199 adds tests/e2e/pipeline-dashboard/ + bumps the CI
-subset to 78 modules; CI re-verification on this commit is pending.
+CI E2E is required and green. Latest known-green run: `26480230470`
+on HEAD 4d9584f4 with the 78-module subset.
 
 Coverage now: 78 of 80 directories under tests/e2e/ are in the required
 CI subset. Remaining excluded:
