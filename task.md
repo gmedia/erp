@@ -1,6 +1,6 @@
 # AI Handoff: Preferred Fiscal Year Auto-Select for Financial Reports
 
-Last updated: 2026-05-27 08:02 UTC
+Last updated: 2026-05-27 09:15 UTC
 
 ## Document Roles
 
@@ -11,11 +11,11 @@ Last updated: 2026-05-27 08:02 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `810a2d98 test(fiscal-years): add preferred_fiscal_year_id meta assertions to FiscalYearCollectionTest`
+- HEAD: `ea92e3f9 ci: trigger re-run after autofix`
 - Working tree: clean.
 - Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
-- Latest verified-green CI run: `26484564047` (HEAD `fc3b1187`, 78-module subset).
+- Latest verified-green CI run: `26500231032` (HEAD `ea92e3f9`, 78-module subset).
   - `Quality checks via Sail`: `success`
   - `Playwright E2E via Sail`: `success`
   - `Test suite via Sail`: `success`
@@ -69,7 +69,7 @@ Last updated: 2026-05-27 08:02 UTC
 - Commits:
   - `3aa557c2 feat(reports): extend preferred fiscal year auto-select to trial-balance-detailed and general-ledger`
   - `810a2d98 test(fiscal-years): add preferred_fiscal_year_id meta assertions to FiscalYearCollectionTest`
-- CI verification: pending (pushed to main, awaiting CI run).
+- CI verification: run `26500231032` green (HEAD `ea92e3f9` which carries the preferred-FY extension).
 
 ### Pipeline Dashboard Smoke Spec (this session)
 
@@ -125,7 +125,7 @@ Three features shipped this session:
 2. Preferred fiscal year auto-select for 5 financial reports (zero frontend change).
 3. Extended preferred-FY to Trial Balance Detailed + General Ledger via `AsyncSelect.preferredMetaKey` prop (zero per-page edits).
 
-CI verification for commits `3aa557c2` + `810a2d98` is pending.
+CI verification for commits `3aa557c2` + `810a2d98` is confirmed green (run `26500231032`).
 
 ## Recommended Next Steps
 
