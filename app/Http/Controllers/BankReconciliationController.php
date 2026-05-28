@@ -45,12 +45,26 @@ class BankReconciliationController extends Controller
             $bankReconciliation->items()->create($item);
         }
 
-        return (new BankReconciliationResource($bankReconciliation->load(['account', 'fiscalYear', 'items.account', 'items.journalEntryLine.journalEntry', 'completedBy', 'creator'])))->response()->setStatusCode(201);
+        return (new BankReconciliationResource($bankReconciliation->load([
+            'account',
+            'fiscalYear',
+            'items.account',
+            'items.journalEntryLine.journalEntry',
+            'completedBy',
+            'creator',
+        ])))->response()->setStatusCode(201);
     }
 
     public function show(BankReconciliation $bankReconciliation): JsonResponse
     {
-        return (new BankReconciliationResource($bankReconciliation->load(['account', 'fiscalYear', 'items.account', 'items.journalEntryLine.journalEntry', 'completedBy', 'creator'])))->response();
+        return (new BankReconciliationResource($bankReconciliation->load([
+            'account',
+            'fiscalYear',
+            'items.account',
+            'items.journalEntryLine.journalEntry',
+            'completedBy',
+            'creator',
+        ])))->response();
     }
 
     public function update(UpdateBankReconciliationRequest $request, BankReconciliation $bankReconciliation): JsonResponse
@@ -67,7 +81,14 @@ class BankReconciliationController extends Controller
             }
         }
 
-        return (new BankReconciliationResource($bankReconciliation->refresh()->load(['account', 'fiscalYear', 'items.account', 'items.journalEntryLine.journalEntry', 'completedBy', 'creator'])))->response();
+        return (new BankReconciliationResource($bankReconciliation->refresh()->load([
+            'account',
+            'fiscalYear',
+            'items.account',
+            'items.journalEntryLine.journalEntry',
+            'completedBy',
+            'creator',
+        ])))->response();
     }
 
     public function destroy(BankReconciliation $bankReconciliation): JsonResponse

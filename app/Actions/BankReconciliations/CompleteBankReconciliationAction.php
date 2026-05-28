@@ -35,6 +35,13 @@ class CompleteBankReconciliationAction
             ]);
         }
 
-        return $bankReconciliation->refresh()->load(['account', 'fiscalYear', 'items.account', 'items.journalEntryLine.journalEntry', 'completedBy', 'creator']);
+        return $bankReconciliation->refresh()->load([
+            'account',
+            'fiscalYear',
+            'items.account',
+            'items.journalEntryLine.journalEntry',
+            'completedBy',
+            'creator',
+        ]);
     }
 }
