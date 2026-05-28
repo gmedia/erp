@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-28 14:53 UTC
+Last updated: 2026-05-28 21:56 UTC
 
 ## Document Roles
 
@@ -11,9 +11,9 @@ Last updated: 2026-05-28 14:53 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `f7a76f2e chore(deps): patch security vulnerabilities in composer + npm`
+- HEAD: `e39afe03 docs(task): update handoff with E2E enrichment + Sonar refactor results`
 - Working tree: clean.
-- Remote: not pushed (2 commits ahead).
+- Remote: not pushed (6 commits ahead).
 - CI E2E is **required gate** (no `continue-on-error`).
 - Latest verified-green CI run: `26572562234` (HEAD `483c7e7d`).
   - `Quality checks via Sail`: `success`
@@ -31,13 +31,18 @@ Last updated: 2026-05-28 14:53 UTC
 1. Enabled 5 TypeScript strict compiler options (`noUnusedLocals`, `noUnusedParameters`, `noImplicitReturns`, `noFallthroughCasesInSwitch`, `noUncheckedIndexedAccess`). Fixed 19 type errors across 12 files.
 2. Patched all composer security vulnerabilities (20 advisories → 0). Updated symfony, phpspreadsheet, scramble, phpunit, aws-sdk-php, psysh, league/commonmark.
 3. Patched npm vulnerabilities (21 → 2 remaining). Remaining: uuid in exceljs (requires breaking change to exceljs 3.x).
-4. PHPStan level bump assessed: level 5→6 = 3219 errors (all generic type annotations). Not viable without massive PHPDoc effort.
+4. PHPStan level bump assessed: level 5→6 = 3219 errors (all generic-type annotations). Not viable without massive PHPDoc effort.
 5. Full Pest suite verified: 1714 tests pass.
+6. E2E enrichment: 4 thin modules (dashboard 1→4, pipeline-dashboard 1→4, approval-monitoring 1→4, my-approvals 1→3 tests).
+7. Sonar duplication: extracted `AbstractFinancialReportExport` base class (-107 lines). Remaining duplication is intentional structural similarity.
 
 ### Commits this session
 
 - `ae9bdcd3 feat(ts): enable 5 strict compiler options + fix 19 type errors`
 - `f7a76f2e chore(deps): patch security vulnerabilities in composer + npm`
+- `aecd23f9 docs(task): update handoff with TS strict + dep audit results`
+- `723d00f8 test(e2e): enrich thin modules with additional test cases`
+- `a6e0e8b1 refactor(exports): extract AbstractFinancialReportExport base class`
 
 ## Recommended Next Steps (AI-autonomous)
 
@@ -45,10 +50,9 @@ Prioritized by value/effort. All can be done without product decisions from user
 
 | # | Task | Effort | Value | Notes |
 |---|------|--------|-------|-------|
-| 1 | E2E test enrichment | Medium | High | Modules with 1-3 tests (approval-monitoring, pipeline-dashboard, dashboards, permissions) could get sorting/export/search cases. |
-| 2 | Sonar duplication extraction | Medium | High | Find remaining duplicated blocks, extract shared helpers. |
-| 3 | Dead code scan | Low | Low | Depwire re-scan. Last attempt had Laravel DI false positives. |
-| 4 | PHPStan level 6 (deferred) | High | Medium | 3219 generic-type annotation errors. Only viable with ide-helper:models regeneration + bulk PHPDoc. |
+| 1 | Dead code scan | Low | Low | Depwire re-scan. Last attempt had Laravel DI false positives. |
+| 2 | PHPStan level 6 (deferred) | High | Medium | 3219 generic-type annotation errors. Only viable with ide-helper:models regeneration + bulk PHPDoc. |
+| 3 | npm uuid vuln in exceljs | Low | Medium | Requires exceljs major version bump (3.x breaking). Test Excel exports after. |
 
 **Product features** (require user scope):
 - Budget management module
@@ -91,17 +95,16 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main` at `f7a76f2e` or newer. Working tree clean (not pushed).
+Read task.md first. Repo on `main` at `e39afe03` or newer. Working tree clean (not pushed, 6 ahead).
 
 CI green (run 26572562234, 78-module subset). Sonar Quality Gate OK.
 TypeScript strict mode fully enabled (5 new options). All deps patched (composer 0 vulns, npm 2 remaining in exceljs).
+E2E enriched: dashboard/pipeline-dashboard/approval-monitoring/my-approvals (1→3-4 tests each).
+Sonar duplication: extracted AbstractFinancialReportExport, remaining is intentional.
 1714 Pest tests pass. PHPStan level 5 clean.
 
-Autonomous next steps available (see table in task.md):
-1. E2E test enrichment (thin modules)
-2. Sonar duplication extraction
-3. Dead code scan
-4. PHPStan level 6 (deferred — high effort)
+Action needed: `git push` (6 commits ahead).
 
-Pick any from the table, or provide a product feature scope.
+Autonomous tasks exhausted (remaining are low-value: dead code scan, PHPStan 6, exceljs uuid).
+Provide a product feature scope for next session.
 ```
