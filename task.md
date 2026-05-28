@@ -1,6 +1,6 @@
 # AI Handoff: Preferred Fiscal Year Auto-Select for Financial Reports
 
-Last updated: 2026-05-28 02:05 UTC
+Last updated: 2026-05-28 02:49 UTC
 
 ## Document Roles
 
@@ -11,7 +11,7 @@ Last updated: 2026-05-28 02:05 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `3eeac6fb docs(task): record locator audit + update recommended next steps`
+- HEAD: `7f3afb5c style(bank-reconciliations): split long lines to comply with 120-char limit (Sonar S103)`
 - Working tree: clean.
 - Remote: pushed.
 - CI E2E is **required gate** (no `continue-on-error`).
@@ -125,19 +125,19 @@ Four items shipped this session:
 2. Preferred fiscal year auto-select for 5 financial reports (zero frontend change).
 3. Extended preferred-FY to Trial Balance Detailed + General Ledger via `AsyncSelect.preferredMetaKey` prop (zero per-page edits).
 4. Defensive locator audit: added `exact: true` to 8 vulnerable locators in 3 E2E specs.
+5. Sonar issues resolved: 1 CRITICAL (cognitive complexity refactor) + 4 MEDIUM (line length splits) in bank-reconciliations.
 
 CI verification for commits `3aa557c2` + `810a2d98` is confirmed green (run `26500231032`).
 CI for locator audit commit `60ee5925` is confirmed green (run `26506366687`).
+CI for Sonar fixes (`6f933e0d`, `7f3afb5c`) is pending.
 
 ## Recommended Next Steps
 
-Bias: shift to product features. Items below are optional.
+Bias: shift to product features. Codebase is healthy.
 
-1. **Dead code cleanup** — run Depwire scan, remove unused symbols.
-
-2. **Sonar duplication refactor** — check current metrics, execute next wave.
-
-3. **New product feature** (user provides scope).
+1. **New product feature** (user provides scope).
+2. **Wait for CI green** on Sonar fix commits (`6f933e0d`, `7f3afb5c`), then record.
+3. **Verify Sonar re-scan** shows 0 open issues after CI triggers analysis.
 
 ## Useful Commands
 
@@ -171,14 +171,14 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `810a2d98` or newer.
+Read task.md first. Repo should be on `main` at `7f3afb5c` or newer.
 Working tree should be clean.
 
-CI E2E is required and green. Latest green run: `26484564047` on HEAD
-fc3b1187 with the 78-module subset. All 3 jobs passed.
-Newer commits (pending CI): 3aa557c2, 810a2d98.
+CI E2E is required and green. Latest green run: `26506366687` on HEAD
+`60ee5925` with the 78-module subset. All 3 jobs passed.
+Newer commits (pending CI): 6f933e0d, 7f3afb5c.
 
-Three features shipped:
+Five items shipped this session:
 1. tests/e2e/pipeline-dashboard/ smoke spec (CI subset 77 -> 78).
 2. GetPreferredFiscalYearAction: financial reports now default to the
    latest FY with posted journal entries instead of just "first open FY".
@@ -188,13 +188,19 @@ Three features shipped:
    - Backend: FiscalYearCollection returns preferred_fiscal_year_id in meta.
    - Frontend: AsyncSelect gained preferredMetaKey prop for auto-select.
    - Zero per-page edits — only filter definitions changed.
+4. Defensive locator audit: 8 locators fixed with exact:true in 3 specs.
+5. Sonar issues resolved: 1 CRITICAL (cognitive complexity refactor in
+   ImportBankStatementDialog.tsx) + 4 MEDIUM (line length >120 in
+   BankReconciliationController + CompleteBankReconciliationAction).
+
+Sonar metrics (pre-fix scan): 91.2% coverage, 0.7% duplication, 91k ncloc.
+Dead code scan via Depwire: not actionable (Laravel DI false positives).
 
 Coverage: 78 of 80 directories under tests/e2e/ in required gate.
 Remaining: misc/ (catch-all), test-results/ (Playwright output).
 
-Recommended next work (all optional, pick zero or one):
-1. Wait for CI green on 810a2d98, then record in task.md.
-2. Run E2E locally for trial-balance-detailed + general-ledger.
-3. Defensive locator audit (getByRole('link'), getByText without exact).
-4. New product feature (user provides scope).
+Recommended next work:
+1. Wait for CI green on 7f3afb5c, then record in task.md.
+2. Verify Sonar re-scan shows 0 open issues.
+3. New product feature (user provides scope).
 ```
