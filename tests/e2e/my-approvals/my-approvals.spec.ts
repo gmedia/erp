@@ -49,4 +49,33 @@ test.describe('My Approvals', () => {
         await page.getByRole('tab', { name: 'Approved' }).click();
         await expect(page.getByRole('tab', { name: 'Approved' })).toHaveAttribute('aria-selected', 'true');
     });
+
+    test('can switch between all tabs', async ({ page }) => {
+        await page.goto('/my-approvals');
+
+        await expect(page.getByRole('tab', { name: 'Pending' })).toHaveAttribute('aria-selected', 'true');
+
+        await page.getByRole('tab', { name: 'Approved' }).click();
+        await expect(page.getByRole('tab', { name: 'Approved' })).toHaveAttribute('aria-selected', 'true');
+
+        await page.getByRole('tab', { name: 'Rejected' }).click();
+        await expect(page.getByRole('tab', { name: 'Rejected' })).toHaveAttribute('aria-selected', 'true');
+
+        await page.getByRole('tab', { name: 'All' }).click();
+        await expect(page.getByRole('tab', { name: 'All' })).toHaveAttribute('aria-selected', 'true');
+    });
+
+    test('displays empty state or request list on each tab', async ({ page }) => {
+        await page.goto('/my-approvals');
+
+        const tabs = ['Approved', 'Rejected', 'All'];
+
+        for (const tabName of tabs) {
+            await page.getByRole('tab', { name: tabName }).click();
+            await expect(page.getByRole('tab', { name: tabName })).toHaveAttribute('aria-selected', 'true');
+
+            const hasContent = page.locator('[data-slot="card"]').or(page.locator('table')).or(page.getByText("No requests found")).or(page.getByText("You're all caught up!")).first();
+            await expect(hasContent).toBeVisible({ timeout: 15000 });
+        }
+    });
 });

@@ -53,4 +53,50 @@ test.describe('Pipeline Dashboard', () => {
       page.getByText('Stale Entities', { exact: true }),
     ).toBeVisible();
   });
+
+  test('can change stale threshold filter', async ({ page }) => {
+    const dataPromise = waitForPipelineDashboardData(page);
+    await page.goto('/pipeline-dashboard');
+    await dataPromise;
+
+    const staleSelect = page.locator('#stale-days');
+    await expect(staleSelect).toBeVisible({ timeout: 10000 });
+    await staleSelect.click();
+    await page.getByRole('option', { name: '14 Days' }).click();
+    await expect(staleSelect).toContainText('14 Days');
+  });
+
+  test('can change pipeline filter', async ({ page }) => {
+    const dataPromise = waitForPipelineDashboardData(page);
+    await page.goto('/pipeline-dashboard');
+    await dataPromise;
+
+    const pipelineSelect = page.locator('#pipeline-filter');
+    await expect(pipelineSelect).toBeVisible({ timeout: 10000 });
+    await pipelineSelect.click();
+    await expect(
+      page.getByRole('option', { name: 'All Active Pipelines' }),
+    ).toBeVisible();
+  });
+
+  test('displays state distribution chart section', async ({ page }) => {
+    const dataPromise = waitForPipelineDashboardData(page);
+    await page.goto('/pipeline-dashboard');
+    await dataPromise;
+
+    await expect(
+      page.getByText('State Distribution', { exact: true }),
+    ).toBeVisible({ timeout: 10000 });
+
+    // Chart may have data (conic-gradient or legend items) or show empty state
+    const chartElement = page.locator('[style*="conic-gradient"]');
+    const legendItems = page.locator('[data-slot="card"]').filter({ hasText: 'State Distribution' }).locator('span');
+    const emptyState = page.getByText('No entities found.');
+
+    const hasChart = await chartElement.isVisible().catch(() => false);
+    const hasLegend = (await legendItems.count()) > 0;
+    const hasEmpty = await emptyState.isVisible().catch(() => false);
+
+    expect(hasChart || hasLegend || hasEmpty).toBeTruthy();
+  });
 });
