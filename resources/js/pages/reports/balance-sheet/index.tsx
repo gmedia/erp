@@ -136,8 +136,8 @@ export default function BalanceSheet() {
         >
             <div className="grid gap-6">
                 <ComparisonFinancialReportSection
-                    title={financialPositionSectionConfigs[0].title}
-                    metric={financialPositionSectionConfigs[0].metric}
+                    title={financialPositionSectionConfigs[0]?.title ?? ''}
+                    metric={financialPositionSectionConfigs[0]?.metric ?? 'assets'}
                     nodes={report.assets || []}
                     totals={report.totals}
                     showComparison={!!comparisonYearId}

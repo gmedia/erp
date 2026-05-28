@@ -642,7 +642,7 @@ function SidebarMenuSkeleton({
         ? Date.now()
         : globalThis.crypto.getRandomValues(new Uint32Array(1))[0]
 
-    return `${(randomValue % 41) + 50}%`
+    return `${((randomValue ?? 0) % 41) + 50}%`
   }, [])
 
   return (

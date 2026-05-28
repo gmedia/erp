@@ -52,7 +52,7 @@ export default function UserGuidePage() {
                 const data: GuideItem[] = json.data || [];
                 setGuides(data);
                 if (data.length > 0) {
-                    setActiveSlug(data[0].slug);
+                    setActiveSlug(data[0]?.slug ?? null);
                 }
                 setLoading(false);
             });

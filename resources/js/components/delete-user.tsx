@@ -49,8 +49,8 @@ export default function DeleteUser() {
                 for (const key of Object.keys(serverErrors)) {
                     const fieldErrors = serverErrors[key];
                     flatErrors[key] = Array.isArray(fieldErrors)
-                        ? fieldErrors[0]
-                        : fieldErrors;
+                        ? (fieldErrors[0] ?? '')
+                        : (fieldErrors ?? '');
                 }
                 setErrors(flatErrors);
                 passwordInput.current?.focus();

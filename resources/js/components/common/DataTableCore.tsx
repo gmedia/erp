@@ -35,6 +35,8 @@ function getPlaceholderFromFilterFields(
     if (filterFields.length === 0) return 'Search...';
 
     const firstField = filterFields[0];
+    if (!firstField) return 'Search...';
+
     const component = firstField.component;
 
     if (React.isValidElement(component)) {
@@ -245,8 +247,8 @@ export function DataTable<T>({
             if (nextSorting.length > 0) {
                 onFilterChange({
                     ...filters,
-                    sort_by: nextSorting[0].id,
-                    sort_direction: nextSorting[0].desc ? 'desc' : 'asc',
+                    sort_by: nextSorting[0]?.id,
+                    sort_direction: nextSorting[0]?.desc ? 'desc' : 'asc',
                 });
             } else {
                 const newFilters = { ...filters };

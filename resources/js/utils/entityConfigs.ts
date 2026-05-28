@@ -33,8 +33,6 @@ export interface BaseEntityConfig<
 // Configuration for entities with custom components and stricter typing
 export interface CustomEntityConfig<
     T = Record<string, unknown>,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    FormData = Record<string, unknown>,
     FilterType extends FilterState = FilterState,
 > extends BaseEntityConfig<T, FilterType> {
     // Column definitions for the data table
@@ -56,9 +54,8 @@ export interface CustomEntityConfig<
 // Union type for all entity configurations with improved typing
 export type EntityConfig<
     T extends EntityWithId = EntityWithId,
-    FormData = Record<string, unknown>,
     FilterType extends FilterState = FilterState,
-> = CustomEntityConfig<T, FormData, FilterType>;
+> = CustomEntityConfig<T, FilterType>;
 
 import { assetCategoryColumns } from '@/components/asset-categories/AssetCategoryColumns';
 import { AssetCategoryForm } from '@/components/asset-categories/AssetCategoryForm';

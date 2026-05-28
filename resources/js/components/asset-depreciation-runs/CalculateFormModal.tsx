@@ -79,7 +79,7 @@ export function CalculateFormModal({
             Object.keys(errors).forEach((key) => {
                 setError(key as keyof CalculateFormValues, {
                     type: 'server',
-                    message: errors[key][0],
+                    message: errors[key]?.[0] ?? 'An error occurred.',
                 });
             });
         } else if (result) {
