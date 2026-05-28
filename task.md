@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-28 10:46 UTC
+Last updated: 2026-05-28 14:53 UTC
 
 ## Document Roles
 
@@ -11,26 +11,50 @@ Last updated: 2026-05-28 10:46 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `f657812d test(e2e): add retry to User Management tests for CI timing resilience`
+- HEAD: `f7a76f2e chore(deps): patch security vulnerabilities in composer + npm`
 - Working tree: clean.
-- Remote: pushed.
+- Remote: not pushed (2 commits ahead).
 - CI E2E is **required gate** (no `continue-on-error`).
-- Latest verified-green CI run: `26565168691` (HEAD `f657812d`).
+- Latest verified-green CI run: `26572562234` (HEAD `483c7e7d`).
   - `Quality checks via Sail`: `success`
   - `Playwright E2E via Sail`: `success`
   - `Test suite via Sail`: `success`
-- Current CI E2E subset: **78 modules**.
-- Coverage: 78 of 80 directories under `tests/e2e/` are in the required gate. Remaining 2 are not real modules:
+- Current CI E2E subset: **78 modules** (redundant `tests/e2e/reports/` removed).
+- Coverage: 78 of 79 directories under `tests/e2e/` are in the required gate. Remaining 2 are not real modules:
   - `misc/` (catch-all utilities)
   - `test-results/` (Playwright output)
-- Sonar metrics (last scan): 91.2% coverage, 0.7% duplication, 91k ncloc.
+- Sonar: Quality Gate OK. 93.3% new coverage, 1.9% new duplication, A ratings all dimensions.
+- Module registry: fully synced — 76 entries covering all E2E modules.
 
-## Recommended Next Steps
+### What changed this session
 
-Bias: shift to product features. Codebase is healthy. All CI green.
+1. Enabled 5 TypeScript strict compiler options (`noUnusedLocals`, `noUnusedParameters`, `noImplicitReturns`, `noFallthroughCasesInSwitch`, `noUncheckedIndexedAccess`). Fixed 19 type errors across 12 files.
+2. Patched all composer security vulnerabilities (20 advisories → 0). Updated symfony, phpspreadsheet, scramble, phpunit, aws-sdk-php, psysh, league/commonmark.
+3. Patched npm vulnerabilities (21 → 2 remaining). Remaining: uuid in exceljs (requires breaking change to exceljs 3.x).
+4. PHPStan level bump assessed: level 5→6 = 3219 errors (all generic type annotations). Not viable without massive PHPDoc effort.
+5. Full Pest suite verified: 1714 tests pass.
 
-1. **New product feature** (user provides scope).
-2. **Verify Sonar re-scan** shows 0 open issues after CI triggers analysis.
+### Commits this session
+
+- `ae9bdcd3 feat(ts): enable 5 strict compiler options + fix 19 type errors`
+- `f7a76f2e chore(deps): patch security vulnerabilities in composer + npm`
+
+## Recommended Next Steps (AI-autonomous)
+
+Prioritized by value/effort. All can be done without product decisions from user.
+
+| # | Task | Effort | Value | Notes |
+|---|------|--------|-------|-------|
+| 1 | E2E test enrichment | Medium | High | Modules with 1-3 tests (approval-monitoring, pipeline-dashboard, dashboards, permissions) could get sorting/export/search cases. |
+| 2 | Sonar duplication extraction | Medium | High | Find remaining duplicated blocks, extract shared helpers. |
+| 3 | Dead code scan | Low | Low | Depwire re-scan. Last attempt had Laravel DI false positives. |
+| 4 | PHPStan level 6 (deferred) | High | Medium | 3219 generic-type annotation errors. Only viable with ide-helper:models regeneration + bulk PHPDoc. |
+
+**Product features** (require user scope):
+- Budget management module
+- Sales/invoicing module
+- AP aging report
+- Financial dashboard with KPI cards
 
 ## Useful Commands
 
@@ -39,7 +63,10 @@ Bias: shift to product features. Codebase is healthy. All CI green.
 git status --short
 git log --oneline -12
 
-# Run current CI subset locally if needed (long)
+# PHPStan current level
+grep -i "level" phpstan.neon.dist
+
+# Run current CI subset locally
 PLAYWRIGHT_USE_SAIL=1 PLAYWRIGHT_BASE_URL=http://localhost:82 PLAYWRIGHT_SKIP_BUILD=1 \
   npx playwright test \
   tests/e2e/account-mappings/ tests/e2e/asset-categories/ tests/e2e/asset-locations/ \
@@ -64,11 +91,17 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo should be on `main` at `f657812d` or newer.
-Working tree should be clean. CI green (run 26565168691, 78-module subset).
+Read task.md first. Repo on `main` at `f7a76f2e` or newer. Working tree clean (not pushed).
 
-Codebase healthy: 91.2% coverage, 0.7% duplication, 0 Sonar blockers.
-All historical context archived in task.handoff-archive.md (2026-05-28 entry).
+CI green (run 26572562234, 78-module subset). Sonar Quality Gate OK.
+TypeScript strict mode fully enabled (5 new options). All deps patched (composer 0 vulns, npm 2 remaining in exceljs).
+1714 Pest tests pass. PHPStan level 5 clean.
 
-Ready for new product feature or Sonar verification.
+Autonomous next steps available (see table in task.md):
+1. E2E test enrichment (thin modules)
+2. Sonar duplication extraction
+3. Dead code scan
+4. PHPStan level 6 (deferred — high effort)
+
+Pick any from the table, or provide a product feature scope.
 ```
