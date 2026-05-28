@@ -152,26 +152,18 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
             }
         };
 
-        const handleImport = async () => {
-            if (!file) return;
-
-            const isValid =
+        const isMappingValid = () =>
+            Boolean(
                 mapping.date &&
-                mapping.description &&
-                (amountMode === 'single'
-                    ? mapping.amount
-                    : mapping.debit && mapping.credit);
+                    mapping.description &&
+                    (amountMode === 'single'
+                        ? mapping.amount
+                        : mapping.debit && mapping.credit),
+            );
 
-            if (!isValid) {
-                toast.error('Incomplete Mapping', {
-                    description: 'Please map all required columns.',
-                });
-                return;
-            }
-
-            setLoading(true);
+        const buildImportFormData = (selectedFile: File) => {
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('file', selectedFile);
             formData.append('mapping[date]', mapping.date);
             formData.append('mapping[description]', mapping.description);
 
@@ -190,10 +182,41 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
                 formData.append('mapping[reference]', mapping.reference);
             }
 
+            return formData;
+        };
+
+        const handleImportError = (error: unknown) => {
+            if (
+                rawAxios.isAxiosError(error) &&
+                error.response?.status === 422
+            ) {
+                toast.error('Validation Error', {
+                    description: error.response.data.message || 'Invalid data.',
+                });
+                return;
+            }
+
+            toast.error('Import Failed', {
+                description: 'An unexpected error occurred.',
+            });
+        };
+
+        const handleImport = async () => {
+            if (!file) return;
+
+            if (!isMappingValid()) {
+                toast.error('Incomplete Mapping', {
+                    description: 'Please map all required columns.',
+                });
+                return;
+            }
+
+            setLoading(true);
+
             try {
                 const response = await axios.post<ImportResult>(
                     `/api/bank-reconciliations/${bankReconciliationId}/import-statement`,
-                    formData,
+                    buildImportFormData(file),
                 );
                 setResult(response.data);
                 setStep(3);
@@ -212,19 +235,7 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
                     });
                 }
             } catch (error: unknown) {
-                if (
-                    rawAxios.isAxiosError(error) &&
-                    error.response?.status === 422
-                ) {
-                    toast.error('Validation Error', {
-                        description:
-                            error.response.data.message || 'Invalid data.',
-                    });
-                } else {
-                    toast.error('Import Failed', {
-                        description: 'An unexpected error occurred.',
-                    });
-                }
+                handleImportError(error);
             } finally {
                 setLoading(false);
             }
