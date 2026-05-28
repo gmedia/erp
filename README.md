@@ -68,7 +68,7 @@ This Enterprise Resource Planning (ERP) system is a comprehensive business manag
     sail npm run test:e2e
     ```
 ## Technologies
-- [x] Laravel, React.js, Inertia.js, Vite.js, Shadcn UI, Tailwind CSS, TypeScript, ESLint, Prettier, PHPUnit, Pest, FakerPHP. ([Link](https://ui.shadcn.com/docs/installation/laravel))
+- [x] Laravel, React.js, Vite.js, Shadcn UI, Tailwind CSS, TypeScript, ESLint, Prettier, PHPUnit, Pest, FakerPHP. ([Link](https://ui.shadcn.com/docs/installation/laravel))
 - [x] Sail. ([Link](https://laravel.com/docs/12.x/sail))
 - [x] Laravel IDE Helper. ([Link](https://github.com/barryvdh/laravel-ide-helper))
 - [x] Larastan, PHPStan. ([Link](https://github.com/larastan/larastan))

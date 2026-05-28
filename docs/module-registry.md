@@ -426,6 +426,84 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
 
+- slug: accounts
+  route: /accounts
+  api: /api/accounts
+  export_api: /api/accounts/export
+  search_placeholder: "Search accounts..."
+  sortable_columns: [Code, Name, Type, Parent Account, Level, Status]
+  view_type: dialog
+  checkbox_header: false
+  tests:
+    - tests/e2e/accounts/add-account.spec.ts
+    - tests/e2e/accounts/delete-account.spec.ts
+    - tests/e2e/accounts/edit-account.spec.ts
+    - tests/e2e/accounts/export-account.spec.ts
+    - tests/e2e/accounts/filter-accounts.spec.ts
+
+- slug: ap-payments
+  route: /ap-payments
+  api: /api/ap-payments
+  export_api: /api/ap-payments/export
+  sortable_columns: [Payment Number, Supplier, Branch, Payment Date, Payment Method, Status, Total Amount]
+  view_type: dialog
+  checkbox_header: false
+
+- slug: ar-receipts
+  route: /ar-receipts
+  api: /api/ar-receipts
+  export_api: /api/ar-receipts/export
+  sortable_columns: [Receipt Number, Customer, Branch, Receipt Date, Payment Method, Status, Total Amount]
+  view_type: dialog
+  checkbox_header: false
+
+- slug: credit-notes
+  route: /credit-notes
+  api: /api/credit-notes
+  export_api: /api/credit-notes/export
+  sortable_columns: [Credit Note Number, Customer, Branch, Credit Note Date, Reason, Status, Grand Total]
+  view_type: dialog
+  checkbox_header: false
+
+- slug: customer-invoices
+  route: /customer-invoices
+  api: /api/customer-invoices
+  export_api: /api/customer-invoices/export
+  sortable_columns: [Invoice Number, Customer, Branch, Invoice Date, Due Date, Status, Grand Total, Amount Due]
+  view_type: dialog
+  checkbox_header: false
+
+- slug: supplier-bills
+  route: /supplier-bills
+  api: /api/supplier-bills
+  export_api: /api/supplier-bills/export
+  sortable_columns: [Bill Number, Supplier, Branch, Bill Date, Due Date, Status, Grand Total, Amount Due]
+  view_type: dialog
+  checkbox_header: false
+
+- slug: recurring-journals
+  route: /recurring-journals
+  api: /api/recurring-journals
+  export_api: /api/recurring-journals/export
+  sortable_columns: [Name, Frequency, Next Run Date, Total Amount, Auto Post, Is Active, Created At]
+  view_type: dialog
+  checkbox_header: false
+
+- slug: period-closings
+  route: /period-closings
+  api: /api/period-closings
+  sortable_columns: [Fiscal Year, Period Month, Period Year, Closing Type, Status, Net Income, Closed At]
+  view_type: dialog
+  checkbox_header: false
+
+- slug: report-configurations
+  route: /report-configurations
+  api: /api/report-configurations
+  export_api: /api/report-configurations/export
+  sortable_columns: [Code, Name]
+  view_type: dialog
+  checkbox_header: false
+
 - slug: entity-state-actions
   route: (embedded in Asset Profile)
   api: /api/entity-states/{entityType}/{entityId}
@@ -442,7 +520,9 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   route: /pipeline-dashboard
   api: /api/pipeline-dashboard/data
   view_type: page
-  note: "Pipeline monitoring dashboard with summary cards, state distribution chart, and stale entity detection. No dedicated Playwright E2E spec yet (no tests/e2e/pipeline-dashboard/ directory) — covered indirectly via pipeline-audit-trail and entity-state-* specs."
+  note: "Pipeline monitoring dashboard with summary cards, state distribution chart, and stale entity detection."
+  tests:
+    - tests/e2e/pipeline-dashboard/pipeline-dashboard.spec.ts
 
 - slug: pipeline-audit-trail
   route: /pipeline-audit-trail
@@ -596,6 +676,98 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   note: "Non-CRUD approval monitoring dashboard. Shows summary stats and overdue approvals."
   tests:
     - tests/e2e/approval-monitoring/approval-monitoring.spec.ts
+
+- slug: dashboards
+  route: /
+  api: /api/dashboard
+  view_type: page
+  note: "Main application dashboard with summary cards and charts."
+  tests:
+    - tests/e2e/dashboards/dashboard.spec.ts
+
+- slug: permissions
+  route: /permissions
+  api: /api/permissions
+  view_type: page
+  note: "Permission management page for role-based access control."
+  tests:
+    - tests/e2e/permissions/permission.spec.ts
+
+- slug: users
+  route: /users
+  api: /api/users
+  view_type: page
+  note: "User management CRUD with role assignment."
+  tests:
+    - tests/e2e/users/user.spec.ts
+
+- slug: bank-reconciliations
+  route: /bank-reconciliations
+  api: /api/bank-reconciliations
+  export_api: /api/bank-reconciliations/export
+  view_type: dialog
+  checkbox_header: false
+  note: "Bank reconciliation module with statement import and matching."
+  tests:
+    - tests/e2e/bank-reconciliations/bank-reconciliation.spec.ts
+
+- slug: balance-sheet-report
+  route: /reports/balance-sheet
+  api: /api/reports/balance-sheet
+  view_type: page
+  note: "Financial report: Balance Sheet. Uses FinancialReportPageShell with fiscal year selector."
+  tests:
+    - tests/e2e/balance-sheet-report/balance-sheet-report.spec.ts
+
+- slug: cash-flow-report
+  route: /reports/cash-flow
+  api: /api/reports/cash-flow
+  view_type: page
+  note: "Financial report: Cash Flow Statement. Uses FinancialReportPageShell."
+  tests:
+    - tests/e2e/cash-flow-report/cash-flow-report.spec.ts
+
+- slug: comparative-report
+  route: /reports/comparative
+  api: /api/reports/comparative
+  view_type: page
+  note: "Financial report: Comparative Report (multi-period comparison). Uses FinancialReportPageShell."
+  tests:
+    - tests/e2e/comparative-report/comparative-report.spec.ts
+
+- slug: income-statement-report
+  route: /reports/income-statement
+  api: /api/reports/income-statement
+  view_type: page
+  note: "Financial report: Income Statement (P&L). Uses FinancialReportPageShell."
+  tests:
+    - tests/e2e/income-statement-report/income-statement-report.spec.ts
+
+- slug: trial-balance-report
+  route: /reports/trial-balance
+  api: /api/reports/trial-balance
+  view_type: page
+  note: "Financial report: Trial Balance. Uses FinancialReportPageShell."
+  tests:
+    - tests/e2e/trial-balance-report/trial-balance-report.spec.ts
+
+- slug: trial-balance-detailed-report
+  route: /reports/trial-balance-detailed
+  api: /reports/trial-balance-detailed
+  export_api: /reports/trial-balance-detailed/export
+  view_type: page
+  note: "Non-CRUD detailed trial balance with per-account transaction drill-down. Uses ReportDataTablePage."
+  tests:
+    - tests/e2e/trial-balance-detailed-report/trial-balance-detailed-report.spec.ts
+
+- slug: general-ledger-report
+  route: /reports/general-ledger
+  api: /reports/general-ledger
+  export_api: /reports/general-ledger/export
+  view_type: page
+  note: "Non-CRUD general ledger report with per-account journal detail. Uses ReportDataTablePage."
+  tests:
+    - tests/e2e/general-ledger-report/general-ledger-report.spec.ts
 
 ## Testing
 
